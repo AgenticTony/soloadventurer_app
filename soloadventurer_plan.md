@@ -143,7 +143,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 
 ### 🔜 **Immediate Next Steps (In Order)**
 
-1. Complete remaining authentication UI tests (sign-up and forgot password screens) _(2 days)_
+1. Complete remaining authentication UI tests (forgot password screen) _(1 day)_
 2. Configure API endpoints in api*service.dart *(2-3 days)\_
 3. Develop travel preferences UI _(4-5 days)_
 4. Build trip planning interface _(7-10 days)_
@@ -227,9 +227,11 @@ We'll use a vertical slice approach, completing each feature from database to UI
 
 - [x] **Authentication UI Testing**
   - [x] Implemented comprehensive login screen tests
+  - [x] Implemented comprehensive signup screen tests
   - [x] Fixed navigation context issues in UI tests
   - [x] Added proper MaterialApp wrapper with NavigatorObserver for testing
   - [x] Verified form validation, error handling, and navigation functionality
+  - [x] Created mock screens for simplified testing of complex UI flows
 
 **Success Metrics:**
 
