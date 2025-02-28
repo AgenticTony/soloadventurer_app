@@ -144,10 +144,14 @@ We'll use a vertical slice approach, completing each feature from database to UI
 ### 🔜 **Immediate Next Steps (In Order)**
 
 1. Complete remaining authentication UI tests (forgot password screen) _(1 day)_
-2. Configure API endpoints in api*service.dart *(2-3 days)\_
-3. Develop travel preferences UI _(4-5 days)_
-4. Build trip planning interface _(7-10 days)_
-5. Integrate Google Maps/Flutter Map for location visualization _(5-7 days)_
+2. Implement Riverpod testing infrastructure improvements _(2 days)_
+   - Create provider test utilities
+   - Implement integration tests for actual screens
+   - Document provider patterns and testing approach
+3. Configure API endpoints in api*service.dart *(2-3 days)\_
+4. Develop travel preferences UI _(4-5 days)_
+5. Build trip planning interface _(7-10 days)_
+6. Integrate Google Maps/Flutter Map for location visualization _(5-7 days)_
 
 ---
 
@@ -461,24 +465,34 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Test all model classes for proper serialization/deserialization
 - Test service classes with mocked dependencies
 - Test utility functions for edge cases
+- Test providers in isolation using ProviderContainer
 
 #### Widget Testing
 
 - Test key UI components in isolation
 - Verify widget behavior with different inputs
 - Test form validation logic
+- Test actual screens with mocked providers
 
 #### Integration Testing
 
 - Test authentication flow end-to-end
 - Test API integration with mocked responses
 - Verify navigation between screens
+- Test provider interactions and dependencies
+
+#### Riverpod Testing Strategy
+
+- Use a multi-layered approach combining mock screens and actual implementation tests
+- Create testing utilities to simplify provider overrides
+- Test providers in isolation and in integration
+- Document provider patterns and testing approaches
 
 #### Performance Testing
 
 - Measure and track key performance metrics using the `measure_performance.dart` utility
 - Establish baseline performance expectations
-- Monitor performance changes between releases
+- Monitor provider rebuilds and performance impact
 
 #### Test Automation
 

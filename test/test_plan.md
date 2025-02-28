@@ -26,12 +26,12 @@
   - [x] Test navigation to sign-up screen
   - [x] Test navigation to forgot password screen
 
-- [ ] **Sign-up Screen Tests**
+- [x] **Sign-up Screen Tests**
 
-  - [ ] Verify UI elements are displayed correctly
-  - [ ] Test form validation (empty fields, password requirements)
-  - [ ] Test sign-up button behavior
-  - [ ] Test navigation back to login screen
+  - [x] Verify UI elements are displayed correctly
+  - [x] Test form validation (empty fields, password requirements)
+  - [x] Test sign-up button behavior
+  - [x] Test navigation back to login screen
 
 - [ ] **Forgot Password Screen Tests**
   - [ ] Verify UI elements are displayed correctly
@@ -45,6 +45,60 @@
   - [ ] Sign-up → Confirmation → Login
   - [ ] Login → Home Screen → Logout
   - [ ] Forgot Password → Reset Password → Login with new password
+
+## Riverpod Testing Strategy
+
+### Provider Testing
+
+- [ ] **Unit Testing Providers**
+
+  - [ ] Test provider initialization
+  - [ ] Test provider state transitions
+  - [ ] Test provider dependencies
+  - [ ] Test provider error handling
+
+- [ ] **StateNotifier Testing**
+
+  - [ ] Test state transitions
+  - [ ] Test async operations
+  - [ ] Test error handling
+  - [ ] Test side effects
+
+- [ ] **Provider Integration Testing**
+  - [ ] Test provider interactions
+  - [ ] Test provider overrides
+  - [ ] Test provider scoping
+
+### Testing Utilities
+
+- [ ] **Create Provider Test Utilities**
+  - [ ] Implement `createTestableApp` utility
+  - [ ] Create feature-specific test helpers
+  - [ ] Implement mock provider factories
+  - [ ] Create provider override utilities
+
+### Testing Approach
+
+We will use a multi-layered testing approach:
+
+1. **Mock Screen Tests**: Simplified tests using mock implementations of screens to test core functionality in isolation.
+
+   - Advantages: Stable, focused, fast
+   - Use cases: Testing form validation, basic UI interactions
+
+2. **Actual Screen Tests**: Tests using the actual screen implementations with mocked providers.
+
+   - Advantages: Tests real implementation, catches integration issues
+   - Use cases: Testing provider interactions, complex workflows
+
+3. **Golden Tests**: Visual regression tests to ensure UI appearance remains consistent.
+
+   - Advantages: Catches visual regressions, ensures design consistency
+   - Use cases: Critical UI components, complex layouts
+
+4. **End-to-End Tests**: Tests that simulate complete user flows.
+   - Advantages: Tests real-world scenarios, validates full functionality
+   - Use cases: Critical user journeys, complex workflows
 
 ## Data Model Testing
 
@@ -157,6 +211,7 @@
 - [ ] Unit Tests: 80% code coverage
 - [ ] Widget Tests: All UI components tested
 - [ ] Integration Tests: All critical user flows tested
+- [ ] Provider Tests: All providers tested
 
 ## CI/CD Integration
 

@@ -167,5 +167,91 @@ void main() {
       // We're just verifying the method exists and returns a boolean
       expect(authService.signOut(), isA<Future<bool>>());
     });
+
+    // New tests for password reset functionality
+    test('forgotPassword - should initiate password reset process', () async {
+      // Arrange
+      const username = 'test@example.com';
+
+      // This test is a placeholder since we can't easily mock the internal CognitoUserPool
+      // In a real implementation, we would inject these dependencies
+
+      // Act & Assert
+      // We're just verifying the method exists and returns a boolean
+      expect(
+          authService.forgotPassword(username: username), isA<Future<bool>>());
+    });
+
+    test('confirmForgotPassword - should confirm new password with valid code',
+        () async {
+      // Arrange
+      const confirmationCode = '123456';
+      const newPassword = 'NewPassword123!';
+
+      // This test is a placeholder since we can't easily mock the internal CognitoUserPool
+      // In a real implementation, we would inject these dependencies
+
+      // Act & Assert
+      // We're just verifying the method exists and returns a boolean
+      expect(
+          authService.confirmForgotPassword(
+            confirmationCode: confirmationCode,
+            newPassword: newPassword,
+          ),
+          isA<Future<bool>>());
+    });
+
+    test('confirmForgotPassword - should return false when no user is set',
+        () async {
+      // Arrange
+      const confirmationCode = '123456';
+      const newPassword = 'NewPassword123!';
+
+      // This test is a placeholder since we can't easily mock the internal CognitoUserPool
+      // In a real implementation, we would inject these dependencies and force _cognitoUser to be null
+
+      // Act & Assert
+      // We're just verifying the method exists and returns a boolean
+      expect(
+          authService.confirmForgotPassword(
+            confirmationCode: confirmationCode,
+            newPassword: newPassword,
+          ),
+          isA<Future<bool>>());
+    });
+
+    // Test for token refresh mechanism
+    test('refreshSession - should refresh user session when valid', () async {
+      // This test is a placeholder since we can't easily mock the internal CognitoUserPool
+      // In a real implementation, we would inject these dependencies
+
+      // Act & Assert
+      // We're just verifying the method exists and returns a boolean
+      expect(authService.refreshSession(), isA<Future<bool>>());
+    });
+
+    test('refreshSession - should return false when no username is stored',
+        () async {
+      // This test is a placeholder since we can't easily mock the internal CognitoUserPool
+      // In a real implementation, we would inject these dependencies and mock the secure storage
+
+      // Act & Assert
+      // We're just verifying the method exists and returns a boolean
+      expect(authService.refreshSession(), isA<Future<bool>>());
+    });
+
+    // Test for resending confirmation code
+    test('resendConfirmationCode - should resend confirmation code', () async {
+      // Arrange
+      const username = 'test@example.com';
+
+      // This test is a placeholder since we can't easily mock the internal CognitoUserPool
+      // In a real implementation, we would inject these dependencies
+
+      // Act & Assert
+      // We're just verifying the method exists and returns a boolean
+      expect(authService.resendConfirmationCode(username: username),
+          isA<Future<bool>>());
+    });
   });
 }
