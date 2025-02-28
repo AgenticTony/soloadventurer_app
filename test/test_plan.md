@@ -21,10 +21,10 @@
 - [x] **Login Screen Tests**
 
   - [x] Verify UI elements are displayed correctly
-  - [ ] Test form validation (empty fields, invalid email format)
-  - [ ] Test login button behavior
-  - [ ] Test navigation to sign-up screen
-  - [ ] Test navigation to forgot password screen
+  - [x] Test form validation (empty fields, invalid email format)
+  - [x] Test login button behavior
+  - [x] Test navigation to sign-up screen
+  - [x] Test navigation to forgot password screen
 
 - [ ] **Sign-up Screen Tests**
 

@@ -187,7 +187,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
   - [x] Test password reset confirmation
   - [x] Test token refresh mechanism
   - [x] Test resending confirmation code
-- [ ] Create widget tests for authentication UI
+- [x] Create widget tests for authentication UI
   - [x] Test login screen UI elements
   - [x] Test login form validation
   - [x] Test login error handling
