@@ -138,15 +138,15 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [x] Implement feedback analysis tools
 - [x] Complete authentication testing framework
 - [x] Implement CloudWatch monitoring for performance tracking
+- [x] Set up CI/CD pipeline with GitHub Actions
 
 ### 🔜 **Immediate Next Steps (In Order)**
 
-1. Set up CI/CD pipeline with GitHub Actions _(2 days)_
-2. Implement remaining automated tests for authentication _(2 days)_
-3. Configure API endpoints in api*service.dart *(2-3 days)\_
-4. Develop travel preferences UI _(4-5 days)_
-5. Build trip planning interface _(7-10 days)_
-6. Integrate Google Maps/Flutter Map for location visualization _(5-7 days)_
+1. Implement remaining automated tests for authentication _(2 days)_
+2. Configure API endpoints in api*service.dart *(2-3 days)\_
+3. Develop travel preferences UI _(4-5 days)_
+4. Build trip planning interface _(7-10 days)_
+5. Integrate Google Maps/Flutter Map for location visualization _(5-7 days)_
 
 ---
 
@@ -204,11 +204,11 @@ We'll use a vertical slice approach, completing each feature from database to UI
   - [ ] Test token expiration handling
   - [ ] Test protection against common authentication attacks
   - [ ] Test input validation and sanitization
-- [ ] Set up **CI/CD pipeline** with GitHub Actions
-  - [ ] Configure automated test runs
-  - [ ] Set up code coverage reporting
-  - [ ] Configure linting and static analysis
-  - [ ] Set up build verification
+- [x] Set up **CI/CD pipeline** with GitHub Actions
+  - [x] Configure automated test runs
+  - [x] Set up code coverage reporting
+  - [x] Configure linting and static analysis
+  - [x] Set up build verification
 
 **Documentation:**
 
