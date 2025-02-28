@@ -1,0 +1,43 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code_coverage:
+    name: Generate code coverage report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.19.0"
+          channel: "stable"
+      - run: flutter pub get
+
+      # Generate coverage report
+      - run: flutter test --coverage
+
+      # Upload coverage to Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage/lcov.info
+          fail_ci_if_error: true
+
+      # Generate HTML report
+      - name: Install lcov
+        run: sudo apt-get install -y lcov
+      - name: Generate HTML report
+        run: genhtml coverage/lcov.info -o coverage/html
+
+      # Upload HTML report as artifact
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: coverage/html/
