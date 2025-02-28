@@ -68,6 +68,23 @@ Run tests with:
 flutter test
 ```
 
+For code coverage:
+
+```bash
+flutter test --coverage
+```
+
+## 🔄 CI/CD
+
+This project uses GitHub Actions for continuous integration and delivery:
+
+- **Automated Testing**: All tests are run on every push and pull request
+- **Code Coverage**: Test coverage reports are generated and uploaded to Codecov
+- **Code Quality**: Linting and static analysis are performed automatically
+- **Build Verification**: iOS and Android builds are created and verified
+
+GitHub Actions workflows can be found in the `.github/workflows` directory.
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
