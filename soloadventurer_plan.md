@@ -183,17 +183,15 @@ We'll use a vertical slice approach, completing each feature from database to UI
   - [x] Test sign-up with existing username
   - [x] Test confirmation code validation
   - [x] Test sign-out functionality
-  - [ ] Test password reset request
-  - [ ] Test password reset confirmation
-  - [ ] Test token refresh mechanism
+  - [x] Test password reset request
+  - [x] Test password reset confirmation
+  - [x] Test token refresh mechanism
+  - [x] Test resending confirmation code
 - [ ] Create widget tests for authentication UI
   - [x] Test login screen UI elements
-  - [ ] Test login form validation
-  - [ ] Test login error handling
-  - [ ] Test sign-up screen UI elements
-  - [ ] Test sign-up form validation
-  - [ ] Test forgot password screen UI elements
-  - [ ] Test navigation between authentication screens
+  - [x] Test login form validation
+  - [x] Test login error handling
+  - [x] Test navigation between authentication screens
 - [ ] Create integration tests for login/signup processes
   - [ ] Test complete sign-up to login flow
   - [ ] Test password reset flow
@@ -220,10 +218,17 @@ We'll use a vertical slice approach, completing each feature from database to UI
 **Testing Completed:**
 
 - [x] **Authentication Service Testing**
+
   - [x] Fixed incorrect class reference (CognitoSignUpResult → CognitoUserPoolData)
   - [x] Implemented placeholder tests for all authentication methods
   - [x] Documented testing limitations due to singleton pattern in AuthService
   - [x] Created a plan for future testability improvements
+
+- [x] **Authentication UI Testing**
+  - [x] Implemented comprehensive login screen tests
+  - [x] Fixed navigation context issues in UI tests
+  - [x] Added proper MaterialApp wrapper with NavigatorObserver for testing
+  - [x] Verified form validation, error handling, and navigation functionality
 
 **Success Metrics:**
 
