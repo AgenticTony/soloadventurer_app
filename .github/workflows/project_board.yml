@@ -1,0 +1,66 @@
+name: Project Board Automation
+
+on:
+  issues:
+    types: [opened, reopened, closed]
+  pull_request:
+    types: [opened, reopened, closed, ready_for_review]
+
+jobs:
+  project_board:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add to Project Board
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue || context.payload.pull_request;
+
+            // Get project data
+            const projects = await github.rest.projects.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+
+            // Find the SoloAdventurer project
+            const project = projects.data.find(p => p.name === 'SoloAdventurer Development');
+
+            if (!project) {
+              console.log('Project not found');
+              return;
+            }
+
+            // Get columns
+            const columns = await github.rest.projects.listColumns({
+              project_id: project.id
+            });
+
+            // Determine which column to add to
+            let columnId;
+            if (context.payload.action === 'opened' || context.payload.action === 'reopened') {
+              // Find "To Do" column
+              const todoColumn = columns.data.find(c => c.name === 'To Do');
+              columnId = todoColumn.id;
+            } else if (context.payload.action === 'closed') {
+              // Find "Done" column
+              const doneColumn = columns.data.find(c => c.name === 'Done');
+              columnId = doneColumn.id;
+            } else if (context.payload.action === 'ready_for_review') {
+              // Find "In Review" column
+              const reviewColumn = columns.data.find(c => c.name === 'In Review');
+              columnId = reviewColumn.id;
+            }
+
+            if (!columnId) {
+              console.log('Column not found');
+              return;
+            }
+
+            // Create card in the appropriate column
+            await github.rest.projects.createCard({
+              column_id: columnId,
+              content_id: issue.id,
+              content_type: context.payload.issue ? 'Issue' : 'PullRequest'
+            });

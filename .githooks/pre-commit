@@ -1,0 +1,89 @@
+#!/bin/sh
+
+# Pre-commit hook to validate documentation references
+
+echo "Validating documentation references..."
+
+# Check if any documentation files are being committed
+DOCS_CHANGED=$(git diff --cached --name-only | grep -E "^docs/.*\.md$")
+
+if [ -z "$DOCS_CHANGED" ]; then
+  echo "No documentation files changed, skipping validation."
+  exit 0
+fi
+
+# Check for broken internal links in documentation
+BROKEN_LINKS=0
+
+for file in $DOCS_CHANGED; do
+  # Extract all markdown links to other docs
+  LINKS=$(grep -o -E "\[.*?\]\(.*?\.md\)" "$file" | sed -E 's/\[.*\]\((.*)\)/\1/')
+  
+  for link in $LINKS; do
+    # Handle relative paths
+    if [[ "$link" != /* ]]; then
+      LINK_DIR=$(dirname "$file")
+      FULL_PATH="$LINK_DIR/$link"
+    else
+      FULL_PATH=".$link"
+    fi
+    
+    # Normalize the path
+    FULL_PATH=$(realpath --relative-to=. "$FULL_PATH" 2>/dev/null)
+    
+    # Check if the file exists
+    if [ ! -f "$FULL_PATH" ]; then
+      echo "Error: Broken link in $file: $link (resolved to $FULL_PATH)"
+      BROKEN_LINKS=$((BROKEN_LINKS + 1))
+    fi
+  done
+done
+
+# Check if the roadmap references existing documents
+ROADMAP="docs/PROJECT_ROADMAP.md"
+if [ -f "$ROADMAP" ]; then
+  ROADMAP_LINKS=$(grep -o -E "\[.*?\]\(.*?\.md\)" "$ROADMAP" | sed -E 's/\[.*\]\((.*)\)/\1/')
+  
+  for link in $ROADMAP_LINKS; do
+    # Handle relative paths
+    if [[ "$link" != /* ]]; then
+      LINK_DIR=$(dirname "$ROADMAP")
+      FULL_PATH="$LINK_DIR/$link"
+    else
+      FULL_PATH=".$link"
+    fi
+    
+    # Normalize the path
+    FULL_PATH=$(realpath --relative-to=. "$FULL_PATH" 2>/dev/null)
+    
+    # Check if the file exists
+    if [ ! -f "$FULL_PATH" ]; then
+      echo "Error: Broken link in $ROADMAP: $link (resolved to $FULL_PATH)"
+      BROKEN_LINKS=$((BROKEN_LINKS + 1))
+    fi
+  done
+fi
+
+# Check if the docs README is up-to-date
+README="docs/README.md"
+if [ -f "$README" ]; then
+  # Get all markdown files in the docs directory
+  ALL_DOCS=$(find docs -name "*.md" -not -path "*/\.*" | sort)
+  
+  for doc in $ALL_DOCS; do
+    if [ "$doc" != "$README" ]; then
+      # Check if the doc is referenced in the README
+      if ! grep -q "$doc" "$README"; then
+        echo "Warning: $doc is not referenced in $README"
+      fi
+    fi
+  done
+fi
+
+if [ $BROKEN_LINKS -gt 0 ]; then
+  echo "Found $BROKEN_LINKS broken links in documentation. Please fix before committing."
+  exit 1
+fi
+
+echo "Documentation validation passed."
+exit 0 
