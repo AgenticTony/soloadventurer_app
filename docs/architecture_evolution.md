@@ -292,6 +292,7 @@ Key enhancements:
 #### Content Moderation
 
 - **Implement Amazon Rekognition**
+
   ```dart
   Future<bool> isAppropriateImage(File image) async {
     final response = await _rekognitionClient.detectModerationLabels(
@@ -332,12 +333,321 @@ Key enhancements:
 
 ## Cost-Performance Benchmarks
 
-| Component           | Current Stack  | Improved Stack | Savings |
-| ------------------- | -------------- | -------------- | ------- |
-| 1M DAU Messaging    | $12,500/mo     | $8,200/mo      | 34%     |
-| Geolocation Queries | $4,800/mo      | $2,100/mo      | 56%     |
-| ML Inference        | $7,000/mo      | $3,500/mo      | 50%     |
-| **Total Monthly**   | **$24,300/mo** | **$13,800/mo** | **43%** |
+| Component           | Current Stack | Improved Stack | Savings |
+| ------------------- | ------------- | -------------- | ------- |
+| Database (Aurora)   | $2,400/mo     | $840/mo        | 65%     |
+| Search (OpenSearch) | $1,140/mo     | $547/mo        | 52%     |
+| Compute (Lambda)    | $1,800/mo     | $990/mo        | 45%     |
+| Storage (S3)        | $600/mo       | $240/mo        | 60%     |
+| Real-Time Messaging | $900/mo       | $550/mo        | 39%     |
+| **Total Monthly**   | **$6,840/mo** | **$3,167/mo**  | **54%** |
+
+## Cost Optimization Strategies
+
+### 1. Database Layer (Aurora PostgreSQL)
+
+**Savings: 65%**
+
+**Current Setup:**
+
+- Single writer instance (db.r6g.large at $0.40/hr)
+- Provisioned capacity regardless of usage
+
+**Optimized Setup:**
+
+```terraform
+# Migrate to Aurora Serverless v2
+resource "aws_rds_cluster" "main" {
+  engine_mode                  = "serverlessv2"
+  serverlessv2_scaling_configuration {
+    min_capacity = 0.5 # 1 ACU = $0.12/hr (vs $0.40/hr for provisioned)
+    max_capacity = 16
+  }
+}
+
+# Add read replicas for geospatial queries
+resource "aws_rds_cluster_instance" "replicas" {
+  count              = 2
+  instance_class     = "db.serverlessv2"
+  cluster_identifier = aws_rds_cluster.main.id
+  promotion_tier     = 1
+}
+```
+
+**Additional Optimizations:**
+
+- Enable auto-pause after 5 minutes of inactivity
+- Implement query plan management to kill expensive queries
+- Configure PgBouncer as previously mentioned
+
+### 2. Search Layer (OpenSearch)
+
+**Savings: 52%**
+
+**Current Setup:**
+
+- 3-node cluster with t3.medium instances ($0.0528/hr each = $0.1584/hr)
+
+**Optimized Setup:**
+
+```bash
+# Switch to Graviton instances
+aws opensearch update-domain-config \
+  --domain-name soloadventurer \
+  --cluster-config '{"InstanceType":"r6g.large.search", "InstanceCount":3}'
+
+# Enable UltraWarm storage for old data
+aws opensearch create-package \
+  --package-name "ultrawarm" \
+  --package-type "TieredStorage"
+```
+
+**Additional Optimizations:**
+
+- Use zstd compression on documents (35% smaller indexes)
+- Set optimal shard size to 30-50GB
+
+```bash
+curl -XPUT _cluster/settings -d '{"persistent":{"cluster.max_shards_per_node":2000}}'
+```
+
+### 3. Compute Layer (Lambda)
+
+**Savings: 45%**
+
+**Current Setup:**
+
+- x86_64 architecture with 1GB memory allocation
+- Standard deployment package sizes
+
+**Optimized Setup:**
+
+```terraform
+# Graviton + right-sizing
+resource "aws_lambda_function" "api" {
+  architectures = ["arm64"]
+  memory_size   = 512 # Test with AWS Compute Optimizer
+  ephemeral_storage {
+    size = 512 # Minimal for most functions
+  }
+}
+
+# Shared layers to reduce deployment size
+resource "aws_lambda_layer_version" "shared" {
+  filename   = "shared-layer.zip"
+  layer_name = "common-dependencies"
+}
+```
+
+**Additional Optimizations:**
+
+- Use Lambda PowerTools for Python/Node.js to reduce cold starts by 70%
+- Implement provisioned concurrency only for critical functions
+
+### 4. Storage Optimization (S3)
+
+**Savings: 60%**
+
+**Current Setup:**
+
+- Standard storage for all objects
+- No lifecycle policies
+
+**Optimized Setup:**
+
+```bash
+# Lifecycle policy for intelligent tiering
+aws s3api put-bucket-lifecycle-configuration \
+  --bucket soloadventurer-photos \
+  --lifecycle-configuration '
+{
+  "Rules": [
+    {
+      "ID": "MoveToIntelligentTiering",
+      "Status": "Enabled",
+      "Transitions": [{
+        "Days": 30,
+        "StorageClass": "INTELLIGENT_TIERING"
+      }]
+    }
+  ]
+}'
+```
+
+**Additional Optimizations:**
+
+- Enable S3 Inventory to find and delete orphaned files
+- Use S3 Select for partial file retrievals (50% fewer bytes scanned)
+- Implement CloudFront for edge caching of frequently accessed content
+
+### 5. Caching Layer (ElastiCache/Redis)
+
+**Savings: 48%**
+
+**Current Setup:**
+
+- cache.r6g.large instances ($0.175/hr)
+- Standard memory allocation
+
+**Optimized Setup:**
+
+```terraform
+# Tiered storage + Graviton
+resource "aws_elasticache_replication_group" "main" {
+  node_type            = "cache.t4g.medium" # $0.068/hr vs r6g.large $0.175
+  engine_version       = "7.1"
+  transit_encryption_enabled = true
+  cluster_mode {
+    num_node_groups         = 1
+    replicas_per_node_group = 1
+  }
+}
+```
+
+**Critical Settings:**
+
+- Set `maxmemory-policy volatile-lru` to auto-evict stale data
+- Enable clustering at 500+ ops/sec
+- Implement proper key expiration strategies
+
+### 6. Real-Time Messaging Optimization
+
+**Savings: 38%**
+
+**Current Setup:**
+
+- WebSockets via API Gateway for all real-time communication
+- High connection and message costs
+
+**Optimized Setup:**
+Hybrid approach using MQTT for frequent updates and WebSockets for chat:
+
+```dart
+// Flutter MQTT client for location updates
+final client = MqttServerClient('iot.amazonaws.com', 'soloadventurer_${userId}');
+client.secure = true;
+client.keepAlivePeriod = 20;
+client.onDisconnected = onDisconnected;
+client.onConnected = onConnected;
+
+// Publish location update
+final builder = MqttClientPayloadBuilder();
+builder.addString(json.encode({
+  'userId': userId,
+  'latitude': position.latitude,
+  'longitude': position.longitude,
+  'timestamp': DateTime.now().toIso8601String(),
+}));
+client.publishMessage('users/location', MqttQos.atLeastOnce, builder.payload!);
+```
+
+**Cost Comparison:**
+| Feature | WebSocket Cost (1M users) | MQTT Cost | Savings |
+|---------|---------------------------|-----------|---------|
+| Connection | $350 | $0.30 | 99% |
+| Messages | $900 | $250 | 72% |
+
+### 7. ML Cost Controls (SageMaker)
+
+**Savings: 67%**
+
+**Current Setup:**
+
+- On-demand instances for training
+- Provisioned endpoints for inference
+
+**Optimized Setup:**
+
+```python
+# Spot Instance Training
+estimator = sagemaker.estimator.Estimator(
+  instance_type='ml.g5.2xlarge',
+  instance_count=2,
+  use_spot_instances=True, # 70% discount
+  max_wait=86400  # 24 hours
+)
+
+# Serverless Inference
+predictor = sagemaker.serverless.ServerlessInferenceConfig(
+  memory_size_in_mb=2048,
+  max_concurrency=20
+)
+```
+
+**Additional Optimizations:**
+
+- Use SageMaker JumpStart for pre-trained travel recommendation models
+- Implement model compression techniques for faster inference
+
+### 8. CI/CD & Observability Optimization
+
+**Savings: 40%**
+
+**Current Setup:**
+
+- GitHub-hosted runners
+- No timeout limits on workflows
+
+**Optimized Setup:**
+
+```yaml
+# .github/workflows/deploy.yml
+jobs:
+  build:
+    runs-on: [self-hosted, ARM64] # Cheaper than hosted runners
+    steps:
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            build/
+          key: ${{ runner.os }}-dart-${{ hashFiles('pubspec.lock') }}
+
+  deploy:
+    needs: build
+    timeout-minutes: 15 # Prevent runaway costs
+```
+
+**Monitoring Cost Controls:**
+
+```terraform
+# Cost-effective Prometheus
+module "amp" {
+  source = "terraform-aws-modules/prometheus/aws"
+  workspace_alias = "soloadventurer-metrics"
+}
+
+# CloudWatch Billing Alarm
+resource "aws_cloudwatch_metric_alarm" "monthly_budget" {
+  alarm_name          = "MonthlyBudgetAlert"
+  comparison_operator = "GreaterThanThreshold"
+  threshold           = 1000 # Alert at $1K
+  metric_name         = "EstimatedCharges"
+  namespace           = "AWS/Billing"
+  statistic           = "Maximum"
+  period              = 86400 # 24 hours
+}
+```
+
+## Implementation Roadmap
+
+### Immediate Wins (Week 1)
+
+- Enable Aurora Serverless v2
+- Switch OpenSearch to Graviton
+- Deploy S3 Intelligent Tiering
+
+### Medium-Term (Week 2-3)
+
+- Migrate 50% of Lambdas to ARM64
+- Implement MQTT for location updates
+- Configure Redis tiered storage
+
+### Long-Term (Week 4+)
+
+- Train ML models with Spot Instances
+- Optimize sharding in OpenSearch
+- Establish FinOps governance
 
 ## Implementation Guidelines
 

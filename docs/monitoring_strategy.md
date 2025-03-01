@@ -843,3 +843,281 @@ All tests have been successfully completed, confirming that:
 2. **Create additional Lambda functions** for error and event tracking
 3. **Implement automated testing** of the monitoring pipeline
 4. **Document alert response procedures** for the team
+
+## Monitoring Cost Optimization
+
+As our monitoring infrastructure grows, it's important to implement cost optimization strategies to ensure we're getting maximum value without unnecessary expenses. Here are specific strategies for each component of our monitoring stack:
+
+### CloudWatch Cost Optimization
+
+1. **Selective Metric Collection**
+
+   ```javascript
+   // Lambda function to filter metrics before sending to CloudWatch
+   exports.handler = async (event) => {
+     const { metricName, value, category } = JSON.parse(event.body);
+
+     // Only send metrics that exceed thresholds or are critical
+     const criticalMetrics = ['api_error_rate', 'authentication_failure', 'database_connection_error'];
+     const isHighValue = value > THRESHOLD_MAP[metricName] || criticalMetrics.includes(metricName);
+
+     if (isHighValue) {
+       // Send to CloudWatch
+       await cloudwatch.putMetricData({...}).promise();
+     } else {
+       // Store in lower-cost storage or aggregate
+       await storeMetricLocally({...});
+     }
+   };
+   ```
+
+2. **Metric Resolution Optimization**
+
+   - Use 1-minute resolution only for critical metrics
+   - Use 5-minute resolution for standard metrics
+   - Use hourly resolution for long-term trend metrics
+
+3. **Log Volume Reduction**
+
+   ```terraform
+   resource "aws_cloudwatch_log_group" "api_logs" {
+     name              = "/aws/lambda/api-function"
+     retention_in_days = 14  # Shorter retention for high-volume logs
+   }
+
+   resource "aws_cloudwatch_log_group" "critical_logs" {
+     name              = "/aws/lambda/critical-function"
+     retention_in_days = 90  # Longer retention only for critical logs
+   }
+   ```
+
+### Prometheus & Grafana Cost Optimization
+
+1. **Efficient Storage Configuration**
+
+   ```yaml
+   # prometheus.yml
+   global:
+     scrape_interval: 30s # Default is 15s, increase to reduce storage
+     evaluation_interval: 30s
+
+   storage:
+     tsdb:
+       retention.time: 15d # Keep data for 15 days instead of default 30
+       retention.size: 10GB # Limit total storage size
+   ```
+
+2. **Managed Service vs. Self-Hosted**
+
+   - Use Amazon Managed Service for Prometheus (AMP) to eliminate infrastructure management costs
+   - Cost comparison: Self-hosted ($200-300/month) vs. AMP ($100-150/month) for similar workloads
+
+   ```terraform
+   # Use Amazon Managed Service for Prometheus
+   module "amp" {
+     source  = "terraform-aws-modules/managed-service-prometheus/aws"
+     version = "~> 2.1"
+
+     workspace_alias = "soloadventurer-metrics"
+
+     scraper_security_group_rules = {
+       egress_to_prometheus = {
+         type        = "egress"
+         from_port   = 9090
+         to_port     = 9090
+         protocol    = "tcp"
+         cidr_blocks = ["10.0.0.0/16"]
+       }
+     }
+   }
+   ```
+
+3. **Grafana Dashboard Optimization**
+
+   - Use variables and templates to create reusable dashboards instead of duplicating panels
+   - Implement proper caching for dashboard queries
+
+   ```yaml
+   # grafana.ini
+   [dashboards]
+   versions_to_keep = 5  # Limit dashboard version history
+
+   [panels]
+   disable_sanitize_html = false  # Security measure
+
+   [dataproxy]
+   timeout = 30  # Reduce long-running queries
+   ```
+
+### X-Ray Cost Optimization
+
+1. **Sampling Rules**
+
+   ```json
+   // xray-sampling-rules.json
+   {
+     "SamplingRule": {
+       "RuleName": "Default",
+       "ResourceARN": "*",
+       "Priority": 10000,
+       "FixedRate": 0.05, // Sample 5% of requests
+       "ReservoirSize": 1,
+       "ServiceName": "*",
+       "ServiceType": "*",
+       "Host": "*",
+       "HTTPMethod": "*",
+       "URLPath": "*",
+       "Version": 1
+     }
+   }
+   ```
+
+2. **Critical Path Tracing**
+
+   ```javascript
+   // Only trace important paths
+   const AWSXRay = require("aws-xray-sdk");
+
+   // Configure custom sampling rules
+   const rules = {
+     rules: [
+       {
+         description: "Critical API paths",
+         host: "*",
+         http_method: "*",
+         url_path: "/api/critical/*",
+         fixed_target: 1,
+         rate: 1.0,
+       },
+       {
+         description: "Standard paths",
+         host: "*",
+         http_method: "*",
+         url_path: "*",
+         fixed_target: 0,
+         rate: 0.05,
+       },
+     ],
+     default: {
+       fixed_target: 0,
+       rate: 0.01,
+     },
+     version: 1,
+   };
+
+   AWSXRay.middleware.setSamplingRules(rules);
+   ```
+
+### Firebase Monitoring Cost Optimization
+
+1. **Selective Event Logging**
+
+   ```dart
+   // Only log important events to Firebase
+   void logEvent(String name, Map<String, dynamic> parameters) {
+     final importantEvents = [
+       'signup_completed',
+       'purchase_made',
+       'critical_error',
+       'trip_booked'
+     ];
+
+     if (importantEvents.contains(name) ||
+         parameters.containsKey('is_critical')) {
+       FirebaseAnalytics.instance.logEvent(
+         name: name,
+         parameters: parameters,
+       );
+     } else {
+       // Log to local analytics only
+       _localAnalytics.logEvent(name, parameters);
+     }
+   }
+   ```
+
+2. **Crashlytics Optimization**
+
+   ```dart
+   // Configure Crashlytics to reduce unnecessary reports
+   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+     !kDebugMode && _userHasOptedIn
+   );
+
+   // Set custom keys only for important context
+   FirebaseCrashlytics.instance.setCustomKey('last_action', lastUserAction);
+   FirebaseCrashlytics.instance.setCustomKey('user_tier', userSubscriptionTier);
+   ```
+
+### Monitoring Cost Comparison
+
+| Monitoring Approach      | Monthly Cost (1K users) | Monthly Cost (10K users) | Monthly Cost (100K users) | Cost-Saving Techniques               |
+| ------------------------ | ----------------------- | ------------------------ | ------------------------- | ------------------------------------ |
+| CloudWatch Only          | $50-100                 | $200-400                 | $1,000-2,000              | Metric filtering, reduced resolution |
+| Prometheus (Self-hosted) | $150-250                | $300-500                 | $800-1,500                | Storage optimization, sampling       |
+| Prometheus (AMP)         | $75-125                 | $150-300                 | $500-1,000                | Managed service efficiencies         |
+| X-Ray (100% sampling)    | $100-200                | $400-800                 | $2,000-4,000              | N/A                                  |
+| X-Ray (5% sampling)      | $5-10                   | $20-40                   | $100-200                  | Intelligent sampling rules           |
+| Firebase (full)          | $0 (Free tier)          | $100-300                 | $500-1,200                | N/A                                  |
+| Firebase (optimized)     | $0 (Free tier)          | $50-150                  | $250-600                  | Selective event logging              |
+| **Optimized Stack**      | **$130-235**            | **$420-790**             | **$1,350-2,800**          | **Combined strategies**              |
+
+### Monitoring Cost Optimization Roadmap
+
+#### Phase 1: Immediate Optimizations (Current)
+
+- Implement CloudWatch metric filtering
+- Set appropriate log retention periods
+- Configure basic X-Ray sampling
+
+#### Phase 2: Enhanced Optimizations (1,000+ Users)
+
+- Deploy Amazon Managed Service for Prometheus
+- Implement intelligent X-Ray sampling rules
+- Configure selective Firebase event logging
+
+#### Phase 3: Advanced Optimizations (10,000+ Users)
+
+- Implement metric aggregation and downsampling
+- Set up multi-tier storage for logs (hot/warm/cold)
+- Create custom monitoring dashboards optimized for performance
+
+### Monitoring Cost Governance
+
+1. **Budget Alerts**
+
+   ```terraform
+   resource "aws_budgets_budget" "monitoring" {
+     name              = "monitoring-budget"
+     budget_type       = "COST"
+     limit_amount      = "500"
+     limit_unit        = "USD"
+     time_unit         = "MONTHLY"
+
+     notification {
+       comparison_operator = "GREATER_THAN"
+       threshold           = 80
+       threshold_type      = "PERCENTAGE"
+       notification_type   = "ACTUAL"
+     }
+
+     cost_filter {
+       name = "Service"
+       values = [
+         "AmazonCloudWatch",
+         "AmazonOpenSearchService",
+         "AWSXRay"
+       ]
+     }
+   }
+   ```
+
+2. **Regular Cost Reviews**
+
+   - Schedule monthly cost review meetings
+   - Analyze cost trends and identify optimization opportunities
+   - Document cost-saving measures implemented and their impact
+
+3. **Monitoring Efficiency Metrics**
+   - Track cost per monitored service
+   - Measure alert signal-to-noise ratio
+   - Calculate cost per detected incident

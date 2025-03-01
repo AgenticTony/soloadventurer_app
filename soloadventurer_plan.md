@@ -51,19 +51,24 @@
 ### 🔧 DevOps & Infrastructure
 
 - **CI/CD**: GitHub Actions
+  - **Self-hosted Runners**: ARM64-based for cost efficiency
+  - **Caching Strategy**: Optimized for Flutter/Dart dependencies
 - **Infrastructure as Code**: Terraform
 - **Monitoring**:
   - **AWS Services**: Amazon CloudWatch (with billing alerts)
   - **Application Metrics**: Prometheus + Grafana for granular metrics
-  - **Distributed Tracing**: AWS X-Ray
-  - See detailed strategy in [docs/monitoring_strategy.md](docs/monitoring_strategy.md)
+  - **Distributed Tracing**: AWS X-Ray with intelligent sampling
+  - **Cost-Optimized Approach**: See detailed strategy in [docs/monitoring_strategy.md](docs/monitoring_strategy.md)
 - **Security**:
   - **Secret Management**: HashiCorp Vault
   - **Runtime Security**: Falco
 - **Cost Optimization**:
   - **Compute**: Spot Instances with AWS Fault Injection Simulator
   - **Database**: Aurora Serverless v2, Graviton instances
+  - **Storage**: S3 Intelligent Tiering with lifecycle policies
+  - **Caching**: Right-sized ElastiCache instances with tiered storage
   - **Scaling**: Auto-scaling based on demand patterns
+  - **Detailed Strategy**: See [docs/architecture_evolution.md](docs/architecture_evolution.md)
 
 ---
 
@@ -639,12 +644,47 @@ We'll use a vertical slice approach, completing each feature from database to UI
   - [ ] Replace basic ListViews with SliverAnimatedList
   - [ ] Optimize image loading and caching
   - [ ] Implement proper widget memoization
+- [ ] **Implement cost optimization strategies**
+  - [ ] Migrate to Aurora Serverless v2
+    ```terraform
+    resource "aws_rds_cluster" "main" {
+      engine_mode = "serverlessv2"
+      serverlessv2_scaling_configuration {
+        min_capacity = 0.5
+        max_capacity = 8
+      }
+    }
+    ```
+  - [ ] Configure S3 Intelligent Tiering
+    ```bash
+    aws s3api put-bucket-lifecycle-configuration \
+      --bucket soloadventurer-photos \
+      --lifecycle-configuration file://lifecycle.json
+    ```
+  - [ ] Implement CloudWatch cost controls
+    ```terraform
+    resource "aws_cloudwatch_log_group" "api_logs" {
+      name              = "/aws/lambda/api-function"
+      retention_in_days = 14  # Shorter retention for high-volume logs
+    }
+    ```
+  - [ ] Set up AWS Budget alerts
+    ```terraform
+    resource "aws_budgets_budget" "monthly" {
+      name         = "monthly-budget"
+      budget_type  = "COST"
+      limit_amount = "1000"
+      limit_unit   = "USD"
+      time_unit    = "MONTHLY"
+    }
+    ```
 
 **Weekly Breakdown:**
 
 - **Week 9**: Secret management with Vault
 - **Week 10**: Database optimization implementation
-- **Week 11-12**: Monitoring enhancements and UI optimizations
+- **Week 11**: Monitoring enhancements and UI optimizations
+- **Week 12**: Cost optimization implementation
 
 **Testing Tasks:**
 
@@ -652,6 +692,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Test secret retrieval from Vault
 - [ ] Validate monitoring data accuracy
 - [ ] Measure UI rendering performance improvements
+- [ ] Compare costs before and after optimization strategies
 
 **Documentation:**
 
@@ -659,6 +700,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Create database optimization guide
 - [ ] Document monitoring setup and dashboard configuration
 - [ ] Create UI optimization patterns guide
+- [ ] Document cost optimization strategies and savings
 
 **Success Metrics:**
 
@@ -667,6 +709,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Comprehensive monitoring dashboards in place
 - UI rendering performance improved by 25%
 - All high-priority security issues resolved
+- Infrastructure costs reduced by 30%
 
 ## 🟠 Phase 3: Location & Matching Features _(Weeks 13-18)_
 
