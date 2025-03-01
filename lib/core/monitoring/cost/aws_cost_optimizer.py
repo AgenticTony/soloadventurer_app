@@ -9,17 +9,10 @@ import boto3
 from datetime import datetime, timedelta
 import json
 import os
+import sys
 
-# Initialize clients
-cost_explorer = boto3.client('ce')
-rds = boto3.client('rds')
-es = boto3.client('es')
-lambda_client = boto3.client('lambda')
-s3 = boto3.client('s3')
-elasticache = boto3.client('elasticache')
-sagemaker = boto3.client('sagemaker')
-iot = boto3.client('iot')
-neptune = boto3.client('neptune')
+# Check for demo mode
+DEMO_MODE = os.environ.get('DEMO_MODE', 'false').lower() == 'true'
 
 # Configuration flags
 ENABLE_SLACK = os.environ.get('ENABLE_SLACK', 'false').lower() == 'true'
@@ -27,8 +20,38 @@ ENABLE_DYNAMODB = os.environ.get('ENABLE_DYNAMODB', 'false').lower() == 'true'
 SLACK_CHANNEL = os.environ.get('SLACK_CHANNEL', '#cloud-costs')
 DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'CostAuditHistory')
 
+# Initialize clients
+if not DEMO_MODE:
+    try:
+        cost_explorer = boto3.client('ce')
+        rds = boto3.client('rds')
+        es = boto3.client('es')
+        lambda_client = boto3.client('lambda')
+        s3 = boto3.client('s3')
+        elasticache = boto3.client('elasticache')
+        sagemaker = boto3.client('sagemaker')
+        iot = boto3.client('iot')
+        neptune = boto3.client('neptune')
+    except Exception as e:
+        print(f"Error initializing AWS clients: {e}")
+        print("If you're testing without AWS credentials, run with DEMO_MODE=true")
+        sys.exit(1)
+
 def get_service_costs():
     """Get last 30 days costs grouped by service"""
+    if DEMO_MODE:
+        # Return mock data for demo mode
+        return {
+            'Amazon RDS Service': 120.45,
+            'Amazon OpenSearch Service': 85.32,
+            'AWS Lambda': 25.67,
+            'Amazon S3': 18.90,
+            'Amazon ElastiCache': 45.78,
+            'Amazon SageMaker': 150.23,
+            'AWS IoT': 12.45,
+            'Amazon Neptune': 95.67
+        }
+    
     end = datetime.utcnow()
     start = end - timedelta(days=30)
     
@@ -47,6 +70,24 @@ def get_service_costs():
 
 def check_aurora_savings():
     """Identify Aurora cost savings opportunities"""
+    if DEMO_MODE:
+        # Return mock findings for demo mode
+        return [{
+            'service': 'Amazon RDS Service',
+            'issue': 'Non-serverless cluster',
+            'resource': 'soloadventurer-prod',
+            'savings_pct': 67,
+            'severity': 'CRITICAL',
+            'terraform_fix': '''
+resource "aws_rds_cluster" "soloadventurer-prod" {
+  engine_mode         = "serverlessv2"
+  serverlessv2_scaling_configuration {
+    min_capacity = 0.5
+    max_capacity = 16
+  }
+}'''
+        }]
+    
     findings = []
     clusters = rds.describe_db_clusters()
     
@@ -54,7 +95,7 @@ def check_aurora_savings():
         if cluster['EngineMode'] != 'serverlessv2':
             savings_pct = 67 if cluster['EngineMode'] == 'provisioned' else 40
             findings.append({
-                'service': 'Aurora PostgreSQL',
+                'service': 'Amazon RDS Service',
                 'issue': 'Non-serverless cluster',
                 'resource': cluster['DBClusterIdentifier'],
                 'savings_pct': savings_pct,
@@ -73,6 +114,23 @@ resource "aws_rds_cluster" "{cluster['DBClusterIdentifier']}" {{
 
 def check_opensearch_graviton():
     """Check for non-Graviton OpenSearch instances"""
+    if DEMO_MODE:
+        # Return mock findings for demo mode
+        return [{
+            'service': 'Amazon OpenSearch Service',
+            'issue': 'Non-Graviton instances',
+            'resource': 'soloadventurer-search',
+            'savings_pct': 52,
+            'severity': 'HIGH',
+            'terraform_fix': '''
+resource "aws_elasticsearch_domain" "soloadventurer-search" {
+  cluster_config {
+    instance_type = "r6g.large.search"
+    instance_count = 2
+  }
+}'''
+        }]
+    
     findings = []
     domains = es.list_domain_names()
     
@@ -83,7 +141,7 @@ def check_opensearch_graviton():
         
         if 'r6g' not in config['ElasticsearchClusterConfig']['InstanceType']:
             findings.append({
-                'service': 'OpenSearch',
+                'service': 'Amazon OpenSearch Service',
                 'issue': 'Non-Graviton instances',
                 'resource': domain['DomainName'],
                 'savings_pct': 52,
@@ -101,6 +159,20 @@ resource "aws_elasticsearch_domain" "{domain['DomainName']}" {{
 
 def check_iot_core_savings():
     """Identify IoT Core optimization opportunities"""
+    if DEMO_MODE:
+        # Return mock findings for demo mode
+        return [{
+            'service': 'AWS IoT',
+            'issue': 'Disabled unused rule',
+            'resource': 'location_tracking_rule',
+            'savings_pct': 15,
+            'severity': 'MEDIUM',
+            'terraform_fix': '''
+resource "aws_iot_topic_rule" "location_tracking_rule" {
+  enabled = false
+}'''
+        }]
+    
     findings = []
     
     # Check for unused topics
@@ -108,7 +180,7 @@ def check_iot_core_savings():
     for rule in topics['rules']:
         if rule['ruleDisabled']:
             findings.append({
-                'service': 'IoT Core',
+                'service': 'AWS IoT',
                 'issue': 'Disabled unused rule',
                 'resource': rule['ruleName'],
                 'savings_pct': 15,
@@ -122,13 +194,28 @@ resource "aws_iot_topic_rule" "{rule['ruleName']}" {{
 
 def check_neptune_savings():
     """Identify Neptune cluster optimizations"""
+    if DEMO_MODE:
+        # Return mock findings for demo mode
+        return [{
+            'service': 'Amazon Neptune',
+            'issue': 'Outdated engine version',
+            'resource': 'soloadventurer-graph',
+            'savings_pct': 35,
+            'severity': 'HIGH',
+            'terraform_fix': '''
+resource "aws_neptune_cluster" "soloadventurer-graph" {
+  engine_version = "1.2.1.0"
+  apply_immediately = true
+}'''
+        }]
+    
     findings = []
     
     clusters = neptune.describe_db_clusters()
     for cluster in clusters['DBClusters']:
         if cluster['EngineVersion'] < '1.2.1.0':
             findings.append({
-                'service': 'Neptune',
+                'service': 'Amazon Neptune',
                 'issue': 'Outdated engine version',
                 'resource': cluster['DBClusterIdentifier'],
                 'savings_pct': 35,
@@ -143,6 +230,20 @@ resource "aws_neptune_cluster" "{cluster['DBClusterIdentifier']}" {{
 
 def check_sagemaker_spot():
     """Check for SageMaker jobs not using spot instances"""
+    if DEMO_MODE:
+        # Return mock findings for demo mode
+        return [{
+            'service': 'Amazon SageMaker',
+            'issue': 'Not using spot instances',
+            'resource': 'matching-model-training',
+            'savings_pct': 70,
+            'severity': 'CRITICAL',
+            'terraform_fix': '''
+resource "aws_sagemaker_training_job" "matching-model-training" {
+  enable_managed_spot_training = true
+}'''
+        }]
+    
     findings = []
     jobs = sagemaker.list_training_jobs()
     
@@ -153,7 +254,7 @@ def check_sagemaker_spot():
         
         if not details.get('EnableManagedSpotTraining', False):
             findings.append({
-                'service': 'SageMaker',
+                'service': 'Amazon SageMaker',
                 'issue': 'Not using spot instances',
                 'resource': job['TrainingJobName'],
                 'savings_pct': 70,
@@ -296,40 +397,45 @@ def generate_terraform_file(findings):
             f.write(f"# Savings: {finding['savings_pct']}%\n")
             f.write(finding['terraform_fix'] + "\n\n")
 
-if __name__ == '__main__':
-    try:
-        print("Starting AWS Cost Audit...")
-        
-        # Get service costs
-        service_costs = get_service_costs()
-        
-        # Collect findings
-        findings = []
-        findings += check_aurora_savings()
-        findings += check_opensearch_graviton()
-        findings += check_iot_core_savings()
-        findings += check_neptune_savings()
-        findings += check_sagemaker_spot()
-        
-        # Generate reports
-        generate_report(findings, service_costs)
-        generate_terraform_file(findings)
-        
-        # Calculate total savings
-        total_savings = sum(
-            service_costs.get(finding['service'], 0) * 4 * (finding['savings_pct'] / 100)
-            for finding in findings
-        )
-        
-        # Post to Slack if enabled
-        post_to_slack(total_savings)
-        
-        # Save to DynamoDB if enabled
-        save_to_dynamodb(findings, total_savings)
-        
-        print(f"Audit complete. Identified ${total_savings:.2f}/month in potential savings.")
-        print("Review cost_audit.md and terraform_remediation.tf for details.")
-        
-    except Exception as e:
-        print(f"Error during cost audit: {e}")
-        raise 
+def main():
+    """Main function to run the cost audit"""
+    print("Starting AWS Cost Audit...")
+    
+    if DEMO_MODE:
+        print("Running in DEMO MODE - using mock data")
+    
+    # Get service costs
+    service_costs = get_service_costs()
+    
+    # Collect findings from all checks
+    findings = []
+    findings.extend(check_aurora_savings())
+    findings.extend(check_opensearch_graviton())
+    findings.extend(check_iot_core_savings())
+    findings.extend(check_neptune_savings())
+    findings.extend(check_sagemaker_spot())
+    
+    # Calculate total potential savings
+    total_savings = 0
+    for finding in findings:
+        service_cost = service_costs.get(finding['service'], 0) * 4  # Weekly to monthly
+        savings = service_cost * (finding['savings_pct'] / 100)
+        total_savings += savings
+    
+    # Generate report
+    generate_report(findings, service_costs)
+    
+    # Generate Terraform remediation file
+    generate_terraform_file(findings)
+    
+    # Post to Slack if enabled
+    post_to_slack(total_savings)
+    
+    # Save to DynamoDB if enabled
+    save_to_dynamodb(findings, total_savings)
+    
+    print(f"AWS Cost Audit completed. Potential monthly savings: ${total_savings:.2f}")
+    print("Reports generated: cost_audit.md, terraform_remediation.tf")
+
+if __name__ == "__main__":
+    main() 
