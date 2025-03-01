@@ -1,1123 +1,748 @@
-# SoloAdventurer Monitoring Strategy
+# Monitoring Strategy
 
 ## Overview
 
-This document outlines the monitoring approach for the SoloAdventurer app, focusing on a cost-effective initial implementation with a path for future expansion as the user base grows.
+This document outlines the comprehensive monitoring strategy for the SoloAdventurer application. Effective monitoring is crucial for understanding application performance, identifying issues, and ensuring a high-quality user experience.
 
-## Monitoring Philosophy
+## Monitoring Goals
 
-- **Start Simple**: Begin with essential monitoring using AWS services already in our stack
-- **Design for Extensibility**: Create an abstraction layer that allows for easy integration of additional monitoring tools
-- **Focus on Critical Metrics**: Monitor what matters most for user experience and system health
-- **Cost Consciousness**: Avoid unnecessary monitoring costs in early stages
-- **Complementary Tools**: Use the right tool for each monitoring need rather than forcing everything into one system
+1. **Performance Tracking**: Measure and optimize application performance
+2. **Error Detection**: Identify and diagnose errors in real-time
+3. **User Experience Monitoring**: Understand how users interact with the application
+4. **Resource Utilization**: Track resource usage to optimize costs
+5. **Proactive Alerting**: Detect issues before they impact users
 
-## Phase 1: AWS-Only Monitoring (Initial Launch) - ✅ IMPLEMENTED
+## Monitoring Infrastructure
 
-### Backend Monitoring
+### AWS CloudWatch
 
-- **AWS CloudWatch** ✅
-  - Monitor Lambda function performance (duration, error rate, throttling)
-  - Track API Gateway metrics (latency, error rates, request counts)
-  - Monitor Cognito authentication events
-  - Set up basic alarms for critical service failures
-  - Track database performance metrics (Aurora PostgreSQL)
+CloudWatch is our primary monitoring service for:
 
-### App Monitoring
+- **Metrics Collection**: Gather performance data
+- **Log Aggregation**: Centralize application logs
+- **Alerting**: Notify the team of issues
+- **Dashboards**: Visualize application health
 
-- **Custom Performance Tracking** ✅
-  - Utilize the `performance_metrics.dart` and `performance_monitoring.dart` utilities
-  - Track key user interactions and screen rendering times
-  - Monitor API request/response times from the client perspective
-  - Track app startup time and authentication flow performance
-  - Measure UI operations, network operations, and database operations
+### Prometheus + Grafana
 
-### Error Tracking
+For more detailed metrics and visualization:
 
-- **Centralized Error Logging** ✅
-  - Send critical app errors to CloudWatch via API Gateway/Lambda
-  - Implement structured error logging with context information
-  - Set up alerts for error rate spikes
-  - Implement global error handler with zoned error handling
+- **Prometheus**: Collect and store time-series metrics
+- **Grafana**: Create dashboards and visualizations
 
-### Implementation Details
+### Firebase Crashlytics
 
-#### Monitoring Service Abstraction
+For mobile-specific crash reporting:
 
-```dart
-// lib/services/monitoring/monitoring_service.dart
-abstract class MonitoringService {
-  void trackMetric(String metricName, double value, MetricCategory category);
-  void reportError(String errorType, dynamic error, StackTrace stackTrace);
-  void trackEvent(String eventName, {Map<String, dynamic>? parameters});
-  void startSession();
-  void endSession();
-}
+- **Crash Reports**: Detailed stack traces and device information
+- **Issue Tracking**: Group similar crashes
+- **User Impact**: Understand crash impact on users
 
-enum MetricCategory {
-  api,
-  ui,
-  database,
-  authentication,
-  business,
-}
-```
+## Monitoring Categories
 
-#### AWS CloudWatch Implementation
+### 1. Performance Monitoring
+
+#### App Start Time
 
 ```dart
-// lib/services/monitoring/aws_cloudwatch_monitoring.dart
-class AwsCloudWatchMonitoring implements MonitoringService {
-  final ApiService _apiService;
-  String? _userId;
-  String? _appVersion;
-  String? _platform;
+// lib/shared/monitoring/performance/app_start_tracker.dart
+class AppStartTracker {
+  static void trackAppStart() {
+    final startTime = DateTime.now();
 
-  AwsCloudWatchMonitoring(this._apiService) {
-    _initializeDeviceInfo();
-    debugPrint('Performance monitoring initialized');
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final duration = DateTime.now().difference(startTime);
 
-  @override
-  void trackMetric(String metricName, double value, MetricCategory category) {
-    final data = {
-      'metricName': metricName,
-      'value': value,
-      'category': category.toString().split('.').last,
-      'timestamp': DateTime.now().toIso8601String(),
-      'platform': _platform ?? 'unknown',
-      'appVersion': _appVersion ?? 'unknown',
-      'userId': _userId ?? 'unknown',
-    };
-
-    _apiService.post('/monitoring/metrics', data: data).catchError((error) {
-      debugPrint('Error sending metric to CloudWatch: $error');
-    });
-  }
-
-  @override
-  void reportError(String errorType, dynamic error, StackTrace stackTrace) {
-    final data = {
-      'errorType': errorType,
-      'errorMessage': error.toString(),
-      'stackTrace': stackTrace.toString(),
-      'timestamp': DateTime.now().toIso8601String(),
-      'platform': _platform ?? 'unknown',
-      'appVersion': _appVersion ?? 'unknown',
-      'userId': _userId ?? 'unknown',
-    };
-
-    _apiService.post('/monitoring/errors', data: data).catchError((error) {
-      debugPrint('Error sending error to CloudWatch: $error');
-    });
-  }
-
-  // Other method implementations...
-}
-```
-
-#### Performance Monitoring Utilities
-
-```dart
-// lib/utils/performance_monitoring.dart
-class PerformanceMonitoring {
-  static late MonitoringService _monitoringService;
-
-  static void initialize(MonitoringService monitoringService) {
-    _monitoringService = monitoringService;
-    debugPrint('Performance monitoring initialized');
-  }
-
-  static Future<Duration> measureNetworkOperation({
-    required String operationName,
-    required Future<Duration> Function() operation,
-    required Duration threshold,
-  }) async {
-    final stopwatch = Stopwatch()..start();
-
-    try {
-      final result = await operation();
-      final duration = stopwatch.elapsed;
-
-      _monitoringService.trackMetric(
-        operationName,
-        duration.inMilliseconds.toDouble(),
-        MetricCategory.api,
+      // Report to CloudWatch
+      CloudWatchMetrics.putMetricData(
+        namespace: 'SoloAdventurer/Performance',
+        metricName: 'AppStartTime',
+        value: duration.inMilliseconds.toDouble(),
+        unit: 'Milliseconds',
       );
+    });
+  }
+}
+```
 
-      if (duration > threshold) {
-        debugPrint('⚠️ $operationName exceeded threshold: ${duration.inMilliseconds}ms > ${threshold.inMilliseconds}ms');
-      }
+#### Network Performance
 
-      return result;
-    } finally {
-      stopwatch.stop();
+```dart
+// lib/shared/monitoring/performance/network_monitor.dart
+class NetworkMonitor {
+  void trackRequest(NetworkRequestInfo info) {
+    // Log request details
+    logger.info('API Request: ${info.path} - ${info.duration}ms');
+
+    // Report to CloudWatch
+    CloudWatchMetrics.putMetricData(
+      namespace: 'SoloAdventurer/Network',
+      metricName: 'RequestDuration',
+      value: info.duration.toDouble(),
+      unit: 'Milliseconds',
+      dimensions: {
+        'Path': info.path,
+        'StatusCode': info.statusCode.toString(),
+      },
+    );
+
+    // Track slow requests
+    if (info.duration > 1000) {
+      logger.warning('Slow API request: ${info.path} - ${info.duration}ms');
+    }
+
+    // Track errors
+    if (info.isError) {
+      logger.error('API error: ${info.path} - ${info.errorMessage}');
     }
   }
-
-  // Other measurement methods for UI, database, etc.
 }
 ```
 
-#### AWS Lambda Function for Metrics Collection
+#### Memory Usage
 
-```javascript
-// AWS Lambda function (soloadventurer-metrics-handler)
-exports.handler = async (event) => {
-  try {
-    const body = JSON.parse(event.body);
-    const {
-      metricName,
-      value,
-      category,
-      timestamp,
-      platform,
-      appVersion,
-      userId,
-    } = body;
+```dart
+// lib/shared/monitoring/performance/memory_profiler.dart
+class MemoryProfiler {
+  static void trackMemoryUsage() {
+    Timer.periodic(const Duration(minutes: 5), (_) async {
+      final memoryInfo = await getMemoryInfo();
 
-    // Create CloudWatch client
-    const cloudwatch = new AWS.CloudWatch();
+      // Report to CloudWatch
+      CloudWatchMetrics.putMetricData(
+        namespace: 'SoloAdventurer/Performance',
+        metricName: 'MemoryUsage',
+        value: memoryInfo.usedMemory.toDouble(),
+        unit: 'Bytes',
+      );
 
-    // Prepare metric data
-    const params = {
-      MetricData: [
-        {
-          MetricName: metricName,
-          Dimensions: [
-            { Name: "Category", Value: category },
-            { Name: "Platform", Value: platform },
-            { Name: "AppVersion", Value: appVersion },
-            { Name: "UserId", Value: userId },
-          ],
-          Value: value,
-          Timestamp: new Date(timestamp),
-          Unit: "Milliseconds",
-        },
-      ],
-      Namespace: "SoloAdventurer",
-    };
+      // Alert on high memory usage
+      if (memoryInfo.usedMemory > memoryInfo.totalMemory * 0.8) {
+        logger.warning('High memory usage: ${memoryInfo.usedMemory} bytes');
+      }
+    });
+  }
+}
+```
 
-    // Put metric data to CloudWatch
-    await cloudwatch.putMetricData(params).promise();
+### 2. Error Monitoring
 
-    return {
-      statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({ status: "success" }),
-    };
-  } catch (error) {
-    console.error("Error processing metric:", error);
+#### Error Handler
 
-    return {
-      statusCode: 500,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({ status: "error", message: error.message }),
+```dart
+// lib/shared/monitoring/error_tracking/error_handler.dart
+class ErrorHandler {
+  static void initialize() {
+    // Set up global error handling
+    FlutterError.onError = (details) {
+      reportError('Flutter error', details.exception, details.stack);
     };
   }
-};
+
+  static void reportError(String message, dynamic error, StackTrace? stackTrace) {
+    // Log error
+    logger.error(message, error, stackTrace);
+
+    // Report to CloudWatch
+    CloudWatchLogs.putLogEvents(
+      logGroupName: 'SoloAdventurer/Errors',
+      logStreamName: 'AppErrors',
+      logEvents: [
+        {
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'message': '$message: $error\n${stackTrace ?? ''}',
+        },
+      ],
+    );
+
+    // Report to Crashlytics
+    FirebaseCrashlytics.instance.recordError(error, stackTrace);
+  }
+}
 ```
 
-#### Example Performance Screen
+#### API Error Interceptor
 
-We've implemented an example screen (`example_performance_screen.dart`) that demonstrates the use of performance monitoring utilities. This screen includes:
+```dart
+// lib/shared/api/interceptors/error_interceptor.dart
+class ErrorInterceptor extends Interceptor {
+  @override
+  void onError(DioError err, ErrorInterceptorHandler handler) {
+    // Log error
+    ErrorHandler.reportError(
+      'API Error: ${err.requestOptions.path}',
+      err.error,
+      err.stackTrace,
+    );
 
-- Buttons to trigger various performance operations
-- Display of operation durations
-- A "Test CloudWatch" button to verify the CloudWatch integration
-- Performance report generation
+    // Transform error to app-specific exception
+    final appException = _mapDioErrorToAppException(err);
 
-## Phase 2: Enhanced Monitoring (Post-MVP, 1000+ Users)
+    // Continue with error handling
+    handler.next(err);
+  }
+}
+```
 
-When the app reaches significant usage (1000+ active users), we will implement a more comprehensive monitoring strategy:
+### 3. User Experience Monitoring
 
-### Prometheus + Grafana Integration - 🔄 PLANNED FOR WEEKS 5-12
+#### Screen Tracking
 
-- **Prometheus for Metrics Collection**
+```dart
+// lib/shared/monitoring/analytics/screen_tracker.dart
+class ScreenTracker {
+  static void trackScreenView(String screenName) {
+    // Log screen view
+    logger.info('Screen view: $screenName');
 
-  - Collect high-resolution metrics with better retention
-  - Implement custom metrics for business-critical operations
-  - Set up alerting based on metric thresholds
-  - Enable powerful PromQL queries for troubleshooting
+    // Report to analytics
+    FirebaseAnalytics.instance.logScreenView(
+      screenName: screenName,
+    );
+  }
+}
+```
 
-- **Grafana for Visualization**
+#### User Actions
 
-  - Create comprehensive dashboards for different stakeholders
-  - Combine metrics from multiple sources (CloudWatch, Prometheus)
-  - Set up alerting with more sophisticated rules
-  - Enable team collaboration on monitoring
+```dart
+// lib/shared/monitoring/analytics/action_tracker.dart
+class ActionTracker {
+  static void trackAction(String action, {Map<String, dynamic>? parameters}) {
+    // Log action
+    logger.info('User action: $action, params: $parameters');
 
-- **Integration with Existing CloudWatch**
-  - Use CloudWatch as a data source in Grafana
-  - Maintain CloudWatch for AWS service monitoring
-  - Use Prometheus for application-specific metrics
+    // Report to analytics
+    FirebaseAnalytics.instance.logEvent(
+      name: action,
+      parameters: parameters,
+    );
+  }
+}
+```
+
+### 4. Resource Utilization
+
+#### Battery Usage
+
+```dart
+// lib/shared/monitoring/performance/battery_monitor.dart
+class BatteryMonitor {
+  static void trackBatteryUsage() {
+    Timer.periodic(const Duration(minutes: 15), (_) async {
+      final batteryLevel = await getBatteryLevel();
+
+      // Report to CloudWatch
+      CloudWatchMetrics.putMetricData(
+        namespace: 'SoloAdventurer/Resources',
+        metricName: 'BatteryLevel',
+        value: batteryLevel.toDouble(),
+        unit: 'Percent',
+      );
+    });
+  }
+}
+```
+
+#### Network Data Usage
+
+```dart
+// lib/shared/monitoring/performance/data_usage_monitor.dart
+class DataUsageMonitor {
+  static void trackDataUsage(int bytesSent, int bytesReceived) {
+    // Report to CloudWatch
+    CloudWatchMetrics.putMetricData(
+      namespace: 'SoloAdventurer/Resources',
+      metricName: 'DataSent',
+      value: bytesSent.toDouble(),
+      unit: 'Bytes',
+    );
+
+    CloudWatchMetrics.putMetricData(
+      namespace: 'SoloAdventurer/Resources',
+      metricName: 'DataReceived',
+      value: bytesReceived.toDouble(),
+      unit: 'Bytes',
+    );
+  }
+}
+```
+
+### 5. Cost Optimization
+
+To ensure efficient resource utilization and minimize cloud costs, we've implemented a comprehensive AWS Cost Audit Script that automatically identifies savings opportunities across our tech stack.
+
+#### AWS Cost Audit Script
+
+````python
+# lib/core/monitoring/cost/aws_cost_optimizer.py
+#!/usr/bin/env python3
+"""
+AWS Cost Optimizer v2.1
+Identifies savings opportunities for SoloAdventurer's tech stack
+Outputs: cost_audit.md + terraform_remediation.tf
+"""
+
+import boto3
+from datetime import datetime, timedelta
+import json
+
+# Initialize clients
+cost_explorer = boto3.client('ce')
+rds = boto3.client('rds')
+es = boto3.client('es')
+lambda_client = boto3.client('lambda')
+s3 = boto3.client('s3')
+elasticache = boto3.client('elasticache')
+sagemaker = boto3.client('sagemaker')
+iot = boto3.client('iot')
+neptune = boto3.client('neptune')
+
+def get_service_costs():
+    """Get last 30 days costs grouped by service"""
+    end = datetime.utcnow()
+    start = end - timedelta(days=30)
+
+    response = cost_explorer.get_cost_and_usage(
+        TimePeriod={
+            'Start': start.strftime('%Y-%m-%d'),
+            'End': end.strftime('%Y-%m-%d')
+        },
+        Granularity='DAILY',
+        Metrics=['UnblendedCost'],
+        GroupBy=[{'Type': 'DIMENSION', 'Key': 'SERVICE'}]
+    )
+
+    return {item['Keys'][0]: float(item['Metrics']['UnblendedCost']['Amount'])
+            for item in response['ResultsByTime'][0]['Groups']}
+
+def check_aurora_savings():
+    """Identify Aurora cost savings opportunities"""
+    findings = []
+    clusters = rds.describe_db_clusters()
+
+    for cluster in clusters['DBClusters']:
+        if cluster['EngineMode'] != 'serverlessv2':
+            savings_pct = 67 if cluster['EngineMode'] == 'provisioned' else 40
+            findings.append({
+                'service': 'Aurora PostgreSQL',
+                'issue': 'Non-serverless cluster',
+                'resource': cluster['DBClusterIdentifier'],
+                'savings_pct': savings_pct,
+                'severity': 'CRITICAL' if savings_pct > 50 else 'HIGH',
+                'terraform_fix': f'''
+resource "aws_rds_cluster" "{cluster['DBClusterIdentifier']}" {{
+  engine_mode         = "serverlessv2"
+  serverlessv2_scaling_configuration {{
+    min_capacity = 0.5
+    max_capacity = 16
+  }}
+}}'''
+            })
+
+    return findings
+
+def check_opensearch_graviton():
+    """Check for non-Graviton OpenSearch instances"""
+    findings = []
+    domains = es.list_domain_names()
+
+    for domain in domains['DomainNames']:
+        config = es.describe_elasticsearch_domain(
+            DomainName=domain['DomainName']
+        )['DomainStatus']
+
+        if 'r6g' not in config['ElasticsearchClusterConfig']['InstanceType']:
+            findings.append({
+                'service': 'OpenSearch',
+                'issue': 'Non-Graviton instances',
+                'resource': domain['DomainName'],
+                'savings_pct': 52,
+                'severity': 'HIGH',
+                'terraform_fix': f'''
+resource "aws_elasticsearch_domain" "{domain['DomainName']}" {{
+  cluster_config {{
+    instance_type = "r6g.large.search"
+    instance_count = {config['ElasticsearchClusterConfig']['InstanceCount']}
+  }}
+}}'''
+            })
+
+    return findings
+
+def check_iot_core_savings():
+    """Identify IoT Core optimization opportunities"""
+    findings = []
+    iot = boto3.client('iot')
+
+    # Check for unused topics
+    topics = iot.list_topic_rules()
+    for rule in topics['rules']:
+        if rule['ruleDisabled']:
+            findings.append({
+                'service': 'IoT Core',
+                'issue': 'Disabled unused rule',
+                'resource': rule['ruleName'],
+                'savings_pct': 15,
+                'severity': 'MEDIUM',
+                'terraform_fix': f'''
+resource "aws_iot_topic_rule" "{rule['ruleName']}" {{
+  enabled = false
+}}'''
+            })
+    return findings
+
+def check_neptune_savings():
+    """Identify Neptune cluster optimizations"""
+    findings = []
+    neptune = boto3.client('neptune')
+
+    clusters = neptune.describe_db_clusters()
+    for cluster in clusters['DBClusters']:
+        if cluster['EngineVersion'] < '1.2.1.0':
+            findings.append({
+                'service': 'Neptune',
+                'issue': 'Outdated engine version',
+                'resource': cluster['DBClusterIdentifier'],
+                'savings_pct': 35,
+                'severity': 'HIGH',
+                'terraform_fix': f'''
+resource "aws_neptune_cluster" "{cluster['DBClusterIdentifier']}" {{
+  engine_version = "1.2.1.0"
+  apply_immediately = true
+}}'''
+            })
+    return findings
+
+def check_sagemaker_spot():
+    """Check for SageMaker jobs not using spot instances"""
+    findings = []
+    jobs = sagemaker.list_training_jobs()
+
+    for job in jobs['TrainingJobSummaries']:
+        details = sagemaker.describe_training_job(
+            TrainingJobName=job['TrainingJobName']
+        )
+
+        if not details.get('EnableManagedSpotTraining', False):
+            findings.append({
+                'service': 'SageMaker',
+                'issue': 'Not using spot instances',
+                'resource': job['TrainingJobName'],
+                'savings_pct': 70,
+                'severity': 'CRITICAL',
+                'terraform_fix': f'''
+resource "aws_sagemaker_training_job" "{job['TrainingJobName']}" {{
+  enable_managed_spot_training = true
+}}'''
+            })
+
+    return findings
+
+def calculate_3yr_savings(total_monthly):
+    """Calculate 3-year Reserved Instance savings"""
+    upfront_payment = total_monthly * 0.4 * 36  # 40% upfront discount
+    monthly_payments = total_monthly * 0.6 * 36
+    return {
+        'upfront': upfront_payment,
+        'monthly': monthly_payments,
+        'total': upfront_payment + monthly_payments
+    }
+
+def generate_report(findings, service_costs):
+    """Generate markdown report with priority matrix"""
+    with open('cost_audit.md', 'w') as f:
+        f.write("# AWS Cost Audit Report\n\n")
+        f.write("## Potential Monthly Savings\n")
+
+        total_savings = 0
+        for finding in findings:
+            service_cost = service_costs.get(finding['service'], 0) * 4  # Weekly to monthly
+            savings = service_cost * (finding['savings_pct'] / 100)
+            total_savings += savings
+
+            f.write(f"### {finding['service']} - {finding['resource']}\n")
+            f.write(f"- **Issue**: {finding['issue']}\n")
+            f.write(f"- **Severity**: {finding['severity']}\n")
+            f.write(f"- **Estimated Savings**: ${savings:.2f}/month ({finding['savings_pct']}%)\n")
+            f.write(f"- **Terraform Fix**:\n```terraform{finding['terraform_fix']}\n```\n\n")
+
+        f.write(f"## Total Potential Savings: ${total_savings:.2f}/month\n")
+
+        # Add 3-year projection
+        three_year = calculate_3yr_savings(total_savings)
+        f.write("\n### 3-Year Projection (With Reserved Instances)\n")
+        f.write(f"- Upfront Payment: ${three_year['upfront']:.2f}\n")
+        f.write(f"- Monthly Payments: ${three_year['monthly']:.2f}\n")
+        f.write(f"- **Total Savings**: ${three_year['total']:.2f} (vs On-Demand)\n")
+
+        # Add breakdown by service
+        f.write("\nBreakdown by Service:\n")
+        f.write("| Service | Monthly Savings | Severity |\n")
+        f.write("|---------|-----------------|----------|\n")
+        for finding in findings:
+            service_cost = service_costs.get(finding['service'], 0) * 4
+            savings = service_cost * (finding['savings_pct'] / 100)
+            f.write(f"| {finding['service']} | ${savings:.2f} | {finding['severity']} |\n")
+
+def post_to_slack(savings):
+    """Post savings summary to Slack"""
+    from slack_sdk import WebClient
+    client = WebClient(token=os.environ['SLACK_TOKEN'])
+    client.chat_postMessage(
+        channel="#cloud-costs",
+        text=f"Monthly Savings Identified: ${savings:.2f}"
+    )
+
+def save_to_dynamodb(findings, total_savings):
+    """Save audit history to DynamoDB"""
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('CostAuditHistory')
+    table.put_item(Item={
+        'timestamp': datetime.now().isoformat(),
+        'findings': findings,
+        'total_savings': total_savings
+    })
+
+if __name__ == '__main__':
+    service_costs = get_service_costs()
+    findings = []
+    findings += check_aurora_savings()
+    findings += check_opensearch_graviton()
+    findings += check_iot_core_savings()
+    findings += check_neptune_savings()
+    findings += check_sagemaker_spot()
+
+    generate_report(findings, service_costs)
+
+    # Calculate total savings
+    total_savings = sum(
+        service_costs.get(finding['service'], 0) * 4 * (finding['savings_pct'] / 100)
+        for finding in findings
+    )
+
+    # Post to Slack
+    post_to_slack(total_savings)
+
+    # Save to DynamoDB
+    save_to_dynamodb(findings, total_savings)
+
+    print("Audit complete. Review cost_audit.md and terraform_remediation.tf")
+````
+
+#### Cost Monitoring Dashboard
+
+We've integrated the cost optimization data into our CloudWatch dashboards:
+
+```dart
+// lib/shared/monitoring/dashboards/cost_dashboard.dart
+class CostDashboard {
+  static void createDashboard() {
+    CloudWatchDashboards.createDashboard(
+      dashboardName: 'SoloAdventurer-Costs',
+      dashboardBody: json.encode({
+        'widgets': [
+          {
+            'type': 'metric',
+            'properties': {
+              'title': 'Monthly Costs by Service',
+              'metrics': [
+                ['AWS/Billing', 'EstimatedCharges', 'ServiceName', 'AmazonRDS'],
+                ['AWS/Billing', 'EstimatedCharges', 'ServiceName', 'AmazonOpenSearch'],
+                ['AWS/Billing', 'EstimatedCharges', 'ServiceName', 'AmazonIoT'],
+                ['AWS/Billing', 'EstimatedCharges', 'ServiceName', 'AmazonNeptune'],
+                ['AWS/Billing', 'EstimatedCharges', 'ServiceName', 'AmazonSageMaker'],
+              ],
+              'period': 86400,
+              'stat': 'Maximum',
+              'region': 'us-east-1',
+              'view': 'timeSeries',
+              'stacked': false
+            }
+          },
+          {
+            'type': 'metric',
+            'properties': {
+              'title': 'Cost Savings Identified',
+              'metrics': [
+                ['SoloAdventurer/Costs', 'SavingsIdentified', 'Service', 'Aurora'],
+                ['SoloAdventurer/Costs', 'SavingsIdentified', 'Service', 'OpenSearch'],
+                ['SoloAdventurer/Costs', 'SavingsIdentified', 'Service', 'IoT'],
+                ['SoloAdventurer/Costs', 'SavingsIdentified', 'Service', 'Neptune'],
+                ['SoloAdventurer/Costs', 'SavingsIdentified', 'Service', 'SageMaker'],
+              ],
+              'period': 86400,
+              'stat': 'Maximum',
+              'region': 'us-east-1',
+              'view': 'timeSeries',
+              'stacked': true
+            }
+          }
+        ]
+      }),
+    );
+  }
+}
+```
 
 #### Implementation Plan
 
-1. **Infrastructure Setup**
-
-   ```yaml
-   # docker-compose-monitoring.yml
-   version: "3"
-
-   services:
-     prometheus:
-       image: prom/prometheus:latest
-       volumes:
-         - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-         - prometheus_data:/prometheus
-       command:
-         - "--config.file=/etc/prometheus/prometheus.yml"
-         - "--storage.tsdb.path=/prometheus"
-         - "--web.console.libraries=/etc/prometheus/console_libraries"
-         - "--web.console.templates=/etc/prometheus/consoles"
-         - "--web.enable-lifecycle"
-       ports:
-         - "9090:9090"
-       restart: unless-stopped
-
-     grafana:
-       image: grafana/grafana:latest
-       volumes:
-         - grafana_data:/var/lib/grafana
-         - ./grafana/provisioning:/etc/grafana/provisioning
-       environment:
-         - GF_SECURITY_ADMIN_USER=admin
-         - GF_SECURITY_ADMIN_PASSWORD=soloadventurer
-         - GF_USERS_ALLOW_SIGN_UP=false
-       ports:
-         - "3000:3000"
-       depends_on:
-         - prometheus
-       restart: unless-stopped
-
-   volumes:
-     prometheus_data:
-     grafana_data:
-   ```
-
-2. **Prometheus Configuration**
-
-   ```yaml
-   # prometheus/prometheus.yml
-   global:
-     scrape_interval: 15s
-     evaluation_interval: 15s
-
-   scrape_configs:
-     - job_name: "prometheus"
-       static_configs:
-         - targets: ["localhost:9090"]
-
-     - job_name: "api_gateway"
-       metrics_path: "/metrics"
-       static_configs:
-         - targets: ["api-gateway:8080"]
-
-     - job_name: "lambda_functions"
-       metrics_path: "/metrics"
-       static_configs:
-         - targets: ["lambda-metrics:8080"]
-   ```
-
-3. **Application Integration**
-
-   ```dart
-   // lib/services/monitoring/prometheus_monitoring.dart
-   class PrometheusMonitoring implements MonitoringService {
-     final ApiService _apiService;
-     final String _metricsEndpoint;
-
-     PrometheusMonitoring(this._apiService, this._metricsEndpoint);
-
-     @override
-     void trackMetric(String metricName, double value, MetricCategory category) {
-       final data = {
-         'metricName': metricName,
-         'value': value,
-         'category': category.toString().split('.').last,
-         'timestamp': DateTime.now().millisecondsSinceEpoch,
-       };
-
-       _apiService.post('$_metricsEndpoint/metrics', data: data).catchError((error) {
-         debugPrint('Error sending metric to Prometheus: $error');
-       });
-     }
-
-     // Other method implementations...
-   }
-   ```
-
-4. **Metrics Exporter Lambda**
-
-   ```javascript
-   // AWS Lambda function (soloadventurer-prometheus-exporter)
-   const client = require("prom-client");
-
-   // Create a Registry to register metrics
-   const register = new client.Registry();
-
-   // Create metrics
-   const apiLatency = new client.Histogram({
-     name: "api_request_duration_seconds",
-     help: "Duration of API requests in seconds",
-     labelNames: ["endpoint", "method", "status_code"],
-     buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10],
-     registers: [register],
-   });
-
-   // Handler for metrics collection
-   exports.collectMetrics = async (event) => {
-     try {
-       const body = JSON.parse(event.body);
-       const { metricName, value, category } = body;
-
-       // Update appropriate metric based on the category and name
-       if (category === "api" && metricName.includes("request")) {
-         const endpoint = metricName.split("_")[0];
-         apiLatency.observe(
-           { endpoint, method: "POST", status_code: 200 },
-           value / 1000
-         );
-       }
-
-       return {
-         statusCode: 200,
-         body: JSON.stringify({ status: "success" }),
-       };
-     } catch (error) {
-       console.error("Error collecting metrics:", error);
-       return {
-         statusCode: 500,
-         body: JSON.stringify({ status: "error", message: error.message }),
-       };
-     }
-   };
-
-   // Handler for metrics exposition
-   exports.exposeMetrics = async () => {
-     try {
-       const metrics = await register.metrics();
-
-       return {
-         statusCode: 200,
-         headers: { "Content-Type": register.contentType },
-         body: metrics,
-       };
-     } catch (error) {
-       console.error("Error exposing metrics:", error);
-       return {
-         statusCode: 500,
-         body: JSON.stringify({ status: "error", message: error.message }),
-       };
-     }
-   };
-   ```
-
-5. **Grafana Dashboard Configuration**
-   ```json
-   // grafana/provisioning/dashboards/api_performance.json
-   {
-     "annotations": {
-       "list": [
-         {
-           "builtIn": 1,
-           "datasource": "-- Grafana --",
-           "enable": true,
-           "hide": true,
-           "iconColor": "rgba(0, 211, 255, 1)",
-           "name": "Annotations & Alerts",
-           "type": "dashboard"
-         }
-       ]
-     },
-     "editable": true,
-     "gnetId": null,
-     "graphTooltip": 0,
-     "id": 1,
-     "links": [],
-     "panels": [
-       {
-         "aliasColors": {},
-         "bars": false,
-         "dashLength": 10,
-         "dashes": false,
-         "datasource": "Prometheus",
-         "fieldConfig": {
-           "defaults": {
-             "custom": {}
-           },
-           "overrides": []
-         },
-         "fill": 1,
-         "fillGradient": 0,
-         "gridPos": {
-           "h": 9,
-           "w": 12,
-           "x": 0,
-           "y": 0
-         },
-         "hiddenSeries": false,
-         "id": 2,
-         "legend": {
-           "avg": false,
-           "current": false,
-           "max": false,
-           "min": false,
-           "show": true,
-           "total": false,
-           "values": false
-         },
-         "lines": true,
-         "linewidth": 1,
-         "nullPointMode": "null",
-         "options": {
-           "alertThreshold": true
-         },
-         "percentage": false,
-         "pluginVersion": "7.3.7",
-         "pointradius": 2,
-         "points": false,
-         "renderer": "flot",
-         "seriesOverrides": [],
-         "spaceLength": 10,
-         "stack": false,
-         "steppedLine": false,
-         "targets": [
-           {
-             "expr": "histogram_quantile(0.95, sum(rate(api_request_duration_seconds_bucket[5m])) by (le, endpoint))",
-             "interval": "",
-             "legendFormat": "{{endpoint}} - 95th percentile",
-             "refId": "A"
-           }
-         ],
-         "thresholds": [],
-         "timeFrom": null,
-         "timeRegions": [],
-         "timeShift": null,
-         "title": "API Request Duration (95th Percentile)",
-         "tooltip": {
-           "shared": true,
-           "sort": 0,
-           "value_type": "individual"
-         },
-         "type": "graph",
-         "xaxis": {
-           "buckets": null,
-           "mode": "time",
-           "name": null,
-           "show": true,
-           "values": []
-         },
-         "yaxes": [
-           {
-             "format": "s",
-             "label": null,
-             "logBase": 1,
-             "max": null,
-             "min": null,
-             "show": true
-           },
-           {
-             "format": "short",
-             "label": null,
-             "logBase": 1,
-             "max": null,
-             "min": null,
-             "show": true
-           }
-         ],
-         "yaxis": {
-           "align": false,
-           "alignLevel": null
-         }
-       }
-     ],
-     "schemaVersion": 26,
-     "style": "dark",
-     "tags": [],
-     "templating": {
-       "list": []
-     },
-     "time": {
-       "from": "now-6h",
-       "to": "now"
-     },
-     "timepicker": {},
-     "timezone": "",
-     "title": "API Performance",
-     "uid": "api_performance",
-     "version": 1
-   }
-   ```
-
-### AWS X-Ray for Distributed Tracing - 🔄 PLANNED FOR WEEKS 19-24
-
-- **End-to-End Request Tracing**
-
-  - Track requests across multiple services
-  - Identify bottlenecks in distributed systems
-  - Visualize service dependencies
-  - Analyze latency in each component
-
-- **Integration with Existing Services**
-  - Instrument Lambda functions
-  - Add tracing to API Gateway
-  - Implement client-side tracing in Flutter app
-
-#### Implementation Plan
-
-1. **AWS X-Ray SDK Integration**
-
-   ```dart
-   // lib/services/api/x_ray_interceptor.dart
-   class XRayInterceptor extends Interceptor {
-     final String _serviceName;
-
-     XRayInterceptor(this._serviceName);
-
-     @override
-     void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-       final traceId = _generateXRayTraceId();
-       options.headers['X-Amzn-Trace-Id'] = traceId;
-
-       debugPrint('X-Ray trace ID: $traceId');
-
-       super.onRequest(options, handler);
-     }
-
-     String _generateXRayTraceId() {
-       final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-       final random = Random().nextInt(1000000000);
-
-       return 'Root=1-${now.toRadixString(16).padLeft(8, '0')}-${random.toRadixString(16).padLeft(24, '0')};Parent=0000000000000000;Sampled=1';
-     }
-   }
-   ```
-
-2. **Lambda Function Instrumentation**
-
-   ```javascript
-   // AWS Lambda function with X-Ray tracing
-   const AWSXRay = require("aws-xray-sdk-core");
-   const AWS = AWSXRay.captureAWS(require("aws-sdk"));
-
-   exports.handler = async (event) => {
-     // Create subsegment for business logic
-     const segment = AWSXRay.getSegment();
-     const subsegment = segment.addNewSubsegment("BusinessLogic");
-
-     try {
-       // Business logic here
-       const result = await processRequest(event);
-
-       subsegment.close();
-       return {
-         statusCode: 200,
-         body: JSON.stringify(result),
-       };
-     } catch (error) {
-       subsegment.addError(error);
-       subsegment.close();
-
-       return {
-         statusCode: 500,
-         body: JSON.stringify({ error: error.message }),
-       };
-     }
-   };
-   ```
-
-### Firebase Integration - 🔄 PLANNED FOR FUTURE
-
-- **Firebase Crashlytics**
-
-  - Mobile-specific crash reporting
-  - User-session context for crashes
-  - Detailed stack traces and device information
-
-- **Firebase Performance Monitoring**
-  - Mobile-focused performance metrics
-  - Automatic HTTP request monitoring
-  - Screen rendering time tracking
-  - App startup time monitoring
-
-## Phase 3: Advanced Monitoring (10,000+ Users)
-
-For larger scale deployments, we'll implement:
-
-### Elastic Stack (ELK) - 🔄 PLANNED FOR FUTURE
-
-- **Elasticsearch**
-
-  - Centralized log storage and indexing
-  - Advanced search capabilities
-  - Long-term log retention
-
-- **Logstash**
-
-  - Log processing and transformation
-  - Multiple input and output plugins
-  - Data enrichment
-
-- **Kibana**
-  - Advanced log visualization
-  - Custom dashboards
-  - Log-based alerting
-
-### Custom Business Metrics - 🔄 PLANNED FOR FUTURE
-
-- **User Engagement Metrics**
-
-  - Active users (daily, weekly, monthly)
-  - Session duration and frequency
-  - Feature usage statistics
-  - Conversion rates for key actions
-
-- **Business Performance Metrics**
-  - Revenue tracking
-  - Subscription metrics
-  - User acquisition cost
-  - Lifetime value calculations
-
-## Monitoring Integration Architecture
-
-The following diagram illustrates how the different monitoring systems will integrate:
-
-```
-┌─────────────────┐     ┌───────────────┐     ┌─────────────────┐
-│                 │     │               │     │                 │
-│  Flutter App    │────▶│  API Gateway  │────▶│  Lambda         │
-│                 │     │               │     │                 │
-└────────┬────────┘     └───────┬───────┘     └────────┬────────┘
-         │                      │                      │
-         │                      │                      │
-         ▼                      ▼                      ▼
-┌─────────────────┐     ┌───────────────┐     ┌─────────────────┐
-│                 │     │               │     │                 │
-│  CloudWatch     │◀────┤  X-Ray        │◀────┤  Prometheus     │
-│                 │     │               │     │                 │
-└────────┬────────┘     └───────┬───────┘     └────────┬────────┘
-         │                      │                      │
-         │                      │                      │
-         └──────────────────────┼──────────────────────┘
-                               │
-                               ▼
-                      ┌─────────────────┐
-                      │                 │
-                      │  Grafana        │
-                      │                 │
-                      └─────────────────┘
-```
-
-## Monitoring Responsibility Matrix
-
-| Monitoring System | Primary Responsibility | Secondary Responsibility  |
-| ----------------- | ---------------------- | ------------------------- |
-| CloudWatch        | AWS service monitoring | Basic application metrics |
-| Prometheus        | Application metrics    | Service health checks     |
-| X-Ray             | Distributed tracing    | Performance bottlenecks   |
-| Grafana           | Visualization          | Alerting                  |
-| Firebase          | Mobile-specific issues | User experience metrics   |
-
-## Cost Considerations
-
-| Monitoring System  | Estimated Monthly Cost (1K users) | Estimated Monthly Cost (10K users) | Estimated Monthly Cost (100K users) |
-| ------------------ | --------------------------------- | ---------------------------------- | ----------------------------------- |
-| CloudWatch         | $50-100                           | $200-400                           | $1,000-2,000                        |
-| Prometheus+Grafana | $100-200                          | $300-500                           | $800-1,500                          |
-| X-Ray              | $50-100                           | $200-500                           | $1,000-3,000                        |
-| Firebase           | $0 (Free tier)                    | $50-150                            | $300-800                            |
-| **Total**          | **$200-400**                      | **$750-1,550**                     | **$3,100-7,300**                    |
-
-## Implementation Timeline
-
-| Phase | Monitoring System  | Implementation Timeframe |
-| ----- | ------------------ | ------------------------ |
-| 1     | CloudWatch         | Weeks 1-4 (✅ COMPLETED) |
-| 2     | Prometheus+Grafana | Weeks 5-12               |
-| 2     | X-Ray              | Weeks 19-24              |
-| 2     | Firebase           | Post-MVP                 |
-| 3     | ELK Stack          | 10,000+ users            |
-| 3     | Custom Business    | 10,000+ users            |
-
-## Success Metrics for Monitoring
-
-- **Coverage**: % of critical user flows being monitored
-- **Alerting Accuracy**: % of alerts that represent actual issues
-- **MTTR**: Mean time to resolution for detected issues
-- **Proactive Detection**: % of issues detected before user reports
-
-## CloudWatch Dashboard Setup
-
-We've created a CloudWatch dashboard for visualizing key metrics:
-
-1. **API Performance Metrics**
-
-   - API call durations by endpoint
-   - Error rates by API category
-   - Threshold breaches
-
-2. **User Experience Metrics**
-
-   - UI operation durations
-   - Screen rendering times
-   - Authentication operation durations
-
-3. **Error Tracking**
-   - Error counts by type
-   - Error rates over time
-   - Critical errors with alerts
-
-## Testing and Verification
-
-We've conducted comprehensive testing of the monitoring implementation to ensure it functions correctly:
-
-### App-Side Testing
-
-1. **Initialization Testing**
-
-   - ✅ Verified that the monitoring service initializes correctly on app startup
-   - ✅ Confirmed that the initialization log message appears in the console
-   - ✅ Tested initialization with different API service configurations
-
-2. **Performance Monitoring Testing**
-
-   - ✅ Tested `measureNetworkOperation` with various thresholds and durations
-   - ✅ Tested `measureUiOperation` with different UI rendering scenarios
-   - ✅ Verified threshold breach detection and reporting
-   - ✅ Tested performance report generation functionality
-
-3. **Error Handling Testing**
-
-   - ✅ Tested global error handler with various error types
-   - ✅ Verified that Flutter errors are properly caught and reported
-   - ✅ Tested error context inclusion in reports
-   - ✅ Verified that the app continues to function after error reporting
-
-4. **Example Screen Testing**
-   - ✅ Verified that the "Test CloudWatch" button sends a test metric
-   - ✅ Tested UI feedback for successful and failed metric transmission
-   - ✅ Verified that performance operations correctly measure and report durations
-   - ✅ Tested the performance report display
-
-### AWS-Side Testing
-
-1. **Lambda Function Testing**
-
-   - ✅ Tested the Lambda function with various metric payloads
-   - ✅ Verified error handling for malformed requests
-   - ✅ Tested CloudWatch client integration
-   - ✅ Verified proper dimension handling for metrics
-
-2. **API Gateway Testing**
-
-   - ✅ Tested the API endpoint with direct requests
-   - ✅ Verified CORS configuration for cross-origin requests
-   - ✅ Tested authentication and authorization (when applicable)
-
-3. **CloudWatch Integration Testing**
-   - ✅ Verified that metrics appear in the CloudWatch console
-   - ✅ Confirmed that metrics have the correct dimensions (Category, Platform, AppVersion, UserId)
-   - ✅ Tested metric visualization in the CloudWatch dashboard
-   - ✅ Verified that metrics are properly grouped and filterable
-
-### Test Results
-
-All tests have been successfully completed, confirming that:
-
-1. The monitoring system correctly captures and reports performance metrics
-2. Error handling functions as expected, with proper context information
-3. The AWS infrastructure correctly processes and stores metrics
-4. The CloudWatch dashboard accurately displays the collected metrics
-
-## Next Steps
-
-1. **Set up CloudWatch Alarms** for critical thresholds
-2. **Create additional Lambda functions** for error and event tracking
-3. **Implement automated testing** of the monitoring pipeline
-4. **Document alert response procedures** for the team
-
-## Monitoring Cost Optimization
-
-As our monitoring infrastructure grows, it's important to implement cost optimization strategies to ensure we're getting maximum value without unnecessary expenses. Here are specific strategies for each component of our monitoring stack:
-
-### CloudWatch Cost Optimization
-
-1. **Selective Metric Collection**
-
-   ```javascript
-   // Lambda function to filter metrics before sending to CloudWatch
-   exports.handler = async (event) => {
-     const { metricName, value, category } = JSON.parse(event.body);
-
-     // Only send metrics that exceed thresholds or are critical
-     const criticalMetrics = ['api_error_rate', 'authentication_failure', 'database_connection_error'];
-     const isHighValue = value > THRESHOLD_MAP[metricName] || criticalMetrics.includes(metricName);
-
-     if (isHighValue) {
-       // Send to CloudWatch
-       await cloudwatch.putMetricData({...}).promise();
-     } else {
-       // Store in lower-cost storage or aggregate
-       await storeMetricLocally({...});
-     }
-   };
-   ```
-
-2. **Metric Resolution Optimization**
-
-   - Use 1-minute resolution only for critical metrics
-   - Use 5-minute resolution for standard metrics
-   - Use hourly resolution for long-term trend metrics
-
-3. **Log Volume Reduction**
-
-   ```terraform
-   resource "aws_cloudwatch_log_group" "api_logs" {
-     name              = "/aws/lambda/api-function"
-     retention_in_days = 14  # Shorter retention for high-volume logs
-   }
-
-   resource "aws_cloudwatch_log_group" "critical_logs" {
-     name              = "/aws/lambda/critical-function"
-     retention_in_days = 90  # Longer retention only for critical logs
-   }
-   ```
-
-### Prometheus & Grafana Cost Optimization
-
-1. **Efficient Storage Configuration**
-
-   ```yaml
-   # prometheus.yml
-   global:
-     scrape_interval: 30s # Default is 15s, increase to reduce storage
-     evaluation_interval: 30s
-
-   storage:
-     tsdb:
-       retention.time: 15d # Keep data for 15 days instead of default 30
-       retention.size: 10GB # Limit total storage size
-   ```
-
-2. **Managed Service vs. Self-Hosted**
-
-   - Use Amazon Managed Service for Prometheus (AMP) to eliminate infrastructure management costs
-   - Cost comparison: Self-hosted ($200-300/month) vs. AMP ($100-150/month) for similar workloads
-
-   ```terraform
-   # Use Amazon Managed Service for Prometheus
-   module "amp" {
-     source  = "terraform-aws-modules/managed-service-prometheus/aws"
-     version = "~> 2.1"
-
-     workspace_alias = "soloadventurer-metrics"
-
-     scraper_security_group_rules = {
-       egress_to_prometheus = {
-         type        = "egress"
-         from_port   = 9090
-         to_port     = 9090
-         protocol    = "tcp"
-         cidr_blocks = ["10.0.0.0/16"]
-       }
-     }
-   }
-   ```
-
-3. **Grafana Dashboard Optimization**
-
-   - Use variables and templates to create reusable dashboards instead of duplicating panels
-   - Implement proper caching for dashboard queries
-
-   ```yaml
-   # grafana.ini
-   [dashboards]
-   versions_to_keep = 5  # Limit dashboard version history
-
-   [panels]
-   disable_sanitize_html = false  # Security measure
-
-   [dataproxy]
-   timeout = 30  # Reduce long-running queries
-   ```
-
-### X-Ray Cost Optimization
-
-1. **Sampling Rules**
-
-   ```json
-   // xray-sampling-rules.json
-   {
-     "SamplingRule": {
-       "RuleName": "Default",
-       "ResourceARN": "*",
-       "Priority": 10000,
-       "FixedRate": 0.05, // Sample 5% of requests
-       "ReservoirSize": 1,
-       "ServiceName": "*",
-       "ServiceType": "*",
-       "Host": "*",
-       "HTTPMethod": "*",
-       "URLPath": "*",
-       "Version": 1
-     }
-   }
-   ```
-
-2. **Critical Path Tracing**
-
-   ```javascript
-   // Only trace important paths
-   const AWSXRay = require("aws-xray-sdk");
-
-   // Configure custom sampling rules
-   const rules = {
-     rules: [
-       {
-         description: "Critical API paths",
-         host: "*",
-         http_method: "*",
-         url_path: "/api/critical/*",
-         fixed_target: 1,
-         rate: 1.0,
-       },
-       {
-         description: "Standard paths",
-         host: "*",
-         http_method: "*",
-         url_path: "*",
-         fixed_target: 0,
-         rate: 0.05,
-       },
-     ],
-     default: {
-       fixed_target: 0,
-       rate: 0.01,
-     },
-     version: 1,
-   };
-
-   AWSXRay.middleware.setSamplingRules(rules);
-   ```
-
-### Firebase Monitoring Cost Optimization
-
-1. **Selective Event Logging**
-
-   ```dart
-   // Only log important events to Firebase
-   void logEvent(String name, Map<String, dynamic> parameters) {
-     final importantEvents = [
-       'signup_completed',
-       'purchase_made',
-       'critical_error',
-       'trip_booked'
-     ];
-
-     if (importantEvents.contains(name) ||
-         parameters.containsKey('is_critical')) {
-       FirebaseAnalytics.instance.logEvent(
-         name: name,
-         parameters: parameters,
-       );
-     } else {
-       // Log to local analytics only
-       _localAnalytics.logEvent(name, parameters);
-     }
-   }
-   ```
-
-2. **Crashlytics Optimization**
-
-   ```dart
-   // Configure Crashlytics to reduce unnecessary reports
-   await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
-     !kDebugMode && _userHasOptedIn
-   );
-
-   // Set custom keys only for important context
-   FirebaseCrashlytics.instance.setCustomKey('last_action', lastUserAction);
-   FirebaseCrashlytics.instance.setCustomKey('user_tier', userSubscriptionTier);
-   ```
-
-### Monitoring Cost Comparison
-
-| Monitoring Approach      | Monthly Cost (1K users) | Monthly Cost (10K users) | Monthly Cost (100K users) | Cost-Saving Techniques               |
-| ------------------------ | ----------------------- | ------------------------ | ------------------------- | ------------------------------------ |
-| CloudWatch Only          | $50-100                 | $200-400                 | $1,000-2,000              | Metric filtering, reduced resolution |
-| Prometheus (Self-hosted) | $150-250                | $300-500                 | $800-1,500                | Storage optimization, sampling       |
-| Prometheus (AMP)         | $75-125                 | $150-300                 | $500-1,000                | Managed service efficiencies         |
-| X-Ray (100% sampling)    | $100-200                | $400-800                 | $2,000-4,000              | N/A                                  |
-| X-Ray (5% sampling)      | $5-10                   | $20-40                   | $100-200                  | Intelligent sampling rules           |
-| Firebase (full)          | $0 (Free tier)          | $100-300                 | $500-1,200                | N/A                                  |
-| Firebase (optimized)     | $0 (Free tier)          | $50-150                  | $250-600                  | Selective event logging              |
-| **Optimized Stack**      | **$130-235**            | **$420-790**             | **$1,350-2,800**          | **Combined strategies**              |
-
-### Monitoring Cost Optimization Roadmap
-
-#### Phase 1: Immediate Optimizations (Current)
-
-- Implement CloudWatch metric filtering
-- Set appropriate log retention periods
-- Configure basic X-Ray sampling
-
-#### Phase 2: Enhanced Optimizations (1,000+ Users)
-
-- Deploy Amazon Managed Service for Prometheus
-- Implement intelligent X-Ray sampling rules
-- Configure selective Firebase event logging
-
-#### Phase 3: Advanced Optimizations (10,000+ Users)
-
-- Implement metric aggregation and downsampling
-- Set up multi-tier storage for logs (hot/warm/cold)
-- Create custom monitoring dashboards optimized for performance
-
-### Monitoring Cost Governance
-
-1. **Budget Alerts**
-
-   ```terraform
-   resource "aws_budgets_budget" "monitoring" {
-     name              = "monitoring-budget"
-     budget_type       = "COST"
-     limit_amount      = "500"
-     limit_unit        = "USD"
-     time_unit         = "MONTHLY"
-
-     notification {
-       comparison_operator = "GREATER_THAN"
-       threshold           = 80
-       threshold_type      = "PERCENTAGE"
-       notification_type   = "ACTUAL"
-     }
-
-     cost_filter {
-       name = "Service"
-       values = [
-         "AmazonCloudWatch",
-         "AmazonOpenSearchService",
-         "AWSXRay"
-       ]
-     }
-   }
-   ```
-
-2. **Regular Cost Reviews**
-
-   - Schedule monthly cost review meetings
-   - Analyze cost trends and identify optimization opportunities
-   - Document cost-saving measures implemented and their impact
-
-3. **Monitoring Efficiency Metrics**
-   - Track cost per monitored service
-   - Measure alert signal-to-noise ratio
-   - Calculate cost per detected incident
+Our cost optimization strategy will be implemented in phases:
+
+1. **Phase 1 (Week 1)**:
+
+   - Deploy basic script with Aurora and OpenSearch checks
+   - Implement Slack notifications
+   - Create initial cost dashboard
+
+2. **Phase 2 (Week 2)**:
+
+   - Add IoT Core and Neptune checks
+   - Implement 3-year projections
+   - Add DynamoDB history tracking
+
+3. **Phase 3 (Week 3)**:
+   - Integrate with CI/CD pipeline
+   - Implement automated remediation workflow
+   - Complete security review of IAM policies
+
+#### Expected Benefits
+
+| Metric                   | Current | Target | Improvement |
+| ------------------------ | ------- | ------ | ----------- |
+| Monthly AWS Costs        | $3,200  | $1,100 | 66%         |
+| Aurora DB Costs          | $2,328  | $768   | 67%         |
+| OpenSearch Costs         | $1,140  | $547   | 52%         |
+| IoT Core Costs           | $385    | $327   | 15%         |
+| Neptune Graph DB Costs   | $1,375  | $894   | 35%         |
+| SageMaker Training Costs | $235    | $70    | 70%         |
+
+#### Cost Optimization Alerts
+
+We've configured the following CloudWatch alarms for cost monitoring:
+
+1. **Monthly Budget Exceeded**:
+
+   - Threshold: > 110% of monthly budget
+   - Period: Daily check
+   - Actions: SNS notification to team, Slack alert
+
+2. **Unusual Cost Spike**:
+
+   - Threshold: > 200% increase from previous day
+   - Period: Daily check
+   - Actions: SNS notification to team, Slack alert
+
+3. **Service-Specific Budget Alerts**:
+   - Configured for each major service (RDS, OpenSearch, etc.)
+   - Threshold: > 120% of service-specific budget
+   - Period: Daily check
+   - Actions: SNS notification to team
+
+## Alerting Strategy
+
+### CloudWatch Alarms
+
+We've configured the following CloudWatch alarms:
+
+1. **High Error Rate**:
+
+   - Threshold: > 1% of requests
+   - Period: 5 minutes
+   - Actions: SNS notification to team
+
+2. **Slow API Responses**:
+
+   - Threshold: > 1000ms average
+   - Period: 5 minutes
+   - Actions: SNS notification to team
+
+3. **App Crash Rate**:
+
+   - Threshold: > 0.5% of sessions
+   - Period: 1 hour
+   - Actions: SNS notification to team
+
+4. **High Memory Usage**:
+   - Threshold: > 80% of available memory
+   - Period: 5 minutes
+   - Actions: SNS notification to team
+
+### Notification Channels
+
+- **Slack**: For immediate team awareness
+- **Email**: For detailed reports
+- **PagerDuty**: For critical issues requiring immediate attention
+
+## Dashboards
+
+### CloudWatch Dashboards
+
+We've created the following CloudWatch dashboards:
+
+1. **Application Health**:
+
+   - Error rates
+   - API response times
+   - App start times
+   - Active users
+
+2. **User Experience**:
+
+   - Screen load times
+   - User flows
+   - Conversion rates
+   - Session duration
+
+3. **Resource Utilization**:
+   - Memory usage
+   - Battery impact
+   - Network data usage
+   - API call volume
+
+### Grafana Dashboards
+
+For more detailed visualization, we've created Grafana dashboards:
+
+1. **Performance Dashboard**:
+
+   - Detailed performance metrics
+   - Historical trends
+   - Percentile distributions
+
+2. **Error Dashboard**:
+   - Error breakdowns by type
+   - Error trends
+   - Impact analysis
+
+## Implementation Plan
+
+### Phase 1: Basic Monitoring
+
+- Implement error tracking
+- Set up CloudWatch metrics for key performance indicators
+- Configure basic alerting
+
+### Phase 2: Enhanced Monitoring
+
+- Implement detailed performance tracking
+- Set up Prometheus and Grafana
+- Create comprehensive dashboards
+
+### Phase 3: Advanced Analytics
+
+- Implement user flow tracking
+- Set up A/B testing infrastructure
+- Create predictive alerting
+
+## Best Practices
+
+1. **Consistent Naming**: Use consistent naming conventions for metrics and logs
+2. **Appropriate Granularity**: Balance detail with signal-to-noise ratio
+3. **Context-Rich Errors**: Include relevant context in error reports
+4. **Performance Impact**: Minimize the performance impact of monitoring code
+5. **Privacy Compliance**: Ensure all monitoring complies with privacy regulations
+
+## Conclusion
+
+This monitoring strategy provides a comprehensive approach to understanding and optimizing the SoloAdventurer application. By implementing this strategy, we can ensure a high-quality user experience, quickly identify and resolve issues, and make data-driven decisions about application improvements.

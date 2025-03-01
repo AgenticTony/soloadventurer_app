@@ -50,23 +50,121 @@ Key enhancements:
 - **Security**: Vault for secret management, Falco for runtime security
 - **Cost Optimization**: Spot Instances instead of Reserved Instances
 
-## Phased Implementation
+## Revised Phased Implementation
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation (Completed)
 
 - AWS Cognito for authentication
 - Basic CloudWatch monitoring
 - Simple API Gateway + Lambda setup
+- Initial Flutter app with basic state management
+- Core authentication flows
 
-### Phase 2: Optimization (Weeks 5-12)
+### Phase 2: Testing & Architecture Refinement (Current Focus)
+
+#### Riverpod Testing Infrastructure
+
+- **Create Provider Test Utilities**
+
+  ```dart
+  // test/utils/provider_container.dart
+  ProviderContainer createContainer({
+    List<Override> overrides = const [],
+  }) {
+    final container = ProviderContainer(
+      overrides: overrides,
+    );
+    return container;
+  }
+  ```
+
+- **Implement Integration Tests for Screens**
+
+  ```dart
+  // test/features/auth/presentation/screens/login_screen_test.dart
+  testWidgets('LoginScreen should show error on failed login', (tester) async {
+    // Arrange
+    final mockAuthRepository = MockAuthRepository();
+    when(mockAuthRepository.signInWithEmailAndPassword(
+      email: 'test@example.com',
+      password: 'password',
+    )).thenThrow(Exception('Invalid credentials'));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authRepositoryProvider.overrideWithValue(mockAuthRepository),
+        ],
+        child: const MaterialApp(
+          home: LoginScreen(),
+        ),
+      ),
+    );
+
+    // Act & Assert
+    // ...
+  });
+  ```
+
+- **Document Provider Patterns and Testing Approach**
+  - Create comprehensive documentation for Riverpod testing strategy
+  - Establish best practices for provider implementation and testing
+
+#### Project Restructuring
+
+- **Migrate to Feature-Based Organization**
+
+  ```
+  lib/
+  ├── app/                     # Core app infrastructure
+  ├── features/                # Feature modules (vertical slices)
+  │   ├── auth/                # Authentication feature
+  │   │   ├── data/            # Data layer
+  │   │   ├── domain/          # Business logic
+  │   │   └── presentation/    # UI layer
+  │   ├── trips/               # Trip management
+  │   └── matching/            # Traveler matching system
+  └── shared/                  # Cross-cutting concerns
+  ```
+
+- **Implement Proper Dependency Injection**
+
+  ```dart
+  // lib/app/di/service_locator.dart
+  final getIt = GetIt.instance;
+
+  void setupServiceLocator() {
+    // Register repositories
+    getIt.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(
+        localDataSource: getIt<AuthLocalDataSource>(),
+        remoteDataSource: getIt<AuthRemoteDataSource>(),
+      ),
+    );
+
+    // Register use cases
+    getIt.registerLazySingleton(() => GetCurrentUser(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => SignIn(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => SignOut(getIt<AuthRepository>()));
+  }
+  ```
+
+- **Enhance Documentation Strategy**
+  - Create architecture documentation
+  - Document testing strategies
+  - Establish monitoring approach
+
+### Phase 3: Database & Monitoring Optimization (Next Focus)
 
 #### Database Optimizations
 
 - **Add Geospatial Indexes**
+
   ```sql
   CREATE INDEX CONCURRENTLY idx_users_geo_gist
   ON users USING GIST (location);
   ```
+
 - **Implement PgBouncer** for connection pooling
   ```yaml
   # docker-compose-pgbouncer.yml
@@ -82,17 +180,10 @@ Key enhancements:
       - DEFAULT_POOL_SIZE=100
   ```
 
-#### Secret Management
-
-- **Implement HashiCorp Vault**
-  ```bash
-  # Secret injection
-  vault kv put secret/db_creds username=admin password=...
-  ```
-
 #### Enhanced Monitoring
 
 - **Set up Prometheus + Grafana**
+
   ```yaml
   # docker-compose-monitoring.yml
   prometheus:
@@ -107,29 +198,95 @@ Key enhancements:
       - "3000:3000"
   ```
 
-#### Flutter Optimizations
+- **Integrate with CloudWatch**
 
-- **Implement SliverAnimatedList for efficient rendering**
+  ```terraform
+  # Integrate CloudWatch with Prometheus
+  resource "aws_cloudwatch_log_group" "prometheus" {
+    name = "/prometheus/metrics"
+    retention_in_days = 30
+  }
+  ```
+
+- **Create Comprehensive Dashboards**
+  - Application health dashboard
+  - User experience metrics
+  - Resource utilization tracking
+
+### Phase 4: API & Feature Development (Weeks 8-14)
+
+#### API Endpoint Configuration
+
+- **Design for Multiple Request Types**
+
   ```dart
-  SliverAnimatedList(
-    itemBuilder: (context, index, animation) {
-      return SizeTransition(
-        sizeFactor: animation,
-        child: MatchCard(match: matches[index]),
-      );
-    },
-  )
-  ```
-- **Add Drift for local database caching**
-  ```yaml
-  dependencies:
-    drift: ^2.0.0
-    sqlite3_flutter_libs: ^0.5.0
-    path_provider: ^2.0.0
-    path: ^1.8.0
+  // lib/shared/api/api_client.dart
+  abstract class ApiClient {
+    Future<Response<T>> get<T>(String path, {Map<String, dynamic>? queryParameters});
+    Future<Response<T>> post<T>(String path, {dynamic data});
+    Future<Response<T>> put<T>(String path, {dynamic data});
+    Future<Response<T>> delete<T>(String path);
+    Stream<T> subscribe<T>(String topic);
+  }
+
+  // REST implementation
+  class RestApiClient implements ApiClient {
+    final Dio _dio;
+    // Implementation
+  }
+
+  // GraphQL implementation
+  class GraphQLApiClient implements ApiClient {
+    final GraphQLClient _client;
+    // Implementation
+  }
+
+  // WebSocket implementation
+  class WebSocketApiClient implements ApiClient {
+    final WebSocketChannel _channel;
+    // Implementation for real-time features
+  }
   ```
 
-### Phase 3: Scaling (Weeks 13-18)
+- **Implement Abstraction Layers**
+
+  ```dart
+  // lib/shared/api/api_service.dart
+  class ApiService {
+    final ApiClient _client;
+    final ApiResponseMapper _mapper;
+
+    ApiService(this._client, this._mapper);
+
+    Future<T> fetchData<T>(String endpoint, {Map<String, dynamic>? params}) async {
+      final response = await _client.get(endpoint, queryParameters: params);
+      return _mapper.map<T>(response);
+    }
+
+    // Other methods
+  }
+  ```
+
+#### Feature Development
+
+- **Travel Preferences UI**
+
+  - Implement preference selection screens
+  - Create preference management system
+  - Build preference-based recommendation engine
+
+- **Trip Planning Interface**
+
+  - Develop trip creation workflow
+  - Implement itinerary management
+  - Build collaborative planning features
+
+- **Location Visualization**
+  - Integrate Google Maps/Flutter Map
+  - Implement location search functionality
+  - Create interactive map features
+
+### Phase 5: Scaling & Performance (Weeks 15-20)
 
 #### Event Streaming
 
@@ -154,6 +311,32 @@ Key enhancements:
     promotion_tier     = 15  # Lower priority for promotion
   }
   ```
+
+#### Flutter Optimizations
+
+- **Implement SliverAnimatedList for efficient rendering**
+
+  ```dart
+  SliverAnimatedList(
+    itemBuilder: (context, index, animation) {
+      return SizeTransition(
+        sizeFactor: animation,
+        child: MatchCard(match: matches[index]),
+      );
+    },
+  )
+  ```
+
+- **Add Drift for local database caching**
+  ```yaml
+  dependencies:
+    drift: ^2.0.0
+    sqlite3_flutter_libs: ^0.5.0
+    path_provider: ^2.0.0
+    path: ^1.8.0
+  ```
+
+### Phase 6: Advanced Features (Weeks 21-28)
 
 #### Location Updates
 
@@ -180,6 +363,13 @@ Key enhancements:
 
 #### Security Enhancements
 
+- **Implement HashiCorp Vault**
+
+  ```bash
+  # Secret injection
+  vault kv put secret/db_creds username=admin password=...
+  ```
+
 - **Implement Falco for runtime security**
   ```yaml
   # falco-values.yaml
@@ -192,7 +382,7 @@ Key enhancements:
       program: "jq '{text: .output}' | curl -d @- -X POST https://hooks.slack.com/services/XXX/YYY/ZZZ"
   ```
 
-### Phase 4: Advanced Architecture (Weeks 19-24)
+### Phase 7: Advanced Architecture (Weeks 29-36)
 
 #### WebSocket Scaling
 
@@ -252,66 +442,13 @@ Key enhancements:
   }
   ```
 
-### Phase 5: Intelligence (Weeks 25-32)
+### Phase 8: Intelligence & Enterprise Features (Future)
 
 #### ML Feature Management
 
 - **Implement SageMaker Feature Store**
-
-  ```python
-  # Create feature group
-  from sagemaker.feature_store.feature_group import FeatureGroup
-
-  user_preferences_fg = FeatureGroup(
-      name="user-travel-preferences",
-      sagemaker_session=sagemaker_session
-  )
-
-  # Define features
-  user_preferences_fg.load_feature_definitions(
-      [
-          {"FeatureName": "user_id", "FeatureType": "String"},
-          {"FeatureName": "preferred_destinations", "FeatureType": "String"},
-          {"FeatureName": "travel_style", "FeatureType": "String"},
-          {"FeatureName": "budget_range", "FeatureType": "String"},
-          {"FeatureName": "activity_preferences", "FeatureType": "String"},
-          {"FeatureName": "last_updated", "FeatureType": "String"}
-      ]
-  )
-
-  # Create feature group
-  user_preferences_fg.create(
-      s3_uri=f"s3://{bucket}/feature-store/user-preferences",
-      record_identifier_name="user_id",
-      event_time_feature_name="last_updated",
-      role_arn=role,
-      enable_online_store=True
-  )
-  ```
-
-#### Content Moderation
-
-- **Implement Amazon Rekognition**
-
-  ```dart
-  Future<bool> isAppropriateImage(File image) async {
-    final response = await _rekognitionClient.detectModerationLabels(
-      image: await image.readAsBytes(),
-      minConfidence: 60.0,
-    );
-
-    final hasModerationLabels = response.moderationLabels.isNotEmpty;
-    if (hasModerationLabels) {
-      _logger.warning(
-        'Image moderation detected inappropriate content: ${response.moderationLabels}',
-      );
-    }
-
-    return !hasModerationLabels;
-  }
-  ```
-
-### Phase 6: Enterprise-Grade (Weeks 33-40)
+- **Deploy recommendation models**
+- **Implement content moderation**
 
 #### Multi-Region Deployment
 
@@ -325,12 +462,6 @@ Key enhancements:
 - **Set up cross-region backup strategies**
 - **Create disaster recovery runbooks**
 
-#### Comprehensive Compliance Framework
-
-- **Implement GDPR compliance measures**
-- **Set up SOC2 compliance monitoring**
-- **Create privacy-by-design architecture**
-
 ## Cost-Performance Benchmarks
 
 | Component           | Current Stack | Improved Stack | Savings |
@@ -342,336 +473,34 @@ Key enhancements:
 | Real-Time Messaging | $900/mo       | $550/mo        | 39%     |
 | **Total Monthly**   | **$6,840/mo** | **$3,167/mo**  | **54%** |
 
-## Cost Optimization Strategies
-
-### 1. Database Layer (Aurora PostgreSQL)
-
-**Savings: 65%**
-
-**Current Setup:**
-
-- Single writer instance (db.r6g.large at $0.40/hr)
-- Provisioned capacity regardless of usage
-
-**Optimized Setup:**
-
-```terraform
-# Migrate to Aurora Serverless v2
-resource "aws_rds_cluster" "main" {
-  engine_mode                  = "serverlessv2"
-  serverlessv2_scaling_configuration {
-    min_capacity = 0.5 # 1 ACU = $0.12/hr (vs $0.40/hr for provisioned)
-    max_capacity = 16
-  }
-}
-
-# Add read replicas for geospatial queries
-resource "aws_rds_cluster_instance" "replicas" {
-  count              = 2
-  instance_class     = "db.serverlessv2"
-  cluster_identifier = aws_rds_cluster.main.id
-  promotion_tier     = 1
-}
-```
-
-**Additional Optimizations:**
-
-- Enable auto-pause after 5 minutes of inactivity
-- Implement query plan management to kill expensive queries
-- Configure PgBouncer as previously mentioned
-
-### 2. Search Layer (OpenSearch)
-
-**Savings: 52%**
-
-**Current Setup:**
-
-- 3-node cluster with t3.medium instances ($0.0528/hr each = $0.1584/hr)
-
-**Optimized Setup:**
-
-```bash
-# Switch to Graviton instances
-aws opensearch update-domain-config \
-  --domain-name soloadventurer \
-  --cluster-config '{"InstanceType":"r6g.large.search", "InstanceCount":3}'
-
-# Enable UltraWarm storage for old data
-aws opensearch create-package \
-  --package-name "ultrawarm" \
-  --package-type "TieredStorage"
-```
-
-**Additional Optimizations:**
-
-- Use zstd compression on documents (35% smaller indexes)
-- Set optimal shard size to 30-50GB
-
-```bash
-curl -XPUT _cluster/settings -d '{"persistent":{"cluster.max_shards_per_node":2000}}'
-```
-
-### 3. Compute Layer (Lambda)
-
-**Savings: 45%**
-
-**Current Setup:**
-
-- x86_64 architecture with 1GB memory allocation
-- Standard deployment package sizes
-
-**Optimized Setup:**
-
-```terraform
-# Graviton + right-sizing
-resource "aws_lambda_function" "api" {
-  architectures = ["arm64"]
-  memory_size   = 512 # Test with AWS Compute Optimizer
-  ephemeral_storage {
-    size = 512 # Minimal for most functions
-  }
-}
-
-# Shared layers to reduce deployment size
-resource "aws_lambda_layer_version" "shared" {
-  filename   = "shared-layer.zip"
-  layer_name = "common-dependencies"
-}
-```
-
-**Additional Optimizations:**
-
-- Use Lambda PowerTools for Python/Node.js to reduce cold starts by 70%
-- Implement provisioned concurrency only for critical functions
-
-### 4. Storage Optimization (S3)
-
-**Savings: 60%**
-
-**Current Setup:**
-
-- Standard storage for all objects
-- No lifecycle policies
-
-**Optimized Setup:**
-
-```bash
-# Lifecycle policy for intelligent tiering
-aws s3api put-bucket-lifecycle-configuration \
-  --bucket soloadventurer-photos \
-  --lifecycle-configuration '
-{
-  "Rules": [
-    {
-      "ID": "MoveToIntelligentTiering",
-      "Status": "Enabled",
-      "Transitions": [{
-        "Days": 30,
-        "StorageClass": "INTELLIGENT_TIERING"
-      }]
-    }
-  ]
-}'
-```
-
-**Additional Optimizations:**
-
-- Enable S3 Inventory to find and delete orphaned files
-- Use S3 Select for partial file retrievals (50% fewer bytes scanned)
-- Implement CloudFront for edge caching of frequently accessed content
-
-### 5. Caching Layer (ElastiCache/Redis)
-
-**Savings: 48%**
-
-**Current Setup:**
-
-- cache.r6g.large instances ($0.175/hr)
-- Standard memory allocation
-
-**Optimized Setup:**
-
-```terraform
-# Tiered storage + Graviton
-resource "aws_elasticache_replication_group" "main" {
-  node_type            = "cache.t4g.medium" # $0.068/hr vs r6g.large $0.175
-  engine_version       = "7.1"
-  transit_encryption_enabled = true
-  cluster_mode {
-    num_node_groups         = 1
-    replicas_per_node_group = 1
-  }
-}
-```
-
-**Critical Settings:**
-
-- Set `maxmemory-policy volatile-lru` to auto-evict stale data
-- Enable clustering at 500+ ops/sec
-- Implement proper key expiration strategies
-
-### 6. Real-Time Messaging Optimization
-
-**Savings: 38%**
-
-**Current Setup:**
-
-- WebSockets via API Gateway for all real-time communication
-- High connection and message costs
-
-**Optimized Setup:**
-Hybrid approach using MQTT for frequent updates and WebSockets for chat:
-
-```dart
-// Flutter MQTT client for location updates
-final client = MqttServerClient('iot.amazonaws.com', 'soloadventurer_${userId}');
-client.secure = true;
-client.keepAlivePeriod = 20;
-client.onDisconnected = onDisconnected;
-client.onConnected = onConnected;
-
-// Publish location update
-final builder = MqttClientPayloadBuilder();
-builder.addString(json.encode({
-  'userId': userId,
-  'latitude': position.latitude,
-  'longitude': position.longitude,
-  'timestamp': DateTime.now().toIso8601String(),
-}));
-client.publishMessage('users/location', MqttQos.atLeastOnce, builder.payload!);
-```
-
-**Cost Comparison:**
-| Feature | WebSocket Cost (1M users) | MQTT Cost | Savings |
-|---------|---------------------------|-----------|---------|
-| Connection | $350 | $0.30 | 99% |
-| Messages | $900 | $250 | 72% |
-
-### 7. ML Cost Controls (SageMaker)
-
-**Savings: 67%**
-
-**Current Setup:**
-
-- On-demand instances for training
-- Provisioned endpoints for inference
-
-**Optimized Setup:**
-
-```python
-# Spot Instance Training
-estimator = sagemaker.estimator.Estimator(
-  instance_type='ml.g5.2xlarge',
-  instance_count=2,
-  use_spot_instances=True, # 70% discount
-  max_wait=86400  # 24 hours
-)
-
-# Serverless Inference
-predictor = sagemaker.serverless.ServerlessInferenceConfig(
-  memory_size_in_mb=2048,
-  max_concurrency=20
-)
-```
-
-**Additional Optimizations:**
-
-- Use SageMaker JumpStart for pre-trained travel recommendation models
-- Implement model compression techniques for faster inference
-
-### 8. CI/CD & Observability Optimization
-
-**Savings: 40%**
-
-**Current Setup:**
-
-- GitHub-hosted runners
-- No timeout limits on workflows
-
-**Optimized Setup:**
-
-```yaml
-# .github/workflows/deploy.yml
-jobs:
-  build:
-    runs-on: [self-hosted, ARM64] # Cheaper than hosted runners
-    steps:
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            build/
-          key: ${{ runner.os }}-dart-${{ hashFiles('pubspec.lock') }}
-
-  deploy:
-    needs: build
-    timeout-minutes: 15 # Prevent runaway costs
-```
-
-**Monitoring Cost Controls:**
-
-```terraform
-# Cost-effective Prometheus
-module "amp" {
-  source = "terraform-aws-modules/prometheus/aws"
-  workspace_alias = "soloadventurer-metrics"
-}
-
-# CloudWatch Billing Alarm
-resource "aws_cloudwatch_metric_alarm" "monthly_budget" {
-  alarm_name          = "MonthlyBudgetAlert"
-  comparison_operator = "GreaterThanThreshold"
-  threshold           = 1000 # Alert at $1K
-  metric_name         = "EstimatedCharges"
-  namespace           = "AWS/Billing"
-  statistic           = "Maximum"
-  period              = 86400 # 24 hours
-}
-```
-
 ## Implementation Roadmap
 
-### Immediate Wins (Week 1)
+### Immediate Focus (Next 2 Weeks)
 
-- Enable Aurora Serverless v2
-- Switch OpenSearch to Graviton
-- Deploy S3 Intelligent Tiering
+- Complete Riverpod testing infrastructure
+- Implement project restructuring based on clean architecture
+- Document provider patterns and testing approach
 
-### Medium-Term (Week 2-3)
+### Short-Term (2-4 Weeks)
 
-- Migrate 50% of Lambdas to ARM64
-- Implement MQTT for location updates
-- Configure Redis tiered storage
+- Implement critical database optimizations
+- Set up enhanced monitoring with Prometheus+Grafana
+- Configure API endpoints with new architecture in mind
 
-### Long-Term (Week 4+)
+### Medium-Term (1-3 Months)
 
-- Train ML models with Spot Instances
-- Optimize sharding in OpenSearch
-- Establish FinOps governance
+- Develop travel preferences UI
+- Build trip planning interface
+- Integrate Google Maps/Flutter Map for location visualization
 
-## Implementation Guidelines
+### Long-Term (3+ Months)
 
-### Testing Strategy
-
-- Create performance benchmarks before and after each change
-- Implement canary deployments for high-risk changes
-- Conduct load testing before production deployment
-- Use synthetic transactions to validate end-to-end functionality
-
-### Rollback Procedures
-
-- Document detailed rollback procedures for each major change
-- Implement automated rollback triggers based on monitoring alerts
-- Maintain previous infrastructure until new systems are proven stable
-- Conduct regular rollback drills to ensure procedures work as expected
-
-### Monitoring Strategy
-
-- Implement comprehensive monitoring before, during, and after migrations
-- Set up alerts for key performance indicators
-- Create dashboards for visualizing system health
-- Establish baseline metrics for comparison
+- Implement event streaming with Kafka
+- Configure database scaling with read replicas
+- Deploy advanced security features
 
 ## Conclusion
 
 This architecture evolution plan provides a roadmap for transforming the SoloAdventurer application from its current state to a more scalable, performant, and cost-effective infrastructure. By implementing these changes in phases, we can minimize risk while continuously improving the application's capabilities.
+
+The revised phasing aligns with our current priorities as outlined in the project plan, focusing first on establishing a solid foundation with proper testing infrastructure and clean architecture before moving on to performance optimizations and advanced features.

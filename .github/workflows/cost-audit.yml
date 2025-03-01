@@ -1,0 +1,58 @@
+name: AWS Cost Audit
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Run daily at midnight
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3 slack_sdk
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Run cost audit
+        run: python lib/core/monitoring/cost/aws_cost_optimizer.py
+        env:
+          # Core AWS environment variables
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+
+          # Integration toggles (disabled by default)
+          ENABLE_SLACK: ${{ secrets.ENABLE_SLACK || 'false' }}
+          ENABLE_DYNAMODB: ${{ secrets.ENABLE_DYNAMODB || 'false' }}
+
+          # Optional configuration
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || '#cloud-costs' }}
+          DYNAMODB_TABLE: ${{ secrets.DYNAMODB_TABLE || 'CostAuditHistory' }}
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v3
+        with:
+          name: cost-audit-report
+          path: |
+            cost_audit.md
+            terraform_remediation.tf
+
+      - name: Apply critical fixes (on approval)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "To apply Terraform remediation, review terraform_remediation.tf and run manually"
+          # Uncomment the line below to apply automatically (use with caution)
+          # terraform apply -auto-approve terraform_remediation.tf
