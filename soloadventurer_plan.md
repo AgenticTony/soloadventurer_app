@@ -5,9 +5,16 @@
 ### 📊 Backend Infrastructure
 
 - **Primary Database**: Amazon Aurora (PostgreSQL) + PostGIS
+  - **Connection Pooling**: PgBouncer for efficient connection management
+  - **Read Replicas**: Dedicated instances for geospatial queries
 - **Search & Discovery**: Amazon OpenSearch (Elasticsearch)
-- **Real-Time Features**: Redis + WebSockets
-- **API Layer**: GraphQL + REST (API Gateway + Lambda)
+- **Real-Time Features**:
+  - **Event Streaming**: Apache Kafka (MSK) for decoupled event processing
+  - **Messaging**: Redis + Envoy Proxy for 100K+ concurrent WebSocket connections
+  - **IoT Communication**: MQTT (AWS IoT Core) for battery-efficient location updates
+- **API Layer**:
+  - **GraphQL**: AWS AppSync for complex data fetching
+  - **REST**: API Gateway + Lambda
 - **Serverless Compute**: AWS Lambda (with Graviton instances for cost efficiency)
 - **Authentication**: AWS Cognito
 - **File Storage**: Amazon S3
@@ -15,16 +22,26 @@
 
 ### 🧠 AI & Recommendations
 
-- **Machine Learning**: AWS SageMaker
+- **Machine Learning**:
+  - **Core Platform**: AWS SageMaker
+  - **Feature Management**: SageMaker Feature Store for unified ML features
+  - **Content Moderation**: Amazon Rekognition for photo moderation/analysis
 - **Social Graph**: Amazon Neptune (Graph Database)
-- **Natural Language Processing**: OpenAI API (GPT-4)
+- **Natural Language Processing**: Specialized models for specific NLP tasks (replacing GPT-4 for non-critical NLP)
 
 ### 📱 Frontend
 
 - **Framework**: Flutter (Dart)
 - **State Management**: Riverpod
+- **Local Storage**:
+  - **Drift**: For efficient local database caching
+  - **Floor**: For database abstraction
 - **Maps & Geolocation**: Google Maps API / Flutter Map
 - **Notifications**: Firebase Cloud Messaging
+- **UI Optimization**:
+  - **SliverAnimatedList**: For optimized rendering of long lists
+  - **flutter_native_splash**: For optimized app launch experience
+  - **flutter_launcher_icons**: For consistent app icons across platforms
 - **Key Packages**:
   - **cached_network_image**: For optimized image loading and caching
   - **connectivity_plus**: For offline-first capabilities
@@ -35,9 +52,18 @@
 
 - **CI/CD**: GitHub Actions
 - **Infrastructure as Code**: Terraform
-- **Monitoring**: Amazon CloudWatch (with billing alerts)
+- **Monitoring**:
+  - **AWS Services**: Amazon CloudWatch (with billing alerts)
+  - **Application Metrics**: Prometheus + Grafana for granular metrics
+  - **Distributed Tracing**: AWS X-Ray
   - See detailed strategy in [docs/monitoring_strategy.md](docs/monitoring_strategy.md)
-- **Cost Optimization**: Aurora Serverless v2, Graviton instances, Reserved Instances
+- **Security**:
+  - **Secret Management**: HashiCorp Vault
+  - **Runtime Security**: Falco
+- **Cost Optimization**:
+  - **Compute**: Spot Instances with AWS Fault Injection Simulator
+  - **Database**: Aurora Serverless v2, Graviton instances
+  - **Scaling**: Auto-scaling based on demand patterns
 
 ---
 
@@ -148,10 +174,19 @@ We'll use a vertical slice approach, completing each feature from database to UI
    - Create provider test utilities
    - Implement integration tests for actual screens
    - Document provider patterns and testing approach
-3. Configure API endpoints in api*service.dart *(2-3 days)\_
-4. Develop travel preferences UI _(4-5 days)_
-5. Build trip planning interface _(7-10 days)_
-6. Integrate Google Maps/Flutter Map for location visualization _(5-7 days)_
+3. **Implement critical database optimizations** _(2 days)_
+   - Add geospatial indexes for location queries
+   - Configure connection pooling with PgBouncer
+4. Configure API endpoints in api*service.dart with new architecture in mind *(3-4 days)\_
+   - Design for future integration with different request types (REST, GraphQL, WebSockets)
+   - Implement proper abstraction layers for future extensibility
+5. Develop travel preferences UI _(4-5 days)_
+6. **Set up enhanced monitoring with Prometheus+Grafana** _(3 days)_
+   - Configure Prometheus for application metrics collection
+   - Set up Grafana dashboards for visualization
+   - Integrate with existing CloudWatch monitoring
+7. Build trip planning interface _(7-10 days)_
+8. Integrate Google Maps/Flutter Map for location visualization _(5-7 days)_
 
 ---
 
@@ -509,16 +544,18 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [x] Implement **user profile screens**
 - [ ] Develop **travel preferences UI** _(Depends on: Authentication completion)_
 - [ ] Create **profile photo upload** with S3 integration
+  - [ ] Implement **Amazon Rekognition** for photo moderation
 - [ ] Implement **user settings** screens
 - [ ] Add **notification preferences**
 - [ ] Implement **optimized image loading** with cached_network_image
+- [ ] **Implement local caching** with Drift for offline profile access
 
 **Weekly Breakdown:**
 
 - **Week 5**: Backend for user profiles and preferences
 - **Week 6**: Frontend for user profiles
 - **Week 7**: Frontend for travel preferences
-- **Week 8**: Photo upload and storage integration
+- **Week 8**: Photo upload, storage integration, and moderation with Rekognition
 
 **Testing Tasks:**
 
@@ -526,12 +563,14 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Test image upload and processing
 - [ ] Validate preference saving and retrieval
 - [ ] Test image caching and offline viewing
+- [ ] Test photo moderation with Rekognition
 
 **Documentation:**
 
 - [ ] Document user profile features
 - [ ] Create user guide for profile management
 - [ ] Document image optimization strategy
+- [ ] Document content moderation approach
 
 **Success Metrics:**
 
@@ -539,6 +578,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Image uploads complete with proper compression
 - UI is intuitive with 90%+ task completion rate in usability testing
 - Images load in < 500ms from cache
+- Inappropriate content detected with > 95% accuracy
 
 ### 🔹 **Trip Planning Features**
 
@@ -548,7 +588,8 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Add **activity preferences** for trips
 - [ ] Implement **trip saving** and **editing**
 - [ ] Create **trip sharing** options
-- [ ] Add **offline trip viewing** capabilities
+- [ ] Add **offline trip viewing** capabilities with Drift local database
+- [ ] Implement **optimized list rendering** with SliverAnimatedList
 
 **Weekly Breakdown:**
 
@@ -563,12 +604,14 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Validate date selection edge cases
 - [ ] Test trip sharing functionality
 - [ ] Test offline trip access
+- [ ] Benchmark list rendering performance
 
 **Documentation:**
 
 - [ ] Create trip planning user guide
 - [ ] Document trip data structure and constraints
 - [ ] Document offline capabilities
+- [ ] Document UI optimization techniques
 
 **Success Metrics:**
 
@@ -576,23 +619,54 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Search results appear in < 1 second
 - 95% of trips save successfully on first attempt
 - Trips accessible offline after initial sync
+- List scrolling maintains 60fps even with 1000+ items
 
-### 🔹 **Technical Debt & Refactoring (Phase 2)**
+### 🔹 **Infrastructure Enhancement (Phase 2)**
 
-- [ ] Refactor any code with quality issues
-- [ ] Optimize database queries
-- [ ] Improve error handling
-- [ ] Address performance bottlenecks
-- [ ] Run code quality analysis tools
+- [ ] **Set up Vault for secret management**
+  - [ ] Configure Vault server
+  - [ ] Migrate sensitive credentials to Vault
+  - [ ] Implement Vault client in application
+- [ ] **Implement database optimizations**
+  - [ ] Create spatial indexes for location queries
+  - [ ] Set up activity-based indexes
+  - [ ] Implement relationship indexes
+- [ ] **Enhance monitoring infrastructure**
+  - [ ] Set up Prometheus for application metrics
+  - [ ] Configure Grafana dashboards
+  - [ ] Integrate with existing CloudWatch monitoring
+- [ ] **Implement Flutter UI optimizations**
+  - [ ] Replace basic ListViews with SliverAnimatedList
+  - [ ] Optimize image loading and caching
+  - [ ] Implement proper widget memoization
+
+**Weekly Breakdown:**
+
+- **Week 9**: Secret management with Vault
+- **Week 10**: Database optimization implementation
+- **Week 11-12**: Monitoring enhancements and UI optimizations
+
+**Testing Tasks:**
+
+- [ ] Benchmark database query performance before and after optimizations
+- [ ] Test secret retrieval from Vault
+- [ ] Validate monitoring data accuracy
+- [ ] Measure UI rendering performance improvements
+
+**Documentation:**
+
+- [ ] Document secret management architecture
+- [ ] Create database optimization guide
+- [ ] Document monitoring setup and dashboard configuration
+- [ ] Create UI optimization patterns guide
 
 **Success Metrics:**
 
-- Code quality metrics improved by 20%
-- Technical debt reduced by 30%
-- Performance improved by 25% for critical paths
-- Static analysis shows no critical issues
-
----
+- Database query performance improved by 30%
+- Secret management system fully operational
+- Comprehensive monitoring dashboards in place
+- UI rendering performance improved by 25%
+- All high-priority security issues resolved
 
 ## 🟠 Phase 3: Location & Matching Features _(Weeks 13-18)_
 
@@ -605,12 +679,14 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Implement **route visualization**
 - [ ] Add **location saving** for favorites
 - [ ] Implement **offline maps** capabilities
+- [ ] **Implement MQTT** for battery-efficient location updates
 
 **Weekly Breakdown:**
 
 - **Week 13**: Maps integration and basic visualization
 - **Week 14**: Location search and current location features
 - **Week 15**: Points of interest and map markers
+- **Week 16**: MQTT integration for efficient location updates
 
 **Testing Tasks:**
 
@@ -618,12 +694,14 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Validate location accuracy
 - [ ] Test route calculation algorithms
 - [ ] Test offline map functionality
+- [ ] Measure battery impact of location updates
 
 **Documentation:**
 
 - [ ] Document map integration
 - [ ] Create location features user guide
 - [ ] Document offline maps implementation
+- [ ] Document MQTT implementation for location updates
 
 **Success Metrics:**
 
@@ -631,6 +709,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Location detection accurate within 10 meters
 - Routes calculate in < 3 seconds
 - Maps usable in offline mode with pre-cached areas
+- Battery consumption reduced by 30% compared to standard location updates
 
 ### 🔹 **Travel Matching System**
 
@@ -641,6 +720,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Create **match acceptance/rejection** flow
 - [ ] Add **match chat** initiation
 - [ ] Optimize **matching performance** with proper indexing
+- [ ] Implement **SageMaker Feature Store** for unified ML features
 
 **Weekly Breakdown:**
 
@@ -654,12 +734,14 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - [ ] Validate match filtering performance
 - [ ] Test chat initialization and message delivery
 - [ ] Benchmark matching algorithm performance
+- [ ] Test ML feature retrieval from Feature Store
 
 **Documentation:**
 
 - [ ] Document matching algorithm
 - [ ] Create user guide for match features
 - [ ] Document performance optimization techniques
+- [ ] Document ML feature management approach
 
 **Success Metrics:**
 
@@ -667,30 +749,56 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - 80%+ match satisfaction rate from users
 - Chat messages deliver in < 1 second
 - Algorithm handles 1000+ users efficiently
+- ML features consistently available with < 100ms retrieval time
 
-### 🔹 **Technical Debt & Refactoring (Phase 3)**
+### 🔹 **Infrastructure Enhancement (Phase 3)**
 
-- [ ] Optimize location-based queries
-- [ ] Refactor complex UI components
-- [ ] Improve state management for real-time features
-- [ ] Address security vulnerabilities in location sharing
-- [ ] Implement performance monitoring for critical features
+- [ ] **Set up Kafka (MSK) for event streaming**
+  - [ ] Configure Kafka clusters
+  - [ ] Implement event producers and consumers
+  - [ ] Set up event schemas and validation
+- [ ] **Implement read replicas for geospatial queries**
+  - [ ] Configure Aurora read replicas
+  - [ ] Implement query routing logic
+  - [ ] Set up monitoring for replica lag
+- [ ] **Set up Falco for runtime security**
+  - [ ] Configure Falco rules
+  - [ ] Implement alert mechanisms
+  - [ ] Create incident response procedures
+
+**Weekly Breakdown:**
+
+- **Week 16**: Kafka setup and integration
+- **Week 17**: Database read replica configuration
+- **Week 18**: Security enhancements with Falco
+
+**Testing Tasks:**
+
+- [ ] Test event delivery reliability
+- [ ] Measure geospatial query performance improvements
+- [ ] Validate security alert mechanisms
+- [ ] Test system behavior under various security scenarios
+
+**Documentation:**
+
+- [ ] Document event streaming architecture
+- [ ] Create database scaling strategy guide
+- [ ] Document security monitoring approach
+- [ ] Create incident response playbooks
 
 **Success Metrics:**
 
-- Location query performance improved by 30%
-- UI rendering performance improved by 25%
-- All high-priority security issues resolved
-- Real-time monitoring in place for key metrics
-
----
+- Event delivery reliability > 99.9%
+- Geospatial query performance improved by 50%
+- Security incidents detected and alerted within 5 minutes
+- System resilient to common attack patterns
 
 ## 🔵 Phase 4: Real-Time & Search Features _(Weeks 19-24)_
 
 ### 🔹 **Real-Time Features**
 
+- [ ] Replace basic WebSockets with **Envoy Proxy** for 100K+ concurrent connections
 - [ ] Set up **Redis** for caching and real-time features
-- [ ] Set up **WebSocket connections**
 - [ ] Implement **real-time messaging** infrastructure
 - [ ] Create **notification system**
 - [ ] Develop **presence indicators** (online status)
@@ -699,22 +807,24 @@ We'll use a vertical slice approach, completing each feature from database to UI
 
 **Weekly Breakdown:**
 
-- **Week 19**: Redis setup and WebSocket infrastructure
-- **Week 20**: Real-time messaging backend
+- **Week 19**: Envoy Proxy setup and WebSocket infrastructure
+- **Week 20**: Redis setup and real-time messaging backend
 - **Week 21**: Messaging UI and notifications
 
 **Testing Tasks:**
 
-- [ ] Test WebSocket connection stability
+- [ ] Test WebSocket connection stability under high load
 - [ ] Validate message delivery rates
 - [ ] Test notification delivery across devices
 - [ ] Test offline message queuing and delivery
+- [ ] Benchmark system with 10K+ concurrent connections
 
 **Documentation:**
 
 - [ ] Document real-time architecture
 - [ ] Create developer guide for WebSocket integration
 - [ ] Document offline messaging capabilities
+- [ ] Create scaling strategy for real-time infrastructure
 
 **Success Metrics:**
 
@@ -722,6 +832,7 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Messages deliver in < 500ms
 - Notifications arrive on 99% of devices within 2 seconds
 - Messages sync properly when coming back online
+- System handles 100K+ concurrent connections efficiently
 
 ### 🔹 **Search & Discovery Implementation**
 
@@ -763,22 +874,47 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - Index updates propagate in < 1 minute
 - Cache hit rate > 80% for common searches
 
-### 🔹 **Technical Debt & Refactoring (Phase 4)**
+### 🔹 **Infrastructure Enhancement (Phase 4)**
 
-- [ ] Optimize search algorithms
-- [ ] Refactor real-time communication code
-- [ ] Improve database query performance
-- [ ] Address UI/UX inconsistencies
-- [ ] Conduct comprehensive security review
+- [ ] **Implement AWS X-Ray for distributed tracing**
+  - [ ] Configure X-Ray daemon
+  - [ ] Instrument application code
+  - [ ] Create tracing dashboards
+- [ ] **Migrate to Spot Instances with AWS Fault Injection Simulator**
+  - [ ] Configure spot instance fleets
+  - [ ] Implement fault-tolerant architecture
+  - [ ] Test system resilience to instance termination
+- [ ] **Optimize cost management**
+  - [ ] Implement automated resource scaling
+  - [ ] Set up detailed cost allocation tags
+  - [ ] Create cost optimization dashboards
+
+**Weekly Breakdown:**
+
+- **Week 22**: Distributed tracing implementation
+- **Week 23**: Spot instance migration
+- **Week 24**: Cost optimization implementation
+
+**Testing Tasks:**
+
+- [ ] Validate trace data accuracy
+- [ ] Test system behavior during spot instance interruptions
+- [ ] Measure cost savings from optimizations
+- [ ] Benchmark system performance under various load conditions
+
+**Documentation:**
+
+- [ ] Document distributed tracing architecture
+- [ ] Create fault tolerance strategy guide
+- [ ] Document cost optimization approach
+- [ ] Create operational runbooks for common scenarios
 
 **Success Metrics:**
 
-- Search performance improved by 30%
-- Database query time reduced by 25%
-- UI consistency score improved to 90%+
-- No critical security vulnerabilities
-
----
+- End-to-end request tracing for 100% of transactions
+- System remains operational during spot instance interruptions
+- Infrastructure costs reduced by 30%
+- System performance maintained or improved despite cost optimizations
 
 ## 🟣 Phase 5: Social & AI Features _(Weeks 25-32)_
 
@@ -859,22 +995,47 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - A/B tests show clear statistical significance
 - Recommendations generate in < 1 second
 
-### 🔹 **Technical Debt & Refactoring (Phase 5)**
+### 🔹 **Infrastructure Enhancement (Phase 5)**
 
-- [ ] Optimize ML model performance
-- [ ] Refactor recommendation algorithms
-- [ ] Improve AI response time
-- [ ] Address model bias issues
-- [ ] Implement model monitoring and alerting
+- [ ] **Implement SageMaker Feature Store for ML feature management**
+  - [ ] Configure feature groups
+  - [ ] Implement feature ingestion pipelines
+  - [ ] Set up feature retrieval mechanisms
+- [ ] **Optimize ML model deployment**
+  - [ ] Implement model versioning
+  - [ ] Set up A/B testing framework
+  - [ ] Create model monitoring dashboards
+- [ ] **Enhance security posture**
+  - [ ] Implement comprehensive IAM policies
+  - [ ] Set up security monitoring and alerting
+  - [ ] Conduct security penetration testing
+
+**Weekly Breakdown:**
+
+- **Week 30**: Feature Store implementation
+- **Week 31**: ML model deployment optimization
+- **Week 32**: Security enhancements
+
+**Testing Tasks:**
+
+- [ ] Test feature ingestion reliability
+- [ ] Validate model deployment processes
+- [ ] Test A/B testing framework
+- [ ] Conduct security vulnerability assessments
+
+**Documentation:**
+
+- [ ] Document ML feature management architecture
+- [ ] Create model deployment guide
+- [ ] Document A/B testing approach
+- [ ] Create security best practices guide
 
 **Success Metrics:**
 
-- Model inference time reduced by 40%
-- Recommendation diversity improved by 25%
-- Bias metrics reduced to acceptable levels
-- Model performance monitoring in place
-
----
+- Feature ingestion reliability > 99.9%
+- Model deployment time reduced by 50%
+- A/B tests provide statistically significant results
+- No critical security vulnerabilities
 
 ## 🔴 Phase 6: Scaling, Security & Monetization _(Weeks 33-40)_
 
@@ -1052,5 +1213,80 @@ We'll use a vertical slice approach, completing each feature from database to UI
 - App performance metrics meet or exceed targets
 - Infrastructure costs optimized by 20%
 - Feature usage analytics show positive adoption trends
+
+---
+
+## 📊 **Infrastructure Evolution Timeline**
+
+### 🔹 **Phase 1: Foundation (Current)**
+
+- AWS Cognito for authentication
+- Basic CloudWatch monitoring
+- Simple API Gateway + Lambda setup
+
+### 🔹 **Phase 2: Optimization (Weeks 5-12)**
+
+- Database optimizations (indexes, connection pooling)
+- Vault for secret management
+- Enhanced monitoring (Prometheus + Grafana)
+- Flutter UI optimizations
+
+### 🔹 **Phase 3: Scaling (Weeks 13-18)**
+
+- Kafka for event streaming
+- Read replicas for geospatial queries
+- MQTT for efficient location updates
+- Falco for runtime security
+
+### 🔹 **Phase 4: Advanced Architecture (Weeks 19-24)**
+
+- Envoy Proxy for WebSocket connections
+- AWS X-Ray for distributed tracing
+- Spot Instances for cost optimization
+- OpenSearch for advanced search capabilities
+
+### 🔹 **Phase 5: Intelligence (Weeks 25-32)**
+
+- SageMaker Feature Store
+- Advanced ML model deployment
+- Comprehensive security enhancements
+
+### 🔹 **Phase 6: Enterprise-Grade (Weeks 33-40)**
+
+- Multi-region deployment
+- Advanced disaster recovery
+- Comprehensive compliance framework
+
+## 💰 **Cost-Performance Benchmarks**
+
+| Component           | Current Stack  | Improved Stack | Savings |
+| ------------------- | -------------- | -------------- | ------- |
+| 1M DAU Messaging    | $12,500/mo     | $8,200/mo      | 34%     |
+| Geolocation Queries | $4,800/mo      | $2,100/mo      | 56%     |
+| ML Inference        | $7,000/mo      | $3,500/mo      | 50%     |
+| **Total Monthly**   | **$24,300/mo** | **$13,800/mo** | **43%** |
+
+## 🔄 **Migration Strategy**
+
+### 🔹 **Incremental Approach**
+
+- Implement changes in small, testable increments
+- Maintain backward compatibility during transitions
+- Use feature flags to control rollout of new capabilities
+- Implement comprehensive monitoring before, during, and after migrations
+
+### 🔹 **Testing Strategy**
+
+- Create performance benchmarks before and after each change
+- Implement canary deployments for high-risk changes
+- Conduct load testing before production deployment
+- Use synthetic transactions to validate end-to-end functionality
+
+### 🔹 **Rollback Plans**
+
+- Document detailed rollback procedures for each major change
+- Implement automated rollback triggers based on monitoring alerts
+- Maintain previous infrastructure until new systems are proven stable
+- Conduct regular rollback drills to ensure procedures work as expected
 
 ---
