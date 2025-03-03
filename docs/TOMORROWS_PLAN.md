@@ -1,160 +1,202 @@
-# Tomorrow's Plan: Riverpod Testing Infrastructure Implementation
+# Tomorrow's Plan: Project Restructuring Based on Clean Architecture
 
 ## Overview
 
-Tomorrow we will focus on implementing the Riverpod testing infrastructure improvements as outlined in our project plan. This is the first item in our immediate next steps and will take approximately 2 days to complete.
+Tomorrow we will begin implementing the project restructuring based on clean architecture as outlined in our project plan. We've made significant progress today by creating the necessary documentation and planning materials. Now we're ready to start the actual implementation phase.
 
-## Detailed Tasks
+## Progress Made Today
 
-### 1. Provider Test Utilities (Estimated time: 2-3 hours)
+### 1. Initial Setup and Planning
 
-#### A. Create Base Test Utilities
+#### A. Created Architecture Documentation
 
-- Create `test/utils/provider_container_utils.dart`
-  - Implement `createContainer()` function for creating test containers
-  - Add container disposal utilities
-  - Create provider listener helpers for state change tracking
+- [x] Created `docs/ARCHITECTURE.md`
+  - [x] Documented the clean architecture principles being applied
+  - [x] Defined layer responsibilities and boundaries
+  - [x] Documented dependency rules and flow of control
+  - [x] Added sections for diagrams (to be completed)
 
-#### B. Create Mock Generator Utilities
+#### B. Created Migration Plan
 
-- Create `test/utils/mock_generator.dart`
-  - Set up Mockito/Mocktail integration
-  - Create base mock generation templates
-  - Implement mock registration utilities
+- [x] Created `docs/MIGRATION_PLAN.md`
+  - [x] Defined step-by-step migration approach
+  - [x] Identified high-risk areas and mitigation strategies
+  - [x] Created rollback procedures
+  - [x] Defined success criteria for each migration step
 
-#### C. Create Provider-Specific Test Helpers
+#### C. Created Supporting Documentation
 
-- Create `test/utils/provider_test_helpers.dart`
-  - Implement helpers for testing `StateNotifierProvider`
-  - Implement helpers for testing `FutureProvider`
-  - Implement helpers for testing `StreamProvider`
-  - Create utilities for testing provider dependencies
+- [x] Created `docs/FEATURE_DEVELOPMENT.md` with templates and guidelines
+- [x] Created `docs/SAMPLE_FEATURE.md` with a concrete example of the Auth feature
+- [x] Created `docs/MIGRATION_CHECKLIST.md` to track progress
 
-### 2. Repository and Service Mocks (Estimated time: 2-3 hours)
+#### D. Test Cleanup
 
-#### A. Create Base Mock Repositories
+- [x] Fixed critical test errors
+- [x] Removed outdated test files
+- [x] Addressed linter warnings in test files
 
-- Create `test/mocks/repositories/auth_repository_mock.dart`
+## Detailed Tasks for Tomorrow
 
-  - Implement mock for `AuthRepository`
-  - Add common test scenarios (success, failure, loading)
+### 1. Core Infrastructure Setup (Completed)
 
-- Create `test/mocks/repositories/user_repository_mock.dart`
-  - Implement mock for `UserRepository`
-  - Add common test scenarios
+#### A. Set Up App Core
 
-#### B. Create Service Mocks
+- [x] Create `lib/core/` directory structure
+  - [x] Implement `error/` with exception classes and error handling
+  - [x] Set up `network/` for API client and interceptors
+  - [x] Create `storage/` for secure storage and shared preferences wrappers
 
-- Create `test/mocks/services/api_service_mock.dart`
+#### B. Set Up Feature Structure
 
-  - Implement mock for API service
-  - Add response simulation utilities
+- [x] Create `lib/features/` directory
+  - [x] Set up `auth/` feature directory with domain, data, and presentation layers
+  - [x] Set up `profile/` feature directory with domain, data, and presentation layers
 
-- Create `test/mocks/services/storage_service_mock.dart`
-  - Implement mock for storage service
-  - Add data simulation utilities
+#### C. Implement Dependency Injection (Completed)
 
-#### C. Create Test Data Factories
+- [x] Update `lib/app/di/service_locator.dart`
+  - [x] Refactor to support feature-based registration
+  - [x] Create feature-specific DI modules
+  - [x] Set up test overrides for DI
 
-- Create `test/utils/test_data.dart`
-  - Create factory functions for test user data
-  - Create factory functions for test trip data
-  - Create factory functions for test preference data
+### 2. Auth Feature Migration (Completed)
 
-### 3. Provider Test Implementation (Estimated time: 3-4 hours)
+#### A. Domain Layer Implementation (Completed)
 
-#### A. Auth Provider Tests
+- [x] Create User entity
+- [x] Define AuthRepository interface
+- [x] Implement use cases:
+  - [x] LoginUseCase
+  - [x] RegisterUseCase
+  - [x] LogoutUseCase
+  - [x] GetCurrentUserUseCase
 
-- Create `test/providers/auth/auth_provider_test.dart`
-  - Test initial state
-  - Test sign-in success flow
-  - Test sign-in failure flow
-  - Test sign-out flow
-  - Test token refresh flow
+#### B. Data Layer Implementation (Completed)
 
-#### B. User Profile Provider Tests
+- [x] Create UserModel
+- [x] Create AuthResponseModel
+- [x] Implement data sources:
+  - [x] AuthRemoteDataSource
+  - [x] AuthLocalDataSource
+- [x] Implement AuthRepositoryImpl
 
-- Create `test/providers/user/user_profile_provider_test.dart`
-  - Test loading state
-  - Test data fetching success
-  - Test error handling
-  - Test caching behavior
+#### C. Presentation Layer Implementation (Completed)
 
-#### C. Provider Integration Tests
+- [x] Create AuthState class
+- [x] Implement AuthNotifier
+- [x] Set up providers
+- [x] Migrate screens:
+  - [x] LoginScreen
+  - [x] RegisterScreen
 
-- Create `test/providers/integration/auth_user_integration_test.dart`
-  - Test interactions between auth and user providers
-  - Test state propagation
-  - Test dependency chain
+### 3. Next Priority Tasks
 
-### 4. Screen Integration Tests (Estimated time: 3-4 hours)
+#### A. Testing Implementation
 
-#### A. Login Screen Tests
+##### 1. Test Infrastructure Setup (Completed)
 
-- Create `test/screens/auth/login_screen_test.dart`
-  - Test UI rendering with providers
-  - Test form validation with providers
-  - Test login flow with mocked providers
-  - Test error handling in UI
+- [x] Create test utilities directory structure
+  - [x] Set up `test/features/auth/` directory
+  - [x] Create mock implementations for external dependencies (for unit tests)
+  - [x] Set up test helpers and fixtures
 
-#### B. Profile Screen Tests
+##### 2. Domain Layer Tests (Unit Tests with Mocks) (Completed)
 
-- Create `test/screens/profile/profile_screen_test.dart`
-  - Test UI rendering with providers
-  - Test data loading states
-  - Test user interaction with providers
-  - Test error handling in UI
+- [x] Test User entity
+- [x] Test AuthRepository interface
+- [x] Test use cases:
+  - [x] LoginUseCase tests
+  - [x] RegisterUseCase tests
+  - [x] LogoutUseCase tests
+  - [x] GetCurrentUserUseCase tests
 
-### 5. Documentation Updates (Estimated time: 2-3 hours)
+##### 3. Data Layer Tests (Unit Tests with Mocks) (Completed)
 
-#### A. Update Riverpod Testing Documentation
+- [x] Test UserModel
+- [x] Test AuthResponseModel
+- [x] Test data sources:
+  - [x] AuthRemoteDataSource tests
+  - [x] AuthLocalDataSource tests
+- [x] Test AuthRepositoryImpl
 
-- Update `docs/RIVERPOD_TESTING.md`
-  - Document the new testing utilities
-  - Add examples for each provider type
-  - Document best practices for mocking
-  - Add troubleshooting section
+##### 4. Presentation Layer Tests (Completed)
 
-#### B. Create Testing Patterns Guide
+- [x] Test AuthState
+- [x] Test AuthNotifier
+- [x] Test AuthProviders
+- [x] Test LoginScreen
+- [x] Test SignUpScreen
 
-- Create `docs/TESTING_PATTERNS.md`
-  - Document common testing patterns
-  - Add examples for different scenarios
-  - Include code snippets for reference
+##### 5. Integration Tests (Real Implementations)
 
-#### C. Update Test Plan
+- [x] Set up integration test environment
+- [x] Create real API client configuration
+- [x] Create real secure storage configuration
+- [x] Test full authentication flow:
+  - [x] Sign up flow
+  - [x] Sign in flow
+  - [x] Token refresh flow
+  - [x] Sign out flow
+- [x] Test error scenarios with real API
+- [x] Test offline scenarios with real storage
 
-- Update `test/test_plan.md`
-  - Update with new testing approach
-  - Mark completed items
-  - Add new test categories if needed
+#### B. Profile Feature Migration
 
-## Getting Started First Thing Tomorrow
+- [x] Set up Profile feature structure
+- [x] Implement domain layer
+  - [x] Create Profile entity
+  - [x] Define ProfileRepository interface
+  - [x] Implement use cases:
+    - [x] GetCurrentProfileUseCase
+    - [x] UpdateProfileUseCase
+    - [x] ManageAvatarUseCase
+    - [x] DeleteProfileUseCase
+- [x] Implement data layer
+  - [x] Create ProfileModel
+  - [x] Create data sources:
+    - [x] ProfileRemoteDataSource
+    - [x] ProfileLocalDataSource
+  - [x] Implement ProfileRepositoryImpl
+  - [x] Implement data layer tests:
+    - [x] ProfileModel tests
+    - [x] ProfileRemoteDataSource tests
+    - [x] ProfileLocalDataSource tests
+    - [x] ProfileRepositoryImpl tests
+- [ ] Implement presentation layer
+  - [ ] Create ProfileState
+  - [ ] Implement ProfileNotifier
+  - [ ] Set up providers
+  - [ ] Create screens:
+    - [ ] ProfileScreen
+    - [ ] EditProfileScreen
+    - [ ] ProfileSettingsScreen
 
-To hit the ground running, we'll start with:
+## Current Status
 
-1. Creating the `provider_container_utils.dart` file
-2. Setting up the basic mock structure
-3. Implementing a simple provider test to validate our approach
+We have successfully completed:
 
-This will give us early feedback on our testing infrastructure and allow us to make adjustments as needed.
+1. ✅ Core infrastructure setup
+2. ✅ Auth feature domain layer
+3. ✅ Auth feature data layer
+4. ✅ Auth feature presentation layer
+5. ✅ Basic error handling and API integration
+6. ✅ Dependency injection setup
+7. ✅ Test infrastructure setup (for unit tests)
 
-## Success Criteria
+## Next Steps
 
-By the end of tomorrow, we should have:
+1. Implement domain layer unit tests
+2. Implement data layer unit tests
+3. Implement presentation layer widget tests
+4. Implement integration tests with real dependencies
+5. Begin Profile feature migration
+6. Set up continuous integration pipeline
 
-1. A complete set of provider testing utilities
-2. Mocks for key repositories and services
-3. Tests for at least two key providers
-4. Integration tests for at least one screen
-5. Updated documentation with examples and best practices
+## Reference Materials
 
-## Next Steps After Completion
-
-After completing the Riverpod testing infrastructure improvements, we will move on to the next item in our project plan:
-
-**Implement project restructuring based on clean architecture** _(5-7 days)_
-
-- Migrate to feature-based organization
-- Implement proper dependency injection
-- Enhance documentation strategy
+- `docs/ARCHITECTURE.md` - Clean architecture principles and structure
+- `docs/MIGRATION_PLAN.md` - Step-by-step migration approach
+- `docs/FEATURE_DEVELOPMENT.md` - Guidelines for feature development
+- `docs/SAMPLE_FEATURE.md` - Example implementation of the Auth feature
+- `docs/MIGRATION_CHECKLIST.md` - Checklist to track migration progress

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Enum representing different categories of metrics to track
 enum MetricCategory { network, ui, database, authentication, business, system }

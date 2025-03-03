@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the comprehensive monitoring strategy for the SoloAdventurer application. Effective monitoring is crucial for understanding application performance, identifying issues, and ensuring a high-quality user experience.
+This document outlines the comprehensive monitoring strategy for the SoloAdventurer application. We use OpenTelemetry as our primary instrumentation layer, with AWS CloudWatch as our centralized monitoring platform. In Phase 2, we'll enhance this with Prometheus and Grafana for more detailed metrics and visualization.
 
 ## Monitoring Goals
 
@@ -14,177 +14,108 @@ This document outlines the comprehensive monitoring strategy for the SoloAdventu
 
 ## Monitoring Infrastructure
 
-### AWS CloudWatch
+### Phase 1: Core Monitoring
 
-CloudWatch is our primary monitoring service for:
+#### OpenTelemetry Integration
 
-- **Metrics Collection**: Gather performance data
-- **Log Aggregation**: Centralize application logs
-- **Alerting**: Notify the team of issues
-- **Dashboards**: Visualize application health
+OpenTelemetry serves as our unified instrumentation layer:
 
-### Prometheus + Grafana
-
-For more detailed metrics and visualization:
-
-- **Prometheus**: Collect and store time-series metrics
-- **Grafana**: Create dashboards and visualizations
-
-### Firebase Crashlytics
-
-For mobile-specific crash reporting:
-
-- **Crash Reports**: Detailed stack traces and device information
-- **Issue Tracking**: Group similar crashes
-- **User Impact**: Understand crash impact on users
-
-## Monitoring Categories
-
-### 1. Performance Monitoring
-
-#### App Start Time
+- **Metrics**: Standardized metrics collection across all services
+- **Traces**: Distributed tracing for request flows
+- **Logs**: Structured logging with context propagation
+- **Exporters**: Primary export to AWS CloudWatch
 
 ```dart
-// lib/shared/monitoring/performance/app_start_tracker.dart
-class AppStartTracker {
-  static void trackAppStart() {
+// lib/shared/monitoring/telemetry/telemetry_service.dart
+class TelemetryService {
+  static final OpenTelemetry otel = OpenTelemetry();
+
+  static Future<void> initialize() async {
+    final cloudWatchExporter = AWSCloudWatchExporter(
+      region: 'us-west-2',
+      credentials: await AWSCredentials.fromEnvironment(),
+    );
+
+    await otel.initialize(
+      serviceName: 'soloadventurer-mobile',
+      exporters: [cloudWatchExporter],
+    );
+  }
+
+  static Tracer get tracer => otel.getTracer('soloadventurer');
+
+  static Meter get meter => otel.getMeter('soloadventurer');
+}
+```
+
+### AWS CloudWatch
+
+CloudWatch serves as our primary monitoring platform:
+
+- **Metrics Storage**: Long-term metrics retention
+- **Log Aggregation**: Centralized log management
+- **Alerting**: Automated issue detection
+- **Dashboards**: Real-time visualization
+
+### Monitoring Categories
+
+#### 1. Performance Monitoring
+
+```dart
+// lib/shared/monitoring/performance/app_performance.dart
+class AppPerformanceMonitor {
+  final _startupTimer = TelemetryService.meter
+      .createHistogram('app.startup.duration');
+
+  final _networkLatency = TelemetryService.meter
+      .createHistogram('network.request.duration');
+
+  void trackAppStartup() {
     final startTime = DateTime.now();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final duration = DateTime.now().difference(startTime);
-
-      // Report to CloudWatch
-      CloudWatchMetrics.putMetricData(
-        namespace: 'SoloAdventurer/Performance',
-        metricName: 'AppStartTime',
-        value: duration.inMilliseconds.toDouble(),
-        unit: 'Milliseconds',
-      );
+      _startupTimer.record(duration.inMilliseconds);
     });
+  }
+
+  void trackNetworkRequest(String path, Duration duration) {
+    _networkLatency.record(
+      duration.inMilliseconds,
+      attributes: {'path': path},
+    );
   }
 }
 ```
 
-#### Network Performance
+#### 2. Error Tracking
 
 ```dart
-// lib/shared/monitoring/performance/network_monitor.dart
-class NetworkMonitor {
-  void trackRequest(NetworkRequestInfo info) {
-    // Log request details
-    logger.info('API Request: ${info.path} - ${info.duration}ms');
+// lib/shared/monitoring/error/error_tracker.dart
+class ErrorTracker {
+  static void trackError(String message, dynamic error, StackTrace? stackTrace) {
+    final span = TelemetryService.tracer
+        .startSpan('error.handled')
+        .setAttribute('error.message', message);
 
-    // Report to CloudWatch
-    CloudWatchMetrics.putMetricData(
-      namespace: 'SoloAdventurer/Network',
-      metricName: 'RequestDuration',
-      value: info.duration.toDouble(),
-      unit: 'Milliseconds',
-      dimensions: {
-        'Path': info.path,
-        'StatusCode': info.statusCode.toString(),
-      },
-    );
+    try {
+      // Log error details
+      logger.error(message, error: error, stackTrace: stackTrace);
 
-    // Track slow requests
-    if (info.duration > 1000) {
-      logger.warning('Slow API request: ${info.path} - ${info.duration}ms');
-    }
+      // Add error attributes
+      span.setAttributes({
+        'error.type': error.runtimeType.toString(),
+        'error.stack': stackTrace?.toString() ?? 'No stack trace',
+      });
 
-    // Track errors
-    if (info.isError) {
-      logger.error('API error: ${info.path} - ${info.errorMessage}');
+    } finally {
+      span.end();
     }
   }
 }
 ```
 
-#### Memory Usage
-
-```dart
-// lib/shared/monitoring/performance/memory_profiler.dart
-class MemoryProfiler {
-  static void trackMemoryUsage() {
-    Timer.periodic(const Duration(minutes: 5), (_) async {
-      final memoryInfo = await getMemoryInfo();
-
-      // Report to CloudWatch
-      CloudWatchMetrics.putMetricData(
-        namespace: 'SoloAdventurer/Performance',
-        metricName: 'MemoryUsage',
-        value: memoryInfo.usedMemory.toDouble(),
-        unit: 'Bytes',
-      );
-
-      // Alert on high memory usage
-      if (memoryInfo.usedMemory > memoryInfo.totalMemory * 0.8) {
-        logger.warning('High memory usage: ${memoryInfo.usedMemory} bytes');
-      }
-    });
-  }
-}
-```
-
-### 2. Error Monitoring
-
-#### Error Handler
-
-```dart
-// lib/shared/monitoring/error_tracking/error_handler.dart
-class ErrorHandler {
-  static void initialize() {
-    // Set up global error handling
-    FlutterError.onError = (details) {
-      reportError('Flutter error', details.exception, details.stack);
-    };
-  }
-
-  static void reportError(String message, dynamic error, StackTrace? stackTrace) {
-    // Log error
-    logger.error(message, error, stackTrace);
-
-    // Report to CloudWatch
-    CloudWatchLogs.putLogEvents(
-      logGroupName: 'SoloAdventurer/Errors',
-      logStreamName: 'AppErrors',
-      logEvents: [
-        {
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-          'message': '$message: $error\n${stackTrace ?? ''}',
-        },
-      ],
-    );
-
-    // Report to Crashlytics
-    FirebaseCrashlytics.instance.recordError(error, stackTrace);
-  }
-}
-```
-
-#### API Error Interceptor
-
-```dart
-// lib/shared/api/interceptors/error_interceptor.dart
-class ErrorInterceptor extends Interceptor {
-  @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
-    // Log error
-    ErrorHandler.reportError(
-      'API Error: ${err.requestOptions.path}',
-      err.error,
-      err.stackTrace,
-    );
-
-    // Transform error to app-specific exception
-    final appException = _mapDioErrorToAppException(err);
-
-    // Continue with error handling
-    handler.next(err);
-  }
-}
-```
-
-### 3. User Experience Monitoring
+#### 3. User Experience Monitoring
 
 #### Screen Tracking
 
@@ -221,7 +152,7 @@ class ActionTracker {
 }
 ```
 
-### 4. Resource Utilization
+#### 4. Resource Utilization
 
 #### Battery Usage
 
@@ -268,7 +199,7 @@ class DataUsageMonitor {
 }
 ```
 
-### 5. Cost Optimization
+#### 5. Cost Optimization
 
 To ensure efficient resource utilization and minimize cloud costs, we've implemented a comprehensive AWS Cost Audit Script that automatically identifies savings opportunities across our tech stack.
 

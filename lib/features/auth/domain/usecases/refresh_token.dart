@@ -1,0 +1,14 @@
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
+
+/// Use case for refreshing the authentication token
+class RefreshToken {
+  final AuthRepository _repository;
+
+  /// Creates a new [RefreshToken] use case
+  const RefreshToken(this._repository);
+
+  /// Execute the use case
+  Future<bool> call() async {
+    return await _repository.refreshToken();
+  }
+}

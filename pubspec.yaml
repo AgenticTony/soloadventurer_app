@@ -61,10 +61,23 @@ dependencies:
   uuid: ^4.3.3
   geolocator: ^11.0.0
   latlong2: ^0.9.0
+  equatable: ^2.0.5
 
   # Monitoring & Device Info
   package_info_plus: ^8.3.0
   device_info_plus: ^9.1.2
+  get_it: ^8.0.3
+  platform_device_id: ^1.0.1
+
+  # Encryption
+  encrypt: ^5.0.3
+  crypto: ^3.0.3
+  pointycastle: ^3.7.4
+
+  # Image Picker
+  image_picker: ^1.0.7
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -82,8 +95,14 @@ dev_dependencies:
   mocktail: ^1.0.3
 
   # Code Generation
-  build_runner: ^2.4.8
+  build_runner: ^2.4.15
   riverpod_generator: ^2.3.11
+
+  # Integration Testing
+  integration_test:
+    sdk: flutter
+  freezed: ^3.0.3
+  json_serializable: ^6.9.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -1,6 +1,5 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/services/secure_storage_service.dart';
 
 class AuthService {

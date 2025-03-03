@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/profile_providers.dart';
+import '../widgets/loading_view.dart';
+
+class ProfileSettingsScreen extends ConsumerWidget {
+  /// Route name for navigation
+  static const routeName = '/profile/settings';
+
+  /// Creates a new [ProfileSettingsScreen]
+  const ProfileSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(profileProvider);
+    final theme = Theme.of(context);
+
+    if (state.isProcessing) {
+      return const LoadingView();
+    }
+
+    if (!state.isInitialized) {
+      return const Scaffold(
+        body: Center(
+          child: Text('No profile data available'),
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profile Settings'),
+      ),
+      body: ListView(
+        children: [
+          _buildSection(
+            context,
+            'Privacy',
+            [
+              SwitchListTile(
+                title: const Text('Public Profile'),
+                subtitle: Text(
+                  state.profile!.isPublic
+                      ? 'Your profile is visible to everyone'
+                      : 'Your profile is private',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                value: state.profile!.isPublic,
+                onChanged: (value) {
+                  ref.read(profileProvider.notifier).updateProfile({
+                    'isPublic': value,
+                  });
+                },
+              ),
+            ],
+          ),
+          _buildSection(
+            context,
+            'Account',
+            [
+              ListTile(
+                title: const Text('Delete Account'),
+                subtitle: const Text(
+                  'Permanently delete your account and all data',
+                ),
+                leading: Icon(
+                  Icons.delete_forever,
+                  color: theme.colorScheme.error,
+                ),
+                textColor: theme.colorScheme.error,
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Delete Account'),
+                      content: const Text(
+                        'Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('CANCEL'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ref.read(profileProvider.notifier).deleteProfile();
+                            Navigator.pop(context); // Pop settings screen
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: theme.colorScheme.error,
+                          ),
+                          child: const Text('DELETE'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          if (state.hasError) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                state.error!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection(
+    BuildContext context,
+    String title,
+    List<Widget> children,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+        ...children,
+      ],
+    );
+  }
+}

@@ -1,304 +1,292 @@
-# Riverpod Testing Strategy
+# Riverpod Testing Guide
 
-## Overview
+This guide explains how to test Riverpod providers in the SoloAdventurer app.
 
-This document outlines the strategy and best practices for testing Riverpod providers in the SoloAdventurer application. Riverpod is our primary state management solution, and proper testing is essential to ensure reliability and maintainability.
+## Table of Contents
 
-## Testing Principles
+1. [Introduction](#introduction)
+2. [Testing Utilities](#testing-utilities)
+3. [Provider Testing](#provider-testing)
+4. [Mock Repositories and Services](#mock-repositories-and-services)
+5. [Test Data](#test-data)
+6. [Best Practices](#best-practices)
+7. [Troubleshooting](#troubleshooting)
 
-1. **Isolation**: Test providers in isolation from their dependencies
-2. **Mocking**: Use mocks for dependencies to control test conditions
-3. **Coverage**: Test all state transitions and edge cases
-4. **Readability**: Write clear, concise tests that document provider behavior
+## Introduction
 
-## Testing Infrastructure
+Testing Riverpod providers is essential to ensure that our state management logic works correctly. This guide covers how to test different types of providers, including:
 
-### Test Utilities
+- `Provider`
+- `StateProvider`
+- `StateNotifierProvider`
+- `FutureProvider`
+- `StreamProvider`
 
-We've created several utilities to simplify Riverpod testing:
+## Testing Utilities
+
+We've created several utilities to make testing Riverpod providers easier:
+
+### Provider Container Utilities
+
+The `provider_container_utils.dart` file contains utilities for creating and testing provider containers:
 
 ```dart
-// test/utils/provider_container.dart
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Create a provider container for testing
+final container = createContainer(
+  overrides: [
+    myProvider.overrideWithValue(mockValue),
+  ],
+);
 
-/// Creates a [ProviderContainer] with the given overrides for testing
-ProviderContainer createContainer({
-  List<Override> overrides = const [],
-}) {
-  final container = ProviderContainer(
-    overrides: overrides,
+// Listen to state changes
+final listener = container.listenToProvider(myProvider);
+
+// Access the current state
+final currentState = listener.lastValue;
+
+// Access all state changes
+final stateChanges = listener.values;
+```
+
+### Mock Generator
+
+The `mock_generator.dart` file contains utilities for creating mocks:
+
+```dart
+// Create a mock provider
+final mockProvider = mockProvider(myProvider, mockValue);
+
+// Create a mock future provider
+final mockFutureProvider = mockFutureProvider(myFutureProvider, mockValue);
+
+// Create a mock state notifier provider
+final mockStateNotifierProvider = mockStateNotifierProvider(
+  myStateNotifierProvider,
+  mockNotifier,
+);
+```
+
+### Provider Test Helpers
+
+The `provider_test_helpers.dart` file contains utilities for testing specific provider types:
+
+```dart
+// Test a state notifier provider
+testStateNotifierProvider(
+  provider: myStateNotifierProvider,
+  buildMocks: [
+    () => mockRepository(),
+  ],
+  testCases: [
+    StateNotifierTestCase(
+      description: 'should update state when action is called',
+      action: (container) async {
+        await container.read(myStateNotifierProvider.notifier).myAction();
+      },
+      expectedState: expectedState,
+    ),
+  ],
+);
+
+// Test a future provider
+testFutureProvider(
+  provider: myFutureProvider,
+  buildMocks: [
+    () => mockRepository(),
+  ],
+  testCases: [
+    FutureProviderTestCase(
+      description: 'should load data successfully',
+      action: (container) async {},
+      expectedData: expectedData,
+    ),
+  ],
+);
+
+// Test a stream provider
+testStreamProvider(
+  provider: myStreamProvider,
+  buildMocks: [
+    () => mockRepository(),
+  ],
+  testCases: [
+    StreamProviderTestCase(
+      description: 'should emit values',
+      action: (container) async {},
+      expectedData: expectedData,
+    ),
+  ],
+);
+```
+
+## Provider Testing
+
+### Testing StateNotifierProvider
+
+```dart
+test('counter should increment', () async {
+  // Arrange
+  final container = createContainer();
+
+  // Act
+  await container.read(counterProvider.notifier).increment();
+
+  // Assert
+  expect(container.read(counterProvider), 1);
+});
+```
+
+### Testing FutureProvider
+
+```dart
+test('user provider should load user', () async {
+  // Arrange
+  final mockUserRepository = MockUserRepository();
+  when(() => mockUserRepository.getUser()).thenAnswer(
+    (_) async => User(id: '1', name: 'Test User'),
   );
 
-  // Add listener to help with debugging
-  container.listen(
-    provider,
-    (previous, next) {
-      // This helps with debugging
-      print('Provider $provider changed from $previous to $next');
-    },
-    fireImmediately: false,
+  final container = createContainer(
+    overrides: [
+      userRepositoryProvider.overrideWithValue(mockUserRepository),
+    ],
   );
 
-  return container;
-}
+  // Act - just reading the provider triggers the future
+  final userAsync = container.read(userProvider);
 
-/// Disposes a [ProviderContainer] after tests
-void disposeContainer(ProviderContainer container) {
-  container.dispose();
-}
+  // Wait for the future to complete
+  await Future.delayed(Duration.zero);
+
+  // Assert
+  final userAsyncAfter = container.read(userProvider);
+  expect(userAsyncAfter.value?.name, 'Test User');
+});
 ```
 
-### Mock Repositories
-
-We use Mockito to create mock repositories for testing:
+### Testing StreamProvider
 
 ```dart
-// test/mocks/mock_auth_repository.dart
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
-import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
+test('notifications provider should emit notifications', () async {
+  // Arrange
+  final mockNotificationRepository = MockNotificationRepository();
+  when(() => mockNotificationRepository.getNotifications()).thenAnswer(
+    (_) => Stream.fromIterable([
+      [Notification(id: '1', message: 'Test')],
+      [Notification(id: '1', message: 'Test'), Notification(id: '2', message: 'Test 2')],
+    ]),
+  );
 
-@GenerateMocks([AuthRepository])
-void main() {}
+  final container = createContainer(
+    overrides: [
+      notificationRepositoryProvider.overrideWithValue(mockNotificationRepository),
+    ],
+  );
+
+  // Act - just reading the provider triggers the stream
+  final notificationsAsync = container.read(notificationsProvider);
+
+  // Wait for the stream to emit values
+  await Future.delayed(Duration(milliseconds: 10));
+
+  // Assert
+  final notificationsAsyncAfter = container.read(notificationsProvider);
+  expect(notificationsAsyncAfter.value?.length, 2);
+});
 ```
 
-## Testing Strategies
+## Mock Repositories and Services
 
-### 1. Testing StateNotifierProvider
+We've created mock implementations of our repositories and services to make testing easier:
 
-For testing `StateNotifierProvider`, we focus on:
-
-- Initial state
-- State transitions
-- Error handling
+### Auth Repository Mock
 
 ```dart
-// Example test for AuthNotifier
-void main() {
-  late MockAuthRepository mockAuthRepository;
-  late ProviderContainer container;
+// Create a mock auth repository
+final mockAuthRepository = MockAuthRepository();
 
-  setUp(() {
-    mockAuthRepository = MockAuthRepository();
-    container = createContainer(
-      overrides: [
-        authRepositoryProvider.overrideWithValue(mockAuthRepository),
-      ],
-    );
-  });
+// Set up the mock for a successful sign-in
+mockAuthRepository.setupSuccessfulSignIn('testuser');
 
-  tearDown(() {
-    disposeContainer(container);
-  });
-
-  test('initial state should be unauthenticated', () {
-    final authState = container.read(authProvider);
-
-    expect(authState.isAuthenticated, false);
-    expect(authState.user, null);
-    expect(authState.isLoading, false);
-    expect(authState.error, null);
-  });
-
-  test('signIn should update state to authenticated on success', () async {
-    // Arrange
-    when(mockAuthRepository.signInWithEmailAndPassword(
-      email: 'test@example.com',
-      password: 'password',
-    )).thenAnswer((_) async => mockUser);
-
-    // Act
-    await container.read(authProvider.notifier).signIn(
-      email: 'test@example.com',
-      password: 'password',
-    );
-
-    // Assert
-    final authState = container.read(authProvider);
-    expect(authState.isAuthenticated, true);
-    expect(authState.user, mockUser);
-    expect(authState.isLoading, false);
-    expect(authState.error, null);
-  });
-
-  test('signIn should update state to error on failure', () async {
-    // Arrange
-    when(mockAuthRepository.signInWithEmailAndPassword(
-      email: 'test@example.com',
-      password: 'password',
-    )).thenThrow(Exception('Invalid credentials'));
-
-    // Act
-    await container.read(authProvider.notifier).signIn(
-      email: 'test@example.com',
-      password: 'password',
-    );
-
-    // Assert
-    final authState = container.read(authProvider);
-    expect(authState.isAuthenticated, false);
-    expect(authState.user, null);
-    expect(authState.isLoading, false);
-    expect(authState.error, isNotNull);
-  });
-}
+// Set up the mock for a failed sign-in
+mockAuthRepository.setupFailedSignIn('Invalid credentials');
 ```
 
-### 2. Testing FutureProvider
-
-For testing `FutureProvider`, we focus on:
-
-- Loading state
-- Data state
-- Error state
+### API Service Mock
 
 ```dart
-// Example test for userProfileProvider
-void main() {
-  late MockUserRepository mockUserRepository;
-  late ProviderContainer container;
+// Create a mock API service
+final mockApiService = MockApiService();
 
-  setUp(() {
-    mockUserRepository = MockUserRepository();
-    container = createContainer(
-      overrides: [
-        userRepositoryProvider.overrideWithValue(mockUserRepository),
-      ],
-    );
-  });
+// Set up the mock for a successful GET request
+mockApiService.setupSuccessfulGet('/users', {'id': '1', 'name': 'Test User'});
 
-  tearDown(() {
-    disposeContainer(container);
-  });
-
-  test('should return loading state initially', () {
-    when(mockUserRepository.getUserProfile())
-        .thenAnswer((_) async => mockUser);
-
-    final userProfileState = container.read(userProfileProvider);
-
-    expect(userProfileState, isA<AsyncLoading<User>>());
-  });
-
-  test('should return data state when repository returns data', () async {
-    when(mockUserRepository.getUserProfile())
-        .thenAnswer((_) async => mockUser);
-
-    // Wait for the provider to complete
-    await container.read(userProfileProvider.future);
-
-    final userProfileState = container.read(userProfileProvider);
-
-    expect(userProfileState, isA<AsyncData<User>>());
-    expect(userProfileState.value, mockUser);
-  });
-
-  test('should return error state when repository throws', () async {
-    when(mockUserRepository.getUserProfile())
-        .thenThrow(Exception('Failed to load profile'));
-
-    // Wait for the provider to complete
-    await expectLater(
-      container.read(userProfileProvider.future),
-      throwsException,
-    );
-
-    final userProfileState = container.read(userProfileProvider);
-
-    expect(userProfileState, isA<AsyncError<User>>());
-    expect(userProfileState.error, isA<Exception>());
-  });
-}
+// Set up the mock for a failed GET request
+mockApiService.setupFailedGet('/users', 404, 'Not found');
 ```
 
-### 3. Testing Provider Dependencies
+## Test Data
 
-For testing providers that depend on other providers:
-
-```dart
-// Example test for a provider with dependencies
-void main() {
-  late ProviderContainer container;
-
-  setUp(() {
-    container = createContainer(
-      overrides: [
-        // Override dependencies
-        userProvider.overrideWithValue(mockUser),
-        settingsProvider.overrideWithValue(mockSettings),
-      ],
-    );
-  });
-
-  tearDown(() {
-    disposeContainer(container);
-  });
-
-  test('userSettingsProvider should combine user and settings', () {
-    final userSettings = container.read(userSettingsProvider);
-
-    expect(userSettings.userId, mockUser.id);
-    expect(userSettings.theme, mockSettings.theme);
-  });
-}
-```
-
-## Integration Testing with Riverpod
-
-For testing the integration of providers with UI:
+We've created factory functions for test data to make testing easier:
 
 ```dart
-// Example widget test with Riverpod
-void main() {
-  testWidgets('LoginScreen should show error on failed login', (tester) async {
-    // Arrange
-    final mockAuthRepository = MockAuthRepository();
-    when(mockAuthRepository.signInWithEmailAndPassword(
-      email: 'test@example.com',
-      password: 'password',
-    )).thenThrow(Exception('Invalid credentials'));
+// Create a test user
+final user = TestData.createUser(
+  id: '1',
+  username: 'testuser',
+  email: 'test@example.com',
+);
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          authRepositoryProvider.overrideWithValue(mockAuthRepository),
-        ],
-        child: const MaterialApp(
-          home: LoginScreen(),
-        ),
-      ),
-    );
+// Create a test trip
+final trip = TestData.createTrip(
+  id: '1',
+  userId: '1',
+  title: 'Test Trip',
+);
 
-    // Act
-    await tester.enterText(find.byType(EmailField), 'test@example.com');
-    await tester.enterText(find.byType(PasswordField), 'password');
-    await tester.tap(find.byType(ElevatedButton));
-    await tester.pump();
-    await tester.pump(const Duration(seconds: 1)); // Wait for async operation
-
-    // Assert
-    expect(find.text('Invalid credentials'), findsOneWidget);
-  });
-}
+// Create test preferences
+final preferences = TestData.createTravelPreference(
+  userId: '1',
+  preferredDestinations: ['Mountains', 'Beach'],
+);
 ```
 
 ## Best Practices
 
-1. **Keep Tests Focused**: Test one aspect of a provider at a time
-2. **Use Descriptive Test Names**: Clearly describe what you're testing
-3. **Test Edge Cases**: Test loading, error, and empty states
-4. **Avoid Testing Implementation Details**: Focus on behavior, not implementation
-5. **Use Test Utilities**: Leverage the test utilities for consistent testing
-6. **Clean Up**: Always dispose containers in tearDown
+1. **Use the provided utilities**: The utilities in `provider_container_utils.dart`, `mock_generator.dart`, and `provider_test_helpers.dart` make testing Riverpod providers easier.
 
-## Common Pitfalls
+2. **Mock dependencies**: Always mock dependencies like repositories and services to isolate the provider being tested.
 
-1. **Not Mocking Dependencies**: Ensure all dependencies are properly mocked
-2. **Not Waiting for Async Operations**: Use `await` for async provider operations
-3. **Testing Too Much**: Focus on provider behavior, not implementation details
-4. **Not Testing Error Cases**: Always test error handling
-5. **Not Disposing Containers**: Always dispose containers in tearDown
+3. **Test all state transitions**: Make sure to test all possible state transitions, including loading, success, and error states.
 
-## Conclusion
+4. **Use descriptive test names**: Use descriptive test names that explain what the test is checking.
 
-This testing strategy provides a comprehensive approach to testing Riverpod providers in the SoloAdventurer application. By following these guidelines, we can ensure that our state management is reliable, maintainable, and well-documented.
+5. **Group related tests**: Use `group` to group related tests together.
+
+6. **Test edge cases**: Make sure to test edge cases like empty lists, null values, and error conditions.
+
+7. **Keep tests independent**: Each test should be independent of other tests. Don't rely on state from previous tests.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Provider not found**: Make sure the provider is registered in the container.
+
+2. **Mock not called**: Make sure the mock is set up correctly and the provider is using the mocked dependency.
+
+3. **State not updated**: Make sure the provider is notifying listeners when the state changes.
+
+4. **Test times out**: Make sure the provider is completing futures or emitting stream values.
+
+### Debugging Tips
+
+1. **Use `addTearDown`**: Use `addTearDown` to dispose resources after each test.
+
+2. **Use `TestObserver`**: Use `TestObserver` to track state changes.
+
+3. **Use `print`**: Use `print` to debug state changes during tests.
+
+4. **Check mock setup**: Make sure mocks are set up correctly before the test runs.
+
+5. **Check provider dependencies**: Make sure provider dependencies are overridden correctly.
