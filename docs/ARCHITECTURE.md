@@ -161,3 +161,151 @@ The migration to clean architecture will be incremental:
 - [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [OpenTelemetry Documentation](https://opentelemetry.io/docs/)
 - [Feature-First Architecture by Ryan Edge](https://codewithandrea.com/articles/flutter-project-structure/)
+
+# Clean Architecture Implementation
+
+## Overview
+
+This document describes the clean architecture implementation in the SoloAdventurer app. The architecture is divided into layers with clear separation of concerns and dependencies flowing inward.
+
+## Layer Structure
+
+### Domain Layer
+
+#### Entities
+
+- User
+- Profile
+
+#### Repositories (Interfaces)
+
+- AuthRepository
+- ProfileRepository
+
+#### Use Cases
+
+- Auth:
+  - LoginUseCase
+  - RegisterUseCase
+  - LogoutUseCase
+  - GetCurrentUserUseCase
+- Profile:
+  - GetCurrentProfileUseCase
+  - UpdateProfileUseCase
+  - ManageAvatarUseCase
+  - DeleteProfileUseCase
+
+### Data Layer
+
+#### Models
+
+- UserModel
+- AuthResponseModel
+- ProfileModel
+
+#### Data Sources
+
+- Auth:
+  - AuthRemoteDataSource
+  - AuthLocalDataSource
+- Profile:
+  - ProfileRemoteDataSource
+  - ProfileLocalDataSource
+
+#### Repository Implementations
+
+- AuthRepositoryImpl
+- ProfileRepositoryImpl
+
+### Presentation Layer
+
+#### State Management
+
+- Auth:
+  - AuthState
+  - AuthNotifier
+  - AuthProviders
+- Profile:
+  - ProfileState (In Progress)
+  - ProfileNotifier (In Progress)
+  - ProfileProviders (In Progress)
+
+#### Screens
+
+- Auth:
+  - LoginScreen
+  - SignupScreen
+- Profile:
+  - EditProfileScreen (In Progress)
+  - ProfileScreen (In Progress)
+  - ProfileSettingsScreen (In Progress)
+
+## Feature Implementation Status
+
+### Auth Feature (Complete)
+
+- ✅ Domain Layer
+- ✅ Data Layer
+- ✅ Presentation Layer
+- ✅ Tests
+
+### Profile Feature (In Progress)
+
+- ✅ Domain Layer
+  - Entity definitions
+  - Repository interfaces
+  - Use case implementations
+- ✅ Data Layer
+  - Models
+  - Data sources
+  - Repository implementation
+  - Mock implementations for testing
+- 🚧 Presentation Layer (In Progress)
+  - State management
+  - Screen implementations
+  - Navigation
+  - Tests
+
+## Testing Strategy
+
+### Unit Tests
+
+- Domain layer tests for entities and use cases
+- Data layer tests for models and repositories
+- Presentation layer tests for state management
+
+### Widget Tests
+
+- Screen component tests
+- Form validation tests
+- Navigation flow tests
+
+### Integration Tests
+
+- Full authentication flow
+- Profile management flow
+- Error handling scenarios
+- Offline mode behavior
+
+## Dependencies
+
+### Core Dependencies
+
+- flutter_riverpod: State management
+- get_it: Dependency injection
+- dio: HTTP client
+- shared_preferences: Local storage
+- flutter_secure_storage: Secure storage
+
+### Testing Dependencies
+
+- flutter_test: Widget testing
+- integration_test: Integration testing
+- mockito: Mocking for unit tests
+
+## Next Steps
+
+1. Complete Profile feature presentation layer
+2. Implement remaining integration tests
+3. Add error handling improvements
+4. Update documentation with final implementation details
