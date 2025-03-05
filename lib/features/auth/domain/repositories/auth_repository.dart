@@ -21,14 +21,11 @@ abstract class AuthRepository {
   /// Check if a user is currently authenticated
   Future<bool> isAuthenticated();
 
-  /// Send password reset email
+  /// Sends a password reset code via SMS
+  Future<void> sendPasswordResetSMS(String phoneNumber);
+
+  /// Sends a password reset code via email
   Future<void> sendPasswordResetEmail(String email);
-
-  /// Get the current access token
-  Future<String?> getAccessToken();
-
-  /// Refresh the authentication token
-  Future<bool> refreshToken();
 
   /// Confirm a password reset with the given code and new password
   Future<void> confirmPasswordReset({
@@ -67,4 +64,10 @@ abstract class AuthRepository {
 
   /// Check if the user is signed in
   Future<bool> isSignedIn();
+
+  /// Get the current access token
+  Future<String?> getAccessToken();
+
+  /// Refresh the authentication token
+  Future<bool> refreshToken();
 }

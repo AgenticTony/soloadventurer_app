@@ -8,37 +8,25 @@ class ProfileRoutes {
   static const editProfile = '/profile/edit';
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+    Widget screen;
     switch (settings.name) {
       case profile:
-        return MaterialPageRoute(
-          builder: (context) => const ProfileScreen(),
-          settings: settings,
-        );
+        screen = const ProfileScreen();
+        break;
       case editProfile:
         final isInitialSetup = settings.arguments as bool? ?? false;
-        return MaterialPageRoute(
-          builder: (context) =>
-              EditProfileScreen(isInitialSetup: isInitialSetup),
-          settings: settings,
-        );
+        screen = EditProfileScreen(isInitialSetup: isInitialSetup);
+        break;
       default:
         return null;
     }
-  }
 
-  static void navigateToProfile(BuildContext context) {
-    Navigator.pushNamed(context, profile);
-  }
-
-  static void navigateToEditProfile(BuildContext context,
-      {bool isInitialSetup = false}) {
-    Navigator.pushNamed(context, editProfile, arguments: isInitialSetup);
-  }
-
-  static void popToProfile(BuildContext context) {
-    Navigator.popUntil(
-      context,
-      (route) => route.settings.name == profile || route.isFirst,
+    return PageRouteBuilder(
+      settings: settings,
+      pageBuilder: (context, animation, secondaryAnimation) => screen,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(opacity: animation, child: child);
+      },
     );
   }
 }

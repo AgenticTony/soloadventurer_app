@@ -50,6 +50,12 @@ abstract class AuthRemoteDataSource {
 
   /// Admin API to initiate password reset
   Future<void> adminResetUserPassword(String email);
+
+  /// Send password reset instructions via email
+  Future<void> sendPasswordResetEmail(String email);
+
+  /// Send password reset instructions via SMS
+  Future<void> sendPasswordResetSMS(String phoneNumber);
 }
 
 /// Implementation of [AuthRemoteDataSource] using AWS Cognito
@@ -790,6 +796,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         'Failed to reset password: $e',
         code: 'UNKNOWN_ERROR',
       );
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    debugPrint('Sending password reset email to: $email');
+    try {
+      // Create a new Cognito user instance if needed
+      _cognitoUser ??= CognitoUser(email, _userPool);
+      await _cognitoUser!.forgotPassword();
+      debugPrint('Password reset email sent successfully');
+    } catch (e) {
+      debugPrint('Error sending password reset email: $e');
+      throw AuthException('Failed to send password reset email: $e');
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetSMS(String phoneNumber) async {
+    debugPrint('Sending password reset SMS to: $phoneNumber');
+    try {
+      // Create a new Cognito user instance if needed
+      _cognitoUser ??= CognitoUser(phoneNumber, _userPool);
+
+      // For SMS delivery, we use the standard forgotPassword method
+      // The Cognito service will automatically use SMS if a phone number is provided
+      await _cognitoUser!.forgotPassword();
+      debugPrint('Password reset SMS sent successfully');
+    } catch (e) {
+      debugPrint('Error sending password reset SMS: $e');
+      throw AuthException('Failed to send password reset SMS: $e');
     }
   }
 }

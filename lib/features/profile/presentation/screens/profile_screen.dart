@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/test_profile_provider.dart';
-import '../routes/profile_routes.dart';
+import '../../../auth/presentation/providers/auth_navigation_provider.dart';
 
 /// Profile screen that displays user profile information
 class ProfileScreen extends ConsumerWidget {
@@ -27,7 +27,7 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => ProfileRoutes.navigateToEditProfile(context),
+            onPressed: () => ref.read(authNavigationProvider.notifier).navigateToProfileEdit(),
           ),
         ],
       ),

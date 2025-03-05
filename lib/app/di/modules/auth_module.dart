@@ -13,6 +13,8 @@ import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/core/config/cognito_config.dart';
 
 /// Register all auth feature dependencies
@@ -42,11 +44,13 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
   );
 
   // Register use cases
-  getIt.registerFactory(() => GetCurrentUser(getIt<AuthRepository>()));
-  getIt.registerFactory(() => IsSignedIn(getIt<AuthRepository>()));
-  getIt.registerFactory(() => LoginUseCase(getIt<AuthRepository>()));
-  getIt.registerFactory(() => SignUp(getIt<AuthRepository>()));
-  getIt.registerFactory(() => SignOut(getIt<AuthRepository>()));
-  getIt.registerFactory(() => VerifyEmail(getIt<AuthRepository>()));
-  getIt.registerFactory(() => ResendVerificationEmail(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => GetCurrentUser(getIt()));
+  getIt.registerLazySingleton(() => IsSignedIn(getIt()));
+  getIt.registerLazySingleton(() => LoginUseCase(getIt()));
+  getIt.registerLazySingleton(() => SignUp(getIt()));
+  getIt.registerLazySingleton(() => SignOut(getIt()));
+  getIt.registerLazySingleton(() => VerifyEmail(getIt()));
+  getIt.registerLazySingleton(() => ResendVerificationEmail(getIt()));
+  getIt.registerLazySingleton(() => ForgotPassword(getIt()));
+  getIt.registerLazySingleton(() => ConfirmPasswordReset(getIt()));
 }

@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart'
-    show StatelessWidget, BuildContext, Widget, Navigator;
-import 'package:flutter/material.dart' as material;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
-import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:flutter/foundation.dart';
 
 /// Home screen of the app
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   /// Creates a new [HomeScreen]
   const HomeScreen({super.key});
 
@@ -15,44 +13,36 @@ class HomeScreen extends StatelessWidget {
   static const String routeName = '/home';
 
   @override
-  Widget build(BuildContext context) {
-    return material.Scaffold(
-      appBar: material.AppBar(
-        title: const material.Text('SoloAdventurer'),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('SoloAdventurer'),
         actions: [
-          material.IconButton(
-            icon: const material.Icon(material.Icons.person),
-            onPressed: () => ProfileRoutes.navigateToProfile(context),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => ref.read(authNavigationProvider.notifier).navigateToProfile(),
             tooltip: 'Profile',
           ),
-          Consumer(
-            builder: (context, ref, _) {
-              return material.IconButton(
-                icon: const material.Icon(material.Icons.logout),
-                onPressed: () async {
-                  debugPrint('Logout button pressed');
-                  await ref.read(authProvider.notifier).signOut();
-                  debugPrint('Sign out completed');
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              debugPrint('Logout button pressed');
+              await ref.read(authProvider.notifier).signOut();
+              debugPrint('Sign out completed');
 
-                  if (context.mounted) {
-                    // Clear the entire navigation stack and push login screen
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/login',
-                      (route) => false, // This removes all routes
-                    );
-                  }
-                },
-                tooltip: 'Sign Out',
-              );
+              if (context.mounted) {
+                ref.read(authNavigationProvider.notifier).navigateToLogin();
+              }
             },
+            tooltip: 'Sign Out',
           ),
         ],
       ),
-      body: const material.Center(
-        child: material.Text(
+      body: const Center(
+        child: Text(
           'Welcome to SoloAdventurer!',
-          key: material.Key('home_screen_title'),
-          style: material.TextStyle(fontSize: 24),
+          key: Key('home_screen_title'),
+          style: TextStyle(fontSize: 24),
         ),
       ),
     );

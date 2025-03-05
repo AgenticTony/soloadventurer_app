@@ -16,6 +16,7 @@ class AuthRoutes {
   static const signup = '/signup';
   static const home = '/home';
   static const forgotPassword = '/forgot-password';
+  static const confirmPasswordReset = '/confirm-password-reset';
 }
 
 /// Notifier for handling auth-related navigation
@@ -30,6 +31,14 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         navigateToVerification(next.user?.email);
       }
     });
+  }
+
+  /// Navigate to confirm password reset screen
+  void navigateToConfirmPasswordReset(String email) {
+    navigateTo(
+      AuthRoutes.confirmPasswordReset,
+      arguments: {'email': email},
+    );
   }
 
   /// Check if navigation to a route is allowed
@@ -126,6 +135,11 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
       ProfileRoutes.editProfile,
       arguments: {'isInitialSetup': isInitialSetup},
     );
+  }
+
+  /// Navigate to profile screen
+  void navigateToProfile() {
+    navigateTo(ProfileRoutes.profile);
   }
 
   /// Request navigation to a specific route (internal use)

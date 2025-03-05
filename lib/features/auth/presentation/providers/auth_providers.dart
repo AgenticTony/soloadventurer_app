@@ -9,6 +9,9 @@ import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/profile/domain/usecases/create_profile_use_case.dart';
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'auth_notifier.dart';
 
@@ -23,9 +26,9 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
     login: ref.watch(loginProvider),
     signUp: ref.watch(signUpProvider),
     signOut: ref.watch(signOutProvider),
-    refreshToken: ref.watch(refreshTokenProvider),
-    createProfile: ref.watch(createProfileUseCaseProvider),
-    repository: ref.watch(authRepositoryProvider),
+    verifyEmail: ref.watch(verifyEmailProvider),
+    forgotPassword: ref.watch(forgotPasswordProvider),
+    confirmPasswordReset: ref.watch(confirmPasswordResetProvider),
   );
 });
 
@@ -66,7 +69,17 @@ final signOutProvider = Provider<SignOut>(
   (ref) => SignOut(ref.watch(authRepositoryProvider)),
 );
 
-/// Provider for the refresh token use case
-final refreshTokenProvider = Provider<RefreshToken>(
-  (ref) => RefreshToken(ref.watch(authRepositoryProvider)),
+/// Provider for the verify email use case
+final verifyEmailProvider = Provider<VerifyEmail>(
+  (ref) => VerifyEmail(ref.watch(authRepositoryProvider)),
+);
+
+/// Provider for the forgot password use case
+final forgotPasswordProvider = Provider<ForgotPassword>(
+  (ref) => ForgotPassword(ref.watch(authRepositoryProvider)),
+);
+
+/// Provider for the confirm password reset use case
+final confirmPasswordResetProvider = Provider<ConfirmPasswordReset>(
+  (ref) => ConfirmPasswordReset(ref.watch(authRepositoryProvider)),
 );

@@ -93,7 +93,6 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     // In mock implementation, we just simulate sending the reset code
   }
 
-
   @override
   Future<void> verifyEmail(String code, String email) async {
     if (_apiClient.isOffline) {
@@ -175,5 +174,27 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     if (!email.contains('@')) {
       throw AuthException('Invalid email format');
     }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    await Future.delayed(const Duration(seconds: 1));
+    // Simulate email validation
+    if (!email.contains('@')) {
+      throw Exception('Invalid email format');
+    }
+    // In a real implementation, this would send an email
+    debugPrint('Password reset email sent to: $email');
+  }
+
+  @override
+  Future<void> sendPasswordResetSMS(String phoneNumber) async {
+    await Future.delayed(const Duration(seconds: 1));
+    // Simulate phone number validation
+    if (!phoneNumber.startsWith('+')) {
+      throw Exception('Phone number must start with country code (+)');
+    }
+    // In a real implementation, this would send an SMS
+    debugPrint('Password reset SMS sent to: $phoneNumber');
   }
 }

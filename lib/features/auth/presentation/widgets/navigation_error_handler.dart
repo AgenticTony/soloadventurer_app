@@ -39,7 +39,6 @@ class NavigationErrorHandler extends ConsumerWidget {
       });
     }
 
-    // Show loading indicator if navigating
     if (navigationState.isNavigating) {
       return Stack(
         children: [
@@ -55,7 +54,6 @@ class NavigationErrorHandler extends ConsumerWidget {
         ],
       );
     }
-
     return child;
   }
 }

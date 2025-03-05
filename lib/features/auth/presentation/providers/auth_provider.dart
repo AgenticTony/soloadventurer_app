@@ -8,6 +8,8 @@ import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:flutter/foundation.dart';
 
@@ -36,6 +38,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final SignOut _signOut;
   final VerifyEmail _verifyEmail;
   final ResendVerificationEmail _resendVerificationEmail;
+  final ForgotPassword _forgotPassword;
+  final ConfirmPasswordReset _confirmPasswordReset;
 
   /// Creates a new [AuthNotifier] with the given use cases
   AuthNotifier({
@@ -46,6 +50,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required SignOut signOut,
     required VerifyEmail verifyEmail,
     required ResendVerificationEmail resendVerificationEmail,
+    required ForgotPassword forgotPassword,
+    required ConfirmPasswordReset confirmPasswordReset,
   })  : _getCurrentUser = getCurrentUser,
         _isSignedIn = isSignedIn,
         _login = login,
@@ -53,6 +59,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         _signOut = signOut,
         _verifyEmail = verifyEmail,
         _resendVerificationEmail = resendVerificationEmail,
+        _forgotPassword = forgotPassword,
+        _confirmPasswordReset = confirmPasswordReset,
         super(AuthState.initial());
 
   /// Set state to authenticated with user
@@ -129,7 +137,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = unverifiedState;
         debugPrint('AuthNotifier: New state set: $state');
         debugPrint(
-            'AuthNotifier: needsVerification: ${state.needsVerification}');
+            'AuthNotifier: requiresEmailVerification: ${state.requiresEmailVerification}');
         debugPrint('AuthNotifier: user: ${state.user}');
       } else {
         state = AuthState.authenticated(user);
@@ -161,7 +169,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> verifyEmail(String code, String email) async {
     debugPrint('AuthNotifier: Starting email verification');
     debugPrint('AuthNotifier: Current state before loading: $state');
-    
+
     // Preserve the current user while setting loading state
     final currentUser = state.user;
     state = AuthState.loading().copyWith(user: currentUser);
@@ -170,20 +178,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _verifyEmail(VerifyEmailParams(code: code, email: email));
       debugPrint('AuthNotifier: Email verification successful');
-      
+
       // After successful verification, use the current user directly
       if (currentUser != null) {
-        debugPrint('AuthNotifier: Setting authenticated state with current user');
+        debugPrint(
+            'AuthNotifier: Setting authenticated state with current user');
         state = AuthState.authenticated(currentUser);
       } else {
-        debugPrint('AuthNotifier: No user available, attempting to get current user');
+        debugPrint(
+            'AuthNotifier: No user available, attempting to get current user');
         try {
           final user = await _getCurrentUser();
           if (user != null) {
-            debugPrint('AuthNotifier: Setting authenticated state with fetched user');
+            debugPrint(
+                'AuthNotifier: Setting authenticated state with fetched user');
             state = AuthState.authenticated(user);
           } else {
-            debugPrint('AuthNotifier: No user data available, setting initial state');
+            debugPrint(
+                'AuthNotifier: No user data available, setting initial state');
             state = AuthState.initial();
           }
         } catch (e) {
@@ -201,7 +213,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Resend verification email
   Future<void> resendVerificationEmail() async {
     debugPrint('AuthNotifier: Resending verification email');
-    
+
     // Preserve the current user while setting loading state
     final currentUser = state.user;
     state = AuthState.loading().copyWith(user: currentUser);
@@ -210,9 +222,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _resendVerificationEmail();
       debugPrint('AuthNotifier: Verification email resent successfully');
-      
+
       if (currentUser != null) {
-        debugPrint('AuthNotifier: Setting unverified state with preserved user');
+        debugPrint(
+            'AuthNotifier: Setting unverified state with preserved user');
         state = AuthState.unverified(currentUser);
       } else {
         debugPrint('AuthNotifier: No user to preserve, checking current user');
@@ -227,6 +240,41 @@ class AuthNotifier extends StateNotifier<AuthState> {
       debugPrint('AuthNotifier: Failed to resend verification email: $e');
       // Preserve the user even in error state
       state = AuthState.error(e.toString()).copyWith(user: currentUser);
+    }
+  }
+
+  /// Initiates password reset process
+  Future<void> forgotPassword(ForgotPasswordParams params) async {
+    try {
+      state = state.copyWith(isLoading: true);
+      await _forgotPassword(params);
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false);
+      rethrow;
+    }
+  }
+
+  /// Confirm password reset with code and new password
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    if (!mounted) return;
+    state = AuthState.loading();
+
+    try {
+      await _confirmPasswordReset(ConfirmPasswordResetParams(
+        email: email,
+        code: code,
+        newPassword: newPassword,
+      ));
+      if (!mounted) return;
+      state = AuthState.initial(); // User needs to sign in with new password
+    } catch (e) {
+      if (!mounted) return;
+      state = AuthState.error(e.toString());
     }
   }
 
@@ -247,5 +295,7 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
     signOut: getIt<SignOut>(),
     verifyEmail: getIt<VerifyEmail>(),
     resendVerificationEmail: getIt<ResendVerificationEmail>(),
+    forgotPassword: getIt<ForgotPassword>(),
+    confirmPasswordReset: getIt<ConfirmPasswordReset>(),
   );
 });

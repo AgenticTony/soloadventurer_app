@@ -6,6 +6,7 @@ import '../providers/profile_providers.dart';
 import '../routes/profile_routes.dart';
 import '../../../home/presentation/screens/home_screen.dart';
 import 'package:flutter/foundation.dart';
+import '../../../auth/presentation/providers/auth_navigation_provider.dart';
 
 /// Screen for editing user profile information
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -83,10 +84,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         'isPublic': _isPublic
       });
 
-      if (widget.isInitialSetup && mounted) {
-        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
-      } else if (mounted) {
-        Navigator.pop(context);
+      if (mounted) {
+        if (widget.isInitialSetup) {
+          ref.read(authNavigationProvider.notifier).navigateToHome();
+        } else {
+          ref.read(authNavigationProvider.notifier).navigateBack();
+        }
       }
     }
   }

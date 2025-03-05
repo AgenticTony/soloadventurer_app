@@ -14,19 +14,17 @@ import 'package:soloadventurer/features/profile/presentation/providers/profile_p
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 
-/// Global navigator key provider
-final globalNavigatorKeyProvider = Provider<GlobalKey<NavigatorState>>((ref) {
-  return GlobalKey<NavigatorState>();
-});
-
 /// Provider for the profile route observer
 final profileRouteObserverProvider = Provider<ProfileRouteObserver>((ref) {
   final notifier = ref.watch(profileNavigationHistoryProvider.notifier);
   return ProfileRouteObserver(notifier);
 });
 
+/// Global navigator key
+final navigatorKey = GlobalKey<NavigatorState>();
+
 /// Widget that handles navigation state changes
-class NavigationHandler extends ConsumerWidget {
+class NavigationHandler extends ConsumerStatefulWidget {
   final Widget child;
 
   const NavigationHandler({
@@ -35,34 +33,40 @@ class NavigationHandler extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NavigationHandler> createState() => _NavigationHandlerState();
+}
+
+class _NavigationHandlerState extends ConsumerState<NavigationHandler> {
+  @override
+  Widget build(BuildContext context) {
     ref.listen<AuthNavigationState>(
       authNavigationProvider,
       (previous, current) {
         final request = current.currentRequest;
         if (request == null || request.handled) {
-          print('[Navigation] No pending navigation request');
+          debugPrint('[Navigation] No pending navigation request');
           return;
         }
 
-        final navigator = Navigator.of(context);
-        if (!navigator.mounted) {
-          print('[Navigation] Navigator not mounted, skipping navigation');
+        final navigatorState = navigatorKey.currentState;
+        if (navigatorState == null) {
+          debugPrint(
+              '[Navigation] Navigator not available, skipping navigation');
           return;
         }
-        
+
         try {
           if (request.isBack) {
-            print('[Navigation] Handling back navigation');
-            if (navigator.canPop()) {
-              navigator.pop();
+            debugPrint('[Navigation] Handling back navigation');
+            if (navigatorState.canPop()) {
+              navigatorState.pop();
             } else {
-              print('[Navigation] Cannot pop - no routes to pop');
+              debugPrint('[Navigation] Cannot pop - no routes to pop');
               return;
             }
           } else {
-            print('[Navigation] Handling navigation to ${request.route}');
-            navigator.pushNamed(
+            debugPrint('[Navigation] Handling navigation to ${request.route}');
+            navigatorState.pushNamed(
               request.route,
               arguments: request.arguments,
             );
@@ -71,13 +75,13 @@ class NavigationHandler extends ConsumerWidget {
           // Mark the request as handled only if navigation was successful
           ref.read(authNavigationProvider.notifier).markCurrentRequestHandled();
         } catch (e) {
-          print('[Navigation] Error during navigation: $e');
+          debugPrint('[Navigation] Error during navigation: $e');
           // Don't mark as handled if navigation failed
         }
       },
     );
 
-    return child;
+    return widget.child;
   }
 }
 
@@ -88,22 +92,23 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final navigatorKey = ref.watch(globalNavigatorKeyProvider);
-
-    return NavigationHandler(
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        title: 'SoloAdventurer',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: AppRouter.onGenerateRoute,
-        initialRoute: '/',
-        navigatorObservers: [
-          NavigatorObserver(),
-        ],
-      ),
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      title: 'SoloAdventurer',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: AppRouter.onGenerateRoute,
+      initialRoute: '/',
+      navigatorObservers: [
+        NavigatorObserver(),
+        ref.watch(profileRouteObserverProvider),
+      ],
+      builder: (context, child) {
+        if (child == null) return const SizedBox();
+        return NavigationHandler(child: child);
+      },
     );
   }
 }

@@ -52,18 +52,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     debugPrint('AuthRepositoryImpl: Starting registration');
     debugPrint('AuthRepositoryImpl: Registering with email: $email');
-    
+
     final (user, needsVerification) = await remoteDataSource.register(
       email: email,
       password: password,
       name: name,
     );
-    
-    debugPrint('AuthRepositoryImpl: Registration successful, caching user data');
+
+    debugPrint(
+        'AuthRepositoryImpl: Registration successful, caching user data');
     // Cache the user data even though they're not fully verified yet
     await localDataSource.cacheUser(user);
-    
-    debugPrint('AuthRepositoryImpl: User cached, needs verification: $needsVerification');
+
+    debugPrint(
+        'AuthRepositoryImpl: User cached, needs verification: $needsVerification');
     return (user, needsVerification);
   }
 
@@ -120,8 +122,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
-    // Not implemented yet
-    throw UnimplementedError('Password reset not implemented yet');
+    await remoteDataSource.sendPasswordResetEmail(email);
   }
 
   @override
@@ -130,8 +131,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String code,
     required String newPassword,
   }) async {
-    // Not implemented yet
-    throw UnimplementedError('Password reset confirmation not implemented yet');
+    await remoteDataSource.confirmForgotPassword(email, code, newPassword);
   }
 
   @override
@@ -174,28 +174,31 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> verifyEmail(String code, String email) async {
     debugPrint('AuthRepositoryImpl: Starting email verification');
     debugPrint('AuthRepositoryImpl: Verifying email: $email');
-    
+
     // Get cached user to ensure we have the right context
     final cachedUser = await localDataSource.getCachedUser();
     debugPrint('AuthRepositoryImpl: Cached user: $cachedUser');
-    
+
     if (cachedUser?.email != email) {
-      debugPrint('AuthRepositoryImpl: Warning - Verification email does not match cached user');
+      debugPrint(
+          'AuthRepositoryImpl: Warning - Verification email does not match cached user');
     }
-    
+
     try {
       await remoteDataSource.verifyEmail(code, email);
       debugPrint('AuthRepositoryImpl: Email verification successful');
-      
+
       // After successful verification, try to get fresh user data
       try {
         final verifiedUser = await remoteDataSource.getCurrentUser();
         if (verifiedUser != null) {
           await localDataSource.cacheUser(verifiedUser);
-          debugPrint('AuthRepositoryImpl: Updated cached user after verification');
+          debugPrint(
+              'AuthRepositoryImpl: Updated cached user after verification');
         } else if (cachedUser != null) {
           // If we can't get fresh data, use cached user but mark as verified
-          debugPrint('AuthRepositoryImpl: Using cached user data after verification');
+          debugPrint(
+              'AuthRepositoryImpl: Using cached user data after verification');
           await localDataSource.cacheUser(cachedUser);
         } else {
           throw AuthException('No user data available after verification');
@@ -207,7 +210,8 @@ class AuthRepositoryImpl implements AuthRepository {
           debugPrint('AuthRepositoryImpl: Falling back to cached user data');
           await localDataSource.cacheUser(cachedUser);
         } else {
-          throw AuthException('Failed to maintain user state after verification');
+          throw AuthException(
+              'Failed to maintain user state after verification');
         }
       }
     } catch (e) {
@@ -241,7 +245,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<bool> refreshToken() async {
-    // Cognito SDK handles token refresh automatically
+    await remoteDataSource.refreshToken();
     return true;
   }
 
@@ -283,5 +287,10 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return false;
     }
+  }
+
+  @override
+  Future<void> sendPasswordResetSMS(String phoneNumber) async {
+    await remoteDataSource.sendPasswordResetSMS(phoneNumber);
   }
 }

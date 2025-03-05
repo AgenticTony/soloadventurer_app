@@ -108,9 +108,18 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
                   ref.read(profileUIProvider(userId).notifier).loadProfile();
                 }
               });
-              // If this is a new user (just registered), show the edit profile screen
+              // If this is a new user (just registered), navigate to edit profile
               if (authState.isNewUser) {
-                return const EditProfileScreen(isInitialSetup: true);
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    ref.read(authNavigationProvider.notifier).navigateToProfileEdit(isInitialSetup: true);
+                  }
+                });
+                return const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
               }
             }
 

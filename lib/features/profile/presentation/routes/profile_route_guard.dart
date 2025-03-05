@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/profile_providers.dart';
@@ -113,22 +114,28 @@ class ProfileRouteObserver extends NavigatorObserver {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     if (route.settings.name != null) {
-      _navigationNotifier.addRoute(route.settings.name!);
+      scheduleMicrotask(() {
+        _navigationNotifier.addRoute(route.settings.name!);
+      });
     }
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
-    _navigationNotifier.removeLastRoute();
+    scheduleMicrotask(() {
+      _navigationNotifier.removeLastRoute();
+    });
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
     if (newRoute?.settings.name != null) {
-      _navigationNotifier.removeLastRoute();
-      _navigationNotifier.addRoute(newRoute!.settings.name!);
+      scheduleMicrotask(() {
+        _navigationNotifier.removeLastRoute();
+        _navigationNotifier.addRoute(newRoute!.settings.name!);
+      });
     }
   }
 
@@ -136,12 +143,15 @@ class ProfileRouteObserver extends NavigatorObserver {
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didRemove(route, previousRoute);
     if (route.settings.name != null) {
-      // Since we can't directly remove a specific route from the middle of the history,
-      // we'll need to rebuild the history without the removed route
-      final currentState = _navigationNotifier.state;
-      final newHistory =
-          currentState.history.where((r) => r != route.settings.name).toList();
-      _navigationNotifier.state = ProfileNavigationState(history: newHistory);
+      scheduleMicrotask(() {
+        // Since we can't directly remove a specific route from the middle of the history,
+        // we'll need to rebuild the history without the removed route
+        final currentState = _navigationNotifier.state;
+        final newHistory = currentState.history
+            .where((r) => r != route.settings.name)
+            .toList();
+        _navigationNotifier.state = ProfileNavigationState(history: newHistory);
+      });
     }
   }
 }
