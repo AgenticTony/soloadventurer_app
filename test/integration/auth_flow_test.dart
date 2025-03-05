@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:soloadventurer/app/app.dart';
-import 'package:soloadventurer/core/network/api_client.dart';
+import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/core/security/security_manager.dart';
+import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
+import 'package:soloadventurer/core/api/interceptors/error_interceptor.dart';
+import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/get_current_user_use_case.dart';
@@ -31,8 +35,18 @@ void main() {
   late GetCurrentUserUseCase getCurrentUserUseCase;
 
   setUp(() async {
-    // Initialize real implementations
-    apiClient = ApiClient(baseUrl: TestConfig.apiBaseUrl);
+    // Initialize mock implementations
+    final authInterceptor = AuthInterceptor();
+    final errorInterceptor = ErrorInterceptor();
+    final networkMonitor = NetworkMonitor();
+    
+    apiClient = ApiClient(
+      baseUrl: TestConfig.apiBaseUrl,
+      authInterceptor: authInterceptor,
+      errorInterceptor: errorInterceptor,
+      networkMonitor: networkMonitor,
+    );
+    
     secureStorage = SecureStorage();
     securityManager = SecurityManagerImpl(storage: secureStorage);
 
@@ -42,9 +56,8 @@ void main() {
     await secureStorage.delete(TestConfig.userDataKey);
 
     // Set up data sources
-    authLocalDataSource =
-        AuthLocalDataSourceImpl(securityManager, secureStorage);
-    authRemoteDataSource = AuthRemoteDataSourceImpl(apiClient: apiClient);
+    authLocalDataSource = AuthLocalDataSourceImpl(securityManager);
+    authRemoteDataSource = MockAuthRemoteDataSource(apiClient);
 
     // Set up repository
     authRepository = AuthRepositoryImpl(

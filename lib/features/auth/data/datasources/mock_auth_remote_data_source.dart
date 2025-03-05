@@ -93,22 +93,6 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     // In mock implementation, we just simulate sending the reset code
   }
 
-  @override
-  Future<void> confirmPasswordReset({
-    required String email,
-    required String code,
-    required String newPassword,
-  }) async {
-    // Do nothing in mock
-  }
-
-  @override
-  Future<void> changePassword({
-    required String currentPassword,
-    required String newPassword,
-  }) async {
-    // Do nothing in mock
-  }
 
   @override
   Future<void> verifyEmail(String code, String email) async {

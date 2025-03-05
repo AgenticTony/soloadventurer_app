@@ -1,5 +1,3 @@
-export 'auth_notifier.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
@@ -13,6 +11,9 @@ import 'package:soloadventurer/features/profile/domain/usecases/create_profile_u
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'auth_notifier.dart';
+
+export 'auth_notifier.dart';
+export '../state/auth_state.dart';
 
 /// Provider for the auth state notifier
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {

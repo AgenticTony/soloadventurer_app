@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/signup_screen.dart';
 import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 
@@ -70,19 +71,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             password,
           );
 
-      if (mounted && context.mounted) {
-        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+      if (mounted) {
+        ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.home);
       }
     }
   }
 
   void _navigateToSignUp() {
-    Navigator.pushReplacementNamed(context, SignUpScreen.routeName);
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.signup);
   }
 
   void _navigateToForgotPassword() {
-    // Navigate to forgot password screen
-    // Navigator.pushNamed(context, ForgotPasswordScreen.routeName);
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.forgotPassword);
   }
 
   @override

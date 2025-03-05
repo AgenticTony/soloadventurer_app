@@ -108,6 +108,23 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               name: name,
             );
         debugPrint('SignUpScreen: Form submitted successfully');
+        
+        if (mounted) {
+          final authState = ref.read(authProvider);
+          if (authState.needsVerification) {
+            // Navigate to verification screen if email verification is needed
+            ref.read(authNavigationProvider.notifier).navigateTo(
+              AuthRoutes.verifyEmail,
+              arguments: {'email': email},
+            );
+          } else {
+            // Navigate to profile setup if no verification needed
+            ref.read(authNavigationProvider.notifier).navigateTo(
+              '/profile/edit',
+              arguments: {'isInitialSetup': true},
+            );
+          }
+        }
       } catch (e) {
         debugPrint('SignUpScreen: Error submitting form: $e');
       }
@@ -117,7 +134,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   void _navigateToLogin() {
-    Navigator.pop(context);
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.login);
   }
 
   @override

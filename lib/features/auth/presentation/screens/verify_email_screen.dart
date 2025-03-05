@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 
@@ -112,11 +113,10 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             if (!mounted) return;
 
             if (newState.isAuthenticated) {
-              // Clear navigation stack and navigate to profile edit
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/profile/edit', (route) => false, // Remove all previous routes
-                  arguments: true // Pass boolean directly for isInitialSetup
-                  );
+              // Use typed navigation method
+              ref.read(authNavigationProvider.notifier).navigateToProfileEdit(
+                isInitialSetup: true,
+              );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
@@ -183,8 +183,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Pop the current screen and go back to signup
-            Navigator.of(context).pop();
+            // Use navigation provider to handle back navigation
+            ref.read(authNavigationProvider.notifier).navigateBack();
             // Reset the verification state
             ref.read(authProvider.notifier).clearVerificationState();
           },

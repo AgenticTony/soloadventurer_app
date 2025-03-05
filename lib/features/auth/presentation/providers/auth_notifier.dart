@@ -5,27 +5,11 @@ import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/refresh_token.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/profile/domain/usecases/create_profile_use_case.dart';
 import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
-import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
-
-/// Provider for the auth notifier
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(
-    getCurrentUser: ref.watch(getCurrentUserProvider),
-    isSignedIn: ref.watch(isSignedInProvider),
-    login: ref.watch(loginProvider),
-    signUp: ref.watch(signUpProvider),
-    signOut: ref.watch(signOutProvider),
-    refreshToken: ref.watch(refreshTokenProvider),
-    createProfile: ref.watch(createProfileUseCaseProvider),
-    repository: ref.watch(authRepositoryProvider),
-  );
-});
 
 /// Notifier that manages authentication state
 class AuthNotifier extends StateNotifier<AuthState> {
