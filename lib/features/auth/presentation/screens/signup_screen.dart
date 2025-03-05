@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
+import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 
 /// Sign up screen for the application
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -106,9 +108,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               name: name,
             );
         debugPrint('SignUpScreen: Form submitted successfully');
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, '/profile/edit');
-        }
       } catch (e) {
         debugPrint('SignUpScreen: Error submitting form: $e');
       }
@@ -124,9 +123,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
+    // Watch the navigation provider to ensure it's instantiated and listening
+    ref.watch(authNavigationProvider);
+
+    debugPrint('SignUpScreen build: authState = $authState');
+    debugPrint('SignUpScreen build: isLoading = ${authState.isLoading}');
+    debugPrint('SignUpScreen build: user = ${authState.user}');
 
     // Show error if there is one
     if (authState.error != null && authState.error!.isNotEmpty) {
+      debugPrint('SignUpScreen build: showing error = ${authState.error}');
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -254,31 +260,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 const SizedBox(height: 24),
 
                 // Sign up button
-                ElevatedButton(
-                  onPressed: authState.isLoading ? null : _signUp,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                if (authState.isLoading)
+                  const Center(child: CircularProgressIndicator())
+                else
+                  ElevatedButton(
+                    onPressed: _signUp,
+                    child: const Text('Sign Up'),
                   ),
-                  child: authState.isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text(
-                          'Sign Up',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                ),
 
                 const SizedBox(height: 16),
 
                 // Login link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Already have an account?'),
-                    TextButton(
-                      onPressed: authState.isLoading ? null : _navigateToLogin,
-                      child: const Text('Login'),
-                    ),
-                  ],
+                TextButton(
+                  onPressed: _navigateToLogin,
+                  child: const Text('Already have an account? Login'),
                 ),
               ],
             ),
