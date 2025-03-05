@@ -1,59 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/profile_providers.dart';
-import '../widgets/profile_avatar.dart';
-import '../widgets/profile_info_section.dart';
-import '../widgets/profile_actions.dart';
-import '../widgets/error_view.dart';
-import '../widgets/loading_view.dart';
+import '../providers/test_profile_provider.dart';
 import '../routes/profile_routes.dart';
 
-/// Profile screen for the application
-class ProfileScreen extends ConsumerStatefulWidget {
-  /// Route name for navigation
-  static const routeName = '/profile';
-
-  /// The ID of the profile to display. If null, displays the current user's profile.
-  final String? profileId;
-
+/// Profile screen that displays user profile information
+class ProfileScreen extends ConsumerWidget {
   /// Creates a new [ProfileScreen]
-  const ProfileScreen({
-    super.key,
-    this.profileId,
-  });
+  const ProfileScreen({super.key});
 
   @override
-  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileState = ref.watch(testProfileProvider);
+    final profile = profileState.profile;
 
-class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(
-      () => ref.read(profileProvider.notifier).loadProfile(),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ref.watch(profileProvider);
-    final theme = Theme.of(context);
-
-    if (state.isLoading) {
-      return const LoadingView();
-    }
-
-    if (state.hasError) {
-      return ErrorView(
-        error: state.error!,
-        onRetry: () => ref.read(profileProvider.notifier).loadProfile(),
-      );
-    }
-
-    if (!state.isInitialized) {
-      return const Center(
-        child: Text('No profile data available'),
+    if (profile == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
@@ -63,80 +27,70 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => ProfileRoutes.navigateToEditProfile(
-              context,
-              profile: state.profile,
-            ),
-            tooltip: 'Edit Profile',
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => ProfileRoutes.navigateToSettings(context),
-            tooltip: 'Profile Settings',
+            onPressed: () => ProfileRoutes.navigateToEditProfile(context),
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => ref.read(profileProvider.notifier).loadProfile(),
-        child: ListView(
-          padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProfileAvatar(
-              avatarUrl: state.profile!.avatarUrl,
-              size: 120,
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: profile.avatarUrl != null
+                    ? NetworkImage(profile.avatarUrl!)
+                    : null,
+                child: profile.avatarUrl == null
+                    ? Text(
+                        profile.displayName[0].toUpperCase(),
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      )
+                    : null,
+              ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              state.profile!.displayName,
-              style: theme.textTheme.headlineMedium,
-              textAlign: TextAlign.center,
+            const SizedBox(height: 16),
+            Center(
+              child: Text(
+                profile.displayName,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ),
-            if (state.profile!.bio != null) ...[
-              const SizedBox(height: 8),
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                '@${profile.username}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.grey,
+                    ),
+              ),
+            ),
+            if (profile.bio != null) ...[
+              const SizedBox(height: 16),
               Text(
-                state.profile!.bio!,
-                style: theme.textTheme.bodyLarge,
+                profile.bio!,
+                style: Theme.of(context).textTheme.bodyLarge,
                 textAlign: TextAlign.center,
               ),
             ],
-            const SizedBox(height: 32),
-            ProfileInfoSection(profile: state.profile!),
             const SizedBox(height: 24),
-            ProfileActions(
-              isPublic: state.profile!.isPublic,
-              onToggleVisibility: (isPublic) {
-                ref.read(profileProvider.notifier).updateProfile({
-                  'isPublic': isPublic,
-                });
-              },
-              onDeleteProfile: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Delete Profile'),
-                    content: const Text(
-                      'Are you sure you want to delete your profile? This action cannot be undone.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('CANCEL'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          ref.read(profileProvider.notifier).deleteProfile();
-                          ProfileRoutes.popToProfile(context);
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: theme.colorScheme.error,
-                        ),
-                        child: const Text('DELETE'),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            ListTile(
+              leading: const Icon(Icons.email),
+              title: const Text('Email'),
+              subtitle: Text(profile.email),
+            ),
+            ListTile(
+              leading: const Icon(Icons.visibility),
+              title: const Text('Profile Visibility'),
+              subtitle: Text(profile.isPublic ? 'Public' : 'Private'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_today),
+              title: const Text('Member Since'),
+              subtitle: Text(
+                profile.createdAt.toLocal().toString().split(' ')[0],
+              ),
             ),
           ],
         ),

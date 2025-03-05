@@ -26,37 +26,40 @@ class DioApiService implements ApiService {
     int receiveTimeout = 30000,
   })  : _baseUrl = baseUrl,
         _defaultHeaders = defaultHeaders ?? {} {
-    _initializeDio(connectTimeout, receiveTimeout);
+    _initializeDio();
   }
 
   /// Initialize the Dio HTTP client with interceptors and timeouts
-  void _initializeDio(int connectTimeout, int receiveTimeout) {
+  Future<void> _initializeDio() async {
     try {
-      final options = BaseOptions(
-        baseUrl: _baseUrl,
-        connectTimeout: Duration(milliseconds: connectTimeout),
-        receiveTimeout: Duration(milliseconds: receiveTimeout),
-        headers: _defaultHeaders,
+      // Initialize Dio with base configuration
+      _dio = Dio(
+        BaseOptions(
+          baseUrl: _baseUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
       );
 
-      _dio = Dio(options);
-
-      // Add logging interceptor in debug mode
-      if (kDebugMode) {
-        _dio.interceptors.add(LogInterceptor(
-          requestBody: true,
-          responseBody: true,
-        ));
-      }
-
-      // Add authentication interceptor
-      // This would be added when auth service is implemented
-      // _dio.interceptors.add(AuthInterceptor(_authService));
+      // Add interceptors
+      _dio.interceptors.addAll([
+        _authInterceptor,
+        _errorInterceptor,
+        if (kDebugMode)
+          LogInterceptor(
+            requestBody: true,
+            responseBody: true,
+          ),
+      ]);
 
       _isInitialized = true;
     } catch (e) {
-      debugPrint('Error initializing Dio: $e');
-      _isInitialized = false;
+      // Handle initialization error
+      rethrow;
     }
   }
 
@@ -76,15 +79,11 @@ class DioApiService implements ApiService {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    try {
-      return await _dio.get(
-        endpoint,
-        queryParameters: queryParameters,
-        options: options,
-      );
-    } on DioException catch (e) {
-      return _handleDioError(e);
-    }
+    return await _handleRequest(() => _dio.get(
+          endpoint,
+          queryParameters: queryParameters,
+          options: options,
+        ));
   }
 
   @override
@@ -94,16 +93,12 @@ class DioApiService implements ApiService {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    try {
-      return await _dio.post(
-        endpoint,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-    } on DioException catch (e) {
-      return _handleDioError(e);
-    }
+    return await _handleRequest(() => _dio.post(
+          endpoint,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+        ));
   }
 
   @override
@@ -113,16 +108,12 @@ class DioApiService implements ApiService {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    try {
-      return await _dio.put(
-        endpoint,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-    } on DioException catch (e) {
-      return _handleDioError(e);
-    }
+    return await _handleRequest(() => _dio.put(
+          endpoint,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+        ));
   }
 
   @override
@@ -132,16 +123,12 @@ class DioApiService implements ApiService {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
-    try {
-      return await _dio.delete(
-        endpoint,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-    } on DioException catch (e) {
-      return _handleDioError(e);
-    }
+    return await _handleRequest(() => _dio.delete(
+          endpoint,
+          data: data,
+          queryParameters: queryParameters,
+          options: options,
+        ));
   }
 
   /// Handle Dio errors and convert them to a standardized format
@@ -216,6 +203,16 @@ class DioApiService implements ApiService {
           return 'NO_INTERNET';
         }
         return 'UNKNOWN_ERROR';
+    }
+  }
+
+  Future<Response<T>> _handleRequest<T>(
+    Future<Response<T>> Function() request,
+  ) async {
+    try {
+      return await request();
+    } on DioException catch (error) {
+      throw _handleDioError(error);
     }
   }
 }

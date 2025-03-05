@@ -1,6 +1,6 @@
 import '../repositories/profile_repository.dart';
 
-/// Use case for managing profile avatars
+/// Use case for managing a user's profile avatar
 class ManageAvatarUseCase {
   final ProfileRepository _repository;
 
@@ -11,6 +11,6 @@ class ManageAvatarUseCase {
   Future<String> uploadAvatar(String userId, String filePath) =>
       _repository.uploadAvatar(userId, filePath);
 
-  /// Remove the user's current avatar
+  /// Remove the user's avatar
   Future<void> removeAvatar(String userId) => _repository.removeAvatar(userId);
 }

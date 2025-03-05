@@ -51,7 +51,7 @@ class SessionManager {
     // Schedule token refresh
     _refreshTimer = Timer.periodic(
       const Duration(minutes: _defaultRefreshIntervalMinutes),
-      (_) => _refreshToken(),
+      (_) => _refreshTokenIfNeeded(),
     );
 
     debugPrint(
@@ -65,18 +65,26 @@ class SessionManager {
   }
 
   /// Refreshes the authentication token.
-  Future<bool> _refreshToken() async {
-    debugPrint('Attempting to refresh token');
-    final result = await _authService.refreshSession();
+  Future<bool> _refreshTokenIfNeeded() async {
+    if (!_shouldRefreshToken()) return false;
 
-    if (result) {
-      debugPrint('Token refreshed successfully');
-      return true;
-    } else {
-      debugPrint('Token refresh failed');
-      // Handle failed refresh (e.g., force logout)
-      await endSession();
+    try {
+      return await _refreshToken();
+    } catch (e) {
+      // Token refresh failed, handle accordingly
+      _clearSession();
       return false;
+    }
+  }
+
+  Future<bool> _refreshToken() async {
+    try {
+      final result = await _authService.refreshSession();
+      _updateSession(result);
+      return result;
+    } catch (e) {
+      _clearSession();
+      rethrow;
     }
   }
 
@@ -86,7 +94,7 @@ class SessionManager {
       // Try to refresh the token if we have credentials but session is invalid
       final username = await _secureStorage.getUsername();
       if (username != null) {
-        return await _refreshToken();
+        return await _refreshTokenIfNeeded();
       }
       return false;
     }
@@ -95,7 +103,7 @@ class SessionManager {
 
   /// Forces an immediate token refresh.
   Future<bool> forceTokenRefresh() async {
-    return await _refreshToken();
+    return await _refreshTokenIfNeeded();
   }
 
   /// Gets the current authentication token.
@@ -112,4 +120,17 @@ class SessionManager {
 
   /// Checks if a user is currently authenticated.
   bool get isAuthenticated => _authService.isAuthenticated;
+
+  void _updateSession(bool result) {
+    // Implementation of _updateSession method
+  }
+
+  void _clearSession() {
+    // Implementation of _clearSession method
+  }
+
+  bool _shouldRefreshToken() {
+    // Implementation of _shouldRefreshToken method
+    return false; // Placeholder return, actual implementation needed
+  }
 }

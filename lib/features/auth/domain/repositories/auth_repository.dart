@@ -2,12 +2,15 @@ import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 
 /// Repository interface for authentication operations
 abstract class AuthRepository {
+  /// Register a new user with email and password
+  Future<(User, bool)> register({
+    required String email,
+    required String password,
+    required String name,
+  });
+
   /// Sign in a user with email and password
   Future<User> signInWithEmailAndPassword(String email, String password);
-
-  /// Register a new user with email and password
-  Future<User> registerWithEmailAndPassword(
-      String email, String password, String username);
 
   /// Sign out the current user
   Future<void> signOut();
@@ -48,7 +51,7 @@ abstract class AuthRepository {
   });
 
   /// Verify the user's email
-  Future<void> verifyEmail(String code);
+  Future<void> verifyEmail(String code, String email);
 
   /// Resend verification email
   Future<void> resendVerificationEmail();

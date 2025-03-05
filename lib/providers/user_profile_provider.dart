@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user.dart';
-import '../services/api_service.dart';
+import '../core/api/api_service.dart';
+import '../app/di/service_locator.dart';
 
 // Provider for the API service
 final apiServiceProvider = Provider<ApiService>((ref) {
-  return ApiService();
+  return getIt<ApiService>();
 });
 
 // Provider for user repository
@@ -22,7 +23,7 @@ class UserRepository {
   Future<User> getUserProfile(String userId) async {
     try {
       final response = await _apiService.get('/users/$userId');
-      return User.fromJson(response.data);
+      return User.fromJson(response);
     } catch (e) {
       throw Exception('Failed to load user profile: $e');
     }
@@ -32,7 +33,7 @@ class UserRepository {
       String userId, Map<String, dynamic> data) async {
     try {
       final response = await _apiService.put('/users/$userId', data: data);
-      return User.fromJson(response.data);
+      return User.fromJson(response);
     } catch (e) {
       throw Exception('Failed to update user profile: $e');
     }

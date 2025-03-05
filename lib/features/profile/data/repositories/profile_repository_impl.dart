@@ -17,12 +17,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<Profile> createProfile(Profile profile) async {
-    if (profile is! ProfileModel) {
-      throw ArgumentError('Profile must be a ProfileModel instance');
-    }
-    final createdProfile = await _remoteDataSource.createProfile(profile);
+    final model = ProfileModel.fromEntity(profile);
+    final createdProfile = await _remoteDataSource.createProfile(model);
     await _localDataSource.createProfile(createdProfile);
-    return createdProfile;
+    return createdProfile.toEntity();
   }
 
   @override
@@ -30,13 +28,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       final profile = await _remoteDataSource.getProfile(userId);
       await _localDataSource.cacheProfile(profile);
-      return profile;
+      return profile.toEntity();
     } on NetworkTimeoutException catch (_) {
       final cachedProfile = await _localDataSource.getCachedProfile(userId);
-      return cachedProfile;
+      return cachedProfile.toEntity();
     } on NetworkConnectivityException catch (_) {
       final cachedProfile = await _localDataSource.getCachedProfile(userId);
-      return cachedProfile;
+      return cachedProfile.toEntity();
     }
   }
 
@@ -45,7 +43,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       final profile = await _remoteDataSource.getCurrentProfile();
       await _localDataSource.cacheProfile(profile);
-      return profile;
+      return profile.toEntity();
     } on NetworkTimeoutException catch (_) {
       throw const CacheException(
           message: 'Failed to get current profile: Network timeout');
@@ -57,12 +55,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<Profile> updateProfile(Profile profile) async {
-    if (profile is! ProfileModel) {
-      throw ArgumentError('Profile must be a ProfileModel instance');
-    }
-    final updatedProfile = await _remoteDataSource.updateProfile(profile);
+    final model = ProfileModel.fromEntity(profile);
+    final updatedProfile = await _remoteDataSource.updateProfile(model);
     await _localDataSource.cacheProfile(updatedProfile);
-    return updatedProfile;
+    return updatedProfile.toEntity();
   }
 
   @override
@@ -71,7 +67,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     final updatedProfile =
         await _remoteDataSource.updateProfileFields(userId, fields);
     await _localDataSource.cacheProfile(updatedProfile);
-    return updatedProfile;
+    return updatedProfile.toEntity();
   }
 
   @override
@@ -133,10 +129,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return await _remoteDataSource.profileExists(userId);
     } on NetworkTimeoutException catch (_) {
       final cachedProfile = await _localDataSource.getCachedProfile(userId);
-      return cachedProfile.userId == userId;
+      return cachedProfile.id == userId;
     } on NetworkConnectivityException catch (_) {
       final cachedProfile = await _localDataSource.getCachedProfile(userId);
-      return cachedProfile.userId == userId;
+      return cachedProfile.id == userId;
     }
   }
 }

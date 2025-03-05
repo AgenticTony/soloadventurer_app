@@ -1,27 +1,77 @@
-import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
 
-/// Model class for Profile that handles JSON serialization/deserialization
-class ProfileModel extends Profile {
+/// Model class for Profile that handles JSON serialization/deserialization and validation
+class ProfileModel {
   static const int maxDisplayNameLength = 50;
   static const int maxBioLength = 500;
   static const int maxInterestsCount = 20;
   static const int maxPreferencesCount = 50;
 
+  final String id;
+  final String userId;
+  final String username;
+  final String email;
+  final String displayName;
+  final String? bio;
+  final String? avatarUrl;
+  final bool isPublic;
+  final List<String> interests;
+  final Map<String, dynamic> preferences;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
   const ProfileModel({
-    required super.id,
-    required super.userId,
-    required super.displayName,
-    super.avatarUrl,
-    super.bio,
-    required super.createdAt,
-    required super.updatedAt,
-    super.preferences = const {},
-    super.interests = const [],
-    super.isPublic = false,
+    required this.id,
+    required this.userId,
+    required this.username,
+    required this.email,
+    required this.displayName,
+    this.bio,
+    this.avatarUrl,
+    this.isPublic = false,
+    this.interests = const [],
+    this.preferences = const {},
+    required this.createdAt,
+    required this.updatedAt,
   });
 
-  /// Creates a [ProfileModel] from JSON data with validation
+  /// Creates a [ProfileModel] from a domain [Profile] entity
+  factory ProfileModel.fromEntity(Profile profile) {
+    return ProfileModel(
+      id: profile.id,
+      userId: profile.userId,
+      username: profile.username,
+      email: profile.email,
+      displayName: profile.displayName,
+      bio: profile.bio,
+      avatarUrl: profile.avatarUrl,
+      isPublic: profile.isPublic,
+      interests: profile.interests,
+      preferences: profile.preferences,
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt,
+    );
+  }
+
+  /// Converts this [ProfileModel] to a domain [Profile] entity
+  Profile toEntity() {
+    return Profile(
+      id: id,
+      userId: userId,
+      username: username,
+      email: email,
+      displayName: displayName,
+      bio: bio,
+      avatarUrl: avatarUrl,
+      isPublic: isPublic,
+      interests: interests,
+      preferences: preferences,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     final displayName = json['displayName'] as String;
     final bio = json['bio'] as String?;
@@ -38,14 +88,64 @@ class ProfileModel extends Profile {
     return ProfileModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
+      username: json['username'] as String,
+      email: json['email'] as String,
       displayName: displayName,
-      avatarUrl: json['avatarUrl'] as String?,
       bio: bio,
+      avatarUrl: json['avatarUrl'] as String?,
+      isPublic: json['isPublic'] as bool? ?? false,
+      interests: interests,
+      preferences: preferences,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      preferences: preferences,
-      interests: interests,
-      isPublic: json['isPublic'] as bool? ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'username': username,
+      'email': email,
+      'displayName': displayName,
+      'bio': bio,
+      'avatarUrl': avatarUrl,
+      'isPublic': isPublic,
+      'interests': interests,
+      'preferences': preferences,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+    };
+  }
+
+  /// Creates a copy of this ProfileModel with the given fields replaced with the new values
+  ProfileModel copyWith({
+    String? id,
+    String? userId,
+    String? username,
+    String? email,
+    String? displayName,
+    String? bio,
+    String? avatarUrl,
+    bool? isPublic,
+    List<String>? interests,
+    Map<String, dynamic>? preferences,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return ProfileModel(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      bio: bio ?? this.bio,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      isPublic: isPublic ?? this.isPublic,
+      interests: interests ?? this.interests,
+      preferences: preferences ?? this.preferences,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -111,65 +211,5 @@ class ProfileModel extends Profile {
         },
       );
     }
-  }
-
-  /// Converts this [ProfileModel] to JSON
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'userId': userId,
-      'displayName': displayName,
-      'avatarUrl': avatarUrl,
-      'bio': bio,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'preferences': preferences,
-      'interests': interests,
-      'isPublic': isPublic,
-    };
-  }
-
-  /// Creates a copy of this ProfileModel with the given fields replaced with the new values
-  @override
-  ProfileModel copyWith({
-    String? id,
-    String? userId,
-    String? displayName,
-    String? avatarUrl,
-    String? bio,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Map<String, dynamic>? preferences,
-    List<String>? interests,
-    bool? isPublic,
-  }) {
-    return ProfileModel(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      displayName: displayName ?? this.displayName,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      bio: bio ?? this.bio,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      preferences: preferences ?? this.preferences,
-      interests: interests ?? this.interests,
-      isPublic: isPublic ?? this.isPublic,
-    );
-  }
-
-  /// Creates a [ProfileModel] from a [Profile] entity
-  factory ProfileModel.fromEntity(Profile profile) {
-    return ProfileModel(
-      id: profile.id,
-      userId: profile.userId,
-      displayName: profile.displayName,
-      avatarUrl: profile.avatarUrl,
-      bio: profile.bio,
-      createdAt: profile.createdAt,
-      updatedAt: profile.updatedAt,
-      preferences: profile.preferences,
-      interests: profile.interests,
-      isPublic: profile.isPublic,
-    );
   }
 }

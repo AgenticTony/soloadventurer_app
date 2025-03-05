@@ -1,49 +1,41 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../entities/profile.dart';
 import '../entities/profile_state.dart';
 import '../repositories/profile_repository.dart';
+import '../../data/repositories/profile_repository_impl.dart';
+import '../../presentation/providers/profile_providers.dart';
 
-final profileProvider =
-    StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
+/// Provider for profile domain state
+final profileDomainProvider =
+    StateNotifierProvider<ProfileDomainNotifier, ProfileDomainState>((ref) {
   final repository = ref.watch(profileRepositoryProvider);
-  return ProfileNotifier(repository);
+  return ProfileDomainNotifier(repository);
 });
 
-class ProfileNotifier extends StateNotifier<ProfileState> {
+/// Notifier for profile domain state
+class ProfileDomainNotifier extends StateNotifier<ProfileDomainState> {
   final ProfileRepository _repository;
 
-  ProfileNotifier(this._repository) : super(const ProfileState()) {
+  ProfileDomainNotifier(this._repository) : super(const ProfileDomainState()) {
     loadProfile();
   }
 
   Future<void> loadProfile() async {
-    state = state.copyWith(isLoading: true, error: null);
     try {
       final profile = await _repository.getCurrentProfile();
-      state = state.copyWith(
-        isLoading: false,
-        profile: profile,
-      );
+      state = state.copyWith(profile: profile);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      state = const ProfileDomainState();
     }
   }
 
-  Future<void> updateProfile(ProfileModel profile) async {
-    state = state.copyWith(isLoading: true, error: null);
+  Future<void> updateProfile(Profile profile) async {
     try {
       await _repository.updateProfile(profile);
-      state = state.copyWith(
-        isLoading: false,
-        profile: profile,
-      );
+      state = state.copyWith(profile: profile);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      // Domain layer maintains current state on error
+      state = state;
     }
   }
 
@@ -58,15 +50,12 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   }
 
   Future<void> deleteProfile() async {
-    state = state.copyWith(isLoading: true, error: null);
     try {
-      await _repository.deleteProfile();
-      state = const ProfileState();
+      await _repository.deleteProfile(state.profile?.id ?? '');
+      state = const ProfileDomainState();
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
+      // Domain layer maintains current state on error
+      state = state;
     }
   }
 }

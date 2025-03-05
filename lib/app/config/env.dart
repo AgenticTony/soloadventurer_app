@@ -17,10 +17,10 @@ class Env {
   }
 
   /// AWS Cognito User Pool ID
-  String get cognitoUserPoolId => 'us-east-1_vNhmt3a4G';
+  String get cognitoUserPoolId => 'us-east-1_mBzCWbAF7';
 
   /// AWS Cognito Client ID
-  String get cognitoClientId => '1g38ds6cnuf9cbtdatbbfom6hq';
+  String get cognitoClientId => 'bcnr0d4dbcc5lc3dh05ih6540';
 
   /// AWS Cognito Identity Pool ID
   String get cognitoIdentityPoolId => '';

@@ -1,67 +1,58 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show StatelessWidget, BuildContext, Widget, Navigator;
+import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:soloadventurer/features/profile/presentation/screens/profile_screen.dart';
-import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
+import 'package:flutter/foundation.dart';
 
-/// The home screen of the app
-class HomeScreen extends ConsumerWidget {
+/// Home screen of the app
+class HomeScreen extends StatelessWidget {
   /// Creates a new [HomeScreen]
   const HomeScreen({super.key});
 
-  /// The route name for this screen
-  static const routeName = '/home';
+  /// Route name for navigation
+  static const String routeName = '/home';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
-    final profileState = ref.watch(profileProvider);
-    final user = authState.user;
-
-    print('HomeScreen build - authState: $authState');
-    print('HomeScreen build - user: $user');
-    print('HomeScreen build - isAuthenticated: ${authState.isAuthenticated}');
-    print('HomeScreen build - isLoading: ${authState.isLoading}');
-    print('HomeScreen build - error: ${authState.error}');
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Home',
-          key: Key('home_screen_title'),
-        ),
+  Widget build(BuildContext context) {
+    return material.Scaffold(
+      appBar: material.AppBar(
+        title: const material.Text('SoloAdventurer'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              ref.read(authProvider.notifier).refreshToken();
-            },
+          material.IconButton(
+            icon: const material.Icon(material.Icons.person),
+            onPressed: () => ProfileRoutes.navigateToProfile(context),
+            tooltip: 'Profile',
           ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authProvider.notifier).signOut();
-              if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/');
-              }
+          Consumer(
+            builder: (context, ref, _) {
+              return material.IconButton(
+                icon: const material.Icon(material.Icons.logout),
+                onPressed: () async {
+                  debugPrint('Logout button pressed');
+                  await ref.read(authProvider.notifier).signOut();
+                  debugPrint('Sign out completed');
+
+                  if (context.mounted) {
+                    // Clear the entire navigation stack and push login screen
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/login',
+                      (route) => false, // This removes all routes
+                    );
+                  }
+                },
+                tooltip: 'Sign Out',
+              );
             },
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-                'Welcome, ${profileState.profile?.displayName ?? user?.username ?? 'User'}!'),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, ProfileScreen.routeName);
-              },
-              child: const Text('View Profile'),
-            ),
-          ],
+      body: const material.Center(
+        child: material.Text(
+          'Welcome to SoloAdventurer!',
+          key: material.Key('home_screen_title'),
+          style: material.TextStyle(fontSize: 24),
         ),
       ),
     );

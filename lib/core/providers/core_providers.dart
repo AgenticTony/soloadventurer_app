@@ -13,7 +13,7 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
   return SecureStorage();
 });
 
-final sharedPreferencesProvider =
-    FutureProvider<SharedPreferences>((ref) async {
-  return await SharedPreferences.getInstance();
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError(
+      'SharedPreferences must be initialized in bootstrap');
 });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
@@ -77,38 +78,54 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       setState(() => _isLoading = true);
       try {
         final code = _codeController.text.trim();
+        // Store the current auth state before verification
         final authState = ref.read(authProvider);
+        final preservedUser = authState.user;
 
         debugPrint('VerifyEmailScreen: Starting verification');
         debugPrint('VerifyEmailScreen: Current auth state: $authState');
+        debugPrint('VerifyEmailScreen: Preserved user: $preservedUser');
         debugPrint('VerifyEmailScreen: Local email state: $_email');
-        debugPrint(
-            'VerifyEmailScreen: User email from state: ${authState.user?.email}');
         debugPrint('VerifyEmailScreen: Verification code: $code');
 
         if (_email == null) {
           debugPrint('VerifyEmailScreen: No email available in local state');
-          // Try to get email from auth state again
-          _email = authState.user?.email;
+          // Try to get email from preserved user first
+          _email = preservedUser?.email ?? authState.user?.email;
           if (_email == null) {
             throw Exception('No email found for verification');
           }
-          debugPrint(
-              'VerifyEmailScreen: Retrieved email from auth state: $_email');
+          debugPrint('VerifyEmailScreen: Retrieved email: $_email');
         }
 
-        debugPrint(
-            'VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
+        debugPrint('VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
         await ref.read(authProvider.notifier).verifyEmail(code, _email!);
         debugPrint('VerifyEmailScreen: Verification completed successfully');
 
+        // Check the verification result
+        final newState = ref.read(authProvider);
+        debugPrint('VerifyEmailScreen: Auth state after verification: $newState');
+
         if (mounted) {
-          // Clear navigation stack and navigate to profile edit
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/profile/edit',
-            (route) => false, // Remove all previous routes
-            arguments: true // Pass boolean directly for isInitialSetup
-          );
+          // Wait for the next frame to ensure state is properly updated
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+
+            if (newState.isAuthenticated) {
+              // Clear navigation stack and navigate to profile edit
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/profile/edit', (route) => false, // Remove all previous routes
+                  arguments: true // Pass boolean directly for isInitialSetup
+                  );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Please try verifying your email again'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
+          });
         }
       } catch (e) {
         if (mounted) {

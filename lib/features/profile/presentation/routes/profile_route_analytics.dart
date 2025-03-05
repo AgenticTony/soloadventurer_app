@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class ProfileRouteAnalytics {
   static final List<RouteEvent> _events = [];
@@ -18,8 +19,8 @@ class ProfileRouteAnalytics {
   }
 
   static void _logEvent(RouteEvent event) {
-    // In a real app, this would send data to an analytics service
-    debugPrint('ProfileRouteAnalytics: ${event.toString()}');
+    // For now, just log the event using debugPrint
+    debugPrint('ROUTE EVENT: ${event.toString()}');
   }
 }
 

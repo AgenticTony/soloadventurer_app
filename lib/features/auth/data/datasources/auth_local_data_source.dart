@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:soloadventurer/core/security/security_manager.dart';
-import 'package:soloadventurer/core/security/encryption_service.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 
@@ -46,31 +45,27 @@ abstract class AuthLocalDataSource {
 /// Implementation of [AuthLocalDataSource] using [SecurityManager]
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final SecurityManager _securityManager;
-  final EncryptionService _encryptionService;
   static const _userKey = 'user_data';
   static const _authTokenKey = 'auth_token';
   static const _refreshTokenKey = 'refresh_token';
   static const _tokenExpirationKey = 'token_expiration';
 
   /// Creates a new [AuthLocalDataSourceImpl] with the given security manager
-  AuthLocalDataSourceImpl(this._securityManager, this._encryptionService);
+  AuthLocalDataSourceImpl(this._securityManager);
 
   @override
   Future<void> cacheUser(User user) async {
     if (user is! UserModel) {
       throw ArgumentError('User must be a UserModel instance');
     }
-    final encryptedData =
-        await _encryptionService.encrypt(jsonEncode(user.toJson()));
-    await _securityManager.write(_userKey, encryptedData);
+    await _securityManager.write(_userKey, jsonEncode(user.toJson()));
   }
 
   @override
   Future<User?> getCachedUser() async {
-    final encryptedData = await _securityManager.read(_userKey);
-    if (encryptedData != null) {
-      final decryptedData = await _encryptionService.decrypt(encryptedData);
-      return UserModel.fromJson(jsonDecode(decryptedData));
+    final data = await _securityManager.read(_userKey);
+    if (data != null) {
+      return UserModel.fromJson(jsonDecode(data));
     }
     return null;
   }
@@ -83,31 +78,23 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<void> saveAuthData(String token, String refreshToken,
       {DateTime? expiresAt}) async {
-    final encryptedToken = await _encryptionService.encrypt(token);
-    final encryptedRefreshToken =
-        await _encryptionService.encrypt(refreshToken);
-    await _securityManager.write(_authTokenKey, encryptedToken);
-    await _securityManager.write(_refreshTokenKey, encryptedRefreshToken);
+    await _securityManager.write(_authTokenKey, token);
+    await _securityManager.write(_refreshTokenKey, refreshToken);
 
     if (expiresAt != null) {
-      final encryptedExpiration =
-          await _encryptionService.encrypt(expiresAt.toIso8601String());
-      await _securityManager.write(_tokenExpirationKey, encryptedExpiration);
+      await _securityManager.write(
+          _tokenExpirationKey, expiresAt.toIso8601String());
     }
   }
 
   @override
   Future<String?> getAuthToken() async {
-    final encryptedToken = await _securityManager.read(_authTokenKey);
-    if (encryptedToken == null) return null;
-    return await _encryptionService.decrypt(encryptedToken);
+    return await _securityManager.read(_authTokenKey);
   }
 
   @override
   Future<String?> getRefreshToken() async {
-    final encryptedToken = await _securityManager.read(_refreshTokenKey);
-    if (encryptedToken == null) return null;
-    return await _encryptionService.decrypt(encryptedToken);
+    return await _securityManager.read(_refreshTokenKey);
   }
 
   @override
@@ -115,20 +102,16 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     final expirationStr = await _securityManager.read(_tokenExpirationKey);
     if (expirationStr == null) return true;
 
-    final decryptedExpiration = await _encryptionService.decrypt(expirationStr);
-    final expiration = DateTime.parse(decryptedExpiration);
+    final expiration = DateTime.parse(expirationStr);
     return DateTime.now().isAfter(expiration);
   }
 
   @override
   Future<DateTime?> getTokenExpiration() async {
-    final encryptedExpiration =
-        await _securityManager.read(_tokenExpirationKey);
-    if (encryptedExpiration == null) return null;
+    final expiration = await _securityManager.read(_tokenExpirationKey);
+    if (expiration == null) return null;
 
-    final decryptedExpiration =
-        await _encryptionService.decrypt(encryptedExpiration);
-    return DateTime.parse(decryptedExpiration);
+    return DateTime.parse(expiration);
   }
 
   @override
@@ -149,28 +132,24 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> cacheAuthToken(String token) async {
-    final encrypted = await _encryptionService.encrypt(token);
-    await _securityManager.write('auth_token', encrypted);
+    await _securityManager.write('auth_token', token);
   }
 
   @override
   Future<void> cacheRefreshToken(String token) async {
-    final encrypted = await _encryptionService.encrypt(token);
-    await _securityManager.write('refresh_token', encrypted);
+    await _securityManager.write('refresh_token', token);
   }
 
   @override
   Future<void> cacheUserData(Map<String, dynamic> userData) async {
-    final encrypted = await _encryptionService.encrypt(userData.toString());
-    await _securityManager.write('user_data', encrypted);
+    await _securityManager.write('user_data', userData.toString());
   }
 
   @override
   Future<Map<String, dynamic>?> getUserData() async {
-    final encrypted = await _securityManager.read('user_data');
-    if (encrypted == null) return null;
-    final decrypted = await _encryptionService.decrypt(encrypted);
+    final data = await _securityManager.read('user_data');
+    if (data == null) return null;
     // Convert string back to map
-    return Map<String, dynamic>.from(decrypted as Map);
+    return Map<String, dynamic>.from(jsonDecode(data));
   }
 }

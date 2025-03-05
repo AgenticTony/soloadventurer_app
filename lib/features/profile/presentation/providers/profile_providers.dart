@@ -1,112 +1,179 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/entities/profile.dart';
+import '../../domain/entities/profile_state.dart';
+import '../../domain/repositories/profile_repository.dart';
+import '../../data/repositories/profile_repository_impl.dart';
+import '../../data/datasources/profile_remote_data_source.dart';
+import '../../data/datasources/profile_local_data_source.dart';
+import '../../../../core/network/network_providers.dart';
+import '../../../../core/providers/core_providers.dart';
+import '../state/profile_state.dart';
 import '../../domain/usecases/get_current_profile_use_case.dart';
 import '../../domain/usecases/update_profile_use_case.dart';
 import '../../domain/usecases/manage_avatar_use_case.dart';
 import '../../domain/usecases/delete_profile_use_case.dart';
 import '../../domain/usecases/create_profile_use_case.dart';
 import '../notifiers/profile_notifier.dart';
-import '../state/profile_state.dart';
-import '../../data/repositories/profile_repository_impl.dart';
-import '../../data/datasources/profile_remote_data_source.dart';
-import '../../data/datasources/profile_local_data_source.dart';
-import '../../../../core/network/network_providers.dart';
-import '../../../../core/providers/core_providers.dart';
-import '../../../../core/storage/secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/features/profile/presentation/state/profile_navigation_state.dart';
+import '../state/profile_navigation_state.dart';
 
 // Data Sources
 final profileRemoteDataSourceProvider =
-    Provider<ProfileRemoteDataSource>((ref) {
-  return ProfileRemoteDataSourceImpl(dio: ref.watch(dioProvider));
+    Provider.autoDispose<ProfileRemoteDataSource>((ref) {
+  return ProfileRemoteDataSourceImpl(dio: ref.read(dioProvider));
 });
 
-final profileLocalDataSourceProvider = Provider<ProfileLocalDataSource>((ref) {
-  final storage = ref.watch(secureStorageProvider);
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return prefs.when(
-    data: (sharedPreferences) => ProfileLocalDataSourceImpl(
-      storage: storage,
-      sharedPreferences: sharedPreferences,
-    ),
-    loading: () => throw Exception('SharedPreferences not initialized'),
-    error: (error, stack) =>
-        throw Exception('Failed to initialize SharedPreferences: $error'),
+final profileLocalDataSourceProvider =
+    Provider.autoDispose<ProfileLocalDataSource>((ref) {
+  final storage = ref.read(secureStorageProvider);
+  final prefs = ref.read(sharedPreferencesProvider);
+  return ProfileLocalDataSourceImpl(
+    storage: storage,
+    sharedPreferences: prefs,
   );
 });
 
-// Repository
-final profileRepositoryProvider = Provider<ProfileRepositoryImpl>((ref) {
+/// Repository provider
+final profileRepositoryProvider =
+    Provider.autoDispose<ProfileRepository>((ref) {
   return ProfileRepositoryImpl(
-    remoteDataSource: ref.watch(profileRemoteDataSourceProvider),
-    localDataSource: ref.watch(profileLocalDataSourceProvider),
+    remoteDataSource: ref.read(profileRemoteDataSourceProvider),
+    localDataSource: ref.read(profileLocalDataSourceProvider),
   );
 });
 
 // Use Cases
 final getCurrentProfileUseCaseProvider =
-    Provider<GetCurrentProfileUseCase>((ref) {
-  return GetCurrentProfileUseCase(ref.watch(profileRepositoryProvider));
+    Provider.autoDispose<GetCurrentProfileUseCase>((ref) {
+  return GetCurrentProfileUseCase(ref.read(profileRepositoryProvider));
 });
 
-final updateProfileUseCaseProvider = Provider<UpdateProfileUseCase>((ref) {
-  return UpdateProfileUseCase(ref.watch(profileRepositoryProvider));
+final updateProfileUseCaseProvider =
+    Provider.autoDispose<UpdateProfileUseCase>((ref) {
+  return UpdateProfileUseCase(ref.read(profileRepositoryProvider));
 });
 
-final manageAvatarUseCaseProvider = Provider<ManageAvatarUseCase>((ref) {
-  return ManageAvatarUseCase(ref.watch(profileRepositoryProvider));
+final manageAvatarUseCaseProvider =
+    Provider.autoDispose<ManageAvatarUseCase>((ref) {
+  return ManageAvatarUseCase(ref.read(profileRepositoryProvider));
 });
 
-final deleteProfileUseCaseProvider = Provider<DeleteProfileUseCase>((ref) {
-  return DeleteProfileUseCase(ref.watch(profileRepositoryProvider));
+final deleteProfileUseCaseProvider =
+    Provider.autoDispose<DeleteProfileUseCase>((ref) {
+  return DeleteProfileUseCase(ref.read(profileRepositoryProvider));
 });
 
-final createProfileUseCaseProvider = Provider<CreateProfileUseCase>((ref) {
-  return CreateProfileUseCase(ref.watch(profileRepositoryProvider));
+final createProfileUseCaseProvider =
+    Provider.autoDispose<CreateProfileUseCase>((ref) {
+  return CreateProfileUseCase(ref.read(profileRepositoryProvider));
 });
 
-// State Notifier Provider
-final profileProvider =
-    StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
-  final getCurrentProfile = ref.watch(getCurrentProfileUseCaseProvider);
-  final updateProfile = ref.watch(updateProfileUseCaseProvider);
-  final manageAvatar = ref.watch(manageAvatarUseCaseProvider);
-  final deleteProfile = ref.watch(deleteProfileUseCaseProvider);
-  final sharedPreferences = ref.watch(sharedPreferencesProvider);
+/// Domain state provider - handles core business logic
+final profileDomainProvider = StateNotifierProvider.family<
+    ProfileDomainNotifier, ProfileDomainState, String>((ref, id) {
+  return ProfileDomainNotifier(ref.read(profileRepositoryProvider));
+});
 
-  return sharedPreferences.when(
-    data: (prefs) => ProfileNotifier(
-      getCurrentProfile: getCurrentProfile,
-      updateProfile: updateProfile,
-      manageAvatar: manageAvatar,
-      deleteProfile: deleteProfile,
-    ),
-    loading: () => throw Exception('SharedPreferences not initialized'),
-    error: (error, stack) =>
-        throw Exception('Failed to initialize SharedPreferences: $error'),
+class ProfileDomainNotifier extends StateNotifier<ProfileDomainState> {
+  final ProfileRepository _repository;
+
+  ProfileDomainNotifier(this._repository) : super(const ProfileDomainState());
+
+  Future<void> loadProfile() async {
+    if (!mounted) return;
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final profile = await _repository.getCurrentProfile();
+      if (!mounted) return;
+      state = state.copyWith(profile: profile, isLoading: false);
+    } catch (e) {
+      if (!mounted) return;
+      state = ProfileDomainState(error: e.toString());
+    }
+  }
+
+  Future<void> updateProfile(Profile profile) async {
+    if (!mounted) return;
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      await _repository.updateProfile(profile);
+      if (!mounted) return;
+      state = state.copyWith(profile: profile, isLoading: false);
+    } catch (e) {
+      if (!mounted) return;
+      state = state.copyWith(error: e.toString(), isLoading: false);
+    }
+  }
+
+  Future<void> toggleVisibility() async {
+    if (state.profile == null || !mounted) return;
+
+    final updatedProfile = state.profile!.copyWith(
+      isPublic: !state.profile!.isPublic,
+    );
+
+    await updateProfile(updatedProfile);
+  }
+
+  Future<void> deleteProfile() async {
+    if (!mounted) return;
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      await _repository.deleteProfile(state.profile?.id ?? '');
+      if (!mounted) return;
+      state = const ProfileDomainState();
+    } catch (e) {
+      if (!mounted) return;
+      state = state.copyWith(error: e.toString(), isLoading: false);
+    }
+  }
+}
+
+/// Profile UI state provider
+final profileUIProvider = StateNotifierProvider.autoDispose
+    .family<ProfileNotifier, ProfileState, String>((ref, id) {
+  final notifier = ProfileNotifier(
+    getCurrentProfile: ref.read(getCurrentProfileUseCaseProvider),
+    updateProfile: ref.read(updateProfileUseCaseProvider),
+    manageAvatar: ref.read(manageAvatarUseCaseProvider),
+    deleteProfile: ref.read(deleteProfileUseCaseProvider),
+    domainState: ref.read(profileDomainProvider(id)),
+    ref: ref,
   );
+
+  ref.onDispose(() {
+    notifier.dispose();
+  });
+
+  return notifier;
 });
 
 // Selectors
-final profileLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(profileProvider).isLoading;
+final profileLoadingProvider =
+    Provider.autoDispose.family<bool, String>((ref, id) {
+  return ref.watch(profileUIProvider(id)).isLoading;
 });
 
-final profileErrorProvider = Provider<String?>((ref) {
-  return ref.watch(profileProvider).error;
+final profileErrorProvider =
+    Provider.autoDispose.family<String?, String>((ref, id) {
+  return ref.watch(profileUIProvider(id)).error;
 });
 
-final hasProfileChangesProvider = Provider<bool>((ref) {
-  return ref.watch(profileProvider).hasChanges;
+final hasProfileChangesProvider =
+    Provider.autoDispose.family<bool, String>((ref, id) {
+  return ref.watch(profileUIProvider(id)).hasChanges;
 });
 
-final canSaveProfileProvider = Provider<bool>((ref) {
-  return ref.watch(profileProvider).canSave;
+final canSaveProfileProvider =
+    Provider.autoDispose.family<bool, String>((ref, id) {
+  return ref.watch(profileUIProvider(id)).canSave;
 });
 
 /// Provider for profile navigation history
-final profileNavigationHistoryProvider =
-    StateNotifierProvider<ProfileNavigationNotifier, ProfileNavigationState>(
+final profileNavigationHistoryProvider = StateNotifierProvider.autoDispose<
+    ProfileNavigationNotifier, ProfileNavigationState>(
   (ref) => ProfileNavigationNotifier(),
 );
 
@@ -117,6 +184,7 @@ class ProfileNavigationNotifier extends StateNotifier<ProfileNavigationState> {
 
   /// Add a route to the navigation history
   void addRoute(String route) {
+    if (!mounted) return;
     state = state.copyWith(
       history: [...state.history, route],
     );
@@ -124,15 +192,15 @@ class ProfileNavigationNotifier extends StateNotifier<ProfileNavigationState> {
 
   /// Remove the last route from the navigation history
   void removeLastRoute() {
-    if (state.history.isNotEmpty) {
-      state = state.copyWith(
-        history: state.history.sublist(0, state.history.length - 1),
-      );
-    }
+    if (!mounted || state.history.isEmpty) return;
+    state = state.copyWith(
+      history: state.history.sublist(0, state.history.length - 1),
+    );
   }
 
   /// Clear the navigation history
   void clearHistory() {
+    if (!mounted) return;
     state = const ProfileNavigationState();
   }
 }

@@ -127,7 +127,8 @@ class UnknownException extends AppException {
 
 /// Exception thrown when authentication operations fail
 class AuthException extends AppException {
-  AuthException(String message) : super(message: message);
+  /// Creates a new [AuthException] with the given [message] and optional [code]
+  const AuthException(String message, {super.code}) : super(message: message);
 }
 
 /// Exception thrown when there is a cache error

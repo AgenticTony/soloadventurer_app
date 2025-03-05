@@ -43,7 +43,7 @@ class NetworkRequestInfo {
   }
 }
 
-/// Class for monitoring network performance
+/// Monitors network performance and tracks request/response metrics
 class NetworkMonitor {
   /// Maximum number of requests to keep in history
   static const int _maxHistorySize = 100;
@@ -55,7 +55,22 @@ class NetworkMonitor {
   static const int _slowRequestThresholdMs = 1000;
 
   /// Track a network request
-  void trackRequest({
+  void trackRequest(String endpoint) {
+    debugPrint('🌐 Network request to: $endpoint');
+  }
+
+  /// Track a network response
+  void trackResponse(String path, int statusCode) {
+    debugPrint('✅ Network response from: $path (Status: $statusCode)');
+  }
+
+  /// Track a network error
+  void trackError(String path, String errorMessage) {
+    debugPrint('❌ Network error for: $path\nError: $errorMessage');
+  }
+
+  /// Track a network request and its response
+  void trackRequestAndResponse({
     required String path,
     required Duration duration,
     required int statusCode,
@@ -89,6 +104,9 @@ class NetworkMonitor {
     // Log errors
     if (isError) {
       debugPrint('❌ Network request error: ${request.path} - $errorMessage');
+    } else {
+      debugPrint(
+          '✅ Network request: ${request.path} - ${duration.inMilliseconds}ms');
     }
   }
 

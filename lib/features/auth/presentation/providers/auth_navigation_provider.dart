@@ -27,13 +27,18 @@ class AuthNavigationNotifier {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = _ref.read(navigatorKeyProvider).currentContext;
       if (context != null) {
-        Navigator.push(
+        // Use pushReplacement to avoid stacking screens
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const VerifyEmailScreen(),
             settings: RouteSettings(
               name: '/verify-email',
-              arguments: {'email': email},
+              arguments: {
+                'email': email,
+                'preserveState':
+                    true, // Flag to indicate state should be preserved
+              },
             ),
           ),
         );

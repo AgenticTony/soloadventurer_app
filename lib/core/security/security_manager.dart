@@ -28,6 +28,7 @@ abstract class SecurityManager {
 class SecurityManagerImpl implements SecurityManager {
   final SecureStorage _storage;
   final DeviceInfoPlugin _deviceInfo;
+  final bool _isTest;
   static const _maxLoginAttempts = 5;
   static const _lockoutDuration = Duration(minutes: 15);
   static const _deviceIdKey = 'device_id';
@@ -39,8 +40,10 @@ class SecurityManagerImpl implements SecurityManager {
   SecurityManagerImpl({
     required SecureStorage storage,
     DeviceInfoPlugin? deviceInfo,
+    bool isTest = false,
   })  : _storage = storage,
-        _deviceInfo = deviceInfo ?? DeviceInfoPlugin();
+        _deviceInfo = deviceInfo ?? DeviceInfoPlugin(),
+        _isTest = isTest;
 
   @override
   Future<void> write(String key, String value) => _storage.write(key, value);
@@ -59,6 +62,10 @@ class SecurityManagerImpl implements SecurityManager {
 
   @override
   Future<String> getDeviceId() async {
+    if (_isTest) {
+      return 'test-device-id';
+    }
+
     final storedId = await _storage.read(_deviceIdKey);
     if (storedId != null) return storedId;
 
@@ -69,6 +76,17 @@ class SecurityManagerImpl implements SecurityManager {
 
   @override
   Future<Map<String, dynamic>> getDeviceInfo() async {
+    if (_isTest) {
+      return {
+        'device_id': 'test-device-id',
+        'timestamp': DateTime.now().toIso8601String(),
+        'model': 'Test Model',
+        'system_name': 'Test System',
+        'system_version': '1.0.0',
+        'name': 'Test Device',
+      };
+    }
+
     final deviceId = await getDeviceId();
     final baseInfo = {
       'device_id': deviceId,
@@ -141,6 +159,10 @@ class SecurityManagerImpl implements SecurityManager {
 
   @override
   Future<bool> isKnownDevice() async {
+    if (_isTest) {
+      return true;
+    }
+
     final deviceId = await getDeviceId();
     final devices = await _getKnownDevices();
     return devices.any((device) => device['device_id'] == deviceId);

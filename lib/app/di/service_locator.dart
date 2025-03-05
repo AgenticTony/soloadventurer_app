@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:soloadventurer/app/config/env.dart';
 import 'package:soloadventurer/app/di/modules/auth_module.dart';
+import 'package:soloadventurer/app/di/modules/core_module.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/core/api/client/mock_api_client.dart';
 import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
@@ -13,14 +14,23 @@ import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:soloadventurer/services/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/services/monitoring/aws_cloudwatch_monitoring.dart';
+import 'package:soloadventurer/core/api/api_service.dart';
 
 /// Global GetIt instance for dependency injection
 final GetIt getIt = GetIt.instance;
+
+/// Flag to indicate if we're in test mode
+bool _isTestMode = false;
 
 /// Initialize the service locator with all dependencies
 Future<void> setupServiceLocator({bool isTest = false}) async {
   // Set test mode
   _isTestMode = isTest;
+
+  // Register core module
+  registerCoreModule(getIt, isTest: isTest);
 
   // Register singletons that don't depend on other services
   await _registerIndependentServices();
@@ -64,8 +74,32 @@ Future<void> _registerIndependentServices() async {
 /// Register services that depend on other services
 Future<void> _registerDependentServices() async {
   // Register API client (depends on interceptors and network monitor)
-  getIt.registerSingleton<ApiClient>(
+  getIt.registerSingleton<ApiService>(
     ApiClient(
+      baseUrl: getIt<Env>().apiBaseUrl,
+      authInterceptor: getIt<AuthInterceptor>(),
+      errorInterceptor: getIt<ErrorInterceptor>(),
+      networkMonitor: getIt<NetworkMonitor>(),
+    ),
+  );
+
+  // Register monitoring service (depends on API client)
+  getIt.registerSingleton<MonitoringService>(
+    AwsCloudWatchMonitoring(getIt<ApiService>()),
+  );
+}
+
+/// Register all feature modules
+Future<void> _registerFeatureModules() async {
+  // Register auth feature module
+  registerAuthModule(getIt, isTest: _isTestMode);
+}
+
+/// Register test overrides for dependencies
+Future<void> _registerTestOverrides() async {
+  // Override API client with mock in test mode
+  getIt.registerSingleton<ApiService>(
+    MockApiClient(
       baseUrl: getIt<Env>().apiBaseUrl,
       authInterceptor: getIt<AuthInterceptor>(),
       errorInterceptor: getIt<ErrorInterceptor>(),
@@ -74,39 +108,10 @@ Future<void> _registerDependentServices() async {
   );
 }
 
-/// Register all feature modules
-Future<void> _registerFeatureModules() async {
-  // Register auth feature module
-  registerAuthModule(getIt);
-}
-
-/// Register test overrides for dependencies
-Future<void> _registerTestOverrides() async {
-  // Override secure storage with in-memory implementation for tests
-  if (getIt.isRegistered<FlutterSecureStorage>()) {
-    getIt.unregister<FlutterSecureStorage>();
-  }
-  getIt.registerSingleton<FlutterSecureStorage>(
-    const FlutterSecureStorage(
-      aOptions: AndroidOptions(encryptedSharedPreferences: true),
-      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
-    ),
-  );
-
-  // Override API client with mock implementation for tests
-  if (getIt.isRegistered<ApiClient>()) {
-    getIt.unregister<ApiClient>();
-  }
-  getIt.registerSingleton<ApiClient>(MockApiClient());
-}
-
 /// Reset all registered dependencies (useful for testing)
 Future<void> resetServiceLocator() async {
   await getIt.reset();
 }
-
-/// Flag to indicate if we're in test mode
-bool _isTestMode = false;
 
 /// Getter for test mode flag
 bool get isTestMode => _isTestMode;

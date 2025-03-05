@@ -3,31 +3,36 @@ import 'package:soloadventurer/features/auth/domain/repositories/auth_repository
 
 /// Parameters for the [SignUp] use case
 class SignUpParams {
+  /// The email to sign up with
   final String email;
-  final String password;
-  final String username;
 
-  /// Creates a new [SignUpParams] with the given email, password and username
-  SignUpParams({
+  /// The password to sign up with
+  final String password;
+
+  /// The name to sign up with
+  final String name;
+
+  /// Creates new [SignUpParams]
+  const SignUpParams({
     required this.email,
     required this.password,
-    required String name,
-  }) : username = name;
+    required this.name,
+  });
 }
 
-/// Use case for signing up with email, password and username
+/// Sign up use case
 class SignUp {
   final AuthRepository _repository;
 
-  /// Creates a new [SignUp] use case with the given repository
+  /// Creates a new [SignUp] use case
   SignUp(this._repository);
 
-  /// Execute the use case with the given parameters
-  Future<User> call(SignUpParams params) async {
-    return _repository.registerWithEmailAndPassword(
-      params.email,
-      params.password,
-      params.username,
+  /// Sign up with the given [params]
+  Future<(User, bool)> call(SignUpParams params) async {
+    return await _repository.register(
+      email: params.email,
+      password: params.password,
+      name: params.name,
     );
   }
 }

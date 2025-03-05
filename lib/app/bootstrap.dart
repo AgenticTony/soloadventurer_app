@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
-import 'package:soloadventurer/app/my_app.dart';
+import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
@@ -12,46 +12,66 @@ import 'package:soloadventurer/core/providers/core_providers.dart';
 /// Bootstrap is responsible for app initialization and configuration
 /// before the app is run.
 Future<void> bootstrap() async {
-  // Ensure Flutter is initialized
-  WidgetsFlutterBinding.ensureInitialized();
+  // Run everything in a zone to ensure consistent error handling
+  runZonedGuarded(() async {
+    // Initialize Flutter bindings first
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Track app start time
-  AppStartTracker.trackAppStart();
+    // Track app start time
+    AppStartTracker.trackAppStart();
 
-  // Set preferred orientations
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
+    // Set preferred orientations
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
 
-  // Initialize service locator
-  await setupServiceLocator();
+    // Initialize service locator first
+    await setupServiceLocator(isTest: false);
 
-  // Initialize error handling
-  ErrorHandler.initialize();
+    // Initialize error handling
+    ErrorHandler.initialize();
 
-  // Initialize SharedPreferences
-  final sharedPreferences = await SharedPreferences.getInstance();
+    // Initialize SharedPreferences
+    final sharedPreferences = await SharedPreferences.getInstance();
 
-  // Run the app in a zone to catch errors
-  runZonedGuarded(
-    () => runApp(
+    // Run the app with proper provider initialization
+    runApp(
       ProviderScope(
+        observers: [
+          ProviderLogger(), // Add logging for provider state changes
+        ],
         overrides: [
           sharedPreferencesProvider.overrideWithValue(sharedPreferences),
         ],
-        child: const MyApp(),
+        child: const App(),
       ),
-    ),
-    (error, stackTrace) {
-      // Report any errors not caught by the Flutter framework
-      ErrorHandler.reportError(
-        'Uncaught exception',
-        error,
-        stackTrace,
-      );
-    },
-  );
+    );
+  }, (error, stackTrace) {
+    // Report any errors not caught by the Flutter framework
+    ErrorHandler.reportError(
+      'Uncaught exception',
+      error,
+      stackTrace,
+    );
+  });
+}
+
+/// Logger for provider state changes
+class ProviderLogger extends ProviderObserver {
+  @override
+  void didUpdateProvider(
+    ProviderBase provider,
+    Object? previousValue,
+    Object? newValue,
+    ProviderContainer container,
+  ) {
+    debugPrint('''
+{
+  "provider": "${provider.name ?? provider.runtimeType}",
+  "newValue": "$newValue"
+}''');
+  }
 }
 
 /// This function will be called when the app is run in debug mode

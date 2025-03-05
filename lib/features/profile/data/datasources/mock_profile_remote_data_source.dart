@@ -1,7 +1,16 @@
-import '../models/profile_model.dart';
+import 'package:flutter/foundation.dart';
+import 'package:soloadventurer/features/profile/data/datasources/profile_remote_data_source.dart';
+import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
+import '../../domain/entities/profile.dart';
 
+/// Mock implementation of [ProfileRemoteDataSource] for testing
 class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   ProfileModel? _mockProfile;
+
+  MockProfileRemoteDataSource() {
+    _mockProfile = null;
+  }
 
   void setMockProfile(ProfileModel profile) {
     _mockProfile = profile;
@@ -9,55 +18,57 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
 
   @override
   Future<ProfileModel> createProfile(ProfileModel profile) async {
-    _mockProfile = profile;
-    return profile;
+    try {
+      _mockProfile = profile;
+      return profile;
+    } catch (e) {
+      throw ServerException(message: 'Failed to create profile');
+    }
+  }
+
+  @override
+  Future<ProfileModel> getCurrentProfile() async {
+    try {
+      if (_mockProfile == null) {
+        throw const NotFoundException(message: 'No current profile');
+      }
+      return _mockProfile!;
+    } catch (e) {
+      throw ServerException(message: 'Failed to get current profile');
+    }
+  }
+
+  @override
+  Future<ProfileModel> updateProfile(ProfileModel profile) async {
+    try {
+      _mockProfile = profile;
+      return profile;
+    } catch (e) {
+      throw ServerException(message: 'Failed to update profile');
+    }
   }
 
   @override
   Future<ProfileModel> getProfile(String userId) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
     return _mockProfile!;
-  }
-
-  @override
-  Future<ProfileModel> getCurrentProfile() async {
-    if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
-    }
-    return _mockProfile!;
-  }
-
-  @override
-  Future<ProfileModel> updateProfile(ProfileModel profile) async {
-    _mockProfile = profile;
-    return profile;
   }
 
   @override
   Future<ProfileModel> updateProfileFields(
       String userId, Map<String, dynamic> fields) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
-    final updatedProfile = ProfileModel(
-      id: _mockProfile!.id,
-      userId: _mockProfile!.userId,
+    _mockProfile = _mockProfile!.copyWith(
       displayName:
           fields['displayName'] as String? ?? _mockProfile!.displayName,
       bio: fields['bio'] as String? ?? _mockProfile!.bio,
-      avatarUrl: fields['avatarUrl'] as String? ?? _mockProfile!.avatarUrl,
-      createdAt: _mockProfile!.createdAt,
-      updatedAt: DateTime.now(),
-      preferences: fields['preferences'] as Map<String, dynamic>? ??
-          _mockProfile!.preferences,
-      interests:
-          fields['interests'] as List<String>? ?? _mockProfile!.interests,
       isPublic: fields['isPublic'] as bool? ?? _mockProfile!.isPublic,
     );
-    _mockProfile = updatedProfile;
-    return updatedProfile;
+    return _mockProfile!;
   }
 
   @override
@@ -68,19 +79,10 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   @override
   Future<String> uploadAvatar(String userId, String filePath) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
-    final updatedProfile = ProfileModel(
-      id: _mockProfile!.id,
-      userId: _mockProfile!.userId,
-      displayName: _mockProfile!.displayName,
-      bio: _mockProfile!.bio,
+    final updatedProfile = _mockProfile!.copyWith(
       avatarUrl: filePath,
-      createdAt: _mockProfile!.createdAt,
-      updatedAt: DateTime.now(),
-      preferences: _mockProfile!.preferences,
-      interests: _mockProfile!.interests,
-      isPublic: _mockProfile!.isPublic,
     );
     _mockProfile = updatedProfile;
     return filePath;
@@ -89,19 +91,10 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   @override
   Future<void> removeAvatar(String userId) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
-    final updatedProfile = ProfileModel(
-      id: _mockProfile!.id,
-      userId: _mockProfile!.userId,
-      displayName: _mockProfile!.displayName,
-      bio: _mockProfile!.bio,
+    final updatedProfile = _mockProfile!.copyWith(
       avatarUrl: null,
-      createdAt: _mockProfile!.createdAt,
-      updatedAt: DateTime.now(),
-      preferences: _mockProfile!.preferences,
-      interests: _mockProfile!.interests,
-      isPublic: _mockProfile!.isPublic,
     );
     _mockProfile = updatedProfile;
   }
@@ -110,19 +103,10 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   Future<void> updatePreferences(
       String userId, Map<String, dynamic> preferences) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
-    final updatedProfile = ProfileModel(
-      id: _mockProfile!.id,
-      userId: _mockProfile!.userId,
-      displayName: _mockProfile!.displayName,
-      bio: _mockProfile!.bio,
-      avatarUrl: _mockProfile!.avatarUrl,
-      createdAt: _mockProfile!.createdAt,
-      updatedAt: DateTime.now(),
+    final updatedProfile = _mockProfile!.copyWith(
       preferences: preferences,
-      interests: _mockProfile!.interests,
-      isPublic: _mockProfile!.isPublic,
     );
     _mockProfile = updatedProfile;
   }
@@ -130,19 +114,10 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   @override
   Future<void> updateInterests(String userId, List<String> interests) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
-    final updatedProfile = ProfileModel(
-      id: _mockProfile!.id,
-      userId: _mockProfile!.userId,
-      displayName: _mockProfile!.displayName,
-      bio: _mockProfile!.bio,
-      avatarUrl: _mockProfile!.avatarUrl,
-      createdAt: _mockProfile!.createdAt,
-      updatedAt: DateTime.now(),
-      preferences: _mockProfile!.preferences,
+    final updatedProfile = _mockProfile!.copyWith(
       interests: interests,
-      isPublic: _mockProfile!.isPublic,
     );
     _mockProfile = updatedProfile;
   }
@@ -150,18 +125,9 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   @override
   Future<void> toggleProfileVisibility(String userId, bool isPublic) async {
     if (_mockProfile == null) {
-      throw Exception('Mock profile not set');
+      throw const NotFoundException(message: 'Profile not found');
     }
-    final updatedProfile = ProfileModel(
-      id: _mockProfile!.id,
-      userId: _mockProfile!.userId,
-      displayName: _mockProfile!.displayName,
-      bio: _mockProfile!.bio,
-      avatarUrl: _mockProfile!.avatarUrl,
-      createdAt: _mockProfile!.createdAt,
-      updatedAt: DateTime.now(),
-      preferences: _mockProfile!.preferences,
-      interests: _mockProfile!.interests,
+    final updatedProfile = _mockProfile!.copyWith(
       isPublic: isPublic,
     );
     _mockProfile = updatedProfile;
@@ -169,6 +135,6 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
 
   @override
   Future<bool> profileExists(String userId) async {
-    return _mockProfile != null;
+    return _mockProfile != null && _mockProfile!.userId == userId;
   }
 }

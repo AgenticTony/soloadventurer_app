@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import '../api/api_service.dart';
+import 'package:soloadventurer/core/api/api_service.dart';
 import 'monitoring_service.dart';
 
 /// Implementation of MonitoringService that sends data to AWS CloudWatch
@@ -41,9 +41,8 @@ class AwsCloudWatchMonitoring implements MonitoringService {
 
       _isInitialized = true;
     } catch (e) {
-      debugPrint('Error initializing device info: $e');
-      // Continue with default values
-      _isInitialized = true;
+      // Handle device info initialization error
+      rethrow;
     }
   }
 

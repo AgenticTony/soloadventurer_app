@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/signup_screen.dart';
+import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 
 /// Login screen for the application
 class LoginScreen extends ConsumerStatefulWidget {
@@ -65,9 +66,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final password = _passwordController.text;
 
       await ref.read(authProvider.notifier).signIn(
-            email: email,
-            password: password,
+            email,
+            password,
           );
+
+      if (mounted && context.mounted) {
+        Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+      }
     }
   }
 

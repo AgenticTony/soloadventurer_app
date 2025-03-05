@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/models/user.dart';
 import 'package:soloadventurer/providers/user_profile_provider.dart';
-import 'package:soloadventurer/services/api_service.dart';
+import 'package:soloadventurer/core/api/api_service.dart';
 import '../../utils/provider_container_utils.dart';
 import '../../utils/test_data.dart';
 import '../../utils/provider_test_helpers.dart';

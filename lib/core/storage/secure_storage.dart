@@ -1,6 +1,4 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../security/encryption_service.dart';
-import '../security/security_manager.dart';
 
 /// A service for securely storing sensitive information like tokens and credentials.
 class SecureStorageService {
@@ -98,106 +96,35 @@ class SecureStorageService {
   }
 }
 
-class SecureStorage implements SecurityManager, EncryptionService {
+/// A simple wrapper around FlutterSecureStorage for secure data storage
+class SecureStorage {
   final FlutterSecureStorage _storage;
 
   /// Creates a new [SecureStorage] instance
   SecureStorage() : _storage = const FlutterSecureStorage();
 
-  @override
+  /// Deletes a value from storage
   Future<void> delete(String key) async {
     await _storage.delete(key: key);
   }
 
-  @override
+  /// Reads a value from storage
   Future<String?> read(String key) async {
     return await _storage.read(key: key);
   }
 
-  @override
+  /// Writes a value to storage
   Future<void> write(String key, String value) async {
     await _storage.write(key: key, value: value);
   }
 
-  @override
+  /// Deletes all values from storage
   Future<void> deleteAll() async {
     await _storage.deleteAll();
   }
 
-  @override
-  Future<String> encrypt(String data) async {
-    // In a real app, implement proper encryption
-    return data;
-  }
-
-  @override
-  Future<String> decrypt(String encryptedData) async {
-    // In a real app, implement proper decryption
-    return encryptedData;
-  }
-
-  @override
+  /// Checks if a key exists in storage
   Future<bool> containsKey(String key) async {
     return await _storage.containsKey(key: key);
-  }
-
-  @override
-  Future<void> checkLoginAttempts() async {
-    // Implement in SecurityManagerImpl
-    return;
-  }
-
-  @override
-  Future<String> getDeviceId() async {
-    // Implement in SecurityManagerImpl
-    return 'test-device';
-  }
-
-  @override
-  Future<Map<String, dynamic>> getDeviceInfo() async {
-    // Implement in SecurityManagerImpl
-    return {'device_id': await getDeviceId()};
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> getKnownDevices() async {
-    // Implement in SecurityManagerImpl
-    return [];
-  }
-
-  @override
-  Future<List<Map<String, dynamic>>> getSecurityEvents() async {
-    // Implement in SecurityManagerImpl
-    return [];
-  }
-
-  @override
-  Future<bool> isKnownDevice() async {
-    // Implement in SecurityManagerImpl
-    return true;
-  }
-
-  @override
-  Future<void> recordFailedLoginAttempt() async {
-    // Implement in SecurityManagerImpl
-    return;
-  }
-
-  @override
-  Future<void> registerDevice() async {
-    // Implement in SecurityManagerImpl
-    return;
-  }
-
-  @override
-  Future<void> removeDevice(String deviceId) async {
-    // Implement in SecurityManagerImpl
-    return;
-  }
-
-  @override
-  Future<void> resetLoginAttempts() async {
-    // Implement in SecurityManagerImpl
-    return;
   }
 }

@@ -11,7 +11,7 @@ class UpdateProfileUseCase {
   /// Execute the use case with the given profile data
   Future<Profile> call(Profile profile) => _repository.updateProfile(profile);
 
-  /// Update specific fields of the profile
+  /// Update specific profile fields
   Future<Profile> updateFields(String userId, Map<String, dynamic> fields) =>
       _repository.updateProfileFields(userId, fields);
 

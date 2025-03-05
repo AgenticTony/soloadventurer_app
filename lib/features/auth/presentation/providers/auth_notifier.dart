@@ -8,9 +8,10 @@ import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/profile/domain/usecases/create_profile_use_case.dart';
-import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
+import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 
 /// Provider for the auth notifier
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -22,6 +23,7 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
     signOut: ref.watch(signOutProvider),
     refreshToken: ref.watch(refreshTokenProvider),
     createProfile: ref.watch(createProfileUseCaseProvider),
+    repository: ref.watch(authRepositoryProvider),
   );
 });
 
@@ -34,6 +36,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final SignOut _signOut;
   final RefreshToken _refreshToken;
   final CreateProfileUseCase _createProfile;
+  final AuthRepository _repository;
 
   /// Creates a new [AuthNotifier]
   AuthNotifier({
@@ -44,6 +47,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required SignOut signOut,
     required RefreshToken refreshToken,
     required CreateProfileUseCase createProfile,
+    required AuthRepository repository,
   })  : _getCurrentUser = getCurrentUser,
         _isSignedIn = isSignedIn,
         _login = login,
@@ -51,6 +55,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         _signOut = signOut,
         _refreshToken = refreshToken,
         _createProfile = createProfile,
+        _repository = repository,
         super(AuthState.initial()) {
     // Check for existing user on initialization
     Future(() => _checkAuthState());
@@ -99,31 +104,94 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String name,
   }) async {
     debugPrint('AuthNotifier: Starting sign up');
+    debugPrint('AuthNotifier: Current state before loading: $state');
     state = AuthState.loading();
+    debugPrint('AuthNotifier: State set to loading: $state');
+
     try {
-      final user = await _signUp(SignUpParams(
+      debugPrint('AuthNotifier: Calling _signUp use case');
+      final (user, needsVerification) = await _signUp(SignUpParams(
         email: email,
         password: password,
         name: name,
       ));
       debugPrint('AuthNotifier: Sign up successful, user: $user');
+      debugPrint('AuthNotifier: Needs verification: $needsVerification');
+      debugPrint('AuthNotifier: Current state before setting state: $state');
 
-      // Create profile for the new user
-      final now = DateTime.now();
-      final profile = ProfileModel(
-        id: user.id,
-        userId: user.id,
-        displayName: name,
-        createdAt: now,
-        updatedAt: now,
-      );
-      await _createProfile(profile);
-      debugPrint('AuthNotifier: Profile created successfully');
-
-      state = AuthState.authenticated(user);
+      if (needsVerification) {
+        debugPrint('AuthNotifier: Creating unverified state');
+        final unverifiedState = AuthState.unverified(user);
+        debugPrint('AuthNotifier: Unverified state created: $unverifiedState');
+        debugPrint('AuthNotifier: Setting state to unverified');
+        state = unverifiedState;
+        debugPrint('AuthNotifier: New state set: $state');
+        debugPrint(
+            'AuthNotifier: needsVerification: ${state.needsVerification}');
+        debugPrint('AuthNotifier: user: ${state.user}');
+      } else {
+        state = AuthState.authenticated(user);
+      }
     } catch (e) {
       debugPrint('AuthNotifier: Sign up failed: $e');
+      debugPrint('AuthNotifier: Setting error state');
       state = AuthState.error(e.toString());
+      debugPrint('AuthNotifier: Error state set: $state');
+    }
+  }
+
+  /// Verify email with confirmation code
+  Future<void> verifyEmail(String code, String email) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      await _repository.verifyEmail(code, email);
+
+      // Get the current user after verification
+      final user = await _getCurrentUser() ?? state.user;
+      if (user == null) {
+        throw Exception('Failed to get user after verification');
+      }
+
+      // After verification, create the profile
+      final now = DateTime.now();
+      final profile = Profile(
+        id: user.id,
+        userId: user.id,
+        username: user.email.split('@')[0],
+        email: user.email,
+        displayName: user.username,
+        createdAt: now,
+        updatedAt: now,
+        isPublic: false,
+        interests: [],
+        preferences: {},
+      );
+      await _createProfile(profile);
+
+      state = AuthState.authenticated(user, isNewUser: true);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
+    }
+  }
+
+  /// Resend verification email
+  Future<void> resendVerificationEmail() async {
+    if (state.user == null) {
+      throw Exception('No user to verify');
+    }
+
+    state = state.copyWith(isLoading: true);
+    try {
+      await _repository.resendVerificationEmail();
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
     }
   }
 
@@ -154,5 +222,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (state.error != null) {
       state = state.copyWith(error: null);
     }
+  }
+
+  /// Clear verification state when going back to signup
+  void clearVerificationState() {
+    state = state.copyWith(
+      needsVerification: false,
+      error: null,
+    );
   }
 }

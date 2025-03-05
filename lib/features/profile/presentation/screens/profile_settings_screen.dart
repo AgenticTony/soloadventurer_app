@@ -12,7 +12,7 @@ class ProfileSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(profileProvider);
+    final state = ref.watch(profileUIProvider('current'));
     final theme = Theme.of(context);
 
     if (state.isProcessing) {
@@ -49,7 +49,9 @@ class ProfileSettingsScreen extends ConsumerWidget {
                 ),
                 value: state.profile!.isPublic,
                 onChanged: (value) {
-                  ref.read(profileProvider.notifier).updateProfile({
+                  ref
+                      .read(profileUIProvider('current').notifier)
+                      .updateProfile({
                     'isPublic': value,
                   });
                 },
@@ -86,7 +88,9 @@ class ProfileSettingsScreen extends ConsumerWidget {
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            ref.read(profileProvider.notifier).deleteProfile();
+                            ref
+                                .read(profileUIProvider('current').notifier)
+                                .deleteProfile();
                             Navigator.pop(context); // Pop settings screen
                           },
                           style: TextButton.styleFrom(

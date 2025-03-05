@@ -1,15 +1,16 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
-import 'package:soloadventurer/core/api/interceptors/error_interceptor.dart';
-import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
+import '../api_service.dart';
+import '../interceptors/auth_interceptor.dart';
+import '../interceptors/error_interceptor.dart';
+import '../../monitoring/performance/network_monitor.dart';
 
 /// API client for making HTTP requests
 ///
 /// This class is a wrapper around Dio HTTP client with additional
 /// functionality like interceptors, error handling, and performance monitoring.
-class ApiClient {
+class ApiClient implements ApiService {
   /// Dio HTTP client
   final Dio _dio;
 
@@ -19,200 +20,201 @@ class ApiClient {
   /// Whether the client is in offline mode
   bool _isOffline = false;
 
+  /// Whether the client is in offline mode
+  bool get isOffline => _isOffline;
+
   /// Creates a new [ApiClient] with the given configuration
   ApiClient({
     required String baseUrl,
     required AuthInterceptor authInterceptor,
     required ErrorInterceptor errorInterceptor,
     required NetworkMonitor networkMonitor,
-  })  : _dio = Dio(
-          BaseOptions(
-            baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 30),
-            receiveTimeout: const Duration(seconds: 30),
-            sendTimeout: const Duration(seconds: 30),
-            headers: {
-              HttpHeaders.contentTypeHeader: 'application/json',
-              HttpHeaders.acceptHeader: 'application/json',
-            },
-          ),
-        ),
+  })  : _dio = Dio(BaseOptions(baseUrl: baseUrl)),
         _networkMonitor = networkMonitor {
-    // Add interceptors
     _dio.interceptors.addAll([
       authInterceptor,
       errorInterceptor,
-      if (kDebugMode)
-        LogInterceptor(
-          requestBody: true,
-          responseBody: true,
-        ),
     ]);
   }
 
   /// Sets whether the client is in offline mode
+  @override
   void setOfflineMode(bool offline) {
     _isOffline = offline;
   }
 
   /// Sets the authorization token for all future requests
+  @override
   void setAuthToken(String token) {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
   /// Clears the authorization token
+  @override
   void clearAuthToken() {
     _dio.options.headers.remove('Authorization');
   }
 
-  /// Make a GET request to the specified [path]
-  Future<Response<T>> get<T>(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
+  @override
+  Future<Map<String, dynamic>> get(String endpoint) async {
     if (_isOffline) {
       throw Exception('No internet connection');
     }
-    return _trackRequest(
-      () => _dio.get<T>(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      ),
-      path,
-    );
-  }
-
-  /// Make a POST request to the specified [path]
-  Future<Response<T>> post<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    if (_isOffline) {
-      throw Exception('No internet connection');
-    }
-    return _trackRequest(
-      () => _dio.post<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      ),
-      path,
-    );
-  }
-
-  /// Make a PUT request to the specified [path]
-  Future<Response<T>> put<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    return _trackRequest(
-      () => _dio.put<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      ),
-      path,
-    );
-  }
-
-  /// Make a DELETE request to the specified [path]
-  Future<Response<T>> delete<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    return _trackRequest(
-      () => _dio.delete<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      ),
-      path,
-    );
-  }
-
-  /// Make a PATCH request to the specified [path]
-  Future<Response<T>> patch<T>(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    return _trackRequest(
-      () => _dio.patch<T>(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-        cancelToken: cancelToken,
-      ),
-      path,
-    );
-  }
-
-  /// Track the request duration and log it to the network monitor
-  Future<Response<T>> _trackRequest<T>(
-    Future<Response<T>> Function() request,
-    String path,
-  ) async {
-    final stopwatch = Stopwatch()..start();
 
     try {
-      final response = await request();
+      final stopwatch = Stopwatch()..start();
+      _networkMonitor.trackRequest(endpoint);
+
+      final response = await _dio.get<Map<String, dynamic>>(endpoint);
       stopwatch.stop();
 
-      _networkMonitor.trackRequest(
-        path: path,
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
         duration: stopwatch.elapsed,
         statusCode: response.statusCode ?? 0,
         responseSize: _calculateResponseSize(response),
-        isError: false,
       );
 
-      return response;
-    } catch (e) {
+      return response.data ?? {};
+    } catch (error) {
+      _handleRequestError(endpoint, error);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> post(String endpoint,
+      {Map<String, dynamic>? data}) async {
+    if (_isOffline) {
+      throw Exception('No internet connection');
+    }
+
+    try {
+      final stopwatch = Stopwatch()..start();
+      _networkMonitor.trackRequest(endpoint);
+
+      final response =
+          await _dio.post<Map<String, dynamic>>(endpoint, data: data);
       stopwatch.stop();
 
-      if (e is DioException) {
-        _networkMonitor.trackRequest(
-          path: path,
-          duration: stopwatch.elapsed,
-          statusCode: e.response?.statusCode ?? 0,
-          responseSize: _calculateResponseSize(e.response),
-          isError: true,
-          errorMessage: e.message,
-        );
-      } else {
-        _networkMonitor.trackRequest(
-          path: path,
-          duration: stopwatch.elapsed,
-          statusCode: 0,
-          responseSize: 0,
-          isError: true,
-          errorMessage: e.toString(),
-        );
-      }
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
+        duration: stopwatch.elapsed,
+        statusCode: response.statusCode ?? 0,
+        responseSize: _calculateResponseSize(response),
+      );
 
+      return response.data ?? {};
+    } catch (error) {
+      _handleRequestError(endpoint, error);
       rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> put(String endpoint,
+      {Map<String, dynamic>? data}) async {
+    if (_isOffline) {
+      throw Exception('No internet connection');
+    }
+
+    try {
+      final stopwatch = Stopwatch()..start();
+      _networkMonitor.trackRequest(endpoint);
+
+      final response =
+          await _dio.put<Map<String, dynamic>>(endpoint, data: data);
+      stopwatch.stop();
+
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
+        duration: stopwatch.elapsed,
+        statusCode: response.statusCode ?? 0,
+        responseSize: _calculateResponseSize(response),
+      );
+
+      return response.data ?? {};
+    } catch (error) {
+      _handleRequestError(endpoint, error);
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> delete(String endpoint) async {
+    if (_isOffline) {
+      throw Exception('No internet connection');
+    }
+
+    try {
+      final stopwatch = Stopwatch()..start();
+      _networkMonitor.trackRequest(endpoint);
+
+      final response = await _dio.delete<Map<String, dynamic>>(endpoint);
+      stopwatch.stop();
+
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
+        duration: stopwatch.elapsed,
+        statusCode: response.statusCode ?? 0,
+        responseSize: _calculateResponseSize(response),
+      );
+
+      return response.data ?? {};
+    } catch (error) {
+      _handleRequestError(endpoint, error);
+      rethrow;
+    }
+  }
+
+  /// Make a PATCH request to the specified [path]
+  Future<Map<String, dynamic>> patch(String endpoint,
+      {Map<String, dynamic>? data}) async {
+    if (_isOffline) {
+      throw Exception('No internet connection');
+    }
+
+    try {
+      final stopwatch = Stopwatch()..start();
+      _networkMonitor.trackRequest(endpoint);
+
+      final response =
+          await _dio.patch<Map<String, dynamic>>(endpoint, data: data);
+      stopwatch.stop();
+
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
+        duration: stopwatch.elapsed,
+        statusCode: response.statusCode ?? 0,
+        responseSize: _calculateResponseSize(response),
+      );
+
+      return response.data ?? {};
+    } catch (error) {
+      _handleRequestError(endpoint, error);
+      rethrow;
+    }
+  }
+
+  void _handleRequestError(String endpoint, dynamic error) {
+    if (error is DioException) {
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
+        duration: Duration.zero,
+        statusCode: error.response?.statusCode ?? 0,
+        responseSize: _calculateResponseSize(error.response),
+        isError: true,
+        errorMessage: error.message,
+      );
+    } else {
+      _networkMonitor.trackRequestAndResponse(
+        path: endpoint,
+        duration: Duration.zero,
+        statusCode: 0,
+        responseSize: 0,
+        isError: true,
+        errorMessage: error.toString(),
+      );
     }
   }
 

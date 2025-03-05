@@ -25,8 +25,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // Check for rate limiting
       await securityManager.checkLoginAttempts();
 
-      final (user, token, refreshToken, expiresAt) =
-          await remoteDataSource.signIn(email, password);
+      final (user, token) = await remoteDataSource.signIn(email, password);
 
       // Check if this is a new device
       if (!await securityManager.isKnownDevice()) {
@@ -34,8 +33,8 @@ class AuthRepositoryImpl implements AuthRepository {
         await securityManager.registerDevice();
       }
 
-      await localDataSource.saveAuthData(token, refreshToken,
-          expiresAt: expiresAt);
+      // With Cognito, we don't need to store refresh tokens as the SDK handles that
+      await localDataSource.saveAuthData(token, token);
       await localDataSource.cacheUser(user);
       await securityManager.resetLoginAttempts();
       return user;
@@ -46,31 +45,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User> registerWithEmailAndPassword(
-    String email,
-    String password,
-    String name,
-  ) async {
-    try {
-      debugPrint('AuthRepositoryImpl: Starting registration');
-      final (user, token, refreshToken, expiresAt) =
-          await remoteDataSource.register(email, password, name);
-
-      debugPrint(
-          'AuthRepositoryImpl: Registration successful, registering device');
-      // Register this device as a known device
-      await securityManager.registerDevice();
-
-      debugPrint('AuthRepositoryImpl: Saving auth data and caching user');
-      await localDataSource.saveAuthData(token, refreshToken,
-          expiresAt: expiresAt);
-      await localDataSource.cacheUser(user);
-      debugPrint('AuthRepositoryImpl: Registration complete');
-      return user;
-    } catch (e) {
-      debugPrint('AuthRepositoryImpl: Registration failed: $e');
-      throw AuthException('Failed to register: ${e.toString()}');
-    }
+  Future<(User, bool)> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    debugPrint('AuthRepositoryImpl: Starting registration');
+    debugPrint('AuthRepositoryImpl: Registering with email: $email');
+    
+    final (user, needsVerification) = await remoteDataSource.register(
+      email: email,
+      password: password,
+      name: name,
+    );
+    
+    debugPrint('AuthRepositoryImpl: Registration successful, caching user data');
+    // Cache the user data even though they're not fully verified yet
+    await localDataSource.cacheUser(user);
+    
+    debugPrint('AuthRepositoryImpl: User cached, needs verification: $needsVerification');
+    return (user, needsVerification);
   }
 
   @override
@@ -114,9 +108,11 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       if (!await localDataSource.hasValidSession()) {
-        return await refreshToken();
+        return false;
       }
-      return true;
+
+      final user = await getCurrentUser();
+      return user != null;
     } catch (e) {
       return false;
     }
@@ -124,7 +120,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
-    await remoteDataSource.forgotPassword(email);
+    // Not implemented yet
+    throw UnimplementedError('Password reset not implemented yet');
   }
 
   @override
@@ -133,11 +130,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required String code,
     required String newPassword,
   }) async {
-    await remoteDataSource.confirmPasswordReset(
-      email: email,
-      code: code,
-      newPassword: newPassword,
-    );
+    // Not implemented yet
+    throw UnimplementedError('Password reset confirmation not implemented yet');
   }
 
   @override
@@ -147,32 +141,9 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     if (!await localDataSource.hasValidSession()) {
-      await refreshToken();
+      return null;
     }
     return localDataSource.getAuthToken();
-  }
-
-  @override
-  Future<bool> refreshToken() async {
-    try {
-      if (!await securityManager.isKnownDevice()) {
-        return false;
-      }
-
-      final refreshToken = await localDataSource.getRefreshToken();
-      if (refreshToken == null) {
-        return false;
-      }
-
-      final (newToken, expiresAt) =
-          await remoteDataSource.refreshToken(refreshToken);
-      await localDataSource.saveAuthData(newToken, refreshToken,
-          expiresAt: expiresAt);
-      return true;
-    } catch (e) {
-      await localDataSource.clearAuthData();
-      return false;
-    }
   }
 
   @override
@@ -195,19 +166,54 @@ class AuthRepositoryImpl implements AuthRepository {
     required String currentPassword,
     required String newPassword,
   }) async {
-    if (!await securityManager.isKnownDevice()) {
-      throw AuthException('Unknown device detected');
-    }
-
-    await remoteDataSource.changePassword(
-      currentPassword: currentPassword,
-      newPassword: newPassword,
-    );
+    // Not implemented yet
+    throw UnimplementedError('Password change not implemented yet');
   }
 
   @override
-  Future<void> verifyEmail(String code) async {
-    await remoteDataSource.verifyEmail(code);
+  Future<void> verifyEmail(String code, String email) async {
+    debugPrint('AuthRepositoryImpl: Starting email verification');
+    debugPrint('AuthRepositoryImpl: Verifying email: $email');
+    
+    // Get cached user to ensure we have the right context
+    final cachedUser = await localDataSource.getCachedUser();
+    debugPrint('AuthRepositoryImpl: Cached user: $cachedUser');
+    
+    if (cachedUser?.email != email) {
+      debugPrint('AuthRepositoryImpl: Warning - Verification email does not match cached user');
+    }
+    
+    try {
+      await remoteDataSource.verifyEmail(code, email);
+      debugPrint('AuthRepositoryImpl: Email verification successful');
+      
+      // After successful verification, try to get fresh user data
+      try {
+        final verifiedUser = await remoteDataSource.getCurrentUser();
+        if (verifiedUser != null) {
+          await localDataSource.cacheUser(verifiedUser);
+          debugPrint('AuthRepositoryImpl: Updated cached user after verification');
+        } else if (cachedUser != null) {
+          // If we can't get fresh data, use cached user but mark as verified
+          debugPrint('AuthRepositoryImpl: Using cached user data after verification');
+          await localDataSource.cacheUser(cachedUser);
+        } else {
+          throw AuthException('No user data available after verification');
+        }
+      } catch (e) {
+        debugPrint('AuthRepositoryImpl: Failed to get fresh user data: $e');
+        if (cachedUser != null) {
+          // If getting fresh data fails, use cached user
+          debugPrint('AuthRepositoryImpl: Falling back to cached user data');
+          await localDataSource.cacheUser(cachedUser);
+        } else {
+          throw AuthException('Failed to maintain user state after verification');
+        }
+      }
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Email verification failed: $e');
+      throw AuthException('Failed to verify email: ${e.toString()}');
+    }
   }
 
   @override
@@ -217,26 +223,26 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String> enableTwoFactor() async {
-    if (!await securityManager.isKnownDevice()) {
-      throw AuthException('Unknown device detected');
-    }
-    return await remoteDataSource.enableTwoFactor();
+    throw UnimplementedError(
+        'Two-factor authentication is not supported with Cognito');
   }
 
   @override
   Future<void> disableTwoFactor(String code) async {
-    if (!await securityManager.isKnownDevice()) {
-      throw AuthException('Unknown device detected');
-    }
-    await remoteDataSource.disableTwoFactor(code);
+    throw UnimplementedError(
+        'Two-factor authentication is not supported with Cognito');
   }
 
   @override
   Future<void> verifyTwoFactor(String code) async {
-    final (token, refreshToken, expiresAt) =
-        await remoteDataSource.verifyTwoFactor(code);
-    await localDataSource.saveAuthData(token, refreshToken,
-        expiresAt: expiresAt);
+    throw UnimplementedError(
+        'Two-factor authentication is not supported with Cognito');
+  }
+
+  @override
+  Future<bool> refreshToken() async {
+    // Cognito SDK handles token refresh automatically
+    return true;
   }
 
   /// Get list of known devices for the current user
