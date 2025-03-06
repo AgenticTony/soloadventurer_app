@@ -71,7 +71,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Sign in with email and password
   Future<void> signIn(String email, String password) async {
     if (!mounted) return;
-    setLoading();
+
+    // Set loading state using Riverpod's state management
+    state = AuthState.loading();
 
     try {
       final user = await _login(LoginParams(
@@ -80,9 +82,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       ));
 
       if (!mounted) return;
-      setAuthenticated(user);
+
+      // Successfully authenticated - update state immutably
+      state = AuthState.authenticated(user);
     } on ValidationException catch (e) {
       if (!mounted) return;
+
       // Handle validation errors from domain layer
       final firstError = e.errors.values
           .firstWhere(
@@ -90,41 +95,77 @@ class AuthNotifier extends StateNotifier<AuthState> {
             orElse: () => ['Please check your input'],
           )
           .first;
-      setError(firstError);
+      state = AuthState.error(firstError);
     } on AuthException catch (e) {
       if (!mounted) return;
 
-      // Convert domain auth errors to user-friendly messages
-      String userMessage;
+      // Map Cognito-specific error codes to user-friendly messages
       final errorStr = e.message.toLowerCase();
+      String userMessage;
+      String? errorCode = e.code;
 
+      // Handle specific Cognito error cases as per AWS docs
       if (errorStr.contains('usernotfoundexception') ||
           errorStr.contains('user does not exist') ||
           errorStr.contains('no account found')) {
         userMessage = 'No account found with this email';
-      } else if (errorStr.contains('authentication failed') ||
-          errorStr.contains('incorrect username or password') ||
-          errorStr.contains('notauthorizedexception')) {
-        userMessage = 'Wrong password. Please try again.';
-      } else if (errorStr.contains('too many login attempts')) {
-        // Extract minutes from error message if available
+        errorCode = 'USER_NOT_FOUND';
+      } else if (errorStr.contains('notauthorizedexception') ||
+          errorStr.contains('incorrect username or password')) {
+        userMessage = 'Wrong password. Please try again';
+        errorCode = 'INVALID_PASSWORD';
+      } else if (errorStr.contains('usernotconfirmedexception')) {
+        // Handle unverified user as per Cognito flow
+        final tempUser = User(
+          id: email,
+          email: email,
+          username: email.split('@')[0],
+          createdAt: DateTime.now(),
+        );
+        state = AuthState.unverified(tempUser);
+        return;
+      } else if (errorStr.contains('passwordresetrequiredexception')) {
+        // Handle forced password reset as per Cognito flow
+        state = state.copyWith(
+            requiresPasswordReset: true,
+            error: 'Password reset required. Please reset your password',
+            errorCode: 'PASSWORD_RESET_REQUIRED');
+        return;
+      } else if (errorStr.contains('limitexceededexception')) {
+        // Handle rate limiting as per Cognito best practices
         final minutes = errorStr.contains('try again in')
             ? errorStr.split('try again in')[1].split('minutes')[0].trim()
-            : '1';
+            : '15';
         userMessage =
-            'Too many attempts. Please wait $minutes minute${minutes == '1' ? '' : 's'} before trying again.';
-      } else if (errorStr.contains('usernotconfirmedexception')) {
-        userMessage = 'Please verify your email before signing in';
+            'Too many attempts. Please wait $minutes minute${minutes == '1' ? '' : 's'} before trying again';
+        errorCode = 'RATE_LIMIT_EXCEEDED';
+      } else if (errorStr.contains('invalidpasswordexception')) {
+        userMessage =
+            'Password must be at least 8 characters long and contain uppercase, lowercase, numbers and special characters';
+        errorCode = 'INVALID_PASSWORD_FORMAT';
+      } else if (errorStr.contains('expiredtokenexception')) {
+        userMessage = 'Your session has expired. Please sign in again';
+        errorCode = 'SESSION_EXPIRED';
+      } else if (errorStr.contains('software_token_mfa_not_found')) {
+        userMessage =
+            'Multi-factor authentication is required. Please set up MFA in your account settings';
+        errorCode = 'MFA_REQUIRED';
       } else {
-        debugPrint('Auth error: $e');
+        debugPrint('Unhandled Cognito error: $e');
         userMessage = 'Unable to sign in. Please try again';
+        errorCode = 'AUTHENTICATION_ERROR';
       }
 
-      setError(userMessage);
+      // Update state immutably with error details
+      state = AuthState.error(userMessage, errorCode);
     } catch (e) {
       if (!mounted) return;
       debugPrint('Unexpected error during sign in: $e');
-      setError('Something went wrong. Please try again');
+
+      // Handle unexpected errors
+      state = AuthState.error(
+          'An unexpected error occurred. Please try again later',
+          'UNKNOWN_ERROR');
     }
   }
 
@@ -135,6 +176,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String name,
   }) async {
     debugPrint('AuthNotifier: Starting sign up');
+
+    // Set initial loading state
     state = AuthState.loading();
 
     try {
@@ -145,13 +188,55 @@ class AuthNotifier extends StateNotifier<AuthState> {
       ));
       final (user, needsVerification) = result;
 
+      // Handle the signup result according to Cognito flow
       if (needsVerification) {
+        debugPrint('AuthNotifier: User requires email verification');
         state = AuthState.unverified(user);
       } else {
+        debugPrint('AuthNotifier: User signed up and verified');
         state = AuthState.authenticated(user);
       }
+    } on ValidationException catch (e) {
+      debugPrint('AuthNotifier: Validation error during sign up: $e');
+      final firstError = e.errors.values
+          .firstWhere(
+            (errors) => errors.isNotEmpty,
+            orElse: () => ['Please check your input'],
+          )
+          .first;
+      state = AuthState.error(firstError, 'VALIDATION_ERROR');
+    } on AuthException catch (e) {
+      debugPrint('AuthNotifier: Auth error during sign up: $e');
+      final errorStr = e.message.toLowerCase();
+      String userMessage;
+      String errorCode;
+
+      // Handle Cognito-specific signup errors
+      if (errorStr.contains('usernameexistsexception') ||
+          errorStr.contains('already exists')) {
+        userMessage = 'An account with this email already exists';
+        errorCode = 'USER_EXISTS';
+      } else if (errorStr.contains('invalidpasswordexception')) {
+        userMessage =
+            'Password must be at least 8 characters long and contain uppercase, lowercase, numbers and special characters';
+        errorCode = 'INVALID_PASSWORD_FORMAT';
+      } else if (errorStr.contains('invalidparameterexception')) {
+        userMessage = 'Please provide valid email and password';
+        errorCode = 'INVALID_PARAMETERS';
+      } else if (errorStr.contains('limitexceededexception')) {
+        userMessage = 'Too many signup attempts. Please try again later';
+        errorCode = 'RATE_LIMIT_EXCEEDED';
+      } else {
+        userMessage = 'Failed to create account. Please try again';
+        errorCode = 'SIGNUP_ERROR';
+      }
+
+      state = AuthState.error(userMessage, errorCode);
     } catch (e) {
-      state = AuthState.error(e.toString());
+      debugPrint('AuthNotifier: Unexpected error during sign up: $e');
+      state = AuthState.error(
+          'An unexpected error occurred. Please try again later',
+          'UNKNOWN_ERROR');
     }
   }
 

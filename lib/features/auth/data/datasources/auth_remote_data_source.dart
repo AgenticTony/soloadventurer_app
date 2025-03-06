@@ -1,6 +1,7 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/core/config/cognito_config.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
@@ -28,7 +29,7 @@ abstract class AuthRemoteDataSource {
   Future<bool> isSignedIn();
 
   /// Refresh the authentication token
-  Future<void> refreshToken();
+  Future<AuthSession> refreshToken();
 
   /// Verify email with confirmation code
   Future<void> verifyEmail(String code, String email);
@@ -486,25 +487,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> refreshToken() async {
+  Future<AuthSession> refreshToken() async {
     try {
-      if (_cognitoUser == null) {
+      final cognitoUser = _cognitoUser;
+      if (cognitoUser == null) {
         throw AuthException('No authenticated user');
       }
 
-      if (_session == null) {
-        throw AuthException('No active session');
-      }
-
-      final refreshToken = _session!.getRefreshToken();
-      if (refreshToken == null) {
+      final currentSession = cognitoUser.getSignInUserSession();
+      final currentRefreshToken = currentSession?.refreshToken;
+      if (currentRefreshToken == null) {
         throw AuthException('No refresh token available');
       }
 
-      _session = await _cognitoUser!.refreshSession(refreshToken);
+      final session = await cognitoUser.refreshSession(currentRefreshToken);
+      if (session == null) {
+        throw AuthException('Failed to refresh session');
+      }
+
+      final accessToken = session.accessToken.jwtToken;
+      final refreshToken = session.refreshToken?.token;
+      final idToken = session.idToken.jwtToken;
+      final expiration = session.accessToken.getExpiration();
+
+      if (accessToken == null || refreshToken == null || idToken == null) {
+        throw AuthException('Invalid session tokens received');
+      }
+
+      return AuthSession(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        idToken: idToken,
+        expiresAt: DateTime.fromMillisecondsSinceEpoch(
+            expiration * 1000), // Convert seconds to milliseconds
+      );
     } catch (e) {
-      debugPrint('Cognito refreshToken error: $e');
-      throw AuthException('Failed to refresh token');
+      throw AuthException('Failed to refresh token: ${e.toString()}');
     }
   }
 

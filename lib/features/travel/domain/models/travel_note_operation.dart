@@ -1,0 +1,111 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:uuid/uuid.dart';
+import '../../../core/services/operation_queue.dart';
+
+part 'travel_note_operation.freezed.dart';
+part 'travel_note_operation.g.dart';
+
+/// Types of travel notes
+enum NoteType {
+  text,
+  photo,
+  voice,
+  location,
+  expense,
+}
+
+@freezed
+class TravelNoteOperation
+    with _$TravelNoteOperation
+    implements QueueableOperation {
+  const factory TravelNoteOperation({
+    required String id,
+    required String tripId,
+    required NoteType noteType,
+    required Map<String, dynamic> content,
+    @Default(1) int priority,
+    String? locationName,
+    double? latitude,
+    double? longitude,
+    DateTime? timestamp,
+  }) = _TravelNoteOperation;
+
+  factory TravelNoteOperation.fromJson(Map<String, dynamic> json) =>
+      _$TravelNoteOperationFromJson(json);
+
+  const TravelNoteOperation._();
+
+  /// Create a text note
+  factory TravelNoteOperation.text({
+    required String tripId,
+    required String text,
+    String? locationName,
+    double? latitude,
+    double? longitude,
+  }) {
+    return TravelNoteOperation(
+      id: const Uuid().v4(),
+      tripId: tripId,
+      noteType: NoteType.text,
+      content: {'text': text},
+      locationName: locationName,
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: DateTime.now(),
+    );
+  }
+
+  /// Create an expense note
+  factory TravelNoteOperation.expense({
+    required String tripId,
+    required double amount,
+    required String currency,
+    required String category,
+    String? description,
+    String? locationName,
+    double? latitude,
+    double? longitude,
+  }) {
+    return TravelNoteOperation(
+      id: const Uuid().v4(),
+      tripId: tripId,
+      noteType: NoteType.expense,
+      content: {
+        'amount': amount,
+        'currency': currency,
+        'category': category,
+        if (description != null) 'description': description,
+      },
+      locationName: locationName,
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: DateTime.now(),
+    );
+  }
+
+  @override
+  String get type => 'travel_note';
+
+  @override
+  bool get requiresNetwork => false; // Notes work offline
+
+  @override
+  Future<void> execute() async {
+    // TODO: Implement actual note storage
+    // This would save to local storage and sync when online
+    await Future.delayed(const Duration(milliseconds: 50));
+  }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'tripId': tripId,
+        'noteType': noteType.toString(),
+        'content': content,
+        'priority': priority,
+        if (locationName != null) 'locationName': locationName,
+        if (latitude != null) 'latitude': latitude,
+        if (longitude != null) 'longitude': longitude,
+        if (timestamp != null) 'timestamp': timestamp!.toIso8601String(),
+      };
+}
