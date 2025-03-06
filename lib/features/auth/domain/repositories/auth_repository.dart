@@ -21,10 +21,7 @@ abstract class AuthRepository {
   /// Check if a user is currently authenticated
   Future<bool> isAuthenticated();
 
-  /// Sends a password reset code via SMS
-  Future<void> sendPasswordResetSMS(String phoneNumber);
-
-  /// Sends a password reset code via email
+  /// Send password reset instructions via email
   Future<void> sendPasswordResetEmail(String email);
 
   /// Confirm a password reset with the given code and new password

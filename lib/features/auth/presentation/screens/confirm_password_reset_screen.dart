@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/navigation_error_handler.dart';
+import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 /// Screen for confirming password reset with code
 class ConfirmPasswordResetScreen extends ConsumerStatefulWidget {

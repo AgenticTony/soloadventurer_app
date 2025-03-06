@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 /// Sign up screen for the application
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -108,7 +109,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               name: name,
             );
         debugPrint('SignUpScreen: Form submitted successfully');
-        
+
         if (mounted) {
           final authState = ref.read(authProvider);
           if (authState.needsVerification) {

@@ -30,7 +30,7 @@ class SecurityManagerImpl implements SecurityManager {
   final DeviceInfoPlugin _deviceInfo;
   final bool _isTest;
   static const _maxLoginAttempts = 5;
-  static const _lockoutDuration = Duration(minutes: 15);
+  static const _lockoutDuration = Duration(minutes: 1);
   static const _deviceIdKey = 'device_id';
   static const _lastLoginAttemptKey = 'last_login_attempt';
   static const _loginAttemptsKey = 'login_attempts';

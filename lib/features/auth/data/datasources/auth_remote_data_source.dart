@@ -1,7 +1,6 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/core/config/cognito_config.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
-import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
@@ -53,9 +52,6 @@ abstract class AuthRemoteDataSource {
 
   /// Send password reset instructions via email
   Future<void> sendPasswordResetEmail(String email);
-
-  /// Send password reset instructions via SMS
-  Future<void> sendPasswordResetSMS(String phoneNumber);
 }
 
 /// Implementation of [AuthRemoteDataSource] using AWS Cognito
@@ -269,37 +265,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<(UserModel, String)> signIn(String email, String password) async {
     try {
-      debugPrint('Starting sign in process for: $email');
+      debugPrint('Attempting to sign in user: $email');
+      _cognitoUser = CognitoUser(email, _userPool);
 
-      // First, try to find the user by email attribute
-      final userByEmail = await CognitoConfig.userPool.getCurrentUser();
-      if (userByEmail != null) {
-        debugPrint('Found existing user by email');
-        _cognitoUser = userByEmail;
-      } else {
-        debugPrint('Creating new CognitoUser instance');
-        _cognitoUser = CognitoUser(email, CognitoConfig.userPool);
-      }
-
-      debugPrint('Getting authentication options...');
+      // Get available authentication methods
       final authMethods = await _getAuthenticationOptions(email);
 
-      debugPrint('Available auth methods: $authMethods');
       if (authMethods.contains(PASSWORD_AUTH)) {
         return _handlePasswordAuth(email, password);
-      } else {
-        throw AuthException(
-          'Password authentication not available. Available methods: ${authMethods.join(", ")}',
-          code: 'AUTH_METHOD_UNAVAILABLE',
-        );
       }
-    } on CognitoUserException catch (e) {
-      debugPrint('Cognito sign in error: $e');
 
+      throw const AuthException(
+        'Unsupported authentication method',
+        code: 'UNSUPPORTED_AUTH',
+      );
+    } on CognitoUserException catch (e) {
+      debugPrint('Cognito error during sign in: $e');
       if (e.toString().contains('NotAuthorizedException')) {
         _handleFailedAttempt();
         throw const AuthException(
-          'Incorrect username or password',
+          'Wrong password. Please try again.',
           code: 'INVALID_CREDENTIALS',
         );
       } else if (e.toString().contains('UserNotConfirmedException')) {
@@ -314,7 +299,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       } else if (e.toString().contains('UserNotFoundException')) {
         throw const AuthException(
-          'User not found',
+          'No account found with this email',
           code: 'USER_NOT_FOUND',
         );
       }
@@ -323,13 +308,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         _handleFailedAttempt();
       }
       throw AuthException(
-        e.toString(),
+        'Wrong password. Please try again.',
         code: 'COGNITO_ERROR',
       );
     } catch (e) {
       debugPrint('Sign in error: $e');
+      if (e is AuthException) {
+        rethrow;
+      }
       throw AuthException(
-        e.toString(),
+        'Wrong password. Please try again.',
         code: 'UNKNOWN_ERROR',
       );
     }
@@ -372,11 +360,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         } else if (e.toString().contains('NotAuthorizedException')) {
           _handleFailedAttempt();
           throw const AuthException(
-            'Incorrect username or password',
+            'Wrong password. Please try again.',
             code: 'INVALID_CREDENTIALS',
           );
         }
-        rethrow;
+        // Handle any other Cognito exceptions
+        _handleFailedAttempt();
+        throw AuthException(
+          'Wrong password. Please try again.',
+          code: 'COGNITO_ERROR',
+        );
       }
 
       await _ensureValidSession();
@@ -410,8 +403,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           !e.toString().contains('Too many failed attempts')) {
         _handleFailedAttempt();
       }
+      if (e is AuthException) {
+        rethrow;
+      }
       throw AuthException(
-          e is AuthException ? e.toString() : 'Authentication failed');
+        'Wrong password. Please try again.',
+        code: 'AUTHENTICATION_FAILED',
+      );
     }
   }
 
@@ -810,23 +808,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       debugPrint('Error sending password reset email: $e');
       throw AuthException('Failed to send password reset email: $e');
-    }
-  }
-
-  @override
-  Future<void> sendPasswordResetSMS(String phoneNumber) async {
-    debugPrint('Sending password reset SMS to: $phoneNumber');
-    try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(phoneNumber, _userPool);
-
-      // For SMS delivery, we use the standard forgotPassword method
-      // The Cognito service will automatically use SMS if a phone number is provided
-      await _cognitoUser!.forgotPassword();
-      debugPrint('Password reset SMS sent successfully');
-    } catch (e) {
-      debugPrint('Error sending password reset SMS: $e');
-      throw AuthException('Failed to send password reset SMS: $e');
     }
   }
 }

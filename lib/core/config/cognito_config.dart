@@ -1,6 +1,5 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/app/config/env.dart';
-import 'package:http/http.dart' as http;
 
 /// Configuration for AWS Cognito
 class CognitoConfig {

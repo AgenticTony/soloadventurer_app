@@ -10,246 +10,348 @@ We organize providers by feature and type:
 
 ```
 lib/
-├─ providers/
-│  ├─ core/
+├─ features/
+│  ├─ auth/
+│  │  ├─ presentation/
+│  │  │  ├─ providers/
+│  │  │  │  ├─ auth_provider.dart
+│  │  │  │  ├─ auth_state.dart
+│  │  │  │  ├─ token_provider.dart
+│  │  │  │  └─ session_provider.dart
+│  ├─ profile/
+│  │  ├─ presentation/
+│  │  │  ├─ providers/
+│  │  │  │  └─ profile_provider.dart
+├─ shared/
+│  ├─ providers/
 │  │  ├─ app_providers.dart      // App-wide providers
-│  ├─ features/
-│  │  ├─ auth/
-│  │  │  ├─ auth_provider.dart   // Authentication providers
-│  │  ├─ profile/
-│  │  │  ├─ profile_provider.dart // Profile-related providers
+│  │  └─ network_providers.dart  // Network-related providers
 ```
 
 ### Provider Types
 
-We categorize providers into three main types:
+We use four main types of providers:
 
-1. **Service Providers**: External dependencies and services
-
-   ```dart
-   final authServiceProvider = Provider<AuthService>((ref) {
-     return AuthService();
-   });
-   ```
-
-2. **State Providers**: Business logic and UI state
+1. **State Providers**: Business logic and UI state
 
    ```dart
-   final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-     return AuthNotifier(ref.watch(authServiceProvider));
-   });
+   @riverpod
+   class AuthNotifier extends _$AuthNotifier {
+     @override
+     AuthState build() => AuthState.initial();
+
+     Future<void> signIn(String email, String password) async {
+       state = state.copyWith(isLoading: true, errorMessage: null);
+       final result = await AsyncValue.guard(
+         () => _authRepository.signInWithEmailAndPassword(email, password),
+       );
+
+       state = state.copyWith(
+         user: result,
+         isLoading: false,
+         status: result.hasError ? AuthStatus.error : AuthStatus.authenticated,
+         errorMessage: result.hasError ? _mapErrorToMessage(result.error!) : null,
+       );
+     }
+   }
    ```
 
-3. **Utility Providers**: Formatting, calculations, etc.
+2. **Service Providers**: External services and repositories
+
    ```dart
-   final dateFormatterProvider = Provider<DateFormatter>((ref) {
-     return DateFormatter();
-   });
+   @riverpod
+   AuthRepository authRepository(AuthRepositoryRef ref) {
+     final authService = ref.watch(authServiceProvider);
+     return AuthRepositoryImpl(authService);
+   }
    ```
 
-### Naming Conventions
+3. **Infrastructure Providers**: AWS services, network clients, etc.
 
-- Service providers: `{service}Provider`
-- State providers: `{feature}Provider`
-- Utility providers: `{utility}Provider`
+   ```dart
+   @riverpod
+   Dio dioClient(DioClientRef ref) {
+     final token = ref.watch(tokenProvider);
+     return Dio()
+       ..interceptors.add(
+         AuthInterceptor(token),
+       );
+   }
+   ```
+
+4. **Utility Providers**: Helpers and formatters
+   ```dart
+   @riverpod
+   class ErrorMapper extends _$ErrorMapper {
+     String mapAuthError(AuthException error) {
+       return switch (error) {
+         UserNotFoundException() => 'No account found with this email',
+         InvalidPasswordException() => 'Incorrect password',
+         _ => 'An unexpected error occurred'
+       };
+     }
+   }
+   ```
+
+## Error Handling Strategy
+
+### 1. Using AsyncValue
+
+Always use AsyncValue for async operations:
+
+```dart
+@freezed
+class AuthState with _$AuthState {
+  const factory AuthState({
+    required AsyncValue<User?> user,
+    required AuthStatus status,
+    String? errorMessage,
+    required bool isLoading,
+  }) = _AuthState;
+
+  factory AuthState.initial() => AuthState(
+    user: const AsyncValue.data(null),
+    status: AuthStatus.initial,
+    isLoading: false,
+  );
+}
+```
+
+### 2. Error Mapping
+
+Implement consistent error mapping:
+
+```dart
+@riverpod
+class AuthErrorMapper extends _$AuthErrorMapper {
+  String mapCognitoError(CognitoException error) {
+    return switch (error.code) {
+      'UserNotFoundException' => 'No account found with this email',
+      'NotAuthorizedException' => 'Incorrect password',
+      'UserNotConfirmedException' => 'Please verify your email first',
+      _ => 'An unexpected error occurred'
+    };
+  }
+}
+```
+
+### 3. Error Propagation
+
+Properly propagate errors through layers:
+
+```dart
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  Future<void> signIn(String email, String password) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    try {
+      final result = await _authRepository.signIn(email, password);
+      state = state.copyWith(
+        user: AsyncValue.data(result),
+        status: AuthStatus.authenticated,
+      );
+    } on CognitoException catch (e) {
+      final errorMessage = ref.read(authErrorMapperProvider).mapCognitoError(e);
+      state = state.copyWith(
+        user: AsyncValue.error(e, StackTrace.current),
+        errorMessage: errorMessage,
+        status: AuthStatus.error,
+      );
+    }
+  }
+}
+```
 
 ## Testing Strategy
 
-### Multi-Layered Testing Approach
+### 1. Provider Unit Tests
 
-We use a multi-layered approach to testing Riverpod:
-
-1. **Mock Screen Tests**: Simplified tests using mock implementations of screens
-
-   - Advantages: Stable, focused, fast
-   - Use cases: Testing form validation, basic UI interactions
-
-2. **Actual Screen Tests**: Tests using the actual screen implementations with mocked providers
-
-   - Advantages: Tests real implementation, catches integration issues
-   - Use cases: Testing provider interactions, complex workflows
-
-3. **Provider Unit Tests**: Tests for providers in isolation
-
-   - Advantages: Fast, focused on business logic
-   - Use cases: Testing state transitions, async operations
-
-4. **Provider Integration Tests**: Tests for provider interactions
-   - Advantages: Tests provider dependencies and interactions
-   - Use cases: Testing complex provider chains
-
-### Testing Utilities
-
-We use the following utilities to simplify testing:
+Test providers in isolation:
 
 ```dart
-// lib/test_utils/provider_test_utils.dart
+void main() {
+  late ProviderContainer container;
+  late MockAuthRepository mockAuthRepository;
 
-/// Helper to create a testable widget with overridden providers
-Widget createTestableApp({
-  required Widget child,
-  List<Override> overrides = const [],
-  List<NavigatorObserver> navigatorObservers = const [],
-}) {
-  return ProviderScope(
-    overrides: overrides,
-    child: MaterialApp(
-      home: child,
-      navigatorObservers: navigatorObservers,
-    ),
-  );
-}
+  setUp(() {
+    mockAuthRepository = MockAuthRepository();
+    container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(mockAuthRepository),
+      ],
+    );
+  });
 
-/// Setup common mocks for authentication tests
-class AuthTestHelper {
-  late MockAuthService authService;
-  late MockNavigatorObserver navigatorObserver;
+  test('signIn updates state correctly on success', () async {
+    final notifier = container.read(authNotifierProvider.notifier);
 
-  AuthTestHelper() {
-    authService = MockAuthService();
-    navigatorObserver = MockNavigatorObserver();
+    when(mockAuthRepository.signIn(any, any))
+        .thenAnswer((_) async => mockUser);
 
-    // Register fallback values
-    registerFallbackValue(MockRoute());
-  }
+    await notifier.signIn('email', 'password');
 
-  /// Get common provider overrides for auth tests
-  List<Override> get authOverrides => [
-    authServiceProvider.overrideWithValue(authService)
-  ];
+    final state = container.read(authNotifierProvider);
+    expect(state.status, AuthStatus.authenticated);
+    expect(state.user, isA<AsyncData<User>>());
+  });
+
+  test('signIn handles errors correctly', () async {
+    final notifier = container.read(authNotifierProvider.notifier);
+
+    when(mockAuthRepository.signIn(any, any))
+        .thenThrow(const CognitoException('UserNotFoundException'));
+
+    await notifier.signIn('email', 'password');
+
+    final state = container.read(authNotifierProvider);
+    expect(state.status, AuthStatus.error);
+    expect(state.errorMessage, 'No account found with this email');
+  });
 }
 ```
 
-### Provider Unit Testing
+### 2. Widget Tests with Providers
+
+Test widgets with provider integration:
 
 ```dart
-// Example of provider unit testing
-test('AuthNotifier changes state to loading when signing in', () {
-  final container = ProviderContainer(
-    overrides: [
-      authServiceProvider.overrideWithValue(mockAuthService),
-    ],
-  );
-  addTearDown(container.dispose);
-
-  final notifier = container.read(authProvider.notifier);
-
-  expect(container.read(authProvider), isA<AuthInitial>());
-
-  notifier.signIn('email', 'password');
-
-  expect(container.read(authProvider), isA<AuthLoading>());
-});
-```
-
-### Widget Testing with Providers
-
-```dart
-// Example of widget testing with providers
-testWidgets('SignUpScreen validates email format', (WidgetTester tester) async {
-  final helper = AuthTestHelper();
+testWidgets('LoginScreen shows error message on failed login',
+    (WidgetTester tester) async {
+  final mockAuthNotifier = MockAuthNotifier();
 
   await tester.pumpWidget(
-    createTestableApp(
-      child: const SignUpScreen(),
-      overrides: helper.authOverrides,
-      navigatorObservers: [helper.navigatorObserver],
+    ProviderScope(
+      overrides: [
+        authNotifierProvider.overrideWith(() => mockAuthNotifier),
+      ],
+      child: const MaterialApp(
+        home: LoginScreen(),
+      ),
     ),
   );
 
-  // Test interactions
-  await tester.enterText(find.byType(TextFormField).at(0), 'invalid-email');
-  await tester.tap(find.text('Sign Up'));
-  await tester.pump();
+  when(mockAuthNotifier.signIn(any, any))
+      .thenThrow(const CognitoException('UserNotFoundException'));
 
-  expect(find.text('Please enter a valid email'), findsOneWidget);
+  await tester.enterText(find.byType(EmailField), 'test@example.com');
+  await tester.enterText(find.byType(PasswordField), 'password');
+  await tester.tap(find.byType(ElevatedButton));
+  await tester.pumpAndSettle();
+
+  expect(find.text('No account found with this email'), findsOneWidget);
 });
 ```
+
+### 3. Integration Tests
+
+Test complete features:
+
+```dart
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('Complete auth flow test', (tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    // Test sign up
+    await tester.tap(find.text('Create Account'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(EmailField), 'test@example.com');
+    await tester.enterText(find.byType(PasswordField), 'password123');
+    await tester.tap(find.text('Sign Up'));
+    await tester.pumpAndSettle();
+
+    // Verify email verification screen is shown
+    expect(find.text('Verify your email'), findsOneWidget);
+  });
+}
+```
+
+## Performance Optimization
+
+### 1. Selective Updates
+
+Use select for granular updates:
+
+```dart
+// Good: Only rebuilds when user name changes
+final userName = ref.watch(
+  authProvider.select((state) => state.user.value?.name)
+);
+
+// Bad: Rebuilds on any auth state change
+final user = ref.watch(authProvider).user.value;
+final userName = user?.name;
+```
+
+### 2. Caching Strategy
+
+Implement proper caching:
+
+```dart
+@riverpod
+class CachedUserProfile extends _$CachedUserProfile {
+  @override
+  Future<UserProfile> build(String userId) async {
+    // Cache for 5 minutes
+    ref.keepAlive();
+    ref.onDispose(() {
+      // Clear cache after 5 minutes
+      Future.delayed(const Duration(minutes: 5), () {
+        ref.invalidateSelf();
+      });
+    });
+
+    return ref.watch(userRepositoryProvider).getUserProfile(userId);
+  }
+}
+```
+
+## Implementation Plan
+
+### Phase 1: Core Authentication (Current)
+
+1. ✅ Basic provider structure
+2. ✅ Auth state management
+3. 🚧 Error handling
+4. 🚧 Token management
+5. 🚧 Testing infrastructure
+
+### Phase 2: Profile Feature
+
+1. Profile state management
+2. Profile error handling
+3. Avatar management
+4. Testing implementation
+
+### Phase 3: Advanced Features
+
+1. Real-time updates
+2. Offline support
+3. Performance optimization
+4. Advanced caching
 
 ## Best Practices
 
-### Provider Creation
+1. Always use AsyncValue for async operations
+2. Implement proper error handling at all layers
+3. Write comprehensive tests
+4. Use selective updates for performance
+5. Document provider dependencies
+6. Maintain consistent naming conventions
+7. Keep providers focused and small
+8. Use proper provider organization
+9. Implement proper cleanup in dispose
+10. Monitor provider performance
 
-1. **Keep providers focused**: Each provider should have a single responsibility
-2. **Use dependency injection**: Inject dependencies through `ref.watch`
-3. **Consider provider lifecycle**: Use `.autoDispose` for providers that should be disposed when no longer used
+## Monitoring & Debugging
 
-```dart
-// Good: Focused provider with dependency injection
-final userProfileProvider = FutureProvider.autoDispose.family<UserProfile, String>((ref, userId) async {
-  final repository = ref.watch(userRepositoryProvider);
-  return repository.getUserProfile(userId);
-});
-
-// Bad: Provider doing too much
-final userProvider = Provider((ref) {
-  final user = User();
-  user.fetchProfile(); // Direct API call
-  return user;
-});
-```
-
-### State Management
-
-1. **Use appropriate provider types**:
-
-   - `Provider` for simple values
-   - `StateProvider` for simple state
-   - `StateNotifierProvider` for complex state
-   - `FutureProvider` for async data
-   - `StreamProvider` for streams
-
-2. **Handle loading and error states**:
-   - Use `AsyncValue` for async operations
-   - Handle loading, data, and error states in the UI
+### 1. Provider Observer
 
 ```dart
-// Good: Using AsyncValue for state management
-class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
-  AuthNotifier(this._authService) : super(const AsyncValue.data(null));
-
-  Future<void> signIn(String email, String password) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(() => _authService.signIn(email, password));
-  }
-}
-
-// In UI
-ref.watch(authProvider).when(
-  data: (user) => user != null ? HomeScreen() : LoginScreen(),
-  loading: () => LoadingScreen(),
-  error: (error, stack) => ErrorScreen(error),
-);
-```
-
-### Performance Optimization
-
-1. **Minimize rebuilds**:
-   - Use `select` to watch specific parts of state
-   - Split large providers into smaller, focused providers
-
-```dart
-// Good: Using select to minimize rebuilds
-final userName = ref.watch(userProvider.select((user) => user.name));
-
-// Bad: Watching entire user object when only name is needed
-final user = ref.watch(userProvider);
-final userName = user.name;
-```
-
-2. **Use caching effectively**:
-   - Use `.family` providers with caching for parameterized data
-   - Consider custom caching for expensive operations
-
-### Debugging
-
-1. **Add provider observers**:
-   - Use `ProviderObserver` to log state changes
-   - Add debug prints in development
-
-```dart
-// Provider observer for debugging
-class LoggerProviderObserver extends ProviderObserver {
+class ProviderLogger extends ProviderObserver {
   @override
   void didUpdateProvider(
     ProviderBase provider,
@@ -257,30 +359,29 @@ class LoggerProviderObserver extends ProviderObserver {
     Object? newValue,
     ProviderContainer container,
   ) {
-    debugPrint(
-      '[${provider.name ?? provider.runtimeType}] value: $newValue',
-    );
+    debugPrint('''
+{
+  "provider": "${provider.name ?? provider.runtimeType}",
+  "previousValue": "$previousValue",
+  "newValue": "$newValue"
+}''');
   }
-}
-
-// In main.dart
-void main() {
-  runApp(
-    ProviderScope(
-      observers: [LoggerProviderObserver()],
-      child: MyApp(),
-    ),
-  );
 }
 ```
 
-## Migration Plan
+### 2. Performance Monitoring
 
-1. **Phase 1**: Create testing utilities and documentation
-2. **Phase 2**: Reorganize existing providers by feature
-3. **Phase 3**: Add integration tests for actual screens
-4. **Phase 4**: Implement provider observers for debugging
+```dart
+extension ProviderContainerX on ProviderContainer {
+  void trackProviderUpdates() {
+    final observer = ProviderLogger();
+    this.addObserver(observer);
+  }
+}
+```
 
-## Conclusion
+## References
 
-Riverpod is the optimal state management solution for SoloAdventurer due to its flexibility, dependency injection capabilities, and performance characteristics. By following these patterns and best practices, we can leverage Riverpod's strengths while mitigating its challenges.
+- [Riverpod Documentation](https://riverpod.dev)
+- [AWS Cognito Integration Guide](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-app-integration.html)
+- [Flutter Testing Best Practices](https://docs.flutter.dev/testing)

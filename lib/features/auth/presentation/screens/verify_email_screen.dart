@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/auth/presentation/providers/auth_provide
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   static const routeName = '/verify-email';
@@ -99,13 +100,15 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           debugPrint('VerifyEmailScreen: Retrieved email: $_email');
         }
 
-        debugPrint('VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
+        debugPrint(
+            'VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
         await ref.read(authProvider.notifier).verifyEmail(code, _email!);
         debugPrint('VerifyEmailScreen: Verification completed successfully');
 
         // Check the verification result
         final newState = ref.read(authProvider);
-        debugPrint('VerifyEmailScreen: Auth state after verification: $newState');
+        debugPrint(
+            'VerifyEmailScreen: Auth state after verification: $newState');
 
         if (mounted) {
           // Wait for the next frame to ensure state is properly updated
@@ -115,8 +118,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             if (newState.isAuthenticated) {
               // Use typed navigation method
               ref.read(authNavigationProvider.notifier).navigateToProfileEdit(
-                isInitialSetup: true,
-              );
+                    isInitialSetup: true,
+                  );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

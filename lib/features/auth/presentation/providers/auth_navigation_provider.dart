@@ -1,23 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 /// Provider for handling auth-related navigation state
 final authNavigationProvider =
     StateNotifierProvider<AuthNavigationNotifier, AuthNavigationState>((ref) {
   return AuthNavigationNotifier(ref);
 });
-
-/// Constants for auth navigation routes
-class AuthRoutes {
-  static const verifyEmail = '/verify-email';
-  static const login = '/login';
-  static const signup = '/signup';
-  static const home = '/home';
-  static const forgotPassword = '/forgot-password';
-  static const confirmPasswordReset = '/confirm-password-reset';
-}
 
 /// Notifier for handling auth-related navigation
 class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
@@ -27,14 +19,41 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
   AuthNavigationNotifier(this._ref) : super(AuthNavigationState.initial()) {
     // Listen to auth state changes
     _ref.listen(authProvider, (previous, next) {
-      if (next.needsVerification && next.user != null) {
-        navigateToVerification(next.user?.email);
+      debugPrint('AuthNavigationNotifier: Auth state changed');
+      debugPrint('AuthNavigationNotifier: Previous state: $previous');
+      debugPrint('AuthNavigationNotifier: Next state: $next');
+
+      // Only navigate if we're not already on the target route
+      final currentRoute = getCurrentRoute();
+
+      if (next.requiresEmailVerification && next.user != null) {
+        debugPrint('AuthNavigationNotifier: User needs verification');
+        if (currentRoute != AuthRoutes.verifyEmail) {
+          debugPrint('AuthNavigationNotifier: Navigating to verify email');
+          navigateToVerification(next.user?.email);
+        } else {
+          debugPrint('AuthNavigationNotifier: Already on verify email screen');
+        }
+      }
+
+      if (next.requiresPasswordReset) {
+        debugPrint('AuthNavigationNotifier: Password reset required');
+        if (currentRoute != AuthRoutes.confirmPasswordReset) {
+          debugPrint(
+              'AuthNavigationNotifier: Navigating to confirm password reset');
+          navigateToConfirmPasswordReset(next.user?.email ?? '');
+        } else {
+          debugPrint(
+              'AuthNavigationNotifier: Already on confirm password reset screen');
+        }
       }
     });
   }
 
   /// Navigate to confirm password reset screen
   void navigateToConfirmPasswordReset(String email) {
+    debugPrint(
+        'AuthNavigationNotifier: Navigating to confirm password reset with email: $email');
     navigateTo(
       AuthRoutes.confirmPasswordReset,
       arguments: {'email': email},
@@ -76,8 +95,11 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Set navigation error
   void _setNavigationError(String message) {
-    state = state.copyWith(error: message);
-    print('[Navigation Debug] Error: $message');
+    debugPrint('AuthNavigationNotifier: Setting error: $message');
+    // Only set the error if it's different from the current error
+    if (state.error != message) {
+      state = state.copyWith(error: message);
+    }
   }
 
   /// Clear navigation error
@@ -144,14 +166,28 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Request navigation to a specific route (internal use)
   void navigateTo(String route, {Map<String, dynamic>? arguments}) {
-    print(
-        '[Navigation Debug] Requesting navigation to $route with arguments: $arguments');
+    debugPrint(
+        'AuthNavigationNotifier: Requesting navigation to $route with arguments: $arguments');
 
     // Clear any previous errors
     clearError();
 
+    // Special handling for confirm password reset
+    if (route == AuthRoutes.confirmPasswordReset) {
+      debugPrint(
+          'AuthNavigationNotifier: Handling confirm password reset navigation');
+      final email = arguments?['email'] as String?;
+      if (email == null || email.isEmpty) {
+        debugPrint(
+            'AuthNavigationNotifier: No email provided for password reset');
+        // Instead of setting an error, just return without navigation
+        return;
+      }
+    }
+
     // Check if navigation is allowed
     if (!_canNavigate(route)) {
+      debugPrint('AuthNavigationNotifier: Navigation not allowed to $route');
       return;
     }
 
@@ -164,14 +200,19 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         arguments: arguments,
       );
 
+      debugPrint(
+          'AuthNavigationNotifier: Creating navigation request: $request');
       state = state.copyWith(
         currentRequest: request,
         history: [...state.history, request],
+        error: null, // Clear any previous errors
       );
+      debugPrint('AuthNavigationNotifier: New state after navigation: $state');
 
       // Run post-navigation middleware
       _afterNavigation(route);
     } catch (e) {
+      debugPrint('AuthNavigationNotifier: Navigation failed: $e');
       _setNavigationError('Failed to navigate: ${e.toString()}');
       _afterNavigation(route, success: false);
     }

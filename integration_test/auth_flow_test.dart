@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart' hide TextButton;
 import 'package:flutter/material.dart' as material
     show
         TextButton,
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart' as material
         Key,
         TextField,
         TextFormField;
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,8 +28,6 @@ import 'package:soloadventurer/features/profile/domain/usecases/get_current_prof
 import 'package:soloadventurer/features/profile/domain/usecases/update_profile_use_case.dart';
 import 'package:soloadventurer/features/profile/domain/usecases/manage_avatar_use_case.dart';
 import 'package:soloadventurer/features/profile/domain/usecases/delete_profile_use_case.dart';
-import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
-import 'package:soloadventurer/features/profile/domain/entities/profile_state.dart';
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';

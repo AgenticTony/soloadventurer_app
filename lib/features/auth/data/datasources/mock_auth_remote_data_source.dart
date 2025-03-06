@@ -1,6 +1,5 @@
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
-import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
@@ -178,23 +177,14 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
+    // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
+
     // Simulate email validation
     if (!email.contains('@')) {
-      throw Exception('Invalid email format');
+      throw AuthException('Invalid email format');
     }
     // In a real implementation, this would send an email
     debugPrint('Password reset email sent to: $email');
-  }
-
-  @override
-  Future<void> sendPasswordResetSMS(String phoneNumber) async {
-    await Future.delayed(const Duration(seconds: 1));
-    // Simulate phone number validation
-    if (!phoneNumber.startsWith('+')) {
-      throw Exception('Phone number must start with country code (+)');
-    }
-    // In a real implementation, this would send an SMS
-    debugPrint('Password reset SMS sent to: $phoneNumber');
   }
 }

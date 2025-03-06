@@ -4,11 +4,8 @@ import 'package:soloadventurer/features/auth/domain/repositories/auth_repository
 import 'package:soloadventurer/features/auth/domain/usecases/get_current_user.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/is_signed_in.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
-import 'package:soloadventurer/features/auth/domain/usecases/refresh_token.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
-import 'package:soloadventurer/features/profile/domain/usecases/create_profile_use_case.dart';
-import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';

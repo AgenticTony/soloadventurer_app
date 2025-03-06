@@ -141,63 +141,63 @@ lib/
 
 ## Phased Implementation Plan
 
-### 🏗️ Phase 1: Foundation Setup (Weeks 1-2)
+### 🏗️ Phase 1: Foundation Setup (Current Sprint)
 
-**Goal**: Establish core infrastructure without disrupting existing features
+**Goal**: Complete authentication implementation and error handling
 
-#### Dependency Injection Overhaul
+#### Authentication Implementation
 
 ```dart
-// lib/app/di/service_locator.dart
-final getIt = GetIt.instance;
+// lib/features/auth/presentation/providers/auth_provider.dart
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  @override
+  AuthState build() => AuthState.initial();
 
-void init() {
-  // Auth Layer
-  getIt.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
-
-  // API Layer
-  getIt.registerLazySingleton<Dio>(() => CostAwareDio(
-    interceptors: [
-      AuthInterceptor(),
-      RateLimitInterceptor(),
-    ],
-  ));
+  Future<void> signIn(String email, String password) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final result = await _authRepository.signIn(email, password);
+      state = state.copyWith(
+        user: AsyncValue.data(result),
+        status: AuthStatus.authenticated,
+      );
+    } on CognitoException catch (e) {
+      final errorMessage = ref.read(authErrorMapperProvider).mapCognitoError(e);
+      state = state.copyWith(
+        user: AsyncValue.error(e, StackTrace.current),
+        errorMessage: errorMessage,
+        status: AuthStatus.error,
+      );
+    }
+  }
 }
 ```
 
-#### Core API Implementation
-
-```
-lib/core/api/
-├── cost_aware_client.dart     # Budget-enforced client
-├── websocket_service.dart     # Shared WS connection manager
-└── interceptors/
-    ├── auth_interceptor.dart  # JWT injection
-    └── cost_logger.dart       # AWS Cost Explorer integration
-```
-
-#### Error Monitoring Baseline
+#### Error Handling Implementation
 
 ```dart
-// lib/shared/monitoring/error_tracking.dart
-void reportError(dynamic error, StackTrace stack) {
-  // Unified error reporting
-  FirebaseCrashlytics.instance.recordError(error, stack);
-  Sentry.captureException(error, stackTrace: stack);
-  CloudWatch.putMetricData(
-    namespace: 'Errors',
-    metricData: [/*...*/]
-  );
+// lib/features/auth/presentation/providers/error_mapper.dart
+@riverpod
+class AuthErrorMapper extends _$AuthErrorMapper {
+  String mapCognitoError(CognitoException error) {
+    return switch (error.code) {
+      'UserNotFoundException' => 'No account found with this email',
+      'NotAuthorizedException' => 'Incorrect password',
+      'UserNotConfirmedException' => 'Please verify your email first',
+      _ => 'An unexpected error occurred'
+    };
+  }
 }
 ```
 
-**Deliverables**:
+**Current Deliverables**:
 
-- Production-ready DI system
-- Cost-monitored API client
-- Unified error tracking
-- CloudWatch dashboard baseline
-- 20% test coverage for core components
+- Complete error handling implementation
+- Implement token refresh mechanism
+- Add session persistence
+- Achieve 90% test coverage for auth
+- Document error handling patterns
 
 ### 🧩 Phase 2: Feature Modularization (Weeks 3-6)
 
@@ -420,47 +420,44 @@ final env = AppEnvironment(
 
 ## File Movement Reference
 
-| Current Location                                              | New Location                                                      |
-| ------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `lib/shared/api/api_client.dart`                              | `lib/core/api/client/api_client.dart`                             |
-| `lib/shared/errors/exceptions.dart`                           | `lib/core/errors/exceptions.dart`                                 |
-| `lib/shared/errors/failures.dart`                             | `lib/core/errors/failures.dart`                                   |
-| `lib/shared/utils/constants.dart`                             | `lib/core/utils/constants.dart`                                   |
-| `lib/features/auth/data/sources/auth_local_data_source.dart`  | `lib/features/auth/data/datasources/auth_local_data_source.dart`  |
-| `lib/features/auth/data/sources/auth_remote_data_source.dart` | `lib/features/auth/data/datasources/auth_remote_data_source.dart` |
+| Current Location                                              | New Location                                                      | Status |
+| ------------------------------------------------------------- | ----------------------------------------------------------------- | ------ |
+| `lib/shared/api/api_client.dart`                              | `lib/core/api/client/api_client.dart`                             | ✅     |
+| `lib/shared/errors/exceptions.dart`                           | `lib/core/errors/exceptions.dart`                                 | ✅     |
+| `lib/shared/errors/failures.dart`                             | `lib/core/errors/failures.dart`                                   | ✅     |
+| `lib/shared/utils/constants.dart`                             | `lib/core/utils/constants.dart`                                   | ✅     |
+| `lib/features/auth/data/sources/auth_local_data_source.dart`  | `lib/features/auth/data/datasources/auth_local_data_source.dart`  | ✅     |
+| `lib/features/auth/data/sources/auth_remote_data_source.dart` | `lib/features/auth/data/datasources/auth_remote_data_source.dart` | ✅     |
 
 ## Testing Considerations
 
-- Update test file paths to match the new structure
-- Ensure mocks and test utilities are properly organized
-- Create a parallel test directory structure that mirrors the lib directory
-- Implement specific tests for real-time components and cost-aware API client
-- Develop specialized testing utilities for WebSocket and geolocation services
-- Create mock ML models for testing recommendation engine
+Current focus:
+
+1. Complete authentication flow tests
+2. Add comprehensive error scenario tests
+3. Implement integration tests for auth flow
+4. Test token refresh mechanism
+5. Test session persistence
 
 ## Migration Strategy
 
-To minimize disruption, we'll follow these steps:
+Current priorities:
 
-1. Create the new directory structure
-2. Move files one feature at a time, starting with core infrastructure
-3. Update imports and dependencies incrementally
-4. Run tests after each significant move to catch issues early
-5. Create a comprehensive pull request with detailed documentation
-6. Implement feature flags to gradually roll out new architecture components
+1. Complete error handling implementation
+2. Add token refresh mechanism
+3. Implement session persistence
+4. Complete test coverage
+5. Update documentation
 
 ## Success Criteria
 
-The restructuring will be considered successful when:
+Updated criteria for current sprint:
 
-1. All code follows the clean architecture principles
-2. All tests pass with the new structure
-3. The application builds and runs without issues
-4. Code review confirms proper separation of concerns
-5. Documentation is updated to reflect the new structure
-6. Real-time features work correctly
-7. Monitoring infrastructure provides comprehensive insights
-8. API cost optimization is effective
+1. All authentication error scenarios properly handled
+2. Token refresh mechanism working reliably
+3. Session persistence implemented
+4. Test coverage at 90% or higher
+5. Documentation complete and accurate
 
 ## Expected Benefits
 

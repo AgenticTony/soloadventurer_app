@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/auth/presentation/providers/auth_provide
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/signup_screen.dart';
 import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
+import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 /// Login screen for the application
 class LoginScreen extends ConsumerStatefulWidget {
@@ -66,13 +67,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
 
-      await ref.read(authProvider.notifier).signIn(
-            email,
-            password,
-          );
+      try {
+        await ref.read(authProvider.notifier).signIn(
+              email,
+              password,
+            );
 
-      if (mounted) {
-        ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.home);
+        // Only navigate to home if we're still mounted and the login was successful
+        if (mounted) {
+          final authState = ref.read(authProvider);
+          if (authState.isAuthenticated) {
+            ref
+                .read(authNavigationProvider.notifier)
+                .navigateTo(AuthRoutes.home);
+          }
+        }
+      } catch (e) {
+        // Error will be handled by the auth state listener
+        debugPrint('LoginScreen: Login failed: $e');
       }
     }
   }
@@ -82,7 +94,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToForgotPassword() {
-    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.forgotPassword);
+    ref
+        .read(authNavigationProvider.notifier)
+        .navigateTo(AuthRoutes.forgotPassword);
   }
 
   @override

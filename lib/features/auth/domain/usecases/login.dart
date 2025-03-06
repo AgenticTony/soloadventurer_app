@@ -45,8 +45,12 @@ class LoginUseCase {
         params.email,
         params.password,
       );
+    } on AuthException {
+      // Pass through domain exceptions without wrapping
+      rethrow;
     } catch (e) {
-      throw AuthException('Failed to sign in: ${e.toString()}');
+      // Only wrap unknown errors as AuthException
+      throw AuthException(e.toString());
     }
   }
 }

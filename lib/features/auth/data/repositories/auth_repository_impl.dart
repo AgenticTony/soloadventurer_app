@@ -38,6 +38,10 @@ class AuthRepositoryImpl implements AuthRepository {
       await localDataSource.cacheUser(user);
       await securityManager.resetLoginAttempts();
       return user;
+    } on AuthException {
+      // Record the failed attempt but preserve the original error
+      await securityManager.recordFailedLoginAttempt();
+      rethrow;
     } catch (e) {
       await securityManager.recordFailedLoginAttempt();
       throw AuthException('Failed to sign in: ${e.toString()}');
@@ -287,10 +291,5 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return false;
     }
-  }
-
-  @override
-  Future<void> sendPasswordResetSMS(String phoneNumber) async {
-    await remoteDataSource.sendPasswordResetSMS(phoneNumber);
   }
 }

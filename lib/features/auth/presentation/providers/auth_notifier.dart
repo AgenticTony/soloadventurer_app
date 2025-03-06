@@ -81,9 +81,50 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
       if (!mounted) return;
       setAuthenticated(user);
+    } on ValidationException catch (e) {
+      if (!mounted) return;
+      // Handle validation errors from domain layer
+      final firstError = e.errors.values
+          .firstWhere(
+            (errors) => errors.isNotEmpty,
+            orElse: () => ['Please check your input'],
+          )
+          .first;
+      setError(firstError);
+    } on AuthException catch (e) {
+      if (!mounted) return;
+
+      // Convert domain auth errors to user-friendly messages
+      String userMessage;
+      final errorStr = e.message.toLowerCase();
+
+      if (errorStr.contains('usernotfoundexception') ||
+          errorStr.contains('user does not exist') ||
+          errorStr.contains('no account found')) {
+        userMessage = 'No account found with this email';
+      } else if (errorStr.contains('authentication failed') ||
+          errorStr.contains('incorrect username or password') ||
+          errorStr.contains('notauthorizedexception')) {
+        userMessage = 'Wrong password. Please try again.';
+      } else if (errorStr.contains('too many login attempts')) {
+        // Extract minutes from error message if available
+        final minutes = errorStr.contains('try again in')
+            ? errorStr.split('try again in')[1].split('minutes')[0].trim()
+            : '1';
+        userMessage =
+            'Too many attempts. Please wait $minutes minute${minutes == '1' ? '' : 's'} before trying again.';
+      } else if (errorStr.contains('usernotconfirmedexception')) {
+        userMessage = 'Please verify your email before signing in';
+      } else {
+        debugPrint('Auth error: $e');
+        userMessage = 'Unable to sign in. Please try again';
+      }
+
+      setError(userMessage);
     } catch (e) {
       if (!mounted) return;
-      setError(e.toString());
+      debugPrint('Unexpected error during sign in: $e');
+      setError('Something went wrong. Please try again');
     }
   }
 
@@ -154,12 +195,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Initiates password reset process
   Future<void> forgotPassword(ForgotPasswordParams params) async {
+    debugPrint('AuthNotifier: Starting password reset process');
     try {
+      debugPrint('AuthNotifier: Setting loading state');
       state = state.copyWith(isLoading: true);
+
+      debugPrint('AuthNotifier: Calling forgotPassword use case');
       await _forgotPassword(params);
-      state = state.copyWith(isLoading: false);
+
+      debugPrint(
+          'AuthNotifier: Password reset initiated successfully, updating state');
+      state = state.copyWith(
+        isLoading: false,
+        requiresPasswordReset: true,
+        error: null,
+      );
+      debugPrint('AuthNotifier: New state after password reset: $state');
     } catch (e) {
-      state = state.copyWith(isLoading: false);
+      debugPrint('AuthNotifier: Error during password reset: $e');
+      state = state.copyWith(
+        isLoading: false,
+        error: e.toString(),
+      );
       rethrow;
     }
   }

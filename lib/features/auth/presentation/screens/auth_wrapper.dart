@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/navigation_error_handler.dart';
-import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
-import 'package:soloadventurer/features/profile/presentation/screens/edit_profile_screen.dart';
 
 /// A widget that wraps the app and handles authentication state
 class AuthWrapper extends ConsumerStatefulWidget {
@@ -74,6 +72,16 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
             );
           }
 
+          // Handle password reset flow
+          if (authState.requiresPasswordReset) {
+            debugPrint('AuthWrapper: User requires password reset');
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+
           // Show login screen if not authenticated
           if (!authState.isAuthenticated) {
             debugPrint(
@@ -112,7 +120,9 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
               if (authState.isNewUser) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   if (mounted) {
-                    ref.read(authNavigationProvider.notifier).navigateToProfileEdit(isInitialSetup: true);
+                    ref
+                        .read(authNavigationProvider.notifier)
+                        .navigateToProfileEdit(isInitialSetup: true);
                   }
                 });
                 return const Scaffold(

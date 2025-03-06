@@ -62,53 +62,256 @@ Key enhancements:
 
 ### Phase 2: Testing & Architecture Refinement (Current Focus)
 
-#### Riverpod Testing Infrastructure
+#### AWS Cognito Integration
 
-- **Create Provider Test Utilities**
+- **Token Lifecycle Management**
 
   ```dart
-  // test/utils/provider_container.dart
-  ProviderContainer createContainer({
-    List<Override> overrides = const [],
-  }) {
-    final container = ProviderContainer(
-      overrides: overrides,
-    );
-    return container;
+  class TokenManager {
+    final FlutterSecureStorage _storage;
+    final Duration _refreshThreshold;
+
+    Future<void> storeTokens(AuthTokens tokens) async {
+      await _storage.write(key: 'access_token', value: tokens.accessToken);
+      await _storage.write(key: 'refresh_token', value: tokens.refreshToken);
+      _scheduleTokenRefresh();
+    }
+
+    Future<AuthTokens?> getStoredTokens() async {
+      final accessToken = await _storage.read(key: 'access_token');
+      final refreshToken = await _storage.read(key: 'refresh_token');
+      if (accessToken == null || refreshToken == null) return null;
+      return AuthTokens(accessToken, refreshToken);
+    }
   }
   ```
 
-- **Implement Integration Tests for Screens**
+- **Session Management**
 
   ```dart
-  // test/features/auth/presentation/screens/login_screen_test.dart
-  testWidgets('LoginScreen should show error on failed login', (tester) async {
-    // Arrange
-    final mockAuthRepository = MockAuthRepository();
-    when(mockAuthRepository.signInWithEmailAndPassword(
-      email: 'test@example.com',
-      password: 'password',
-    )).thenThrow(Exception('Invalid credentials'));
+  @riverpod
+  class SessionController extends _$SessionController {
+    Timer? _refreshTimer;
 
-    await tester.pumpWidget(
-      ProviderScope(
+    @override
+    AsyncValue<SessionState> build() {
+      ref.onDispose(() {
+        _refreshTimer?.cancel();
+      });
+      return const AsyncValue.data(SessionState.initial());
+    }
+
+    Future<void> initialize() async {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final tokens = await _tokenManager.getStoredTokens();
+        if (tokens != null) {
+          await _validateAndRefreshTokens(tokens);
+          return SessionState.authenticated;
+        }
+        return SessionState.unauthenticated;
+      });
+    }
+  }
+  ```
+
+- **Error Handling**
+
+  ```dart
+  sealed class AuthError {
+    final String message;
+    final String code;
+  }
+
+  class UserNotFoundError extends AuthError {
+    UserNotFoundError() : super(
+      message: 'No account found with this email',
+      code: 'USER_NOT_FOUND',
+    );
+  }
+
+  @riverpod
+  class ErrorHandler extends _$ErrorHandler {
+    @override
+    void build() {
+      ref.listen(authStateProvider, (previous, next) {
+        next.whenOrNull(
+          error: (error, stack) => _handleError(error, stack),
+        );
+      });
+    }
+  }
+  ```
+
+#### Riverpod State Management
+
+- **Authentication State**
+
+  ```dart
+  @riverpod
+  class AuthController extends _$AuthController {
+    @override
+    AsyncValue<AuthState> build() => const AsyncValue.data(AuthState.initial());
+
+    Future<void> signIn(String email, String password) async {
+      state = const AsyncValue.loading();
+      state = await AsyncValue.guard(() async {
+        final result = await _authRepository.signIn(email, password);
+        await _tokenManager.storeTokens(result.tokens);
+        return AuthState.authenticated(result.user);
+      });
+    }
+  }
+  ```
+
+- **Loading States**
+
+  ```dart
+  sealed class LoadingState {
+    const LoadingState();
+  }
+
+  class InitialLoading extends LoadingState {
+    const InitialLoading();
+  }
+
+  class ContentLoading extends LoadingState {
+    final AuthState currentState;
+    const ContentLoading(this.currentState);
+  }
+  ```
+
+- **Error States**
+
+  ```dart
+  @riverpod
+  class AuthError extends _$AuthError {
+    @override
+    AsyncValue<void> build() => const AsyncValue.data(null);
+
+    void handleError(Object error, StackTrace stackTrace) {
+      state = AsyncValue.error(error, stackTrace);
+    }
+
+    void clearError() {
+      state = const AsyncValue.data(null);
+    }
+  }
+  ```
+
+#### Testing Infrastructure
+
+- **Provider Testing**
+
+  ```dart
+  void main() {
+    late ProviderContainer container;
+
+    setUp(() {
+      container = ProviderContainer(
         overrides: [
-          authRepositoryProvider.overrideWithValue(mockAuthRepository),
+          authRepositoryProvider.overrideWithValue(MockAuthRepository()),
         ],
-        child: const MaterialApp(
-          home: LoginScreen(),
+      );
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('AuthController sign in success', () async {
+      final controller = container.read(authControllerProvider.notifier);
+      await controller.signIn('test@example.com', 'password');
+
+      expect(
+        container.read(authControllerProvider),
+        isA<AsyncData<AuthState>>(),
+      );
+    });
+  }
+  ```
+
+- **Integration Testing**
+
+  ```dart
+  void main() {
+    testWidgets('Full authentication flow', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: LoginScreen(),
+          ),
         ),
-      ),
+      );
+
+      // Test the complete authentication flow
+      await tester.enterText(
+        find.byKey(const Key('email_field')),
+        'test@example.com',
+      );
+      await tester.enterText(
+        find.byKey(const Key('password_field')),
+        'password',
+      );
+
+      await tester.tap(find.byKey(const Key('login_button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomeScreen), findsOneWidget);
+    });
+  }
+  ```
+
+- **Error Testing**
+
+  ```dart
+  test('AuthController handles network error', () async {
+    final container = ProviderContainer(
+      overrides: [
+        authRepositoryProvider.overrideWithValue(
+          MockAuthRepository()..throwsNetworkError(),
+        ),
+      ],
     );
 
-    // Act & Assert
-    // ...
+    final controller = container.read(authControllerProvider.notifier);
+    await controller.signIn('test@example.com', 'password');
+
+    expect(
+      container.read(authControllerProvider),
+      isA<AsyncError>(),
+    );
   });
   ```
 
-- **Document Provider Patterns and Testing Approach**
-  - Create comprehensive documentation for Riverpod testing strategy
-  - Establish best practices for provider implementation and testing
+#### Documentation Strategy
+
+1. **Architecture Documentation**
+
+   - Clean Architecture principles
+   - AWS Cognito integration
+   - Riverpod state management
+   - Error handling patterns
+
+2. **Testing Documentation**
+
+   - Provider testing patterns
+   - Integration testing approach
+   - Error testing strategies
+   - Mock implementation guidelines
+
+3. **State Management Documentation**
+
+   - Riverpod patterns
+   - AsyncValue usage
+   - Error handling
+   - State persistence
+
+4. **Security Documentation**
+   - Token management
+   - Session handling
+   - Error message security
+   - Rate limiting implementation
 
 #### Project Restructuring
 
