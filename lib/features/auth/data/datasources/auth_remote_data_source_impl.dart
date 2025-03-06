@@ -3,6 +3,7 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
+import 'package:soloadventurer/features/auth/domain/entities/auth_session.dart';
 
 /// Implementation of [AuthRemoteDataSource] using AWS Cognito
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -253,13 +254,24 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthSession> refreshToken() async {
     try {
+      debugPrint('Attempting to refresh token');
       await _ensureValidSession();
+
+      final token = await _getToken(ACCESS_TOKEN);
+      if (token == null || token.isEmpty) {
+        throw const AuthException('Failed to refresh token: No token available',
+            code: 'TOKEN_REFRESH_FAILED');
+      }
+
+      debugPrint('Token refreshed successfully');
       return AuthSession(
-        accessToken: await _getToken(ACCESS_TOKEN) ?? '',
+        accessToken: token,
         userId: _getUserId(),
       );
     } catch (e) {
-      throw AuthException('Failed to refresh token: $e');
+      debugPrint('Token refresh failed: $e');
+      throw AuthException('Failed to refresh token: $e',
+          code: 'TOKEN_REFRESH_FAILED');
     }
   }
 

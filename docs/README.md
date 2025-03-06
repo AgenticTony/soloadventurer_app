@@ -1,47 +1,55 @@
 # SoloAdventurer Documentation
 
-This directory contains comprehensive documentation for the SoloAdventurer project.
+## Project Documentation
 
-## Core Documentation
+- [Project Plan](PROJECT_PLAN.md)
+- [Project Plan 2](PROJECT_PLAN2.md)
+- [Project Roadmap](PROJECT_ROADMAP.md)
+- [Project Restructuring](PROJECT_RESTRUCTURING.md)
+- [Restructuring Progress](RESTRUCTURING_PROGRESS.md)
+- [Sprint Plan Phase 1](SPRINT_PLAN_PHASE1.md)
 
-- [Project Plan](./PROJECT_PLAN2.md) - Current project plan and objectives
-- [Project Roadmap](./PROJECT_ROADMAP.md) - Detailed development timeline and milestones
-- [Architecture](./ARCHITECTURE.md) - Core architecture documentation
-- [Architecture Evolution](./ARCHITECTURE_EVOLUTION.md) - Planned architectural changes
+## Architecture Documentation
 
-## Implementation Guides
+- [Architecture](ARCHITECTURE.md)
+- [Architecture Evolution](ARCHITECTURE_EVOLUTION.md)
+- [Auth Architecture](AUTH_ARCHITECTURE.md)
 
-- [Project Restructuring](./PROJECT_RESTRUCTURING.md) - Clean architecture implementation plan
-- [Auth Architecture](./AUTH_ARCHITECTURE.md) - Authentication implementation details
-- [Riverpod Patterns](./RIVERPOD_PATTERNS.md) - State management patterns and best practices
-- [Riverpod Testing](./RIVERPOD_TESTING.md) - Testing strategies for Riverpod
-- [Testing Patterns](./TESTING_PATTERNS.md) - General testing guidelines
-- [Sample Feature](./SAMPLE_FEATURE.md) - Example feature implementation
+## Development Documentation
+
+- [Feature Development](FEATURE_DEVELOPMENT.md)
+- [Sample Feature](SAMPLE_FEATURE.md)
+- [Travel Preferences Implementation](TRAVEL_PREFERENCES_IMPLEMENTATION.md)
+
+## Testing Documentation
+
+- [Testing Patterns](TESTING_PATTERNS.md)
+- [Riverpod Testing](RIVERPOD_TESTING.md)
+
+## State Management
+
+- [Riverpod Patterns](RIVERPOD_PATTERNS.md)
+- [Riverpod Strategy](riverpod_strategy.md)
+
+## Infrastructure
+
+- [Monitoring Strategy](monitoring_strategy.md)
+- [Cost Optimization](COST_OPTIMIZATION.md)
+
+## AI/ML
+
+- [AI/ML Strategy](AI_ML_STRATEGY.md)
+
+## Migration
+
+- [Migration Plan](MIGRATION_PLAN.md)
+- [Migration Checklist](MIGRATION_CHECKLIST.md)
 
 ## Progress Tracking
 
-- [Sprint Plan Phase 1](./SPRINT_PLAN_PHASE1.md) - Current sprint details
-- [Restructuring Progress](./RESTRUCTURING_PROGRESS.md) - Progress on architecture implementation
-- [Daily Progress](./DAILY_PROGRESS.md) - Daily progress log
-- [Tomorrow's Plan](./TOMORROWS_PLAN.md) - Next day's tasks and goals
-- [End of Day Checklist](./END_OF_DAY_CHECKLIST.md) - Daily progress tracking checklist
-
-## Feature Documentation
-
-- [Travel Preferences Implementation](./TRAVEL_PREFERENCES_IMPLEMENTATION.md) - Travel preferences feature
-- [AI/ML Strategy](./AI_ML_STRATEGY.md) - Machine learning implementation details
-
-## Infrastructure & Operations
-
-- [Cost Optimization](./COST_OPTIMIZATION.md) - AWS cost optimization strategy
-- [Monitoring Strategy](./monitoring_strategy.md) - Application monitoring approach
-- [Migration Plan](./MIGRATION_PLAN.md) - Data migration strategy
-- [Migration Checklist](./MIGRATION_CHECKLIST.md) - Migration process checklist
-
-## Development Guidelines
-
-- [Feature Development](./FEATURE_DEVELOPMENT.md) - Feature development workflow
-- [Riverpod Strategy](./riverpod_strategy.md) - Riverpod implementation strategy
+- [Daily Progress](DAILY_PROGRESS.md)
+- [End of Day Checklist](END_OF_DAY_CHECKLIST.md)
+- [Tomorrow's Plan](TOMORROWS_PLAN.md)
 
 ## Document Status
 

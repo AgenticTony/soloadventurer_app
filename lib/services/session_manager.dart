@@ -121,16 +121,33 @@ class SessionManager {
   /// Checks if a user is currently authenticated.
   bool get isAuthenticated => _authService.isAuthenticated;
 
+  /// Updates the session state based on refresh result
   void _updateSession(bool result) {
-    // Implementation of _updateSession method
+    if (!result) {
+      _clearSession();
+    }
   }
 
+  /// Clears the current session
   void _clearSession() {
-    // Implementation of _clearSession method
+    _cancelTokenRefresh();
+    _authService.signOut();
   }
 
+  /// Checks if the token should be refreshed
   bool _shouldRefreshToken() {
-    // Implementation of _shouldRefreshToken method
-    return false; // Placeholder return, actual implementation needed
+    if (!_authService.isAuthenticated) {
+      return false;
+    }
+
+    // Check if we have a token
+    final token = _authService.token;
+    if (token == null || token.isEmpty) {
+      return false;
+    }
+
+    // In a real implementation, you would check the token expiration
+    // For now, we'll return true to always refresh
+    return true;
   }
 }

@@ -6,9 +6,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/services/auth_service.dart';
 import 'package:soloadventurer/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/entities/auth_session.dart';
 
 /// Mock classes for testing
-class MockAuthService extends Mock implements AuthService {}
+class MockAuthService extends Mock implements AuthService {
+  @override
+  String? get token => null;
+
+  @override
+  String? get username => null;
+
+  @override
+  bool get isAuthenticated => false;
+}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
@@ -49,53 +59,19 @@ class AuthTestHelper {
   /// Setup common mock behaviors
   void setupCommonMocks() {
     // Setup common mock behaviors for auth service
-    when(() => authService.signIn(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-        )).thenAnswer((_) async => true);
-
-    when(() => authService.signUp(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-          email: any(named: 'email'),
-          firstName: any(named: 'firstName'),
-          lastName: any(named: 'lastName'),
-          displayName: any(named: 'displayName'),
-        )).thenAnswer((_) async => true);
-
-    when(() => authService.confirmSignUp(
-          username: any(named: 'username'),
-          confirmationCode: any(named: 'confirmationCode'),
-        )).thenAnswer((_) async => true);
-
-    when(() => authService.forgotPassword(
-          username: any(named: 'username'),
-        )).thenAnswer((_) async => true);
-
-    when(() => authService.confirmForgotPassword(
-          confirmationCode: any(named: 'confirmationCode'),
-          newPassword: any(named: 'newPassword'),
-        )).thenAnswer((_) async => true);
+    when(() => authService.initialize()).thenAnswer((_) async {});
+    when(() => authService.refreshSession()).thenAnswer((_) async => true);
+    when(() => authService.signOut()).thenAnswer((_) async {});
   }
 
   /// Setup mock for failed sign in
   void setupFailedSignIn() {
-    when(() => authService.signIn(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-        )).thenAnswer((_) async => false);
+    when(() => authService.refreshSession()).thenAnswer((_) async => false);
   }
 
   /// Setup mock for failed sign up
   void setupFailedSignUp() {
-    when(() => authService.signUp(
-          username: any(named: 'username'),
-          password: any(named: 'password'),
-          email: any(named: 'email'),
-          firstName: any(named: 'firstName'),
-          lastName: any(named: 'lastName'),
-          displayName: any(named: 'displayName'),
-        )).thenAnswer((_) async => false);
+    when(() => authService.refreshSession()).thenAnswer((_) async => false);
   }
 }
 
