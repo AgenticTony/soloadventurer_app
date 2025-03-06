@@ -4,14 +4,14 @@ This document serves as the central reference for the SoloAdventurer development
 
 ## Quick Reference
 
-| Document                                               | Purpose                                | Key Sections                                                  |
-| ------------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------- |
-| [PROJECT_PLAN2.md](PROJECT_PLAN2.md)                   | Overall project vision and tech stack  | Tech Stack, Backend Infrastructure, Frontend Framework        |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                     | Current architecture documentation     | Architectural Principles, Project Structure, Testing Strategy |
-| [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) | Future architecture plans              | Phased Implementation, Target Architecture                    |
-| [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md)   | Clean architecture implementation plan | Phased Implementation Plan, Expected Benefits                 |
-| [RIVERPOD_TESTING.md](RIVERPOD_TESTING.md)             | State management testing strategy      | Testing Principles, Provider Testing Strategies               |
-| [MONITORING_STRATEGY.md](monitoring_strategy.md)       | Application monitoring approach        | Monitoring Goals, Implementation Plan                         |
+| Document                                                 | Purpose                                | Key Sections                                                  |
+| -------------------------------------------------------- | -------------------------------------- | ------------------------------------------------------------- |
+| [PROJECT_PLAN2.md](./PROJECT_PLAN2.md)                   | Overall project vision and tech stack  | Tech Stack, Backend Infrastructure, Frontend Framework        |
+| [ARCHITECTURE.md](./ARCHITECTURE.md)                     | Current architecture documentation     | Architectural Principles, Project Structure, Testing Strategy |
+| [ARCHITECTURE_EVOLUTION.md](./ARCHITECTURE_EVOLUTION.md) | Future architecture plans              | Phased Implementation, Target Architecture                    |
+| [PROJECT_RESTRUCTURING.md](./PROJECT_RESTRUCTURING.md)   | Clean architecture implementation plan | Phased Implementation Plan, Expected Benefits                 |
+| [RIVERPOD_TESTING.md](./RIVERPOD_TESTING.md)             | State management testing strategy      | Testing Principles, Provider Testing Strategies               |
+| [MONITORING_STRATEGY.md](./monitoring_strategy.md)       | Application monitoring approach        | Monitoring Goals, Implementation Plan                         |
 
 ## Current Phase: Authentication & Error Handling
 
@@ -219,8 +219,8 @@ This document serves as the central reference for the SoloAdventurer development
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 1: Foundation Setup
-- [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) - Phase 2: Testing & Architecture Refinement
+- [PROJECT_RESTRUCTURING.md](./PROJECT_RESTRUCTURING.md) - Phase 1: Foundation Setup
+- [ARCHITECTURE_EVOLUTION.md](./ARCHITECTURE_EVOLUTION.md) - Phase 2: Testing & Architecture Refinement
 
 **Key Deliverables**:
 
@@ -248,8 +248,8 @@ This document serves as the central reference for the SoloAdventurer development
 
 **Reference Documents**:
 
-- [RIVERPOD_TESTING.md](RIVERPOD_TESTING.md) - Testing Principles
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Project Structure
+- [RIVERPOD_TESTING.md](./RIVERPOD_TESTING.md) - Testing Principles
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Project Structure
 
 **Key Deliverables**:
 
@@ -275,8 +275,8 @@ This document serves as the central reference for the SoloAdventurer development
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 2: Feature Modularization
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Authentication Layer
+- [PROJECT_RESTRUCTURING.md](./PROJECT_RESTRUCTURING.md) - Phase 2: Feature Modularization
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Authentication Layer
 
 **Key Deliverables**:
 
@@ -300,7 +300,7 @@ This document serves as the central reference for the SoloAdventurer development
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Design System Implementation
+- [PROJECT_RESTRUCTURING.md](./PROJECT_RESTRUCTURING.md) - Design System Implementation
 
 **Key Deliverables**:
 
@@ -324,8 +324,8 @@ This document serves as the central reference for the SoloAdventurer development
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Feature Toggle System
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Feature Structure
+- [PROJECT_RESTRUCTURING.md](./PROJECT_RESTRUCTURING.md) - Feature Toggle System
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Feature Structure
 
 **Key Deliverables**:
 
@@ -351,8 +351,8 @@ This document serves as the central reference for the SoloAdventurer development
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 3: Real-Time Infrastructure
-- [MONITORING_STRATEGY.md](MONITORING_STRATEGY.md) - Performance Monitoring
+- [PROJECT_RESTRUCTURING.md](./PROJECT_RESTRUCTURING.md) - Phase 3: Real-Time Infrastructure
+- [MONITORING_STRATEGY.md](./monitoring_strategy.md) - Performance Monitoring
 
 **Key Deliverables**:
 
