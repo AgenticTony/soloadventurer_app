@@ -28,18 +28,61 @@ class AuthController extends _$AuthController {
 @riverpod
 class TokenManager extends _$TokenManager {
   static const _tokenRefreshThreshold = Duration(minutes: 45);
+  static const _minTokenValidity = Duration(minutes: 5);
 
-  Future<void> storeTokens(AuthTokens tokens) async {
-    await _secureStorage.write(key: 'access_token', value: tokens.accessToken);
-    await _secureStorage.write(key: 'refresh_token', value: tokens.refreshToken);
+  @override
+  FeatureAvailability build() {
+    // Initialize with unauthorized state
+    print('TokenManager: Initializing with unauthorized state');
+    return FeatureAvailability.unauthorized;
+  }
+
+  Future<void> initialize() async {
+    print('TokenManager: Starting initialization');
+    final newState = await _calculateCurrentState();
+    state = newState;
+    print('TokenManager: Initialized with state: $newState');
     _scheduleTokenRefresh();
   }
 
-  void _scheduleTokenRefresh() {
-    _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(_tokenRefreshThreshold, (_) {
-      _refreshTokenIfNeeded();
-    });
+  Future<FeatureAvailability> _calculateCurrentState() async {
+    print('TokenManager: Calculating current state');
+    print('TokenManager: Online status: ${_connectivityService.isOnline}');
+
+    final tokens = await _secureStorage.getStoredTokens();
+    final hasValidTokens = tokens != null && await _validateTokens(tokens);
+
+    print('TokenManager: Has valid tokens: $hasValidTokens');
+
+    if (!_connectivityService.isOnline) {
+      return hasValidTokens
+          ? FeatureAvailability.offlineWithCache
+          : FeatureAvailability.unauthorized;
+    }
+
+    return hasValidTokens
+        ? FeatureAvailability.fullyAvailable
+        : FeatureAvailability.unauthorized;
+  }
+
+  void _handleConnectivityChange(bool isOnline) async {
+    print('TokenManager: Connectivity changed - Online: $isOnline');
+    final newState = await _calculateCurrentState();
+    print('TokenManager: New state after connectivity change: $newState');
+
+    if (newState != state) {
+      state = newState;
+      if (isOnline && newState == FeatureAvailability.fullyAvailable) {
+        _scheduleTokenRefresh();
+      }
+    }
+  }
+
+  Future<bool> _validateTokens(AuthTokens tokens) async {
+    final jwt = JWT.decode(tokens.accessToken);
+    final expiryTime = DateTime.fromMillisecondsSinceEpoch(jwt.expiryTime * 1000);
+    final now = DateTime.now();
+    return now.isBefore(expiryTime.subtract(_minTokenValidity));
   }
 }
 ```

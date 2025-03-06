@@ -67,4 +67,8 @@ abstract class AuthRepository {
 
   /// Refresh the authentication token
   Future<bool> refreshToken();
+
+  /// Register a new user with email and password
+  Future<User> registerWithEmailAndPassword(
+      String email, String password, String username);
 }

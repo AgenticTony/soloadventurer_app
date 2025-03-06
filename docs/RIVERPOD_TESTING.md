@@ -195,6 +195,77 @@ test('notifications provider should emit notifications', () async {
 });
 ```
 
+### Provider Initialization in Integration Tests
+
+When testing providers that have complex initialization requirements or dependencies, follow these guidelines:
+
+```dart
+void main() {
+  late ProviderContainer container;
+
+  setUp(() async {
+    // Initialize all required providers before accessing any state
+    container = ProviderContainer(
+      overrides: [
+        // Override dependencies with mocks
+        connectivityServiceProvider.overrideWithValue(mockConnectivityService),
+        secureStorageProvider.overrideWithValue(mockSecureStorage),
+      ],
+    );
+
+    // Important: Initialize providers in the correct order
+    await container.read(tokenManagerProvider.notifier).initialize();
+    await container.read(sessionManagerProvider.notifier).initialize();
+
+    // Listen to state changes after initialization
+    final listener = container.listen(
+      tokenManagerProvider,
+      (previous, next) {
+        print('TokenManager state changed: $previous -> $next');
+      },
+    );
+  });
+
+  test('should handle state transitions correctly', () async {
+    // Arrange - ensure provider is initialized
+    expect(container.read(tokenManagerProvider), isNotNull);
+
+    // Act - trigger state change
+    mockConnectivityService.setOnline(false);
+
+    // Wait for state updates to propagate
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    // Assert - verify state transition
+    expect(
+      container.read(tokenManagerProvider),
+      FeatureAvailability.offlineWithCache,
+    );
+  });
+}
+```
+
+### Common Provider Initialization Issues
+
+1. **Circular Dependencies**
+
+   - Problem: Providers depending on each other's state during initialization
+   - Solution: Initialize providers in the correct order and use `AsyncValue` for loading states
+
+2. **Uninitialized Provider Access**
+
+   - Problem: Accessing provider state before initialization is complete
+   - Solution: Ensure all required providers are initialized in `setUp`
+
+3. **State Transition Timing**
+
+   - Problem: Tests failing due to state changes not being detected
+   - Solution: Add appropriate delays and use `container.listen` to track changes
+
+4. **Mock Synchronization**
+   - Problem: Mocked services not updating provider state
+   - Solution: Ensure mocks properly notify dependents of state changes
+
 ## Mock Repositories and Services
 
 We've created mock implementations of our repositories and services to make testing easier:

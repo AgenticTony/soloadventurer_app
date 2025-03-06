@@ -8,11 +8,13 @@ part 'connectivity_service_impl.g.dart';
 class ConnectivityServiceImpl implements ConnectivityService {
   final Connectivity _connectivity;
   final _statusController = StreamController<NetworkStatus>.broadcast();
+  NetworkStatus _lastKnownStatus = NetworkStatus.disconnected;
 
   ConnectivityServiceImpl({Connectivity? connectivity})
       : _connectivity = connectivity ?? Connectivity() {
     // Initialize stream with current status
     checkConnectivity().then((status) {
+      _lastKnownStatus = status;
       _statusController.add(status);
     });
 
@@ -22,6 +24,7 @@ class ConnectivityServiceImpl implements ConnectivityService {
       final status = results.isEmpty
           ? NetworkStatus.disconnected
           : _mapConnectivityResult(results.first);
+      _lastKnownStatus = status;
       _statusController.add(status);
     });
   }
@@ -32,9 +35,11 @@ class ConnectivityServiceImpl implements ConnectivityService {
   @override
   Future<NetworkStatus> checkConnectivity() async {
     final results = await _connectivity.checkConnectivity();
-    return results.isEmpty
+    final status = results.isEmpty
         ? NetworkStatus.disconnected
         : _mapConnectivityResult(results.first);
+    _lastKnownStatus = status;
+    return status;
   }
 
   @override
@@ -42,6 +47,9 @@ class ConnectivityServiceImpl implements ConnectivityService {
     final status = await checkConnectivity();
     return status == NetworkStatus.connected;
   }
+
+  @override
+  bool get hasConnectivitySync => _lastKnownStatus == NetworkStatus.connected;
 
   @override
   void dispose() {

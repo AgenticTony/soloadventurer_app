@@ -67,52 +67,75 @@
   - [x] Offline state detection
   - [x] Operation queueing
 
-#### B. Integration Tests (Priority)
+#### B. Integration Tests (High Priority)
 
-- [ ] Test complete authentication flow
-- [ ] Test error recovery scenarios
-- [ ] Test token refresh mechanisms
-- [ ] Test session persistence
-- [ ] Test offline synchronization
+- [ ] Fix provider initialization issues
+  - [ ] Review Riverpod provider initialization patterns
+  - [ ] Resolve circular dependency in state initialization
+  - [ ] Implement proper provider setup in tests
+- [ ] Fix state transition issues
+  - [ ] Ensure proper state propagation
+  - [ ] Handle connectivity changes correctly
+  - [ ] Add timeout handling for state transitions
+- [ ] Complete test scenarios
+  - [ ] Token refresh with exponential backoff
+  - [ ] Session persistence across restarts
+  - [ ] Offline synchronization
+  - [ ] Error recovery mechanisms
 
-### 3. Documentation
+### 3. Documentation (Medium Priority)
 
 #### A. Technical Documentation
 
-- [ ] Update error handling documentation with new error codes
-- [x] Document token refresh implementation
-- [x] Add session management details
-- [ ] Update test coverage reports
-- [x] Document offline support implementation
-  - [x] Token caching strategy
-  - [x] Offline detection mechanism
-  - [x] Operation queueing system
+- [ ] Document TokenManager implementation details
+  - [ ] State transition logic
+  - [ ] Error handling approach
+  - [ ] AWS Cognito compliance
+- [ ] Update test documentation
+  - [ ] Integration test setup
+  - [ ] Test scenarios
+  - [ ] Common issues and solutions
+- [ ] Update architecture documentation
+  - [ ] Token management flow
+  - [ ] State management patterns
+  - [ ] Error handling patterns
 
 #### B. Documentation Validation
 
-- [ ] Fix broken links in PROJECT_ROADMAP.md
-- [ ] Fix broken links in README.md
-- [ ] Update git hooks for documentation validation
+- [ ] Review and update all documentation
+- [ ] Ensure consistency across documents
+- [ ] Update test coverage reports
+- [ ] Validate documentation links
 
 ## Success Criteria
 
 1. ✅ All authentication error scenarios properly handled
 2. ✅ Token refresh mechanism working reliably
 3. ✅ Session recovery implemented with exponential backoff
-4. 🔄 Test coverage at 90% or higher (Unit tests complete, integration tests pending)
-5. ⏳ Documentation complete and accurate
+4. 🔄 Integration tests passing and reliable
+5. 📝 Documentation complete and accurate
 
 ## Next Steps
 
-1. ✅ TokenManager implementation
-2. ✅ Session recovery mechanisms
-3. ✅ Complete offline support
-   - ✅ Secure token caching
-   - ✅ Implement connectivity abstraction
-   - ✅ Implement offline operation queue
-4. ✅ Add unit tests for token management
-5. 📝 Complete integration tests
-6. 📝 Update documentation with token management details
+1. 🔄 Fix provider initialization issues
+2. 🔄 Resolve state transition problems
+3. 🔄 Complete integration tests
+4. 📝 Update documentation
+5. ✅ Review and validate implementation
+
+## Notes
+
+1. Focus on fixing test infrastructure before adding more tests
+2. Consider alternative approaches to state initialization
+3. Document any workarounds or solutions found
+4. Keep AWS Cognito compliance as top priority
+5. Maintain high test coverage throughout changes
+
+## Known Issues
+
+1. Provider initialization causing test failures
+2. State transitions not working reliably in tests
+3. Documentation needs updating with latest changes
 
 ## Reference Materials
 
@@ -120,22 +143,3 @@
 - `test/features/auth/` - Authentication tests
 - `docs/ARCHITECTURE.md` - Clean architecture documentation
 - `docs/RIVERPOD_PATTERNS.md` - State management patterns
-
-## Notes
-
-1. ✅ Error handling implementation complete
-2. ✅ Token management implementation complete
-3. ✅ Session recovery implementation complete
-4. ✅ Connectivity abstraction implemented
-5. 🔄 Integration tests needed
-   - 📝 Plan test scenarios
-   - 📝 Implement test infrastructure
-   - 📝 Write integration tests
-6. 📝 Documentation needs updating
-7. 🧪 Maintain test coverage throughout
-
-## Known Issues
-
-1. ✅ Connectivity detection issue resolved with abstraction layer
-2. 📝 Integration tests pending implementation
-3. 📝 Documentation needs updating with latest changes

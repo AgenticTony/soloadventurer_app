@@ -3,6 +3,7 @@ import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
 /// Mock implementation of [AuthRemoteDataSource] for testing
 class MockAuthRemoteDataSource implements AuthRemoteDataSource {
@@ -122,12 +123,27 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> refreshToken() async {
+  Future<AuthSession> refreshToken() async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
     if (!_isAuthenticated) {
       throw AuthException('Not authenticated');
     }
+
     await Future.delayed(const Duration(seconds: 1));
-    // Mock token refresh - in a real implementation this would refresh the token
+
+    // Return a new mock session with refreshed tokens
+    return AuthSession(
+      accessToken:
+          'refreshed_access_token_${DateTime.now().millisecondsSinceEpoch}',
+      idToken: 'refreshed_id_token_${DateTime.now().millisecondsSinceEpoch}',
+      refreshToken:
+          'refreshed_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+      expiresAt: DateTime.now().add(const Duration(hours: 1)),
+    );
   }
 
   @override

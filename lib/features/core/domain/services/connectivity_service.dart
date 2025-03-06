@@ -22,6 +22,9 @@ abstract class ConnectivityService {
   /// Whether the device currently has connectivity
   Future<bool> get hasConnectivity;
 
+  /// Whether the device currently has connectivity (synchronous)
+  bool get hasConnectivitySync;
+
   /// Dispose any resources
   void dispose();
 }

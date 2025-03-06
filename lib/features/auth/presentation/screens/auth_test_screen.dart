@@ -13,7 +13,9 @@ class AuthTestScreen extends ConsumerStatefulWidget {
 
 class _AuthTestScreenState extends ConsumerState<AuthTestScreen> {
   String _status = 'Not authenticated';
-  final AuthRemoteDataSourceImpl _authDataSource = AuthRemoteDataSourceImpl();
+  final AuthRemoteDataSourceImpl _authDataSource = AuthRemoteDataSourceImpl(
+    userPool: CognitoConfig.userPool,
+  );
 
   Future<void> _signIn() async {
     try {
@@ -62,9 +64,9 @@ class _AuthTestScreenState extends ConsumerState<AuthTestScreen> {
       setState(() => _status = 'Registering...');
 
       final (user, token) = await _authDataSource.register(
-        'test@example.com', // Replace with your test email
-        'Test123!', // Replace with your test password
-        'Test User', // Replace with your test name
+        email: 'test@example.com', // Replace with your test email
+        password: 'Test123!', // Replace with your test password
+        name: 'Test User', // Replace with your test name
       );
 
       setState(() => _status = 'Registered as ${user.email}');

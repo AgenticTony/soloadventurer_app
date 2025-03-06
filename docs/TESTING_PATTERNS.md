@@ -190,6 +190,106 @@ test('filtered trips provider should filter trips', () {
 
 ## Integration Testing Patterns
 
+### Testing Complex Provider Initialization
+
+When testing providers with complex initialization requirements and state transitions, follow these patterns:
+
+```dart
+void main() {
+  late ProviderContainer container;
+  late MockConnectivityService mockConnectivityService;
+  late MockSecureStorage mockSecureStorage;
+
+  setUp(() async {
+    // Reset all mocks before each test
+    mockConnectivityService = MockConnectivityService();
+    mockSecureStorage = MockSecureStorage();
+
+    // Create container with all required overrides
+    container = ProviderContainer(
+      overrides: [
+        connectivityServiceProvider.overrideWithValue(mockConnectivityService),
+        secureStorageProvider.overrideWithValue(mockSecureStorage),
+      ],
+    );
+
+    // Add debug listeners for state changes
+    container.listen<FeatureAvailability>(
+      tokenManagerProvider,
+      (previous, next) {
+        print('TokenManager state changed: $previous -> $next');
+      },
+    );
+
+    // Initialize providers in the correct order
+    await container.read(tokenManagerProvider.notifier).initialize();
+    await container.read(sessionManagerProvider.notifier).initialize();
+  });
+
+  tearDown(() {
+    container.dispose();
+  });
+
+  group('TokenManager Integration Tests', () {
+    test('should handle offline transition with valid tokens', () async {
+      // Arrange
+      await mockSecureStorage.storeValidTokens();
+      mockConnectivityService.setOnline(true);
+
+      // Wait for initial state to stabilize
+      await Future.delayed(const Duration(milliseconds: 50));
+      expect(container.read(tokenManagerProvider), FeatureAvailability.fullyAvailable);
+
+      // Act
+      mockConnectivityService.setOnline(false);
+
+      // Wait for state transition
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      // Assert
+      expect(container.read(tokenManagerProvider), FeatureAvailability.offlineWithCache);
+    });
+
+    test('should handle token expiration', () async {
+      // Arrange
+      await mockSecureStorage.storeExpiredTokens();
+      mockConnectivityService.setOnline(true);
+
+      // Act - initialize with expired tokens
+      await container.read(tokenManagerProvider.notifier).initialize();
+
+      // Assert
+      expect(container.read(tokenManagerProvider), FeatureAvailability.unauthorized);
+    });
+  });
+}
+```
+
+### Best Practices for Integration Testing
+
+1. **Provider Initialization Order**
+
+   - Initialize providers in the correct dependency order
+   - Use `setUp` to ensure consistent initialization
+   - Add debug listeners to track state changes
+
+2. **State Transition Testing**
+
+   - Add appropriate delays after state changes
+   - Use debug prints to track state transitions
+   - Verify intermediate states when needed
+
+3. **Mock Service Synchronization**
+
+   - Ensure mocks properly notify dependents
+   - Use consistent timing for state updates
+   - Add debug prints in mock implementations
+
+4. **Error Handling**
+   - Test error recovery scenarios
+   - Verify error state propagation
+   - Test timeout and retry mechanisms
+
 ### Testing Provider Chains
 
 ```dart

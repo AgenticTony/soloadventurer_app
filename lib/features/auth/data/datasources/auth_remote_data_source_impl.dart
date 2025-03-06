@@ -251,8 +251,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> refreshToken() async {
-    throw UnimplementedError('refreshToken not implemented');
+  Future<AuthSession> refreshToken() async {
+    try {
+      await _ensureValidSession();
+      return AuthSession(
+        accessToken: await _getToken(ACCESS_TOKEN) ?? '',
+        userId: _getUserId(),
+      );
+    } catch (e) {
+      throw AuthException('Failed to refresh token: $e');
+    }
   }
 
   @override

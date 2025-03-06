@@ -29,16 +29,14 @@ Future<void> setupServiceLocator({bool isTest = false}) async {
   // Register singletons that don't depend on other services
   await _registerIndependentServices();
 
+  // Register API client first
+  await _registerApiClient();
+
   // Register services that depend on other services
   await _registerDependentServices();
 
   // Register feature modules
   await _registerFeatureModules();
-
-  // Register test overrides if in test mode
-  if (isTest) {
-    await _registerTestOverrides();
-  }
 }
 
 /// Register services that don't depend on other services
@@ -55,7 +53,7 @@ Future<void> _registerIndependentServices() async {
 
   // Register secure storage
   getIt.registerSingleton<FlutterSecureStorage>(
-    isTestMode
+    _isTestMode
         ? const FlutterSecureStorage(
             aOptions: AndroidOptions(encryptedSharedPreferences: true),
             iOptions:
@@ -65,10 +63,10 @@ Future<void> _registerIndependentServices() async {
   );
 }
 
-/// Register services that depend on other services
-Future<void> _registerDependentServices() async {
+/// Register API client
+Future<void> _registerApiClient() async {
   // Register API client (depends on interceptors and network monitor)
-  getIt.registerSingleton<ApiService>(
+  getIt.registerSingleton<ApiClient>(
     ApiClient(
       baseUrl: getIt<Env>().apiBaseUrl,
       authInterceptor: getIt<AuthInterceptor>(),
@@ -77,6 +75,21 @@ Future<void> _registerDependentServices() async {
     ),
   );
 
+  // Register API service interface
+  getIt.registerSingleton<ApiService>(
+    _isTestMode
+        ? MockApiClient(
+            baseUrl: getIt<Env>().apiBaseUrl,
+            authInterceptor: getIt<AuthInterceptor>(),
+            errorInterceptor: getIt<ErrorInterceptor>(),
+            networkMonitor: getIt<NetworkMonitor>(),
+          )
+        : getIt<ApiClient>(),
+  );
+}
+
+/// Register services that depend on other services
+Future<void> _registerDependentServices() async {
   // Register monitoring service (depends on API client)
   getIt.registerSingleton<MonitoringService>(
     AwsCloudWatchMonitoring(getIt<ApiService>()),
@@ -87,19 +100,6 @@ Future<void> _registerDependentServices() async {
 Future<void> _registerFeatureModules() async {
   // Register auth feature module
   registerAuthModule(getIt, isTest: _isTestMode);
-}
-
-/// Register test overrides for dependencies
-Future<void> _registerTestOverrides() async {
-  // Override API client with mock in test mode
-  getIt.registerSingleton<ApiService>(
-    MockApiClient(
-      baseUrl: getIt<Env>().apiBaseUrl,
-      authInterceptor: getIt<AuthInterceptor>(),
-      errorInterceptor: getIt<ErrorInterceptor>(),
-      networkMonitor: getIt<NetworkMonitor>(),
-    ),
-  );
 }
 
 /// Reset all registered dependencies (useful for testing)
