@@ -101,7 +101,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'usernotfoundexception'
     ])) {
       return const AuthException(
-        'No account found with this email address',
+        'Unable to sign in. Please check your email and password.',
         code: 'USER_NOT_FOUND',
       );
     }
@@ -115,8 +115,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     ])) {
       _handleFailedAttempt();
       return const AuthException(
-        'Incorrect password',
-        code: 'INVALID_PASSWORD',
+        'Unable to sign in. Please check your email and password.',
+        code: 'INVALID_CREDENTIALS',
       );
     }
 
@@ -200,8 +200,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (e is AuthException) {
         rethrow;
       }
-      throw AuthException(
-        'Unable to sign in: $e',
+      throw const AuthException(
+        'Unable to sign in. Please try again',
         code: 'AUTHENTICATION_FAILED',
       );
     }

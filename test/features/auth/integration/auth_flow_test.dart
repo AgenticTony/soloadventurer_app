@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -189,9 +188,9 @@ void main() {
           .thenAnswer((_) async {});
 
       await container.read(authNotifierProvider.notifier).confirmPasswordReset(
-            'test@test.com',
-            '123456',
-            'newpassword',
+            email: 'test@test.com',
+            code: '123456',
+            newPassword: 'newpassword',
           );
 
       // Should return to initial state after password reset

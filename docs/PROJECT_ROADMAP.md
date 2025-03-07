@@ -2,14 +2,14 @@
 
 ## Documentation Structure
 
-| Document                                               | Purpose                           | Key Contents                                    |
-| ------------------------------------------------------ | --------------------------------- | ----------------------------------------------- |
-| [PROJECT_PLAN2.md](PROJECT_PLAN2.md)                   | Current project plan              | Goals, Timeline, Resources                      |
-| [ARCHITECTURE.md](ARCHITECTURE.md)                     | Core architecture documentation   | System Design, Components, Data Flow            |
-| [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) | Planned architectural changes     | Future State, Migration Path                    |
-| [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md)   | Clean architecture implementation | Implementation Plan, Progress Tracking          |
-| [RIVERPOD_TESTING.md](RIVERPOD_TESTING.md)             | State management testing strategy | Testing Principles, Provider Testing Strategies |
-| [MONITORING_STRATEGY.md](monitoring_strategy.md)       | Application monitoring approach   | Monitoring Goals, Implementation Plan           |
+| Document                                                     | Purpose                           | Key Contents                                    |
+| ------------------------------------------------------------ | --------------------------------- | ----------------------------------------------- |
+| [PROJECT_PLAN2.md](/docs/PROJECT_PLAN2.md)                   | Current project plan              | Goals, Timeline, Resources                      |
+| [ARCHITECTURE.md](/docs/ARCHITECTURE.md)                     | Core architecture documentation   | System Design, Components, Data Flow            |
+| [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) | Planned architectural changes     | Future State, Migration Path                    |
+| [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md)   | Clean architecture implementation | Implementation Plan, Progress Tracking          |
+| [RIVERPOD_TESTING.md](/docs/RIVERPOD_TESTING.md)             | State management testing strategy | Testing Principles, Provider Testing Strategies |
+| [monitoring_strategy.md](/docs/monitoring_strategy.md)       | Application monitoring approach   | Monitoring Goals, Implementation Plan           |
 
 ## Current Phase: Authentication & Error Handling
 
@@ -23,62 +23,62 @@
 
 ### Implementation Plan
 
-See [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) for detailed implementation steps.
+See [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) for detailed implementation steps.
 
 ### Architecture Changes
 
-Refer to [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) for architectural evolution details.
+Refer to [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) for architectural evolution details.
 
 ### Testing Strategy
 
-See [RIVERPOD_TESTING.md](RIVERPOD_TESTING.md) for testing approach.
+See [RIVERPOD_TESTING.md](/docs/RIVERPOD_TESTING.md) for testing approach.
 
 ### Core Architecture
 
-Refer to [ARCHITECTURE.md](ARCHITECTURE.md) for core architecture details.
+Refer to [ARCHITECTURE.md](/docs/ARCHITECTURE.md) for core architecture details.
 
 ### Project Structure
 
-See [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) for clean architecture implementation.
+See [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) for clean architecture implementation.
 
 ### Monitoring
 
-See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring approach.
+See [monitoring_strategy.md](/docs/monitoring_strategy.md) for monitoring approach.
 
 ## Next Phase: Feature Implementation
 
 ### Implementation Plan
 
-See [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) for implementation details.
+See [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) for implementation details.
 
 ### Architecture Evolution
 
-Refer to [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) for planned changes.
+Refer to [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) for planned changes.
 
 ### Project Structure Updates
 
-See [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) for structure updates.
+See [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) for structure updates.
 
 ### Architecture Updates
 
-Refer to [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) for architecture updates.
+Refer to [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) for architecture updates.
 
 ### Testing Updates
 
-See [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) for testing updates.
+See [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) for testing updates.
 
 ### Monitoring Updates
 
-See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
+See [monitoring_strategy.md](/docs/monitoring_strategy.md) for monitoring updates.
 
 ## References
 
-- [Project Plan 2](PROJECT_PLAN2.md)
-- [Architecture](ARCHITECTURE.md)
-- [Architecture Evolution](ARCHITECTURE_EVOLUTION.md)
-- [Project Restructuring](PROJECT_RESTRUCTURING.md)
-- [Riverpod Testing](RIVERPOD_TESTING.md)
-- [Monitoring Strategy](monitoring_strategy.md)
+- [Project Plan 2](/docs/PROJECT_PLAN2.md)
+- [Architecture](/docs/ARCHITECTURE.md)
+- [Architecture Evolution](/docs/ARCHITECTURE_EVOLUTION.md)
+- [Project Restructuring](/docs/PROJECT_RESTRUCTURING.md)
+- [Riverpod Testing](/docs/RIVERPOD_TESTING.md)
+- [Monitoring Strategy](/docs/monitoring_strategy.md)
 
 ## Current Phase: Authentication & Error Handling
 
@@ -286,8 +286,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 1: Foundation Setup
-- [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) - Phase 2: Testing & Architecture Refinement
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Phase 1: Foundation Setup
+- [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) - Phase 2: Testing & Architecture Refinement
 
 **Key Deliverables**:
 
@@ -315,8 +315,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [RIVERPOD_TESTING.md](RIVERPOD_TESTING.md) - Testing Principles
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Project Structure
+- [RIVERPOD_TESTING.md](/docs/RIVERPOD_TESTING.md) - Testing Principles
+- [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Project Structure
 
 **Key Deliverables**:
 
@@ -342,8 +342,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 2: Feature Modularization
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Authentication Layer
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Phase 2: Feature Modularization
+- [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Authentication Layer
 
 **Key Deliverables**:
 
@@ -367,7 +367,7 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Design System Implementation
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Design System Implementation
 
 **Key Deliverables**:
 
@@ -391,8 +391,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Feature Toggle System
-- [ARCHITECTURE.md](ARCHITECTURE.md) - Feature Structure
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Feature Toggle System
+- [ARCHITECTURE.md](/docs/ARCHITECTURE.md) - Feature Structure
 
 **Key Deliverables**:
 
@@ -418,8 +418,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 3: Real-Time Infrastructure
-- [MONITORING_STRATEGY.md](MONITORING_STRATEGY.md) - Performance Monitoring
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Phase 3: Real-Time Infrastructure
+- [monitoring_strategy.md](/docs/monitoring_strategy.md) - Performance Monitoring
 
 **Key Deliverables**:
 
@@ -443,8 +443,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Presence Tracking
-- [MONITORING_STRATEGY.md](MONITORING_STRATEGY.md) - Resource Utilization
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Presence Tracking
+- [monitoring_strategy.md](/docs/monitoring_strategy.md) - Resource Utilization
 
 **Key Deliverables**:
 
@@ -468,8 +468,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Real-Time Infrastructure
-- [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) - Offline Capabilities
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Real-Time Infrastructure
+- [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) - Offline Capabilities
 
 **Key Deliverables**:
 
@@ -495,8 +495,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 4: AI/ML Integration
-- [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) - ML Infrastructure
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Phase 4: AI/ML Integration
+- [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) - ML Infrastructure
 
 **Key Deliverables**:
 
@@ -520,8 +520,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Graph Database Implementation
-- [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) - Matching Algorithm
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Graph Database Implementation
+- [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) - Matching Algorithm
 
 **Key Deliverables**:
 
@@ -545,8 +545,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Recommendation Service
-- [ARCHITECTURE_EVOLUTION.md](ARCHITECTURE_EVOLUTION.md) - Personalization
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Recommendation Service
+- [ARCHITECTURE_EVOLUTION.md](/docs/ARCHITECTURE_EVOLUTION.md) - Personalization
 
 **Key Deliverables**:
 
@@ -572,8 +572,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Phase 5: Optimization & Launch
-- [MONITORING_STRATEGY.md](MONITORING_STRATEGY.md) - Performance Monitoring
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Phase 5: Optimization & Launch
+- [monitoring_strategy.md](/docs/monitoring_strategy.md) - Performance Monitoring
 
 **Key Deliverables**:
 
@@ -597,8 +597,8 @@ See [MONITORING_STRATEGY.md](monitoring_strategy.md) for monitoring updates.
 
 **Reference Documents**:
 
-- [PROJECT_RESTRUCTURING.md](PROJECT_RESTRUCTURING.md) - Launch Preparation
-- [MONITORING_STRATEGY.md](MONITORING_STRATEGY.md) - Alerting Strategy
+- [PROJECT_RESTRUCTURING.md](/docs/PROJECT_RESTRUCTURING.md) - Launch Preparation
+- [monitoring_strategy.md](/docs/monitoring_strategy.md) - Alerting Strategy
 
 **Key Deliverables**:
 

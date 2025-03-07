@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../core/services/operation_queue.dart';
 
 part 'base_travel_operation.freezed.dart';
 part 'base_travel_operation.g.dart';

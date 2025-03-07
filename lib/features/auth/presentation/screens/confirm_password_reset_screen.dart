@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/navigation_error_handler.dart';
-import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 /// Screen for confirming password reset with code
 class ConfirmPasswordResetScreen extends ConsumerStatefulWidget {
@@ -51,6 +50,12 @@ class _ConfirmPasswordResetScreenState
     super.dispose();
   }
 
+  void _togglePasswordVisibility() {
+    setState(() {
+      _isPasswordVisible = !_isPasswordVisible;
+    });
+  }
+
   String? _validateCode(String? value) {
     if (value == null || value.isEmpty) {
       return 'Please enter the verification code';
@@ -96,6 +101,145 @@ class _ConfirmPasswordResetScreenState
     return null;
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final authState = ref.watch(authStateProvider);
+    final isLoading = ref.watch(isLoadingProvider);
+
+    return NavigationErrorHandler(
+      child: isLoading
+          ? const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : authState.error != null
+              ? Scaffold(
+                  body: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Error: ${authState.error}'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            ref.read(authNotifierProvider.notifier).signOut();
+                          },
+                          child: const Text('Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Reset Password'),
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        ref
+                            .read(authNavigationProvider.notifier)
+                            .navigateBack();
+                      },
+                    ),
+                  ),
+                  body: Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const Text(
+                              'Enter Reset Code',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Enter the verification code sent to your email and choose a new password.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 32),
+                            TextFormField(
+                              controller: _codeController,
+                              decoration: const InputDecoration(
+                                labelText: 'Verification Code',
+                                hintText: 'Enter the code from your email',
+                                prefixIcon: Icon(Icons.security),
+                                border: OutlineInputBorder(),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: _validateCode,
+                              enabled: !_isLoading,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                labelText: 'New Password',
+                                hintText: 'Enter your new password',
+                                prefixIcon: const Icon(Icons.lock),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible
+                                        ? Icons.visibility_off
+                                        : Icons.visibility,
+                                  ),
+                                  onPressed: _togglePasswordVisibility,
+                                ),
+                                border: const OutlineInputBorder(),
+                              ),
+                              obscureText: !_isPasswordVisible,
+                              validator: _validatePassword,
+                              enabled: !_isLoading,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _confirmPasswordController,
+                              decoration: const InputDecoration(
+                                labelText: 'Confirm New Password',
+                                hintText: 'Confirm your new password',
+                                prefixIcon: Icon(Icons.lock_outline),
+                                border: OutlineInputBorder(),
+                              ),
+                              obscureText: true,
+                              validator: _validateConfirmPassword,
+                              enabled: !_isLoading,
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed:
+                                  _isLoading ? null : _confirmPasswordReset,
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator()
+                                  : const Text(
+                                      'Reset Password',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+    );
+  }
+
   Future<void> _confirmPasswordReset() async {
     if (_email == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -108,25 +252,21 @@ class _ConfirmPasswordResetScreenState
     }
 
     if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _isLoading = true;
-      });
-
+      setState(() => _isLoading = true);
       try {
-        await ref.read(authProvider.notifier).confirmPasswordReset(
-              email: _email!,
-              code: _codeController.text.trim(),
-              newPassword: _passwordController.text,
+        await ref.read(authNotifierProvider.notifier).confirmPasswordReset(
+              _email!,
+              _codeController.text.trim(),
+              _passwordController.text,
             );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Password has been reset successfully'),
+              content: Text('Password reset successful. Please sign in.'),
               backgroundColor: Colors.green,
             ),
           );
-          // Navigate to login screen
           ref.read(authNavigationProvider.notifier).navigateToLogin();
         }
       } catch (e) {
@@ -140,128 +280,9 @@ class _ConfirmPasswordResetScreenState
         }
       } finally {
         if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
+          setState(() => _isLoading = false);
         }
       }
     }
-  }
-
-  void _togglePasswordVisibility() {
-    setState(() {
-      _isPasswordVisible = !_isPasswordVisible;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return NavigationErrorHandler(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Reset Password'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              ref.read(authNavigationProvider.notifier).navigateBack();
-            },
-          ),
-        ),
-        body: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Enter Reset Code',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Enter the verification code sent to your email and choose a new password.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _codeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Verification Code',
-                      hintText: 'Enter the code from your email',
-                      prefixIcon: Icon(Icons.security),
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: _validateCode,
-                    enabled: !_isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _passwordController,
-                    decoration: InputDecoration(
-                      labelText: 'New Password',
-                      hintText: 'Enter your new password',
-                      prefixIcon: const Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                        ),
-                        onPressed: _togglePasswordVisibility,
-                      ),
-                      border: const OutlineInputBorder(),
-                    ),
-                    obscureText: !_isPasswordVisible,
-                    validator: _validatePassword,
-                    enabled: !_isLoading,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _confirmPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Confirm New Password',
-                      hintText: 'Confirm your new password',
-                      prefixIcon: Icon(Icons.lock_outline),
-                      border: OutlineInputBorder(),
-                    ),
-                    obscureText: true,
-                    validator: _validateConfirmPassword,
-                    enabled: !_isLoading,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _isLoading ? null : _confirmPasswordReset,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : const Text('Reset Password'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

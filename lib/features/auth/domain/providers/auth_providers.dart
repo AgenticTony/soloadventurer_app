@@ -2,11 +2,23 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/notifiers/auth_notifier.dart';
 import 'package:soloadventurer/features/auth/domain/state/auth_state.dart';
+import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/get_current_user.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/is_signed_in.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/resend_verification_email.dart'
+    as resend;
+import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
+import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
 
 /// Authentication configuration constants
 const _kMaxFailedAttempts = 5;
@@ -89,18 +101,65 @@ JWTPayload? _parseJwt(String token) {
 /// final metrics = ref.watch(authMetricsProvider);
 /// ```
 
-/// Provider for the auth data source that interfaces with AWS Cognito
+/// Provider for the auth data source
 final authDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
-  return AuthRemoteDataSourceImpl(userPool: AppConfig.awsConfig.userPool);
+  return getIt<AuthRemoteDataSource>();
 });
 
-/// Core provider that manages authentication state
+/// Provider for the auth repository
+final authRepositoryProvider =
+    Provider<AuthRepository>((ref) => getIt<AuthRepository>());
+
+/// Provider for the get current user use case
+final getCurrentUserProvider = Provider<GetCurrentUser>(
+    (ref) => GetCurrentUser(ref.watch(authRepositoryProvider)));
+
+/// Provider for the is signed in use case
+final isSignedInProvider = Provider<IsSignedIn>(
+    (ref) => IsSignedIn(ref.watch(authRepositoryProvider)));
+
+/// Provider for the login use case
+final loginProvider = Provider<LoginUseCase>(
+    (ref) => LoginUseCase(ref.watch(authRepositoryProvider)));
+
+/// Provider for the sign up use case
+final signUpProvider =
+    Provider<SignUp>((ref) => SignUp(ref.watch(authRepositoryProvider)));
+
+/// Provider for the sign out use case
+final signOutProvider =
+    Provider<SignOut>((ref) => SignOut(ref.watch(authRepositoryProvider)));
+
+/// Provider for the verify email use case
+final verifyEmailProvider = Provider<VerifyEmail>(
+    (ref) => VerifyEmail(ref.watch(authRepositoryProvider)));
+
+/// Provider for the resend verification email use case
+final resendVerificationEmailProvider =
+    Provider<resend.ResendVerificationEmail>(
+  (ref) => resend.ResendVerificationEmail(ref.watch(authRepositoryProvider)),
+);
+
+/// Provider for the forgot password use case
+final forgotPasswordProvider = Provider<ForgotPassword>(
+    (ref) => ForgotPassword(ref.watch(authRepositoryProvider)));
+
+/// Provider for the confirm password reset use case
+final confirmPasswordResetProvider = Provider<ConfirmPasswordReset>(
+  (ref) => ConfirmPasswordReset(ref.watch(authRepositoryProvider)),
+);
+
+/// Provider for the logging service
+final loggingServiceProvider =
+    Provider<LoggingService>((ref) => getIt<LoggingService>());
+
+/// Provider for the auth notifier
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(ref.watch(authDataSourceProvider));
 });
 
-/// Provides the complete auth state object
+/// Provider for the auth state
 final authStateProvider = Provider<AuthState>((ref) {
   return ref.watch(authNotifierProvider);
 });
@@ -117,7 +176,7 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 
 /// Indicates if any authentication operation is in progress
 final isLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(authNotifierProvider.select((state) => state.isLoading));
+  return ref.watch(authNotifierProvider).isLoading;
 });
 
 /// Provides the current authentication error message if any

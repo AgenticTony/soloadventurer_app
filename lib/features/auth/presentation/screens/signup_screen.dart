@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
-import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 /// Sign up screen for the application
@@ -91,77 +90,43 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     return null;
   }
 
-  Future<void> _signUp() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final name = _nameController.text.trim();
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
-
-      debugPrint('SignUpScreen: Submitting form with:');
-      debugPrint('  name: $name');
-      debugPrint('  email: $email');
-      debugPrint('  password: $password');
-
-      try {
-        await ref.read(authProvider.notifier).signUp(
-              email: email,
-              password: password,
-              name: name,
-            );
-        debugPrint('SignUpScreen: Form submitted successfully');
-
-        if (mounted) {
-          final authState = ref.read(authProvider);
-          if (authState.needsVerification) {
-            // Navigate to verification screen if email verification is needed
-            ref.read(authNavigationProvider.notifier).navigateTo(
-              AuthRoutes.verifyEmail,
-              arguments: {'email': email},
-            );
-          } else {
-            // Navigate to profile setup if no verification needed
-            ref.read(authNavigationProvider.notifier).navigateTo(
-              '/profile/edit',
-              arguments: {'isInitialSetup': true},
-            );
-          }
-        }
-      } catch (e) {
-        debugPrint('SignUpScreen: Error submitting form: $e');
-      }
-    } else {
-      debugPrint('SignUpScreen: Form validation failed');
-    }
-  }
-
   void _navigateToLogin() {
     ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.login);
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authStateProvider);
+    final isLoading = ref.watch(isLoadingProvider);
     // Watch the navigation provider to ensure it's instantiated and listening
     ref.watch(authNavigationProvider);
 
-    debugPrint('SignUpScreen build: authState = $authState');
-    debugPrint('SignUpScreen build: isLoading = ${authState.isLoading}');
-    debugPrint('SignUpScreen build: user = ${authState.user}');
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
-    // Show error if there is one
-    if (authState.error != null && authState.error!.isNotEmpty) {
-      debugPrint('SignUpScreen build: showing error = ${authState.error}');
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authState.error!),
-            backgroundColor: Colors.red,
+    if (authState.error != null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: ${authState.error}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.read(authNotifierProvider.notifier).signOut();
+                },
+                child: const Text('Try Again'),
+              ),
+            ],
           ),
-        );
-
-        // Clear the error
-        ref.read(authProvider.notifier).clearError();
-      });
+        ),
+      );
     }
 
     return Scaffold(
@@ -278,20 +243,31 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 const SizedBox(height: 24),
 
                 // Sign up button
-                if (authState.isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else
-                  ElevatedButton(
-                    onPressed: _signUp,
-                    child: const Text('Sign Up'),
+                ElevatedButton(
+                  onPressed: authState.isLoading ? null : _signUp,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
+                  child: authState.isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text(
+                          'Sign Up',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                ),
 
                 const SizedBox(height: 16),
 
                 // Login link
-                TextButton(
-                  onPressed: _navigateToLogin,
-                  child: const Text('Already have an account? Login'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Already have an account?'),
+                    TextButton(
+                      onPressed: authState.isLoading ? null : _navigateToLogin,
+                      child: const Text('Login'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -299,5 +275,33 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _signUp() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      try {
+        await ref.read(authNotifierProvider.notifier).register(
+              email: email,
+              password: password,
+              name: name,
+            );
+
+        // Only navigate if we're still mounted and the signup was successful
+        if (mounted) {
+          final authState = ref.read(authStateProvider);
+          if (authState.requiresEmailVerification) {
+            ref
+                .read(authNavigationProvider.notifier)
+                .navigateTo(AuthRoutes.verifyEmail);
+          }
+        }
+      } catch (e) {
+        // Error handling is done by the provider
+      }
+    }
   }
 }

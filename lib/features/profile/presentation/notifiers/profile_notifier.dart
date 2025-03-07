@@ -5,7 +5,7 @@ import '../../domain/usecases/manage_avatar_use_case.dart';
 import '../../domain/usecases/delete_profile_use_case.dart';
 import '../state/profile_state.dart';
 import '../../domain/entities/profile_state.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/domain/providers/auth_providers.dart';
 
 class ProfileNotifier extends StateNotifier<ProfileState> {
   final GetCurrentProfileUseCase _getCurrentProfile;
@@ -46,8 +46,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> loadProfile() async {
     if (state.isLoading) return;
 
-    final authState = _ref.read(authProvider);
-    if (!authState.isAuthenticated || authState.user == null) {
+    final authState = _ref.read(authStateProvider);
+    final isAuthenticated = authState.isLoggedIn;
+    final user = authState.user;
+
+    if (!isAuthenticated || user == null) {
       state = state.copyWith(
         isLoading: false,
         error: 'Not authenticated',
@@ -76,8 +79,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
-    final authState = _ref.read(authProvider);
-    if (!authState.isAuthenticated || authState.user == null) {
+    final authState = _ref.read(authStateProvider);
+    final isAuthenticated = authState.isLoggedIn;
+    final user = authState.user;
+
+    if (!isAuthenticated || user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -113,8 +119,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> uploadAvatar(String filePath) async {
     if (state.isUploading || !state.isInitialized) return;
 
-    final authState = _ref.read(authProvider);
-    if (!authState.isAuthenticated || authState.user == null) {
+    final authState = _ref.read(authStateProvider);
+    final isAuthenticated = authState.isLoggedIn;
+    final user = authState.user;
+
+    if (!isAuthenticated || user == null) {
       state = state.copyWith(
         isUploading: false,
         error: 'Not authenticated',
@@ -125,7 +134,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     state = state.copyWith(isUploading: true, error: null);
     try {
       final avatarUrl = await _manageAvatar.uploadAvatar(
-        authState.user!.id,
+        user.id,
         filePath,
       );
       state = state.copyWith(
@@ -143,8 +152,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> removeAvatar() async {
     if (state.isUpdating || !state.isInitialized) return;
 
-    final authState = _ref.read(authProvider);
-    if (!authState.isAuthenticated || authState.user == null) {
+    final authState = _ref.read(authStateProvider);
+    final isAuthenticated = authState.isLoggedIn;
+    final user = authState.user;
+
+    if (!isAuthenticated || user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -154,7 +166,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
     state = state.copyWith(isUpdating: true, error: null);
     try {
-      await _manageAvatar.removeAvatar(authState.user!.id);
+      await _manageAvatar.removeAvatar(user.id);
       state = state.copyWith(
         isUpdating: false,
         profile: state.profile!.copyWith(avatarUrl: null),
@@ -170,8 +182,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> deleteProfile() async {
     if (state.isUpdating || !state.isInitialized) return;
 
-    final authState = _ref.read(authProvider);
-    if (!authState.isAuthenticated || authState.user == null) {
+    final authState = _ref.read(authStateProvider);
+    final isAuthenticated = authState.isLoggedIn;
+    final user = authState.user;
+
+    if (!isAuthenticated || user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -181,7 +196,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
     state = state.copyWith(isUpdating: true, error: null);
     try {
-      await _deleteProfile(authState.user!.id);
+      await _deleteProfile(user.id);
       state = const ProfileState();
     } catch (e) {
       state = state.copyWith(

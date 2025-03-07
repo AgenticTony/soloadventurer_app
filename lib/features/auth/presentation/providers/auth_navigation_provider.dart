@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
@@ -18,7 +18,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
   /// Creates a new [AuthNavigationNotifier]
   AuthNavigationNotifier(this._ref) : super(AuthNavigationState.initial()) {
     // Listen to auth state changes
-    _ref.listen(authProvider, (previous, next) {
+    _ref.listen(authStateProvider, (previous, next) {
       debugPrint('AuthNavigationNotifier: Auth state changed');
       debugPrint('AuthNavigationNotifier: Previous state: $previous');
       debugPrint('AuthNavigationNotifier: Next state: $next');
@@ -26,7 +26,8 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
       // Only navigate if we're not already on the target route
       final currentRoute = getCurrentRoute();
 
-      if (next.requiresEmailVerification && next.user != null) {
+      // Email verification takes highest priority
+      if (next.requiresEmailVerification) {
         debugPrint('AuthNavigationNotifier: User needs verification');
         if (currentRoute != AuthRoutes.verifyEmail) {
           debugPrint('AuthNavigationNotifier: Navigating to verify email');
@@ -34,8 +35,10 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         } else {
           debugPrint('AuthNavigationNotifier: Already on verify email screen');
         }
+        return; // Early return to prevent other navigation
       }
 
+      // Password reset takes second priority
       if (next.requiresPasswordReset) {
         debugPrint('AuthNavigationNotifier: Password reset required');
         if (currentRoute != AuthRoutes.confirmPasswordReset) {
@@ -45,6 +48,20 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         } else {
           debugPrint(
               'AuthNavigationNotifier: Already on confirm password reset screen');
+        }
+        return; // Early return to prevent other navigation
+      }
+
+      // Only handle login/home navigation if no special states are active
+      if (!next.requiresEmailVerification && !next.requiresPasswordReset) {
+        if (next.isLoggedIn) {
+          debugPrint(
+              'AuthNavigationNotifier: User is logged in, navigating to home');
+          navigateToHome();
+        } else {
+          debugPrint(
+              'AuthNavigationNotifier: User is not logged in, navigating to login');
+          navigateToLogin();
         }
       }
     });
@@ -62,31 +79,36 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Check if navigation to a route is allowed
   bool _canNavigate(String route) {
-    final authState = _ref.read(authProvider);
+    final authState = _ref.read(authStateProvider);
 
     switch (route) {
       case AuthRoutes.home:
-        if (!authState.isAuthenticated) {
+        if (!authState.isLoggedIn) {
           _setNavigationError('Authentication required to access home');
           return false;
         }
         return true;
 
       case AuthRoutes.verifyEmail:
-        if (!authState.needsVerification) {
-          _setNavigationError('No verification needed');
-          return false;
-        }
-        return true;
+        // Always allow navigation to verify email if verification is required
+        if (authState.requiresEmailVerification) return true;
+        // Also allow if we have a user that needs verification
+        if (authState.user != null) return true;
+        return false;
 
       case AuthRoutes.login:
       case AuthRoutes.signup:
       case AuthRoutes.forgotPassword:
-        if (authState.isAuthenticated) {
-          _setNavigationError('Already authenticated');
+        // Block navigation to auth screens if user needs verification
+        if (authState.requiresEmailVerification) {
+          debugPrint(
+              'AuthNavigationNotifier: Blocking navigation to $route - email verification required');
           return false;
         }
-        return true;
+        // Allow navigation to auth screens if not logged in
+        if (!authState.isLoggedIn) return true;
+        _setNavigationError('Already authenticated');
+        return false;
 
       default:
         return true;
@@ -237,62 +259,16 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
   void navigateBack() {
     print('[Navigation Debug] Requesting back navigation');
     if (state.history.isEmpty) {
-      _setNavigationError('No previous route to navigate back to');
+      print('[Navigation Debug] No history to navigate back to');
       return;
     }
 
-    // Get the previous route from history
-    final previousRequests =
-        state.history.where((request) => !request.isBack).toList();
-
-    if (previousRequests.length < 2) {
-      _setNavigationError('No previous route to navigate back to');
-      return;
-    }
-
-    final previousRequest = previousRequests[previousRequests.length - 2];
-
-    // Check if we can navigate to the previous route
-    if (!_canNavigate(previousRequest.route)) {
-      return;
-    }
-
-    // Run pre-navigation middleware
-    _beforeNavigation(previousRequest.route, previousRequest.arguments);
-
-    try {
-      final backRequest = AuthNavigationRequest(
-        route: previousRequest.route,
-        arguments: previousRequest.arguments,
-        isBack: true,
-      );
-
-      state = state.copyWith(
-        currentRequest: backRequest,
-        history: [...state.history, backRequest],
-      );
-
-      // Run post-navigation middleware
-      _afterNavigation(previousRequest.route);
-    } catch (e) {
-      _setNavigationError('Failed to navigate back: ${e.toString()}');
-      _afterNavigation(previousRequest.route, success: false);
-    }
-  }
-
-  /// Clear the current navigation request
-  void clearCurrentRequest() {
-    print('[Navigation Debug] Clearing current request');
-    state = state.copyWith(currentRequest: null);
+    final previousRequest = state.history[state.history.length - 2];
+    navigateTo(previousRequest.route, arguments: previousRequest.arguments);
   }
 
   /// Get the current route
-  String? getCurrentRoute() {
-    return state.currentRequest?.route;
-  }
-
-  /// Check if there's a pending navigation request
-  bool hasPendingRequest() {
-    return state.currentRequest != null && !state.currentRequest!.handled;
+  String getCurrentRoute() {
+    return state.currentRequest?.route ?? AuthRoutes.login;
   }
 }

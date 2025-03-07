@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/profile/data/datasources/profile_remote_data_source.dart';
 import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import '../../domain/entities/profile.dart';
 
 /// Mock implementation of [ProfileRemoteDataSource] for testing
 class MockProfileRemoteDataSource implements ProfileRemoteDataSource {

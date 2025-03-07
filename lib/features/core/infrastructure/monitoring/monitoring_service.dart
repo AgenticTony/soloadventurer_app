@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Interface for monitoring services
 abstract class MonitoringService {

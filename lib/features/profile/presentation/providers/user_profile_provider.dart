@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../features/auth/domain/models/user.dart';
 import '../../../../features/core/infrastructure/api/api_service.dart';
 import '../../../../features/core/infrastructure/api/dio_api_service.dart';
-import '../../../../features/core/config/app_config.dart';
 
 // Provider for the API service
 final apiServiceProvider = Provider<ApiService>((ref) {

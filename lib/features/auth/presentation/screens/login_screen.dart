@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
-import 'package:soloadventurer/features/auth/presentation/screens/signup_screen.dart';
-import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 
 /// Login screen for the application
 class LoginScreen extends ConsumerStatefulWidget {
@@ -62,60 +61,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return null;
   }
 
-  Future<void> _login() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
-
-      try {
-        await ref.read(authProvider.notifier).signIn(
-              email,
-              password,
-            );
-
-        // Only navigate to home if we're still mounted and the login was successful
-        if (mounted) {
-          final authState = ref.read(authProvider);
-          if (authState.isAuthenticated) {
-            ref
-                .read(authNavigationProvider.notifier)
-                .navigateTo(AuthRoutes.home);
-          }
-        }
-      } catch (e) {
-        // Error will be handled by the auth state listener
-        debugPrint('LoginScreen: Login failed: $e');
-      }
-    }
-  }
-
-  void _navigateToSignUp() {
-    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.signup);
-  }
-
-  void _navigateToForgotPassword() {
-    ref
-        .read(authNavigationProvider.notifier)
-        .navigateTo(AuthRoutes.forgotPassword);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authStateProvider);
+    final isLoading = ref.watch(isLoadingProvider);
 
-    // Show error if there is one
-    if (authState.error != null && authState.error!.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Listen for auth state changes to show error messages
+    ref.listen(authStateProvider, (previous, next) {
+      if (next.error?.isNotEmpty == true && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authState.error!),
-            backgroundColor: Colors.red,
+            content: Text(next.error!),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
+      }
+    });
 
-        // Clear the error
-        ref.read(authProvider.notifier).clearError();
-      });
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
     }
 
     return Scaffold(
@@ -211,7 +180,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: authState.isLoading
-                      ? const CircularProgressIndicator()
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : const Text(
                           'Login',
                           style: TextStyle(fontSize: 16),
@@ -237,5 +210,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void _navigateToSignUp() {
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.signup);
+  }
+
+  void _navigateToForgotPassword() {
+    ref
+        .read(authNavigationProvider.notifier)
+        .navigateTo(AuthRoutes.forgotPassword);
+  }
+
+  Future<void> _login() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      try {
+        await ref.read(authNotifierProvider.notifier).signIn(
+              email,
+              password,
+            );
+
+        // Only navigate to home if we're still mounted and the login was successful
+        if (mounted) {
+          final authState = ref.read(authStateProvider);
+          if (authState.isLoggedIn) {
+            ref
+                .read(authNavigationProvider.notifier)
+                .navigateTo(AuthRoutes.home);
+          }
+        }
+      } catch (e) {
+        // Error handling is done by the provider
+      }
+    }
   }
 }

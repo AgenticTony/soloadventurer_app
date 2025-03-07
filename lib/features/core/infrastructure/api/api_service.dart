@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 
 /// Interface for making HTTP requests
 abstract class ApiService {

@@ -59,9 +59,13 @@ class AuthTestHelper {
   /// Setup common mock behaviors
   void setupCommonMocks() {
     // Setup common mock behaviors for auth service
-    when(() => authService.initialize()).thenAnswer((_) async {});
+    when(() => authService.initialize()).thenAnswer((_) async {
+      return null;
+    });
     when(() => authService.refreshSession()).thenAnswer((_) async => true);
-    when(() => authService.signOut()).thenAnswer((_) async {});
+    when(() => authService.signOut()).thenAnswer((_) async {
+      return null;
+    });
   }
 
   /// Setup mock for failed sign in

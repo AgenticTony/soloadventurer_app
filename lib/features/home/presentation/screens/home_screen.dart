@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
-import 'package:flutter/foundation.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -20,14 +19,15 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
-            onPressed: () => ref.read(authNavigationProvider.notifier).navigateToProfile(),
+            onPressed: () =>
+                ref.read(authNavigationProvider.notifier).navigateToProfile(),
             tooltip: 'Profile',
           ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
               debugPrint('Logout button pressed');
-              await ref.read(authProvider.notifier).signOut();
+              await ref.read(authNotifierProvider.notifier).signOut();
               debugPrint('Sign out completed');
 
               if (context.mounted) {

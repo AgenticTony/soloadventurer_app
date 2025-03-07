@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import '../../domain/models/auth_session.dart';
 import '../../../../features/core/errors/exceptions.dart';
 
 /// Service for handling authentication operations with AWS Cognito

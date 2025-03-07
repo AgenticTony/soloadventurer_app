@@ -1,0 +1,15 @@
+{
+  "UserPoolId": "us-east-1_xxxxxxxx",
+  "ClientId": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "Region": "us-east-1",
+  "IdentityPoolId": "us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "ApiBaseUrl": {
+    "dev": "https://api.soloadventurer.com/dev",
+    "staging": "https://api.soloadventurer.com/staging",
+    "prod": "https://api.soloadventurer.com/prod"
+  },
+  "Monitoring": {
+    "LogGroup": "/soloadventurer/app",
+    "LogStream": "mobile-client"
+  }
+}

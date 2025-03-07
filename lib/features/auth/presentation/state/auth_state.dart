@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 
 /// Represents the authentication state of the application
@@ -14,6 +13,9 @@ class AuthState {
 
   /// Whether the user requires email verification
   final bool requiresEmailVerification;
+
+  /// Whether the user requires password reset
+  final bool requiresPasswordReset;
 
   /// The access token for the current session
   final String? accessToken;
@@ -33,6 +35,7 @@ class AuthState {
         isAuthenticated = false,
         requiresMFA = false,
         requiresEmailVerification = false,
+        requiresPasswordReset = false,
         accessToken = null,
         idToken = null,
         refreshToken = null,
@@ -50,6 +53,7 @@ class AuthState {
         isAuthenticated = true,
         requiresMFA = requiresMFA,
         requiresEmailVerification = false,
+        requiresPasswordReset = false,
         accessToken = accessToken,
         idToken = idToken,
         refreshToken = refreshToken,
@@ -62,6 +66,7 @@ class AuthState {
         isAuthenticated = false,
         requiresMFA = false,
         requiresEmailVerification = true,
+        requiresPasswordReset = false,
         accessToken = null,
         idToken = null,
         refreshToken = null,
@@ -74,6 +79,20 @@ class AuthState {
         isAuthenticated = false,
         requiresMFA = true,
         requiresEmailVerification = false,
+        requiresPasswordReset = false,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
+
+  /// Creates a password reset required state with the given user
+  const AuthState.passwordResetRequired({
+    required User user,
+  })  : user = user,
+        isAuthenticated = false,
+        requiresMFA = false,
+        requiresEmailVerification = false,
+        requiresPasswordReset = true,
         accessToken = null,
         idToken = null,
         refreshToken = null,
@@ -85,6 +104,7 @@ class AuthState {
         isAuthenticated = false,
         requiresMFA = false,
         requiresEmailVerification = false,
+        requiresPasswordReset = false,
         accessToken = null,
         idToken = null,
         refreshToken = null,
@@ -96,6 +116,7 @@ class AuthState {
         isAuthenticated = false,
         requiresMFA = false,
         requiresEmailVerification = false,
+        requiresPasswordReset = false,
         accessToken = null,
         idToken = null,
         refreshToken = null,
@@ -107,6 +128,7 @@ class AuthState {
         isAuthenticated = false,
         requiresMFA = false,
         requiresEmailVerification = false,
+        requiresPasswordReset = false,
         accessToken = null,
         idToken = null,
         refreshToken = null,
@@ -118,6 +140,7 @@ class AuthState {
     bool? isAuthenticated,
     bool? requiresMFA,
     bool? requiresEmailVerification,
+    bool? requiresPasswordReset,
     String? accessToken,
     String? idToken,
     String? refreshToken,
@@ -129,6 +152,8 @@ class AuthState {
       requiresMFA: requiresMFA ?? this.requiresMFA,
       requiresEmailVerification:
           requiresEmailVerification ?? this.requiresEmailVerification,
+      requiresPasswordReset:
+          requiresPasswordReset ?? this.requiresPasswordReset,
       accessToken: accessToken ?? this.accessToken,
       idToken: idToken ?? this.idToken,
       refreshToken: refreshToken ?? this.refreshToken,
@@ -142,6 +167,7 @@ class AuthState {
     this.isAuthenticated = false,
     this.requiresMFA = false,
     this.requiresEmailVerification = false,
+    this.requiresPasswordReset = false,
     this.accessToken,
     this.idToken,
     this.refreshToken,
@@ -157,6 +183,7 @@ class AuthState {
           isAuthenticated == other.isAuthenticated &&
           requiresMFA == other.requiresMFA &&
           requiresEmailVerification == other.requiresEmailVerification &&
+          requiresPasswordReset == other.requiresPasswordReset &&
           accessToken == other.accessToken &&
           idToken == other.idToken &&
           refreshToken == other.refreshToken &&
@@ -168,6 +195,7 @@ class AuthState {
       isAuthenticated.hashCode ^
       requiresMFA.hashCode ^
       requiresEmailVerification.hashCode ^
+      requiresPasswordReset.hashCode ^
       accessToken.hashCode ^
       idToken.hashCode ^
       refreshToken.hashCode ^

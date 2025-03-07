@@ -115,12 +115,16 @@ class MockAuthService extends Mock implements AuthService {
 class MockSessionManager extends Mock implements SessionManager {
   /// Sets up the mock for a successful session start.
   void setupSuccessfulSessionStart() {
-    when(() => startSession()).thenAnswer((_) async {});
+    when(() => startSession()).thenAnswer((_) async {
+      return null;
+    });
   }
 
   /// Sets up the mock for a successful session end.
   void setupSuccessfulSessionEnd() {
-    when(() => endSession()).thenAnswer((_) async {});
+    when(() => endSession()).thenAnswer((_) async {
+      return null;
+    });
   }
 
   /// Sets up the mock for a failed session operation.

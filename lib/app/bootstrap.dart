@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
@@ -19,6 +20,20 @@ Future<void> bootstrap() async {
 
     // Track app start time
     AppStartTracker.trackAppStart();
+
+    // Load environment variables with fallback
+    try {
+      await dotenv.load(fileName: '.env');
+    } catch (e) {
+      debugPrint('Warning: Failed to load .env file. Using default values.');
+      // Load example environment file as fallback
+      try {
+        await dotenv.load(fileName: '.env.example');
+      } catch (e) {
+        debugPrint(
+            'Warning: Failed to load .env.example file. Using hardcoded defaults.');
+      }
+    }
 
     // Set preferred orientations
     await SystemChrome.setPreferredOrientations([

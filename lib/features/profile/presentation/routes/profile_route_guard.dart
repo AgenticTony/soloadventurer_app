@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/profile_providers.dart';
 import '../state/profile_state.dart';
 import '../widgets/error_view.dart';
-import 'profile_route_analytics.dart';
 import 'package:soloadventurer/features/profile/presentation/state/profile_navigation_state.dart';
 
 enum GuardAction { proceed, redirect, block }

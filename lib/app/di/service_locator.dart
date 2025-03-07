@@ -5,13 +5,6 @@ import 'package:soloadventurer/app/di/modules/auth_module.dart';
 import 'package:soloadventurer/app/di/modules/core_module.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
-import 'package:soloadventurer/core/api/client/api_client.dart';
-import 'package:soloadventurer/core/api/client/mock_api_client.dart';
-import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
-import 'package:soloadventurer/core/api/interceptors/error_interceptor.dart';
-import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
-import 'package:soloadventurer/features/core/infrastructure/monitoring/monitoring_service.dart';
-import 'package:soloadventurer/features/core/infrastructure/monitoring/aws_cloudwatch_monitoring.dart';
 
 /// Global GetIt instance for dependency injection
 final GetIt getIt = GetIt.instance;

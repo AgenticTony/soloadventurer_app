@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/core/security/security_manager.dart';

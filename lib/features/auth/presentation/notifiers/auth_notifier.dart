@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/get_current_user.dart';
@@ -12,8 +12,6 @@ import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dar
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
-import 'package:soloadventurer/features/core/infrastructure/services/logging_service_impl.dart';
-import 'package:flutter/foundation.dart';
 
 /// Auth state notifier with AsyncValue pattern for better error handling
 class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
@@ -416,19 +414,3 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     }
   }
 }
-
-/// Provider for the auth state
-final authProvider =
-    StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>((ref) {
-  return AuthNotifier(
-    getCurrentUser: getIt<GetCurrentUser>(),
-    isSignedIn: getIt<IsSignedIn>(),
-    login: getIt<LoginUseCase>(),
-    signUp: getIt<SignUp>(),
-    signOut: getIt<SignOut>(),
-    verifyEmail: getIt<VerifyEmail>(),
-    forgotPassword: getIt<ForgotPassword>(),
-    confirmPasswordReset: getIt<ConfirmPasswordReset>(),
-    logger: ref.watch(loggingServiceImplProvider),
-  );
-});

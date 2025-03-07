@@ -1,7 +1,4 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../models/base_travel_operation.dart';
-import '../models/trip_planning_operation.dart';
-import '../models/travel_note_operation.dart';
 
 /// Repository interface for managing travel operations storage
 abstract class TravelOperationRepository {

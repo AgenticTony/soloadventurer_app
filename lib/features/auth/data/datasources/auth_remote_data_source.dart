@@ -1,5 +1,4 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -274,7 +273,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (e.toString().contains('NotAuthorizedException')) {
         await _handleFailedAttempt();
         throw const AuthException(
-          'Wrong password. Please try again.',
+          'Unable to sign in. Please check your email and password.',
           code: 'INVALID_CREDENTIALS',
         );
       } else if (e.toString().contains('UserNotConfirmedException')) {
@@ -289,7 +288,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       } else if (e.toString().contains('UserNotFoundException')) {
         throw const AuthException(
-          'No account found with this email',
+          'Unable to sign in. Please check your email and password.',
           code: 'USER_NOT_FOUND',
         );
       }
@@ -298,7 +297,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         await _handleFailedAttempt();
       }
       throw AuthException(
-        'Wrong password. Please try again.',
+        'Unable to sign in. Please check your email and password.',
         code: 'COGNITO_ERROR',
       );
     } catch (e) {
@@ -307,7 +306,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         rethrow;
       }
       throw AuthException(
-        'Wrong password. Please try again.',
+        'Unable to sign in. Please check your email and password.',
         code: 'UNKNOWN_ERROR',
       );
     }
@@ -350,14 +349,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         } else if (e.toString().contains('NotAuthorizedException')) {
           await _handleFailedAttempt();
           throw const AuthException(
-            'Wrong password. Please try again.',
+            'Unable to sign in. Please check your email and password.',
             code: 'INVALID_CREDENTIALS',
           );
         }
         // Handle any other Cognito exceptions
         await _handleFailedAttempt();
         throw AuthException(
-          'Wrong password. Please try again.',
+          'Unable to sign in. Please check your email and password.',
           code: 'COGNITO_ERROR',
         );
       }
@@ -397,7 +396,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         rethrow;
       }
       throw AuthException(
-        'Wrong password. Please try again.',
+        'Unable to sign in. Please check your email and password.',
         code: 'AUTHENTICATION_FAILED',
       );
     }

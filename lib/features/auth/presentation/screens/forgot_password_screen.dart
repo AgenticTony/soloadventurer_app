@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 
 /// Screen for initiating password reset
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -30,11 +29,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     try {
       final email = _emailController.text.trim();
-      await ref.read(authProvider.notifier).forgotPassword(
-            ForgotPasswordParams(
-              identifier: email,
-            ),
-          );
+      await ref.read(authNotifierProvider.notifier).forgotPassword(email);
 
       if (!mounted) return;
 

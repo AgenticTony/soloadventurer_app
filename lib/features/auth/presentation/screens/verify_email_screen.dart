@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
-import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
-import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
-import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   static const routeName = '/verify-email';
@@ -25,37 +22,37 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authState = ref.read(authProvider);
+      final authState = ref.read(authStateProvider);
       debugPrint('VerifyEmailScreen: Auth state on init: $authState');
       debugPrint(
-          'VerifyEmailScreen: User email from state: ${authState.value?.user?.email}');
+          'VerifyEmailScreen: User email from state: ${authState.user?.email}');
       debugPrint(
-          'VerifyEmailScreen: Needs verification: ${authState.value?.needsVerification}');
+          'VerifyEmailScreen: Needs verification: ${authState.requiresEmailVerification}');
 
       // Try to get email from navigation arguments first
-      final emailFromArgs =
-          ModalRoute.of(context)?.settings.arguments as String?;
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final emailFromArgs = args?['email'] as String?;
 
       if (mounted) {
         setState(() {
           _email = emailFromArgs ??
-              authState.value?.user?.email ??
-              (authState.value?.needsVerification == true
-                  ? authState.value?.user?.email
+              authState.user?.email ??
+              (authState.requiresEmailVerification
+                  ? authState.user?.email
                   : null);
         });
       }
 
       debugPrint('VerifyEmailScreen: Final email state: $_email');
 
-      if (_email == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-                'No email found for verification. Please try registering again.'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      // Check if we need to redirect to login
+      if (!authState.requiresEmailVerification && authState.user == null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ref.read(authNavigationProvider.notifier).navigateToLogin();
+          }
+        });
       }
     });
   }
@@ -82,8 +79,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       try {
         final code = _codeController.text.trim();
         // Store the current auth state before verification
-        final authState = ref.read(authProvider);
-        final preservedUser = authState.value?.user;
+        final authState = ref.read(authStateProvider);
+        final preservedUser = authState.user;
 
         debugPrint('VerifyEmailScreen: Starting verification');
         debugPrint('VerifyEmailScreen: Current auth state: $authState');
@@ -94,7 +91,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         if (_email == null) {
           debugPrint('VerifyEmailScreen: No email available in local state');
           // Try to get email from preserved user first
-          _email = preservedUser?.email ?? authState.value?.user?.email;
+          _email = preservedUser?.email ?? authState.user?.email;
           if (_email == null) {
             throw Exception('No email found for verification');
           }
@@ -103,11 +100,11 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
 
         debugPrint(
             'VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
-        await ref.read(authProvider.notifier).verifyEmail(code, _email!);
+        await ref.read(authNotifierProvider.notifier).verifyEmail(code);
         debugPrint('VerifyEmailScreen: Verification completed successfully');
 
         // Check the verification result
-        final newState = ref.read(authProvider);
+        final newState = ref.read(authStateProvider);
         debugPrint(
             'VerifyEmailScreen: Auth state after verification: $newState');
 
@@ -116,12 +113,8 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
 
-            if (newState.value?.isAuthenticated ?? false) {
-              // Use typed navigation method
-              ref.read(authNavigationProvider.notifier).navigateToProfileEdit(
-                    isInitialSetup: true,
-                  );
-            } else {
+            // Only show message if verification failed but user is still logged in
+            if (newState.requiresEmailVerification && newState.user != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Please try verifying your email again'),
@@ -129,6 +122,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                 ),
               );
             }
+            // No need to handle navigation here as AuthNavigationNotifier will handle it
           });
         }
       } catch (e) {
@@ -151,7 +145,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   Future<void> _resendCode() async {
     setState(() => _isLoading = true);
     try {
-      await ref.read(authProvider.notifier).resendVerificationEmail();
+      await ref.read(authNotifierProvider.notifier).resendVerificationEmail();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -178,35 +172,40 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authStateProvider);
+    final isLoading = ref.watch(isLoadingProvider);
 
-    // Redirect if user is authenticated
-    if (authState.value?.isAuthenticated ?? false) {
-      ref.read(authNavigationProvider.notifier).navigateToHome();
-      return const SizedBox.shrink();
-    }
+    debugPrint('VerifyEmailScreen build - Full authState: $authState');
+    debugPrint('VerifyEmailScreen - isLoading: $isLoading');
+    debugPrint(
+        'VerifyEmailScreen - requiresEmailVerification: ${authState.requiresEmailVerification}');
+    debugPrint('VerifyEmailScreen - user: ${authState.user}');
+    debugPrint('VerifyEmailScreen - isLoggedIn: ${authState.isLoggedIn}');
 
     // Show loading state
-    if (authState.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    // Show error state
-    if (authState.hasError) {
-      return Center(
-        child: Text(
-          authState.error.toString(),
-          style: const TextStyle(color: Colors.red),
+    if (isLoading || authState.isLoading) {
+      debugPrint('VerifyEmailScreen: Showing loading state');
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
       );
     }
 
-    final user = authState.value?.user;
-    if (user == null) {
-      ref.read(authNavigationProvider.notifier).navigateToLogin();
-      return const SizedBox.shrink();
+    // Show error state
+    if (authState.error != null) {
+      debugPrint('VerifyEmailScreen: Showing error state: ${authState.error}');
+      return Scaffold(
+        body: Center(
+          child: Text(
+            authState.error.toString(),
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
+      );
     }
 
+    debugPrint('VerifyEmailScreen: Showing verification screen');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Verify Email'),
@@ -214,7 +213,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              ref.read(authProvider.notifier).signOut();
+              ref.read(authNotifierProvider.notifier).signOut();
             },
           ),
         ],
@@ -230,7 +229,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'We sent a verification code to ${user.email}',
+              'We sent a verification code to ${_email ?? authState.user?.email}',
               style: Theme.of(context).textTheme.bodyLarge,
               textAlign: TextAlign.center,
             ),
@@ -245,34 +244,23 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                       labelText: 'Verification Code',
                       hintText: 'Enter the code from your email',
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter the verification code';
-                      }
-                      return null;
-                    },
+                    validator: _validateCode,
+                    enabled: !_isLoading,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _verifyEmail,
+                    child: _isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text('Verify Email'),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        ref.read(authProvider.notifier).verifyEmail(
-                              _codeController.text,
-                              user.email,
-                            );
-                      }
-                    },
-                    child: const Text('Verify Email'),
+                  TextButton(
+                    onPressed: _isLoading ? null : _resendCode,
+                    child: const Text('Resend Code'),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () {
-                ref.read(authProvider.notifier).resendVerificationEmail();
-              },
-              child: const Text('Resend Code'),
             ),
           ],
         ),

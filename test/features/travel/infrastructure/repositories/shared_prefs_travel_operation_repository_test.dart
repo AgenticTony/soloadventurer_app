@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/features/travel/domain/models/base_travel_operation.dart';
-import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
-import 'package:soloadventurer/features/travel/domain/models/travel_note_operation.dart';
 import 'package:soloadventurer/features/travel/infrastructure/repositories/shared_prefs_travel_operation_repository.dart';
 
 class MockSharedPreferences extends Mock implements SharedPreferences {}

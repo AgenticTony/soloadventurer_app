@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart' hide TextButton;
-import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/profile.dart';
 import '../providers/profile_providers.dart';
-import '../routes/profile_routes.dart';
-import '../../../home/presentation/screens/home_screen.dart';
-import 'package:flutter/foundation.dart';
 import '../../../auth/presentation/providers/auth_navigation_provider.dart';
 
 /// Screen for editing user profile information

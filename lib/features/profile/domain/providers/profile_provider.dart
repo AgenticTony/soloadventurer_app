@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../entities/profile.dart';
 import '../entities/profile_state.dart';
 import '../repositories/profile_repository.dart';
-import '../../data/repositories/profile_repository_impl.dart';
 import '../../presentation/providers/profile_providers.dart';
 
 /// Provider for profile domain state

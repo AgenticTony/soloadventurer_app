@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Interface for logging service following clean architecture principles
 abstract class LoggingService {

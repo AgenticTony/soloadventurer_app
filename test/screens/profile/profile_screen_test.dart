@@ -116,7 +116,9 @@ void main() {
       when(() => mockUserProfileNotifier.state)
           .thenReturn(AsyncValue.data(testUser));
       when(() => mockUserProfileNotifier.updateProfile(any()))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+            return null;
+          });
 
       // Act
       await tester.pumpWidget(createTestableWidget());
@@ -153,7 +155,9 @@ void main() {
       when(() => mockUserProfileNotifier.state).thenReturn(
           const AsyncValue.error('Failed to load profile', StackTrace.empty));
       when(() => mockUserProfileNotifier.updateProfile(any()))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+            return null;
+          });
 
       // Act
       await tester.pumpWidget(createTestableWidget());

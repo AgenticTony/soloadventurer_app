@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/repositories/travel_operation_repository.dart';
 import '../../domain/models/base_travel_operation.dart';
-import '../../infrastructure/repositories/shared_prefs_travel_operation_repository.dart';
 
 final travelOperationRepositoryProvider =
     Provider<TravelOperationRepository>((ref) {
