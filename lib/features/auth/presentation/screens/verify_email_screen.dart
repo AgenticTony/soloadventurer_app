@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
@@ -28,22 +28,23 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       final authState = ref.read(authProvider);
       debugPrint('VerifyEmailScreen: Auth state on init: $authState');
       debugPrint(
-          'VerifyEmailScreen: User email from state: ${authState.user?.email}');
+          'VerifyEmailScreen: User email from state: ${authState.value?.user?.email}');
       debugPrint(
-          'VerifyEmailScreen: Needs verification: ${authState.needsVerification}');
+          'VerifyEmailScreen: Needs verification: ${authState.value?.needsVerification}');
 
       // Try to get email from navigation arguments first
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      final emailFromArgs = args?['email'] as String?;
-      debugPrint(
-          'VerifyEmailScreen: Email from navigation args: $emailFromArgs');
+      final emailFromArgs =
+          ModalRoute.of(context)?.settings.arguments as String?;
 
-      setState(() {
-        _email = emailFromArgs ??
-            authState.user?.email ??
-            (authState.needsVerification ? authState.user?.email : null);
-      });
+      if (mounted) {
+        setState(() {
+          _email = emailFromArgs ??
+              authState.value?.user?.email ??
+              (authState.value?.needsVerification == true
+                  ? authState.value?.user?.email
+                  : null);
+        });
+      }
 
       debugPrint('VerifyEmailScreen: Final email state: $_email');
 
@@ -82,7 +83,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         final code = _codeController.text.trim();
         // Store the current auth state before verification
         final authState = ref.read(authProvider);
-        final preservedUser = authState.user;
+        final preservedUser = authState.value?.user;
 
         debugPrint('VerifyEmailScreen: Starting verification');
         debugPrint('VerifyEmailScreen: Current auth state: $authState');
@@ -93,7 +94,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
         if (_email == null) {
           debugPrint('VerifyEmailScreen: No email available in local state');
           // Try to get email from preserved user first
-          _email = preservedUser?.email ?? authState.user?.email;
+          _email = preservedUser?.email ?? authState.value?.user?.email;
           if (_email == null) {
             throw Exception('No email found for verification');
           }
@@ -115,7 +116,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
 
-            if (newState.isAuthenticated) {
+            if (newState.value?.isAuthenticated ?? false) {
               // Use typed navigation method
               ref.read(authNavigationProvider.notifier).navigateToProfileEdit(
                     isInitialSetup: true,
@@ -178,83 +179,102 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-    final email = _email ?? authState.user?.email ?? '';
+
+    // Redirect if user is authenticated
+    if (authState.value?.isAuthenticated ?? false) {
+      ref.read(authNavigationProvider.notifier).navigateToHome();
+      return const SizedBox.shrink();
+    }
+
+    // Show loading state
+    if (authState.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // Show error state
+    if (authState.hasError) {
+      return Center(
+        child: Text(
+          authState.error.toString(),
+          style: const TextStyle(color: Colors.red),
+        ),
+      );
+    }
+
+    final user = authState.value?.user;
+    if (user == null) {
+      ref.read(authNavigationProvider.notifier).navigateToLogin();
+      return const SizedBox.shrink();
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Verify Email'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Use navigation provider to handle back navigation
-            ref.read(authNavigationProvider.notifier).navigateBack();
-            // Reset the verification state
-            ref.read(authProvider.notifier).clearVerificationState();
-          },
-        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              ref.read(authProvider.notifier).signOut();
+            },
+          ),
+        ],
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Icon(
-                  Icons.email_outlined,
-                  size: 64,
-                  color: Colors.blue,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Verify your email',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'We sent a verification code to:',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  email,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _codeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Verification Code',
-                    hintText: 'Enter 6-digit code',
-                    prefixIcon: Icon(Icons.lock_outline),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Please verify your email',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'We sent a verification code to ${user.email}',
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _codeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Verification Code',
+                      hintText: 'Enter the code from your email',
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter the verification code';
+                      }
+                      return null;
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                  maxLength: 6,
-                  validator: _validateCode,
-                  enabled: !_isLoading,
-                ),
-                const SizedBox(height: 24),
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else ...[
+                  const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: _verifyEmail,
+                    onPressed: () {
+                      if (_formKey.currentState?.validate() ?? false) {
+                        ref.read(authProvider.notifier).verifyEmail(
+                              _codeController.text,
+                              user.email,
+                            );
+                      }
+                    },
                     child: const Text('Verify Email'),
                   ),
-                  TextButton(
-                    onPressed: _resendCode,
-                    child: const Text('Resend Code'),
-                  ),
                 ],
-              ],
+              ),
             ),
-          ),
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                ref.read(authProvider.notifier).resendVerificationEmail();
+              },
+              child: const Text('Resend Code'),
+            ),
+          ],
         ),
       ),
     );

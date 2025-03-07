@@ -12,7 +12,6 @@ _$AuthSessionImpl _$$AuthSessionImplFromJson(Map<String, dynamic> json) =>
       refreshToken: json['refreshToken'] as String,
       idToken: json['idToken'] as String,
       expiresAt: DateTime.parse(json['expiresAt'] as String),
-      isOffline: json['isOffline'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$$AuthSessionImplToJson(_$AuthSessionImpl instance) =>
@@ -21,5 +20,4 @@ Map<String, dynamic> _$$AuthSessionImplToJson(_$AuthSessionImpl instance) =>
       'refreshToken': instance.refreshToken,
       'idToken': instance.idToken,
       'expiresAt': instance.expiresAt.toIso8601String(),
-      'isOffline': instance.isOffline,
     };

@@ -48,21 +48,19 @@ class AuthInterceptor extends Interceptor {
         final authRepository = getIt<AuthRepository>();
 
         // Try to refresh token
-        final refreshed = await authRepository.refreshToken();
+        final session = await authRepository.refreshToken();
 
-        if (refreshed) {
-          // Get new token
-          final newToken = await authRepository.getAccessToken();
+        // Get new token from session
+        final newToken = session.accessToken;
 
-          if (newToken != null && newToken.isNotEmpty) {
-            // Create new request with updated token
-            final options = err.requestOptions;
-            options.headers['Authorization'] = 'Bearer $newToken';
+        if (newToken.isNotEmpty) {
+          // Create new request with updated token
+          final options = err.requestOptions;
+          options.headers['Authorization'] = 'Bearer $newToken';
 
-            // Retry request with new token
-            final response = await Dio().fetch(options);
-            return handler.resolve(response);
-          }
+          // Retry request with new token
+          final response = await Dio().fetch(options);
+          return handler.resolve(response);
         }
 
         // If token refresh failed, proceed with error

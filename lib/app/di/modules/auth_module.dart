@@ -14,7 +14,7 @@ import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
-import 'package:soloadventurer/core/config/cognito_config.dart';
+import 'package:soloadventurer/features/core/config/app_config.dart';
 
 /// Register all auth feature dependencies
 void registerAuthModule(GetIt getIt, {bool isTest = false}) {
@@ -29,7 +29,7 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
     () => isTest
         ? MockAuthRemoteDataSource(getIt<ApiClient>())
         : AuthRemoteDataSourceImpl(
-            userPool: CognitoConfig.userPool,
+            userPool: AppConfig.awsConfig.userPool,
           ),
   );
 

@@ -24,7 +24,6 @@ mixin _$AuthSession {
   String get refreshToken => throw _privateConstructorUsedError;
   String get idToken => throw _privateConstructorUsedError;
   DateTime get expiresAt => throw _privateConstructorUsedError;
-  bool get isOffline => throw _privateConstructorUsedError;
 
   /// Serializes this AuthSession to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,8 +45,7 @@ abstract class $AuthSessionCopyWith<$Res> {
       {String accessToken,
       String refreshToken,
       String idToken,
-      DateTime expiresAt,
-      bool isOffline});
+      DateTime expiresAt});
 }
 
 /// @nodoc
@@ -69,7 +67,6 @@ class _$AuthSessionCopyWithImpl<$Res, $Val extends AuthSession>
     Object? refreshToken = null,
     Object? idToken = null,
     Object? expiresAt = null,
-    Object? isOffline = null,
   }) {
     return _then(_value.copyWith(
       accessToken: null == accessToken
@@ -88,10 +85,6 @@ class _$AuthSessionCopyWithImpl<$Res, $Val extends AuthSession>
           ? _value.expiresAt
           : expiresAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      isOffline: null == isOffline
-          ? _value.isOffline
-          : isOffline // ignore: cast_nullable_to_non_nullable
-              as bool,
     ) as $Val);
   }
 }
@@ -108,8 +101,7 @@ abstract class _$$AuthSessionImplCopyWith<$Res>
       {String accessToken,
       String refreshToken,
       String idToken,
-      DateTime expiresAt,
-      bool isOffline});
+      DateTime expiresAt});
 }
 
 /// @nodoc
@@ -129,7 +121,6 @@ class __$$AuthSessionImplCopyWithImpl<$Res>
     Object? refreshToken = null,
     Object? idToken = null,
     Object? expiresAt = null,
-    Object? isOffline = null,
   }) {
     return _then(_$AuthSessionImpl(
       accessToken: null == accessToken
@@ -148,10 +139,6 @@ class __$$AuthSessionImplCopyWithImpl<$Res>
           ? _value.expiresAt
           : expiresAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      isOffline: null == isOffline
-          ? _value.isOffline
-          : isOffline // ignore: cast_nullable_to_non_nullable
-              as bool,
     ));
   }
 }
@@ -163,8 +150,7 @@ class _$AuthSessionImpl implements _AuthSession {
       {required this.accessToken,
       required this.refreshToken,
       required this.idToken,
-      required this.expiresAt,
-      this.isOffline = false});
+      required this.expiresAt});
 
   factory _$AuthSessionImpl.fromJson(Map<String, dynamic> json) =>
       _$$AuthSessionImplFromJson(json);
@@ -177,13 +163,10 @@ class _$AuthSessionImpl implements _AuthSession {
   final String idToken;
   @override
   final DateTime expiresAt;
-  @override
-  @JsonKey()
-  final bool isOffline;
 
   @override
   String toString() {
-    return 'AuthSession(accessToken: $accessToken, refreshToken: $refreshToken, idToken: $idToken, expiresAt: $expiresAt, isOffline: $isOffline)';
+    return 'AuthSession(accessToken: $accessToken, refreshToken: $refreshToken, idToken: $idToken, expiresAt: $expiresAt)';
   }
 
   @override
@@ -197,15 +180,13 @@ class _$AuthSessionImpl implements _AuthSession {
                 other.refreshToken == refreshToken) &&
             (identical(other.idToken, idToken) || other.idToken == idToken) &&
             (identical(other.expiresAt, expiresAt) ||
-                other.expiresAt == expiresAt) &&
-            (identical(other.isOffline, isOffline) ||
-                other.isOffline == isOffline));
+                other.expiresAt == expiresAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, accessToken, refreshToken, idToken, expiresAt, isOffline);
+  int get hashCode =>
+      Object.hash(runtimeType, accessToken, refreshToken, idToken, expiresAt);
 
   /// Create a copy of AuthSession
   /// with the given fields replaced by the non-null parameter values.
@@ -228,8 +209,7 @@ abstract class _AuthSession implements AuthSession {
       {required final String accessToken,
       required final String refreshToken,
       required final String idToken,
-      required final DateTime expiresAt,
-      final bool isOffline}) = _$AuthSessionImpl;
+      required final DateTime expiresAt}) = _$AuthSessionImpl;
 
   factory _AuthSession.fromJson(Map<String, dynamic> json) =
       _$AuthSessionImpl.fromJson;
@@ -242,8 +222,6 @@ abstract class _AuthSession implements AuthSession {
   String get idToken;
   @override
   DateTime get expiresAt;
-  @override
-  bool get isOffline;
 
   /// Create a copy of AuthSession
   /// with the given fields replaced by the non-null parameter values.

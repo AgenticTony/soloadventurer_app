@@ -1,5 +1,5 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import 'package:soloadventurer/core/config/cognito_config.dart';
+import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -63,6 +63,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   CognitoUserSession? _session;
   int _failedAttempts = 0;
   DateTime? _lastFailedAttempt;
+  static const int _maxFailedAttempts =
+      5; // Same as AppConfig.awsConfig.maxFailedAttempts
 
   /// Authentication flow types
   static const String USER_SRP_AUTH = 'USER_SRP_AUTH';
@@ -85,25 +87,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required CognitoUserPool userPool,
   }) : _userPool = userPool;
 
-  void _handleFailedAttempt() {
-    final now = DateTime.now();
-
-    // Reset failed attempts if last attempt was more than 15 minutes ago
-    if (_lastFailedAttempt != null &&
-        now.difference(_lastFailedAttempt!).inMinutes >= 15) {
-      _failedAttempts = 0;
-    }
-
+  Future<void> _handleFailedAttempt() async {
     _failedAttempts++;
-    _lastFailedAttempt = now;
-
-    // Calculate lockout duration based on AWS's exponential backoff
-    if (_failedAttempts >= CognitoConfig.maxFailedAttempts) {
-      final lockoutSeconds =
-          pow(2, _failedAttempts - CognitoConfig.maxFailedAttempts);
-      throw AuthException(
-        'Too many failed attempts. Please try again in $lockoutSeconds seconds.',
-      );
+    if (_failedAttempts >= _maxFailedAttempts) {
+      final backoffDuration = Duration(
+          seconds: pow(2, _failedAttempts - _maxFailedAttempts).toInt());
+      await Future.delayed(backoffDuration);
     }
   }
 
@@ -283,7 +272,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } on CognitoUserException catch (e) {
       debugPrint('Cognito error during sign in: $e');
       if (e.toString().contains('NotAuthorizedException')) {
-        _handleFailedAttempt();
+        await _handleFailedAttempt();
         throw const AuthException(
           'Wrong password. Please try again.',
           code: 'INVALID_CREDENTIALS',
@@ -306,7 +295,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       if (!e.toString().contains('Too many failed attempts')) {
-        _handleFailedAttempt();
+        await _handleFailedAttempt();
       }
       throw AuthException(
         'Wrong password. Please try again.',
@@ -359,14 +348,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             code: 'NEW_PASSWORD_REQUIRED',
           );
         } else if (e.toString().contains('NotAuthorizedException')) {
-          _handleFailedAttempt();
+          await _handleFailedAttempt();
           throw const AuthException(
             'Wrong password. Please try again.',
             code: 'INVALID_CREDENTIALS',
           );
         }
         // Handle any other Cognito exceptions
-        _handleFailedAttempt();
+        await _handleFailedAttempt();
         throw AuthException(
           'Wrong password. Please try again.',
           code: 'COGNITO_ERROR',
@@ -402,7 +391,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       debugPrint('Authentication error: $e');
       if (e is! AuthException ||
           !e.toString().contains('Too many failed attempts')) {
-        _handleFailedAttempt();
+        await _handleFailedAttempt();
       }
       if (e is AuthException) {
         rethrow;
@@ -489,39 +478,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<AuthSession> refreshToken() async {
     try {
-      final cognitoUser = _cognitoUser;
-      if (cognitoUser == null) {
+      if (_cognitoUser == null || _session == null) {
         throw AuthException('No authenticated user');
       }
 
-      final currentSession = cognitoUser.getSignInUserSession();
-      final currentRefreshToken = currentSession?.refreshToken;
-      if (currentRefreshToken == null) {
+      final refreshToken = _session!.getRefreshToken();
+      if (refreshToken == null) {
         throw AuthException('No refresh token available');
       }
 
-      final session = await cognitoUser.refreshSession(currentRefreshToken);
-      if (session == null) {
+      _session = await _cognitoUser!.refreshSession(refreshToken);
+      if (_session == null) {
         throw AuthException('Failed to refresh session');
       }
 
-      final accessToken = session.accessToken.jwtToken;
-      final refreshToken = session.refreshToken?.token;
-      final idToken = session.idToken.jwtToken;
-      final expiration = session.accessToken.getExpiration();
-
-      if (accessToken == null || refreshToken == null || idToken == null) {
-        throw AuthException('Invalid session tokens received');
-      }
-
       return AuthSession(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-        idToken: idToken,
+        accessToken: _session!.getAccessToken().getJwtToken()!,
+        idToken: _session!.getIdToken().getJwtToken()!,
+        refreshToken: _session!.getRefreshToken()!.getToken()!,
         expiresAt: DateTime.fromMillisecondsSinceEpoch(
-            expiration * 1000), // Convert seconds to milliseconds
+          _session!.getAccessToken().getExpiration() * 1000,
+        ),
       );
     } catch (e) {
+      debugPrint('Token refresh error: $e');
       throw AuthException('Failed to refresh token: ${e.toString()}');
     }
   }

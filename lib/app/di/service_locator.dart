@@ -1,16 +1,17 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
-import 'package:soloadventurer/app/config/env.dart';
+import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/app/di/modules/auth_module.dart';
 import 'package:soloadventurer/app/di/modules/core_module.dart';
+import 'package:soloadventurer/features/core/infrastructure/api/api_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/core/api/client/mock_api_client.dart';
 import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
 import 'package:soloadventurer/core/api/interceptors/error_interceptor.dart';
 import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
-import 'package:soloadventurer/services/monitoring/monitoring_service.dart';
-import 'package:soloadventurer/services/monitoring/aws_cloudwatch_monitoring.dart';
-import 'package:soloadventurer/core/api/api_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/monitoring/aws_cloudwatch_monitoring.dart';
 
 /// Global GetIt instance for dependency injection
 final GetIt getIt = GetIt.instance;
@@ -41,58 +42,28 @@ Future<void> setupServiceLocator({bool isTest = false}) async {
 
 /// Register services that don't depend on other services
 Future<void> _registerIndependentServices() async {
-  // Register environment configuration
-  getIt.registerSingleton<Env>(Env());
-
-  // Register monitoring services
-  getIt.registerSingleton<NetworkMonitor>(NetworkMonitor());
-
-  // Register interceptors
-  getIt.registerSingleton<ErrorInterceptor>(ErrorInterceptor());
-  getIt.registerSingleton<AuthInterceptor>(AuthInterceptor());
-
   // Register secure storage
-  getIt.registerSingleton<FlutterSecureStorage>(
-    _isTestMode
-        ? const FlutterSecureStorage(
-            aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            iOptions:
-                IOSOptions(accessibility: KeychainAccessibility.first_unlock),
-          )
-        : const FlutterSecureStorage(),
+  getIt.registerLazySingleton<FlutterSecureStorage>(
+    () => const FlutterSecureStorage(),
   );
+
+  // Register app configuration
+  getIt.registerLazySingleton(() => AppConfig());
 }
 
-/// Register API client
+/// Register API client and related services
 Future<void> _registerApiClient() async {
-  // Register API client (depends on interceptors and network monitor)
-  getIt.registerSingleton<ApiClient>(
-    ApiClient(
-      baseUrl: getIt<Env>().apiBaseUrl,
-      authInterceptor: getIt<AuthInterceptor>(),
-      errorInterceptor: getIt<ErrorInterceptor>(),
-      networkMonitor: getIt<NetworkMonitor>(),
-    ),
-  );
-
-  // Register API service interface
-  getIt.registerSingleton<ApiService>(
-    _isTestMode
-        ? MockApiClient(
-            baseUrl: getIt<Env>().apiBaseUrl,
-            authInterceptor: getIt<AuthInterceptor>(),
-            errorInterceptor: getIt<ErrorInterceptor>(),
-            networkMonitor: getIt<NetworkMonitor>(),
-          )
-        : getIt<ApiClient>(),
+  // Register API service
+  getIt.registerLazySingleton<ApiService>(
+    () => DioApiService(),
   );
 }
 
 /// Register services that depend on other services
 Future<void> _registerDependentServices() async {
-  // Register monitoring service (depends on API client)
-  getIt.registerSingleton<MonitoringService>(
-    AwsCloudWatchMonitoring(getIt<ApiService>()),
+  // Register monitoring service
+  getIt.registerLazySingleton(
+    () => AppConfig.awsConfig.userPool,
   );
 }
 

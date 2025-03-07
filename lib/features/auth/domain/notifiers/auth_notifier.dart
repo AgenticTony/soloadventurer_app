@@ -84,7 +84,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
     state = state.copyWith(isLoading: true, error: null);
     try {
-      await _authDataSource.verifyEmail(code);
+      await _authDataSource.verifyEmail(code, state.user!.email);
       // After verification, user needs to sign in
       state = AuthState.initial();
     } on AuthException catch (e) {

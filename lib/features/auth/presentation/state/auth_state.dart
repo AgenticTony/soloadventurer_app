@@ -1,112 +1,175 @@
 import 'package:equatable/equatable.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 
-/// Represents the current state of authentication
-class AuthState extends Equatable {
-  /// The current user, if any
+/// Represents the authentication state of the application
+class AuthState {
+  /// The current user, if authenticated
   final User? user;
 
-  /// Whether the state is loading
-  final bool isLoading;
+  /// Whether the user is authenticated
+  final bool isAuthenticated;
 
-  /// Any error message
-  final String? error;
+  /// Whether the user requires MFA
+  final bool requiresMFA;
 
-  /// The error code, if any
-  final String? errorCode;
-
-  /// Whether email verification is required
+  /// Whether the user requires email verification
   final bool requiresEmailVerification;
 
-  /// Whether password reset is required
-  final bool requiresPasswordReset;
+  /// The access token for the current session
+  final String? accessToken;
 
-  /// Creates a new [AuthState]
-  const AuthState({
-    this.user,
-    this.isLoading = false,
-    this.error,
-    this.errorCode,
-    this.requiresEmailVerification = false,
-    this.requiresPasswordReset = false,
-  });
+  /// The ID token for the current session
+  final String? idToken;
 
-  /// Creates an initial state
-  factory AuthState.initial() {
-    return const AuthState();
-  }
+  /// The refresh token for the current session
+  final String? refreshToken;
+
+  /// The expiration time of the current session
+  final DateTime? tokenExpiresAt;
+
+  /// Creates an initial authentication state
+  const AuthState.initial()
+      : user = null,
+        isAuthenticated = false,
+        requiresMFA = false,
+        requiresEmailVerification = false,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
+
+  /// Creates an authenticated state with the given user and tokens
+  const AuthState.authenticated({
+    required User user,
+    required String accessToken,
+    required String idToken,
+    required String refreshToken,
+    required DateTime tokenExpiresAt,
+    bool requiresMFA = false,
+  })  : user = user,
+        isAuthenticated = true,
+        requiresMFA = requiresMFA,
+        requiresEmailVerification = false,
+        accessToken = accessToken,
+        idToken = idToken,
+        refreshToken = refreshToken,
+        tokenExpiresAt = tokenExpiresAt;
+
+  /// Creates an unverified state with the given user
+  const AuthState.unverified({
+    required User user,
+  })  : user = user,
+        isAuthenticated = false,
+        requiresMFA = false,
+        requiresEmailVerification = true,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
+
+  /// Creates an MFA required state with the given user
+  const AuthState.mfaRequired({
+    required User user,
+  })  : user = user,
+        isAuthenticated = false,
+        requiresMFA = true,
+        requiresEmailVerification = false,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
+
+  /// Creates an unauthenticated state
+  const AuthState.unauthenticated()
+      : user = null,
+        isAuthenticated = false,
+        requiresMFA = false,
+        requiresEmailVerification = false,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
 
   /// Creates a loading state
-  factory AuthState.loading() {
-    return const AuthState(isLoading: true);
-  }
+  const AuthState.loading()
+      : user = null,
+        isAuthenticated = false,
+        requiresMFA = false,
+        requiresEmailVerification = false,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
 
   /// Creates an error state
-  factory AuthState.error(String message, [String? code]) {
-    return AuthState(
-      error: message,
-      errorCode: code,
-    );
-  }
-
-  /// Creates an authenticated state
-  factory AuthState.authenticated(User user) {
-    return AuthState(user: user);
-  }
-
-  /// Creates an unverified state
-  factory AuthState.unverified(User user) {
-    return AuthState(
-      user: user,
-      requiresEmailVerification: true,
-    );
-  }
+  const AuthState.error()
+      : user = null,
+        isAuthenticated = false,
+        requiresMFA = false,
+        requiresEmailVerification = false,
+        accessToken = null,
+        idToken = null,
+        refreshToken = null,
+        tokenExpiresAt = null;
 
   /// Creates a copy of this state with the given fields replaced with new values
   AuthState copyWith({
     User? user,
-    bool? isLoading,
-    String? error,
-    String? errorCode,
+    bool? isAuthenticated,
+    bool? requiresMFA,
     bool? requiresEmailVerification,
-    bool? requiresPasswordReset,
+    String? accessToken,
+    String? idToken,
+    String? refreshToken,
+    DateTime? tokenExpiresAt,
   }) {
     return AuthState(
       user: user ?? this.user,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      errorCode: errorCode,
+      isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      requiresMFA: requiresMFA ?? this.requiresMFA,
       requiresEmailVerification:
           requiresEmailVerification ?? this.requiresEmailVerification,
-      requiresPasswordReset:
-          requiresPasswordReset ?? this.requiresPasswordReset,
+      accessToken: accessToken ?? this.accessToken,
+      idToken: idToken ?? this.idToken,
+      refreshToken: refreshToken ?? this.refreshToken,
+      tokenExpiresAt: tokenExpiresAt ?? this.tokenExpiresAt,
     );
   }
 
-  /// Whether the user is logged in
-  bool get isLoggedIn => user != null && !requiresEmailVerification;
-
-  /// Whether the user is authenticated (has a valid user object)
-  bool get isAuthenticated => user != null;
-
-  /// Whether the user needs to verify their email
-  bool get needsVerification => requiresEmailVerification;
-
-  /// Whether the user is new (just registered)
-  bool get isNewUser => user != null && requiresEmailVerification;
-
-  @override
-  List<Object?> get props => [
-        user,
-        isLoading,
-        error,
-        errorCode,
-        requiresEmailVerification,
-        requiresPasswordReset,
-      ];
+  /// Creates an authentication state with the given fields
+  const AuthState({
+    this.user,
+    this.isAuthenticated = false,
+    this.requiresMFA = false,
+    this.requiresEmailVerification = false,
+    this.accessToken,
+    this.idToken,
+    this.refreshToken,
+    this.tokenExpiresAt,
+  });
 
   @override
-  String toString() {
-    return 'AuthState(user: $user, isLoading: $isLoading, error: $error, errorCode: $errorCode, requiresEmailVerification: $requiresEmailVerification, requiresPasswordReset: $requiresPasswordReset)';
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AuthState &&
+          runtimeType == other.runtimeType &&
+          user == other.user &&
+          isAuthenticated == other.isAuthenticated &&
+          requiresMFA == other.requiresMFA &&
+          requiresEmailVerification == other.requiresEmailVerification &&
+          accessToken == other.accessToken &&
+          idToken == other.idToken &&
+          refreshToken == other.refreshToken &&
+          tokenExpiresAt == other.tokenExpiresAt;
+
+  @override
+  int get hashCode =>
+      user.hashCode ^
+      isAuthenticated.hashCode ^
+      requiresMFA.hashCode ^
+      requiresEmailVerification.hashCode ^
+      accessToken.hashCode ^
+      idToken.hashCode ^
+      refreshToken.hashCode ^
+      tokenExpiresAt.hashCode;
 }

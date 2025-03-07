@@ -1,4 +1,5 @@
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
 /// Repository interface for authentication operations
 abstract class AuthRepository {
@@ -65,8 +66,9 @@ abstract class AuthRepository {
   /// Get the current access token
   Future<String?> getAccessToken();
 
-  /// Refresh the authentication token
-  Future<bool> refreshToken();
+  /// Refresh the authentication tokens
+  /// Returns a new [AuthSession] with updated tokens
+  Future<AuthSession> refreshToken();
 
   /// Register a new user with email and password
   Future<User> registerWithEmailAndPassword(

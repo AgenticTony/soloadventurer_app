@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 
 class AuthTestScreen extends ConsumerStatefulWidget {
@@ -105,6 +105,15 @@ class _AuthTestScreenState extends ConsumerState<AuthTestScreen> {
             ElevatedButton(
               onPressed: _signOut,
               child: const Text('Sign Out'),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Current user: ${authState.value?.user?.email ?? 'No user'}',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            Text(
+              'Is authenticated: ${authState.value?.user != null}',
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),

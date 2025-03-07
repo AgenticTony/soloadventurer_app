@@ -5,6 +5,7 @@ import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_s
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
 /// Implementation of [AuthRepository] that coordinates between local and remote data sources
 class AuthRepositoryImpl implements AuthRepository {
@@ -248,9 +249,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> refreshToken() async {
-    await remoteDataSource.refreshToken();
-    return true;
+  Future<AuthSession> refreshToken() async {
+    try {
+      final session = await remoteDataSource.refreshToken();
+      await localDataSource.saveAuthData(
+        session.accessToken,
+        session.refreshToken,
+      );
+      return session;
+    } catch (e) {
+      throw AuthException('Failed to refresh token: ${e.toString()}');
+    }
   }
 
   /// Get list of known devices for the current user
@@ -291,5 +300,19 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return false;
     }
+  }
+
+  @override
+  Future<User> registerWithEmailAndPassword(
+    String email,
+    String password,
+    String name,
+  ) async {
+    final (user, _) = await register(
+      email: email,
+      password: password,
+      name: name,
+    );
+    return user;
   }
 }

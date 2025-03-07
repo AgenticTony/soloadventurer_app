@@ -8,41 +8,97 @@ import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
-import 'package:soloadventurer/features/auth/domain/usecases/resend_verification_email.dart';
+import 'package:soloadventurer/features/auth/domain/usecases/resend_verification_email.dart'
+    as resend;
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
+import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/services/logging_service_impl.dart';
 import 'package:flutter/foundation.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/token_notifier.dart';
 
-/// Auth initialization provider
-final authInitProvider = FutureProvider.autoDispose((ref) async {
-  final isSignedIn = getIt<IsSignedIn>();
-  final getCurrentUser = getIt<GetCurrentUser>();
-
-  final isAuthenticated = await isSignedIn();
-  if (isAuthenticated) {
-    final user = await getCurrentUser();
-    if (user != null) {
-      ref.read(authProvider.notifier).setAuthenticated(user);
-      return;
-    }
-  }
-  ref.read(authProvider.notifier).setInitial();
+/// Auth provider that manages authentication state
+final authProvider =
+    StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>((ref) {
+  final tokenNotifier = ref.watch(tokenNotifierProvider);
+  return AuthNotifier(
+    getCurrentUser: getIt<GetCurrentUser>(),
+    isSignedIn: getIt<IsSignedIn>(),
+    login: getIt<LoginUseCase>(),
+    signUp: getIt<SignUp>(),
+    signOut: getIt<SignOut>(),
+    verifyEmail: getIt<VerifyEmail>(),
+    resendVerificationEmail: getIt<resend.ResendVerificationEmail>(),
+    forgotPassword: getIt<ForgotPassword>(),
+    confirmPasswordReset: getIt<ConfirmPasswordReset>(),
+    logger: getIt<LoggingService>(),
+    tokenNotifier: tokenNotifier,
+  );
 });
 
-/// Auth state notifier
-class AuthNotifier extends StateNotifier<AuthState> {
+/// Auth initialization provider that handles the initial authentication check
+/// and sets up the auth state accordingly
+final authInitProvider = FutureProvider.autoDispose((ref) async {
+  final logger = ref.watch(loggingServiceImplProvider);
+  logger.logAuthEvent(
+    event: 'InitializeAuth',
+    status: 'Started',
+    metadata: {'source': 'authInitProvider'},
+  );
+
+  try {
+    final isSignedIn = getIt<IsSignedIn>();
+    final getCurrentUser = getIt<GetCurrentUser>();
+
+    final isAuthenticated = await isSignedIn();
+    if (isAuthenticated) {
+      final user = await getCurrentUser();
+      if (user != null) {
+        logger.logAuthEvent(
+          event: 'InitializeAuth',
+          status: 'Success',
+          metadata: {'user_id': user.id, 'state': 'authenticated'},
+        );
+        ref.read(authProvider.notifier).initialize();
+        return;
+      }
+    }
+
+    logger.logAuthEvent(
+      event: 'InitializeAuth',
+      status: 'Success',
+      metadata: {'state': 'unauthenticated'},
+    );
+    ref.read(authProvider.notifier).initialize();
+  } catch (e, stack) {
+    logger.logError(
+      feature: 'Authentication',
+      error: 'Failed to initialize auth state',
+      metadata: {'error': e.toString()},
+      stackTrace: stack,
+    );
+    rethrow;
+  }
+});
+
+/// Auth state notifier that manages authentication state using AsyncValue
+/// for better error handling and loading states
+class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final GetCurrentUser _getCurrentUser;
   final IsSignedIn _isSignedIn;
   final LoginUseCase _login;
   final SignUp _signUp;
   final SignOut _signOut;
   final VerifyEmail _verifyEmail;
-  final ResendVerificationEmail _resendVerificationEmail;
+  final resend.ResendVerificationEmail _resendVerificationEmail;
   final ForgotPassword _forgotPassword;
   final ConfirmPasswordReset _confirmPasswordReset;
+  final LoggingService _logger;
+  final TokenNotifier _tokenNotifier;
 
-  /// Creates a new [AuthNotifier] with the given use cases
+  /// Creates a new [AuthNotifier] with the given use cases and logger
   AuthNotifier({
     required GetCurrentUser getCurrentUser,
     required IsSignedIn isSignedIn,
@@ -50,9 +106,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required SignUp signUp,
     required SignOut signOut,
     required VerifyEmail verifyEmail,
-    required ResendVerificationEmail resendVerificationEmail,
+    required resend.ResendVerificationEmail resendVerificationEmail,
     required ForgotPassword forgotPassword,
     required ConfirmPasswordReset confirmPasswordReset,
+    required LoggingService logger,
+    required TokenNotifier tokenNotifier,
   })  : _getCurrentUser = getCurrentUser,
         _isSignedIn = isSignedIn,
         _login = login,
@@ -62,36 +120,90 @@ class AuthNotifier extends StateNotifier<AuthState> {
         _resendVerificationEmail = resendVerificationEmail,
         _forgotPassword = forgotPassword,
         _confirmPasswordReset = confirmPasswordReset,
-        super(AuthState.initial());
-
-  /// Set state to authenticated with user
-  void setAuthenticated(User user) {
-    if (!mounted) return;
-    state = AuthState.authenticated(user);
+        _logger = logger,
+        _tokenNotifier = tokenNotifier,
+        super(AsyncValue.data(AuthState.initial())) {
+    _logger.logAuthEvent(
+      event: 'Initialize',
+      status: 'Started',
+      metadata: {'initial_state': 'unauthenticated'},
+    );
   }
 
-  /// Set state to initial
-  void setInitial() {
-    if (!mounted) return;
-    state = AuthState.initial();
+  /// Updates state with proper logging
+  void _updateState(AsyncValue<AuthState> newState) {
+    final previousState = state.value;
+    state = newState;
+
+    if (previousState != newState.value) {
+      _logger.logStateTransition(
+        feature: 'Authentication',
+        fromState: previousState?.toString() ?? 'null',
+        toState: newState.value?.toString() ?? 'null',
+        metadata: {
+          'is_loading': newState.isLoading,
+          'has_error': newState.hasError,
+          'is_authenticated': newState.value?.isAuthenticated ?? false,
+        },
+        stackTrace: StackTrace.current,
+      );
+    }
   }
 
-  /// Set state to loading
-  void setLoading() {
+  /// Initialize auth state
+  Future<void> initialize() async {
     if (!mounted) return;
-    state = AuthState.loading();
-  }
 
-  /// Set state to error
-  void setError(String message) {
+    _logger.logAuthEvent(
+      event: 'Initialize',
+      status: 'InProgress',
+    );
+
+    _updateState(const AsyncValue.loading());
+
+    final newState = await AsyncValue.guard(() async {
+      final isAuthenticated = await _isSignedIn();
+      if (isAuthenticated) {
+        final user = await _getCurrentUser();
+        final session = _tokenNotifier.currentSession;
+        if (user != null && session != null) {
+          _logger.logAuthEvent(
+            event: 'Initialize',
+            status: 'Success',
+            metadata: {'user_id': user.id},
+          );
+          return AuthState.authenticated(
+            user: user,
+            accessToken: session.accessToken,
+            idToken: session.idToken,
+            refreshToken: session.refreshToken,
+            tokenExpiresAt: session.expiresAt,
+          );
+        }
+      }
+      _logger.logAuthEvent(
+        event: 'Initialize',
+        status: 'Success',
+        metadata: {'state': 'unauthenticated'},
+      );
+      return AuthState.initial();
+    });
+
     if (!mounted) return;
-    state = AuthState.error(message);
+    _updateState(newState);
   }
 
   /// Sign in with email and password
   Future<void> signIn(String email, String password) async {
     if (!mounted) return;
-    setLoading();
+
+    _logger.logAuthEvent(
+      event: 'SignIn',
+      status: 'Started',
+      metadata: {'email': email},
+    );
+
+    _updateState(const AsyncValue.loading());
 
     try {
       final user = await _login(LoginParams(
@@ -100,209 +212,187 @@ class AuthNotifier extends StateNotifier<AuthState> {
       ));
 
       if (!mounted) return;
-      setAuthenticated(user);
-    } catch (e) {
+
+      _logger.logAuthEvent(
+        event: 'SignIn',
+        status: 'Success',
+        metadata: {'user_id': user.id},
+      );
+
+      final session = _tokenNotifier.currentSession;
+      if (session == null) {
+        _updateState(AsyncValue.data(AuthState.initial()));
+        return;
+      }
+
+      _updateState(AsyncValue.data(AuthState.authenticated(
+        user: user,
+        accessToken: session.accessToken,
+        idToken: session.idToken,
+        refreshToken: session.refreshToken,
+        tokenExpiresAt: session.expiresAt,
+      )));
+    } on ValidationException catch (e, stack) {
       if (!mounted) return;
-      setError(e.toString());
+
+      _logger.logError(
+        feature: 'Authentication',
+        error: 'Validation Error',
+        code: 'VALIDATION_ERROR',
+        metadata: {'errors': e.errors},
+        stackTrace: stack,
+      );
+
+      final firstError = e.errors.values
+          .firstWhere(
+            (errors) => errors.isNotEmpty,
+            orElse: () => ['Please check your input'],
+          )
+          .first;
+
+      _updateState(AsyncValue.error(firstError, stack));
+    } on AuthException catch (e, stack) {
+      if (!mounted) return;
+
+      final errorStr = e.message.toLowerCase();
+      final tempUser = User(
+        id: email,
+        email: email,
+        username: email.split('@')[0],
+        createdAt: DateTime.now(),
+      );
+
+      if (errorStr.contains('usernotconfirmedexception')) {
+        _updateState(AsyncValue.data(AuthState.unverified(user: tempUser)));
+        return;
+      } else if (errorStr.contains('mfamethod')) {
+        _updateState(AsyncValue.data(AuthState.mfaRequired(user: tempUser)));
+        return;
+      }
+
+      _logger.logError(
+        feature: 'Authentication',
+        error: 'Authentication Error',
+        code: e.code,
+        metadata: {'message': e.message},
+        stackTrace: stack,
+      );
+
+      _updateState(AsyncValue.error(e.message, stack));
+    } catch (e, stack) {
+      if (!mounted) return;
+
+      _logger.logError(
+        feature: 'Authentication',
+        error: 'Unexpected Error',
+        metadata: {'error': e.toString()},
+        stackTrace: stack,
+      );
+
+      _updateState(AsyncValue.error('An unexpected error occurred', stack));
     }
   }
 
-  /// Register with email and password
+  /// Sign up a new user
   Future<void> signUp({
     required String email,
     required String password,
     required String name,
   }) async {
-    debugPrint('AuthNotifier: Starting sign up');
-    debugPrint('AuthNotifier: Current state before loading: $state');
-    state = AuthState.loading();
-    debugPrint('AuthNotifier: State set to loading: $state');
+    if (!mounted) return;
+
+    _logger.logAuthEvent(
+      event: 'SignUp',
+      status: 'Started',
+      metadata: {'email': email},
+    );
+
+    _updateState(const AsyncValue.loading());
 
     try {
-      debugPrint('AuthNotifier: Calling _signUp use case');
       final result = await _signUp(SignUpParams(
         email: email,
         password: password,
         name: name,
       ));
       final (user, needsVerification) = result;
-      debugPrint('AuthNotifier: Sign up successful, user: $user');
-      debugPrint('AuthNotifier: Needs verification: $needsVerification');
-      debugPrint('AuthNotifier: Current state before setting state: $state');
+
+      if (!mounted) return;
+
+      _logger.logAuthEvent(
+        event: 'SignUp',
+        status: 'Success',
+        metadata: {
+          'user_id': user.id,
+          'needs_verification': needsVerification,
+        },
+      );
 
       if (needsVerification) {
-        debugPrint('AuthNotifier: Creating unverified state');
-        final unverifiedState = AuthState.unverified(user);
-        debugPrint('AuthNotifier: Unverified state created: $unverifiedState');
-        debugPrint('AuthNotifier: Setting state to unverified');
-        state = unverifiedState;
-        debugPrint('AuthNotifier: New state set: $state');
-        debugPrint(
-            'AuthNotifier: requiresEmailVerification: ${state.requiresEmailVerification}');
-        debugPrint('AuthNotifier: user: ${state.user}');
+        _updateState(AsyncValue.data(AuthState.unverified(user: user)));
       } else {
-        state = AuthState.authenticated(user);
+        final session = _tokenNotifier.currentSession;
+        if (session == null) {
+          _updateState(AsyncValue.data(AuthState.initial()));
+          return;
+        }
+
+        _updateState(AsyncValue.data(AuthState.authenticated(
+          user: user,
+          accessToken: session.accessToken,
+          idToken: session.idToken,
+          refreshToken: session.refreshToken,
+          tokenExpiresAt: session.expiresAt,
+        )));
       }
-    } catch (e) {
-      debugPrint('AuthNotifier: Sign up failed: $e');
-      debugPrint('AuthNotifier: Setting error state');
-      state = AuthState.error(e.toString());
-      debugPrint('AuthNotifier: Error state set: $state');
+    } catch (e, stack) {
+      if (!mounted) return;
+
+      _logger.logError(
+        feature: 'Authentication',
+        error: 'SignUp Error',
+        metadata: {'error': e.toString()},
+        stackTrace: stack,
+      );
+
+      _updateState(AsyncValue.error(e.toString(), stack));
     }
   }
 
   /// Sign out
   Future<void> signOut() async {
     if (!mounted) return;
-    setLoading();
+
+    _logger.logAuthEvent(
+      event: 'SignOut',
+      status: 'Started',
+    );
+
+    _updateState(const AsyncValue.loading());
 
     try {
       await _signOut();
+      _tokenNotifier.clearSession();
+
       if (!mounted) return;
-      setInitial();
-    } catch (e) {
-      if (!mounted) return;
-      setError(e.toString());
-    }
-  }
 
-  /// Verify email with confirmation code
-  Future<void> verifyEmail(String code, String email) async {
-    debugPrint('AuthNotifier: Starting email verification');
-    debugPrint('AuthNotifier: Current state before loading: $state');
-
-    // Preserve the current user while setting loading state
-    final currentUser = state.user;
-    state = AuthState.loading().copyWith(user: currentUser);
-    debugPrint('AuthNotifier: Loading state with preserved user: $state');
-
-    try {
-      await _verifyEmail(VerifyEmailParams(code: code, email: email));
-      debugPrint('AuthNotifier: Email verification successful');
-
-      // After successful verification, use the current user directly
-      if (currentUser != null) {
-        debugPrint(
-            'AuthNotifier: Setting authenticated state with current user');
-        state = AuthState.authenticated(currentUser);
-      } else {
-        debugPrint(
-            'AuthNotifier: No user available, attempting to get current user');
-        try {
-          final user = await _getCurrentUser();
-          if (user != null) {
-            debugPrint(
-                'AuthNotifier: Setting authenticated state with fetched user');
-            state = AuthState.authenticated(user);
-          } else {
-            debugPrint(
-                'AuthNotifier: No user data available, setting initial state');
-            state = AuthState.initial();
-          }
-        } catch (e) {
-          debugPrint('AuthNotifier: Error getting user after verification: $e');
-          throw AuthException('Failed to get user after verification');
-        }
-      }
-    } catch (e) {
-      debugPrint('AuthNotifier: Email verification failed: $e');
-      // Preserve the user even in error state
-      state = AuthState.error(e.toString()).copyWith(user: currentUser);
-    }
-  }
-
-  /// Resend verification email
-  Future<void> resendVerificationEmail() async {
-    debugPrint('AuthNotifier: Resending verification email');
-
-    // Preserve the current user while setting loading state
-    final currentUser = state.user;
-    state = AuthState.loading().copyWith(user: currentUser);
-    debugPrint('AuthNotifier: Loading state with preserved user: $state');
-
-    try {
-      await _resendVerificationEmail();
-      debugPrint('AuthNotifier: Verification email resent successfully');
-
-      if (currentUser != null) {
-        debugPrint(
-            'AuthNotifier: Setting unverified state with preserved user');
-        state = AuthState.unverified(currentUser);
-      } else {
-        debugPrint('AuthNotifier: No user to preserve, checking current user');
-        final user = await _getCurrentUser();
-        if (user != null) {
-          state = AuthState.unverified(user);
-        } else {
-          state = AuthState.initial();
-        }
-      }
-    } catch (e) {
-      debugPrint('AuthNotifier: Failed to resend verification email: $e');
-      // Preserve the user even in error state
-      state = AuthState.error(e.toString()).copyWith(user: currentUser);
-    }
-  }
-
-  /// Initiates password reset process
-  Future<void> forgotPassword(ForgotPasswordParams params) async {
-    try {
-      state = state.copyWith(isLoading: true);
-      await _forgotPassword(params);
-      state = state.copyWith(
-        isLoading: false,
-        requiresPasswordReset: true,
-        error: null,
+      _logger.logAuthEvent(
+        event: 'SignOut',
+        status: 'Success',
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
+
+      _updateState(AsyncValue.data(AuthState.initial()));
+    } catch (e, stack) {
+      if (!mounted) return;
+
+      _logger.logError(
+        feature: 'Authentication',
+        error: 'Failed to sign out',
+        metadata: {'error': e.toString()},
+        stackTrace: stack,
       );
+
+      _updateState(AsyncValue.error('Failed to sign out', stack));
     }
-  }
-
-  /// Confirm password reset with code and new password
-  Future<void> confirmPasswordReset({
-    required String email,
-    required String code,
-    required String newPassword,
-  }) async {
-    if (!mounted) return;
-    state = AuthState.loading();
-
-    try {
-      await _confirmPasswordReset(ConfirmPasswordResetParams(
-        email: email,
-        code: code,
-        newPassword: newPassword,
-      ));
-      if (!mounted) return;
-      state = AuthState.initial(); // User needs to sign in with new password
-    } catch (e) {
-      if (!mounted) return;
-      state = AuthState.error(e.toString());
-    }
-  }
-
-  /// Clear any error in the state
-  void clearError() {
-    if (!mounted) return;
-    state = state.copyWith(error: null);
   }
 }
-
-/// Provider for the auth state
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(
-    getCurrentUser: getIt<GetCurrentUser>(),
-    isSignedIn: getIt<IsSignedIn>(),
-    login: getIt<LoginUseCase>(),
-    signUp: getIt<SignUp>(),
-    signOut: getIt<SignOut>(),
-    verifyEmail: getIt<VerifyEmail>(),
-    resendVerificationEmail: getIt<ResendVerificationEmail>(),
-    forgotPassword: getIt<ForgotPassword>(),
-    confirmPasswordReset: getIt<ConfirmPasswordReset>(),
-  );
-});

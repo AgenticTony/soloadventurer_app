@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/core/config/cognito_config.dart';
+import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/notifiers/auth_notifier.dart';
@@ -91,7 +91,7 @@ JWTPayload? _parseJwt(String token) {
 
 /// Provider for the auth data source that interfaces with AWS Cognito
 final authDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
-  return AuthRemoteDataSourceImpl(userPool: CognitoConfig.userPool);
+  return AuthRemoteDataSourceImpl(userPool: AppConfig.awsConfig.userPool);
 });
 
 /// Core provider that manages authentication state

@@ -292,46 +292,4 @@ class GraphQLQueries {
       }
     }
   ''';
-
-  static String deleteTrip = '''
-    mutation DeleteTrip(\$id: ID!) {
-      deleteTrip(id: \$id) {
-        id
-        success
-      }
-    }
-  ''';
-
-  // Travel Match queries
-  static String findTravelMatches = '''
-    query FindTravelMatches(
-      \$userId: ID!
-      \$destination: String
-      \$startDate: String
-      \$endDate: String
-      \$limit: Int
-    ) {
-      findTravelMatches(
-        userId: \$userId
-        destination: \$destination
-        startDate: \$startDate
-        endDate: \$endDate
-        limit: \$limit
-      ) {
-        id
-        username
-        firstName
-        lastName
-        profilePictureUrl
-        compatibilityScore
-        trip {
-          id
-          title
-          destination
-          startDate
-          endDate
-        }
-      }
-    }
-  ''';
 }
