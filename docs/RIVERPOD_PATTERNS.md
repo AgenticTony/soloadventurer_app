@@ -321,3 +321,82 @@ class ComputedValue extends _$ComputedValue {
 - [Flutter State Management](https://flutter.dev/docs/development/data-and-backend/state-mgmt/options)
 - [Riverpod Testing Guide](https://riverpod.dev/docs/essentials/testing)
 - [AsyncValue Documentation](https://pub.dev/documentation/riverpod/latest/riverpod/AsyncValue-class.html)
+
+## Error Handling Patterns
+
+### Inline Error Display with SnackBar
+
+```dart
+class MyScreen extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Listen for state changes and show errors
+    ref.listen(myStateProvider, (previous, next) {
+      if (next.error?.isNotEmpty == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.error!),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    });
+
+    return Scaffold(
+      // ... rest of the widget
+    );
+  }
+}
+```
+
+### State Error Handling
+
+```dart
+@riverpod
+class MyNotifier extends _$MyNotifier {
+  @override
+  AsyncValue<MyState> build() => const AsyncValue.data(MyState.initial());
+
+  Future<void> performAction() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      // Perform the action
+      return newState;
+    });
+  }
+}
+```
+
+### Loading State Management
+
+```dart
+Widget build(BuildContext context, WidgetRef ref) {
+  final state = ref.watch(myStateProvider);
+
+  return state.when(
+    data: (data) => MyContent(data: data),
+    loading: () => const Center(child: CircularProgressIndicator()),
+    error: (error, stack) => ErrorDisplay(error: error),
+  );
+}
+```
+
+### Best Practices
+
+1. Error Display
+
+   - Use SnackBar for transient errors
+   - Show inline errors for form validation
+   - Maintain context during error recovery
+
+2. State Management
+
+   - Use AsyncValue for consistent error handling
+   - Handle loading states explicitly
+   - Provide clear error messages
+
+3. Error Recovery
+   - Implement retry mechanisms where appropriate
+   - Clear error state after recovery
+   - Maintain user progress where possible

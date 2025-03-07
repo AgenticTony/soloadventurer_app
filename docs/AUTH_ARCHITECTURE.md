@@ -226,58 +226,71 @@ class AuthController extends _$AuthController {
 
 ## Error Handling
 
-### 1. Error Propagation
+### User Feedback Implementation
 
 ```dart
-@riverpod
-class ErrorHandler extends _$ErrorHandler {
-  @override
-  void build() {
-    ref.listen(authStateProvider, (previous, next) {
-      next.whenOrNull(
-        error: (error, stackTrace) {
-          if (error is UserNotFoundError) {
-            _showErrorDialog('Account not found');
-          } else if (error is InvalidCredentialsError) {
-            _showErrorDialog('Invalid credentials');
-          } else if (error is EmailNotVerifiedError) {
-            _navigateToVerification();
-          }
-        },
-      );
-    });
+// In LoginScreen
+ref.listen(authStateProvider, (previous, next) {
+  if (next.error?.isNotEmpty == true && mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(next.error!),
+        backgroundColor: Theme.of(context).colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
-}
+});
 ```
 
-### 2. Rate Limiting
+### Error Message Standardization
 
-```dart
-class RateLimiter {
-  final int maxAttempts;
-  final Duration resetDuration;
-  int _attempts = 0;
-  DateTime? _lastAttemptTime;
+For security and user experience, error messages are standardized:
 
-  void checkRateLimit() {
-    final now = DateTime.now();
-    if (_lastAttemptTime != null &&
-        now.difference(_lastAttemptTime!) > resetDuration) {
-      _attempts = 0;
-    }
+1. Authentication Failures
 
-    if (_attempts >= maxAttempts) {
-      throw const AuthException(
-        'Too many attempts. Please try again later.',
-        code: 'RATE_LIMIT_EXCEEDED',
-      );
-    }
+   - "Unable to sign in. Please check your email and password."
+   - Avoids revealing whether email or password was incorrect
 
-    _attempts++;
-    _lastAttemptTime = now;
-  }
-}
-```
+2. Email Verification
+
+   - Clear guidance when verification is needed
+   - Success confirmation without revealing sensitive information
+
+3. Loading States
+   - Visual indicators during operations
+   - Disabled inputs during processing
+   - Clear feedback on operation status
+
+### Error Recovery
+
+1. Automatic Recovery
+
+   - Retry with exponential backoff for transient failures
+   - Automatic redirect to appropriate screens based on state
+
+2. User-Initiated Recovery
+   - Clear error messages with action guidance
+   - Easy access to recovery flows (password reset, resend verification)
+
+### Implementation Guidelines
+
+1. Security First
+
+   - Never reveal sensitive information in error messages
+   - Use generic messages for authentication failures
+   - Log detailed errors server-side only
+
+2. User Experience
+
+   - Show errors inline where possible
+   - Provide clear next steps
+   - Maintain context during error recovery
+
+3. Error Propagation
+   - Use AsyncValue for consistent error handling
+   - Proper error mapping in data sources
+   - Centralized error handling in state management
 
 ## Testing Strategy
 
