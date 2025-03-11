@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
-import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 
 /// Login screen for the application
 class LoginScreen extends ConsumerStatefulWidget {

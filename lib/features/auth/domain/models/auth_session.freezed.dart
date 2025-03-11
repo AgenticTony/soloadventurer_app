@@ -21,8 +21,8 @@ AuthSession _$AuthSessionFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$AuthSession {
   String get accessToken => throw _privateConstructorUsedError;
-  String get refreshToken => throw _privateConstructorUsedError;
   String get idToken => throw _privateConstructorUsedError;
+  String get refreshToken => throw _privateConstructorUsedError;
   DateTime get expiresAt => throw _privateConstructorUsedError;
 
   /// Serializes this AuthSession to a JSON map.
@@ -43,8 +43,8 @@ abstract class $AuthSessionCopyWith<$Res> {
   @useResult
   $Res call(
       {String accessToken,
-      String refreshToken,
       String idToken,
+      String refreshToken,
       DateTime expiresAt});
 }
 
@@ -64,8 +64,8 @@ class _$AuthSessionCopyWithImpl<$Res, $Val extends AuthSession>
   @override
   $Res call({
     Object? accessToken = null,
-    Object? refreshToken = null,
     Object? idToken = null,
+    Object? refreshToken = null,
     Object? expiresAt = null,
   }) {
     return _then(_value.copyWith(
@@ -73,13 +73,13 @@ class _$AuthSessionCopyWithImpl<$Res, $Val extends AuthSession>
           ? _value.accessToken
           : accessToken // ignore: cast_nullable_to_non_nullable
               as String,
-      refreshToken: null == refreshToken
-          ? _value.refreshToken
-          : refreshToken // ignore: cast_nullable_to_non_nullable
-              as String,
       idToken: null == idToken
           ? _value.idToken
           : idToken // ignore: cast_nullable_to_non_nullable
+              as String,
+      refreshToken: null == refreshToken
+          ? _value.refreshToken
+          : refreshToken // ignore: cast_nullable_to_non_nullable
               as String,
       expiresAt: null == expiresAt
           ? _value.expiresAt
@@ -99,8 +99,8 @@ abstract class _$$AuthSessionImplCopyWith<$Res>
   @useResult
   $Res call(
       {String accessToken,
-      String refreshToken,
       String idToken,
+      String refreshToken,
       DateTime expiresAt});
 }
 
@@ -118,8 +118,8 @@ class __$$AuthSessionImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? accessToken = null,
-    Object? refreshToken = null,
     Object? idToken = null,
+    Object? refreshToken = null,
     Object? expiresAt = null,
   }) {
     return _then(_$AuthSessionImpl(
@@ -127,13 +127,13 @@ class __$$AuthSessionImplCopyWithImpl<$Res>
           ? _value.accessToken
           : accessToken // ignore: cast_nullable_to_non_nullable
               as String,
-      refreshToken: null == refreshToken
-          ? _value.refreshToken
-          : refreshToken // ignore: cast_nullable_to_non_nullable
-              as String,
       idToken: null == idToken
           ? _value.idToken
           : idToken // ignore: cast_nullable_to_non_nullable
+              as String,
+      refreshToken: null == refreshToken
+          ? _value.refreshToken
+          : refreshToken // ignore: cast_nullable_to_non_nullable
               as String,
       expiresAt: null == expiresAt
           ? _value.expiresAt
@@ -148,8 +148,8 @@ class __$$AuthSessionImplCopyWithImpl<$Res>
 class _$AuthSessionImpl implements _AuthSession {
   const _$AuthSessionImpl(
       {required this.accessToken,
-      required this.refreshToken,
       required this.idToken,
+      required this.refreshToken,
       required this.expiresAt});
 
   factory _$AuthSessionImpl.fromJson(Map<String, dynamic> json) =>
@@ -158,15 +158,15 @@ class _$AuthSessionImpl implements _AuthSession {
   @override
   final String accessToken;
   @override
-  final String refreshToken;
-  @override
   final String idToken;
+  @override
+  final String refreshToken;
   @override
   final DateTime expiresAt;
 
   @override
   String toString() {
-    return 'AuthSession(accessToken: $accessToken, refreshToken: $refreshToken, idToken: $idToken, expiresAt: $expiresAt)';
+    return 'AuthSession(accessToken: $accessToken, idToken: $idToken, refreshToken: $refreshToken, expiresAt: $expiresAt)';
   }
 
   @override
@@ -176,9 +176,9 @@ class _$AuthSessionImpl implements _AuthSession {
             other is _$AuthSessionImpl &&
             (identical(other.accessToken, accessToken) ||
                 other.accessToken == accessToken) &&
+            (identical(other.idToken, idToken) || other.idToken == idToken) &&
             (identical(other.refreshToken, refreshToken) ||
                 other.refreshToken == refreshToken) &&
-            (identical(other.idToken, idToken) || other.idToken == idToken) &&
             (identical(other.expiresAt, expiresAt) ||
                 other.expiresAt == expiresAt));
   }
@@ -186,7 +186,7 @@ class _$AuthSessionImpl implements _AuthSession {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, accessToken, refreshToken, idToken, expiresAt);
+      Object.hash(runtimeType, accessToken, idToken, refreshToken, expiresAt);
 
   /// Create a copy of AuthSession
   /// with the given fields replaced by the non-null parameter values.
@@ -207,8 +207,8 @@ class _$AuthSessionImpl implements _AuthSession {
 abstract class _AuthSession implements AuthSession {
   const factory _AuthSession(
       {required final String accessToken,
-      required final String refreshToken,
       required final String idToken,
+      required final String refreshToken,
       required final DateTime expiresAt}) = _$AuthSessionImpl;
 
   factory _AuthSession.fromJson(Map<String, dynamic> json) =
@@ -217,9 +217,9 @@ abstract class _AuthSession implements AuthSession {
   @override
   String get accessToken;
   @override
-  String get refreshToken;
-  @override
   String get idToken;
+  @override
+  String get refreshToken;
   @override
   DateTime get expiresAt;
 

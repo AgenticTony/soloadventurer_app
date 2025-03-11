@@ -6,6 +6,9 @@ import '../models/auth_session.dart';
 import '../../data/providers/auth_data_providers.dart';
 import '../../../core/domain/services/connectivity_service.dart';
 import '../../../core/data/services/connectivity_service_impl.dart';
+import '../../data/models/credentials.dart';
+import '../services/token_blacklist_manager.dart' as blacklist;
+import '../../infrastructure/logging/token_audit_logger.dart';
 
 part 'token_manager.g.dart';
 
@@ -34,70 +37,21 @@ class TokenManager extends _$TokenManager {
   static const Duration _minValidityThreshold = Duration(minutes: 2);
   static const double _refreshAtTokenLifetimePercentage = 0.75;
 
+  late final blacklist.TokenBlacklistManager _blacklistManager;
+  late final TokenAuditLogger _auditLogger;
+
   @override
   FeatureAvailability build() {
-    debugPrint('TokenManager: Building with new state');
-
-    // Watch connectivity changes through our service
-    final connectivityService = ref.watch(connectivityServiceImplProvider);
-    debugPrint(
-        'TokenManager: Current connectivity: ${connectivityService.hasConnectivitySync}');
-
-    // Setup connectivity monitoring and session initialization only once
-    if (_connectivitySubscription == null) {
-      debugPrint('TokenManager: Setting up connectivity monitoring');
-      debugPrint('TokenManager: Creating new connectivity subscription');
-      _connectivitySubscription =
-          connectivityService.onConnectivityChanged.listen((status) {
-        if (_isDisposed) {
-          debugPrint('TokenManager: Ignoring connectivity change - disposed');
-          return;
-        }
-        debugPrint('TokenManager: Received connectivity change: $status');
-        _handleConnectivityChange(status);
-      });
-
-      // Ensure cleanup on dispose
-      ref.onDispose(() {
-        debugPrint('TokenManager: Disposing');
-        debugPrint('TokenManager: Cleaning up resources');
-        _isDisposed = true;
-        _connectivitySubscription?.cancel();
-        _refreshTimer?.cancel();
-        _recoveryTimer?.cancel();
-        _initializationCompleter = null;
-      });
-
-      // Initialize session if not already initialized
-      if (!_isInitialized) {
-        debugPrint('TokenManager: Not initialized, starting initialization');
-        debugPrint('TokenManager: Creating initialization completer');
-        _initializationCompleter = Completer<void>();
-
-        // Initialize synchronously to maintain state
-        initialize().then((_) {
-          if (!_isDisposed) {
-            debugPrint(
-                'TokenManager: Initialization completed, calculating new state');
-            final newState = _calculateCurrentState();
-            if (state != newState) {
-              debugPrint(
-                  'TokenManager: Updating state from $state to $newState after initialization');
-              state = newState;
-            }
-          } else {
-            debugPrint('TokenManager: Skipping state update - disposed');
-          }
-        }).catchError((error) {
-          debugPrint('TokenManager: Initialization failed: $error');
-          if (!_isDisposed) {
-            state = FeatureAvailability.unauthorized;
-          }
-        });
-      }
-    }
-
-    return state;
+    _blacklistManager =
+        ref.watch(blacklist.tokenBlacklistManagerProvider.notifier);
+    _auditLogger = ref.watch(tokenAuditLoggerProvider.notifier);
+    ref.onDispose(() {
+      _refreshTimer?.cancel();
+      _recoveryTimer?.cancel();
+      _connectivitySubscription?.cancel();
+      _isDisposed = true;
+    });
+    return FeatureAvailability.unauthorized;
   }
 
   FeatureAvailability _calculateCurrentState() {
@@ -238,7 +192,11 @@ class TokenManager extends _$TokenManager {
     final isOnline = await connectivityService.hasConnectivity;
 
     if (!isOnline || _isDisposed) {
-      debugPrint('TokenManager: Skipping refresh - offline or disposed');
+      _auditLogger.logTokenEvent(
+        event: 'refresh_skipped',
+        status: 'info',
+        metadata: {'reason': 'offline_or_disposed'},
+      );
       return;
     }
 
@@ -247,36 +205,64 @@ class TokenManager extends _$TokenManager {
       final remote = ref.read(authRemoteDataSourceProvider);
       final currentRefreshToken = await storage.getRefreshToken();
 
-      // According to AWS docs: if refresh token is expired, user must re-authenticate
       if (currentRefreshToken == null || _isDisposed) {
-        debugPrint(
-            'TokenManager: No refresh token available, requiring re-authentication');
+        _auditLogger.logTokenEvent(
+          event: 'refresh_failed',
+          status: 'error',
+          metadata: {'reason': 'no_refresh_token'},
+        );
         state = FeatureAvailability.unauthorized;
         return;
       }
 
-      // AWS best practice: implement max retries with exponential backoff
-      if (_refreshAttempts >= _maxRefreshAttempts) {
-        debugPrint(
-            'TokenManager: Max refresh attempts reached, requiring re-authentication');
+      // Check if refresh token is blacklisted
+      if (_blacklistManager.isTokenBlacklisted(currentRefreshToken)) {
+        _auditLogger.logTokenBlacklist(
+          token: currentRefreshToken,
+          reason: 'blacklisted_token_detected',
+        );
         await clearSession();
         return;
       }
 
-      // Apply exponential backoff with jitter as per AWS best practices
+      if (_refreshAttempts >= _maxRefreshAttempts) {
+        _auditLogger.logTokenEvent(
+          event: 'refresh_failed',
+          status: 'error',
+          metadata: {
+            'reason': 'max_attempts_reached',
+            'attempts': _refreshAttempts,
+          },
+        );
+        await clearSession();
+        return;
+      }
+
       final backoffDelay = _getBackoffDelay();
       if (backoffDelay > Duration.zero) {
-        debugPrint(
-            'TokenManager: Implementing backoff delay of ${backoffDelay.inSeconds} seconds before refresh attempt');
+        _auditLogger.logTokenEvent(
+          event: 'refresh_backoff',
+          status: 'info',
+          metadata: {'delay_seconds': backoffDelay.inSeconds},
+        );
         await Future.delayed(backoffDelay);
       }
 
       if (_isDisposed) return;
 
-      // Attempt to refresh tokens
+      final oldSession = _cachedSession;
       final newSession = await remote.refreshToken();
 
-      // AWS best practice: atomically save all token data
+      // Handle token rotation and blacklisting
+      if (oldSession != null) {
+        await _blacklistManager.handleTokenRotation(oldSession, newSession);
+        _auditLogger.logTokenRotation(
+          oldSession: oldSession,
+          newSession: newSession,
+          reason: 'scheduled_refresh',
+        );
+      }
+
       await Future.wait([
         storage.saveAuthData(
           newSession.accessToken,
@@ -288,14 +274,10 @@ class TokenManager extends _$TokenManager {
 
       if (_isDisposed) return;
 
-      // Update memory cache
       _cachedSession = newSession;
-      _refreshAttempts = 0; // Reset attempts on success
-
-      // Schedule next refresh at 75% of token lifetime as per AWS best practices
+      _refreshAttempts = 0;
       _scheduleTokenRefresh();
 
-      // Update state based on current connectivity
       final networkStatus = await connectivityService.checkConnectivity();
       final isConnected = networkStatus == NetworkStatus.connected;
       final hasValidTokens = newSession.expiresAt
@@ -303,24 +285,41 @@ class TokenManager extends _$TokenManager {
 
       final newState = _calculateState(isConnected, hasValidTokens);
       if (state != newState) {
-        debugPrint(
-            'TokenManager: Updating state after refresh from $state to $newState');
+        _auditLogger.logStateTransition(
+          feature: 'token_manager',
+          fromState: state.toString(),
+          toState: newState.toString(),
+        );
         state = newState;
       }
 
-      debugPrint('TokenManager: Token refresh successful');
-    } catch (e) {
+      _auditLogger.logTokenRefresh(
+        success: true,
+        attemptNumber: _refreshAttempts + 1,
+      );
+    } catch (e, stackTrace) {
       if (_isDisposed) return;
 
       _refreshAttempts++;
-      debugPrint('Token refresh failed (attempt $_refreshAttempts): $e');
+      _auditLogger.logError(
+        feature: 'token_manager',
+        error: e.toString(),
+        code: 'refresh_failed',
+        metadata: {'attempt': _refreshAttempts},
+        stackTrace: stackTrace,
+      );
 
-      // AWS best practice: implement recovery with exponential backoff
       if (_refreshAttempts < _maxRefreshAttempts) {
         _scheduleRecoveryAttempt();
       } else {
-        debugPrint(
-            'TokenManager: Max refresh attempts reached, requiring re-authentication');
+        _auditLogger.logTokenEvent(
+          event: 'refresh_failed',
+          status: 'error',
+          metadata: {
+            'reason': 'max_attempts_reached',
+            'attempts': _refreshAttempts,
+          },
+        );
         await clearSession();
       }
     }
@@ -428,7 +427,10 @@ class TokenManager extends _$TokenManager {
     _recoveryTimer?.cancel();
     _refreshAttempts = 0;
     state = FeatureAvailability.unauthorized;
-    debugPrint('TokenManager: Session cleared');
+    _auditLogger.logTokenEvent(
+      event: 'session_cleared',
+      status: 'info',
+    );
   }
 
   // Public methods for feature checks
@@ -486,6 +488,127 @@ class TokenManager extends _$TokenManager {
       debugPrint(
           'TokenManager: Offline with valid tokens, returning offlineWithCache');
       return FeatureAvailability.offlineWithCache;
+    }
+  }
+
+  Future<void> refreshToken() async {
+    if (_isDisposed) return;
+
+    final connectivityService = ref.read(connectivityServiceImplProvider);
+    final isOnline = await connectivityService.hasConnectivity;
+
+    if (!isOnline || _isDisposed) {
+      debugPrint('TokenManager: Skipping refresh - offline or disposed');
+      return;
+    }
+
+    try {
+      final storage = ref.read(authLocalDataSourceProvider);
+      final remote = ref.read(authRemoteDataSourceProvider);
+
+      debugPrint('TokenManager: Attempting to refresh token');
+      final newSession = await remote.refreshToken();
+
+      // Store new session data
+      await Future.wait([
+        storage.setAuthToken(newSession.accessToken),
+        storage.setIdToken(newSession.idToken),
+        storage.setRefreshToken(newSession.refreshToken),
+        storage.setTokenExpiration(newSession.expiresAt),
+      ]);
+
+      _cachedSession = newSession;
+      _scheduleTokenRefresh();
+      state = FeatureAvailability.fullyAvailable;
+      debugPrint('TokenManager: Token refresh successful');
+    } catch (e) {
+      debugPrint('TokenManager: Token refresh failed: $e');
+      state = FeatureAvailability.unauthorized;
+    }
+  }
+
+  Future<void> reauthenticate(String username, String password) async {
+    if (_isDisposed) return;
+
+    final connectivityService = ref.read(connectivityServiceImplProvider);
+    final isOnline = await connectivityService.hasConnectivity;
+
+    if (!isOnline || _isDisposed) {
+      debugPrint(
+          'TokenManager: Skipping reauthentication - offline or disposed');
+      return;
+    }
+
+    try {
+      state = FeatureAvailability.unauthorized;
+      final storage = ref.read(authLocalDataSourceProvider);
+      final remote = ref.read(authRemoteDataSourceProvider);
+
+      // Clear existing session
+      await storage.clearSession();
+      _cachedSession = null;
+
+      // Attempt to reauthenticate
+      final newTokens = await remote.reauthenticate(
+        Credentials(username: username, password: password),
+      );
+
+      // Convert AuthTokens to AuthSession
+      final newSession = AuthSession(
+        accessToken: newTokens.accessToken,
+        idToken: newTokens.idToken,
+        refreshToken: newTokens.refreshToken,
+        expiresAt: DateTime.now().add(const Duration(
+            minutes: 60)), // Default to 1 hour if expiresIn is not available
+      );
+
+      // Store new session data
+      await Future.wait([
+        storage.setAuthToken(newSession.accessToken),
+        storage.setIdToken(newSession.idToken),
+        storage.setRefreshToken(newSession.refreshToken),
+        storage.setTokenExpiration(newSession.expiresAt),
+      ]);
+
+      _cachedSession = newSession;
+      _scheduleTokenRefresh();
+      state = FeatureAvailability.fullyAvailable;
+      debugPrint('TokenManager: Reauthentication successful');
+    } catch (e) {
+      debugPrint('TokenManager: Reauthentication failed: $e');
+      state = FeatureAvailability.unauthorized;
+    }
+  }
+
+  Future<void> handleOffline() async {
+    if (_isDisposed) return;
+
+    debugPrint('TokenManager: Handling offline state');
+    final storage = ref.read(authLocalDataSourceProvider);
+    final hasLocalData = await storage.hasValidSession();
+
+    if (hasLocalData) {
+      debugPrint('TokenManager: Found valid local session data');
+      state = FeatureAvailability.offlineWithCache;
+    } else {
+      debugPrint('TokenManager: No valid local session data');
+      state = FeatureAvailability.offlineNoCache;
+    }
+  }
+
+  Future<void> handleOnline() async {
+    if (_isDisposed) return;
+
+    debugPrint('TokenManager: Handling online state');
+    final storage = ref.read(authLocalDataSourceProvider);
+    final hasLocalData = await storage.hasValidSession();
+
+    if (hasLocalData) {
+      debugPrint('TokenManager: Found valid local session, refreshing token');
+      await refreshToken();
+    } else {
+      debugPrint('TokenManager: No valid local session');
+      state = FeatureAvailability.unauthorized;
     }
   }
 }

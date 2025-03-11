@@ -4,6 +4,11 @@ import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dar
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../domain/services/token_manager.dart';
+
+part 'auth_navigation_provider.g.dart';
 
 /// Provider for handling auth-related navigation state
 final authNavigationProvider =
@@ -63,6 +68,13 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
               'AuthNavigationNotifier: User is not logged in, navigating to login');
           navigateToLogin();
         }
+      }
+    });
+
+    // Listen to token manager state changes
+    _ref.listen(tokenManagerProvider, (previous, next) {
+      if (next == FeatureAvailability.unauthorized) {
+        _handleUnauthorized();
       }
     });
   }
@@ -271,4 +283,31 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
   String getCurrentRoute() {
     return state.currentRequest?.route ?? AuthRoutes.login;
   }
+
+  void _handleUnauthorized() {
+    final context = ref.read(navigatorKeyProvider).currentContext;
+    if (context != null && context.mounted) {
+      // Clear navigation stack and go to login
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/login',
+        (route) => false,
+      );
+    }
+  }
+
+  Future<void> navigateToLogin(BuildContext context) async {
+    await Navigator.of(context).pushNamedAndRemoveUntil(
+      '/login',
+      (route) => false,
+    );
+  }
+
+  Future<void> navigateAfterLogin(BuildContext context) async {
+    await Navigator.of(context).pushReplacementNamed('/home');
+  }
 }
+
+/// Global navigator key for handling navigation from providers
+final navigatorKeyProvider = Provider<GlobalKey<NavigatorState>>((ref) {
+  return GlobalKey<NavigatorState>();
+});

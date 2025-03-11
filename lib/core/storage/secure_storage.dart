@@ -1,4 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'secure_storage.g.dart';
 
 /// A service for securely storing sensitive information like tokens and credentials.
 class SecureStorageService {
@@ -127,4 +130,10 @@ class SecureStorage {
   Future<bool> containsKey(String key) async {
     return await _storage.containsKey(key: key);
   }
+}
+
+/// Provider for SecureStorage
+@riverpod
+SecureStorage secureStorage(SecureStorageRef ref) {
+  return SecureStorage();
 }

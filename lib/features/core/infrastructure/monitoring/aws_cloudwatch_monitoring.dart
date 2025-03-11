@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import './monitoring_service.dart';
+
+part 'aws_cloudwatch_monitoring.g.dart';
 
 /// CloudWatch types
 class CloudWatch {
@@ -245,4 +248,19 @@ class AwsCloudWatchMonitoring implements MonitoringService {
         .map((e) => Dimension(name: e.key, value: e.value.toString()))
         .toList();
   }
+}
+
+/// Provider for AWS CloudWatch monitoring service
+@riverpod
+AwsCloudWatchMonitoring awsCloudWatchMonitoring(
+    AwsCloudWatchMonitoringRef ref) {
+  return AwsCloudWatchMonitoring(
+    cloudWatch: CloudWatch(
+      region:
+          const String.fromEnvironment('AWS_REGION', defaultValue: 'us-east-1'),
+      accessKeyId: const String.fromEnvironment('AWS_ACCESS_KEY_ID'),
+      secretAccessKey: const String.fromEnvironment('AWS_SECRET_ACCESS_KEY'),
+    ),
+    namespace: 'SoloAdventurer',
+  );
 }

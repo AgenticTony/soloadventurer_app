@@ -5,30 +5,16 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:platform_device_id/platform_device_id.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'security_manager.g.dart';
 
 /// Manages security-related features like rate limiting and device tracking
-abstract class SecurityManager {
-  Future<void> write(String key, String value);
-  Future<String?> read(String key);
-  Future<void> delete(String key);
-  Future<void> deleteAll();
-  Future<bool> containsKey(String key);
-  Future<String> getDeviceId();
-  Future<Map<String, dynamic>> getDeviceInfo();
-  Future<void> checkLoginAttempts();
-  Future<void> recordFailedLoginAttempt();
-  Future<void> resetLoginAttempts();
-  Future<void> registerDevice();
-  Future<bool> isKnownDevice();
-  Future<void> removeDevice(String deviceId);
-  Future<List<Map<String, dynamic>>> getKnownDevices();
-  Future<List<Map<String, dynamic>>> getSecurityEvents();
-}
-
-class SecurityManagerImpl implements SecurityManager {
-  final SecureStorage _storage;
-  final DeviceInfoPlugin _deviceInfo;
-  final bool _isTest;
+@riverpod
+class SecurityManager extends _$SecurityManager {
+  late final SecureStorage _storage;
+  late final DeviceInfoPlugin _deviceInfo;
+  late final bool _isTest;
   static const _maxLoginAttempts = 5;
   static const _lockoutDuration = Duration(minutes: 1);
   static const _deviceIdKey = 'device_id';
@@ -36,31 +22,36 @@ class SecurityManagerImpl implements SecurityManager {
   static const _loginAttemptsKey = 'login_attempts';
   static const _knownDevicesKey = 'known_devices';
   static const _securityEventsKey = 'security_events';
+  static const _rateLimitKey = 'rate_limit';
+  static const _sensitiveEndpointsKey = 'sensitive_endpoints';
+  static const _revokedTokensKey = 'revoked_tokens';
 
-  SecurityManagerImpl({
-    required SecureStorage storage,
-    DeviceInfoPlugin? deviceInfo,
-    bool isTest = false,
-  })  : _storage = storage,
-        _deviceInfo = deviceInfo ?? DeviceInfoPlugin(),
-        _isTest = isTest;
+  // List of sensitive endpoints that require extra monitoring
+  static const Set<String> _sensitiveEndpoints = {
+    '/api/v1/users/profile',
+    '/api/v1/payment/methods',
+    '/api/v1/settings',
+    // Add more sensitive endpoints as needed
+  };
 
   @override
+  SecurityManager build() {
+    _storage = ref.watch(secureStorageProvider);
+    _deviceInfo = DeviceInfoPlugin();
+    _isTest = false;
+    return this;
+  }
+
   Future<void> write(String key, String value) => _storage.write(key, value);
 
-  @override
   Future<String?> read(String key) => _storage.read(key);
 
-  @override
   Future<void> delete(String key) => _storage.delete(key);
 
-  @override
   Future<void> deleteAll() => _storage.deleteAll();
 
-  @override
   Future<bool> containsKey(String key) => _storage.containsKey(key);
 
-  @override
   Future<String> getDeviceId() async {
     if (_isTest) {
       return 'test-device-id';
@@ -74,7 +65,6 @@ class SecurityManagerImpl implements SecurityManager {
     return deviceId;
   }
 
-  @override
   Future<Map<String, dynamic>> getDeviceInfo() async {
     if (_isTest) {
       return {
@@ -116,7 +106,6 @@ class SecurityManagerImpl implements SecurityManager {
     return baseInfo;
   }
 
-  @override
   Future<void> checkLoginAttempts() async {
     final attempts = await _getLoginAttempts();
     final lastAttempt = await _getLastLoginAttempt();
@@ -136,7 +125,6 @@ class SecurityManagerImpl implements SecurityManager {
     }
   }
 
-  @override
   Future<void> recordFailedLoginAttempt() async {
     final attempts = await _getLoginAttempts();
     await _storage.write(_loginAttemptsKey, (attempts + 1).toString());
@@ -145,10 +133,8 @@ class SecurityManagerImpl implements SecurityManager {
     await _logSecurityEvent('failed_login_attempt');
   }
 
-  @override
   Future<void> resetLoginAttempts() => _resetLoginAttempts();
 
-  @override
   Future<void> registerDevice() async {
     final deviceInfo = await getDeviceInfo();
     final devices = await _getKnownDevices();
@@ -157,7 +143,6 @@ class SecurityManagerImpl implements SecurityManager {
     await _logSecurityEvent('device_registered', data: deviceInfo);
   }
 
-  @override
   Future<bool> isKnownDevice() async {
     if (_isTest) {
       return true;
@@ -168,7 +153,6 @@ class SecurityManagerImpl implements SecurityManager {
     return devices.any((device) => device['device_id'] == deviceId);
   }
 
-  @override
   Future<void> removeDevice(String deviceId) async {
     final devices = await _getKnownDevices();
     devices.removeWhere((device) => device['device_id'] == deviceId);
@@ -176,14 +160,51 @@ class SecurityManagerImpl implements SecurityManager {
     await _logSecurityEvent('device_removed', data: {'device_id': deviceId});
   }
 
-  @override
   Future<List<Map<String, dynamic>>> getKnownDevices() => _getKnownDevices();
 
-  @override
   Future<List<Map<String, dynamic>>> getSecurityEvents() async {
     final eventsJson = await _storage.read(_securityEventsKey);
     if (eventsJson == null) return [];
     return List<Map<String, dynamic>>.from(jsonDecode(eventsJson));
+  }
+
+  /// Check if an endpoint is considered sensitive
+  bool isSensitiveEndpoint(String endpoint) {
+    return _sensitiveEndpoints.contains(endpoint);
+  }
+
+  /// Apply rate limiting to a user
+  Future<void> rateLimit(String userId, Duration duration) async {
+    final rateLimits = await _getRateLimits();
+    rateLimits[userId] = DateTime.now().add(duration).toIso8601String();
+    await _storage.write(_rateLimitKey, jsonEncode(rateLimits));
+    await _logSecurityEvent('rate_limit_applied', data: {
+      'user_id': userId,
+      'duration': duration.inMinutes,
+    });
+  }
+
+  /// Revoke a specific token
+  Future<void> revokeToken(String tokenId) async {
+    final revokedTokens = await _getRevokedTokens();
+    revokedTokens.add({
+      'token_id': tokenId,
+      'revoked_at': DateTime.now().toIso8601String(),
+    });
+    await _storage.write(_revokedTokensKey, jsonEncode(revokedTokens));
+    await _logSecurityEvent('token_revoked', data: {'token_id': tokenId});
+  }
+
+  /// Revoke all tokens for a user
+  Future<void> revokeAllTokens(String userId) async {
+    final revokedTokens = await _getRevokedTokens();
+    revokedTokens.add({
+      'user_id': userId,
+      'revoked_at': DateTime.now().toIso8601String(),
+      'all_tokens': true,
+    });
+    await _storage.write(_revokedTokensKey, jsonEncode(revokedTokens));
+    await _logSecurityEvent('all_tokens_revoked', data: {'user_id': userId});
   }
 
   Future<void> _logSecurityEvent(String eventType,
@@ -221,5 +242,17 @@ class SecurityManagerImpl implements SecurityManager {
     final devicesJson = await _storage.read(_knownDevicesKey);
     if (devicesJson == null) return [];
     return List<Map<String, dynamic>>.from(jsonDecode(devicesJson));
+  }
+
+  Future<Map<String, String>> _getRateLimits() async {
+    final limitsJson = await _storage.read(_rateLimitKey);
+    if (limitsJson == null) return {};
+    return Map<String, String>.from(jsonDecode(limitsJson));
+  }
+
+  Future<List<Map<String, dynamic>>> _getRevokedTokens() async {
+    final tokensJson = await _storage.read(_revokedTokensKey);
+    if (tokensJson == null) return [];
+    return List<Map<String, dynamic>>.from(jsonDecode(tokensJson));
   }
 }

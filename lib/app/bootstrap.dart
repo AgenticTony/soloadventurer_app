@@ -8,7 +8,7 @@ import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
-import 'package:soloadventurer/core/providers/core_providers.dart';
+import '../features/auth/domain/services/token_manager.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
 /// before the app is run.
@@ -50,15 +50,16 @@ Future<void> bootstrap() async {
     // Initialize SharedPreferences
     final sharedPreferences = await SharedPreferences.getInstance();
 
+    // Create ProviderContainer for initialization
+    final container = ProviderContainer();
+
+    // Initialize TokenManager
+    await container.read(tokenManagerProvider.notifier).initialize();
+
     // Run the app with proper provider initialization
     runApp(
-      ProviderScope(
-        observers: [
-          ProviderLogger(), // Add logging for provider state changes
-        ],
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(sharedPreferences),
-        ],
+      UncontrolledProviderScope(
+        container: container,
         child: const App(),
       ),
     );

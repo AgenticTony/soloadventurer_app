@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:soloadventurer/core/security/security_manager.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Interface for local data storage operations related to authentication
 abstract class AuthLocalDataSource {
@@ -48,19 +49,26 @@ abstract class AuthLocalDataSource {
   Future<void> cacheRefreshToken(String token);
   Future<void> cacheUserData(Map<String, dynamic> userData);
   Future<Map<String, dynamic>?> getUserData();
+
+  Future<void> setAuthToken(String token);
+  Future<void> setIdToken(String idToken);
+  Future<void> setRefreshToken(String refreshToken);
+  Future<void> setTokenExpiration(DateTime expiration);
+  Future<void> clearSession();
 }
 
-/// Implementation of [AuthLocalDataSource] using [SecurityManager]
+/// Implementation of [AuthLocalDataSource] using [SecurityManager] and SharedPreferences
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final SecurityManager _securityManager;
+  final SharedPreferences _sharedPreferences;
   static const _userKey = 'user_data';
   static const _authTokenKey = 'auth_token';
   static const _idTokenKey = 'id_token';
   static const _refreshTokenKey = 'refresh_token';
   static const _tokenExpirationKey = 'token_expiration';
 
-  /// Creates a new [AuthLocalDataSourceImpl] with the given security manager
-  AuthLocalDataSourceImpl(this._securityManager);
+  /// Creates a new [AuthLocalDataSourceImpl] with the given security manager and shared preferences
+  AuthLocalDataSourceImpl(this._securityManager, this._sharedPreferences);
 
   @override
   Future<void> cacheUser(User user) async {
@@ -178,5 +186,38 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
     final data = await _securityManager.read(_userKey);
     if (data == null) return null;
     return jsonDecode(data) as Map<String, dynamic>;
+  }
+
+  @override
+  Future<void> setAuthToken(String token) async {
+    await _sharedPreferences.setString(_authTokenKey, token);
+  }
+
+  @override
+  Future<void> setIdToken(String idToken) async {
+    await _sharedPreferences.setString(_idTokenKey, idToken);
+  }
+
+  @override
+  Future<void> setRefreshToken(String refreshToken) async {
+    await _sharedPreferences.setString(_refreshTokenKey, refreshToken);
+  }
+
+  @override
+  Future<void> setTokenExpiration(DateTime expiration) async {
+    await _sharedPreferences.setInt(
+      _tokenExpirationKey,
+      expiration.millisecondsSinceEpoch,
+    );
+  }
+
+  @override
+  Future<void> clearSession() async {
+    await Future.wait([
+      _sharedPreferences.remove(_authTokenKey),
+      _sharedPreferences.remove(_idTokenKey),
+      _sharedPreferences.remove(_refreshTokenKey),
+      _sharedPreferences.remove(_tokenExpirationKey),
+    ]);
   }
 }

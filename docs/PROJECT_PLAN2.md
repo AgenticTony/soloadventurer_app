@@ -323,6 +323,132 @@ class ErrorBoundary extends StatelessWidget {
   - [ ] Add data export capability
   - [ ] Set up data deletion workflow
 
+#### Location Services Infrastructure (Week 6-7)
+
+##### Core Location Infrastructure
+
+- [ ] **Domain Layer**
+
+  ```dart
+  lib/features/location/
+  ├── domain/
+  │   ├── entities/
+  │   │   ├── place.dart         # Core place entity
+  │   │   ├── location.dart      # Location coordinates
+  │   │   ├── route.dart         # Route information
+  │   │   └── place_details.dart # Detailed place information
+  │   ├── repositories/
+  │   │   └── location_repository.dart  # Abstract location operations
+  │   └── use_cases/
+  │       ├── search_places.dart        # Place search functionality
+  │       ├── get_place_details.dart    # Retrieve place details
+  │       ├── calculate_route.dart      # Route calculation
+  │       └── get_timezone.dart         # Timezone information
+  ```
+
+- [ ] **Data Layer**
+
+  ```dart
+  lib/features/location/
+  ├── data/
+  │   ├── models/
+  │   │   ├── place_model.dart
+  │   │   ├── location_model.dart
+  │   │   └── route_model.dart
+  │   ├── sources/
+  │   │   ├── remote/
+  │   │   │   ├── google_maps_api.dart  # Google Maps API integration
+  │   │   │   └── google_maps_config.dart
+  │   │   └── local/
+  │   │       └── location_cache.dart    # Local caching
+  │   └── repositories/
+  │       └── location_repository_impl.dart
+  ```
+
+- [ ] **Presentation Layer**
+  ```dart
+  lib/features/location/
+  ├── presentation/
+  │   ├── state/
+  │   │   ├── location_state.dart
+  │   │   └── location_provider.dart
+  │   ├── widgets/
+  │   │   ├── place_search_field.dart
+  │   │   ├── location_picker.dart
+  │   │   └── route_display.dart
+  │   └── screens/
+  │       ├── place_search_screen.dart
+  │       └── route_preview_screen.dart
+  ```
+
+##### Implementation Tasks
+
+- [ ] **Core Location Services**
+
+  - [ ] Implement Google Maps API integration
+  - [ ] Set up secure API key management
+  - [ ] Create location caching system
+  - [ ] Implement rate limiting and quota management
+
+- [ ] **Place Search & Details**
+
+  - [ ] Implement place search functionality
+  - [ ] Add place details retrieval
+  - [ ] Create location suggestion system
+  - [ ] Add place photo handling
+
+- [ ] **Route Calculation**
+  - [ ] Implement route calculation
+  - [ ] Add travel mode support (driving, walking, etc.)
+  - [ ] Create route optimization
+  - [ ] Implement ETA calculations
+
+##### Testing Infrastructure
+
+- [ ] **Unit Tests**
+  ```dart
+  test/features/location/
+  ├── domain/
+  │   └── use_cases/
+  │       ├── search_places_test.dart
+  │       └── calculate_route_test.dart
+  ├── data/
+  │   └── repositories/
+  │       └── location_repository_test.dart
+  └── presentation/
+      └── state/
+          └── location_provider_test.dart
+  ```
+
+##### Integration with State Management
+
+```dart
+@riverpod
+class LocationState extends _$LocationState {
+  @override
+  AsyncValue<LocationState> build() => const AsyncValue.data(LocationState.initial());
+
+  Future<void> searchPlaces(String query) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => _locationRepository.searchPlaces(query));
+  }
+
+  Future<void> getPlaceDetails(String placeId) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() => _locationRepository.getPlaceDetails(placeId));
+  }
+}
+```
+
+##### Success Metrics
+
+| Metric                     | Target           | Warning Threshold |
+| -------------------------- | ---------------- | ----------------- |
+| Place Search Response Time | < 300ms          | > 500ms           |
+| Route Calculation Time     | < 500ms          | > 1s              |
+| Cache Hit Rate             | > 80%            | < 60%             |
+| API Usage Efficiency       | < 1000 calls/day | > 2000 calls/day  |
+
 ##### Basic Trip Planning (Week 7-8)
 
 - [ ] Create **trip management system**

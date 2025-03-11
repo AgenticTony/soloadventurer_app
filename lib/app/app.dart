@@ -6,6 +6,7 @@ import 'package:soloadventurer/features/profile/presentation/routes/profile_rout
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
+import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_overlay.dart';
 
 /// Provider for the profile route observer
 final profileRouteObserverProvider = Provider<ProfileRouteObserver>((ref) {
@@ -85,23 +86,27 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return MaterialApp(
-      navigatorKey: navigatorKey,
-      title: 'SoloAdventurer',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: AppRouter.onGenerateRoute,
-      initialRoute: '/',
-      navigatorObservers: [
-        NavigatorObserver(),
-        ref.watch(profileRouteObserverProvider),
-      ],
-      builder: (context, child) {
-        if (child == null) return const SizedBox();
-        return NavigationHandler(child: child);
-      },
+    final navigatorKey = ref.watch(navigatorKeyProvider);
+
+    return TokenRefreshOverlay(
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        title: 'SoloAdventurer',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        onGenerateRoute: AppRouter.onGenerateRoute,
+        initialRoute: '/',
+        navigatorObservers: [
+          NavigatorObserver(),
+          ref.watch(profileRouteObserverProvider),
+        ],
+        builder: (context, child) {
+          if (child == null) return const SizedBox();
+          return NavigationHandler(child: child);
+        },
+      ),
     );
   }
 }
