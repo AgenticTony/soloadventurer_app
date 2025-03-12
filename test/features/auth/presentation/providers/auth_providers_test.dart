@@ -87,7 +87,7 @@ void main() {
   group('AuthProvider', () {
     test('initial state is loading', () {
       final state = container.read(authStateProvider);
-      expect(state.value, AuthState.loading());
+      expect(state.value, const AuthState.loading());
     });
 
     test('initialize sets initial state when not signed in', () async {
@@ -97,7 +97,7 @@ void main() {
       await container.read(authStateProvider.notifier).initialize();
 
       final state = container.read(authStateProvider);
-      expect(state.value, AuthState.initial());
+      expect(state.value, const AuthState.initial());
     });
 
     test('initialize sets authenticated state when signed in', () async {
@@ -145,7 +145,7 @@ void main() {
           .signIn('test@test.com', 'password');
 
       final state = container.read(authStateProvider);
-      expect(state.value, AuthState.error('Invalid credentials'));
+      expect(state.value, const AuthState.error('Invalid credentials'));
     });
 
     test('signOut updates state on success', () async {
@@ -154,7 +154,7 @@ void main() {
       await container.read(authStateProvider.notifier).signOut();
 
       final state = container.read(authStateProvider);
-      expect(state.value, AuthState.initial());
+      expect(state.value, const AuthState.initial());
     });
 
     test('signOut updates state on error', () async {
@@ -163,7 +163,7 @@ void main() {
       await container.read(authStateProvider.notifier).signOut();
 
       final state = container.read(authStateProvider);
-      expect(state.value, AuthState.error('Sign out failed'));
+      expect(state.value, const AuthState.error('Sign out failed'));
     });
   });
 }

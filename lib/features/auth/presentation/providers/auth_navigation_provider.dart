@@ -1,14 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:flutter/material.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/services/token_manager.dart';
-
-part 'auth_navigation_provider.g.dart';
 
 /// Provider for handling auth-related navigation state
 final authNavigationProvider =
@@ -66,7 +62,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         } else {
           debugPrint(
               'AuthNavigationNotifier: User is not logged in, navigating to login');
-          navigateToLogin();
+          navigateToLogin(null);
         }
       }
     });
@@ -77,6 +73,17 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         _handleUnauthorized();
       }
     });
+  }
+
+  /// Get the current route
+  String getCurrentRoute() {
+    return state.currentRequest?.route ?? '/';
+  }
+
+  /// Handle unauthorized state
+  void _handleUnauthorized() {
+    debugPrint('AuthNavigationNotifier: Handling unauthorized state');
+    navigateToLogin(null);
   }
 
   /// Navigate to confirm password reset screen
@@ -166,7 +173,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
   }
 
   /// Navigate to login screen
-  void navigateToLogin() {
+  void navigateToLogin(BuildContext? context) {
     navigateTo(AuthRoutes.login);
   }
 
@@ -248,6 +255,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
     } catch (e) {
       debugPrint('AuthNavigationNotifier: Navigation failed: $e');
       _setNavigationError('Failed to navigate: ${e.toString()}');
+      // Run post-navigation middleware with failure status
       _afterNavigation(route, success: false);
     }
   }
@@ -277,33 +285,6 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
     final previousRequest = state.history[state.history.length - 2];
     navigateTo(previousRequest.route, arguments: previousRequest.arguments);
-  }
-
-  /// Get the current route
-  String getCurrentRoute() {
-    return state.currentRequest?.route ?? AuthRoutes.login;
-  }
-
-  void _handleUnauthorized() {
-    final context = ref.read(navigatorKeyProvider).currentContext;
-    if (context != null && context.mounted) {
-      // Clear navigation stack and go to login
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        '/login',
-        (route) => false,
-      );
-    }
-  }
-
-  Future<void> navigateToLogin(BuildContext context) async {
-    await Navigator.of(context).pushNamedAndRemoveUntil(
-      '/login',
-      (route) => false,
-    );
-  }
-
-  Future<void> navigateAfterLogin(BuildContext context) async {
-    await Navigator.of(context).pushReplacementNamed('/home');
   }
 }
 

@@ -6,7 +6,26 @@ part of 'alert_manager.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$alertManagerHash() => r'f65a839278d5f4da7737894698334af575229585';
+String _$cloudWatchClientHash() => r'6f4d1e1c3bcbdcb35f78e221f908d9332b0d9a54';
+
+/// Provider for CloudWatch client
+///
+/// Copied from [cloudWatchClient].
+@ProviderFor(cloudWatchClient)
+final cloudWatchClientProvider = AutoDisposeProvider<CloudWatch>.internal(
+  cloudWatchClient,
+  name: r'cloudWatchClientProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$cloudWatchClientHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef CloudWatchClientRef = AutoDisposeProviderRef<CloudWatch>;
+String _$alertManagerHash() => r'78c9bfa1782f76a4535c8507950f116db1e10691';
 
 /// Manager responsible for handling security alerts and notifications
 ///

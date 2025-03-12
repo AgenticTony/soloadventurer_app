@@ -5,7 +5,7 @@ import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart'
 void main() {
   group('AuthState', () {
     test('initial state has correct values', () {
-      final state = AuthState.initial();
+      const state = AuthState.initial();
       expect(state.isLoading, false);
       expect(state.user, null);
       expect(state.error, null);
@@ -19,7 +19,7 @@ void main() {
     });
 
     test('loading state has correct values', () {
-      final state = AuthState.loading();
+      const state = AuthState.loading();
       expect(state.isLoading, true);
       expect(state.user, null);
       expect(state.error, null);
@@ -29,7 +29,7 @@ void main() {
     });
 
     test('error state has correct values', () {
-      final state = AuthState.error('Test error', 'ERROR_CODE');
+      const state = AuthState.error('Test error', 'ERROR_CODE');
       expect(state.isLoading, false);
       expect(state.user, null);
       expect(state.error, 'Test error');
@@ -85,7 +85,7 @@ void main() {
         username: 'test',
         createdAt: DateTime.now(),
       );
-      final state = AuthState.initial();
+      const state = AuthState.initial();
       final newState = state.copyWith(
         user: user,
         isLoading: true,

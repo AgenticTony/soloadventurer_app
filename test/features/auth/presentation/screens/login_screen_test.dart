@@ -10,7 +10,7 @@ import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart'
 class MockAuthNotifier extends StateNotifier<AsyncValue<AuthState>>
     with Mock
     implements AuthNotifier {
-  MockAuthNotifier() : super(AsyncValue.data(AuthState.initial()));
+  MockAuthNotifier() : super(const AsyncValue.data(AuthState.initial()));
 
   @override
   Future<void> signIn(String email, String password) async {
@@ -29,7 +29,7 @@ void main() {
 
     setUp(() {
       mockAuthNotifier = MockAuthNotifier();
-      registerFallbackValue(AsyncValue<AuthState>.data(AuthState.initial()));
+      registerFallbackValue(const AsyncValue<AuthState>.data(AuthState.initial()));
     });
 
     Widget createWidgetUnderTest() {
@@ -41,7 +41,7 @@ void main() {
             ),
           ),
         ],
-        child: MaterialApp(
+        child: const MaterialApp(
           home: LoginScreen(),
         ),
       );

@@ -21,6 +21,9 @@ class AuthRoutes {
   /// Route for profile screen
   static const profile = '/profile';
 
+  /// Route for CloudWatch test screen
+  static const cloudWatchTest = '/cloudwatch-test';
+
   /// Private constructor to prevent instantiation
   const AuthRoutes._();
 }

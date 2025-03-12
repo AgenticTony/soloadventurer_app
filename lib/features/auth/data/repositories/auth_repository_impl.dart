@@ -161,7 +161,7 @@ class AuthRepositoryImpl implements AuthRepository {
     // For now, we'll just return the current user
     final currentUser = await getCurrentUser();
     if (currentUser == null) {
-      throw AuthException('No authenticated user');
+      throw const AuthException('No authenticated user');
     }
     return currentUser;
   }
@@ -206,7 +206,7 @@ class AuthRepositoryImpl implements AuthRepository {
               'AuthRepositoryImpl: Using cached user data after verification');
           await localDataSource.cacheUser(cachedUser);
         } else {
-          throw AuthException('No user data available after verification');
+          throw const AuthException('No user data available after verification');
         }
       } catch (e) {
         debugPrint('AuthRepositoryImpl: Failed to get fresh user data: $e');
@@ -215,7 +215,7 @@ class AuthRepositoryImpl implements AuthRepository {
           debugPrint('AuthRepositoryImpl: Falling back to cached user data');
           await localDataSource.cacheUser(cachedUser);
         } else {
-          throw AuthException(
+          throw const AuthException(
               'Failed to maintain user state after verification');
         }
       }

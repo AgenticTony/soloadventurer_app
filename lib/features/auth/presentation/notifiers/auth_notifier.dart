@@ -45,7 +45,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         _forgotPassword = forgotPassword,
         _confirmPasswordReset = confirmPasswordReset,
         _logger = logger,
-        super(AsyncValue.data(AuthState.initial())) {
+        super(const AsyncValue.data(AuthState.initial())) {
     _logger.logAuthEvent(
       event: 'Initialize',
       status: 'Started',
@@ -104,7 +104,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         status: 'Success',
         metadata: {'state': 'unauthenticated'},
       );
-      return AuthState.initial();
+      return const AuthState.initial();
     });
 
     if (!mounted) return;
@@ -294,12 +294,12 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   /// Sign out the current user
   Future<void> signOut() async {
     if (!mounted) return;
-    _updateState(AsyncValue.loading());
+    _updateState(const AsyncValue.loading());
 
     try {
       await _signOut();
       if (!mounted) return;
-      _updateState(AsyncValue.data(AuthState.initial()));
+      _updateState(const AsyncValue.data(AuthState.initial()));
     } catch (e, stack) {
       if (!mounted) return;
       _updateState(AsyncValue.error(e.toString(), stack));
@@ -309,7 +309,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   /// Verify email with confirmation code
   Future<void> verifyEmail(String code, String email) async {
     final currentUser = state.value?.user;
-    _updateState(AsyncValue.loading());
+    _updateState(const AsyncValue.loading());
 
     try {
       await _verifyEmail(VerifyEmailParams(code: code, email: email));
@@ -321,7 +321,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         if (user != null) {
           _updateState(AsyncValue.data(AuthState.authenticated(user)));
         } else {
-          _updateState(AsyncValue.data(AuthState.initial()));
+          _updateState(const AsyncValue.data(AuthState.initial()));
         }
       }
     } catch (e, stack) {
@@ -378,7 +378,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     required String email,
   }) async {
     if (!mounted) return;
-    _updateState(AsyncValue.loading());
+    _updateState(const AsyncValue.loading());
 
     try {
       await _confirmPasswordReset(ConfirmPasswordResetParams(
@@ -387,7 +387,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         email: email,
       ));
       if (!mounted) return;
-      _updateState(AsyncValue.data(AuthState.initial()));
+      _updateState(const AsyncValue.data(AuthState.initial()));
     } catch (e, stack) {
       if (!mounted) return;
       _updateState(AsyncValue.error(e.toString(), stack));

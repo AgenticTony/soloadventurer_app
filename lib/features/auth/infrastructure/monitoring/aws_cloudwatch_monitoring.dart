@@ -1,69 +1,31 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:aws_client/aws_client.dart';
+import 'package:aws_cloudwatch/aws_cloudwatch.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-part 'aws_cloudwatch_monitoring.g.dart';
+/// Configuration for AWS CloudWatch monitoring
+class AwsCloudWatchConfig {
+  /// Initialize CloudWatch client with environment variables
+  static CloudWatch initializeClient() {
+    return CloudWatch(
+      awsAccessKey: dotenv.env['AWS_ACCESS_KEY_ID'] ?? '',
+      awsSecretKey: dotenv.env['AWS_SECRET_ACCESS_KEY'] ?? '',
+      region: dotenv.env['AWS_REGION'] ?? 'us-east-1',
+      groupName: 'SoloAdventurer/TokenSecurity',
+      streamName: 'SecurityAlerts',
+    );
+  }
 
-/// AWS service clients
-@riverpod
-AwsClientCredentials awsCredentials(AwsCredentialsRef ref) {
-  return AwsClientCredentials(
-    accessKey: const String.fromEnvironment('AWS_ACCESS_KEY_ID'),
-    secretKey: const String.fromEnvironment('AWS_SECRET_ACCESS_KEY'),
-    region:
-        const String.fromEnvironment('AWS_REGION', defaultValue: 'us-east-1'),
-  );
-}
+  /// Get CloudWatch log group name
+  static String get logGroupName => 'SoloAdventurer/TokenSecurity';
 
-/// Provider for CloudWatch client
-@riverpod
-CloudWatch cloudWatchClient(CloudWatchClientRef ref) {
-  final credentials = ref.watch(awsCredentialsProvider);
-  return CloudWatch(credentials: credentials);
-}
+  /// Get CloudWatch log stream name
+  static String get logStreamName => 'SecurityAlerts';
 
-/// Provider for SNS client
-@riverpod
-SNS snsClient(SNSClientRef ref) {
-  final credentials = ref.watch(awsCredentialsProvider);
-  return SNS(credentials: credentials);
-}
+  /// Get AWS region
+  static String get region => dotenv.env['AWS_REGION'] ?? 'us-east-1';
 
-/// Provider for CloudWatch monitoring service
-@riverpod
-class AwsCloudWatchMonitoring extends _$AwsCloudWatchMonitoring {
-  @override
-  void build() {}
-
-  /// Record a metric to CloudWatch
-  Future<void> recordMetric(
-    String metricName,
-    double value, {
-    Map<String, String>? dimensions,
-  }) async {
-    final cloudWatch = ref.read(cloudWatchClientProvider);
-
-    try {
-      final metricData = PutMetricDataInput(
-        namespace: 'SoloAdventurer/TokenSecurity',
-        metricData: [
-          MetricDatum(
-            metricName: metricName,
-            value: value,
-            timestamp: DateTime.now(),
-            dimensions: dimensions?.entries
-                .map((e) => Dimension(
-                      name: e.key,
-                      value: e.value,
-                    ))
-                .toList(),
-          ),
-        ],
-      );
-
-      await cloudWatch.putMetricData(metricData);
-    } catch (e) {
-      // Log error but don't rethrow to prevent app disruption
-      print('Failed to record metric: $e');
-    }
+  /// Check if AWS credentials are configured
+  static bool get isConfigured {
+    return dotenv.env['AWS_ACCESS_KEY_ID']?.isNotEmpty == true &&
+        dotenv.env['AWS_SECRET_ACCESS_KEY']?.isNotEmpty == true;
   }
 }

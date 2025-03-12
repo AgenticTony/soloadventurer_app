@@ -31,7 +31,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       );
       return (_currentUser!, 'mock-auth-token');
     }
-    throw AuthException('Invalid credentials');
+    throw const AuthException('Invalid credentials');
   }
 
   @override
@@ -42,15 +42,15 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }) async {
     try {
       if (!email.contains('@')) {
-        throw AuthException('Invalid email format');
+        throw const AuthException('Invalid email format');
       }
 
       if (password.length < 6) {
-        throw AuthException('Password must be at least 6 characters');
+        throw const AuthException('Password must be at least 6 characters');
       }
 
       if (name.isEmpty) {
-        throw AuthException('Name is required');
+        throw const AuthException('Name is required');
       }
 
       final user = UserModel(
@@ -65,7 +65,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       if (e is AuthException) {
         rethrow;
       }
-      throw AuthException('Registration failed');
+      throw const AuthException('Registration failed');
     }
   }
 
@@ -88,7 +88,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     }
     await Future.delayed(const Duration(seconds: 1));
     if (!email.contains('@')) {
-      throw AuthException('Invalid email format');
+      throw const AuthException('Invalid email format');
     }
     // In mock implementation, we just simulate sending the reset code
   }
@@ -102,7 +102,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     await Future.delayed(const Duration(seconds: 1));
     if (code != '123456') {
       // Mock verification code
-      throw AuthException('Invalid verification code');
+      throw const AuthException('Invalid verification code');
     }
   }
 
@@ -130,7 +130,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     }
 
     if (!_isAuthenticated) {
-      throw AuthException('Not authenticated');
+      throw const AuthException('Not authenticated');
     }
 
     await Future.delayed(const Duration(seconds: 1));
@@ -156,10 +156,10 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     await Future.delayed(const Duration(seconds: 1));
     if (code != '123456') {
       // Mock reset code
-      throw AuthException('Invalid reset code');
+      throw const AuthException('Invalid reset code');
     }
     if (newPassword.length < 8) {
-      throw AuthException('Password must be at least 8 characters long');
+      throw const AuthException('Password must be at least 8 characters long');
     }
   }
 
@@ -172,10 +172,10 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     }
     await Future.delayed(const Duration(seconds: 1));
     if (!email.contains('@')) {
-      throw AuthException('Invalid email format');
+      throw const AuthException('Invalid email format');
     }
     if (newPassword.length < 8) {
-      throw AuthException('Password must be at least 8 characters long');
+      throw const AuthException('Password must be at least 8 characters long');
     }
   }
 
@@ -187,7 +187,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     }
     await Future.delayed(const Duration(seconds: 1));
     if (!email.contains('@')) {
-      throw AuthException('Invalid email format');
+      throw const AuthException('Invalid email format');
     }
   }
 
@@ -198,7 +198,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
 
     // Simulate email validation
     if (!email.contains('@')) {
-      throw AuthException('Invalid email format');
+      throw const AuthException('Invalid email format');
     }
     // In a real implementation, this would send an email
     debugPrint('Password reset email sent to: $email');

@@ -33,29 +33,29 @@ class TokenLoadingState extends ConsumerWidget {
   Widget _buildOfflineWithCacheMessage(BuildContext context) {
     return Container(
       color: Colors.black54,
-      child: Center(
+      child: const Center(
         child: Card(
-          margin: const EdgeInsets.all(16),
+          margin: EdgeInsets.all(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.cloud_off,
                   size: 48,
                   color: Colors.orange,
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: 16),
+                Text(
                   'Offline Mode',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: 8),
+                Text(
                   'You are currently offline. Some features may be limited.',
                   textAlign: TextAlign.center,
                 ),
@@ -123,25 +123,25 @@ class TokenLoadingState extends ConsumerWidget {
   Widget _buildReauthenticatingProgress(BuildContext context) {
     return Container(
       color: Colors.black54,
-      child: Center(
+      child: const Center(
         child: Card(
-          margin: const EdgeInsets.all(16),
+          margin: EdgeInsets.all(16),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                const Text(
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text(
                   'Re-authenticating...',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Text(
+                SizedBox(height: 8),
+                Text(
                   'Please wait while we restore your session.',
                   textAlign: TextAlign.center,
                 ),

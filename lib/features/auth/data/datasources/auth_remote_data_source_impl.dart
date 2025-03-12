@@ -44,21 +44,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
               await _cognitoUser!.refreshSession(_session!.getRefreshToken()!);
         } catch (e) {
           debugPrint('Failed to refresh session: $e');
-          throw AuthException('Session expired. Please sign in again.');
+          throw const AuthException('Session expired. Please sign in again.');
         }
       } else {
-        throw AuthException('No valid session. Please sign in.');
+        throw const AuthException('No valid session. Please sign in.');
       }
     }
   }
 
   String _getUserId() {
     if (_cognitoUser == null) {
-      throw AuthException('No authenticated user');
+      throw const AuthException('No authenticated user');
     }
     final username = _cognitoUser?.username;
     if (username == null || username.isEmpty) {
-      throw AuthException('Invalid user ID');
+      throw const AuthException('Invalid user ID');
     }
     return username;
   }

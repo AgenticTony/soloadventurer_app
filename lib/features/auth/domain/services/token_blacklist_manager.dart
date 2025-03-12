@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter/foundation.dart';
 import '../models/auth_session.dart';

@@ -81,7 +81,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       // Use navigation provider for consistent navigation
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ref.read(authNavigationProvider.notifier).navigateToLogin();
+          ref.read(authNavigationProvider.notifier).navigateToLogin(context);
         }
       });
       // Show loading until navigation is handled

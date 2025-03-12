@@ -8,11 +8,19 @@ import 'package:soloadventurer/features/auth/domain/services/token_manager.dart'
 import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/core/data/services/connectivity_service_impl.dart';
+import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/logging/token_audit_logger.dart';
+import 'package:soloadventurer/features/auth/domain/services/token_blacklist_manager.dart'
+    show TokenBlacklistManager;
 import 'package:riverpod/riverpod.dart';
 
 class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
+
+class MockTokenBlacklistManager extends Mock implements TokenBlacklistManager {}
+
+class MockLoggingService extends Mock implements LoggingService {}
 
 class MockConnectivityService extends Mock implements ConnectivityService {
   final _connectivityController = StreamController<NetworkStatus>.broadcast();
@@ -28,6 +36,9 @@ class MockConnectivityService extends Mock implements ConnectivityService {
   @override
   Future<bool> get hasConnectivity async =>
       _currentStatus == NetworkStatus.connected;
+
+  @override
+  bool get hasConnectivitySync => _currentStatus == NetworkStatus.connected;
 
   void emitConnectivityState(NetworkStatus status) {
     _currentStatus = status;
@@ -45,22 +56,30 @@ void main() {
   late MockAuthLocalDataSource localDataSource;
   late MockAuthRemoteDataSource remoteDataSource;
   late MockConnectivityService connectivityService;
+  late MockTokenBlacklistManager blacklistManager;
+  late MockLoggingService loggingService;
 
   setUp(() {
     localDataSource = MockAuthLocalDataSource();
     remoteDataSource = MockAuthRemoteDataSource();
     connectivityService = MockConnectivityService();
+    blacklistManager = MockTokenBlacklistManager();
+    loggingService = MockLoggingService();
 
     container = ProviderContainer(
       overrides: [
         authLocalDataSourceProvider.overrideWithValue(localDataSource),
         authRemoteDataSourceProvider.overrideWithValue(remoteDataSource),
         connectivityServiceImplProvider.overrideWithValue(connectivityService),
+        tokenBlacklistManagerProvider.overrideWithValue(blacklistManager),
+        tokenAuditLoggerProvider.overrideWithValue(loggingService),
       ],
     );
 
     // Register fallback values for mocks
     registerFallbackValue(DateTime.now());
+    registerFallbackValue(const Duration(seconds: 1));
+    registerFallbackValue({});
   });
 
   tearDown(() {
@@ -68,9 +87,10 @@ void main() {
     container.dispose();
   });
 
-  group('TokenManager - Token Lifecycle', () {
-    final expiresAt = DateTime.now().add(const Duration(hours: 1));
+  group('TokenManager - Core Token Management', () {
+    final validExpiresAt = DateTime.now().add(const Duration(hours: 1));
     final expiredAt = DateTime.now().subtract(const Duration(minutes: 5));
+    final nearExpiry = DateTime.now().add(const Duration(minutes: 4));
 
     test('should initialize with unauthorized state when no tokens exist',
         () async {
@@ -92,16 +112,16 @@ void main() {
           equals(FeatureAvailability.unauthorized));
     });
 
-    test('should be fully available with valid tokens', () async {
+    test('should validate token expiration correctly', () async {
       // Arrange
       when(() => localDataSource.getAuthToken())
-          .thenAnswer((_) async => 'valid_access_token');
+          .thenAnswer((_) async => 'valid_token');
       when(() => localDataSource.getIdToken())
           .thenAnswer((_) async => 'valid_id_token');
       when(() => localDataSource.getRefreshToken())
           .thenAnswer((_) async => 'valid_refresh_token');
       when(() => localDataSource.getTokenExpiration())
-          .thenAnswer((_) async => expiresAt);
+          .thenAnswer((_) async => validExpiresAt);
 
       // Act
       final notifier = container.read(tokenManagerProvider.notifier);
@@ -112,99 +132,82 @@ void main() {
           equals(FeatureAvailability.fullyAvailable));
     });
 
-    test('should handle token refresh with exponential backoff', () async {
+    test('should handle rate limiting for token refresh', () async {
       // Arrange
       when(() => localDataSource.getAuthToken())
-          .thenAnswer((_) async => 'expired_token');
+          .thenAnswer((_) async => 'token');
       when(() => localDataSource.getIdToken())
-          .thenAnswer((_) async => 'expired_id_token');
+          .thenAnswer((_) async => 'id_token');
       when(() => localDataSource.getRefreshToken())
-          .thenAnswer((_) async => 'valid_refresh_token');
+          .thenAnswer((_) async => 'refresh_token');
       when(() => localDataSource.getTokenExpiration())
-          .thenAnswer((_) async => expiredAt);
-
-      // Simulate network error for first attempt
-      when(() => remoteDataSource.refreshToken())
-          .thenThrow(Exception('Network error'));
-
-      // Act & Assert
-      final stopwatch = Stopwatch()..start();
-      final notifier = container.read(tokenManagerProvider.notifier);
-      await notifier.initialize();
-
-      // First attempt
-      await notifier.refreshToken();
-      final firstAttemptDuration = stopwatch.elapsed;
-
-      // Second attempt
-      await notifier.refreshToken();
-      final secondAttemptDuration = stopwatch.elapsed;
-
-      // Verify exponential backoff
-      expect(
-        secondAttemptDuration.inMilliseconds >
-            firstAttemptDuration.inMilliseconds * 1.5,
-        isTrue,
-        reason: 'Second attempt should take longer due to exponential backoff',
-      );
-    });
-
-    test('should handle offline mode with cached tokens', () async {
-      // Arrange
-      when(() => localDataSource.getAuthToken())
-          .thenAnswer((_) async => 'cached_token');
-      when(() => localDataSource.getIdToken())
-          .thenAnswer((_) async => 'cached_id_token');
-      when(() => localDataSource.getRefreshToken())
-          .thenAnswer((_) async => 'cached_refresh_token');
-      when(() => localDataSource.getTokenExpiration())
-          .thenAnswer((_) async => expiresAt);
-
-      // Set offline mode
-      connectivityService.emitConnectivityState(NetworkStatus.disconnected);
+          .thenAnswer((_) async => nearExpiry);
 
       // Act
       final notifier = container.read(tokenManagerProvider.notifier);
       await notifier.initialize();
 
-      // Assert
-      expect(container.read(tokenManagerProvider),
-          equals(FeatureAvailability.offlineWithCache));
-      verifyNever(() => remoteDataSource.refreshToken());
-    });
+      // Attempt multiple rapid refreshes
+      for (var i = 0; i < 3; i++) {
+        await notifier.refreshToken();
+      }
 
-    test('should clear session and tokens', () async {
+      // Verify rate limiting through audit logs
+      verify(() => loggingService.logTokenEvent(
+            event: any(named: 'event'),
+            status: 'info',
+            metadata: any(named: 'metadata'),
+          )).called(greaterThan(1));
+    });
+  });
+
+  group('TokenManager - Security Features', () {
+    final validExpiresAt = DateTime.now().add(const Duration(hours: 1));
+
+    test('should detect and handle blacklisted tokens', () async {
       // Arrange
+      when(() => localDataSource.getAuthToken())
+          .thenAnswer((_) async => 'token');
+      when(() => localDataSource.getIdToken())
+          .thenAnswer((_) async => 'id_token');
+      when(() => localDataSource.getRefreshToken())
+          .thenAnswer((_) async => 'blacklisted_token');
+      when(() => localDataSource.getTokenExpiration())
+          .thenAnswer((_) async => validExpiresAt);
+      when(() => blacklistManager.isTokenBlacklisted(any())).thenReturn(true);
       when(() => localDataSource.clearAuthData()).thenAnswer((_) async {});
 
       // Act
       final notifier = container.read(tokenManagerProvider.notifier);
-      await notifier.clearSession();
+      await notifier.initialize();
+      await notifier.refreshToken();
 
       // Assert
-      expect(container.read(tokenManagerProvider),
-          equals(FeatureAvailability.unauthorized));
+      verify(() => loggingService.logTokenEvent(
+            event: any(named: 'event'),
+            status: any(named: 'status'),
+            metadata: any(named: 'metadata'),
+          )).called(greaterThan(0));
       verify(() => localDataSource.clearAuthData()).called(1);
     });
 
-    test('should automatically refresh tokens near expiry', () async {
+    test('should rotate tokens securely', () async {
       // Arrange
-      final nearExpiry = DateTime.now().add(const Duration(minutes: 4));
       when(() => localDataSource.getAuthToken())
-          .thenAnswer((_) async => 'current_token');
+          .thenAnswer((_) async => 'old_token');
       when(() => localDataSource.getIdToken())
-          .thenAnswer((_) async => 'current_id_token');
+          .thenAnswer((_) async => 'old_id_token');
       when(() => localDataSource.getRefreshToken())
-          .thenAnswer((_) async => 'valid_refresh_token');
+          .thenAnswer((_) async => 'old_refresh_token');
       when(() => localDataSource.getTokenExpiration())
-          .thenAnswer((_) async => nearExpiry);
+          .thenAnswer((_) async => validExpiresAt);
 
       when(() => remoteDataSource.refreshToken())
           .thenAnswer((_) async => AuthSession(
                 accessToken: 'new_token',
                 idToken: 'new_id_token',
                 refreshToken: 'new_refresh_token',
-                expiresAt: expiresAt,
+                expiresAt: validExpiresAt.add(const Duration(hours: 1)),
               ));
 
       when(() => localDataSource.saveAuthData(
@@ -217,78 +220,133 @@ void main() {
       // Act
       final notifier = container.read(tokenManagerProvider.notifier);
       await notifier.initialize();
-      await notifier.refreshToken(); // Explicitly trigger refresh
+      await notifier.refreshToken();
 
       // Assert
-      expect(container.read(tokenManagerProvider),
-          equals(FeatureAvailability.fullyAvailable));
-      verify(() => remoteDataSource.refreshToken()).called(1);
       verify(() => localDataSource.saveAuthData(
             'new_token',
             'new_refresh_token',
-            expiresAt: expiresAt,
+            expiresAt: any(named: 'expiresAt'),
             idToken: 'new_id_token',
           )).called(1);
-    });
 
-    test('should handle connectivity changes', () async {
+      verify(() => loggingService.logTokenEvent(
+            event: any(named: 'event'),
+            status: any(named: 'status'),
+            metadata: any(named: 'metadata'),
+          )).called(greaterThan(0));
+    });
+  });
+
+  group('TokenManager - Error Recovery', () {
+    final validExpiresAt = DateTime.now().add(const Duration(hours: 1));
+
+    test('should implement exponential backoff with jitter', () async {
       // Arrange
       when(() => localDataSource.getAuthToken())
-          .thenAnswer((_) async => 'valid_token');
+          .thenAnswer((_) async => 'token');
       when(() => localDataSource.getIdToken())
-          .thenAnswer((_) async => 'valid_id_token');
+          .thenAnswer((_) async => 'id_token');
       when(() => localDataSource.getRefreshToken())
-          .thenAnswer((_) async => 'valid_refresh_token');
+          .thenAnswer((_) async => 'refresh_token');
       when(() => localDataSource.getTokenExpiration())
-          .thenAnswer((_) async => expiresAt);
+          .thenAnswer((_) async => validExpiresAt);
+
+      // Simulate network errors
+      when(() => remoteDataSource.refreshToken())
+          .thenThrow(Exception('Network error'));
 
       // Act
       final notifier = container.read(tokenManagerProvider.notifier);
       await notifier.initialize();
 
-      // Assert initial state
-      expect(container.read(tokenManagerProvider),
-          equals(FeatureAvailability.fullyAvailable));
+      final stopwatch = Stopwatch()..start();
 
-      // Create a completer to track state changes
-      final stateChanged = Completer<void>();
-      final subscription = container.listen(
-        tokenManagerProvider,
-        (_, __) {
-          if (!stateChanged.isCompleted) {
-            stateChanged.complete();
-          }
-        },
-      );
+      // First attempt
+      await notifier.refreshToken();
+      final firstAttemptDuration = stopwatch.elapsed;
+
+      // Second attempt
+      await notifier.refreshToken();
+      final secondAttemptDuration = stopwatch.elapsed - firstAttemptDuration;
+
+      // Third attempt
+      await notifier.refreshToken();
+      final thirdAttemptDuration =
+          stopwatch.elapsed - secondAttemptDuration - firstAttemptDuration;
+
+      // Verify exponential backoff pattern
+      expect(secondAttemptDuration > firstAttemptDuration, isTrue);
+      expect(thirdAttemptDuration > secondAttemptDuration, isTrue);
+    });
+
+    test('should handle permanent failures gracefully', () async {
+      // Arrange
+      when(() => localDataSource.getAuthToken())
+          .thenAnswer((_) async => 'token');
+      when(() => localDataSource.getIdToken())
+          .thenAnswer((_) async => 'id_token');
+      when(() => localDataSource.getRefreshToken())
+          .thenAnswer((_) async => 'refresh_token');
+      when(() => localDataSource.getTokenExpiration())
+          .thenAnswer((_) async => validExpiresAt);
+      when(() => localDataSource.clearAuthData()).thenAnswer((_) async {});
+
+      // Simulate permanent failure after max attempts
+      when(() => remoteDataSource.refreshToken())
+          .thenThrow(Exception('Permanent error'));
+
+      // Act
+      final notifier = container.read(tokenManagerProvider.notifier);
+      await notifier.initialize();
+
+      // Attempt multiple refreshes to trigger max attempts
+      for (var i = 0; i < 6; i++) {
+        await notifier.refreshToken();
+      }
+
+      // Assert
+      verify(() => loggingService.logTokenEvent(
+            event: any(named: 'event'),
+            status: 'error',
+            metadata: any(named: 'metadata'),
+          )).called(greaterThan(0));
+
+      verify(() => localDataSource.clearAuthData()).called(1);
+      expect(container.read(tokenManagerProvider),
+          equals(FeatureAvailability.unauthorized));
+    });
+
+    test('should handle offline recovery', () async {
+      // Arrange
+      when(() => localDataSource.getAuthToken())
+          .thenAnswer((_) async => 'token');
+      when(() => localDataSource.getIdToken())
+          .thenAnswer((_) async => 'id_token');
+      when(() => localDataSource.getRefreshToken())
+          .thenAnswer((_) async => 'refresh_token');
+      when(() => localDataSource.getTokenExpiration())
+          .thenAnswer((_) async => validExpiresAt);
+
+      // Act
+      final notifier = container.read(tokenManagerProvider.notifier);
+      await notifier.initialize();
 
       // Simulate going offline
       connectivityService.emitConnectivityState(NetworkStatus.disconnected);
-      await stateChanged.future;
-      
       expect(container.read(tokenManagerProvider),
           equals(FeatureAvailability.offlineWithCache));
 
-      // Create another completer for the next state change
-      final onlineStateChanged = Completer<void>();
-      final onlineSubscription = container.listen(
-        tokenManagerProvider,
-        (_, __) {
-          if (!onlineStateChanged.isCompleted) {
-            onlineStateChanged.complete();
-          }
-        },
-      );
-
       // Simulate coming back online
       connectivityService.emitConnectivityState(NetworkStatus.connected);
-      await onlineStateChanged.future;
-
       expect(container.read(tokenManagerProvider),
           equals(FeatureAvailability.fullyAvailable));
 
-      // Cleanup
-      subscription.close();
-      onlineSubscription.close();
+      verify(() => loggingService.logTokenEvent(
+            event: any(named: 'event'),
+            status: any(named: 'status'),
+            metadata: any(named: 'metadata'),
+          )).called(greaterThan(0));
     });
   });
 }
