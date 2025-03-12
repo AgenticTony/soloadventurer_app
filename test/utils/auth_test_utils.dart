@@ -102,7 +102,7 @@ extension AuthTestingX on ProviderContainer {
 class MockAuthNotifier extends StateNotifier<AsyncValue<AuthState>>
     with Mock
     implements AuthNotifier {
-  MockAuthNotifier() : super(AsyncValue.data(AuthState.initial()));
+  MockAuthNotifier() : super(const AsyncValue.data(AuthState.initial()));
 }
 
 Widget createAuthTestWidget({

@@ -53,7 +53,7 @@ class NotificationService extends _$NotificationService {
     required String title,
     required String body,
   }) async {
-    final androidDetails = AndroidNotificationDetails(
+    const androidDetails = AndroidNotificationDetails(
       _channelId,
       _channelName,
       channelDescription: _channelDescription,
@@ -64,13 +64,13 @@ class NotificationService extends _$NotificationService {
       category: AndroidNotificationCategory.service,
     );
 
-    final iOSDetails = const DarwinNotificationDetails(
+    const iOSDetails = DarwinNotificationDetails(
       presentAlert: false,
       presentBadge: false,
       presentSound: false,
     );
 
-    final details = NotificationDetails(
+    const details = NotificationDetails(
       android: androidDetails,
       iOS: iOSDetails,
     );

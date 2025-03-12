@@ -1,28 +1,77 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:aws_cloudwatch_api/cloudwatch-2010-08-01.dart' as aws;
+import 'package:shared_aws_api/shared.dart';
 import './monitoring_service.dart';
 
 part 'aws_cloudwatch_monitoring.g.dart';
 
-/// CloudWatch types
+/// Provider for AWS CloudWatch monitoring service
+@riverpod
+AwsCloudWatchMonitoring awsCloudWatchMonitoring(
+    AwsCloudWatchMonitoringRef ref) {
+  final cloudWatch = CloudWatch(
+    region: dotenv.env['AWS_REGION'] ?? 'us-east-1',
+    accessKeyId: dotenv.env['AWS_ACCESS_KEY_ID'] ?? '',
+    secretAccessKey: dotenv.env['AWS_SECRET_ACCESS_KEY'] ?? '',
+  );
+
+  return AwsCloudWatchMonitoring(
+    cloudWatch: cloudWatch,
+    namespace: 'SoloAdventurer/TokenSecurity',
+  );
+}
+
+/// CloudWatch wrapper class
 class CloudWatch {
   final String region;
   final String accessKeyId;
   final String secretAccessKey;
+  late final aws.CloudWatch _client;
 
   CloudWatch({
     required this.region,
     required this.accessKeyId,
     required this.secretAccessKey,
-  });
+  }) {
+    _client = aws.CloudWatch(
+      region: region,
+      credentials: AwsClientCredentials(
+        accessKey: accessKeyId,
+        secretKey: secretAccessKey,
+      ),
+    );
+  }
 
   Future<void> putMetricData({
     required String namespace,
     required List<MetricDatum> metricData,
   }) async {
-    // Implement AWS CloudWatch API call
-    // This is a placeholder for the actual AWS SDK implementation
+    try {
+      final request = aws.PutMetricDataInput(
+        namespace: namespace,
+        metricData: metricData
+            .map((datum) => aws.MetricDatum(
+                  metricName: datum.metricName,
+                  value: datum.value,
+                  dimensions: datum.dimensions
+                      ?.map((d) => aws.Dimension(
+                            name: d.name,
+                            value: d.value,
+                          ))
+                      .toList(),
+                  timestamp: datum.timestamp,
+                ))
+            .toList(),
+      );
+
+      await _client.putMetricData(request);
+    } catch (e) {
+      debugPrint('Failed to put metric data to CloudWatch: $e');
+      rethrow;
+    }
   }
 }
 
@@ -248,19 +297,4 @@ class AwsCloudWatchMonitoring implements MonitoringService {
         .map((e) => Dimension(name: e.key, value: e.value.toString()))
         .toList();
   }
-}
-
-/// Provider for AWS CloudWatch monitoring service
-@riverpod
-AwsCloudWatchMonitoring awsCloudWatchMonitoring(
-    AwsCloudWatchMonitoringRef ref) {
-  return AwsCloudWatchMonitoring(
-    cloudWatch: CloudWatch(
-      region:
-          const String.fromEnvironment('AWS_REGION', defaultValue: 'us-east-1'),
-      accessKeyId: const String.fromEnvironment('AWS_ACCESS_KEY_ID'),
-      secretAccessKey: const String.fromEnvironment('AWS_SECRET_ACCESS_KEY'),
-    ),
-    namespace: 'SoloAdventurer',
-  );
 }

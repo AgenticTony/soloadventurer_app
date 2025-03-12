@@ -20,7 +20,7 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
       _mockProfile = profile;
       return profile;
     } catch (e) {
-      throw ServerException(message: 'Failed to create profile');
+      throw const ServerException(message: 'Failed to create profile');
     }
   }
 
@@ -32,7 +32,7 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
       }
       return _mockProfile!;
     } catch (e) {
-      throw ServerException(message: 'Failed to get current profile');
+      throw const ServerException(message: 'Failed to get current profile');
     }
   }
 
@@ -42,7 +42,7 @@ class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
       _mockProfile = profile;
       return profile;
     } catch (e) {
-      throw ServerException(message: 'Failed to update profile');
+      throw const ServerException(message: 'Failed to update profile');
     }
   }
 
