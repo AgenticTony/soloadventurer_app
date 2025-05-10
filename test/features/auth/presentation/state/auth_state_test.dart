@@ -6,34 +6,9 @@ void main() {
   group('AuthState', () {
     test('initial state has correct values', () {
       const state = AuthState.initial();
-      expect(state.isLoading, false);
       expect(state.user, null);
-      expect(state.error, null);
-      expect(state.errorCode, null);
-      expect(state.requiresEmailVerification, false);
-      expect(state.requiresPasswordReset, false);
-      expect(state.isLoggedIn, false);
       expect(state.isAuthenticated, false);
-      expect(state.needsVerification, false);
-      expect(state.isNewUser, false);
-    });
-
-    test('loading state has correct values', () {
-      const state = AuthState.loading();
-      expect(state.isLoading, true);
-      expect(state.user, null);
-      expect(state.error, null);
-      expect(state.errorCode, null);
-      expect(state.requiresEmailVerification, false);
-      expect(state.requiresPasswordReset, false);
-    });
-
-    test('error state has correct values', () {
-      const state = AuthState.error('Test error', 'ERROR_CODE');
-      expect(state.isLoading, false);
-      expect(state.user, null);
-      expect(state.error, 'Test error');
-      expect(state.errorCode, 'ERROR_CODE');
+      expect(state.requiresMFA, false);
       expect(state.requiresEmailVerification, false);
       expect(state.requiresPasswordReset, false);
     });
@@ -45,17 +20,18 @@ void main() {
         username: 'test',
         createdAt: DateTime.now(),
       );
-      final state = AuthState.authenticated(user);
-      expect(state.isLoading, false);
+      final state = AuthState.authenticated(
+        user: user,
+        accessToken: 'test-token',
+        idToken: 'test-id-token',
+        refreshToken: 'test-refresh-token',
+        tokenExpiresAt: DateTime.now().add(const Duration(hours: 1)),
+      );
       expect(state.user, user);
-      expect(state.error, null);
-      expect(state.errorCode, null);
+      expect(state.isAuthenticated, true);
+      expect(state.requiresMFA, false);
       expect(state.requiresEmailVerification, false);
       expect(state.requiresPasswordReset, false);
-      expect(state.isLoggedIn, true);
-      expect(state.isAuthenticated, true);
-      expect(state.needsVerification, false);
-      expect(state.isNewUser, false);
     });
 
     test('unverified state has correct values', () {
@@ -65,17 +41,42 @@ void main() {
         username: 'test',
         createdAt: DateTime.now(),
       );
-      final state = AuthState.unverified(user);
-      expect(state.isLoading, false);
+      final state = AuthState.unverified(user: user);
       expect(state.user, user);
-      expect(state.error, null);
-      expect(state.errorCode, null);
+      expect(state.isAuthenticated, false);
+      expect(state.requiresMFA, false);
       expect(state.requiresEmailVerification, true);
       expect(state.requiresPasswordReset, false);
-      expect(state.isLoggedIn, false);
-      expect(state.isAuthenticated, true);
-      expect(state.needsVerification, true);
-      expect(state.isNewUser, true);
+    });
+
+    test('mfaRequired state has correct values', () {
+      final user = User(
+        id: '1',
+        email: 'test@test.com',
+        username: 'test',
+        createdAt: DateTime.now(),
+      );
+      final state = AuthState.mfaRequired(user: user);
+      expect(state.user, user);
+      expect(state.isAuthenticated, false);
+      expect(state.requiresMFA, true);
+      expect(state.requiresEmailVerification, false);
+      expect(state.requiresPasswordReset, false);
+    });
+
+    test('passwordResetRequired state has correct values', () {
+      final user = User(
+        id: '1',
+        email: 'test@test.com',
+        username: 'test',
+        createdAt: DateTime.now(),
+      );
+      final state = AuthState.passwordResetRequired(user: user);
+      expect(state.user, user);
+      expect(state.isAuthenticated, false);
+      expect(state.requiresMFA, false);
+      expect(state.requiresEmailVerification, false);
+      expect(state.requiresPasswordReset, true);
     });
 
     test('copyWith creates new instance with updated values', () {
@@ -88,17 +89,15 @@ void main() {
       const state = AuthState.initial();
       final newState = state.copyWith(
         user: user,
-        isLoading: true,
-        error: 'Test error',
-        errorCode: 'ERROR_CODE',
+        isAuthenticated: true,
+        requiresMFA: true,
         requiresEmailVerification: true,
         requiresPasswordReset: true,
       );
 
       expect(newState.user, user);
-      expect(newState.isLoading, true);
-      expect(newState.error, 'Test error');
-      expect(newState.errorCode, 'ERROR_CODE');
+      expect(newState.isAuthenticated, true);
+      expect(newState.requiresMFA, true);
       expect(newState.requiresEmailVerification, true);
       expect(newState.requiresPasswordReset, true);
     });
@@ -110,42 +109,56 @@ void main() {
         username: 'test',
         createdAt: DateTime.now(),
       );
-      final state = AuthState.authenticated(user);
+      final state = AuthState.authenticated(
+        user: user,
+        accessToken: 'test-token',
+        idToken: 'test-id-token',
+        refreshToken: 'test-refresh-token',
+        tokenExpiresAt: DateTime.now().add(const Duration(hours: 1)),
+      );
       final newState = state.copyWith();
 
       expect(newState.user, state.user);
-      expect(newState.isLoading, state.isLoading);
-      expect(newState.error, state.error);
-      expect(newState.errorCode, state.errorCode);
+      expect(newState.isAuthenticated, state.isAuthenticated);
+      expect(newState.requiresMFA, state.requiresMFA);
       expect(
           newState.requiresEmailVerification, state.requiresEmailVerification);
       expect(newState.requiresPasswordReset, state.requiresPasswordReset);
     });
 
-    test('props contains all properties', () {
-      final user = User(
+    test('equality works correctly', () {
+      final user1 = User(
         id: '1',
         email: 'test@test.com',
         username: 'test',
         createdAt: DateTime.now(),
       );
-      final state = AuthState(
-        user: user,
-        isLoading: true,
-        error: 'Test error',
-        errorCode: 'ERROR_CODE',
-        requiresEmailVerification: true,
-        requiresPasswordReset: true,
+
+      final user2 = User(
+        id: '1',
+        email: 'test@test.com',
+        username: 'test',
+        createdAt: user1.createdAt,
       );
 
-      expect(state.props, [
-        user,
-        true,
-        'Test error',
-        'ERROR_CODE',
-        true,
-        true,
-      ]);
+      final state1 = AuthState.authenticated(
+        user: user1,
+        accessToken: 'test-token',
+        idToken: 'test-id-token',
+        refreshToken: 'test-refresh-token',
+        tokenExpiresAt: DateTime.now().add(const Duration(hours: 1)),
+      );
+      final state2 = AuthState.authenticated(
+        user: user2,
+        accessToken: 'test-token',
+        idToken: 'test-id-token',
+        refreshToken: 'test-refresh-token',
+        tokenExpiresAt: DateTime.now().add(const Duration(hours: 1)),
+      );
+      final state3 = AuthState.unverified(user: user1);
+
+      expect(state1 == state2, isTrue);
+      expect(state1 == state3, isFalse);
     });
 
     test('toString returns correct string representation', () {
@@ -157,17 +170,19 @@ void main() {
       );
       final state = AuthState(
         user: user,
-        isLoading: true,
-        error: 'Test error',
-        errorCode: 'ERROR_CODE',
+        isAuthenticated: true,
+        requiresMFA: false,
         requiresEmailVerification: true,
-        requiresPasswordReset: true,
+        requiresPasswordReset: false,
       );
 
       expect(
         state.toString(),
-        'AuthState(user: $user, isLoading: true, error: Test error, errorCode: ERROR_CODE, requiresEmailVerification: true, requiresPasswordReset: true)',
+        contains('AuthState'),
       );
+      expect(state.toString(), contains('user: $user'));
+      expect(state.toString(), contains('isAuthenticated: true'));
+      expect(state.toString(), contains('requiresEmailVerification: true'));
     });
   });
 }

@@ -27,10 +27,8 @@ void main() {
 
     container = ProviderContainer(
       overrides: [
-        authNotifierProvider.overrideWithProvider(
-          StateNotifierProvider<AuthNotifier, AuthState>(
-            (ref) => AuthNotifier(mockAuthDataSource),
-          ),
+        authNotifierProvider.overrideWith(
+          (ref) => AuthNotifier(mockAuthDataSource),
         ),
       ],
     );
@@ -188,9 +186,9 @@ void main() {
           .thenAnswer((_) async {});
 
       await container.read(authNotifierProvider.notifier).confirmPasswordReset(
-            email: 'test@test.com',
-            code: '123456',
-            newPassword: 'newpassword',
+            'test@test.com',
+            '123456',
+            'newpassword',
           );
 
       // Should return to initial state after password reset

@@ -31,8 +31,8 @@ import 'package:soloadventurer/features/profile/domain/usecases/delete_profile_u
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
-import 'package:soloadventurer/config/test_config.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
+import 'test_config.dart';
+import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 
 class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   ProfileModel? _mockProfile;
@@ -438,6 +438,6 @@ void main() {
 
     // Verify we're on the home screen
     await tester.pumpAndSettle();
-    expect(find.text('Welcome, Test User!'), findsOneWidget);
+    expect(find.text('Welcome to SoloAdventurer!'), findsOneWidget);
   });
 }

@@ -38,20 +38,19 @@ void main() {
 
     setUp(() {
       mockAuthNotifier = MockAuthNotifier();
-      registerFallbackValue(const AsyncValue<AuthState>.data(AuthState.initial()));
+      registerFallbackValue(
+          const AsyncValue<AuthState>.data(AuthState.initial()));
     });
 
     Widget createWidgetUnderTest() {
       return ProviderScope(
         overrides: [
-          authProvider.overrideWithProvider(
-            StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>(
-              (ref) => mockAuthNotifier,
-            ),
+          authNotifierProvider.overrideWith(
+            (ref) => mockAuthNotifier,
           ),
         ],
-        child: MaterialApp(
-          home: SignupScreen(),
+        child: const MaterialApp(
+          home: SignUpScreen(),
         ),
       );
     }

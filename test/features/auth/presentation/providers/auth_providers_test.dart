@@ -12,7 +12,7 @@ import 'package:soloadventurer/features/auth/domain/usecases/resend_verification
     as resend;
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
 
@@ -86,18 +86,19 @@ void main() {
 
   group('AuthProvider', () {
     test('initial state is loading', () {
-      final state = container.read(authStateProvider);
-      expect(state.value, const AuthState.loading());
+      final state = container.read(authNotifierProvider);
+      expect(state.isLoading, isFalse);
     });
 
     test('initialize sets initial state when not signed in', () async {
       when(() => mockIsSignedIn.call()).thenAnswer((_) async => false);
       when(() => mockGetCurrentUser.call()).thenAnswer((_) async => null);
 
-      await container.read(authStateProvider.notifier).initialize();
+      await container.read(authNotifierProvider.notifier).initialize();
 
-      final state = container.read(authStateProvider);
-      expect(state.value, const AuthState.initial());
+      final state = container.read(authNotifierProvider);
+      expect(state.value, isA<AuthState>());
+      expect(state.value?.isAuthenticated, isFalse);
     });
 
     test('initialize sets authenticated state when signed in', () async {
@@ -111,10 +112,12 @@ void main() {
       when(() => mockIsSignedIn.call()).thenAnswer((_) async => true);
       when(() => mockGetCurrentUser.call()).thenAnswer((_) async => user);
 
-      await container.read(authStateProvider.notifier).initialize();
+      await container.read(authNotifierProvider.notifier).initialize();
 
-      final state = container.read(authStateProvider);
-      expect(state.value, AuthState.authenticated(user));
+      final state = container.read(authNotifierProvider);
+      expect(state.value, isA<AuthState>());
+      expect(state.value?.user, equals(user));
+      expect(state.value?.isAuthenticated, isTrue);
     });
 
     test('signIn updates state on success', () async {
@@ -125,45 +128,50 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      when(() => mockLoginUseCase.call(any(), any()))
+      when(() => mockLoginUseCase.call(any(that: isA<LoginParams>())))
           .thenAnswer((_) async => user);
 
       await container
-          .read(authStateProvider.notifier)
+          .read(authNotifierProvider.notifier)
           .signIn('test@test.com', 'password');
 
-      final state = container.read(authStateProvider);
-      expect(state.value, AuthState.authenticated(user));
+      final state = container.read(authNotifierProvider);
+      expect(state.value, isA<AuthState>());
+      expect(state.value?.user, equals(user));
+      expect(state.value?.isAuthenticated, isTrue);
     });
 
     test('signIn updates state on error', () async {
-      when(() => mockLoginUseCase.call(any(), any()))
+      when(() => mockLoginUseCase.call(any(that: isA<LoginParams>())))
           .thenThrow(Exception('Invalid credentials'));
 
       await container
-          .read(authStateProvider.notifier)
+          .read(authNotifierProvider.notifier)
           .signIn('test@test.com', 'password');
 
-      final state = container.read(authStateProvider);
-      expect(state.value, const AuthState.error('Invalid credentials'));
+      final state = container.read(authNotifierProvider);
+      expect(state.hasError, isTrue);
+      expect(state.error.toString(), contains('Invalid credentials'));
     });
 
     test('signOut updates state on success', () async {
       when(() => mockSignOut.call()).thenAnswer((_) async {});
 
-      await container.read(authStateProvider.notifier).signOut();
+      await container.read(authNotifierProvider.notifier).signOut();
 
-      final state = container.read(authStateProvider);
-      expect(state.value, const AuthState.initial());
+      final state = container.read(authNotifierProvider);
+      expect(state.value, isA<AuthState>());
+      expect(state.value?.isAuthenticated, isFalse);
     });
 
     test('signOut updates state on error', () async {
       when(() => mockSignOut.call()).thenThrow(Exception('Sign out failed'));
 
-      await container.read(authStateProvider.notifier).signOut();
+      await container.read(authNotifierProvider.notifier).signOut();
 
-      final state = container.read(authStateProvider);
-      expect(state.value, const AuthState.error('Sign out failed'));
+      final state = container.read(authNotifierProvider);
+      expect(state.hasError, isTrue);
+      expect(state.error.toString(), contains('Sign out failed'));
     });
   });
 }

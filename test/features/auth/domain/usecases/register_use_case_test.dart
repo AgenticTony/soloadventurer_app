@@ -21,57 +21,65 @@ void main() {
   group('RegisterUseCase', () {
     test('should return User when registration is successful', () async {
       // Arrange
-      when(() => testSetup.mockAuthRepository.registerWithEmailAndPassword(
-            any(),
-            any(),
-            any(),
-          )).thenAnswer((_) async => testSetup.createTestUser());
+      when(() => testSetup.mockAuthRepository.register(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            name: any(named: 'name'),
+          )).thenAnswer((_) async => (testSetup.createTestUser(), false));
 
       // Act
       final result = await registerUseCase.execute(
-        testEmail,
-        testPassword,
-        testUsername,
+        email: testEmail,
+        password: testPassword,
+        name: testUsername,
       );
 
       // Assert
-      expect(result, isA<User>());
-      expect(result.email, equals(testEmail));
-      expect(result.username, equals(testUsername));
+      expect(result.$1, isA<User>());
+      expect(result.$1.email, equals(testEmail));
+      expect(result.$1.username, equals(testUsername));
     });
 
     test('should throw when registration fails', () async {
       // Arrange
-      when(() => testSetup.mockAuthRepository.registerWithEmailAndPassword(
-            any(),
-            any(),
-            any(),
+      when(() => testSetup.mockAuthRepository.register(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            name: any(named: 'name'),
           )).thenThrow(Exception('Registration failed'));
 
       // Act & Assert
       expect(
-        () => registerUseCase.execute(testEmail, testPassword, testUsername),
+        () => registerUseCase.execute(
+          email: testEmail,
+          password: testPassword,
+          name: testUsername,
+        ),
         throwsA(isA<Exception>()),
       );
     });
 
     test('should call repository with correct parameters', () async {
       // Arrange
-      when(() => testSetup.mockAuthRepository.registerWithEmailAndPassword(
-            any(),
-            any(),
-            any(),
-          )).thenAnswer((_) async => testSetup.createTestUser());
+      when(() => testSetup.mockAuthRepository.register(
+            email: any(named: 'email'),
+            password: any(named: 'password'),
+            name: any(named: 'name'),
+          )).thenAnswer((_) async => (testSetup.createTestUser(), false));
 
       // Act
-      await registerUseCase.execute(testEmail, testPassword, testUsername);
+      await registerUseCase.execute(
+        email: testEmail,
+        password: testPassword,
+        name: testUsername,
+      );
 
       // Assert
       verify(
-        () => testSetup.mockAuthRepository.registerWithEmailAndPassword(
-          testEmail,
-          testPassword,
-          testUsername,
+        () => testSetup.mockAuthRepository.register(
+          email: testEmail,
+          password: testPassword,
+          name: testUsername,
         ),
       ).called(1);
     });

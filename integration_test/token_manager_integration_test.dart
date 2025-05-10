@@ -7,6 +7,8 @@ import 'package:soloadventurer/core/security/security_manager.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
+import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
@@ -84,14 +86,11 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
 
   @override
   Future<AuthSession> refreshToken() async {
-    debugPrint('MockAuthRemoteDataSource: Refreshing token');
     if (!_isAuthenticated) {
-      debugPrint('MockAuthRemoteDataSource: Not authenticated');
       throw const AuthException('No authenticated user');
     }
 
     if (_currentSession == null) {
-      debugPrint('MockAuthRemoteDataSource: No current session');
       throw const AuthException('No current session');
     }
 
@@ -106,8 +105,60 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     );
 
     _currentSession = newSession;
-    debugPrint('MockAuthRemoteDataSource: Token refreshed successfully');
     return newSession;
+  }
+
+  @override
+  Future<AuthTokens> refreshTokenWithString(String refreshToken) async {
+    if (!_isAuthenticated) {
+      throw const AuthException('No authenticated user');
+    }
+
+    // Create a new session with refreshed tokens
+    final newSession = AuthSession(
+      accessToken:
+          'refreshed_access_token_${DateTime.now().millisecondsSinceEpoch}',
+      idToken: 'refreshed_id_token_${DateTime.now().millisecondsSinceEpoch}',
+      refreshToken: refreshToken,
+      expiresAt: DateTime.now().add(const Duration(hours: 1)),
+    );
+
+    _currentSession = newSession;
+
+    // Return AuthTokens
+    return AuthTokens(
+      accessToken: newSession.accessToken,
+      idToken: newSession.idToken,
+      refreshToken: newSession.refreshToken,
+      expiration: DateTime.now().add(const Duration(hours: 1)),
+    );
+  }
+
+  @override
+  Future<AuthTokens> reauthenticate(Credentials credentials) async {
+    if (!_isAuthenticated) {
+      throw const AuthException('No authenticated user');
+    }
+
+    // Create a new session with refreshed tokens
+    final newSession = AuthSession(
+      accessToken:
+          'reauth_access_token_${DateTime.now().millisecondsSinceEpoch}',
+      idToken: 'reauth_id_token_${DateTime.now().millisecondsSinceEpoch}',
+      refreshToken:
+          'reauth_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+      expiresAt: DateTime.now().add(const Duration(hours: 1)),
+    );
+
+    _currentSession = newSession;
+
+    // Return AuthTokens
+    return AuthTokens(
+      accessToken: newSession.accessToken,
+      idToken: newSession.idToken,
+      refreshToken: newSession.refreshToken,
+      expiration: DateTime.now().add(const Duration(hours: 1)),
+    );
   }
 
   void setAuthenticated(bool authenticated, {AuthSession? session}) {
@@ -193,22 +244,18 @@ void main() {
   late SecurityManager securityManager;
 
   setUp(() async {
-    debugPrint('\n=== Setting up test ===');
-    debugPrint('Resetting service locator and initializing test environment');
+    // Set up test environment
     await resetServiceLocator();
     SharedPreferences.setMockInitialValues({});
 
-    debugPrint('Creating and configuring mock services');
+    // Create and configure mock services
     mockConnectivityService = MockConnectivityService();
-    debugPrint('Initialized MockConnectivityService with default connected state');
-
     mockAuthRemoteDataSource = MockAuthRemoteDataSource();
-    debugPrint('Initialized MockAuthRemoteDataSource with unauthenticated state');
 
-    debugPrint('Setting up service locator in test mode');
+    // Set up service locator in test mode
     await setupServiceLocator(isTest: true);
 
-    debugPrint('Creating ProviderContainer with mock service overrides');
+    // Create ProviderContainer with mock service overrides
     container = ProviderContainer(
       overrides: [
         connectivityServiceImplProvider
@@ -217,79 +264,60 @@ void main() {
             .overrideWithValue(mockAuthRemoteDataSource),
       ],
     );
-    debugPrint('Provider container created with mock service overrides');
 
-    debugPrint('Initializing security manager and local data source');
+    // Initialize security manager and local data source
     securityManager = getIt<SecurityManager>();
-    authLocalDataSource = AuthLocalDataSourceImpl(securityManager);
+    final sharedPrefs = await SharedPreferences.getInstance();
+    authLocalDataSource = AuthLocalDataSourceImpl(securityManager, sharedPrefs);
 
-    debugPrint('Clearing existing storage and auth data');
+    // Clear existing storage and auth data
     await getIt<FlutterSecureStorage>().deleteAll();
     await authLocalDataSource.clearAuthData();
 
-    debugPrint('Setting up initial authentication state');
+    // Set up initial authentication state
     final initialTokens = AuthSession(
       accessToken: 'test_access_token',
       idToken: 'test_id_token',
       refreshToken: 'test_refresh_token',
       expiresAt: DateTime.now().add(const Duration(minutes: 10)),
     );
-    debugPrint('Created initial test tokens with 10-minute validity');
 
-    debugPrint('Saving auth data to local storage');
+    // Save auth data to local storage
     await authLocalDataSource.saveAuthData(
       initialTokens.accessToken,
       initialTokens.refreshToken,
       expiresAt: initialTokens.expiresAt,
       idToken: initialTokens.idToken,
     );
-    debugPrint('Auth data saved to local storage');
 
-    debugPrint('Configuring mock remote data source');
+    // Configure mock remote data source
     mockAuthRemoteDataSource.setAuthenticated(true, session: initialTokens);
-    debugPrint('Mock remote data source configured with test session');
 
-    debugPrint('Initializing TokenManager');
+    // Initialize TokenManager
     tokenManager = container.read(tokenManagerProvider.notifier);
-    debugPrint('TokenManager instance created');
-
-    debugPrint('Waiting for TokenManager initialization');
     await tokenManager.initialize();
-    debugPrint('TokenManager initialization completed');
 
     addTearDown(() async {
-      debugPrint('\n=== Tearing down test ===');
-      debugPrint('Clearing TokenManager session');
+      // Clean up resources
       await tokenManager.clearSession();
-      debugPrint('Disposing provider container');
       container.dispose();
-      debugPrint('Clearing secure storage');
       await getIt<FlutterSecureStorage>().deleteAll();
-      debugPrint('Resetting service locator');
       await resetServiceLocator();
-      debugPrint('Test teardown complete');
     });
   });
 
   Future<void> waitForState(FeatureAvailability expectedState) async {
-    debugPrint('\nWaiting for state transition to: $expectedState');
-    debugPrint('Current state: ${tokenManager.state}');
-    
     if (tokenManager.state == expectedState) {
-      debugPrint('Already in expected state: $expectedState');
       return;
     }
 
     final completer = Completer<void>();
     late ProviderSubscription<FeatureAvailability> subscription;
 
-    debugPrint('Setting up state change listener');
     subscription = container.listen(
       tokenManagerProvider,
       (previous, next) {
-        debugPrint('State changed: $previous -> $next');
         if (next == expectedState && !completer.isCompleted) {
-          debugPrint('Reached expected state: $expectedState');
           completer.complete();
           subscription.close();
         }
@@ -297,18 +325,15 @@ void main() {
     );
 
     try {
-      debugPrint('Waiting for state transition with 5-second timeout');
       await completer.future.timeout(
         const Duration(seconds: 5),
         onTimeout: () {
-          debugPrint('State transition timeout - expected: $expectedState, current: ${tokenManager.state}');
           throw TimeoutException(
             'Failed to transition to $expectedState state. Current state: ${tokenManager.state}',
           );
         },
       );
     } finally {
-      debugPrint('Cleaning up state change listener');
       subscription.close();
     }
   }
