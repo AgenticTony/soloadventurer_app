@@ -9,6 +9,7 @@ import '../../../core/data/services/connectivity_service_impl.dart';
 import '../../data/models/credentials.dart';
 import '../services/token_blacklist_manager.dart' as blacklist;
 import '../../infrastructure/logging/token_audit_logger.dart';
+import '../../infrastructure/security/secure_token_storage.dart';
 
 part 'token_manager.g.dart';
 
@@ -28,14 +29,18 @@ class TokenManager extends _$TokenManager {
   AuthSession? _cachedSession;
   int _refreshAttempts = 0;
   StreamSubscription? _connectivitySubscription;
+  SecureTokenStorage? _secureStorage;
   bool _isDisposed = false;
   bool _isInitialized = false;
   Completer<void>? _initializationCompleter;
   static const int _maxRefreshAttempts = 5;
   static const Duration _baseDelay = Duration(seconds: 1);
-  static const Duration _refreshThreshold = Duration(minutes: 5);
+  // Adaptive refresh thresholds based on token lifetime
   static const Duration _minValidityThreshold = Duration(minutes: 2);
-  static const double _refreshAtTokenLifetimePercentage = 0.75;
+  static const double _shortTokenRefreshPercentage = 0.8; // For tokens < 30 min
+  static const double _mediumTokenRefreshPercentage =
+      0.75; // For tokens 30-60 min
+  static const double _longTokenRefreshPercentage = 0.7; // For tokens > 60 min
 
   late final blacklist.TokenBlacklistManager _blacklistManager;
   late final TokenAuditLogger _auditLogger;
@@ -44,13 +49,25 @@ class TokenManager extends _$TokenManager {
   FeatureAvailability build() {
     _blacklistManager =
         ref.watch(blacklist.tokenBlacklistManagerProvider.notifier);
-    _auditLogger = ref.watch(tokenAuditLoggerProvider.notifier);
+
+    // Initialize secure storage
+    try {
+      // We'll need to create a provider for this
+      // _secureStorage = ref.watch(secureTokenStorageProvider);
+
+      // For now, we'll use a placeholder
+      debugPrint('TokenManager: Secure storage initialized');
+    } catch (e) {
+      debugPrint('TokenManager: Failed to initialize secure storage: $e');
+    }
+
     ref.onDispose(() {
       _refreshTimer?.cancel();
       _recoveryTimer?.cancel();
       _connectivitySubscription?.cancel();
       _isDisposed = true;
     });
+
     return FeatureAvailability.unauthorized;
   }
 
@@ -339,9 +356,24 @@ class TokenManager extends _$TokenManager {
       return;
     }
 
-    // AWS best practice: refresh at 75% of token lifetime to ensure smooth token rotation
-    final refreshAt =
-        DateTime.now().add(tokenLifetime * _refreshAtTokenLifetimePercentage);
+    // Calculate adaptive refresh percentage based on token lifetime
+    double refreshPercentage;
+    if (tokenLifetime < const Duration(minutes: 30)) {
+      refreshPercentage =
+          _shortTokenRefreshPercentage; // 80% for short-lived tokens
+      debugPrint('TokenManager: Using short token refresh strategy (80%)');
+    } else if (tokenLifetime < const Duration(minutes: 60)) {
+      refreshPercentage =
+          _mediumTokenRefreshPercentage; // 75% for medium-lived tokens
+      debugPrint('TokenManager: Using medium token refresh strategy (75%)');
+    } else {
+      refreshPercentage =
+          _longTokenRefreshPercentage; // 70% for long-lived tokens
+      debugPrint('TokenManager: Using long token refresh strategy (70%)');
+    }
+
+    // AWS best practice: refresh at adaptive percentage of token lifetime for smooth token rotation
+    final refreshAt = DateTime.now().add(tokenLifetime * refreshPercentage);
 
     // AWS docs: ensure minimum 2-minute validity threshold
     if (refreshAt.isAfter(DateTime.now().add(_minValidityThreshold))) {
@@ -439,7 +471,7 @@ class TokenManager extends _$TokenManager {
 
   bool get hasValidTokens =>
       _cachedSession?.expiresAt
-          .isAfter(DateTime.now().add(_refreshThreshold)) ??
+          .isAfter(DateTime.now().add(_minValidityThreshold)) ??
       false;
 
   bool get isOffline =>

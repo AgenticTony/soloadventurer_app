@@ -89,9 +89,112 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   /// Maps Cognito exceptions to domain-specific AuthExceptions
+  /// Enhanced with comprehensive AWS Cognito error codes
   AuthException _mapCognitoException(CognitoUserException e) {
     final errorMessage = (e.message ?? e.toString()).toLowerCase();
+
+    // Extract error code from message if possible
+    String? errorCode;
+    final errorCodeMatch =
+        RegExp(r'\b([A-Z][a-zA-Z]+Exception)\b').firstMatch(e.message ?? '');
+    if (errorCodeMatch != null) {
+      errorCode = errorCodeMatch.group(1);
+    }
+
     debugPrint('Mapping Cognito error: $errorMessage');
+    debugPrint('Extracted error code: $errorCode');
+
+    // Handle specific AWS Cognito error codes first (most precise)
+    if (errorCode != null) {
+      switch (errorCode) {
+        case 'UserNotFoundException':
+          return const AuthException(
+            'No account found with this email address.',
+            code: 'USER_NOT_FOUND',
+          );
+
+        case 'NotAuthorizedException':
+          _handleFailedAttempt();
+          return const AuthException(
+            'Incorrect email or password. Please try again.',
+            code: 'INVALID_CREDENTIALS',
+          );
+
+        case 'UserNotConfirmedException':
+          return const AuthException(
+            'Please verify your email address before signing in.',
+            code: 'EMAIL_NOT_VERIFIED',
+          );
+
+        case 'PasswordResetRequiredException':
+          return const AuthException(
+            'You need to reset your password before continuing.',
+            code: 'PASSWORD_RESET_REQUIRED',
+          );
+
+        case 'LimitExceededException':
+          return const AuthException(
+            'Too many attempts. Please try again later.',
+            code: 'RATE_LIMIT_EXCEEDED',
+          );
+
+        case 'TooManyRequestsException':
+          return const AuthException(
+            'Too many requests. Please try again later.',
+            code: 'TOO_MANY_REQUESTS',
+          );
+
+        case 'InvalidPasswordException':
+          return const AuthException(
+            'Password does not meet the requirements. Please use a stronger password.',
+            code: 'INVALID_PASSWORD',
+          );
+
+        case 'CodeMismatchException':
+          return const AuthException(
+            'Invalid verification code. Please try again.',
+            code: 'INVALID_CODE',
+          );
+
+        case 'ExpiredCodeException':
+          return const AuthException(
+            'Verification code has expired. Please request a new code.',
+            code: 'EXPIRED_CODE',
+          );
+
+        case 'InvalidParameterException':
+          return const AuthException(
+            'Invalid parameter provided. Please check your input.',
+            code: 'INVALID_PARAMETER',
+          );
+
+        case 'MFAMethodNotFoundException':
+          return const AuthException(
+            'MFA method not found. Please set up MFA for your account.',
+            code: 'MFA_METHOD_NOT_FOUND',
+          );
+
+        case 'SoftwareTokenMFANotFoundException':
+          return const AuthException(
+            'Software token MFA not found. Please set up MFA for your account.',
+            code: 'SOFTWARE_TOKEN_MFA_NOT_FOUND',
+          );
+
+        case 'AliasExistsException':
+          return const AuthException(
+            'This email is already associated with another account.',
+            code: 'EMAIL_EXISTS',
+          );
+
+        case 'InternalErrorException':
+          return const AuthException(
+            'An internal error occurred. Please try again later.',
+            code: 'INTERNAL_ERROR',
+          );
+      }
+    }
+
+    // Fallback to message pattern matching for older SDK versions or unhandled codes
 
     // User not found cases
     if (_containsAny(errorMessage, [
@@ -101,7 +204,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'usernotfoundexception'
     ])) {
       return const AuthException(
-        'Unable to sign in. Please check your email and password.',
+        'No account found with this email address.',
         code: 'USER_NOT_FOUND',
       );
     }
@@ -115,7 +218,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     ])) {
       _handleFailedAttempt();
       return const AuthException(
-        'Unable to sign in. Please check your email and password.',
+        'Incorrect email or password. Please try again.',
         code: 'INVALID_CREDENTIALS',
       );
     }
@@ -124,7 +227,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (_containsAny(
         errorMessage, ['user is not confirmed', 'usernotconfirmedexception'])) {
       return const AuthException(
-        'Please verify your email address',
+        'Please verify your email address before signing in.',
         code: 'EMAIL_NOT_VERIFIED',
       );
     }
@@ -133,7 +236,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (_containsAny(errorMessage,
         ['password reset required', 'passwordresetrequiredexception'])) {
       return const AuthException(
-        'Password reset required. Please reset your password',
+        'You need to reset your password before continuing.',
         code: 'PASSWORD_RESET_REQUIRED',
       );
     }
@@ -143,6 +246,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return const AuthException(
         'Too many attempts. Please try again later.',
         code: 'RATE_LIMIT_EXCEEDED',
+      );
+    }
+
+    // Network issues
+    if (_containsAny(
+        errorMessage, ['network', 'connection', 'timeout', 'unreachable'])) {
+      return const AuthException(
+        'Network error. Please check your internet connection and try again.',
+        code: 'NETWORK_ERROR',
       );
     }
 
