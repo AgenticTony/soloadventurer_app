@@ -15,6 +15,8 @@ import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/core/config/app_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 /// Register all auth feature dependencies
 void registerAuthModule(GetIt getIt, {bool isTest = false}) {
@@ -22,6 +24,7 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(
       getIt<SecurityManager>(),
+      getIt<SharedPreferences>(),
     ),
   );
 
@@ -30,6 +33,9 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
         ? MockAuthRemoteDataSource(getIt<ApiClient>())
         : AuthRemoteDataSourceImpl(
             userPool: AppConfig.awsConfig.userPool,
+            clientSecret: AppConfig.awsConfig.clientId, // Using clientId as fallback
+            client: getIt<http.Client>(),
+            baseUrl: AppConfig.apiBaseUrl,
           ),
   );
 

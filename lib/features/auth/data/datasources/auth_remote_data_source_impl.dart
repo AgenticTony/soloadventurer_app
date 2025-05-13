@@ -3,9 +3,10 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
-import 'package:soloadventurer/features/auth/domain/entities/auth_session.dart';
+import 'package:soloadventurer/features/auth/domain/entities/auth_tokens.dart';
+import 'package:soloadventurer/features/auth/domain/entities/credentials.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
-/// Implementation of [AuthRemoteDataSource] using AWS Cognito
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final CognitoUserPool _userPool;
   CognitoUser? _cognitoUser;
@@ -13,90 +14,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   int _failedAttempts = 0;
   DateTime? _lastFailedAttempt;
 
-  static const String USER_SRP_AUTH = 'USER_SRP_AUTH';
-  static const String ACCESS_TOKEN = 'ACCESS';
-
-  /// Creates a new [AuthRemoteDataSourceImpl]
   AuthRemoteDataSourceImpl({
     required CognitoUserPool userPool,
   }) : _userPool = userPool;
 
-  void _handleFailedAttempt() {
-    final now = DateTime.now();
-    if (_lastFailedAttempt != null &&
-        now.difference(_lastFailedAttempt!).inMinutes >= 15) {
-      _failedAttempts = 0;
-    }
-    _failedAttempts++;
-    _lastFailedAttempt = now;
-  }
-
-  void _resetFailedAttempts() {
-    _failedAttempts = 0;
-    _lastFailedAttempt = null;
-  }
-
-  Future<void> _ensureValidSession() async {
-    if (_session == null || !_session!.isValid()) {
-      if (_cognitoUser != null && _session?.getRefreshToken() != null) {
-        try {
-          _session =
-              await _cognitoUser!.refreshSession(_session!.getRefreshToken()!);
-        } catch (e) {
-          debugPrint('Failed to refresh session: $e');
-          throw const AuthException('Session expired. Please sign in again.');
-        }
-      } else {
-        throw const AuthException('No valid session. Please sign in.');
-      }
-    }
-  }
-
-  String _getUserId() {
-    if (_cognitoUser == null) {
-      throw const AuthException('No authenticated user');
-    }
-    final username = _cognitoUser?.username;
-    if (username == null || username.isEmpty) {
-      throw const AuthException('Invalid user ID');
-    }
-    return username;
-  }
-
-  String _getAttributeValue(List<CognitoUserAttribute>? attributes,
-      String attributeName, String defaultValue) {
-    if (attributes == null) return defaultValue;
-    try {
-      final attr = attributes.firstWhere(
-        (attr) => attr.name == attributeName,
-        orElse: () =>
-            CognitoUserAttribute(name: attributeName, value: defaultValue),
-      );
-      return attr.getValue() ?? defaultValue;
-    } catch (e) {
-      return defaultValue;
-    }
-  }
-
-  Future<String?> _getToken(String tokenType) async {
-    await _ensureValidSession();
-    switch (tokenType) {
-      case ACCESS_TOKEN:
-        return _session?.getAccessToken().getJwtToken();
-      default:
-        return null;
-    }
-  }
-
   /// Maps Cognito exceptions to domain-specific AuthExceptions
   /// Enhanced with comprehensive AWS Cognito error codes
-  AuthException _mapCognitoException(CognitoUserException e) {
-    final errorMessage = (e.message ?? e.toString()).toLowerCase();
+  AuthException _mapCognitoException(Exception e) {
+    final errorMessage =
+        (e is CognitoUserException ? (e.message ?? '') : e.toString())
+            .toLowerCase();
 
     // Extract error code from message if possible
     String? errorCode;
-    final errorCodeMatch =
-        RegExp(r'\b([A-Z][a-zA-Z]+Exception)\b').firstMatch(e.message ?? '');
+    final errorCodeMatch = RegExp(r'\b([A-Z][a-zA-Z]+Exception)\b')
+        .firstMatch(e is CognitoUserException ? e.message ?? '' : e.toString());
     if (errorCodeMatch != null) {
       errorCode = errorCodeMatch.group(1);
     }
@@ -114,7 +46,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           );
 
         case 'NotAuthorizedException':
-          _handleFailedAttempt();
           return const AuthException(
             'Incorrect email or password. Please try again.',
             code: 'INVALID_CREDENTIALS',
@@ -216,7 +147,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       'password incorrect',
       'notauthorizedexception'
     ])) {
-      _handleFailedAttempt();
       return const AuthException(
         'Incorrect email or password. Please try again.',
         code: 'INVALID_CREDENTIALS',
@@ -258,9 +188,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     }
 
+    // Session expired
+    if (_containsAny(errorMessage, ['invalid session'])) {
+      return const AuthException('Session expired. Please sign in again.');
+    }
+
     debugPrint('Unhandled Cognito error: $errorMessage');
     return AuthException(
-      'Authentication failed: ${e.message}',
+      'Authentication failed: ${e is CognitoUserException ? e.message : e.toString()}',
       code: 'AUTHENTICATION_FAILED',
     );
   }
@@ -270,134 +205,82 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return patterns.any((pattern) => source.contains(pattern));
   }
 
+  // This method is not part of the interface
   @override
-  Future<(UserModel, String)> signIn(String email, String password) async {
+  Future<AuthTokens> refreshTokenWithString(String refreshToken) async {
     try {
-      debugPrint('Attempting to sign in user: $email');
-      _cognitoUser = CognitoUser(email, _userPool);
+      _cognitoUser ??= CognitoUser('', _userPool);
+      _session =
+          await _cognitoUser!.refreshSession(CognitoRefreshToken(refreshToken));
 
-      final authDetails = AuthenticationDetails(
-        username: email,
-        password: password,
+      final accessToken = _session!.getAccessToken().getJwtToken() ?? '';
+      final idToken = _session!.getIdToken().getJwtToken() ?? '';
+      final refreshTokenValue = _session!.getRefreshToken()?.getToken() ?? '';
+      final expiration = _session!.getAccessToken().getExpiration();
+
+      return AuthTokens(
+        accessToken: accessToken,
+        idToken: idToken,
+        refreshToken: refreshTokenValue,
+        expiration: DateTime.fromMillisecondsSinceEpoch(expiration * 1000),
       );
-
-      try {
-        debugPrint('Authenticating user...');
-        _session = await _cognitoUser!.authenticateUser(authDetails);
-
-        if (_session == null) {
-          throw const AuthException(
-            'Unable to sign in. Please try again',
-            code: 'AUTHENTICATION_FAILED',
-          );
-        }
-
-        debugPrint('Authentication successful');
-        final user = await _createUserModel(email);
-        final token = await _getAccessToken();
-        _resetFailedAttempts();
-        return (user, token);
-      } on CognitoUserException catch (e) {
-        debugPrint('========= COGNITO ERROR DETAILS =========');
-        debugPrint('Raw error: $e');
-        debugPrint('Error type: ${e.runtimeType}');
-        debugPrint('Error message: ${e.message}');
-        debugPrint('=======================================');
-
-        throw _mapCognitoException(e);
-      }
-    } catch (e) {
-      debugPrint('Sign in error: $e');
-      debugPrint('Error type: ${e.runtimeType}');
-      if (e is AuthException) {
-        rethrow;
-      }
-      throw const AuthException(
-        'Unable to sign in. Please try again',
-        code: 'AUTHENTICATION_FAILED',
-      );
+    } on CognitoUserException catch (e) {
+      throw _mapCognitoException(e);
     }
-  }
-
-  /// Creates a UserModel from the current authenticated user
-  Future<UserModel> _createUserModel(String email) async {
-    final attributes = await _cognitoUser!.getUserAttributes();
-    final userId = _cognitoUser!.username ?? email;
-    final name = _getAttributeValue(attributes, 'name', email);
-
-    return UserModel(
-      id: userId,
-      email: email,
-      username: name,
-      createdAt: DateTime.now(),
-      lastLoginAt: DateTime.now(),
-    );
-  }
-
-  /// Gets the current access token
-  Future<String> _getAccessToken() async {
-    return _session?.getAccessToken().getJwtToken() ?? '';
-  }
-
-  @override
-  Future<(UserModel, bool)> register({
-    required String email,
-    required String password,
-    required String name,
-  }) async {
-    throw UnimplementedError('register not implemented');
-  }
-
-  @override
-  Future<void> signOut() async {
-    throw UnimplementedError('signOut not implemented');
-  }
-
-  @override
-  Future<UserModel?> getCurrentUser() async {
-    throw UnimplementedError('getCurrentUser not implemented');
-  }
-
-  @override
-  Future<bool> isSignedIn() async {
-    throw UnimplementedError('isSignedIn not implemented');
   }
 
   @override
   Future<AuthSession> refreshToken() async {
+    if (_cognitoUser == null || _session?.getRefreshToken() == null) {
+      throw const AuthException('No refresh token available');
+    }
+
     try {
-      debugPrint('Attempting to refresh token');
-      await _ensureValidSession();
+      _session =
+          await _cognitoUser!.refreshSession(_session!.getRefreshToken()!);
 
-      final token = await _getToken(ACCESS_TOKEN);
-      if (token == null || token.isEmpty) {
-        throw const AuthException('Failed to refresh token: No token available',
-            code: 'TOKEN_REFRESH_FAILED');
-      }
-
-      debugPrint('Token refreshed successfully');
       return AuthSession(
-        accessToken: token,
-        userId: _getUserId(),
+        accessToken: _session!.getAccessToken().getJwtToken()!,
+        idToken: _session!.getIdToken().getJwtToken()!,
+        refreshToken: _session!.getRefreshToken()!.getToken()!,
+        expiresAt: DateTime.fromMillisecondsSinceEpoch(
+          _session!.getAccessToken().getExpiration() * 1000,
+        ),
       );
-    } catch (e) {
-      debugPrint('Token refresh failed: $e');
-      throw AuthException('Failed to refresh token: $e',
-          code: 'TOKEN_REFRESH_FAILED');
+    } on CognitoUserException catch (e) {
+      throw _mapCognitoException(e);
     }
   }
 
+  // This method is not part of the interface
   @override
-  Future<void> verifyEmail(String code, String email) async {
-    throw UnimplementedError('verifyEmail not implemented');
+  Future<AuthTokens> reauthenticate(Credentials credentials) async {
+    try {
+      _cognitoUser = CognitoUser(credentials.username, _userPool);
+      final authDetails = AuthenticationDetails(
+        username: credentials.username,
+        password: credentials.password,
+      );
+
+      _session = await _cognitoUser!.authenticateUser(authDetails);
+
+      final accessToken = _session!.getAccessToken().getJwtToken() ?? '';
+      final idToken = _session!.getIdToken().getJwtToken() ?? '';
+      final refreshTokenValue = _session!.getRefreshToken()?.getToken() ?? '';
+      final expiration = _session!.getAccessToken().getExpiration();
+
+      return AuthTokens(
+        accessToken: accessToken,
+        idToken: idToken,
+        refreshToken: refreshTokenValue,
+        expiration: DateTime.fromMillisecondsSinceEpoch(expiration * 1000),
+      );
+    } on CognitoUserException catch (e) {
+      throw _mapCognitoException(e);
+    }
   }
 
-  @override
-  Future<void> resendVerificationEmail() async {
-    throw UnimplementedError('resendVerificationEmail not implemented');
-  }
-
-  @override
+  // This is an additional method not in the interface
   Future<void> forgotPasswordSMS({
     required String email,
     required String phoneNumber,
@@ -694,5 +577,131 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       debugPrint('Error sending password reset email: $e');
       throw AuthException('Failed to send password reset email: $e');
     }
+  }
+
+  @override
+  Future<void> signOut() async {
+    await _cognitoUser?.signOut();
+    _cognitoUser = null;
+    _session = null;
+  }
+
+  @override
+  Future<UserModel?> getCurrentUser() async {
+    if (_cognitoUser == null) return null;
+
+    final attributes = await _cognitoUser!.getUserAttributes();
+    final email = _cognitoUser!.username ?? '';
+    final name = _getAttributeValue(attributes, 'name', email);
+
+    return UserModel(
+      id: email,
+      email: email,
+      username: name,
+      createdAt: DateTime.now(),
+      lastLoginAt: DateTime.now(),
+    );
+  }
+
+  @override
+  Future<bool> isSignedIn() async {
+    return _cognitoUser != null && _session?.isValid() == true;
+  }
+
+  @override
+  Future<void> verifyEmail(String code, String email) async {
+    try {
+      _cognitoUser ??= CognitoUser(email, _userPool);
+      await _cognitoUser!.verifyAttribute('email', code);
+    } on CognitoUserException catch (e) {
+      throw _mapCognitoException(e);
+    }
+  }
+
+  @override
+  Future<void> resendVerificationEmail() async {
+    if (_cognitoUser == null) {
+      throw const AuthException('No user session found');
+    }
+
+    try {
+      await _cognitoUser!.getAttributeVerificationCode('email');
+    } on CognitoUserException catch (e) {
+      throw _mapCognitoException(e);
+    }
+  }
+
+  @override
+  Future<(UserModel, bool)> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    try {
+      final userAttributes = [
+        CognitoUserAttribute(name: 'email', value: email),
+        CognitoUserAttribute(name: 'name', value: name),
+      ];
+
+      // Convert CognitoUserAttribute to AttributeArg
+      final attributeArgs = userAttributes
+          .map((attr) => AttributeArg(name: attr.name, value: attr.value ?? ''))
+          .toList();
+
+      final result = await _userPool.signUp(email, password,
+          userAttributes: attributeArgs);
+
+      return (
+        UserModel(
+          id: email,
+          email: email,
+          username: name,
+          createdAt: DateTime.now(),
+          lastLoginAt: DateTime.now(),
+        ),
+        result.userConfirmed!
+      );
+    } on CognitoClientException catch (e) {
+      throw _mapCognitoException(e);
+    }
+  }
+
+  @override
+  Future<(UserModel, String)> signIn(String email, String password) async {
+    try {
+      _cognitoUser = CognitoUser(email, _userPool);
+      final authDetails = AuthenticationDetails(
+        username: email,
+        password: password,
+      );
+
+      _session = await _cognitoUser!.authenticateUser(authDetails);
+
+      final tokens = AuthTokens(
+        accessToken: _session!.getAccessToken().getJwtToken()!,
+        idToken: _session!.getIdToken().getJwtToken()!,
+        refreshToken: _session!.getRefreshToken()!.getToken()!,
+        expiration: DateTime.fromMillisecondsSinceEpoch(
+          _session!.getAccessToken().getExpiration() * 1000,
+        ),
+      );
+
+      final user = await getCurrentUser();
+
+      return (user!, tokens.refreshToken);
+    } on CognitoUserException catch (e) {
+      throw _mapCognitoException(e);
+    }
+  }
+
+  String _getAttributeValue(List<CognitoUserAttribute>? attributes,
+      String attributeName, String defaultValue) {
+    if (attributes == null) return defaultValue;
+    final attribute = attributes.firstWhere(
+      (attr) => attr.name == attributeName,
+      orElse: () =>
+          CognitoUserAttribute(name: attributeName, value: defaultValue),
+    );
+    return attribute.value!;
   }
 }
