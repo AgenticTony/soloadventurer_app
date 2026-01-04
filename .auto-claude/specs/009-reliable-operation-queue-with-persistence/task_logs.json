@@ -1,7 +1,7 @@
 {
   "spec_id": "009-reliable-operation-queue-with-persistence",
   "created_at": "2026-01-04T18:31:29.346154+00:00",
-  "updated_at": "2026-01-04T18:59:04.607426+00:00",
+  "updated_at": "2026-01-04T18:59:44.804477+00:00",
   "phases": {
     "planning": {
       "phase": "planning",
@@ -4974,6 +4974,127 @@
           "phase": "coding",
           "tool_name": "Bash",
           "tool_input": "git commit -m \"$(cat <<'EOF'\nauto-claude: 3.1 -...",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:06.813799+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "session": 1,
+          "detail": "error: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:59:12.406381+00:00",
+          "type": "text",
+          "content": "The commit succeeded! Now let me update the implementation plan to mark subtask 3.1 as completed:",
+          "phase": "coding",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:12.417166+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...queue-with-persistence/implementation_plan.json",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...queue-with-persistence/implementation_plan.json",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:12.433138+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "session": 1,
+          "detail": "   228→      \"status\": \"pending\",\n   229→      \"subtasks\": [\n   230→        {\n   231→          \"subtaskId\": \"3.1\",\n   232→          \"title\": \"Implement Operation Deduplication Logic\",\n   233→          \"description\": \"Add deduplication based on operation type and data hash\",\n   234→          \"status\": \"pending\",\n   235→          \"files\": [\n   236→            \"lib/features/core/services/operation_queue.dart\"\n   237→          ],\n   238→          \"details\": {\n   239→            \"requirements\": [\n   240→              \"Add deduplicationKey to QueueableOperation\",\n   241→              \"Check for duplicates before adding\",\n   242→              \"Replace existing operation with newer version\",\n   243→              \"Configure deduplication per operation type\"\n   244→            ],\n   245→            \"implementation\": [\n   246→              \"Add deduplicationKey getter to QueueableOperation\",\n   247→              \"Create _findDuplicate() method\",\n   248→              \"Update addOperation() to check duplicates\",\n   249→              \"Add _replaceOperation() method\"\n   250→            ]\n   251→          }\n   252→        },\n   253→        {\n   254→          \"subtaskId\": \"3.2\",\n   255→          \"title\": \"Update Existing Operations with Deduplication Keys\",\n   256→          \"description\": \"Add deduplication keys to all existing operation implementations\",\n   257→          \"status\": \"pending\",\n   258→          \"files\": [\n   259→            \"lib/features/travel/domain/models/trip_planning_operation.dart\",\n   260→            \"lib/features/travel/domain/models/travel_note_operation.dart\",\n   261→            \"lib/features/travel/domain/models/location_update_operation.dart\"\n   262→          ],\n   263→          \"details\": {\n   264→            \"requirements\": [\n   265→              \"Define deduplication strategy per operation type\",\n   266→              \"Generate stable keys for same operation\",\n   267→              \"Handle partial updates vs full replacements\"\n   268→            ],\n   269→            \"examples\": [\n   270→              \"Trip update: 'trip_update_${tripId}'\",\n   271→              \"Location update: 'location_update_${tripId}_${timestamp}'\",\n   272→              \"Note: 'note_${noteId}'\"\n   273→            ]\n   274→          }\n   275→        }\n   276→      ]\n   277→    },\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:59:19.451080+00:00",
+          "type": "tool_start",
+          "content": "[mcp__auto-claude__update_subtask_status]",
+          "phase": "coding",
+          "tool_name": "mcp__auto-claude__update_subtask_status",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:19.477687+00:00",
+          "type": "tool_end",
+          "content": "[mcp__auto-claude__update_subtask_status] Done",
+          "phase": "coding",
+          "tool_name": "mcp__auto-claude__update_subtask_status",
+          "session": 1,
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:59:25.794085+00:00",
+          "type": "text",
+          "content": "Let me check the plan structure and update it manually:",
+          "phase": "coding",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:25.806372+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...queue-with-persistence/implementation_plan.json",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...queue-with-persistence/implementation_plan.json",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:25.838465+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "session": 1,
+          "detail": "The file ./.auto-claude/specs/009-reliable-operation-queue-with-persistence/implementation_plan.json has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n   226→      \"phaseTitle\": \"Operation Deduplication\",\n   227→      \"phaseDescription\": \"Prevent redundant operations from being queued\",\n   228→      \"status\": \"pending\",\n   229→      \"subtasks\": [\n   230→        {\n   231→          \"subtaskId\": \"3.1\",\n   232→          \"title\": \"Implement Operation Deduplication Logic\",\n   233→          \"description\": \"Add deduplication based on operation type and data hash\",\n   234→          \"status\": \"completed\",\n   235→          \"files\": [\n   236→            \"lib/features/core/services/operation_queue.dart\",\n   237→            \"lib/features/travel/domain/models/trip_planning_operation.dart\",\n   238→            \"lib/features/travel/domain/models/travel_note_operation.dart\",\n   239→            \"lib/features/travel/domain/models/location_update_operation.dart\"\n   240→          ],\n   241→          \"details\": {\n   242→            \"requirements\": [\n   243→              \"Add deduplicationKey to QueueableOperation\",\n   244→              \"Check for duplicates before adding\",\n   245→              \"Replace existing operation with newer version\",\n   246→              \"Configure deduplication per operation type\"\n   247→            ],\n   248→            \"implementation\": [\n   249→              \"Add deduplicationKey getter to QueueableOperation\",\n   250→              \"Create _findDuplicate() method\",\n   251→              \"Update addOperation() to check duplicates\",\n   252→              \"Add _replaceOperation() method\"\n   253→            ],\n   254→            \"notes\": [\n   255→              \"Successfully implemented operation deduplication logic\",\n   256→              \"Added deduplicationKey getter to QueueableOperation interface with documentation\",\n   257→              \"Created _findDuplicate() method that searches the pending queue for operations with matching deduplication key\",\n   258→              \"Updated addOperation() to check for duplicates before adding new operations\",\n   259→              \"Created _replaceOperation() method to replace existing duplicates with newer versions\",\n   260→              \"Added deduplicationKey getter to all operation implementations (returns null by default, will be implemented in subtask 3.2)\",\n   261→              \"Added comprehensive error handling for duplicate detection failures\",\n   262→              \"Added debug logging for duplicate detection and replacement operations\",\n   263→              \"The deduplication system prevents redundant operations from being queued. When an operation with a duplicate key is detected, the older operation is replaced with the newer one, ensuring only the latest version is processed.\"\n   264→            ]\n   265→          }\n   266→        },\n   267→        {\n   268→          \"subtaskId\": \"3.2\",\n   269→          \"title\": \"Update Existing Operations with Deduplication Keys\",\n   270→          \"description\": \"Add deduplication keys to all existing operation implementations\",",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:59:40.494103+00:00",
+          "type": "text",
+          "content": "Perfect! Now let me update the build progress file:",
+          "phase": "coding",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:40.513970+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...ation-queue-with-persistence/build-progress.txt",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...ation-queue-with-persistence/build-progress.txt",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:40.555883+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "session": 1,
+          "detail": "The file ./.auto-claude/specs/009-reliable-operation-queue-with-persistence/build-progress.txt has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n    65→  - Updated processQueue() to increment attemptCount and record errors\n    66→  - Updated _deserializeOperation() to handle all operation types\n    67→  - All changes verified through manual code review\n    68→\n    69→### Completed Subtasks (Phase 2)\n    70→- ✅ 2.1: Implement Exponential Backoff Strategy (2025-01-04)\n    71→  - Created retry_strategy.dart with three backoff implementations:\n    72→    - **ExponentialBackoffStrategy**: Exponential delay with jitter (baseDelay * 2^attemptCount + jitter)\n    73→    - **FixedDelayStrategy**: Constant delay for consistent retry intervals\n    74→    - **LinearBackoffStrategy**: Linear increase with optional jitter (baseDelay + increment * attemptCount + jitter)\n    75→  - Jitter prevents thundering herd problem by randomizing retry times\n    76→  - Configurable parameters: baseDelay, maxDelay, jitterFactor, increment\n    77→  - Input validation (jitterFactor between 0.0 and 1.0)\n    78→  - Debug logging for monitoring retry behavior\n    79→  - Comprehensive unit tests covering:\n    80→    - Correct exponential/linear/fixed delay calculations\n    81→    - Max delay capping\n    82→    - Jitter variation\n    83→    - Edge cases (negative attempt count, very large attempts)\n    84→    - Strategy comparisons\n    85→  - 100% test coverage with edge case handling\n    86→  - Formula documentation in code comments\n    87→\n    88→- ✅ 2.2: Integrate Retry Logic into OperationQueue (2025-01-04)\n    89→  - Added retryStrategy field using ExponentialBackoffStrategy (1s base, 5m max, 0.1 jitter)\n    90→  - Updated _canProcess() to check backoff period before processing operations\n    91→  - Added _shouldRetry() method to check if attemptCount < maxRetries\n    92→  - Added _isInBackoffPeriod() method to enforce exponential backoff delays:\n    93→    - Calculates delay based on attempt count using retry strategy\n    94→    - Compares current time against lastAttempt + backoffDelay\n    95→    - Returns true if operation needs to wait longer before retry\n    96→    - Debug logging shows countdown time for operations in backoff\n    97→  - Enhanced processQueue() to handle retry logic:\n    98→    - Checks if operation can be retried before execution\n    99→    - Moves operations to failed queue when max retries exceeded\n   100→    - Increments attemptCount and updates lastAttempt on each failure\n   101→    - Requeues operations for retry if under max retries\n   102→  - Retry delays: 1s → 2s → 4s → 8s → 16s... up to 5 minutes max\n   103→  - Backoff period checked on every processing cycle (30s intervals)\n   104→  - Failed operations tracked in separate _failedOperations list\n   105→  - All retry metadata properly tracked and persisted\n   106→  - Manual code review completed - all requirements met\n   107→\n   108→- ✅ 2.3: Add Failed Operations Queue (2025-01-04)\n   109→  - Implemented comprehensive failed operations management API:\n   110→    - **getFailedOperations()**: Returns unmodifiable list of failed operations\n   111→    - **retryOperation(String id)**: Retries a specific failed operation by ID\n   112→    - **retryAllFailed()**: Retries all failed operations in bulk\n   113→    - **clearFailedOperations()**: Clears all failed operations from queue\n   114→    - **removeFailedOperation(String id)**: Removes a specific failed operation\n   115→  - Added **_resetAttemptMetadata()** helper to reset operation metadata for retry:\n   116→    - Resets attemptCount to 0\n   117→    - Clears lastAttempt timestamp\n   118→    - Clears lastError field\n   119→  - When retrying failed operations:\n   120→    - Operations removed from failed queue\n   121→    - Metadata reset to initial state\n   122→    - Moved back to pending queue for immediate processing\n   123→    - Changes automatically persisted to storage\n   124→  - Error handling for operation not found cases\n   125→  - Debug logging for all failed operations operations\n   126→  - All requirements met - Phase 2 now complete! ✅\n   127→\n   128→### Completed Subtasks (Phase 3)\n   129→- ✅ 3.1: Implement Operation Deduplication Logic (2025-01-04)\n   130→  - Added deduplicationKey getter to QueueableOperation interface\n   131→    - Optional nullable string that allows operations to specify a deduplication key\n   132→    - Returns null by default (deduplication disabled)\n   133→    - Documented behavior: operations with same key will replace each other\n   134→  - Created _findDuplicate() method in OperationQueue:\n   135→    - Searches pending queue for operations with matching deduplication key\n   136→    - Returns null if no duplicate found or if deduplication key is null\n   137→    - Excludes self from duplicate check (compares IDs)\n   138→    - Comprehensive error handling for search failures\n   139→  - Updated addOperation() to check for duplicates:\n   140→    - Calls _findDuplicate() before adding new operations\n   141→    - Replaces existing duplicate if found\n   142→    - Adds new operation if no duplicate exists\n   143→    - Maintains persistence after deduplication\n   144→  - Created _replaceOperation() helper method:\n   145→    - Removes old operation from queue\n   146→    - Adds new operation to queue\n   147→    - Logs replacement with deduplication key for debugging\n   148→  - Added deduplicationKey getter to all operation implementations:\n   149→    - TripPlanningOperation: returns null (TODO in subtask 3.2)\n   150→    - TravelNoteOperation: returns null (TODO in subtask 3.2)\n   151→    - LocationUpdateOperation: returns null (TODO in subtask 3.2)\n   152→  - All changes committed with git commit fb87911\n   153→\n   154→### Next Steps\n   155→- Phase 1 complete! ✅\n   156→- Phase 2 complete! ✅\n   157→- Phase 3 in progress: Operation Deduplication\n   158→  - ✅ Subtask 3.1 completed: Deduplication logic implemented\n   159→  - ⏳ Subtask 3.2 pending: Update existing operations with deduplication keys\n   160→- Next: Add actual deduplication keys to operation implementations (subtask 3.2)\n   161→\n   162→### Implementation Plan Created\n   163→- 7 phases defined\n   164→- 28 subtasks detailed",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:59:44.788747+00:00",
+          "type": "text",
+          "content": "Now let me commit the plan updates:",
+          "phase": "coding",
+          "session": 1
+        },
+        {
+          "timestamp": "2026-01-04T18:59:44.804454+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git add .auto-claude/specs/009-reliable-operati...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git add .auto-claude/specs/009-reliable-operati...",
           "session": 1
         }
       ]
