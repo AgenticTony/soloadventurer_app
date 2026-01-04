@@ -2,9 +2,30 @@
 
 Optimized image caching strategy for handling large photo collections (500+ photos) with memory efficiency and smooth scrolling performance.
 
+## 📚 Important Documentation
+
+**NEW:** Cache Limits and LRU Eviction - See [CACHE_LIMITS_README.md](./CACHE_LIMITS_README.md) for detailed information about:
+- How cache limits are properly configured on Flutter's image cache
+- How LRU (Least Recently Used) eviction works automatically
+- How to verify cache limits are set correctly
+- Performance benefits and memory management
+- Troubleshooting and best practices
+
 ## Overview
 
 The `ImageCacheConfig` utility configures the `cached_network_image` package to optimize memory usage and performance when displaying large numbers of photos. It works in conjunction with the `LazyLoadImage` widget to provide a complete image optimization solution.
+
+### What's New
+
+The cache configuration now **properly sets** the cache limits on Flutter's image cache:
+
+- ✅ `maximumSize` - Maximum number of images to cache
+- ✅ `maximumSizeBytes` - Maximum memory size in bytes
+- ✅ Automatic LRU eviction when limits are exceeded
+- ✅ New utility methods: `isCacheConfigured()`, `getCurrentMaximumSize()`, `getCurrentMaximumSizeBytes()`
+
+**Previously:** Cache limits were defined but not actually applied to the image cache.
+**Now:** Cache limits are properly configured and LRU eviction works automatically.
 
 ## Configuration
 

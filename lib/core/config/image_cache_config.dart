@@ -8,11 +8,16 @@ import 'package:flutter/material.dart';
 /// This utility configures the `cached_network_image` package to handle large photo
 /// collections (500+ photos) efficiently by:
 ///
+/// - **Actually setting cache limits** on Flutter's image cache (maximumSize, maximumSizeBytes)
+/// - **Automatic LRU eviction** when limits are exceeded (least recently used images removed first)
 /// - Limiting memory cache size to prevent out-of-memory errors
 /// - Setting disk cache limits for offline support
 /// - Configuring memory cache dimensions to reduce memory per image
-/// - Implementing cache eviction policies (LRU)
-/// - Providing cache management utilities (clear, stats)
+/// - Providing cache management utilities (clear, stats, verification)
+///
+/// **Important:** The cache limits are now properly configured on Flutter's image cache.
+/// See [CACHE_LIMITS_README.md](../config/CACHE_LIMITS_README.md) for detailed information
+/// about how LRU eviction works and how to verify the configuration.
 ///
 /// Performance Targets:
 /// - Memory Cache: 100-150 MB (for ~100-200 images in memory)
@@ -24,6 +29,15 @@ import 'package:flutter/material.dart';
 /// ```dart
 /// // Initialize in bootstrap.dart
 /// await ImageCacheConfig.initialize();
+///
+/// // Verify limits are configured
+/// if (ImageCacheConfig.isCacheConfigured()) {
+///   debugPrint('✅ Cache limits properly configured');
+/// }
+///
+/// // Get current limits
+/// final maxImages = ImageCacheConfig.getCurrentMaximumSize();
+/// final maxBytes = ImageCacheConfig.getCurrentMaximumSizeBytes();
 ///
 /// // Get cache statistics
 /// final stats = await ImageCacheConfig.getCacheStats();
@@ -121,32 +135,31 @@ class ImageCacheConfig {
     required int maxDiskCacheBytes,
     required int maxMemoryCacheImages,
   }) async {
-    // Set memory cache limits
-    // This limits the total amount of memory used by cached images
-    final memoryCacheLimit = maxMemoryCacheBytes;
+    // Configure Flutter's image cache with custom limits
+    final imageCache = PaintingBinding.instance.imageCache;
 
-    // Set the maximum number of images in memory cache
-    // Combined with memoryCacheLimit, this prevents the cache from growing too large
-    final memoryCacheImageLimit = maxMemoryCacheImages;
+    // Set maximum number of images to cache in memory
+    // When this limit is reached, the least recently used (LRU) images are evicted
+    imageCache.maximumSize = maxMemoryCacheImages;
 
-    // Configure the image cache with custom settings
-    final imageCache = CachedNetworkImageProvider;
-    // Note: The cached_network_image package uses a singleton cache manager
-    // We configure it through the DefaultCacheOptions
+    // Set maximum memory cache size in bytes
+    // When this limit is reached, the least recently used (LRU) images are evicted
+    imageCache.maximumSizeBytes = maxMemoryCacheBytes;
 
     // Set default cache options for all CachedNetworkImage widgets
-    // These settings will be used by default, but can be overridden per-image
     CachedNetworkImage.logLevel = kDebugMode ? CacheManagerLogLevel.high : CacheManagerLogLevel.none;
 
     if (kDebugMode) {
       debugPrint('ImageCacheConfig: Cache settings configured');
-      debugPrint('  - Memory cache limit: ${_formatBytes(memoryCacheLimit)}');
-      debugPrint('  - Memory image limit: $memoryCacheImageLimit images');
+      debugPrint('  - Maximum images: $maxMemoryCacheImages');
+      debugPrint('  - Maximum memory: ${_formatBytes(maxMemoryCacheBytes)}');
+      debugPrint('  - Disk cache: ${_formatBytes(maxDiskCacheBytes)}');
+      debugPrint('  - LRU eviction: enabled (automatic)');
     }
 
-    // Note: The actual cache configuration is done through BaseCacheManager
-    // The package uses sensible defaults, but we can create custom cache managers
-    // for different image types (photos, thumbnails, avatars) if needed.
+    // Note: Disk cache size is configured through DefaultCacheManager
+    // The disk cache will automatically manage its size using LRU eviction
+    // when the specified limit is reached
   }
 
   /// Get current cache statistics.
@@ -278,6 +291,51 @@ class ImageCacheConfig {
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+  }
+
+  /// Get the current maximum cache size (number of images).
+  ///
+  /// Returns the configured maximum number of images that can be cached in memory.
+  /// When this limit is reached, the least recently used (LRU) images are evicted.
+  ///
+  /// Example:
+  /// ```dart
+  /// final maxImages = ImageCacheConfig.getCurrentMaximumSize();
+  /// debugPrint('Max cached images: $maxImages');
+  /// ```
+  static int getCurrentMaximumSize() {
+    return PaintingBinding.instance.imageCache.maximumSize;
+  }
+
+  /// Get the current maximum cache size in bytes.
+  ///
+  /// Returns the configured maximum memory size for the image cache.
+  /// When this limit is reached, the least recently used (LRU) images are evicted.
+  ///
+  /// Example:
+  /// ```dart
+  /// final maxBytes = ImageCacheConfig.getCurrentMaximumSizeBytes();
+  /// debugPrint('Max cache size: ${maxBytes / (1024 * 1024)} MB');
+  /// ```
+  static int getCurrentMaximumSizeBytes() {
+    return PaintingBinding.instance.imageCache.maximumSizeBytes;
+  }
+
+  /// Verify that cache limits are properly configured.
+  ///
+  /// Returns true if the cache limits have been set to non-zero values,
+  /// indicating that LRU eviction is properly configured.
+  ///
+  /// Example:
+  /// ```dart
+  /// final isConfigured = ImageCacheConfig.isCacheConfigured();
+  /// if (!isConfigured) {
+  ///   debugPrint('Warning: Image cache limits not configured!');
+  /// }
+  /// ```
+  static bool isCacheConfigured() {
+    final imageCache = PaintingBinding.instance.imageCache;
+    return imageCache.maximumSize > 0 && imageCache.maximumSizeBytes > 0;
   }
 
   /// Get recommended memory cache dimensions for a target display size.

@@ -268,6 +268,71 @@ void main() {
         const expected = 85;
         expect(ImageCacheConfig.defaultImageQuality, equals(expected));
       });
+
+      test('isCacheConfigured returns true after initialization', () async {
+        await ImageCacheConfig.initialize();
+
+        expect(ImageCacheConfig.isCacheConfigured(), isTrue);
+      });
+
+      test('isCacheConfigured returns false before initialization', () {
+        // Don't initialize, just check
+        expect(ImageCacheConfig.isCacheConfigured(), isFalse);
+      });
+
+      test('getCurrentMaximumSize returns configured limit', () async {
+        const customLimit = 50;
+        await ImageCacheConfig.initialize(
+          maxMemoryCacheImages: customLimit,
+        );
+
+        final currentLimit = ImageCacheConfig.getCurrentMaximumSize();
+        expect(currentLimit, equals(customLimit));
+      });
+
+      test('getCurrentMaximumSizeBytes returns configured limit', () async {
+        const customLimit = 50 * 1024 * 1024; // 50 MB
+        await ImageCacheConfig.initialize(
+          maxMemoryCacheBytes: customLimit,
+        );
+
+        final currentLimit = ImageCacheConfig.getCurrentMaximumSizeBytes();
+        expect(currentLimit, equals(customLimit));
+      });
+
+      test('cache limits are properly set on Flutter image cache', () async {
+        const expectedMaxImages = 100;
+        const expectedMaxBytes = 75 * 1024 * 1024; // 75 MB
+
+        await ImageCacheConfig.initialize(
+          maxMemoryCacheImages: expectedMaxImages,
+          maxMemoryCacheBytes: expectedMaxBytes,
+        );
+
+        final actualMaxImages = ImageCacheConfig.getCurrentMaximumSize();
+        final actualMaxBytes = ImageCacheConfig.getCurrentMaximumSizeBytes();
+
+        expect(actualMaxImages, equals(expectedMaxImages));
+        expect(actualMaxBytes, equals(expectedMaxBytes));
+        expect(ImageCacheConfig.isCacheConfigured(), isTrue);
+      });
+
+      test('multiple initializations use first configuration', () async {
+        const firstMaxImages = 100;
+        const secondMaxImages = 200;
+
+        await ImageCacheConfig.initialize(
+          maxMemoryCacheImages: firstMaxImages,
+        );
+
+        await ImageCacheConfig.initialize(
+          maxMemoryCacheImages: secondMaxImages,
+        );
+
+        // Should keep the first configuration
+        final actualMaxImages = ImageCacheConfig.getCurrentMaximumSize();
+        expect(actualMaxImages, equals(firstMaxImages));
+      });
     });
 
     group('Integration with Flutter Image Cache', () {
