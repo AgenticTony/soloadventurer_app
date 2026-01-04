@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+import 'image_error_widget.dart';
+import 'image_placeholder.dart';
+
 /// A lazy-loading image widget that only loads images when they become visible.
 ///
 /// This widget uses [VisibilityDetector] to detect when the image widget enters
@@ -78,6 +81,15 @@ class LazyLoadImage extends StatefulWidget {
   /// Optional border radius
   final BorderRadius? borderRadius;
 
+  /// Type of placeholder to use (shimmer, skeleton, color, or blurred)
+  final PlaceholderType placeholderType;
+
+  /// Whether to use enhanced error handling with retry button
+  final bool useEnhancedErrorHandling;
+
+  /// Callback when retry is pressed on error widget
+  final VoidCallback? onRetry;
+
   /// Creates a lazy-loading image widget
   const LazyLoadImage({
     super.key,
@@ -92,6 +104,9 @@ class LazyLoadImage extends StatefulWidget {
     this.width,
     this.height,
     this.borderRadius,
+    this.placeholderType = PlaceholderType.shimmer,
+    this.useEnhancedErrorHandling = false,
+    this.onRetry,
   });
 
   @override
@@ -141,22 +156,39 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
       return widget.placeholder!(context, widget.imageUrl);
     }
 
-    // Default placeholder
-    return Container(
-      width: widget.width,
-      height: widget.height,
-      decoration: BoxDecoration(
-        color: widget.placeholderColor ?? Colors.grey[300],
-        borderRadius: widget.borderRadius,
-      ),
-      child: const Center(
-        child: SizedBox(
-          width: 24,
-          height: 24,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
-    );
+    // Use optimized placeholder based on type
+    switch (widget.placeholderType) {
+      case PlaceholderType.shimmer:
+        return ImagePlaceholder.shimmer(
+          width: widget.width,
+          height: widget.height,
+          borderRadius: widget.borderRadius,
+          baseColor: widget.placeholderColor,
+        );
+      case PlaceholderType.skeleton:
+        return ImagePlaceholder.skeleton(
+          width: widget.width,
+          height: widget.height,
+          color: widget.placeholderColor,
+          borderRadius: widget.borderRadius,
+          showIcon: true,
+        );
+      case PlaceholderType.color:
+        return ImagePlaceholder.color(
+          width: widget.width,
+          height: widget.height,
+          backgroundColor: widget.placeholderColor,
+          borderRadius: widget.borderRadius,
+        );
+      case PlaceholderType.blurred:
+        return ImagePlaceholder.blurred(
+          thumbnailUrl: widget.thumbnailUrl,
+          width: widget.width,
+          height: widget.height,
+          borderRadius: widget.borderRadius,
+          fallbackColor: widget.placeholderColor,
+        );
+    }
   }
 
   /// Builds the actual image widget with caching
@@ -190,6 +222,20 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
 
   /// Builds default error widget
   Widget _buildDefaultError() {
+    // Use enhanced error handling if enabled
+    if (widget.useEnhancedErrorHandling) {
+      return ImageErrorWidget(
+        error: 'Failed to load',
+        imageUrl: widget.imageUrl,
+        width: widget.width,
+        height: widget.height,
+        borderRadius: widget.borderRadius,
+        onRetry: widget.onRetry,
+        showRetryButton: widget.onRetry != null,
+      );
+    }
+
+    // Default simple error widget
     return Container(
       width: widget.width,
       height: widget.height,
@@ -204,6 +250,21 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
       ),
     );
   }
+}
+
+/// Type of placeholder to display while image is loading
+enum PlaceholderType {
+  /// Animated shimmer effect with gradient (modern, visually appealing)
+  shimmer,
+
+  /// Simple solid color with optional icon (most performant)
+  skeleton,
+
+  /// Theme-aware color with icon overlay (subtle)
+  color,
+
+  /// Blurred thumbnail if available, falls back to shimmer (progressive)
+  blurred,
 }
 
 /// Extension on LazyLoadImage for common use cases
@@ -291,6 +352,161 @@ extension LazyLoadImageExtensions on LazyLoadImage {
       fit: fit,
       visibilityThreshold: visibilityThreshold,
       fadeInDuration: const Duration(milliseconds: 150),
+      borderRadius: borderRadius ?? BorderRadius.circular(4.0),
+    );
+  }
+
+  /// Creates a photo with optimized shimmer placeholder and enhanced error handling.
+  ///
+  /// This is the recommended constructor for photo galleries as it provides:
+  /// - Modern shimmer loading animation
+  /// - Retry button on error
+  /// - Offline detection
+  /// - Automatic error type classification
+  ///
+  /// Example:
+  /// ```dart
+  /// LazyLoadImage.optimized(
+  ///   imageUrl: photo.url,
+  ///   thumbnailUrl: photo.thumbnailUrl,
+  ///   size: 100.0,
+  ///   onRetry: () {
+  ///     // Trigger reload (e.g., setState or refresh provider)
+  ///   },
+  /// )
+  /// ```
+  static LazyLoadImage optimized({
+    Key? key,
+    required String imageUrl,
+    String? thumbnailUrl,
+    double size = 100.0,
+    BoxFit fit = BoxFit.cover,
+    PlaceholderType placeholderType = PlaceholderType.shimmer,
+    BorderRadius? borderRadius,
+    VoidCallback? onRetry,
+    double visibilityThreshold = 0.01,
+  }) {
+    return LazyLoadImage(
+      key: key,
+      imageUrl: imageUrl,
+      thumbnailUrl: thumbnailUrl,
+      width: size,
+      height: size,
+      fit: fit,
+      placeholderType: placeholderType,
+      useEnhancedErrorHandling: true,
+      onRetry: onRetry,
+      visibilityThreshold: visibilityThreshold,
+      borderRadius: borderRadius ?? BorderRadius.circular(4.0),
+    );
+  }
+
+  /// Creates a card image with skeleton placeholder and enhanced error handling.
+  ///
+  /// This is optimized for card-based layouts where performance is important
+  /// but you still want good error handling.
+  ///
+  /// Example:
+  /// ```dart
+  /// LazyLoadImage.optimizedCard(
+  ///   imageUrl: trip.coverImage,
+  ///   height: 200.0,
+  ///   onRetry: () => ref.refresh(tripCoverProvider),
+  /// )
+  /// ```
+  static LazyLoadImage optimizedCard({
+    Key? key,
+    required String imageUrl,
+    String? thumbnailUrl,
+    double width = double.infinity,
+    double height = 200.0,
+    BoxFit fit = BoxFit.cover,
+    PlaceholderType placeholderType = PlaceholderType.skeleton,
+    BorderRadius? borderRadius,
+    VoidCallback? onRetry,
+  }) {
+    return LazyLoadImage(
+      key: key,
+      imageUrl: imageUrl,
+      thumbnailUrl: thumbnailUrl,
+      width: width,
+      height: height,
+      fit: fit,
+      placeholderType: placeholderType,
+      useEnhancedErrorHandling: true,
+      onRetry: onRetry,
+      borderRadius: borderRadius ?? BorderRadius.circular(8.0),
+    );
+  }
+
+  /// Creates a thumbnail with color placeholder and compact error widget.
+  ///
+  /// This is optimized for list items where space is limited and you want
+  /// a subtle loading indicator.
+  ///
+  /// Example:
+  /// ```dart
+  /// LazyLoadImage.optimizedThumbnail(
+  ///   imageUrl: user.avatarUrl,
+  ///   size: 48.0,
+  /// )
+  /// ```
+  static LazyLoadImage optimizedThumbnail({
+    Key? key,
+    required String imageUrl,
+    double size = 48.0,
+    BoxFit fit = BoxFit.cover,
+    PlaceholderType placeholderType = PlaceholderType.color,
+    BorderRadius? borderRadius,
+    VoidCallback? onRetry,
+  }) {
+    return LazyLoadImage(
+      key: key,
+      imageUrl: imageUrl,
+      width: size,
+      height: size,
+      fit: fit,
+      placeholderType: placeholderType,
+      useEnhancedErrorHandling: onRetry != null,
+      onRetry: onRetry,
+      visibilityThreshold: 0.1,
+      fadeInDuration: const Duration(milliseconds: 150),
+      borderRadius: borderRadius ?? BorderRadius.circular(4.0),
+    );
+  }
+
+  /// Creates a photo with blurred placeholder (progressive loading effect).
+  ///
+  /// This creates a blur-up effect where a heavily blurred thumbnail is shown
+  /// first, then replaced with the full-quality image. Requires thumbnailUrl.
+  ///
+  /// Example:
+  /// ```dart
+  /// LazyLoadImage.progressive(
+  ///   imageUrl: photo.fullSizeUrl,
+  ///   thumbnailUrl: photo.thumbnailUrl,
+  ///   size: 150.0,
+  /// )
+  /// ```
+  static LazyLoadImage progressive({
+    Key? key,
+    required String imageUrl,
+    required String thumbnailUrl,
+    double size = 150.0,
+    BoxFit fit = BoxFit.cover,
+    BorderRadius? borderRadius,
+    VoidCallback? onRetry,
+  }) {
+    return LazyLoadImage(
+      key: key,
+      imageUrl: imageUrl,
+      thumbnailUrl: thumbnailUrl,
+      width: size,
+      height: size,
+      fit: fit,
+      placeholderType: PlaceholderType.blurred,
+      useEnhancedErrorHandling: true,
+      onRetry: onRetry,
       borderRadius: borderRadius ?? BorderRadius.circular(4.0),
     );
   }

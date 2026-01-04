@@ -14,6 +14,10 @@
 ///   monitors render times, memory usage, and frame rates for virtual lists
 /// - [LazyLoadImage]: A visibility-based lazy loading image widget that
 ///   only loads images when they become visible on screen
+/// - [ImagePlaceholder]: A collection of optimized placeholder widgets
+///   for image loading states (shimmer, skeleton, color, blurred)
+/// - [ImageErrorWidget]: Enhanced error widget with retry functionality,
+///   offline detection, and error type classification
 ///
 /// ## Usage
 ///
@@ -33,11 +37,23 @@
 ///   itemBuilder: (context, index) => ImageCard(photo: photos[index]),
 /// )
 ///
-/// // Lazy loading image
+/// // Optimized lazy loading image with shimmer placeholder
+/// LazyLoadImage.optimized(
+///   imageUrl: photo.url,
+///   thumbnailUrl: photo.thumbnailUrl,
+///   size: 100.0,
+///   onRetry: () => ref.refresh(photoProvider),
+/// )
+///
+/// // Custom placeholder
 /// LazyLoadImage(
-///   imageUrl: 'https://example.com/image.jpg',
-///   placeholder: (context, url) => CircularProgressIndicator(),
-///   errorWidget: (context, url, error) => Icon(Icons.error),
+///   imageUrl: url,
+///   placeholder: (context, url) => ImagePlaceholder.shimmer(),
+///   errorWidget: (context, url, error) => ImageErrorWidget.withRetry(
+///     error: error,
+///     imageUrl: url,
+///     onRetry: () => setState(() {}),
+///   ),
 /// )
 ///
 /// // With performance tracking
@@ -60,3 +76,5 @@ export 'virtual_list_view.dart';
 export 'virtual_grid_view.dart';
 export 'virtual_list_performance_tracker.dart';
 export 'lazy_load_image.dart';
+export 'image_placeholder.dart';
+export 'image_error_widget.dart';
