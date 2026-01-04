@@ -3,3 +3,4 @@
 
 export 'offline_interceptor.dart';
 export 'mutation_interceptor.dart';
+export 'sync_manager_impl.dart';

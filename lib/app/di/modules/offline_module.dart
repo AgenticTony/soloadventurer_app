@@ -113,15 +113,28 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // );
 
   // ==============================================================================
-  // PHASE 5: DATA SYNCHRONIZATION ENGINE (To be implemented in Phase 5)
+  // PHASE 5: DATA SYNCHRONIZATION ENGINE
   // ==============================================================================
   //
-  // TODO: Register ConflictResolver
+  // Register SyncManager as the core sync coordinator
+  // This manager orchestrates all sync operations and triggers sync
+  // when connectivity is restored. It prevents concurrent sync cycles
+  // and provides status updates via a stream for UI consumption.
+  getIt.registerLazySingleton<SyncManager>(
+    () => SyncManagerImpl(
+      connectivityService: getIt<ConnectivityService>(),
+      syncQueueService: getIt<SyncQueueService>(),
+      autoSyncMinInterval: const Duration(seconds: 30),
+      syncOnlyOnWifi: false,
+    ),
+  );
+  //
+  // TODO: Register ConflictResolver (Subtask 5.4)
   // getIt.registerLazySingleton<ConflictResolver>(
   //   () => ConflictResolver(),
   // );
   //
-  // TODO: Register UploadSync
+  // TODO: Register UploadSync (Subtask 5.2)
   // getIt.registerLazySingleton<UploadSync>(
   //   () => UploadSync(
   //     apiClient: getIt<ApiService>(),
@@ -130,7 +143,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   //   ),
   // );
   //
-  // TODO: Register DownloadSync
+  // TODO: Register DownloadSync (Subtask 5.3)
   // getIt.registerLazySingleton<DownloadSync>(
   //   () => DownloadSync(
   //     apiClient: getIt<ApiService>(),
@@ -139,20 +152,10 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   //   ),
   // );
   //
-  // TODO: Register IncrementalSync
+  // TODO: Register IncrementalSync (Subtask 5.5)
   // getIt.registerLazySingleton<IncrementalSync>(
   //   () => IncrementalSync(
   //     downloadSync: getIt<DownloadSync>(),
-  //   ),
-  // );
-  //
-  // TODO: Register SyncManager
-  // getIt.registerLazySingleton<SyncManager>(
-  //   () => SyncManagerImpl(
-  //     connectivityService: getIt<ConnectivityService>(),
-  //     uploadSync: getIt<UploadSync>(),
-  //     downloadSync: getIt<DownloadSync>(),
-  //     syncQueueService: getIt<SyncQueueService>(),
   //   ),
   // );
 
