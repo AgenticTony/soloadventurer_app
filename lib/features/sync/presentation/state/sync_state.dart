@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import '../../domain/models/sync_status.dart';
 
@@ -124,5 +125,78 @@ class SyncState with EquatableMixin {
         'lastSuccessCount: $lastSuccessCount, '
         'lastFailureCount: $lastFailureCount, '
         'lastError: $lastError)';
+  }
+
+  /// Convert state to JSON for serialization
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status.name,
+      'queueSize': queueSize,
+      'isProcessing': isProcessing,
+      'lastStatusChangeAt': lastStatusChangeAt?.toIso8601String(),
+      'lastSuccessfulSyncAt': lastSuccessfulSyncAt?.toIso8601String(),
+      'lastSuccessCount': lastSuccessCount,
+      'lastFailureCount': lastFailureCount,
+      'lastError': lastError,
+      'hasPendingOperations': hasPendingOperations,
+    };
+  }
+
+  /// Create state from JSON
+  ///
+  /// Returns null if JSON is invalid or required fields are missing
+  static SyncState? fromJson(Map<String, dynamic> json) {
+    try {
+      // Parse status from string
+      final statusString = json['status'] as String?;
+      if (statusString == null) return null;
+
+      final status = SyncStatus.values.firstWhere(
+        (s) => s.name == statusString,
+        orElse: () => SyncStatus.idle,
+      );
+
+      return SyncState(
+        status: status,
+        queueSize: json['queueSize'] as int? ?? 0,
+        isProcessing: json['isProcessing'] as bool? ?? false,
+        lastStatusChangeAt: _parseDateTime(json['lastStatusChangeAt'] as String?),
+        lastSuccessfulSyncAt: _parseDateTime(json['lastSuccessfulSyncAt'] as String?),
+        lastSuccessCount: json['lastSuccessCount'] as int? ?? 0,
+        lastFailureCount: json['lastFailureCount'] as int? ?? 0,
+        lastError: json['lastError'] as String?,
+        hasPendingOperations: json['hasPendingOperations'] as bool? ?? false,
+      );
+    } catch (e) {
+      // Return null on any parsing error
+      return null;
+    }
+  }
+
+  /// Parse DateTime from ISO8601 string
+  static DateTime? _parseDateTime(String? dateTimeString) {
+    if (dateTimeString == null || dateTimeString.isEmpty) return null;
+    try {
+      return DateTime.parse(dateTimeString);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Serialize state to JSON string
+  String toJsonString() {
+    return jsonEncode(toJson());
+  }
+
+  /// Deserialize state from JSON string
+  ///
+  /// Returns null if string is invalid or JSON is malformed
+  static SyncState? fromJsonString(String jsonString) {
+    try {
+      final json = jsonDecode(jsonString) as Map<String, dynamic>;
+      return fromJson(json);
+    } catch (e) {
+      return null;
+    }
   }
 }

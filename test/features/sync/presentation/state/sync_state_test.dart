@@ -310,5 +310,167 @@ void main() {
         expect(withQueue.queueSize, 5);
       });
     });
+
+    group('JSON Serialization', () {
+      test('toJson serializes all fields', () {
+        final now = DateTime.now();
+        final state = SyncState(
+          status: SyncStatus.syncing,
+          queueSize: 5,
+          isProcessing: true,
+          lastStatusChangeAt: now,
+          lastSuccessfulSyncAt: now,
+          lastSuccessCount: 10,
+          lastFailureCount: 2,
+          lastError: 'Test error',
+          hasPendingOperations: true,
+        );
+
+        final json = state.toJson();
+
+        expect(json['status'], 'syncing');
+        expect(json['queueSize'], 5);
+        expect(json['isProcessing'], true);
+        expect(json['lastStatusChangeAt'], now.toIso8601String());
+        expect(json['lastSuccessfulSyncAt'], now.toIso8601String());
+        expect(json['lastSuccessCount'], 10);
+        expect(json['lastFailureCount'], 2);
+        expect(json['lastError'], 'Test error');
+        expect(json['hasPendingOperations'], true);
+      });
+
+      test('fromJson creates correct state from valid JSON', () {
+        final now = DateTime.now();
+        final json = {
+          'status': 'syncing',
+          'queueSize': 5,
+          'isProcessing': true,
+          'lastStatusChangeAt': now.toIso8601String(),
+          'lastSuccessfulSyncAt': now.toIso8601String(),
+          'lastSuccessCount': 10,
+          'lastFailureCount': 2,
+          'lastError': 'Test error',
+          'hasPendingOperations': true,
+        };
+
+        final state = SyncState.fromJson(json);
+
+        expect(state, isNotNull);
+        expect(state!.status, SyncStatus.syncing);
+        expect(state.queueSize, 5);
+        expect(state.isProcessing, true);
+        expect(state.lastStatusChangeAt, now);
+        expect(state.lastSuccessfulSyncAt, now);
+        expect(state.lastSuccessCount, 10);
+        expect(state.lastFailureCount, 2);
+        expect(state.lastError, 'Test error');
+        expect(state.hasPendingOperations, true);
+      });
+
+      test('fromJson returns null for invalid JSON', () {
+        expect(SyncState.fromJson({}), isNull);
+        expect(SyncState.fromJson({'status': 'invalid'}), isNull);
+        expect(SyncState.fromJson(null), isNull);
+      });
+
+      test('fromJson handles missing optional fields', () {
+        final json = {'status': 'idle'};
+
+        final state = SyncState.fromJson(json);
+
+        expect(state, isNotNull);
+        expect(state!.status, SyncStatus.idle);
+        expect(state.queueSize, 0);
+        expect(state.isProcessing, false);
+        expect(state.lastStatusChangeAt, isNull);
+        expect(state.lastSuccessfulSyncAt, isNull);
+        expect(state.lastSuccessCount, 0);
+        expect(state.lastFailureCount, 0);
+        expect(state.lastError, isNull);
+        expect(state.hasPendingOperations, false);
+      });
+
+      test('fromJson handles null DateTime strings', () {
+        final json = {
+          'status': 'idle',
+          'lastStatusChangeAt': null,
+          'lastSuccessfulSyncAt': null,
+        };
+
+        final state = SyncState.fromJson(json);
+
+        expect(state, isNotNull);
+        expect(state!.lastStatusChangeAt, isNull);
+        expect(state.lastSuccessfulSyncAt, isNull);
+      });
+
+      test('fromJson handles invalid DateTime strings', () {
+        final json = {
+          'status': 'idle',
+          'lastStatusChangeAt': 'invalid-date',
+          'lastSuccessfulSyncAt': 'also-invalid',
+        };
+
+        final state = SyncState.fromJson(json);
+
+        expect(state, isNotNull);
+        expect(state!.lastStatusChangeAt, isNull);
+        expect(state.lastSuccessfulSyncAt, isNull);
+      });
+
+      test('toJsonString and fromJsonString round-trip correctly', () {
+        final now = DateTime.now();
+        final original = SyncState(
+          status: SyncStatus.failed,
+          queueSize: 3,
+          isProcessing: false,
+          lastStatusChangeAt: now,
+          lastSuccessfulSyncAt: now.subtract(const Duration(days: 1)),
+          lastSuccessCount: 7,
+          lastFailureCount: 3,
+          lastError: 'Network timeout',
+          hasPendingOperations: true,
+        );
+
+        final jsonString = original.toJsonString();
+        final restored = SyncState.fromJsonString(jsonString);
+
+        expect(restored, isNotNull);
+        expect(restored!.status, original.status);
+        expect(restored.queueSize, original.queueSize);
+        expect(restored.isProcessing, original.isProcessing);
+        expect(restored.lastStatusChangeAt, original.lastStatusChangeAt);
+        expect(restored.lastSuccessfulSyncAt, original.lastSuccessfulSyncAt);
+        expect(restored.lastSuccessCount, original.lastSuccessCount);
+        expect(restored.lastFailureCount, original.lastFailureCount);
+        expect(restored.lastError, original.lastError);
+        expect(restored.hasPendingOperations, original.hasPendingOperations);
+      });
+
+      test('fromJsonString returns null for invalid JSON', () {
+        expect(SyncState.fromJsonString(''), isNull);
+        expect(SyncState.fromJsonString('not json'), isNull);
+        expect(SyncState.fromJsonString('{invalid}'), isNull);
+      });
+
+      test('all status values serialize and deserialize correctly', () {
+        final statuses = [
+          SyncStatus.idle,
+          SyncStatus.syncing,
+          SyncStatus.success,
+          SyncStatus.failed,
+          SyncStatus.pending,
+        ];
+
+        for (final status in statuses) {
+          final state = SyncState(status: status);
+          final json = state.toJson();
+          final restored = SyncState.fromJson(json);
+
+          expect(restored, isNotNull);
+          expect(restored!.status, status);
+        }
+      });
+    });
   });
 }

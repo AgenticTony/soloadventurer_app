@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../domain/services/sync_service.dart';
+import '../../domain/services/sync_state_persistence.dart';
 import '../state/sync_state.dart';
 import '../../../core/domain/services/logging_service.dart';
 
@@ -9,12 +10,16 @@ import '../../../core/domain/services/logging_service.dart';
 /// Listens to all sync service status changes and queue updates,
 /// providing reactive state for UI components to consume.
 /// Ensures all status indicators update immediately when sync state changes.
+/// Optionally persists state across app restarts.
 class SyncStateNotifier extends StateNotifier<SyncState> {
   /// Sync service for status and queue monitoring
   final SyncService _syncService;
 
   /// Logging service for debug/info logging
   final LoggingService _logger;
+
+  /// Optional persistence service for saving state across app restarts
+  final SyncStatePersistence? _persistence;
 
   /// Subscription to sync status changes
   StreamSubscription<SyncStatus>? _statusSubscription;
@@ -26,14 +31,21 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
   SyncStateNotifier({
     required SyncService syncService,
     required LoggingService logger,
+    SyncStatePersistence? persistence,
   })  : _syncService = syncService,
         _logger = logger,
+        _persistence = persistence,
         super(SyncState.initial()) {
     _initialize();
   }
 
   /// Initialize the notifier by subscribing to sync service streams
-  void _initialize() {
+  void _initialize() async {
+    // Try to load persisted state first
+    if (_persistence != null) {
+      await _loadPersistedState();
+    }
+
     // Subscribe to status changes
     _statusSubscription = _syncService.statusStream.listen(
       _onStatusChanged,
@@ -58,10 +70,56 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
       },
     );
 
-    // Initialize with current state
-    _updateStateFromService();
+    // Initialize with current state (only if no persisted state was loaded)
+    if (state.status == SyncStatus.idle && state.queueSize == 0) {
+      _updateStateFromService();
+    }
 
     _logger.info('SyncStateNotifier: Initialized');
+  }
+
+  /// Load persisted state from storage
+  Future<void> _loadPersistedState() async {
+    try {
+      final persistedState = await _persistence!.loadState();
+      if (persistedState != null) {
+        state = persistedState;
+        _logger.info(
+          'SyncStateNotifier: Loaded persisted state - '
+          'status: ${persistedState.status}, '
+          'queueSize: ${persistedState.queueSize}, '
+          'hasPending: ${persistedState.hasPendingOperations}',
+        );
+      } else {
+        _logger.debug('SyncStateNotifier: No persisted state found');
+      }
+    } catch (e, stack) {
+      _logger.error(
+        'SyncStateNotifier: Error loading persisted state',
+        error: e,
+        stackTrace: stack,
+      );
+    }
+  }
+
+  /// Save current state to persistent storage
+  Future<void> _saveState() async {
+    if (_persistence == null) return;
+
+    try {
+      final result = await _persistence!.saveState(state);
+      if (!result.success) {
+        _logger.warning(
+          'SyncStateNotifier: Failed to save state: ${result.error}',
+        );
+      }
+    } catch (e, stack) {
+      _logger.error(
+        'SyncStateNotifier: Error saving state',
+        error: e,
+        stackTrace: stack,
+      );
+    }
   }
 
   /// Handle sync status changes from the sync service
@@ -93,6 +151,9 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
     state = state.copyWith(
       isProcessing: newStatus == SyncStatus.syncing,
     );
+
+    // Persist state after status change
+    _saveState();
   }
 
   /// Handle queue changes from the sync service
@@ -116,6 +177,9 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
         lastStatusChangeAt: DateTime.now(),
       );
     }
+
+    // Persist state after queue change
+    _saveState();
   }
 
   /// Update state from current sync service state
@@ -143,10 +207,24 @@ class SyncStateNotifier extends StateNotifier<SyncState> {
 
   /// Reset state to initial
   ///
-  /// Clears all sync state information.
-  void reset() {
+  /// Clears all sync state information and persisted state.
+  Future<void> reset() async {
     _logger.info('SyncStateNotifier: Resetting state');
     state = SyncState.initial();
+
+    // Clear persisted state if persistence is enabled
+    if (_persistence != null) {
+      try {
+        await _persistence!.clearState();
+        _logger.debug('SyncStateNotifier: Cleared persisted state');
+      } catch (e, stack) {
+        _logger.error(
+          'SyncStateNotifier: Error clearing persisted state',
+          error: e,
+          stackTrace: stack,
+        );
+      }
+    }
   }
 
   @override
