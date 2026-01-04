@@ -28,6 +28,12 @@ class TravelNoteOperation
     double? latitude,
     double? longitude,
     DateTime? timestamp,
+    // Retry metadata
+    DateTime? createdAt,
+    DateTime? lastAttempt,
+    @Default(0) int attemptCount,
+    String? lastError,
+    @Default(3) int maxRetries,
   }) = _TravelNoteOperation;
 
   factory TravelNoteOperation.fromJson(Map<String, dynamic> json) =>
@@ -52,6 +58,7 @@ class TravelNoteOperation
       latitude: latitude,
       longitude: longitude,
       timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
     );
   }
 
@@ -80,6 +87,7 @@ class TravelNoteOperation
       latitude: latitude,
       longitude: longitude,
       timestamp: DateTime.now(),
+      createdAt: DateTime.now(),
     );
   }
 
@@ -107,5 +115,11 @@ class TravelNoteOperation
         if (latitude != null) 'latitude': latitude,
         if (longitude != null) 'longitude': longitude,
         if (timestamp != null) 'timestamp': timestamp!.toIso8601String(),
+        // Retry metadata
+        if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
+        if (lastAttempt != null) 'lastAttempt': lastAttempt!.toIso8601String(),
+        'attemptCount': attemptCount,
+        if (lastError != null) 'lastError': lastError,
+        'maxRetries': maxRetries,
       };
 }

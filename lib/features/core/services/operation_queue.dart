@@ -6,6 +6,8 @@ import '../providers/connectivity_provider.dart';
 import '../../auth/domain/services/token_manager.dart';
 import 'operation_storage_service.dart';
 import '../../travel/domain/models/trip_planning_operation.dart';
+import '../../travel/domain/models/travel_note_operation.dart';
+import '../../travel/domain/models/location_update_operation.dart';
 
 part 'operation_queue.g.dart';
 
@@ -22,6 +24,21 @@ abstract class QueueableOperation {
 
   /// Whether this operation requires an active network connection
   bool get requiresNetwork;
+
+  /// Timestamp when the operation was created
+  DateTime? get createdAt;
+
+  /// Timestamp of the last execution attempt
+  DateTime? get lastAttempt;
+
+  /// Number of times this operation has been attempted
+  int get attemptCount;
+
+  /// Error message from the last failed attempt (if any)
+  String? get lastError;
+
+  /// Maximum number of retry attempts allowed
+  int get maxRetries;
 
   /// Execute the operation
   Future<void> execute();
@@ -87,22 +104,73 @@ class OperationQueue extends _$OperationQueue {
       final operations = _pendingOperations.toList()
         ..sort((a, b) => b.priority.compareTo(a.priority));
 
+      final operationsToRemove = <QueueableOperation>[];
+      final operationsToAdd = <QueueableOperation>[];
+
       for (final operation in operations) {
         if (!_canProcess(operation)) continue;
 
+        // Create updated operation with attempt metadata
+        final updatedOperation = _updateAttemptMetadata(operation, null);
+
         try {
           await operation.execute();
-          _pendingOperations.remove(operation);
-        } catch (e) {
+          operationsToRemove.add(operation);
+        } catch (e, stackTrace) {
           debugPrint('Failed to execute operation ${operation.id}: $e');
-          // Leave operation in queue for retry
+          debugPrint('Stack trace: $stackTrace');
+
+          // Update operation with error information
+          final failedOperation = _updateAttemptMetadata(operation, e.toString());
+
+          // Replace the operation with the updated one
+          operationsToRemove.add(operation);
+          operationsToAdd.add(failedOperation);
         }
+      }
+
+      // Update the queue
+      for (final op in operationsToRemove) {
+        _pendingOperations.remove(op);
+      }
+      for (final op in operationsToAdd) {
+        _pendingOperations.add(op);
       }
 
       await _persistQueue();
     } finally {
       _isProcessing = false;
     }
+  }
+
+  /// Update operation metadata with attempt information
+  QueueableOperation _updateAttemptMetadata(
+    QueueableOperation operation,
+    String? error,
+  ) {
+    // Use type checking and copyWith to update metadata
+    if (operation is TripPlanningOperation) {
+      return operation.copyWith(
+        lastAttempt: DateTime.now(),
+        attemptCount: operation.attemptCount + 1,
+        lastError: error,
+      );
+    } else if (operation is TravelNoteOperation) {
+      return operation.copyWith(
+        lastAttempt: DateTime.now(),
+        attemptCount: operation.attemptCount + 1,
+        lastError: error,
+      );
+    } else if (operation is LocationUpdateOperation) {
+      return operation.copyWith(
+        lastAttempt: DateTime.now(),
+        attemptCount: operation.attemptCount + 1,
+        lastError: error,
+      );
+    }
+
+    // Fallback: return operation as-is if type is unknown
+    return operation;
   }
 
   bool _canProcess(QueueableOperation operation) {
@@ -174,11 +242,10 @@ class OperationQueue extends _$OperationQueue {
       switch (type) {
         case 'trip_planning':
           return TripPlanningOperation.fromJson(data);
-        // Add other operation types here as they are implemented
-        // case 'location_update':
-        //   return LocationUpdateOperation.fromJson(data);
-        // case 'travel_note':
-        //   return TravelNoteOperation.fromJson(data);
+        case 'travel_note':
+          return TravelNoteOperation.fromJson(data);
+        case 'location_update':
+          return LocationUpdateOperation.fromJson(data);
         default:
           debugPrint('OperationQueue: Unknown operation type: $type');
           return null;

@@ -27,6 +27,12 @@ class TripPlanningOperation
     @Default(2) int priority, // Higher than location updates
     DateTime? plannedStartDate,
     DateTime? plannedEndDate,
+    // Retry metadata
+    DateTime? createdAt,
+    DateTime? lastAttempt,
+    @Default(0) int attemptCount,
+    String? lastError,
+    @Default(3) int maxRetries,
   }) = _TripPlanningOperation;
 
   factory TripPlanningOperation.fromJson(Map<String, dynamic> json) =>
@@ -51,6 +57,7 @@ class TripPlanningOperation
       },
       plannedStartDate: startDate,
       plannedEndDate: endDate,
+      createdAt: DateTime.now(),
     );
   }
 
@@ -72,6 +79,7 @@ class TripPlanningOperation
       },
       plannedStartDate: startDate,
       plannedEndDate: endDate,
+      createdAt: DateTime.now(),
     );
   }
 
@@ -99,5 +107,11 @@ class TripPlanningOperation
           'plannedStartDate': plannedStartDate!.toIso8601String(),
         if (plannedEndDate != null)
           'plannedEndDate': plannedEndDate!.toIso8601String(),
+        // Retry metadata
+        if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
+        if (lastAttempt != null) 'lastAttempt': lastAttempt!.toIso8601String(),
+        'attemptCount': attemptCount,
+        if (lastError != null) 'lastError': lastError,
+        'maxRetries': maxRetries,
       };
 }

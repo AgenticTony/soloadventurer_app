@@ -14,6 +14,12 @@ class LocationUpdateOperation
     required double longitude,
     required DateTime timestamp,
     @Default(1) int priority,
+    // Retry metadata
+    DateTime? createdAt,
+    DateTime? lastAttempt,
+    @Default(0) int attemptCount,
+    String? lastError,
+    @Default(3) int maxRetries,
   }) = _LocationUpdateOperation;
 
   factory LocationUpdateOperation.fromJson(Map<String, dynamic> json) =>
@@ -33,4 +39,19 @@ class LocationUpdateOperation
     // This would call your travel service to update the user's location
     await Future.delayed(const Duration(seconds: 1)); // Simulate network call
   }
+
+  @override
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'latitude': latitude,
+        'longitude': longitude,
+        'timestamp': timestamp.toIso8601String(),
+        'priority': priority,
+        // Retry metadata
+        if (createdAt != null) 'createdAt': createdAt!.toIso8601String(),
+        if (lastAttempt != null) 'lastAttempt': lastAttempt!.toIso8601String(),
+        'attemptCount': attemptCount,
+        if (lastError != null) 'lastError': lastError,
+        'maxRetries': maxRetries,
+      };
 }
