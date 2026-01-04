@@ -489,42 +489,46 @@
     {
       "phase_id": "9",
       "name": "Journal List Screen",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "9.1",
           "title": "Build main journal list screen",
           "description": "Create screen showing all journal entries organized by trip or date",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/screens/journal/JournalListScreen.tsx"
+            "lib/features/journal/presentation/providers/journal_list_provider.dart",
+            "lib/features/journal/presentation/screens/journal_list_screen.dart",
+            "lib/features/journal/presentation/widgets/journal_entry_card.dart",
+            "lib/features/journal/presentation/screens/journal_list_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_LIST.md"
           ]
         },
         {
           "subtask_id": "9.2",
           "title": "Add entry preview cards",
           "description": "Create cards showing entry summary, date, location, and thumbnail",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/JournalEntryCard.tsx"
+            "lib/features/journal/presentation/widgets/journal_entry_card.dart"
           ]
         },
         {
           "subtask_id": "9.3",
           "title": "Implement pull-to-refresh",
           "description": "Add pull-to-refresh gesture to update journal list",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/JournalListRefresh.tsx"
+            "lib/features/journal/presentation/screens/journal_list_screen.dart"
           ]
         },
         {
           "subtask_id": "9.4",
           "title": "Add empty state and onboarding",
           "description": "Show helpful message when no journal entries exist yet",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/JournalEmptyState.tsx"
+            "lib/features/journal/presentation/screens/journal_list_screen.dart"
           ]
         }
       ]
