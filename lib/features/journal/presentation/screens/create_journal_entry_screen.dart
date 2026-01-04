@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/rich_text_editor.dart';
+import 'package:soloadventurer/features/journal/presentation/widgets/mood_picker.dart';
 
 /// Screen for creating a new journal entry
 class CreateJournalEntryScreen extends ConsumerStatefulWidget {
@@ -385,6 +386,11 @@ class _CreateJournalEntryScreenState
                 ),
               ),
 
+              const SizedBox(height: 24),
+
+              // Mood picker
+              const MoodPicker(),
+
               const SizedBox(height: 32),
 
               // Additional options hint
@@ -415,7 +421,6 @@ class _CreateJournalEntryScreenState
                       Text(
                         '• Add photos and videos to your entries\n'
                         '• Tag your location on a map\n'
-                        '• Track your mood\n'
                         '• Organize entries by trips',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color:
