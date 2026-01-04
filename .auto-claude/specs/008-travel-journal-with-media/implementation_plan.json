@@ -594,8 +594,15 @@
           "subtask_id": "10.5",
           "title": "Error handling improvements",
           "description": "Add better error messages and recovery options",
-          "status": "pending",
-          "files": []
+          "status": "completed",
+          "files": [
+            "lib/core/errors/app_error.dart",
+            "lib/core/errors/error_handler.dart",
+            "lib/core/presentation/widgets/error_display_widget.dart",
+            "lib/core/presentation/widgets/error_dialog.dart",
+            "lib/core/errors/README_ERROR_HANDLING.md",
+            "lib/core/errors/error_handling_example.dart"
+          ]
         },
         {
           "subtask_id": "10.6",
