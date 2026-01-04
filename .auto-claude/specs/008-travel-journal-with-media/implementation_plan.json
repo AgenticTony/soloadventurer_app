@@ -452,9 +452,21 @@
           "subtask_id": "8.3",
           "title": "Create public trip sharing links",
           "description": "Generate shareable links for trips with optional password protection",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/api/sharing.ts"
+            "supabase/migrations/20250106000000_create_shared_links_table.sql",
+            "lib/features/journal/domain/entities/shared_link.dart",
+            "lib/features/journal/data/models/shared_link_model.dart",
+            "lib/features/journal/domain/services/shared_link_service.dart",
+            "lib/features/journal/data/datasources/shared_link_remote_data_source.dart",
+            "lib/features/journal/data/datasources/shared_link_remote_data_source_impl.dart",
+            "lib/features/journal/data/services/shared_link_service_impl.dart",
+            "lib/features/journal/presentation/providers/shared_link_providers.dart",
+            "lib/features/journal/presentation/widgets/shared_link_creator.dart",
+            "lib/features/journal/presentation/widgets/shared_link_manager.dart",
+            "lib/features/journal/presentation/widgets/public_trip_viewer.dart",
+            "lib/features/journal/data/services/README_SHARED_LINKS.md",
+            "lib/features/journal/data/services/shared_link_service_example.dart"
           ]
         },
         {
