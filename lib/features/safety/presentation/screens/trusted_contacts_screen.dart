@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
+import 'add_edit_trusted_contact_screen.dart';
 
 /// Screen to display and manage trusted contacts
 /// Shows list of contacts with options to add, edit, or remove them
@@ -333,26 +334,19 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
   }
 
   void _navigateToAddContact(BuildContext context) {
-    // TODO: Navigate to add contact screen when implemented
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Add contact screen will be implemented in next phase'),
-        duration: Duration(seconds: 2),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const AddEditTrustedContactScreen(),
       ),
     );
   }
 
   void _navigateToEditContact(BuildContext context, TrustedContact contact) {
-    // Select the contact and navigate to edit screen
-    ref
-        .read(trustedContactsNotifierProvider.notifier)
-        .selectContact(contact);
-
-    // TODO: Navigate to edit contact screen when implemented
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Edit ${contact.name} - Coming soon'),
-        duration: const Duration(seconds: 2),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddEditTrustedContactScreen(
+          contact: contact,
+        ),
       ),
     );
   }

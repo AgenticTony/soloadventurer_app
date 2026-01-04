@@ -283,7 +283,70 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Follows existing screen patterns from profile feature
 - Uses ConsumerStatefulWidget pattern for interactive screen
 - Integrates with TrustedContactsNotifier for state management
-- Commit: (pending)
+- Commit: 300f861
+
+✅ **Subtask 5.2: Create add/edit trusted contact screen** (COMPLETED)
+- Created comprehensive AddEditTrustedContactScreen with full form functionality
+- Features include:
+  - Support for both adding and editing trusted contacts in single screen
+  - All TrustedContact fields: name, phone, email, source, permission
+  - Contact source dropdown (phone contact or community member)
+  - Permission level dropdown with descriptive helper text
+    - Emergency Only: receives alerts during emergencies only
+    - Check-ins: receives check-ins and emergency alerts
+    - Full Access: receives everything including location sharing
+  - Notification settings with toggle switches:
+    - Location sharing
+    - Emergency alerts
+    - Check-in notifications
+  - Notes field for additional information
+  - Form validation with proper error messages
+  - Permission level descriptions with color-coded icons
+  - Loading states during save operations
+  - Success/error feedback with snackbars
+  - Returns updated contact object after save
+- Fixed bug in TrustedContactsNotifier: receivesCheckInNotifications → receivesCheckIns
+- Updated TrustedContactsScreen navigation to use new add/edit screen
+- Follows existing screen patterns from EditProfileScreen
+- Uses ConsumerStatefulWidget pattern with proper state management
+- Integrates with TrustedContactsNotifier and currentUserProvider
+- Commit: pending (git index issues)
+
+✅ **Subtask 5.3: Create contact picker widget** (COMPLETED)
+- Created comprehensive ContactPickerWidget with tabbed interface for selecting contacts
+- Features include:
+  - Tabbed interface: Phone Contacts tab and Community Members tab
+  - Phone Contacts tab functionality:
+    - Uses flutter_contacts package to fetch device contacts
+    - Search functionality with real-time filtering
+    - Handles contact permissions gracefully with request flow
+    - Shows loading, empty, and error states
+    - Filters contacts to show only those with phone numbers
+    - Sorts contacts alphabetically by name
+    - Displays contact avatar with initials, name, phone, and email
+    - Returns selected contact via callback with name, phone, and optional email
+  - Community Members tab:
+    - Placeholder for future community member selection feature
+    - Shows "Coming Soon" message with explanation
+  - Error handling:
+    - Permission denied state with grant permission button
+    - Error state with retry option
+    - Empty states with appropriate messages
+- Integration:
+  - Added "Select from Phone Contacts" button to AddEditTrustedContactScreen
+  - Auto-fills form fields (name, phone, email, source) when contact selected
+  - Button only shown in add mode, not edit mode
+  - Uses ContactSelectedCallback typedef for type-safe callback
+- Dependencies:
+  - Added flutter_contacts: ^1.0.0 to pubspec.yaml
+  - Requires contact permission on Android and iOS
+- Follows existing widget patterns with:
+  - ConsumerStatefulWidget for Riverpod integration
+  - SingleTickerProviderStateMixin for TabController
+  - Material Design UI with proper theme usage
+  - Proper resource disposal (controllers, tab controller)
+  - Comprehensive documentation
+- Commit: pending
 
 ### Phases Overview
 

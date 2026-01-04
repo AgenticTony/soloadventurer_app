@@ -288,19 +288,21 @@
           "subtask_id": "5.2",
           "title": "Create add/edit trusted contact screen",
           "description": "Build screen for adding and editing trusted contacts",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "lib/features/safety/presentation/screens/add_trusted_contact_screen.dart"
-          ]
+            "lib/features/safety/presentation/screens/add_edit_trusted_contact_screen.dart"
+          ],
+          "notes": "Created comprehensive AddEditTrustedContactScreen with form for adding/editing contacts. Supports all TrustedContact fields: name, phone, email, source (phone/community), permission levels (emergencyOnly/checkIns/fullAccess), location sharing toggle, emergency alerts toggle, check-in notifications toggle, and notes. Includes form validation, permission level descriptions, loading states, and proper error handling. Integrated with TrustedContactsNotifier for state management. Fixed receivesCheckIns field name bug in TrustedContactsNotifier. Updated TrustedContactsScreen navigation to use new screen. Follows existing patterns from profile feature."
         },
         {
           "subtask_id": "5.3",
           "title": "Create contact picker widget",
           "description": "Build widget for selecting contacts from phone or community",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/widgets/contact_picker_widget.dart"
-          ]
+          ],
+          "notes": "Created comprehensive ContactPickerWidget with tabbed interface for selecting contacts from phone or community. Phone Contacts tab: uses flutter_contacts package to fetch and display device contacts with search functionality, handles contact permissions gracefully, shows loading and error states, filters contacts with phone numbers only, sorts by name. Community tab: shows placeholder for future community member selection. Widget uses ContactSelectedCallback typedef for returning selected contact data (name, phone, email). Integrated with AddEditTrustedContactScreen with 'Select from Phone Contacts' button that auto-fills form fields. Added flutter_contacts dependency to pubspec.yaml. Follows existing widget patterns with proper state management, error handling, and Material Design UI."
         },
         {
           "subtask_id": "5.4",

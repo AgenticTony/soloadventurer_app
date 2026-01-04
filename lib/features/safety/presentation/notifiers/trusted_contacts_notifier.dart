@@ -180,7 +180,7 @@ class TrustedContactsNotifier extends StateNotifier<TrustedContactsState> {
     );
 
     final updatedContact = contact.copyWith(
-      receivesCheckInNotifications: enabled,
+      receivesCheckIns: enabled,
     );
 
     await updateContact(updatedContact);
