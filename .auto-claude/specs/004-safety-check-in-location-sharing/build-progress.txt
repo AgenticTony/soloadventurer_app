@@ -42,10 +42,19 @@ Implementation of Phase 1 has begun.
 - Follows existing repository patterns from auth and profile features
 - Commit: 5c047e6
 
+✅ **Subtask 1.4: Create use cases for trusted contacts** (COMPLETED)
+- Created AddTrustedContactUseCase for adding new trusted contacts
+- Created RemoveTrustedContactUseCase for removing existing contacts
+- Created UpdateTrustedContactUseCase for updating contact details with helper methods for location sharing and notification preferences
+- Created GetTrustedContactsUseCase for retrieving all contacts or getting a specific contact by ID
+- All use cases follow established patterns with const constructors and proper documentation
+- Use cases delegate to SafetyRepository interface methods
+- Commit: c88b399
+
 ## Next Steps
 
-1. **Subtask 1.4**: Create use cases for trusted contacts
-2. Implement AddTrustedContact, RemoveTrustedContact, UpdateTrustedContact, GetTrustedContacts
+1. **Subtask 1.5**: Create use cases for check-ins
+2. Implement CreateCheckIn, CompleteCheckIn, ScheduleCheckIn, CancelCheckIn, GetUpcomingCheckIns
 
 ### Phases Overview
 

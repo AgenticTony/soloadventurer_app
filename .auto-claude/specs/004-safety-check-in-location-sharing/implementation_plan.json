@@ -51,7 +51,7 @@
           "subtask_id": "1.4",
           "title": "Create use cases for trusted contacts",
           "description": "Implement use cases for managing trusted contacts (add, remove, update, list)",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/domain/usecases/add_trusted_contact.dart",
             "lib/features/safety/domain/usecases/remove_trusted_contact.dart",
