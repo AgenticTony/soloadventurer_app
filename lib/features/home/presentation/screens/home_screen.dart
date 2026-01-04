@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -18,6 +19,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('SoloAdventurer'),
         actions: [
+          const QueueStatusIndicator(),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () =>
