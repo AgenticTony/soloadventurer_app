@@ -287,9 +287,13 @@
           "subtask_id": "5.4",
           "title": "Add search and filter functionality",
           "description": "Allow searching entries by text, location, date, or tags",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/JournalSearch.tsx"
+            "lib/features/journal/presentation/providers/journal_search_provider.dart",
+            "lib/features/journal/presentation/screens/journal_search_screen.dart",
+            "lib/features/journal/presentation/widgets/journal_search_filter_sheet.dart",
+            "lib/features/journal/presentation/screens/journal_search_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_SEARCH.md"
           ]
         }
       ]

@@ -1285,3 +1285,117 @@ Phase 5 (Organization & Tagging) progress: 3 of 4 subtasks completed
 
 Next step: Subtask 5.4 - Add search and filter functionality
 
+### 2026-01-06 04:00: Subtask 5.4 Completed
+Implemented comprehensive search and filter functionality for journal entries (5 files):
+- **JournalSearchProvider** (presentation/providers/journal_search_provider.dart - 700+ lines):
+  - JournalSearchFilters class for encapsulating all search criteria
+  - Filter fields: query (text), locationName, startDate, endDate, tagIds, tripId, favoriteOnly, mood
+  - Helper methods: hasActiveFilters, activeFilterCount, clearFilters, copyWith
+  - JournalSearchState class for managing search results and UI state
+  - JournalSearchNotifier with complete search business logic
+  - Debounced text search (500ms delay) to reduce API calls
+  - Client-side filtering for location, date range, mood, favorites
+  - Tag filtering via repository calls
+  - Methods: search(), updateQuery(), updateLocationFilter(), updateDateRangeFilter(), updateTagsFilter(), updateTripFilter(), updateFavoriteFilter(), updateMoodFilter(), clearFilters(), clearAll()
+  - Comprehensive error handling with AppException
+  - Provider setup: journalSearchProvider, journalRepositoryProvider
+- **JournalSearchScreen** (presentation/screens/journal_search_screen.dart - 500+ lines):
+  - Complete search screen with Material Design 3 styling
+  - Search bar with real-time search and debouncing
+  - Filter button with active filter badge count
+  - Clear all filters button
+  - Active filter chips display (horizontal scrollable)
+  - Search results in card-based list view
+  - Result cards with title, date, location, mood, favorite status, content preview
+  - Tap-to-navigate to entry detail screen
+  - Pull-to-refresh support
+  - Empty state with helpful initial message
+  - No results state with user feedback
+  - Error state with retry functionality
+  - Loading state with progress indicator
+  - _SearchResultCard widget for displaying entries
+  - _FilterChip widget for active filter display
+  - Debouncer utility class for search input
+- **JournalSearchFilterSheet** (presentation/widgets/journal_search_filter_sheet.dart - 600+ lines):
+  - Modal bottom sheet for configuring search filters
+  - Scrollable content for small screens
+  - _DateRangeFilter with from/to date pickers
+  - _LocationFilter with text input for location name
+  - _MoodFilter with filter chips and emoji support (7 moods)
+  - _FavoriteFilter with toggle switch
+  - Clear individual filters option
+  - Clear all filters button
+  - Apply filters button to trigger search
+  - Material Design 3 styling with theme integration
+  - StringCapitalization extension for mood display
+- **Example implementations** (presentation/screens/journal_search_screen_example.dart - 700+ lines):
+  - JournalSearchExampleScreen with 4 different usage examples
+  - Example 1: Basic navigation to search screen
+  - Example 2: Programmatic search with predefined filters
+  - Example 3: Watch search state and react to changes
+  - Example 4: Custom filter UI with quick filters (today, this week, this month, with photos)
+  - _StateDisplay widget for showing search state
+  - _ProgrammaticSearchExample with multiple filter buttons
+  - _CustomFilterExample with quick filter chips
+  - JournalSearchExampleMenu for navigating all examples
+  - Complete working examples for all scenarios
+  - Integration patterns with Riverpod providers
+- **Comprehensive documentation** (presentation/screens/README_JOURNAL_SEARCH.md - 900+ lines):
+  - Complete feature overview with capabilities list
+  - Architecture breakdown with component descriptions
+  - Installation and setup instructions
+  - Provider configuration examples
+  - Navigation patterns
+  - 5+ usage examples covering all scenarios:
+    - Basic search screen navigation
+    - Programmatic search with filters
+    - Watching search state
+    - Applying filters programmatically
+    - Clearing filters
+  - State management reference with code examples
+  - Customization guide for filters, result cards, and filter sheet
+  - Performance considerations and optimization tips
+  - Future optimization recommendations (server-side filtering, pagination, caching)
+  - Error handling strategies
+  - Testing examples (unit and widget tests)
+  - Troubleshooting guide for common issues
+  - Future enhancement roadmap (saved searches, voice search, advanced builder)
+  - Related components reference
+
+Key features implemented:
+✅ Full-text search across entry titles and content
+✅ Location filtering by location name
+✅ Date range filtering with start and end dates
+✅ Mood filtering with emoji support (7 moods)
+✅ Favorites filter to show only favorite entries
+✅ Multiple filter combinations for refined searches
+✅ Real-time search with debouncing (500ms)
+✅ Filter chips showing active filters (horizontal scrollable)
+✅ Pull-to-refresh for updating results
+✅ Empty states with helpful messages
+✅ Error handling with retry functionality
+✅ Complete state management with Riverpod
+✅ Material Design 3 styling with theme support
+✅ Comprehensive documentation with examples
+✅ Integration with existing journal entry system
+
+The implementation addresses the user story: "Users can organize entries by trip, date, or custom tags" by providing powerful search and filter capabilities. Users can now search their journal entries by text, location, date range, mood, favorites, and tags, making it easy to find specific memories from their travels.
+
+The search system is fully integrated with the existing journal infrastructure:
+- Uses JournalRepository.searchEntries() for text search
+- Filters results using existing entry fields
+- Integrates with JournalEntryDetailScreen for viewing results
+- Follows existing patterns for state management and error handling
+- Compatible with Riverpod provider architecture
+- Material Design 3 styling consistent with other screens
+
+All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, Material Design 3 styling, error handling, and documentation standards consistent with trip, tag, and journal entry implementations.
+
+Phase 5 (Organization & Tagging) is now COMPLETE with all 4 subtasks finished:
+✅ 5.1 - Trip management system (COMPLETED)
+✅ 5.2 - Custom tags feature (COMPLETED)
+✅ 5.3 - Trip overview screen (COMPLETED)
+✅ 5.4 - Search and filter functionality (COMPLETED)
+
+Next step: Phase 6 - Media Gallery & Views
+
