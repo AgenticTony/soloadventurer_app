@@ -193,3 +193,12 @@ class LocationException extends AppException {
     String? code,
   }) : super(code: code ?? 'location_error');
 }
+
+/// Exception thrown when geocoding operations fail
+class GeocodingException extends AppException {
+  /// Creates a new [GeocodingException] with the given [message] and optional [code]
+  const GeocodingException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'geocoding_error');
+}
