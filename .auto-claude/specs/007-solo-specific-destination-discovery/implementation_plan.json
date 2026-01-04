@@ -522,7 +522,7 @@
     {
       "phase_id": "phase-6",
       "phase_name": "Navigation & Routing",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "6.1",
@@ -546,13 +546,14 @@
           "subtask_id": "6.2",
           "title": "Update app navigation",
           "description": "Add destination discovery entry point to main navigation",
-          "status": "pending",
-          "file_path": "./lib/screens/home_screen.dart or ./lib/features/home/presentation/screens/home_screen.dart",
+          "status": "completed",
+          "file_path": "./lib/features/home/presentation/screens/home_screen.dart",
+          "notes": "Comprehensively updated HomeScreen with destination discovery navigation entry points. Implementation includes: 1) Welcome section with greeting and tagline, 2) Large hero card 'Discover Destinations' with compelling travel image (Unsplash), safety ratings badge, and direct navigation to main discovery screen, 3) 'Recommended for You' section with horizontal scrolling cards (Personalized, Trending, Hidden Gems) each with icon, title, subtitle, and navigation to appropriate screens, 4) 'Curated Collections' section with horizontal scrolling image cards (Popular Solo Spots, Hidden Gems, Budget Friendly) using CachedNetworkImage with gradient overlays and 'See All' link to curated lists, 5) 'Quick Access' section with 2-column grid of cards (Saved Destinations, Browse All) with gradient backgrounds and icon styling. All sections follow Material Design 3 patterns, use theme colors, include proper loading/error states for images, and navigate to all 6 destination discovery routes. The home screen now serves as a comprehensive hub for the entire destination discovery feature.",
           "acceptance_criteria": [
-            "Add Discover/Trending destinations section to home screen",
-            "Add navigation to destination discovery feature",
-            "Add recommendations widget on home",
-            "Add quick link to curated collections"
+            "Add Discover/Trending destinations section to home screen - COMPLETED (Hero card with image and safety badge)",
+            "Add navigation to destination discovery feature - COMPLETED (Multiple entry points to all discovery screens)",
+            "Add recommendations widget on home - COMPLETED (Recommended for You section with 3 quick action cards)",
+            "Add quick link to curated collections - COMPLETED (Curated Collections section with 3 preview cards and See All link)"
           ]
         },
         {
