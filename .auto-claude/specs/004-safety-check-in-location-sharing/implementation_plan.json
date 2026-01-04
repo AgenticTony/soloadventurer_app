@@ -493,10 +493,12 @@
           "subtask_id": "9.3",
           "title": "Integrate with app navigation",
           "description": "Add safety feature to main app navigation",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "lib/core/navigation/app_router.dart"
-          ]
+            "lib/features/auth/presentation/providers/auth_navigation_provider.dart",
+            "lib/features/home/presentation/screens/home_screen.dart"
+          ],
+          "notes": "Added comprehensive safety navigation integration to main app. Updated AuthNavigationNotifier with safety navigation methods for all safety screens: navigateToSafetyHub(), navigateToTrustedContacts(), navigateToAddTrustedContact(), navigateToEditTrustedContact(), navigateToCheckInHome(), navigateToManualCheckIn(), navigateToScheduleCheckIn(), navigateToCheckInHistory(), navigateToEmergencySOS(), navigateToStatusUpdate(), and navigateToLocationSharing(). Updated HomeScreen with dedicated safety section featuring Safety Hub card with prominent shield icon, and quick action buttons for Check In and Emergency features. All navigation uses existing authNavigationProvider for consistency with app navigation patterns. Safety section appears at top of home screen with clear visual hierarchy using Cards and proper Material Design styling. Commit: a6d520c"
         },
         {
           "subtask_id": "9.4",
