@@ -447,6 +447,195 @@ class TripsScreen extends StatelessWidget {
 - You need manual control over loading
 - Data is small (< 500 items)
 
+### Intelligent Preloading (New!)
+
+The `InfiniteScrollListView` now supports intelligent preloading strategies that predict when users will reach the end of a list and preload data before they need it.
+
+#### Features
+
+- **5 Preloading Strategies**: Fixed distance, velocity-based, predictive, aggressive, conservative
+- **Adaptive Thresholds**: Automatically adjusts preload timing based on page load performance
+- **Velocity Tracking**: Monitors scroll speed to preload earlier when scrolling fast
+- **Performance Metrics**: Tracks preload success rate, load times, and cache hits
+- **Predefined Configs**: Ready-to-use configurations for different scenarios
+
+#### Quick Start
+
+```dart
+// Basic intelligent preloading (recommended)
+InfiniteScrollListView<Trip>.withIntelligentPreloading(
+  fetchData: (cursor) async {
+    return await tripRepository.getTripsCursor(
+      userId: 'user123',
+      cursor: cursor,
+      pageSize: 20,
+    );
+  },
+  itemBuilder: (context, trip) => TripCard(trip: trip),
+  preloadConfig: PreloadConfig.defaultConfig,
+)
+```
+
+#### Preloading Strategies
+
+**1. Predictive (Recommended - Default)**
+Uses scroll velocity and acceleration to predict when user will reach end.
+
+```dart
+PreloadConfig.defaultConfig
+// or
+PreloadConfig(
+  strategy: PreloadStrategy.predictive,
+  fixedThreshold: 500.0,
+  velocityThreshold: 1000.0,
+  velocityMultiplier: 0.5,
+)
+```
+
+**2. Aggressive (Fast Networks)**
+Preloads 2-3 pages ahead for smoothest experience.
+
+```dart
+PreloadConfig.aggressiveConfig
+// Preloads at 800px, loads 3 pages ahead, 300ms interval
+```
+
+**3. Conservative (Slow Networks)**
+Only preloads when very close to end to minimize data usage.
+
+```dart
+PreloadConfig.conservativeConfig
+// Preloads at 200px, loads 1 page ahead, 1000ms interval
+```
+
+**4. Velocity-Based**
+Increases preload distance when scrolling faster.
+
+```dart
+PreloadConfig(
+  strategy: PreloadStrategy.velocityBased,
+  fixedThreshold: 500.0,
+  velocityThreshold: 1000.0, // px/s
+  velocityMultiplier: 0.5,
+)
+// At 2000 px/s: preload at 500 + (2000 * 0.5) = 1500px
+```
+
+**5. Fixed Distance**
+Simple fixed threshold (backward compatible).
+
+```dart
+PreloadConfig(
+  strategy: PreloadStrategy.fixedDistance,
+  fixedThreshold: 500.0,
+)
+```
+
+#### Monitoring Performance
+
+Track preload metrics to optimize performance:
+
+```dart
+class TripItemsScreen extends StatefulWidget {
+  @override
+  _TripItemsScreenState createState() => _TripItemsScreenState();
+}
+
+class _TripItemsScreenState extends State<TripItemsScreen> {
+  PreloadMetrics? _metrics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Trips'),
+        actions: [
+          if (_metrics != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: Text(
+                  'Load: ${_metrics!.averageLoadTime.toStringAsFixed(0)}ms',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+            ),
+        ],
+      ),
+      body: InfiniteScrollListView<Trip>.withIntelligentPreloading(
+        fetchData: (cursor) async {
+          return await tripRepository.getTripsCursor(
+            userId: 'user123',
+            cursor: cursor,
+            pageSize: 20,
+          );
+        },
+        itemBuilder: (context, trip) => TripCard(trip: trip),
+        preloadConfig: PreloadConfig.defaultConfig,
+        onPreloadMetricsUpdated: (metrics) {
+          setState(() {
+            _metrics = metrics;
+          });
+
+          // Adjust strategy based on performance
+          if (metrics.averageLoadTime > 2000) {
+            // Switch to conservative on slow networks
+            debugPrint('Slow loads detected');
+          }
+        },
+      ),
+    );
+  }
+}
+```
+
+#### Adaptive Thresholds
+
+The system can automatically adjust preload timing based on performance:
+
+```dart
+PreloadConfig(
+  strategy: PreloadStrategy.predictive,
+  enableAdaptiveThreshold: true,
+  adaptiveFactor: 1.0,
+)
+```
+
+**How it works:**
+- Fast loads (< 500ms): Preload later (factor = 1.3x)
+- Slow loads (> 2000ms): Preload earlier (factor = 0.7x)
+- Failed loads: Be more conservative (factor *= 0.8)
+
+#### Performance Comparison
+
+| Approach | Threshold | Network Usage | Smoothness |
+|----------|-----------|---------------|------------|
+| Fixed (500px) | Always 500px | Medium | Good |
+| Predictive | 500-1500px | Medium | Best |
+| Aggressive | 800px (3 pages) | High | Best |
+| Conservative | 200px (1 page) | Low | Fair |
+
+#### When to Use Each Strategy
+
+```dart
+// ✅ WiFi / Fast Network - Use Aggressive
+PreloadConfig.aggressiveConfig
+
+// ✅ 4G / Typical - Use Predictive (default)
+PreloadConfig.defaultConfig
+
+// ✅ 3G / Slow Network - Use Conservative
+PreloadConfig.conservativeConfig
+
+// ✅ Data Saver Mode - Use Conservative
+PreloadConfig.conservativeConfig
+
+// ✅ User preference "Best Performance" - Use Aggressive
+PreloadConfig.aggressiveConfig
+```
+
+For complete documentation on intelligent preloading, see [INTELLIGENT_PRELOADING_README.md](../utils/INTELLIGENT_PRELOADING_README.md).
+
 For comprehensive documentation, see [InfiniteScrollListView README](./INFINITE_SCROLL_README.md) and [Examples](./example_infinite_scroll_list_view.dart).
 
 ---

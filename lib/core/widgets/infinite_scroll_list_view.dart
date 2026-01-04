@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/paginated_data.dart';
+import '../utils/preloading_strategy.dart';
 import 'virtual_list_view.dart';
 
 /// Pagination state for the infinite scroll list
@@ -152,7 +153,15 @@ class InfiniteScrollListView<T> extends StatefulWidget {
 
   /// Distance from end (in pixels) to trigger loading next page
   /// Default: 500px (loads before user reaches end)
+  /// Note: This is only used if [preloadConfig] is null
   final double preloadThreshold;
+
+  /// Configuration for intelligent preloading
+  /// If provided, overrides [preloadThreshold] and uses advanced strategies
+  final PreloadConfig? preloadConfig;
+
+  /// Callback when preload metrics are updated
+  final void Function(PreloadMetrics)? onPreloadMetricsUpdated;
 
   /// The axis along which the list scrolls
   final Axis scrollDirection;
@@ -180,6 +189,8 @@ class InfiniteScrollListView<T> extends StatefulWidget {
     this.endOfListWidget,
     this.enablePullToRefresh = true,
     this.preloadThreshold = 500.0,
+    this.preloadConfig,
+    this.onPreloadMetricsUpdated,
     this.scrollDirection = Axis.vertical,
     this.padding,
     this.controller,
@@ -194,12 +205,17 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
   late ScrollController _scrollController;
   InfiniteScrollState<T> _state = const InfiniteScrollState();
   bool _isLoadingNextPage = false;
+  late PreloadingManager _preloadingManager;
+  DateTime? _lastScrollUpdate;
 
   @override
   void initState() {
     super.initState();
     _scrollController = widget.controller ?? ScrollController();
     _scrollController.addListener(_onScroll);
+    _preloadingManager = PreloadingManager(
+      config: widget.preloadConfig ?? PreloadConfig.defaultConfig,
+    );
     _loadInitialData();
   }
 
@@ -260,6 +276,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     if (!_state.hasNextPage) return;
     if (_state.isLoading) return;
 
+    final startTime = DateTime.now();
     setState(() {
       _state = _state.copyWith(status: InfiniteScrollStatus.loadingMore);
       _isLoadingNextPage = true;
@@ -270,6 +287,16 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       final pageData = await widget.fetchData(cursor);
 
       if (!mounted) return;
+
+      // Calculate load time
+      final loadTimeMs =
+          DateTime.now().difference(startTime).inMilliseconds;
+
+      // Record successful load
+      if (widget.preloadConfig != null) {
+        _preloadingManager.recordSuccessfulLoad(loadTimeMs);
+        widget.onPreloadMetricsUpdated?.call(_preloadingManager.metrics);
+      }
 
       setState(() {
         _state = _state.copyWith(
@@ -284,6 +311,12 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       });
     } catch (e) {
       if (!mounted) return;
+
+      // Record failed load
+      if (widget.preloadConfig != null) {
+        _preloadingManager.recordFailedLoad();
+        widget.onPreloadMetricsUpdated?.call(_preloadingManager.metrics);
+      }
 
       setState(() {
         _state = _state.copyWith(
@@ -303,14 +336,43 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
 
-    // Load next page if we're within the preload threshold
-    if (maxScroll - currentScroll <= widget.preloadThreshold) {
-      _loadNextPage();
+    // Calculate velocity
+    if (_lastScrollUpdate != null) {
+      final timeDiff = DateTime.now().difference(_lastScrollUpdate!);
+      if (timeDiff.inMicroseconds > 0) {
+        final velocity = (timeDiff.inMicroseconds > 0)
+            ? (_scrollController.position.pixels - currentScroll) /
+                timeDiff.inMicroseconds * 1000000
+            : 0.0;
+
+        // Update velocity in preloading manager
+        if (widget.preloadConfig != null) {
+          _preloadingManager.updateVelocity(velocity.abs());
+        }
+      }
+    }
+    _lastScrollUpdate = DateTime.now();
+
+    // Use intelligent preloading if configured
+    if (widget.preloadConfig != null) {
+      if (_preloadingManager.shouldPreload(maxScroll, currentScroll)) {
+        _preloadingManager.markPreloadTriggered();
+        _loadNextPage();
+      }
+    } else {
+      // Fallback to simple threshold-based preloading
+      if (maxScroll - currentScroll <= widget.preloadThreshold) {
+        _loadNextPage();
+      }
     }
   }
 
   /// Handles pull-to-refresh
   Future<void> _onRefresh() async {
+    // Reset preloading manager on refresh
+    if (widget.preloadConfig != null) {
+      _preloadingManager.reset();
+    }
     await _loadInitialData();
   }
 
@@ -440,6 +502,8 @@ extension InfiniteScrollListViewExtensions on InfiniteScrollListView {
     Widget? endOfListWidget,
     bool enablePullToRefresh = true,
     double preloadThreshold = 500.0,
+    PreloadConfig? preloadConfig,
+    void Function(PreloadMetrics)? onPreloadMetricsUpdated,
     EdgeInsets? padding,
     ScrollController? controller,
   }) {
@@ -457,6 +521,8 @@ extension InfiniteScrollListViewExtensions on InfiniteScrollListView {
       endOfListWidget: endOfListWidget,
       enablePullToRefresh: enablePullToRefresh,
       preloadThreshold: preloadThreshold,
+      preloadConfig: preloadConfig,
+      onPreloadMetricsUpdated: onPreloadMetricsUpdated,
       padding: padding,
       controller: controller,
     );
@@ -473,6 +539,8 @@ extension InfiniteScrollListViewExtensions on InfiniteScrollListView {
     Widget? emptyWidget,
     bool enablePullToRefresh = true,
     double preloadThreshold = 500.0,
+    PreloadConfig? preloadConfig,
+    void Function(PreloadMetrics)? onPreloadMetricsUpdated,
     EdgeInsets? padding,
     ScrollController? controller,
   }) {
@@ -487,6 +555,39 @@ extension InfiniteScrollListViewExtensions on InfiniteScrollListView {
       emptyWidget: emptyWidget,
       enablePullToRefresh: enablePullToRefresh,
       preloadThreshold: preloadThreshold,
+      preloadConfig: preloadConfig,
+      onPreloadMetricsUpdated: onPreloadMetricsUpdated,
+      padding: padding,
+      controller: controller,
+    );
+  }
+
+  /// Creates an infinite scroll list with intelligent preloading
+  static InfiniteScrollListView<T> withIntelligentPreloading<T>({
+    Key? key,
+    required PaginatedDataFetcher<T> fetchData,
+    required ItemWidgetBuilder<T> itemBuilder,
+    NullableItemWidgetBuilder<T>? separatorBuilder,
+    Widget? header,
+    Widget? footer,
+    Widget? emptyWidget,
+    PreloadConfig preloadConfig = PreloadConfig.defaultConfig,
+    void Function(PreloadMetrics)? onPreloadMetricsUpdated,
+    bool enablePullToRefresh = true,
+    EdgeInsets? padding,
+    ScrollController? controller,
+  }) {
+    return InfiniteScrollListView<T>(
+      key: key,
+      fetchData: fetchData,
+      itemBuilder: itemBuilder,
+      separatorBuilder: separatorBuilder,
+      header: header,
+      footer: footer,
+      emptyWidget: emptyWidget,
+      enablePullToRefresh: enablePullToRefresh,
+      preloadConfig: preloadConfig,
+      onPreloadMetricsUpdated: onPreloadMetricsUpdated,
       padding: padding,
       controller: controller,
     );
