@@ -86,6 +86,7 @@ dependencies:
 
   # Local Notifications
   flutter_local_notifications: ^16.3.2
+  timezone: ^0.9.4
 
   # AWS SDK
   aws_cloudwatch: ^1.0.1
