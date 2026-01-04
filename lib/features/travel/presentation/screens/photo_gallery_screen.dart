@@ -188,7 +188,7 @@ class _PhotoGridItem extends StatelessWidget {
   }
 }
 
-/// Widget for displaying the photo image with loading and error states
+/// Widget for displaying the photo image with lazy loading
 class _PhotoImage extends StatelessWidget {
   final Photo photo;
 
@@ -196,24 +196,25 @@ class _PhotoImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      photo.displayUrl,
+    // Use LazyLoadImage for visibility-based lazy loading
+    return LazyLoadImage.photo(
+      imageUrl: photo.displayUrl,
+      thumbnailUrl: photo.thumbnailUrl,
       fit: BoxFit.cover,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
+      visibilityThreshold: 0.01,
+      placeholder: (context, url) {
         return Container(
           color: Colors.grey[300],
-          child: Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                  : null,
+          child: const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
           ),
         );
       },
-      errorBuilder: (context, error, stackTrace) {
+      errorWidget: (context, url, error) {
         return Container(
           color: Colors.grey[300],
           child: const Icon(Icons.broken_image, size: 48, color: Colors.grey),

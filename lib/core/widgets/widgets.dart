@@ -12,6 +12,8 @@
 ///   rendering of large photo galleries (500+ items)
 /// - [VirtualListPerformanceTracker]: A performance tracking wrapper that
 ///   monitors render times, memory usage, and frame rates for virtual lists
+/// - [LazyLoadImage]: A visibility-based lazy loading image widget that
+///   only loads images when they become visible on screen
 ///
 /// ## Usage
 ///
@@ -29,6 +31,13 @@
 ///   itemCount: photos.length,
 ///   crossAxisCount: 3,
 ///   itemBuilder: (context, index) => ImageCard(photo: photos[index]),
+/// )
+///
+/// // Lazy loading image
+/// LazyLoadImage(
+///   imageUrl: 'https://example.com/image.jpg',
+///   placeholder: (context, url) => CircularProgressIndicator(),
+///   errorWidget: (context, url, error) => Icon(Icons.error),
 /// )
 ///
 /// // With performance tracking
@@ -50,3 +59,4 @@
 export 'virtual_list_view.dart';
 export 'virtual_grid_view.dart';
 export 'virtual_list_performance_tracker.dart';
+export 'lazy_load_image.dart';
