@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
+import 'package:soloadventurer/utils/performance/image_cache_manager.dart';
 
 /// Configuration for media gallery display and behavior
 class MediaGalleryConfig {
@@ -312,6 +313,7 @@ class _MediaGridItem extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
+  final ImageCacheConfig? imageConfig;
 
   const _MediaGridItem({
     required this.media,
@@ -319,11 +321,13 @@ class _MediaGridItem extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.onLongPress,
+    this.imageConfig,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final imageManager = ImageCacheManager.instance;
 
     return GestureDetector(
       onTap: onTap,
@@ -333,18 +337,13 @@ class _MediaGridItem extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Media thumbnail or placeholder
+            // Media thumbnail or placeholder using optimized caching
             if (media.storagePath.isNotEmpty)
-              Image.network(
+              imageManager.buildThumbnail(
                 media.storagePath,
+                placeholder: _buildLoadingPlaceholder(context),
+                errorWidget: _buildPlaceholder(context),
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildPlaceholder(context);
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return _buildLoadingPlaceholder(context);
-                },
               )
             else
               _buildPlaceholder(context),
@@ -452,7 +451,11 @@ class _MediaGridItem extends StatelessWidget {
     return Container(
       color: theme.colorScheme.surfaceContainerHighest,
       child: const Center(
-        child: CircularProgressIndicator(),
+        child: SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
       ),
     );
   }

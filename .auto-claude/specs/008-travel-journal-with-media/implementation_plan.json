@@ -578,8 +578,17 @@
           "subtask_id": "10.4",
           "title": "Performance optimization",
           "description": "Optimize image loading, list rendering, and database queries",
-          "status": "pending",
-          "files": []
+          "status": "completed",
+          "files": [
+            "lib/utils/performance/image_cache_manager.dart",
+            "lib/utils/performance/paginated_list_notifier.dart",
+            "lib/utils/performance/query_optimizer.dart",
+            "lib/utils/performance/README_PERFORMANCE_OPTIMIZATION.md",
+            "lib/utils/performance/performance_optimization_example.dart",
+            "lib/features/journal/presentation/providers/journal_list_provider_optimized.dart",
+            "lib/features/journal/data/datasources/journal_remote_data_source_optimized.dart",
+            "lib/features/journal/presentation/widgets/media_gallery.dart"
+          ]
         },
         {
           "subtask_id": "10.5",
