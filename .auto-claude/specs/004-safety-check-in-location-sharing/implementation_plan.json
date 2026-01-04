@@ -416,10 +416,11 @@
           "subtask_id": "7.4",
           "title": "Create status selector widget",
           "description": "Build widget for selecting safety status",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/widgets/status_selector_widget.dart"
-          ]
+          ],
+          "notes": "Created comprehensive StatusSelectorWidget with multiple variants for different use cases. Features: radio button selection for safety status (safe, need help, emergency) with color-coded icons and descriptions; supports initial value, disabled state, and custom labels; optional wrapping in Card for consistent styling; follows Material Design guidelines. Variants included: 1) StatusSelectorWidget - full-featured radio button selector with title/description support, 2) StatusSelectorCompact - horizontal button layout for space-constrained UIs, 3) StatusSelectorDropdown - segmented button for inline forms, 4) StatusDisplayWidget - display-only widget for cards/lists with chip/icon/badge styles. All widgets follow existing patterns from CheckInStatusIndicator and StatusUpdateScreen with comprehensive documentation, proper theming, and Material Design 3 compliance. Includes StatusSelectedCallback typedef for type-safe callbacks and StatusDisplayStyle enum for display variants."
         }
       ]
     },
