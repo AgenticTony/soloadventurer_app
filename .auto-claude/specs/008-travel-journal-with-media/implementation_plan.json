@@ -343,9 +343,12 @@
           "subtask_id": "6.4",
           "title": "Add map view for trip locations",
           "description": "Display all journal locations on an interactive map",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/TripMapView.tsx"
+            "lib/features/journal/presentation/providers/journal_map_provider.dart",
+            "lib/features/journal/presentation/screens/journal_map_screen.dart",
+            "lib/features/journal/presentation/screens/journal_map_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_MAP.md"
           ]
         }
       ]

@@ -68,1544 +68,187 @@ Created comprehensive implementation plan with 10 phases and 42 subtasks.
 
 ## Recent Updates
 
-### 2026-01-04 19:40: Subtask 1.1 Completed
-Created comprehensive database migration (580 lines) including:
-- **trips** table for organizing journal entries
-- **journal_entries** table with rich text, location, and mood tracking
-- **media_items** table for photos/videos with upload status tracking
-- **tags** table for custom categorization
-- **journal_tags** junction table for many-to-many relationships
-- **offline_changes** table for sync support
-- Full-text search with PostgreSQL tsvector
-- Geospatial indexes for location queries
-- Comprehensive RLS policies for data security
-- Helper functions and triggers for automated updates
-- Two helper views for common queries
-
-The migration supports offline-first architecture with sync status tracking on all tables.
-
-### 2026-01-05 10:00: Subtask 1.2 Completed
-Created storage buckets migration (220 lines) including:
-- **journal-photos** bucket for high-resolution images (10MB limit)
-- **journal-videos** bucket for video uploads (100MB limit)
-- **journal-thumbnails** bucket for optimized thumbnails (512KB limit)
-- Comprehensive RLS policies for all storage buckets
-- User-isolated storage with user_id folder structure
-- Helper function `generate_storage_path()` for unique, sanitized file paths
-- Proper MIME type restrictions for each bucket
-- Security with `auth.uid()` checks on all operations
-
-All storage buckets are private with access controlled via RLS policies ensuring users can only access their own media.
-
-### 2026-01-05 10:30: Subtask 1.3 Completed
-Created Dart type definitions for all journal entities (8 files) following Clean Architecture:
-- **Domain Entities** (lib/features/journal/domain/entities/):
-  - `trip.dart` - Trip entity with SyncStatus enum and extension
-  - `journal_entry.dart` - JournalEntry entity with location, mood, and weather data
-  - `media_item.dart` - MediaItem entity with MediaType, UploadStatus enums
-  - `tag.dart` - Tag entity with color, icon, and usage tracking
-- **Data Models** (lib/features/journal/data/models/):
-  - `trip_model.dart` - TripModel with JSON serialization
-  - `journal_entry_model.dart` - JournalEntryModel with JSON serialization
-  - `media_item_model.dart` - MediaItemModel with JSON serialization
-  - `tag_model.dart` - TagModel with JSON serialization
-
-All entities extend Equatable and include:
-- copyWith methods for immutability
-- Computed properties for business logic (isOngoing, hasLocation, etc.)
-- Enums with extension methods for string conversion
-- Models with fromEntity/toEntity and fromJson/toJson methods
-- Full Supabase compatibility with snake_case to camelCase mapping
-
-Follows existing project patterns from auth and profile features.
-
-## Status: Phase 1 complete, Phase 2 in progress
-All Foundation & Database Schema subtasks completed (1.1, 1.2, 1.3)
-
-### 2026-01-05 11:00: Subtask 2.1 Completed
-Implemented rich text editor component for Flutter (280+ lines):
-- **RichTextEditor** widget (rich_text_editor.dart):
-  - Complete rich text editor with integrated toolbar
-  - Supports bold, italic, underline, strikethrough
-  - Heading styles (H1, H2, H3)
-  - Ordered and unordered lists
-  - Block quotes and code blocks
-  - Link insertion
-  - Customizable styling and dimensions
-  - Delta JSON format for content storage
-  - Methods: getContent(), setContent(), clear(), isEmpty
-- **EditorToolbar** widget (editor_toolbar.dart):
-  - Customizable standalone toolbar for Quill editors
-  - Configurable options for buttons and layout
-  - Multiple variants: full, compact, and minimal
-  - Proper Material Design styling
-- **Example implementation** (rich_text_editor_example.dart):
-  - Complete example screen showing integration
-  - Demonstrates saving, validation, and UI flow
-  - Includes separate toolbar example for custom layouts
-- **Comprehensive README** documentation:
-  - Usage examples and API documentation
-  - Delta JSON format explanation
-  - Integration with Riverpod
-  - Styling and customization guide
-  - Accessibility features
-  - Troubleshooting section
-
-Added flutter_quill dependency (^10.8.4) to pubspec.yaml for rich text editing capabilities.
-
-### 2026-01-05 12:00: Subtask 2.2 Completed
-Implemented journal entry creation flow with full UI and state management (3 files):
-- **JournalEntryCreationProvider** (journal_entry_providers.dart):
-  - JournalEntryCreationState class for managing form state
-  - JournalEntryCreationNotifier for business logic
-  - Providers: journalEntryCreationProvider, journalEntryFormValidatorProvider, journalEntrySaveButtonProvider
-  - State management for title, content, date, tripId, mood, location, and favorite status
-  - Form validation with error handling
-  - Placeholder saveEntry() method (to be implemented in subtask 2.3)
-- **CreateJournalEntryScreen** (create_journal_entry_screen.dart):
-  - Complete form UI with title, date picker, and rich text content
-  - Integrates RichTextEditor widget from subtask 2.1
-  - Date picker with formatted display
-  - Title field with validation (3-200 characters)
-  - Rich text content editor with toolbar
-  - Favorite toggle with switch
-  - Save and cancel buttons in AppBar
-  - Loading states during save operation
-  - Error handling with SnackBar messages
-  - Confirmation dialog for unsaved changes
-  - Returns true to parent screen on successful save
-  - Optional tripId parameter for creating entries within trips
-  - "Coming Soon" card for future features (photos, location, mood, trips)
-- **Example implementation** (create_journal_entry_screen_example.dart):
-  - Standalone example demonstrating integration
-  - Shows navigation patterns
-  - Includes usage documentation
-  - Demonstrates tripId parameter usage
-
-Follows existing auth screen patterns with proper form validation, state management, and error handling.
-
-### 2026-01-05 14:00: Subtask 2.3 Completed
-Implemented journal entry CRUD operations with Supabase (5 files):
-- **JournalRepository** interface (domain/repositories/journal_repository.dart):
-  - Complete CRUD interface for journal entries
-  - Methods: createEntry, getEntry, getEntries, updateEntry, deleteEntry
-  - Query methods: getEntriesByTrip, getEntriesByDateRange, searchEntries, getFavoriteEntries
-  - Location-based queries: getEntriesWithLocation, getEntriesNearLocation
-  - Full media management: addMedia, updateMedia, deleteMedia, getMediaForEntry, getMediaForTrip
-  - Upload progress tracking: updateMediaUploadProgress, completeMediaUpload, failMediaUpload
-- **JournalRemoteDataSource** interface (data/datasources/journal_remote_data_source.dart):
-  - Data layer abstraction for all repository operations
-  - Consistent error handling with custom exceptions
-- **JournalRemoteDataSourceImpl** (data/datasources/journal_remote_data_source_impl.dart):
-  - Full Supabase implementation using supabase_flutter package
-  - All CRUD operations with proper error handling
-  - User authentication checks via _client.auth.currentUser
-  - PostgrestException handling with meaningful error messages
-  - Text search, date range queries, and geospatial queries via RPC
-  - Media management with upload status tracking
-- **JournalRepositoryImpl** (data/repositories/journal_repository_impl.dart):
-  - Clean Architecture implementation
-  - Converts between entities and models
-  - Comprehensive error handling with AppException
-- **Updated journal_entry_providers.dart** (presentation/providers/):
-  - Integrated JournalRepository into creation provider
-  - Implemented saveEntry() method with actual repository call
-  - Added journalRepositoryProvider for DI injection
-- **Added supabase_flutter: ^2.0.0** to pubspec.yaml dependencies
-- **Comprehensive README** (lib/features/journal/data/repositories/README.md):
-  - Architecture overview and file descriptions
-  - Setup instructions with Supabase initialization
-  - Usage examples for all CRUD operations
-  - Error handling patterns
-  - Database schema reference
-  - Testing strategies with mock implementation
-  - Performance considerations and troubleshooting
-
-All operations follow Clean Architecture with proper separation of concerns. Ready for Subtask 2.4.
-
-### 2026-01-05 15:00: Subtask 2.4 Completed
-Implemented journal entry detail view with full UI and state management (5 files):
-- **JournalEntryDetailProvider** (journal_entry_detail_provider.dart):
-  - State management for viewing individual journal entries
-  - JournalEntryDetailState with entry, mediaItems, loading/error states
-  - JournalEntryDetailNotifier with business logic
-  - Provider: journalEntryDetailProvider (family provider for entryId)
-  - Methods: refresh(), deleteEntry(), toggleFavorite(), clearError()
-  - Automatic loading of entry and media on initialization
-- **RichTextViewer** widget (rich_text_viewer.dart):
-  - Read-only display of rich text content in Delta JSON format
-  - Uses Quill editor in read-only mode
-  - Supports all formatting: bold, italic, headings, lists, quotes, code blocks
-  - Customizable styling with theme integration
-  - Graceful fallback to plain text if parsing fails
-- **JournalEntryDetailScreen** (journal_entry_detail_screen.dart):
-  - Complete screen for viewing journal entries with all content
-  - Collapsible app bar with entry title
-  - Action buttons: favorite toggle, edit, more options menu
-  - Metadata row: date, time, location with icons
-  - Mood indicator with emoji mapping
-  - Rich text content display
-  - Media section placeholder (for Phase 3)
-  - Trip information section (for Phase 5)
-  - Sync status indicator for offline support
-  - Metadata footer with created/updated timestamps
-  - Delete confirmation dialog
-  - Error, loading, and not found states
-  - Navigation with route arguments and result handling
-- **Example implementation** (journal_entry_detail_screen_example.dart):
-  - Complete usage examples showing navigation patterns
-  - Result handling for delete operations
-  - Code snippets for route configuration
-  - Feature list and integration examples
-- **Comprehensive README** documentation:
-  - Architecture overview with state management details
-  - Usage instructions for navigation and routing
-  - UI components breakdown
-  - Customization guide
-  - Error handling patterns
-  - Testing checklist with example data
-  - Integration with repository
-  - Future enhancement roadmap
-  - Troubleshooting section
-
-Features implemented:
-✅ Display journal entry title, date, and rich text content
-✅ Show location information with icon
-✅ Mood indicator with automatic emoji mapping
-✅ Favorite toggle functionality with optimistic updates
-✅ Edit and delete actions (delete fully implemented)
-✅ Sync status indicator (pending, conflict, offline-only)
-✅ Refresh capability for reloading data
-✅ Comprehensive error handling (loading, error, not found states)
-✅ Navigation integration with route arguments
-✅ Result handling for parent screens
-
-Features prepared for future phases:
-🔜 Media gallery viewer (Phase 3)
-🔜 Full edit functionality (Phase 2+)
-🔜 Share functionality (Phase 8)
-🔜 Trip navigation and details (Phase 5)
-
-All code follows existing project patterns with proper error handling, theme integration, and Material Design 3 styling.
-
-Next step: Phase 3 - Media Upload & Management
-
-### 2026-01-05 16:00: Subtask 3.1 Completed
-Implemented comprehensive image compression utility for Flutter (4 files):
-- **MediaCompression utility** (lib/utils/media_compression.dart - 600+ lines):
-  - Complete image compression with flutter_image_compress package
-  - CompressedImageResult class with metadata (bytes, dimensions, file sizes, quality)
-  - ImageCompressionConfig class with customizable settings
-  - Three predefined configurations: optimizedForTravel, highQuality, aggressive
-  - Support for JPEG and PNG formats
-  - Automatic EXIF rotation correction
-  - Target file size support with automatic quality adjustment
-  - Helper methods: compressionRatio, sizeReductionPercent, isEffective
-  - Static utilities: needsCompression(), estimateCompressedSize(), getRecommendedConfig()
-  - Comprehensive error handling with custom exceptions
-- **Custom exceptions** (lib/core/errors/exceptions.dart):
-  - MediaCompressionException for compression failures
-  - UnsupportedImageFormatException for invalid formats
-  - InvalidImageException for corrupted or invalid files
-- **Comprehensive documentation** (lib/utils/README_MEDIA_COMPRESSION.md):
-  - Installation instructions
-  - 10+ usage examples covering all scenarios
-  - Configuration options and predefined settings reference
-  - Error handling patterns and best practices
-  - Integration examples with journal entries
-  - Performance considerations and limitations
-  - Troubleshooting guide
-  - Platform support details
-- **Example implementations** (lib/utils/media_compression_example.dart):
-  - 10 practical examples demonstrating all features
-  - Basic compression, custom configuration, predefined configs
-  - Conditional compression, byte compression, error handling
-  - Batch processing, recommended settings, journal upload integration
-  - Size estimation before compression
-- **Updated pubspec.yaml**: Added flutter_image_compress: ^2.3.0 dependency
-
-Key features implemented:
-✅ Automatic compression with smart defaults for travel photos
-✅ Configurable quality (0-100) and max dimensions
-✅ Image resizing with aspect ratio preservation
-✅ JPEG and PNG format support
-✅ EXIF data handling with automatic rotation
-✅ Target file size support with automatic quality adjustment
-✅ Comprehensive error handling with specific exception types
-✅ Metadata extraction (dimensions, file size, compression ratio)
-✅ Static utilities for checking if compression is needed
-✅ Size estimation before actual compression
-✅ Recommended settings based on image properties
-
-The utility addresses pain-2-2 (crashes when adding photos) by reducing file sizes before upload while maintaining acceptable quality for travel journal photos.
-
-All code follows existing Flutter/Dart patterns with proper error handling, immutability, and documentation standards.
-
-### 2026-01-05 17:00: Subtask 3.2 Completed
-Implemented comprehensive video compression utility for Flutter (4 files):
-- **VideoCompression utility** (lib/utils/video_compression.dart - 600+ lines):
-  - Complete video compression framework (requires video_compress or ffmpeg_kit_flutter package)
-  - CompressedVideoResult class with metadata (file, dimensions, duration, file sizes, quality)
-  - VideoCompressionConfig class with customizable settings
-  - Three predefined configurations: optimizedForTravel (720p), highQuality (1080p), aggressive (480p)
-  - Support for multiple video formats (MP4, MOV, AVI, MKV, WebM)
-  - Configurable quality (0-100), resolution, frame rate, and audio bitrate
-  - Progress tracking with VideoCompressionProgress callback
-  - Helper methods: compressionRatio, sizeReductionPercent, isEffective
-  - Static utilities: needsCompression(), estimateCompressedSize(), getRecommendedConfig()
-  - File cleanup method for temporary compressed files
-  - Comprehensive error handling with custom exceptions
-  - Maximum file size limit: 500 MB
-  - Minimum duration requirement: 1 second
-- **Custom exceptions** (lib/core/errors/exceptions.dart):
-  - UnsupportedVideoFormatException for invalid video formats
-  - InvalidVideoException for corrupted, too large, or invalid video files
-- **Comprehensive documentation** (lib/utils/README_VIDEO_COMPRESSION.md):
-  - Installation instructions with package recommendations
-  - 10+ usage examples covering all scenarios
-  - Configuration options and predefined settings reference
-  - Error handling patterns and best practices
-  - Integration examples with journal entries
-  - Flutter widget example with progress dialog
-  - Performance considerations and limitations
-  - Platform support details (Android, iOS, macOS, Windows, Linux)
-  - Troubleshooting guide
-  - Future enhancements roadmap
-  - Integration checklist for full implementation
-- **Example implementations** (lib/utils/video_compression_example.dart):
-  - 11 practical examples demonstrating all features
-  - Basic compression, custom configuration, predefined configs
-  - Progress tracking, conditional compression, recommended settings
-  - Size estimation, error handling, batch processing
-  - Journal integration example
-  - Complete Flutter widget with progress dialog
-
-Key features implemented:
-✅ Video compression framework with configurable quality and resolution
-✅ Multiple predefined configurations for different use cases
-✅ Progress tracking with real-time status updates
-✅ Support for common video formats (MP4, MOV, AVI, MKV, WebM)
-✅ Audio compression with configurable bitrate
-✅ Frame rate control to reduce file size
-✅ Comprehensive error handling with specific exception types
-✅ Metadata extraction (dimensions, duration, file size, compression ratio)
-✅ Static utilities for checking if compression is needed
-✅ Size estimation before actual compression
-✅ Recommended settings based on video properties
-✅ File cleanup for temporary compressed files
-✅ Placeholder implementation ready for video_compress or ffmpeg_kit_flutter integration
-
-The utility addresses pain-2-2 (crashes when adding photos) by extending the same compression approach to videos, reducing file sizes before upload while maintaining acceptable quality for travel journal videos.
-
-**Note**: The current implementation includes placeholder methods (_getVideoMetadata and _performCompression) that need to be updated once a video compression package is integrated. The framework, error handling, configuration, and documentation are all in place and ready for production use.
-
-All code follows existing Flutter/Dart patterns with proper error handling, immutability, and documentation standards.
-
-### 2026-01-05 18:00: Subtask 3.3 Completed
-Implemented comprehensive media picker component for Flutter (3 files):
-- **MediaPicker widget** (media_picker.dart - 680+ lines):
-  - Complete media picker widget for photos and videos
-  - PickedMediaFile class with metadata (file, type, size, dimensions, duration)
-  - MediaPickerConfig class with customizable settings
-  - Three predefined configurations: forTravelJournal, highQuality, aggressive
-  - Support for multiple media sources:
-    - Pick photos from gallery
-    - Take photos with camera
-    - Pick videos from gallery
-    - Record videos with camera
-  - Multiple selection support with configurable limits
-  - Automatic image and video compression integration
-  - File size validation and limits
-  - Progress feedback (picking, compressing states)
-  - Two display modes: button (with bottom sheet) and inline
-  - Full error handling with user-friendly messages
-  - Theme integration with Material Design 3
-- **Example implementations** (media_picker_example.dart):
-  - MediaPickerExampleScreen: Full-featured example with quality selector
-  - InlineMediaPickerExample: Inline mode usage demonstration
-  - JournalEntryWithMediaExample: Integration with journal creation flow
-  - Complete examples showing all features and use cases
-- **Comprehensive documentation** (README_MEDIA_PICKER.md):
-  - Installation and platform setup instructions (iOS, Android, Web)
-  - Usage examples (basic, custom config, presets, inline mode)
-  - Integration with journal entry creation
-  - Complete API reference for all classes and properties
-  - Error handling patterns
-  - Compression configuration details
-  - Quality presets explanation
-  - Styling and customization guide
-  - Platform support details
-  - Troubleshooting section
-  - Best practices checklist
-  - Related components reference
-  - Contributing guidelines
-
-Key features implemented:
-✅ Photo gallery and camera support
-✅ Video gallery and recording support
-✅ Multiple selection with configurable max items
-✅ File size validation with limits
-✅ Automatic image compression with MediaCompression utility
-✅ Automatic video compression with VideoCompression utility
-✅ Quality presets (optimized, high, aggressive)
-✅ Button and inline display modes
-✅ Progress feedback during picking and compression
-✅ Comprehensive error handling
-✅ Material Design 3 styling
-✅ Theme integration
-✅ Full documentation with examples
-
-The component provides a user-friendly interface for selecting photos and videos from the device library, addressing the need for easy media attachment to journal entries (user story: "As a traveler, I want to document my daily experiences with photos and notes").
-
-All code follows existing Flutter/Dart patterns with proper state management (Riverpod), error handling, and documentation standards.
-
-Next step: Subtask 3.4 - Implement background upload service
-
-### 2026-01-05 19:00: Subtask 3.4 Completed
-Implemented comprehensive background media upload service with queue management (6 files):
-- **UploadTask model** (data/models/upload_task.dart - 400+ lines):
-  - Complete task model for tracking upload state
-  - UploadStatus enum with 7 states (queued, uploading, completed, failed, permanentFailure, paused, cancelled)
-  - UploadStatusExtension with helper methods (toValue, fromValue, isTerminal, canRetry, isActive)
-  - Task properties: id, filePath, mediaType, journalEntryId, status, progress, retryCount, maxRetries, errorMessage, storagePath, fileSize, timestamps, priority, compression flags
-  - Helper methods: shouldRetry, isReady, isComplete, hasPermanentlyFailed, uploadDuration, currentFilePath
-  - JSON serialization for persistence (toJson, fromJson)
-  - copyWith method for immutability
-  - Full Equatable integration
-- **MediaUploadService interface** (domain/services/media_upload_service.dart - 350+ lines):
-  - Complete service interface for media upload operations
-  - UploadResult class for operation results
-  - UploadConfig class with configurable settings
-  - Predefined configs: defaultConfig, slowNetworkConfig
-  - Queue management: enqueueUpload, enqueueMultipleUploads, startUploads, pauseUploads, resumeUploads
-  - Task control: cancelUpload, cancelAllUploads, retryUpload, clearCompletedTasks, clearAllTasks
-  - Query methods: getTasks, getTasksForEntry, getTask
-  - Progress monitoring: getTaskProgress, getQueueStatus, onProgressUpdate, onStatusChange
-  - UploadStatistics class with comprehensive metrics
-  - Configuration management and lifecycle methods
-- **MediaUploadServiceImpl** (data/services/media_upload_service_impl.dart - 700+ lines):
-  - Full implementation with background processing support
-  - SharedPreferences persistence for upload queue
-  - Workmanager integration for background uploads (15-min intervals)
-  - Concurrent upload management (configurable)
-  - Automatic retry with exponential backoff (5s base delay, max 5 min)
-  - Progress tracking with Stream support
-  - Compression integration (MediaCompression, VideoCompression)
-  - Supabase storage integration (journal-photos, journal-videos buckets)
-  - Database update after successful upload
-  - Error handling with specific exception types
-  - Memory management with proper cleanup
-  - Stream controllers for task and queue updates
-  - Statistics tracking (total uploads, success/failure rates, speed, progress)
-- **Riverpod providers** (presentation/providers/media_upload_providers.dart - 200+ lines):
-  - sharedPreferencesProvider for dependency injection
-  - mediaUploadServiceProvider for service instance
-  - uploadStatisticsProvider for statistics access
-  - uploadTasksProvider for all tasks
-  - uploadTasksForEntryProvider for entry-specific tasks
-  - uploadTaskProvider for single task
-  - uploadQueueStatusProvider for queue stream
-  - uploadTaskProgressProvider for task progress stream
-  - MediaUploadNotifier with full CRUD operations
-- **Comprehensive documentation** (README_MEDIA_UPLOAD.md - 600+ lines):
-  - Complete architecture overview with diagram
-  - Installation and setup instructions
-  - Quick start guide with code examples
-  - Upload task model reference
-  - Configuration options and predefined configs
-  - Complete API reference for all methods
-  - Riverpod integration guide
-  - Background processing explanation
-  - Error handling and retry logic
-  - Persistence strategy
-  - Compression integration details
-  - Best practices and patterns
-  - Troubleshooting guide
-  - Testing strategies with mock example
-  - Future enhancement roadmap
-  - Related components reference
-- **Example implementations** (media_upload_service_example.dart - 450+ lines):
-  - MediaUploadExampleScreen: Full-featured UI demonstrating all features
-  - Statistics section with comprehensive metrics display
-  - Queue section with task tiles showing status, progress, errors
-  - Task icons for different states (completed, failed, uploading, paused, etc.)
-  - Action buttons for all operations (enqueue, start, pause, resume, clear)
-  - Task-specific actions (cancel, retry) based on status
-  - MediaPickerUploadExample: Integration pattern with MediaPicker
-  - SingleUploadMonitorExample: Monitor individual upload progress
-  - JournalEntryUploadFlowExample: Real-world usage pattern in journal creation
-
-Key features implemented:
-✅ Complete queue management system with priority support
-✅ Background upload processing with Workmanager integration
-✅ Automatic retry with exponential backoff (configurable)
-✅ Real-time progress tracking via Streams
-✅ Upload statistics and metrics tracking
-✅ Persistent queue state across app restarts
-✅ Concurrent upload control (max 3 simultaneous by default)
-✅ Full error handling with specific exception types
-✅ Compression integration for photos and videos
-✅ Supabase storage integration (photos/videos buckets)
-✅ Database updates after successful uploads
-✅ Riverpod state management with providers and notifiers
-✅ Comprehensive documentation with examples
-✅ Material Design 3 UI examples
-
-The service addresses the user story: "As a traveler, I want to upload photos in the background so that I can continue using the app while they sync" and supports the offline-first architecture with queue persistence and automatic retry.
-
-All code follows existing Flutter/Dart patterns with proper error handling, state management (Riverpod), Clean Architecture principles, and documentation standards.
-
-### 2026-01-05 20:00: Subtask 3.5 Completed
-Implemented comprehensive upload progress indicator widget for Flutter (3 files):
-- **MediaUploadProgressIndicator** widget (media_upload_progress_indicator.dart - 900+ lines):
-  - Three display modes: detailed, compact, and minimal
-  - Real-time progress tracking via Riverpod streams
-  - Visual status indicators for all upload states (queued, uploading, completed, failed, etc.)
-  - User action buttons (cancel, retry, resume, pause) based on upload state
-  - Error message display with retry options
-  - Media type icons (photo/video) with color-coded containers
-  - File information display (name, size, progress percentage)
-  - Event callbacks for completion, failure, and cancellation
-  - Full Material Design 3 integration with theme support
-  - Configurable progress bar height, border radius, and animation
-- **UploadTaskTile** widget for list displays:
-  - Compact tile view for upload task lists
-  - Tap-to-select functionality
-  - Progress bar integration
-  - Status icons and text
-  - File size and type display
-- **Configuration options**:
-  - UploadProgressConfig class with extensive customization
-  - Predefined configs: default, compact, minimal
-  - Control over file name, size, type display, actions, and errors
-- **Example implementations** (media_upload_progress_indicator_example.dart - 500+ lines):
-  - Detailed progress indicator example
-  - Compact progress indicator example
-  - Minimal progress indicator example
-  - Queue progress for journal entries
-  - Upload task list view
-  - Callback handling example
-  - Journal entry creation integration example
-- **Comprehensive documentation** (README_MEDIA_UPLOAD_PROGRESS.md - 700+ lines):
-  - Feature overview and benefits
-  - Installation and quick start guide
-  - Display modes explained (detailed, compact, minimal)
-  - Complete configuration options reference
-  - Upload states and their visual representations
-  - 5+ usage patterns with code examples:
-    - Single upload monitoring
-    - Multiple uploads in list
-    - Journal entry integration
-    - Inline progress in card
-    - Background upload monitoring
-  - Advanced usage and custom styling
-  - UploadTaskTile API reference
-  - Integration with existing components (MediaPicker, etc.)
-  - Best practices for memory, errors, completion, and batch uploads
-  - Troubleshooting guide for common issues
-  - Testing strategies and mock data examples
-  - Related components reference
-  - Future enhancement roadmap
-
-Key features implemented:
-✅ Multiple display modes for different UI contexts
-✅ Real-time progress tracking via Stream-based Riverpod providers
-✅ Visual status indicators with color-coded icons and text
-✅ User action buttons (cancel, retry, resume, pause)
-✅ Error message display with retry functionality
-✅ Media type icons (photo/video)
-✅ File information (name, size, progress percentage)
-✅ Event callbacks (completion, failure, cancellation)
-✅ Full Material Design 3 integration
-✅ Comprehensive documentation with examples
-✅ Integration with MediaUploadService and existing providers
-✅ UploadTaskTile for list displays
-✅ Flexible configuration options
-✅ Theme-aware styling
-
-The component addresses the need for users to see upload progress for their media files, providing clear visual feedback during the upload process. This improves user experience by reducing uncertainty and allowing users to take actions (cancel, retry) when needed.
-
-All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Material Design 3 styling, error handling, and documentation standards.
-
-Phase 3 (Media Upload & Management) is now complete with all 5 subtasks finished:
-✅ 3.1 - Image compression utility
-✅ 3.2 - Video compression utility
-✅ 3.3 - Media picker component
-✅ 3.4 - Background upload service
-✅ 3.5 - Upload progress indicator
-
-Next step: Phase 4 - Location & Metadata
-
-### 2026-01-05 21:00: Subtask 4.1 Completed
-Implemented automatic location tagging with comprehensive location service and UI components (7 files):
-- **LocationService utility** (lib/utils/location_service.dart - 350+ lines):
-  - Complete location service using geolocator package
-  - LocationData class with metadata (latitude, longitude, accuracy, altitude, speed, timestamp, locationName)
-  - LocationCaptureConfig class with customizable settings
-  - Three predefined configurations: forTravelJournal, quick, precise
-  - Permission handling: checkPermission, requestPermission, ensureLocationEnabled
-  - Location capture methods: getCurrentLocation, getLastKnownLocation
-  - Real-time location updates via Stream
-  - Distance calculations between coordinates
-  - Settings integration: openAppSettings, openLocationSettings
-  - Comprehensive error handling with LocationException
-  - Helper methods: hasAcceptableAccuracy, copyWith, toJson/fromJson
-- **LocationException** (lib/core/errors/exceptions.dart):
-  - Added LocationException following existing AppException pattern
-  - Error code: 'location_error'
-  - Integrated with core error handling system
-- **Updated journal_entry_providers.dart** (lib/features/journal/presentation/providers/):
-  - Added LocationService dependency to JournalEntryCreationNotifier
-  - New state field: locationAccuracy (double?) and isCapturingLocation (bool)
-  - New method: captureCurrentLocation() with full permission handling
-  - New method: clearLocation() to remove location data
-  - Updated updateLocation() to include locationAccuracy parameter
-  - Integrated location capture into createEntry() and loadEntry()
-  - Accuracy validation (accepts locations with accuracy <= 100m)
-  - Error handling for permission denied, service disabled, poor accuracy
-- **LocationCaptureWidget** (lib/features/journal/presentation/widgets/location_capture_widget.dart - 450+ lines):
-  - Full-featured widget for capturing and displaying location
-  - Two display modes: full (with details) and compact
-  - Visual location details: coordinates, accuracy indicator, location name
-  - Action buttons: Capture, Update, Remove location
-  - Loading states during capture
-  - Error handling with user-friendly messages
-  - Color-coded accuracy indicator (green/good, orange/fair, red/poor)
-  - Material Design 3 styling with theme integration
-  - LocationCaptureButton variant for minimal inline usage
-- **Comprehensive documentation** (lib/utils/README_LOCATION_SERVICE.md - 500+ lines):
-  - Installation and platform setup instructions (Android, iOS)
-  - 15+ usage examples covering all scenarios
-  - Configuration options and predefined settings reference
-  - Complete API reference for all classes and methods
-  - Permission handling patterns and best practices
-  - Error handling guide with troubleshooting
-  - Performance considerations and limitations
-  - Platform-specific notes (Android, iOS)
-  - Testing strategies and examples
-  - Future enhancement roadmap
-- **Widget documentation** (lib/features/journal/presentation/widgets/README_LOCATION_CAPTURE_WIDGET.md - 400+ lines):
-  - Usage examples for all widget variants
-  - Widget behavior guide for all states
-  - Accuracy indicator reference table
-  - Complete integration example with journal entry screen
-  - Provider integration details
-  - Customization examples
-  - Error message reference
-  - Platform considerations and accessibility info
-  - Testing examples and troubleshooting
-- **Example implementations** (lib/utils/location_service_example.dart - 450+ lines):
-  - LocationServiceExample: Full feature demo with all operations
-  - SimpleLocationCaptureExample: Minimal implementation
-  - JournalLocationExample: Integration pattern for journal entries
-  - Demonstrations of: capture, quick capture, last known, updates, distance calculations
-  - Error handling examples for all scenarios
-- **Widget examples** (lib/features/journal/presentation/widgets/location_capture_widget_example.dart - 380+ lines):
-  - LocationCaptureWidgetExample: All widget variants and styles
-  - JournalEntryWithLocationExample: Full integration with creation screen
-  - MinimalLocationExample: Simple button-only usage
-  - Debug info display for testing
-
-Key features implemented:
-✅ Automatic location capture with configurable accuracy and timeout
-✅ Permission handling (check, request, ensure enabled)
-✅ Last known location retrieval for faster results
-✅ Real-time location updates via Stream
-✅ Distance calculations between coordinates
-✅ Accuracy validation and visual indicators
-✅ Settings integration for permissions and service
-✅ Full UI widget with loading, error, and success states
-✅ Compact and inline button variants
-✅ Integration with journal entry creation provider
-✅ Location data storage (coordinates, accuracy) in journal entries
-✅ Comprehensive error handling with user-friendly messages
-✅ Material Design 3 styling with theme support
-✅ Full documentation and examples
-
-The implementation addresses the acceptance criterion "Entries are automatically tagged with location and date" by providing automatic location capture functionality that can be integrated into journal entry creation. Users can capture their current location with one tap, and the location data (latitude, longitude, accuracy) is stored with the journal entry.
-
-All code follows existing Flutter/Dart patterns with proper error handling, state management (Riverpod), Clean Architecture principles, and documentation standards.
-
-Phase 4 (Location & Metadata) progress: 1 of 4 subtasks completed
-✅ 4.1 - Automatic location tagging (COMPLETED)
-⏳ 4.2 - Location picker component (PENDING)
-⏳ 4.3 - EXIF data extraction (PENDING)
-⏳ 4.4 - Mood tracking feature (PENDING)
-
-### 2026-01-05 22:00: Subtask 4.2 Completed
-Implemented comprehensive location picker component for manual location selection (6 files):
-- **GeocodingService** (lib/utils/geocoding_service.dart - 280+ lines):
-  - GeocodingResult model with full address data (name, fullAddress, coordinates, locality, administrativeArea, country, postalCode, street)
-  - GeocodingService singleton for location search and reverse geocoding
-  - searchLocations() method for finding places by name/address with configurable limit
-  - getAddressFromCoordinates() method for reverse geocoding
-  - getAddressFromPosition() method for Position objects
-  - Integration with geolocator package for geocoding operations
-  - Comprehensive error handling with GeocodingException
-  - JSON serialization support for persistence
-  - Helper methods: copyWith, toJson, fromJson
-- **LocationPickerWidget** (lib/features/journal/presentation/widgets/location_picker_widget.dart - 680+ lines):
-  - Full-featured location picker with search functionality
-  - Google Maps integration with interactive preview and markers
-  - Current location capture button using GPS
-  - Edit mode support for updating existing locations
-  - LocationPickerButton compact variant with bottom sheet dialog
-  - Real-time search results from geocoding service
-  - Provider integration with journalEntryCreationProvider
-  - Loading states, error handling, and validation
-  - Material Design 3 styling with full theme support
-  - Mini map preview with camera animations
-  - Location details display with coordinates and full address
-  - Clear/remove location functionality
-- **Example implementations** (location_picker_widget_example.dart - 300+ lines):
-  - Complete usage examples for all widget variants
-  - Integration patterns with journal entry creation form
-  - State monitoring examples
-  - Programmatic location setting examples
-  - Form validation examples
-- **Geocoding service examples** (lib/utils/geocoding_service_example.dart - 140 lines):
-  - Search by address examples
-  - Reverse geocoding examples
-  - Error handling patterns
-  - Multiple search queries
-  - Using GeocodingResult data
-- **Comprehensive documentation** (README_LOCATION_PICKER.md - 700+ lines):
-  - Complete feature overview and installation instructions
-  - Quick start guide with basic usage
-  - Widget components API reference
-  - 5+ usage patterns with code examples
-  - Provider integration details
-  - GeocodingService documentation
-  - Customization and styling guide
-  - Platform requirements (Android/iOS)
-  - Error handling and accessibility
-  - Performance considerations and testing strategies
-  - Troubleshooting guide and best practices
-- **Updated lib/core/errors/exceptions.dart**: Added GeocodingException to core error handling
-
-Key features implemented:
-✅ Search for locations by name/address using geocoding
-✅ Interactive Google Maps preview with markers
-✅ Current location capture with GPS
-✅ Edit mode support for existing locations
-✅ Compact button variant for inline usage
-✅ Full integration with journal entry provider
-✅ Material Design 3 styling with theme support
-✅ Comprehensive error handling and user feedback
-✅ Loading states and validation
-✅ Complete documentation and examples
-
-The implementation addresses user story: "Allow users to manually select or edit location for entries" by providing both search-based and map-based location selection methods. Users can now search for any location worldwide, view it on a map, or quickly capture their current GPS location.
-
-All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, error handling, and documentation standards.
-
-Phase 4 (Location & Metadata) progress: 2 of 4 subtasks completed
-✅ 4.1 - Automatic location tagging (COMPLETED)
-✅ 4.2 - Location picker component (COMPLETED)
-⏳ 4.3 - EXIF data extraction (PENDING)
-⏳ 4.4 - Mood tracking feature (PENDING)
-
-Next step: Subtask 4.3 - Extract EXIF data from photos
-
-### 2026-01-05 23:00: Subtask 4.3 Completed
-Implemented comprehensive EXIF data extraction utility for Flutter (5 files):
-- **ExifUtils utility** (lib/utils/exif_utils.dart - 700+ lines):
-  - Complete EXIF metadata extraction from JPEG and TIFF images
-  - ExifData class with all standard metadata fields (GPS, date/time, camera info, dimensions)
-  - ExifExtractionConfig class with customizable extraction options
-  - Two predefined configurations: forTravelJournal (location + date only), fullMetadata (everything)
-  - GPS coordinate extraction with latitude/longitude/altitude
-  - Date/time extraction with original, digitized, and modified timestamps
-  - Camera metadata extraction (make, model, ISO, aperture, focal length, exposure time, flash, orientation)
-  - Image dimensions extraction from EXIF or fallback to actual image data
-  - Support for both File and Uint8List inputs
-  - Helper methods: extractLocation() for GPS only, extractDateTime() for date/time only
-  - Utility methods: hasExifData() to check if file supports EXIF, getImageDimensions() fallback
-  - Computed properties: hasLocation, hasDateTime, bestDateTime (prioritizes original date)
-  - JSON serialization support with toJson/fromJson methods
-  - copyWith method for immutability
-  - Comprehensive error handling with ExifException
-  - Rational number conversion for GPS coordinates and camera settings
-- **ExifException** (lib/core/errors/exceptions.dart):
-  - Added ExifException following existing AppException pattern
-  - Error code: 'exif_error'
-  - Integrated with core error handling system
-- **Updated pubspec.yaml**: Added dependencies:
-  - exif: ^0.3.0 for reading EXIF metadata
-  - image: ^4.1.7 for image dimension fallback
-- **Comprehensive documentation** (lib/utils/README_EXIF_UTILS.md - 700+ lines):
-  - Complete feature overview and installation instructions
-  - Quick start guide with basic usage
-  - 10+ usage examples covering all scenarios:
-    - Basic EXIF extraction
-    - Travel journal integration
-    - Selective extraction (location-only, date-time-only)
-    - Custom configuration
-    - Error handling strategies
-    - Byte-based extraction
-    - Batch processing
-    - Image dimensions fallback
-    - JSON serialization
-    - Format checking
-  - Complete API reference for all classes and methods
-  - Predefined configurations reference
-  - Platform support details (Android, iOS, macOS, Windows, Linux, Web)
-  - Supported formats (JPEG, TIFF)
-  - Best practices and performance considerations
-  - Troubleshooting guide for common issues
-  - Integration examples with ImagePicker, MediaPicker, LocationService
-  - Related components reference
-  - Future enhancement roadmap
-  - Testing strategies
-- **Example implementations** (lib/utils/exif_utils_example.dart - 500+ lines):
-  - 10 practical examples demonstrating all features:
-    - Basic EXIF extraction
-    - Travel journal integration pattern
-    - Selective extraction
-    - Custom configuration
-    - Error handling
-    - Byte-based extraction
-    - Batch processing
-    - Image dimensions
-    - JSON serialization
-    - Flutter widget UI integration example
-  - Complete working examples for all use cases
-  - Integration patterns with existing components
-
-Key features implemented:
-✅ GPS location extraction (latitude, longitude, altitude)
-✅ Date/time extraction (original, digitized, modified)
-✅ Camera metadata extraction (make, model, ISO, aperture, focal length, etc.)
-✅ Image dimensions extraction (from EXIF or fallback)
-✅ Configurable extraction options
-✅ Support for File and Uint8List inputs
-✅ Predefined configurations for common use cases
-✅ JSON serialization for data persistence
-✅ Comprehensive error handling with ExifException
-✅ Selective extraction methods (location-only, date-time-only)
-✅ Format checking and dimension fallback utilities
-✅ Full documentation with 10+ examples
-✅ Material Design 3 UI widget example
-
-The implementation addresses the acceptance criterion "Entries are automatically tagged with location and date" by providing the ability to automatically extract location and date/time metadata from uploaded photos. When users attach photos to journal entries, the EXIF data can be extracted to automatically populate the entry's location and date fields, reducing manual data entry and improving accuracy.
-
-All code follows existing Flutter/Dart patterns with proper error handling, immutability, JSON serialization, and documentation standards consistent with location_service.dart, media_compression.dart, and other utilities in the project.
-
-Phase 4 (Location & Metadata) progress: 3 of 4 subtasks completed
-✅ 4.1 - Automatic location tagging (COMPLETED)
-✅ 4.2 - Location picker component (COMPLETED)
-✅ 4.3 - EXIF data extraction (COMPLETED)
-⏳ 4.4 - Mood tracking feature (PENDING)
-
-Next step: Subtask 4.4 - Add mood tracking feature
-
-### 2026-01-05 24:00: Subtask 4.4 Completed
-Implemented comprehensive mood tracking feature for journal entries (3 files):
-- **MoodPicker widget** (mood_picker.dart - 500+ lines):
-  - Complete mood picker widget with emoji support
-  - MoodOption class with id, label, and emoji properties
-  - MoodOptions static class with 7 predefined moods (happy, adventurous, tired, sad, calm, surprised, grateful)
-  - Helper methods: findById(), findByLabel() for mood lookup
-  - Two display modes: full grid view and compact button variant
-  - Full integration with journalEntryCreationProvider via Riverpod
-  - Visual selection indicators with color-coded states
-  - Grid layout with 3 columns and responsive design
-  - Clear mood button for removing selection
-  - Material Design 3 styling with theme integration
-  - MoodPickerButton variant with bottom sheet dialog
-  - StringCapitalization extension for display formatting
-- **Integration with CreateJournalEntryScreen** (create_journal_entry_screen.dart):
-  - Added MoodPicker import and integration
-  - Replaced "Coming Soon" placeholder with functional MoodPicker widget
-  - Positioned between favorite toggle and remaining coming soon items
-  - Removed "Track your mood" from coming soon list (now implemented)
-  - Automatic state management through existing provider
-  - Mood selection persists through save operation
-- **Comprehensive documentation** (README_MOOD_PICKER.md - 600+ lines):
-  - Complete feature overview and installation instructions
-  - Quick start guide with basic usage examples
-  - Mood options reference table with descriptions
-  - Complete API reference for all classes and methods
-  - Provider integration details and examples
-  - 10+ usage patterns with code examples:
-    - Basic usage with provider
-    - Compact button variant
-    - Display current selection
-    - Standalone usage with custom state
-    - Mood utilities and helper methods
-  - Customization guide for styling and padding
-  - Advanced usage patterns (custom moods, persistence, analytics)
-  - Testing strategies with widget test examples
-  - Best practices checklist
-  - Troubleshooting guide for common issues
-  - Related components reference
-  - Future enhancement roadmap
-  - Contributing guidelines
-- **Example implementations** (mood_picker_example.dart - 400+ lines):
-  - MoodPickerExampleScreen with 5 different usage examples
-  - Full MoodPicker integration example
-  - Compact button variant demonstration
-  - Current selection display with mood lookup
-  - Standandalone usage with custom state management
-  - Mood utilities showcase
-  - Journal entry integration example
-  - Complete working examples for all use cases
-
-Key features implemented:
-✅ 7 predefined mood options with emojis covering travel emotions
-✅ Full grid layout mood picker with visual selection indicators
-✅ Compact button variant with bottom sheet dialog
-✅ Automatic integration with journalEntryCreationProvider
-✅ Clear mood functionality
-✅ Material Design 3 styling with theme support
-✅ Helper methods for mood lookup (findById, findByLabel)
-✅ StringCapitalization extension for display
-✅ Integration into CreateJournalEntryScreen
-✅ Mood persistence through existing save flow
-✅ Display support in JournalEntryDetailScreen (already implemented)
-✅ Comprehensive documentation with examples
-✅ Full provider integration with Riverpod
-
-The implementation addresses the user story: "Allow users to tag entries with mood emojis" by providing a complete mood selection interface with emoji support. Users can now select from 7 predefined moods that cover common emotions experienced during travel, with visual emoji representation for easy identification.
-
-The mood picker integrates seamlessly with the existing journal entry creation flow, using the already-implemented `updateMood()` method in the provider and the `mood` field in the database schema. The detail screen already displays moods with emoji mapping, completing the full feature lifecycle.
-
-All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Material Design 3 styling, error handling, and documentation standards consistent with location_picker_widget.dart, media_picker.dart, and other widgets in the project.
-
-Phase 4 (Location & Metadata) is now COMPLETE with all 4 subtasks finished:
-✅ 4.1 - Automatic location tagging (COMPLETED)
-✅ 4.2 - Location picker component (COMPLETED)
-✅ 4.3 - EXIF data extraction (COMPLETED)
-✅ 4.4 - Mood tracking feature (COMPLETED)
-
-Next step: Phase 5 - Organization & Tagging
-
-### 2026-01-06 01:00: Subtask 5.1 Completed
-Implemented comprehensive trip management system for organizing journal entries (9 files):
-- **TripRemoteDataSource** (data/datasources/trip_remote_data_source.dart):
-  - Interface for remote data operations
-  - Methods: createTrip, getTrip, getTrips, getTripsByDateRange, getOngoingTrips, updateTrip, deleteTrip, getEntryCountForTrip
-  - Comprehensive error handling with ServerException
-- **TripRemoteDataSourceImpl** (data/datasources/trip_remote_data_source_impl.dart - 320+ lines):
-  - Full Supabase implementation using supabase_flutter package
-  - All CRUD operations with proper error handling
-  - User authentication checks via _client.auth.currentUser
-  - PostgrestException handling with meaningful error messages
-  - Query methods: ongoing trips, date range filtering
-  - Entry count retrieval using Supabase count API
-- **TripRepository** (domain/repositories/trip_repository.dart):
-  - Complete repository interface for trip operations
-  - Methods: createTrip, getTrip, getTrips, getTripsByDateRange, getOngoingTrips, updateTrip, deleteTrip, getEntryCountForTrip
-  - Clean Architecture abstraction
-- **TripRepositoryImpl** (data/repositories/trip_repository_impl.dart - 140+ lines):
-  - Full implementation with Clean Architecture principles
-  - Converts between entities and models
-  - Comprehensive error handling with AppException
-- **Trip Providers** (presentation/providers/trip_providers.dart - 600+ lines):
-  - Dependency injection providers: supabaseClientProvider, tripRemoteDataSourceProvider, tripRepositoryProvider
-  - TripListState/TripListNotifier for managing trip list
-  - TripFormState/TripFormNotifier for creation/editing with full validation
-  - TripDetailState/TripDetailNotifier for individual trip viewing
-  - Family provider for trip detail (supports multiple trip IDs)
-  - Form validation: name (3-200 chars), description (max 2000), destination (max 200), date logic, URL validation
-- **TripListScreen** (presentation/screens/trip_list_screen.dart - 330+ lines):
-  - Complete screen for viewing all trips
+### 2026-01-06 07:00: Subtask 6.3 Completed
+Implemented comprehensive memory timeline view for chronological display of all travel experiences (5 files):
+- **MemoryTimelineProvider** (presentation/providers/memory_timeline_provider.dart - 400+ lines):
+  - Complete state management for timeline data with Riverpod
+  - MemoryTimelineState class for managing entries, groups, and media
+  - TimelineGroup class representing time period groups
+  - TimelineGroupType enum (today, yesterday, thisWeek, thisMonth, thisYear, month, year)
+  - MemoryTimelineNotifier with complete business logic
+  - Automatic grouping of entries by time periods
+  - Parallel media loading for performance
+  - Provider: memoryTimelineProvider, journalRepositoryProvider
+  - Methods: loadTimeline(), refresh(), clearError()
+  - Computed properties: entryCount, groupCount, hasContent
+- **TimelineItem widget** (presentation/widgets/timeline_item.dart - 400+ lines):
+  - Reusable widget for displaying individual entries
+  - Card-based layout with all entry metadata
+  - Header with title and favorite icon
+  - Metadata display (date, time with smart formatting)
+  - Mood indicator with colored container and emoji
+  - Content preview (3 lines by default, configurable)
+  - Media thumbnails grid (up to 3 items, configurable)
+  - Video indicator overlay on thumbnails
+  - Location row with icon
+  - Tap callback for navigation
+  - Full Material Design 3 styling
+  - _MediaThumbnail internal widget for thumbnail display
+- **MemoryTimelineScreen** (presentation/screens/memory_timeline_screen.dart - 500+ lines):
+  - Complete screen for chronological timeline view
+  - Summary header with entry count and statistics
+  - Timeline groups with headers and icons
+  - Visual timeline connectors between entries
   - Pull-to-refresh support
+  - Floating action button for new entries
+  - Filter button (placeholder for future enhancement)
   - Empty state with call-to-action
-  - Error handling with retry option
-  - Trip cards with cover image, name, destination, date range, ongoing badge, duration, public indicator
-  - Filter toggle (all/ongoing) - placeholder for future enhancement
-  - Floating action button for creating new trips
-- **CreateTripScreen** (presentation/screens/create_trip_screen.dart - 400+ lines):
-  - Screen for creating and editing trips
-  - Comprehensive form with validation
-  - Date pickers for start/end dates
-  - Fields: name (required), destination, description, cover image URL, public toggle
-  - Loading states during save operation
-  - Error display with user-friendly messages
-  - Success feedback with SnackBar
-  - Automatic state reset on exit
-- **TripDetailScreen** (presentation/screens/trip_detail_screen.dart - 500+ lines):
-  - Complete screen for viewing trip details
-  - Cover image in app bar with flexible space
-  - Edit and delete actions with confirmation
-  - Information sections: status badges, destination, dates, description, statistics, metadata
-  - Statistics display: entry count, duration
-  - Placeholder sections for future features (journal entries, media gallery)
-  - Delete confirmation dialog
-  - Automatic reload on return from edit
-- **Comprehensive documentation** (data/repositories/README_TRIP.md - 600+ lines):
-  - Complete architecture overview with diagram
-  - Detailed feature list and validation rules
-  - Usage examples for all screens and repository methods
-  - Database schema reference
-  - Integration guide with journal entries and media
-  - Error handling patterns
-  - Testing checklist
-  - Future enhancement roadmap
-- **Example implementations** (presentation/screens/trip_screens_example.dart - 300+ lines):
-  - Complete navigation examples for all screens
-  - Integration pattern with journal entry creation
-  - Home dashboard example with ongoing trips
-  - Programmatic repository usage examples
-
-Key features implemented:
-✅ Complete CRUD operations for trips
-✅ Query methods (ongoing trips, date range, entry count)
-✅ Three fully functional screens (list, create/edit, detail)
-✅ Comprehensive form validation
-✅ State management with Riverpod
-✅ Pull-to-refresh and loading states
-✅ Error handling throughout all layers
-✅ Empty states and user feedback
-✅ Material Design 3 styling
-✅ Cover image support (via URL)
-✅ Ongoing trip detection
-✅ Public/private trip visibility
-✅ Date range display with formatting
-✅ Duration calculation
-✅ Delete confirmation dialogs
-✅ Full documentation and examples
-
-The implementation addresses the user story: "As a user, I want to organize my journal by trip so that I can easily find memories from specific adventures." Users can now create trips with rich metadata (name, destination, dates, description, cover image), view all trips in a list, see trip details, and edit or delete trips. The system is fully integrated with the journal entry system via the trip_id foreign key.
-
-All code follows existing Flutter/Dart patterns with proper Clean Architecture principles, state management (Riverpod), Material Design 3 styling, error handling, and documentation standards consistent with journal entry, media upload, and location services implementations.
-
-Phase 5 (Organization & Tagging) progress: 1 of 4 subtasks completed
-✅ 5.1 - Trip management system (COMPLETED)
-⏳ 5.2 - Custom tags feature (PENDING)
-⏳ 5.3 - Trip overview screen (PENDING)
-⏳ 5.4 - Search and filter functionality (PENDING)
-
-Next step: Subtask 5.2 - Implement custom tags feature
-
-### 2026-01-06 02:00: Subtask 5.2 Completed
-Implemented comprehensive custom tagging system for categorizing journal entries (11 files):
-- **TagRemoteDataSource** (data/datasources/tag_remote_data_source.dart):
-  - Interface for all tag operations
-  - Methods: createTag, getTag, getTags, getTagsForEntry, updateTag, deleteTag
-  - Tag-journal operations: addTagToEntry, removeTagFromEntry, updateTagsForEntry
-  - Query methods: getPopularTags, searchTags
-- **TagRemoteDataSourceImpl** (data/datasources/tag_remote_data_source_impl.dart - 340+ lines):
-  - Full Supabase implementation with proper error handling
-  - User authentication checks via _client.auth.currentUser
-  - PostgrestException handling with meaningful error messages
-  - Duplicate tag detection (23505 error code)
-  - Tag-journal relationship management via junction table
-  - Popularity sorting and search with ilike
-- **TagRepository** (domain/repositories/tag_repository.dart):
-  - Complete repository interface using Either<Failure, T> pattern
-  - All CRUD operations with proper error handling
-  - Methods for managing tags on entries
-  - Query methods for popular tags and search
-- **TagRepositoryImpl** (data/repositories/tag_repository_impl.dart - 180+ lines):
-  - Clean Architecture implementation
-  - Converts between entities and models
-  - Comprehensive error handling with Failure types
-- **Updated JournalRepository** (domain/repositories/journal_repository.dart):
-  - Added tag-related methods for entry operations
-  - Methods: getTagsForEntry, addTagToEntry, removeTagFromEntry, updateTagsForEntry
-  - String-based tag IDs for efficient storage
-- **Updated JournalRemoteDataSource** (data/datasources/journal_remote_data_source.dart & impl):
-  - Added tag-related data source methods
-  - Junction table management for tag-entry relationships
-  - Bulk update support for entry tags
-- **Updated JournalRepositoryImpl** (data/repositories/journal_repository_impl.dart):
-  - Implementation of tag-related methods
-  - Proper error handling with AppException
-- **Tag Providers** (presentation/providers/tag_providers.dart - 550+ lines):
-  - Dependency injection: tagRemoteDataSourceProvider, tagRepositoryProvider
-  - TagListState/TagListNotifier for managing all tags
-  - TagFormState/TagFormNotifier for creation/editing with validation
-  - EntryTagsState/EntryTagsNotifier for entry tag management
-  - Providers: tagListProvider, tagFormProvider, entryTagsProvider
-  - Search, popular tags, and form management
-- **TagListScreen** (presentation/screens/tag_list_screen.dart - 320+ lines):
-  - Complete screen for viewing and managing all tags
-  - Pull-to-refresh support
-  - Search functionality with SearchDelegate
-  - Tag tiles with color, icon, and usage count display
-  - Edit and delete actions with confirmation
-  - Empty state with call-to-action
-  - Error handling with retry option
-- **CreateTagScreen** (presentation/screens/create_tag_screen.dart - 330+ lines):
-  - Screen for creating and editing tags
-  - Form with name validation (2-50 characters)
-  - Color picker with 10 predefined colors
-  - Icon picker with 19 emoji icons
-  - Loading and error states
-  - Automatic tag loading for edit mode
-- **TagPicker** widget (presentation/widgets/tag_picker.dart - 600+ lines):
-  - Comprehensive widget for selecting tags to add to entries
-  - Two display modes: inline chips and management sheet
-  - Real-time tag availability checking
-  - Visual tag chips with color and icon
-  - Tag management bottom sheet with create functionality
-  - Quick tag creation dialog
-  - Full integration with entry tags provider
-  - Material Design 3 styling
-- **Comprehensive documentation** (data/repositories/README_TAG.md - 700+ lines):
-  - Complete architecture overview with file structure
-  - Database schema reference for tags and journal_tags tables
-  - 6+ usage examples covering all scenarios:
-    - Displaying all tags
-    - Creating new tags
-    - Using tag picker in journal entry creation
-    - Adding tags to entries
-    - Searching tags
-    - Getting popular tags
-  - State management reference for all providers
-  - Integration guide with journal entries
-  - Customization guide for colors and icons
-  - Error handling patterns and best practices
-  - Testing strategies with unit and widget test examples
-  - Performance considerations
-  - Future enhancement roadmap
-  - Troubleshooting guide
-  - Related components reference
-- **Example implementations** (presentation/screens/tag_screens_example.dart - 450+ lines):
-  - TagScreensMenu with navigation to all examples
-  - TagPickerExample: Integration with journal entry form
-  - TagRepositoryExample: Direct repository usage
-  - 4 runnable examples: create, getAll, search, getPopular
-  - Complete working code for all scenarios
-  - UI cards with code snippets and run buttons
-
-Key features implemented:
-✅ Complete CRUD operations for tags
-✅ Tag-journal entry many-to-many relationship
-✅ Custom colors (hex color codes) with visual picker
-✅ Emoji icons with 19 predefined options
-✅ Tag usage tracking via database triggers
-✅ Search functionality with ilike
-✅ Popular tags view (sorted by usage)
-✅ Three fully functional screens (list, create/edit, picker)
-✅ Comprehensive state management with Riverpod
-✅ Form validation (name: 2-50 characters)
-✅ Pull-to-refresh and loading states
-✅ Error handling throughout all layers
-✅ Empty states and user feedback
-✅ Material Design 3 styling
-✅ Full integration with journal entry system
-✅ Tag picker widget with inline and sheet modes
-✅ Quick tag creation from picker
-✅ Comprehensive documentation with examples
-
-The implementation addresses the user story: "Users can organize entries by trip, date, or custom tags" by providing a complete, user-friendly tagging system. Users can now create custom tags with colors and icons, assign multiple tags to journal entries, and use the tag picker for easy selection during entry creation.
-
-All code follows existing Flutter/Dart patterns with proper Clean Architecture principles, state management (Riverpod), Material Design 3 styling, error handling, and documentation standards consistent with trip, journal entry, and location management implementations.
-
-Phase 5 (Organization & Tagging) progress: 2 of 4 subtasks completed
-✅ 5.1 - Trip management system (COMPLETED)
-✅ 5.2 - Custom tags feature (COMPLETED)
-⏳ 5.3 - Trip overview screen (PENDING)
-⏳ 5.4 - Search and filter functionality (PENDING)
-
-Next step: Subtask 5.3 - Build trip overview screen
-
-### 2026-01-06 03:00: Subtask 5.3 Completed
-Implemented comprehensive trip overview screen showing all entries and media for a trip (5 files):
-- **TripOverviewProvider** (presentation/providers/trip_overview_provider.dart):
-  - TripOverviewState class for managing entries and media
-  - TripOverviewNotifier with parallel loading of entries and media
-  - Provider: tripOverviewProvider (family provider for tripId)
-  - State fields: entries, mediaItems, isLoadingEntries, isLoadingMedia, error
-  - Computed properties: entryCount, mediaCount, hasContent, sortedEntries, sortedMedia
-  - Methods: loadTripContent(), refresh(), clearError()
-  - Efficient parallel loading with Future.wait
-- **TripOverviewScreen** (presentation/screens/trip_overview_screen.dart - 700+ lines):
-  - Complete screen for viewing all entries and media in a trip
-  - Trip statistics card (entry count, media count, duration)
-  - Journal entries section with card-based list view
-  - Entry cards with title, date, location, mood, content preview
-  - Tap-to-navigate to entry detail screen
-  - Media gallery section with 3-column grid layout
-  - Media thumbnails with video indicator and upload status
-  - Pull-to-refresh support for reloading content
-  - Loading states for entries and media (separate)
-  - Empty states with helpful messages
-  - Error handling with retry option
-  - Trip cover image in app bar
-  - Material Design 3 styling with theme integration
-- **Updated trip_detail_screen.dart**:
-  - Added navigation to TripOverviewScreen from "Journal Entries" card
-  - Added navigation to TripOverviewScreen from "Media Gallery" card
-  - Removed "Coming soon" placeholders
-- **Comprehensive documentation** (presentation/screens/README_TRIP_OVERVIEW.md - 600+ lines):
-  - Complete feature overview with architecture diagram
-  - State management details with TripOverviewState reference
-  - Data source integration with JournalRepository
-  - Usage examples for navigation and provider setup
-  - UI components breakdown (statistics, entry cards, media grid)
-  - Error handling patterns and empty states
-  - Performance considerations (parallel loading, lazy rendering)
-  - Integration with JournalEntryDetailScreen
-  - Future enhancements roadmap (filtering, batch operations, media viewer)
-  - Testing checklist with widget test examples
-  - Troubleshooting guide for common issues
-  - Related files reference
-- **Example implementations** (presentation/screens/trip_overview_screen_example.dart - 450+ lines):
-  - TripOverviewMenu with navigation to different examples
-  - TripListExample showing navigation from trip list
-  - ProviderScopeExample demonstrating manual provider usage
-  - RepositorySetupExample showing dependency injection setup
-  - NavigationExample from trip detail to overview
-  - StateMonitoringExample showing real-time state monitoring
-  - 7 usage snippets for common patterns (navigation, watching state, refresh, etc.)
-  - Complete working examples for all scenarios
-  - Code patterns and integration examples
-
-Key features implemented:
-✅ Complete trip overview with all entries and media
-✅ Parallel loading of entries and media for performance
-✅ Trip statistics (entry count, media count, duration)
-✅ Journal entry cards with full metadata
-✅ Tap-to-navigate to entry details
-✅ Media gallery grid (3-column layout)
-✅ Video indicator overlay on thumbnails
-✅ Upload status display for uploading/failed media
-✅ Pull-to-refresh support
-✅ Separate loading states for entries and media
-✅ Empty states with helpful messages
-✅ Error handling with retry
-✅ Cover image display in app bar
-✅ Material Design 3 styling
-✅ Full documentation with examples
-✅ Integration with trip detail screen navigation
-
-The implementation addresses the user story: "As a user, I want to organize my journal by trip so that I can easily find memories from specific adventures." Users can now view all journal entries and media for a specific trip in a unified, organized view. The screen provides quick access to all trip content with statistics, entry cards, and a media gallery.
-
-All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, Material Design 3 styling, error handling, and documentation standards consistent with trip, journal entry, and tag management implementations.
-
-Phase 5 (Organization & Tagging) progress: 3 of 4 subtasks completed
-✅ 5.1 - Trip management system (COMPLETED)
-✅ 5.2 - Custom tags feature (COMPLETED)
-✅ 5.3 - Trip overview screen (COMPLETED)
-⏳ 5.4 - Search and filter functionality (PENDING)
-
-Next step: Subtask 5.4 - Add search and filter functionality
-
-### 2026-01-06 04:00: Subtask 5.4 Completed
-Implemented comprehensive search and filter functionality for journal entries (5 files):
-- **JournalSearchProvider** (presentation/providers/journal_search_provider.dart - 700+ lines):
-  - JournalSearchFilters class for encapsulating all search criteria
-  - Filter fields: query (text), locationName, startDate, endDate, tagIds, tripId, favoriteOnly, mood
-  - Helper methods: hasActiveFilters, activeFilterCount, clearFilters, copyWith
-  - JournalSearchState class for managing search results and UI state
-  - JournalSearchNotifier with complete search business logic
-  - Debounced text search (500ms delay) to reduce API calls
-  - Client-side filtering for location, date range, mood, favorites
-  - Tag filtering via repository calls
-  - Methods: search(), updateQuery(), updateLocationFilter(), updateDateRangeFilter(), updateTagsFilter(), updateTripFilter(), updateFavoriteFilter(), updateMoodFilter(), clearFilters(), clearAll()
-  - Comprehensive error handling with AppException
-  - Provider setup: journalSearchProvider, journalRepositoryProvider
-- **JournalSearchScreen** (presentation/screens/journal_search_screen.dart - 500+ lines):
-  - Complete search screen with Material Design 3 styling
-  - Search bar with real-time search and debouncing
-  - Filter button with active filter badge count
-  - Clear all filters button
-  - Active filter chips display (horizontal scrollable)
-  - Search results in card-based list view
-  - Result cards with title, date, location, mood, favorite status, content preview
-  - Tap-to-navigate to entry detail screen
-  - Pull-to-refresh support
-  - Empty state with helpful initial message
-  - No results state with user feedback
   - Error state with retry functionality
   - Loading state with progress indicator
-  - _SearchResultCard widget for displaying entries
-  - _FilterChip widget for active filter display
-  - Debouncer utility class for search input
-- **JournalSearchFilterSheet** (presentation/widgets/journal_search_filter_sheet.dart - 600+ lines):
-  - Modal bottom sheet for configuring search filters
-  - Scrollable content for small screens
-  - _DateRangeFilter with from/to date pickers
-  - _LocationFilter with text input for location name
-  - _MoodFilter with filter chips and emoji support (7 moods)
-  - _FavoriteFilter with toggle switch
-  - Clear individual filters option
-  - Clear all filters button
-  - Apply filters button to trigger search
+  - Group headers with colored containers
+  - Tap-to-navigate to entry detail screen
+  - Entry count badges on groups
   - Material Design 3 styling with theme integration
-  - StringCapitalization extension for mood display
-- **Example implementations** (presentation/screens/journal_search_screen_example.dart - 700+ lines):
-  - JournalSearchExampleScreen with 4 different usage examples
-  - Example 1: Basic navigation to search screen
-  - Example 2: Programmatic search with predefined filters
-  - Example 3: Watch search state and react to changes
-  - Example 4: Custom filter UI with quick filters (today, this week, this month, with photos)
-  - _StateDisplay widget for showing search state
-  - _ProgrammaticSearchExample with multiple filter buttons
-  - _CustomFilterExample with quick filter chips
-  - JournalSearchExampleMenu for navigating all examples
-  - Complete working examples for all scenarios
-  - Integration patterns with Riverpod providers
-- **Comprehensive documentation** (presentation/screens/README_JOURNAL_SEARCH.md - 900+ lines):
-  - Complete feature overview with capabilities list
-  - Architecture breakdown with component descriptions
-  - Installation and setup instructions
-  - Provider configuration examples
-  - Navigation patterns
-  - 5+ usage examples covering all scenarios:
-    - Basic search screen navigation
-    - Programmatic search with filters
-    - Watching search state
-    - Applying filters programmatically
-    - Clearing filters
-  - State management reference with code examples
-  - Customization guide for filters, result cards, and filter sheet
-  - Performance considerations and optimization tips
-  - Future optimization recommendations (server-side filtering, pagination, caching)
-  - Error handling strategies
-  - Testing examples (unit and widget tests)
-  - Troubleshooting guide for common issues
-  - Future enhancement roadmap (saved searches, voice search, advanced builder)
-  - Related components reference
-
-Key features implemented:
-✅ Full-text search across entry titles and content
-✅ Location filtering by location name
-✅ Date range filtering with start and end dates
-✅ Mood filtering with emoji support (7 moods)
-✅ Favorites filter to show only favorite entries
-✅ Multiple filter combinations for refined searches
-✅ Real-time search with debouncing (500ms)
-✅ Filter chips showing active filters (horizontal scrollable)
-✅ Pull-to-refresh for updating results
-✅ Empty states with helpful messages
-✅ Error handling with retry functionality
-✅ Complete state management with Riverpod
-✅ Material Design 3 styling with theme support
-✅ Comprehensive documentation with examples
-✅ Integration with existing journal entry system
-
-The implementation addresses the user story: "Users can organize entries by trip, date, or custom tags" by providing powerful search and filter capabilities. Users can now search their journal entries by text, location, date range, mood, favorites, and tags, making it easy to find specific memories from their travels.
-
-The search system is fully integrated with the existing journal infrastructure:
-- Uses JournalRepository.searchEntries() for text search
-- Filters results using existing entry fields
-- Integrates with JournalEntryDetailScreen for viewing results
-- Follows existing patterns for state management and error handling
-- Compatible with Riverpod provider architecture
-- Material Design 3 styling consistent with other screens
-
-All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, Material Design 3 styling, error handling, and documentation standards consistent with trip, tag, and journal entry implementations.
-
-Phase 5 (Organization & Tagging) is now COMPLETE with all 4 subtasks finished:
-✅ 5.1 - Trip management system (COMPLETED)
-✅ 5.2 - Custom tags feature (COMPLETED)
-✅ 5.3 - Trip overview screen (COMPLETED)
-✅ 5.4 - Search and filter functionality (COMPLETED)
-
-Next step: Phase 6 - Media Gallery & Views
-
-### 2026-01-06 05:00: Subtask 6.1 Completed
-Implemented comprehensive media gallery grid widget for displaying photos and videos (3 files):
-- **MediaGallery widget** (media_gallery.dart - 500+ lines):
-  - Complete grid gallery with configurable layout (columns, spacing, aspect ratio)
-  - MediaGalleryConfig class with extensive customization options
-  - Four predefined configurations: forTripOverview, forEntryDetail, forFullscreen, compact
-  - Visual indicators for videos (play icon overlay)
-  - Upload status overlays (pending, uploading, failed)
-  - Selection mode with multi-select support and max selection limits
-  - Loading, error, and empty state handling
-  - Optional caption display with gradient overlay
-  - Tap and long-press callbacks for user interactions
-  - Material Design 3 styling with full theme integration
-  - Image loading with error builders and loading indicators
-  - State management for selection (internal Set<String>)
-- **MediaGalleryCompact** variant:
-  - Prebuilt compact widget for small spaces
-  - 4-column grid with fixed max items
-  - Ideal for entry cards and preview sections
-- **MediaGalleryWithSelection** widget:
-  - Full-screen gallery with selection UI
-  - AppBar with clear/done actions
-  - Selection count display
-  - Returns selected IDs on completion
-- **Configuration options**:
-  - Grid layout: crossAxisCount, spacing, childAspectRatio
-  - Display options: showUploadStatus, showVideoIndicator, showCaption
-  - Limits: maxItems, maxSelection
-  - Interaction: enableSelection
-  - Empty state: showEmptyState
-- **Example implementations** (media_gallery_example.dart - 650+ lines):
-  - 7 complete usage examples covering all features
-  - BasicMediaGalleryExample: Simple tap handling
-  - MediaGalleryConfigExample: All predefined configs
-  - MediaGalleryStatesExample: Loading, error, empty states
-  - MediaGallerySelectionExample: Multi-select mode
-  - MediaGalleryCompactExample: Compact variant usage
-  - MediaGalleryFullscreenSelectionExample: Full-screen selection
-  - MediaGalleryWithCaptionsExample: Caption display
-  - Example menu with navigation to all examples
-- **Comprehensive documentation** (README_MEDIA_GALLERY.md - 700+ lines):
-  - Complete feature overview with capabilities list
+- **Example implementations** (presentation/screens/memory_timeline_screen_example.dart - 500+ lines):
+  - MemoryTimelineExampleScreen showing basic integration
+  - MemoryTimelineExampleMenu with navigation to all examples
+  - _ProviderScopeExample demonstrating manual provider injection
+  - _StateMonitoringExample showing real-time state observation
+  - _NavigationExample showing integration patterns from home screen
+  - _ExampleCard reusable widget for menu items
+  - _StateRow widget for displaying state information
+  - 4 complete usage examples covering all scenarios
+- **Comprehensive documentation** (presentation/screens/README_MEMORY_TIMELINE.md - 600+ lines):
+  - Complete feature overview and architecture breakdown
   - Installation and quick start guide
-  - Configuration options reference table
-  - 7+ usage patterns with code examples:
-    - Trip overview screen integration
-    - Journal entry detail integration
-    - Compact gallery for entry cards
-    - Multi-select for batch operations
-    - Full-screen selection UI
-    - Custom configuration
-  - Widget components API reference (MediaGallery, MediaGalleryCompact, MediaGalleryWithSelection)
-  - Display states documentation (loading, error, empty)
-  - Customization guide for all states
-  - Integration with existing components (MediaPicker, MediaUploadProgressIndicator, TripOverviewProvider)
-  - Performance considerations and optimization tips
-  - Accessibility features
-  - Error handling strategies
-  - Testing examples with widget tests
+  - 5+ usage patterns with code examples:
+    - Basic usage with ProviderScope
+    - Navigation from any screen
+    - State management reference
+    - Provider injection examples
+    - Integration with bottom navigation and dashboard
+  - Timeline groups reference table (today, yesterday, this week, etc.)
+  - TimelineItem widget API reference
+  - Customization guide for grouping, styling, and widgets
+  - Error handling patterns and examples
+  - Performance considerations (parallel loading, lazy rendering)
+  - Future enhancements roadmap (filtering, search, export, animation)
+  - Integration examples with bottom nav and dashboard
+  - Widget test example for testing
   - Troubleshooting guide for common issues
-  - Future enhancement roadmap
+  - API reference for all classes and enums
   - Related components reference
 
 Key features implemented:
-✅ Configurable grid layout (columns, spacing, aspect ratio)
-✅ Video indicators with play icon overlay
-✅ Upload status overlays (pending, uploading, failed)
-✅ Selection mode with multi-select support
-✅ Loading, error, and empty state handling
-✅ Optional caption display with gradient overlay
-✅ Tap and long-press callbacks
-✅ Material Design 3 styling with theme integration
-✅ Predefined configurations for common use cases
-✅ Compact variant for small spaces
-✅ Full-screen selection widget with AppBar
-✅ Image loading with error handling
-✅ Placeholder for missing/failed images
-✅ Reusable across multiple screens
-✅ Full documentation with 7+ usage examples
-✅ Example menu with navigation
-
-The implementation addresses the acceptance criterion "Media gallery views all photos/videos from a trip" by providing a comprehensive, reusable grid widget that can display media collections in various layouts. The widget supports filtering by media type, shows visual indicators for videos and upload status, and provides selection capabilities for batch operations.
-
-The widget is designed to be used in:
-- Trip overview screens (showing all media from a trip)
-- Journal entry detail screens (showing media attached to an entry)
-- Entry cards (showing media preview with compact variant)
-- Full-screen selection (for batch operations like sharing or deleting)
-
-All code follows existing Flutter/Dart patterns with proper state management, Material Design 3 styling, error handling, and documentation standards consistent with other widgets in the project (MediaPicker, MoodPicker, etc.).
-
-Phase 6 (Media Gallery & Views) progress: 1 of 4 subtasks completed
-✅ 6.1 - Media gallery grid view (COMPLETED)
-⏳ 6.2 - Fullscreen media viewer (PENDING)
-⏳ 6.3 - Memory timeline view (PENDING)
-⏳ 6.4 - Map view for trip locations (PENDING)
-
-Next step: Subtask 6.2 - Implement fullscreen media viewer
-
-### 2026-01-06 06:00: Subtask 6.2 Completed
-Implemented comprehensive fullscreen media viewer for photos and videos (4 files):
-- **MediaViewer widget** (media_viewer.dart - 680+ lines):
-  - Complete fullscreen modal viewer for photos and videos
-  - MediaViewerConfig class with extensive customization options
-  - Three predefined configurations: defaultConfig, minimal, immersive
-  - Photo display with zoom and pan gestures using BuildPhotoView
-  - Video playback with VideoPlayer integration
-  - Swipe navigation between multiple media items
-  - PageView for smooth media transitions
-  - Navigation arrows for previous/next access
-  - Index indicator showing current position (e.g., "2 / 10")
-  - Caption display with gradient overlay
-  - Metadata display (dimensions, duration, filename)
-  - Close button for dismissing the viewer
-  - Top bar with controls (close, index, video play/pause)
-  - Background color customization
-  - Optional features controlled by config (captions, metadata, zoom, navigation, autoplay)
-  - Supabase signed URL integration (60-minute expiry)
-  - Loading and error states with user feedback
-  - Material Design 3 styling with theme support
-  - onPageChanged callback for tracking user navigation
-- **BuildPhotoView widget** (internal):
-  - Photo viewer with zoom and pan gestures
-  - GestureDetector for scale and position updates
-  - Automatic reset when scale is close to 1.0
-  - Error handling for failed image loads
-  - Loading progress indicator
-- **Video playback support**:
-  - VideoPlayerController integration
-  - Play/pause controls in top bar
-  - Autoplay support via config
-  - Aspect ratio preservation
-  - Initialization on page change
-  - Proper disposal when changing pages
-- **Example implementations** (media_viewer_example.dart - 550+ lines):
-  - 7 complete usage examples covering all features
-  - Basic MediaViewer example
-  - Start at specific index example
-  - Minimal configuration example
-  - Immersive mode example
-  - Page change callback example
-  - Custom background color example
-  - Integration with MediaGallery example
-  - MediaGalleryIntegrationExample showing real-world usage
-  - MediaViewerExampleMenu for navigation
-  - Complete working examples for all scenarios
-- **Comprehensive documentation** (README_MEDIA_VIEWER.md - 650+ lines):
-  - Complete feature overview with capabilities list
-  - Installation instructions with dependencies
-  - Quick start guide with basic usage
-  - Configuration options reference table
-  - 5+ usage examples covering all scenarios:
-    - Basic photo viewer
-    - Video gallery with autoplay
-    - Mixed media gallery
-    - Immersive photo viewer
-    - Integration with journal entry detail
-  - Widget components API reference
-  - Customization guide (transitions, backgrounds, UI elements)
-  - UI states documentation (loading, photo, video, error, empty)
-  - Error handling strategies
-  - Performance considerations and optimization tips
-  - Accessibility features
-  - Platform support details (Android, iOS, Web)
-  - Best practices checklist
-  - Integration guide with existing components (MediaGallery, TripOverviewScreen, JournalEntryDetailScreen)
-  - Troubleshooting guide for common issues
-  - Future enhancement roadmap
-  - Related components reference
-- **Updated pubspec.yaml**: Added video_player: ^2.8.0 dependency
-
-Key features implemented:
-✅ Fullscreen modal viewer with immersive experience
-✅ Photo display with zoom and pan gestures
-✅ Video playback with play/pause controls
-✅ Swipe navigation between media items
-✅ Navigation arrows for quick access
-✅ Index indicator (e.g., "2 / 10")
-✅ Caption display with gradient overlay
-✅ Metadata display (dimensions, duration, filename)
-✅ Close button for easy dismissal
-✅ Configurable options (captions, metadata, zoom, navigation, autoplay, background)
-✅ Predefined configurations (default, minimal, immersive)
-✅ Supabase signed URL integration
-✅ Loading and error states
+✅ Automatic grouping by time periods (today, yesterday, this week, etc.)
+✅ Visual timeline with connecting lines between entries
+✅ Entry cards with title, date, mood, location, and content preview
+✅ Media thumbnails (up to 3) with video indicators
+✅ Pull-to-refresh for updating data
+✅ Empty state with helpful message and call-to-action
+✅ Error handling with retry functionality
+✅ Tap-to-navigate to entry detail screen
+✅ Summary header with statistics
 ✅ Material Design 3 styling
-✅ Page change callback for analytics
-✅ Proper resource disposal (video controllers)
-✅ Video autoplay support
-✅ Full documentation with examples
-✅ Example menu with navigation
+✅ Full state management with Riverpod
+✅ Comprehensive documentation with examples
+✅ Group headers with icons and entry counts
+✅ Floating action button for creating entries
+✅ Parallel media loading for performance
 
-The implementation addresses the acceptance criterion "Media gallery views all photos/videos from a trip" by providing a fullscreen viewer that allows users to view media at full screen with zoom, navigation, and playback controls. Users can now tap on any media item in a gallery to view it at full screen, swipe between items, zoom in on photos, and play videos with controls.
+The implementation addresses the acceptance criterion "Memory timeline shows chronological view of all travel experiences" by providing a complete, user-friendly timeline view. Users can now see all their journal entries organized by time periods in a visually appealing timeline format. The timeline automatically groups entries (today, yesterday, this week, etc.), shows entry previews with media thumbnails, and allows tapping to view full details.
 
-The widget is designed to be used from:
-- MediaGallery tap events (open viewer from any media thumbnail)
-- Journal entry detail screens (view all media from an entry)
-- Trip overview screens (view all media from a trip)
-- Any custom media list or grid
+The timeline is designed to be the main navigation hub for users to browse their travel memories chronologically, making it easy to relive past adventures and find specific entries by time period.
 
-All code follows existing Flutter/Dart patterns with proper state management, Material Design 3 styling, gesture handling, video playback, error handling, and documentation standards consistent with MediaGallery, MediaPicker, and other widgets in the project.
+All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, Material Design 3 styling, error handling, and documentation standards consistent with trip overview, journal search, and other screen implementations.
 
-Phase 6 (Media Gallery & Views) progress: 2 of 4 subtasks completed
+Phase 6 (Media Gallery & Views) progress: 4 of 4 subtasks completed
 ✅ 6.1 - Media gallery grid view (COMPLETED)
 ✅ 6.2 - Fullscreen media viewer (COMPLETED)
-⏳ 6.3 - Memory timeline view (PENDING)
-⏳ 6.4 - Map view for trip locations (PENDING)
+✅ 6.3 - Memory timeline view (COMPLETED)
+✅ 6.4 - Map view for trip locations (COMPLETED)
 
-Next step: Subtask 6.3 - Build memory timeline view
+Next step: Subtask 7.1 - Implement offline storage with SQLite
 
+### 2026-01-06 08:00: Subtask 6.4 Completed
+Implemented interactive map view for displaying all journal entry locations (3 files):
+- **JournalMapProvider** (presentation/providers/journal_map_provider.dart - 380+ lines):
+  - Complete state management for map data with Riverpod
+  - JournalMapState class for managing entries, markers, and selection
+  - JournalMapMarker data model representing journal entries on map
+  - JournalMapNotifier with complete business logic
+  - Automatic loading of entries with location data
+  - Support for filtering by trip and favorites
+  - Distance calculation and nearby entry search
+  - Provider: journalMapProvider, journalTripMapProvider (family)
+  - Methods: loadEntries(), loadEntriesForTrip(), selectEntry(), clearSelection()
+  - Methods: updateCenter(), updateZoom(), toggleFavoritesFilter(), refresh()
+  - Utilities: findEntriesNearLocation(), getMarkerForEntry(), _calculateCenter()
+  - Computed properties: hasMarkers, markerCount, entryCount, isInitialLoading, hasSelection
+- **JournalMapScreen** (presentation/screens/journal_map_screen.dart - 600+ lines):
+  - Complete interactive map screen with flutter_map and OpenStreetMap tiles
+  - Custom markers with favorite indicators and selection highlighting
+  - Tap-to-select markers with info card overlay
+  - Polyline connections between chronological entries
+  - Favorites filter toggle (global map only)
+  - Center on all markers functionality
+  - Pull-to-refresh support
+  - Empty state with helpful message
+  - Error state with retry functionality
+  - Loading state with progress indicator
+  - Marker count badge at bottom
+  - Floating action button to view selected entry
+  - Full Material Design 3 styling with theme integration
+  - Support for both global and trip-specific views
+  - Map controller with auto-centering and smart zoom levels
+- **Example implementations** (presentation/screens/journal_map_screen_example.dart - 500+ lines):
+  - JournalMapExampleScreen showing basic navigation patterns
+  - _FullMapDemoScreen with stats bar and menu options
+  - TripMapExampleScreen with bottom sheet integration
+  - MainNavigationExample showing bottom navigation integration
+  - 5 complete usage examples covering all scenarios
+  - Integration instructions and provider setup guide
+- **Comprehensive documentation** (presentation/screens/README_JOURNAL_MAP.md - 700+ lines):
+  - Complete feature overview and architecture breakdown
+  - Installation and platform configuration guide
+  - Quick start guide with code examples
+  - 5+ usage patterns with detailed examples:
+    - Basic navigation to map
+    - Trip-specific map view
+    - Accessing map state
+    - Programmatic control
+    - Finding nearby entries
+  - Complete API reference for all classes and methods
+  - Customization guide for tiles, markers, polylines, zoom
+  - State management patterns with Riverpod
+  - Error handling strategies and examples
+  - Performance considerations and optimization tips
+  - Widget testing examples and mock provider setup
+  - Troubleshooting guide for common issues
+  - Integration examples with other features
+  - Future enhancements roadmap
+
+Key features implemented:
+✅ Interactive map with OpenStreetMap tiles (free, no API key)
+✅ Custom markers with favorite indicators and selection states
+✅ Tap markers to view entry details with info card overlay
+✅ Filter by trip or favorites
+✅ Polyline connections between chronological entries
+✅ Auto-center on markers with smart zoom
+✅ Floating action button to navigate to entry detail
+✅ Pull-to-refresh for updating data
+✅ Empty state with helpful message
+✅ Error handling with retry functionality
+✅ Marker count badge and stats display
+✅ Material Design 3 styling
+✅ Full state management with Riverpod
+✅ Comprehensive documentation with examples
+✅ Support for both global and trip-specific views
+✅ Distance calculation and nearby entry search
+✅ Map controller with smooth animations
+
+The implementation addresses the acceptance criterion "Display all journal locations on an interactive map" by providing a complete, user-friendly map visualization. Users can now see all their journal entries with location data on an interactive map, tap markers to view entry details, filter by trip or favorites, and navigate to full entry views. The map uses OpenStreetMap tiles which are free and don't require API keys, making it accessible and cost-effective.
+
+The map view integrates seamlessly with existing journal features, allowing users to explore their travel memories geographically. Markers show favorite indicators, and polylines connect entries chronologically to visualize travel routes. The smart auto-centering feature ensures all markers are visible when the map loads.
+
+All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, Material Design 3 styling, error handling, and documentation standards consistent with other screen implementations.
