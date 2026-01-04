@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/services/operation_queue.dart';
+import '../../../core/services/operation_priority.dart';
 
 part 'travel_note_operation.freezed.dart';
 part 'travel_note_operation.g.dart';
@@ -23,7 +24,7 @@ class TravelNoteOperation
     required String tripId,
     required NoteType noteType,
     required Map<String, dynamic> content,
-    @Default(1) int priority,
+    @Default(OperationPriority.normal) int priority,
     String? locationName,
     double? latitude,
     double? longitude,

@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/services/operation_queue.dart';
+import '../../../core/services/operation_priority.dart';
 
 part 'trip_planning_operation.freezed.dart';
 part 'trip_planning_operation.g.dart';
@@ -24,7 +25,7 @@ class TripPlanningOperation
     required String tripId,
     required TripPlanningType planningType,
     required Map<String, dynamic> changes,
-    @Default(2) int priority, // Higher than location updates
+    @Default(OperationPriority.normal) int priority,
     DateTime? plannedStartDate,
     DateTime? plannedEndDate,
     // Retry metadata

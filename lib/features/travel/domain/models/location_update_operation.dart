@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../core/services/operation_queue.dart';
+import '../../../core/services/operation_priority.dart';
 
 part 'location_update_operation.freezed.dart';
 part 'location_update_operation.g.dart';
@@ -13,7 +14,7 @@ class LocationUpdateOperation
     required double latitude,
     required double longitude,
     required DateTime timestamp,
-    @Default(1) int priority,
+    @Default(OperationPriority.low) int priority,
     // Retry metadata
     DateTime? createdAt,
     DateTime? lastAttempt,
