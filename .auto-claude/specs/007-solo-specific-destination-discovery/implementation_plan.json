@@ -357,13 +357,14 @@
           "subtask_id": "4.6",
           "title": "Create SafetyInsights widget",
           "description": "Widget to display detailed safety insights for a destination",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/presentation/widgets/safety_insights.dart",
+          "notes": "Created comprehensive SafetyInsights widget with all required features. Implementation includes: 1) List of safety insights displayed in expandable/collapsible cards, 2) Contextual icons for each insight category (theft=shopping_bag, transportation=directions_transit, nightlife=local_bar, scams=money_off, natural=cloud, health=local_hospital, women=woman, lgbtq=diversity_3, political=gavel, terrorism=warning, water/food=restaurant, general=security), 3) Severity-based color coding (green for low, orange for medium, red for high) with appropriate icons (check_circle, warning_amber, error), 4) Expandable cards with smooth animations (AnimatedSize and AnimatedRotation), 5) Detailed description for each insight, 6) List of actionable safety tips with bullet points, 7) Optional title parameter, 8) Configurable initial expansion state, 9) Show/hide icons option, 10) Empty state handling with helpful message, 11) Clear typography and spacing with theme-based styling, 12) Border highlighting with severity color, 13) Tap-to-expand interaction with visual feedback, 14) Comprehensive documentation with usage examples. Added to widgets barrel file for clean imports. Follows existing patterns from SafetyScoreBadge, DestinationCard, and CuratedListCard widgets.",
           "acceptance_criteria": [
-            "List of safety insights",
-            "Icon for each insight type",
-            "Expandable/collapsible sections",
-            "Clear typography and spacing"
+            "List of safety insights - COMPLETED with expandable cards",
+            "Icon for each insight type - COMPLETED with contextual icons for 12+ categories",
+            "Expandable/collapsible sections - COMPLETED with smooth animations",
+            "Clear typography and spacing - COMPLETED with theme-based styling"
           ]
         },
         {
