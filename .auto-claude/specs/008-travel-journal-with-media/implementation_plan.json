@@ -542,9 +542,12 @@
           "subtask_id": "10.1",
           "title": "Write unit tests for journal API functions",
           "description": "Test all CRUD operations and edge cases",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/__tests__/api/journal.test.ts"
+            "test/features/journal/helpers/journal_test_helpers.dart",
+            "test/features/journal/data/datasources/journal_remote_data_source_test.dart",
+            "test/features/journal/data/repositories/journal_repository_impl_test.dart",
+            "test/features/journal/README_JOURNAL_TESTS.md"
           ]
         },
         {

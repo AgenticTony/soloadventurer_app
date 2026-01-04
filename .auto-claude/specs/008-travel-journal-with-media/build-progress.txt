@@ -101,6 +101,128 @@ Key features implemented:
 
 The implementation addresses the acceptance criterion for automatic backups by providing a complete, production-ready backup and restore system. Users can create full backups of their journal data with optional encryption and compression, restore from backup files with intelligent conflict resolution, and monitor progress through real-time updates. The system supports both merge and replace modes, creates pre-restore backups for safety, and provides comprehensive validation and error handling.
 
+### 2026-01-06 16:00: Subtask 10.1 Completed
+Implemented comprehensive unit tests for journal API functions, testing all CRUD operations and edge cases (4 files):
+- **Test Helpers** (helpers/journal_test_helpers.dart - 300+ lines):
+  - Mock classes: MockJournalRemoteDataSource
+  - Test data factories for JournalEntryModel, MediaItemModel
+  - Test data factories for JournalEntry, MediaItem entities
+  - List creation helpers with configurable count
+  - JSON map creation helpers for Supabase format
+  - Custom assertion helpers for exception testing
+  - Test constants (testUserId, testEntryId, testTripId, testMediaId, testTagId)
+  - Flexible factory methods with default values for all fields
+- **Remote Data Source Tests** (data/datasources/journal_remote_data_source_test.dart - 700+ lines):
+  - Entry CRUD operations (14 tests):
+    - createEntry: Success, PostgrestException, custom error codes
+    - getEntry: Found case, 404 errors, PGRST116 code handling
+    - getEntries: List retrieval, authentication checks
+    - getEntriesByTrip: Trip filtering, error handling
+    - getEntriesByDateRange: Date range filtering, authentication checks
+    - searchEntries: Text search, authentication checks
+    - getFavoriteEntries: Favorite filtering, authentication checks
+    - updateEntry: Success case, error handling
+    - deleteEntry: Success case, error handling
+    - toggleFavorite: Toggle logic, error handling
+    - getEntriesWithLocation: Location filtering, authentication checks
+    - getEntriesNearLocation: Geospatial queries, authentication checks
+  - Media CRUD operations (12 tests):
+    - addMedia: Success, error handling
+    - updateMedia: Success, error handling
+    - deleteMedia: Success, error handling
+    - getMediaForEntry: List retrieval, error handling
+    - getMediaForTrip: Trip media, empty trip case, error handling
+    - updateMediaUploadProgress: Progress updates, 100% completion status
+    - completeMediaUpload: Completion with all fields set
+    - failMediaUpload: Failed status marking
+  - Tag operations (8 tests):
+    - getTagsForEntry: Tag retrieval, error handling
+    - addTagToEntry: Tag addition, error handling
+    - removeTagFromEntry: Tag removal, error handling
+    - updateTagsForEntry: Bulk replacement, empty list handling
+  - Edge cases (5 tests):
+    - Null values in optional fields
+    - Concurrent operations
+    - Large content strings (100KB)
+    - Special characters in content
+    - Date range boundary conditions
+- **Repository Tests** (data/repositories/journal_repository_impl_test.dart - 900+ lines):
+  - Entry CRUD operations (25 tests):
+    - createEntry: Entity to model conversion, success/failure paths
+    - getEntry: Model to entity conversion, error propagation
+    - getEntries: List conversion, empty list handling
+    - getEntriesByTrip: Trip filtering with conversion
+    - getEntriesByDateRange: Date filtering, invalid range handling
+    - searchEntries: Empty queries, special characters
+    - getFavoriteEntries: Favorite status verification
+    - updateEntry: Update with conversion
+    - deleteEntry: Deletion with error handling
+    - toggleFavorite: Toggle both directions (false→true, true→false)
+    - getEntriesWithLocation: Location data verification
+    - getEntriesNearLocation: Zero radius, very large radius
+  - Media CRUD operations (14 tests):
+    - addMedia: Entity to model conversion
+    - updateMedia: Media update with conversion
+    - deleteMedia: Deletion with error handling
+    - getMediaForEntry: List with conversion
+    - getMediaForTrip: Trip media with conversion
+    - updateMediaUploadProgress: Progress at 0%, 50%, 100%
+    - completeMediaUpload: Completion status verification
+    - failMediaUpload: Failed status marking
+  - Tag operations (8 tests):
+    - getTagsForEntry: Tag list retrieval
+    - addTagToEntry: Tag addition with error handling
+    - removeTagFromEntry: Tag removal with error handling
+    - updateTagsForEntry: Bulk updates, empty list handling
+  - Edge cases (5 tests):
+    - Null optional fields in entries
+    - Large content (100KB text)
+    - Special characters and emoji
+    - Rapid successive operations
+    - Media with all null optional fields
+- **Test Documentation** (README_JOURNAL_TESTS.md - 500+ lines):
+  - Complete test overview and file descriptions
+  - Detailed test coverage breakdown (80+ tests total)
+  - Running tests instructions with multiple command examples
+  - Test statistics and coverage metrics
+  - Testing patterns used (AAA, Mock Verification, Exception Testing, Edge Cases)
+  - Key test scenarios documentation
+  - Dependencies and maintenance notes
+  - Integration with CI/CD guidance
+  - Future enhancements roadmap
+
+Key features tested:
+✅ All CRUD operations (Create, Read, Update, Delete)
+✅ All query methods (by trip, date, location, search, favorites)
+✅ All media operations (add, update, delete, upload progress)
+✅ All tag operations (get, add, remove, update)
+✅ All error scenarios (404, 500, authentication failures)
+✅ All edge cases (null values, large content, special characters, concurrent operations)
+✅ Entity to Model conversion verification
+✅ Model to Entity conversion verification
+✅ Exception propagation from data source to repository
+✅ Mock interaction verification with proper call counts
+✅ Authentication boundary testing
+✅ Boundary condition testing (dates, distances, percentages)
+
+Test coverage statistics:
+- Total tests: 80+
+- Remote data source: 39 tests
+- Repository: 52 tests
+- Edge cases: 10 tests
+
+The implementation provides comprehensive test coverage for the journal feature's API layer, ensuring all CRUD operations, queries, media handling, and tag management work correctly. Tests follow established Flutter testing patterns with mocktail for mocking, AAA (Arrange-Act-Assert) structure, and thorough edge case coverage. The tests verify both success paths and error scenarios, ensuring robust error handling and proper exception propagation throughout the data layer.
+
+All code follows existing Flutter/Dart testing patterns with mocktail, proper test organization, clear test names, comprehensive assertions, and documentation standards consistent with other feature tests in the project (auth, profile).
+
+Phase 10 (Testing & Polish) progress: 1 of 6 subtasks completed
+✅ 10.1 - Write unit tests for journal API functions (COMPLETED)
+⏳ 10.2 - Test media upload and compression (PENDING)
+⏳ 10.3 - Test offline sync functionality (PENDING)
+⏳ 10.4 - Performance optimization (PENDING)
+⏳ 10.5 - Error handling improvements (PENDING)
+⏳ 10.6 - Accessibility audit (PENDING)
+
 Phase 8 (Export & Sharing) is now complete with all 4 subtasks finished
 ✅ 8.1 - Implement trip export to PDF (COMPLETED)
 ✅ 8.2 - Add social media sharing (COMPLETED)
