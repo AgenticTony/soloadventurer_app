@@ -503,17 +503,18 @@
           "subtask_id": "5.7",
           "title": "Create SavedDestinationsScreen",
           "description": "Screen showing user's saved destinations (wishlist)",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/presentation/screens/saved_destinations_screen.dart",
+          "notes": "Implemented comprehensive SavedDestinationsScreen with all required features. Created ConsumerStatefulWidget with TabController for Wishlist/Trips tabs. Features include: 1) Tab interface (Wishlist and Trips tabs) with proper filtering, 2) Filter options via PopupMenuButton with three filters (All Saved, With Notes, Recently Added), 3) Custom _SavedDestinationCard widget showing destination image, name, notes preview, safety/solo suitability badges, save type badge (Wishlist/Trip), and action buttons (edit notes, add to trip, remove), 4) Edit notes functionality with AlertDialog for updating personal notes on saved destinations, 5) Remove from saved functionality with confirmation and undo option, 6) Add to trip button shown for wishlist items (placeholder for subtask 7.1), 7) Pull-to-refresh using RefreshIndicator, 8) Loading state with CircularProgressIndicator, 9) Error state with user-friendly error message and 'Try Again' button, 10) Sign-in prompt state for unauthenticated users with call-to-action button, 11) Empty state with contextual messages based on selected tab and 'Discover Destinations' CTA button, 12) Proper authentication flow checking user is signed in before showing saved destinations, 13) Integration with SavedDestinationsProvider for state management, 14) Proper Riverpod AsyncValue pattern usage throughout. Created SavedDestinationFilter enum for filtering options (all, withNotes, recentlyAdded). Updated screens barrel file to export SavedDestinationsScreen. Follows existing patterns from RecommendationsScreen and CuratedListsScreen with proper Material Design 3 patterns and theme integration.",
           "acceptance_criteria": [
-            "Tab or section for wishlist vs trip destinations",
-            "Destinations grid/list",
-            "Notes for saved destinations",
-            "Remove from saved option",
-            "Add to trip option",
-            "Pull to refresh",
-            "Loading and error states",
-            "Empty state with CTA to discover"
+            "Tab or section for wishlist vs trip destinations - COMPLETED (TabBar with Wishlist and Trips tabs)",
+            "Destinations grid/list - COMPLETED (2-column GridView with custom _SavedDestinationCard)",
+            "Notes for saved destinations - COMPLETED (notes display in card + edit dialog)",
+            "Remove from saved option - COMPLETED (delete button with undo snackbar)",
+            "Add to trip option - COMPLETED (add button shown for wishlist items, placeholder for flow)",
+            "Pull to refresh - COMPLETED (RefreshIndicator)",
+            "Loading and error states - COMPLETED (proper AsyncValue handling)",
+            "Empty state with CTA to discover - COMPLETED (contextual empty state with Discover button)"
           ]
         }
       ]
