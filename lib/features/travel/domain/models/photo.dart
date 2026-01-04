@@ -34,6 +34,9 @@ class Photo {
   final int width;
 
   /// Photo height in pixels
+  final int height;
+
+  /// Photo file size in bytes
   final int sizeInBytes;
 
   /// When the photo was uploaded
@@ -51,6 +54,7 @@ class Photo {
     this.longitude,
     required this.takenAt,
     required this.width,
+    required this.height,
     required this.sizeInBytes,
     required this.createdAt,
   });
@@ -68,6 +72,7 @@ class Photo {
       longitude: (json['longitude'] as num?)?.toDouble(),
       takenAt: DateTime.parse(json['takenAt'] as String),
       width: json['width'] as int,
+      height: json['height'] as int,
       sizeInBytes: json['sizeInBytes'] as int,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
@@ -86,13 +91,14 @@ class Photo {
       'longitude': longitude,
       'takenAt': takenAt.toIso8601String(),
       'width': width,
+      'height': height,
       'sizeInBytes': sizeInBytes,
       'createdAt': createdAt.toIso8601String(),
     };
   }
 
   /// Calculates aspect ratio for proper image display
-  double get aspectRatio => width > 0 ? width / width : 1.0;
+  double get aspectRatio => height > 0 ? width / height : 1.0;
 
   /// Returns the appropriate URL to display based on availability
   String get displayUrl => thumbnailUrl ?? imageUrl;
@@ -109,6 +115,7 @@ class Photo {
     double? longitude,
     DateTime? takenAt,
     int? width,
+    int? height,
     int? sizeInBytes,
     DateTime? createdAt,
   }) {
@@ -123,6 +130,7 @@ class Photo {
       longitude: longitude ?? this.longitude,
       takenAt: takenAt ?? this.takenAt,
       width: width ?? this.width,
+      height: height ?? this.height,
       sizeInBytes: sizeInBytes ?? this.sizeInBytes,
       createdAt: createdAt ?? this.createdAt,
     );
