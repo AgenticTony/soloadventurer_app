@@ -7,8 +7,8 @@ Created comprehensive implementation plan with 10 phases and 42 subtasks.
 
 **Phase 1: Foundation & Database Schema** (3 subtasks) - IN PROGRESS
 - ✅ Database schema design for journal entries and media (1.1 - COMPLETED)
-- Storage buckets setup for photos/videos
-- TypeScript types definition
+- ✅ Storage buckets setup for photos/videos (1.2 - COMPLETED)
+- ✅ TypeScript types definition (1.3 - COMPLETED)
 
 **Phase 2: Core Journal Entry Functionality** (4 subtasks)
 - Rich text editor component
@@ -97,6 +97,28 @@ Created storage buckets migration (220 lines) including:
 
 All storage buckets are private with access controlled via RLS policies ensuring users can only access their own media.
 
-## Status: Phase 1 in progress
-Currently working on: Foundation & Database Schema
-Next step: Create TypeScript types for journal entities (subtask 1.3)
+### 2026-01-05 10:30: Subtask 1.3 Completed
+Created Dart type definitions for all journal entities (8 files) following Clean Architecture:
+- **Domain Entities** (lib/features/journal/domain/entities/):
+  - `trip.dart` - Trip entity with SyncStatus enum and extension
+  - `journal_entry.dart` - JournalEntry entity with location, mood, and weather data
+  - `media_item.dart` - MediaItem entity with MediaType, UploadStatus enums
+  - `tag.dart` - Tag entity with color, icon, and usage tracking
+- **Data Models** (lib/features/journal/data/models/):
+  - `trip_model.dart` - TripModel with JSON serialization
+  - `journal_entry_model.dart` - JournalEntryModel with JSON serialization
+  - `media_item_model.dart` - MediaItemModel with JSON serialization
+  - `tag_model.dart` - TagModel with JSON serialization
+
+All entities extend Equatable and include:
+- copyWith methods for immutability
+- Computed properties for business logic (isOngoing, hasLocation, etc.)
+- Enums with extension methods for string conversion
+- Models with fromEntity/toEntity and fromJson/toJson methods
+- Full Supabase compatibility with snake_case to camelCase mapping
+
+Follows existing project patterns from auth and profile features.
+
+## Status: Phase 1 complete
+All Foundation & Database Schema subtasks completed (1.1, 1.2, 1.3)
+Next step: Begin Phase 2 - Core Journal Entry Functionality (subtask 2.1)

@@ -32,9 +32,16 @@
           "subtask_id": "1.3",
           "title": "Create TypeScript types for journal entities",
           "description": "Define TypeScript interfaces for JournalEntry, MediaItem, Trip, and Tag",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/types/journal.ts"
+            "lib/features/journal/domain/entities/trip.dart",
+            "lib/features/journal/domain/entities/journal_entry.dart",
+            "lib/features/journal/domain/entities/media_item.dart",
+            "lib/features/journal/domain/entities/tag.dart",
+            "lib/features/journal/data/models/trip_model.dart",
+            "lib/features/journal/data/models/journal_entry_model.dart",
+            "lib/features/journal/data/models/media_item_model.dart",
+            "lib/features/journal/data/models/tag_model.dart"
           ]
         }
       ]
