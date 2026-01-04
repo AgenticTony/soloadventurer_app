@@ -555,5 +555,84 @@ The service addresses the user story: "As a traveler, I want to upload photos in
 
 All code follows existing Flutter/Dart patterns with proper error handling, state management (Riverpod), Clean Architecture principles, and documentation standards.
 
-Next step: Subtask 3.5 - Add upload progress indicator
+### 2026-01-05 20:00: Subtask 3.5 Completed
+Implemented comprehensive upload progress indicator widget for Flutter (3 files):
+- **MediaUploadProgressIndicator** widget (media_upload_progress_indicator.dart - 900+ lines):
+  - Three display modes: detailed, compact, and minimal
+  - Real-time progress tracking via Riverpod streams
+  - Visual status indicators for all upload states (queued, uploading, completed, failed, etc.)
+  - User action buttons (cancel, retry, resume, pause) based on upload state
+  - Error message display with retry options
+  - Media type icons (photo/video) with color-coded containers
+  - File information display (name, size, progress percentage)
+  - Event callbacks for completion, failure, and cancellation
+  - Full Material Design 3 integration with theme support
+  - Configurable progress bar height, border radius, and animation
+- **UploadTaskTile** widget for list displays:
+  - Compact tile view for upload task lists
+  - Tap-to-select functionality
+  - Progress bar integration
+  - Status icons and text
+  - File size and type display
+- **Configuration options**:
+  - UploadProgressConfig class with extensive customization
+  - Predefined configs: default, compact, minimal
+  - Control over file name, size, type display, actions, and errors
+- **Example implementations** (media_upload_progress_indicator_example.dart - 500+ lines):
+  - Detailed progress indicator example
+  - Compact progress indicator example
+  - Minimal progress indicator example
+  - Queue progress for journal entries
+  - Upload task list view
+  - Callback handling example
+  - Journal entry creation integration example
+- **Comprehensive documentation** (README_MEDIA_UPLOAD_PROGRESS.md - 700+ lines):
+  - Feature overview and benefits
+  - Installation and quick start guide
+  - Display modes explained (detailed, compact, minimal)
+  - Complete configuration options reference
+  - Upload states and their visual representations
+  - 5+ usage patterns with code examples:
+    - Single upload monitoring
+    - Multiple uploads in list
+    - Journal entry integration
+    - Inline progress in card
+    - Background upload monitoring
+  - Advanced usage and custom styling
+  - UploadTaskTile API reference
+  - Integration with existing components (MediaPicker, etc.)
+  - Best practices for memory, errors, completion, and batch uploads
+  - Troubleshooting guide for common issues
+  - Testing strategies and mock data examples
+  - Related components reference
+  - Future enhancement roadmap
+
+Key features implemented:
+✅ Multiple display modes for different UI contexts
+✅ Real-time progress tracking via Stream-based Riverpod providers
+✅ Visual status indicators with color-coded icons and text
+✅ User action buttons (cancel, retry, resume, pause)
+✅ Error message display with retry functionality
+✅ Media type icons (photo/video)
+✅ File information (name, size, progress percentage)
+✅ Event callbacks (completion, failure, cancellation)
+✅ Full Material Design 3 integration
+✅ Comprehensive documentation with examples
+✅ Integration with MediaUploadService and existing providers
+✅ UploadTaskTile for list displays
+✅ Flexible configuration options
+✅ Theme-aware styling
+
+The component addresses the need for users to see upload progress for their media files, providing clear visual feedback during the upload process. This improves user experience by reducing uncertainty and allowing users to take actions (cancel, retry) when needed.
+
+All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Material Design 3 styling, error handling, and documentation standards.
+
+Phase 3 (Media Upload & Management) is now complete with all 5 subtasks finished:
+✅ 3.1 - Image compression utility
+✅ 3.2 - Video compression utility
+✅ 3.3 - Media picker component
+✅ 3.4 - Background upload service
+✅ 3.5 - Upload progress indicator
+
+Next step: Phase 4 - Location & Metadata
 
