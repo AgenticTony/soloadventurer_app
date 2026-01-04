@@ -404,9 +404,11 @@
           "subtask_id": "7.4",
           "title": "Implement offline mode indicator",
           "description": "Show visual indicator when app is in offline mode",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/common/OfflineIndicator.tsx"
+            "lib/features/core/presentation/widgets/offline_indicator.dart",
+            "lib/features/core/presentation/widgets/offline_indicator_example.dart",
+            "lib/features/core/presentation/widgets/README_OFFLINE_INDICATOR.md"
           ]
         }
       ]
