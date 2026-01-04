@@ -42,7 +42,7 @@
           "subtask_id": "1.3",
           "title": "Define repository interfaces",
           "description": "Create SafetyRepository interface with all safety-related operations",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/domain/repositories/safety_repository.dart"
           ]

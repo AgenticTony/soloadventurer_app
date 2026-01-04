@@ -29,10 +29,23 @@ Implementation of Phase 1 has begun.
 - Include comprehensive fromJson/toJson, fromEntity/toEntity methods
 - Commit: 4e243e9
 
+✅ **Subtask 1.3: Define repository interfaces** (COMPLETED)
+- Created SafetyRepository interface with comprehensive safety operations
+- Trusted contacts: add, remove, update, get, list
+- Check-ins: create, complete, schedule, cancel, get (all, upcoming, by trip), update status
+- Location sharing: share, stop (specific/all), get active shares, get updates, update permissions
+- Emergency SOS: trigger SOS, update safety status, get safety status (current/user)
+- Safety alerts: get (all, by ID, recent, missed check-in), acknowledge, resolve, cancel
+- Battery monitoring: update level, get current level
+- Settings: update contact notification preferences, get/update safety settings
+- All methods return Future types for async operations
+- Follows existing repository patterns from auth and profile features
+- Commit: 5c047e6
+
 ## Next Steps
 
-1. **Subtask 1.3**: Define repository interfaces
-2. Create SafetyRepository interface with all safety-related operations
+1. **Subtask 1.4**: Create use cases for trusted contacts
+2. Implement AddTrustedContact, RemoveTrustedContact, UpdateTrustedContact, GetTrustedContacts
 
 ### Phases Overview
 
