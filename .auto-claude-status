@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "005-sync-conflict-resolution-system",
+  "state": "building",
+  "subtasks": {
+    "completed": 0,
+    "total": 0,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "",
+    "id": 0,
+    "total": 0
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 5,
+    "started_at": "2026-01-04T19:31:35.753525"
+  },
+  "last_update": "2026-01-04T19:43:35.448305"
+}
