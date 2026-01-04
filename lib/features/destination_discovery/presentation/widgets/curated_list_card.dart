@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/models/curated_list.dart';
+import '../utils/image_cache_manager.dart';
 
 /// A reusable card widget for displaying curated destination lists with key information.
 ///
@@ -51,55 +52,57 @@ class CuratedListCard extends StatelessWidget {
     final theme = Theme.of(context);
     final typeInfo = _getTypeInfo(curatedList.type);
 
-    return Semantics(
-      label: 'Curated list: ${curatedList.name}, ${curatedList.destinationCountLabel}, ${typeInfo['label']} collection',
-      hint: onTap != null ? 'Double tap to view curated list details' : null,
-      button: onTap != null,
-      child: Card(
-        elevation: elevation,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image section with badges overlay
-              _buildImageSection(context, theme),
+    return RepaintBoundary(
+      child: Semantics(
+        label: 'Curated list: ${curatedList.name}, ${curatedList.destinationCountLabel}, ${typeInfo['label']} collection',
+        hint: onTap != null ? 'Double tap to view curated list details' : null,
+        button: onTap != null,
+        child: Card(
+          elevation: elevation,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(borderRadius),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image section with badges overlay
+                _buildImageSection(context, theme),
 
-              // Content section
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name row
-                    _buildNameRow(context, theme),
-                    const SizedBox(height: 8),
+                // Content section
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name row
+                      _buildNameRow(context, theme),
+                      const SizedBox(height: 8),
 
-                    // Type badge and destination count
-                    _buildMetadataRow(context, theme),
-                    const SizedBox(height: 8),
+                      // Type badge and destination count
+                      _buildMetadataRow(context, theme),
+                      const SizedBox(height: 8),
 
-                    // Description
-                    _buildDescription(context, theme),
-                    const SizedBox(height: 12),
-
-                    // Preview destinations
-                    if (curatedList.hasDestinations)
-                      _buildDestinationsPreview(context, theme),
-
-                    // Trailing widget if provided
-                    if (trailing != null) ...[
+                      // Description
+                      _buildDescription(context, theme),
                       const SizedBox(height: 12),
-                      trailing!,
+
+                      // Preview destinations
+                      if (curatedList.hasDestinations)
+                        _buildDestinationsPreview(context, theme),
+
+                      // Trailing widget if provided
+                      if (trailing != null) ...[
+                        const SizedBox(height: 12),
+                        trailing!,
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -127,6 +130,9 @@ class CuratedListCard extends StatelessWidget {
                     width: double.infinity,
                     height: 180,
                     fit: BoxFit.cover,
+                    cacheManager: curatedListImageCacheManager,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    fadeOutDuration: const Duration(milliseconds: 100),
                     placeholder: (context, url) => Container(
                       color: theme.colorScheme.surfaceContainerHighest,
                       child: Center(
@@ -324,6 +330,8 @@ class CuratedListCard extends StatelessWidget {
                 width: 32,
                 height: 32,
                 fit: BoxFit.cover,
+                cacheManager: destinationThumbnailCacheManager,
+                fadeInDuration: const Duration(milliseconds: 150),
                 placeholder: (context, url) => Container(
                   width: 32,
                   height: 32,

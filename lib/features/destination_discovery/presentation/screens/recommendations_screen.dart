@@ -296,15 +296,18 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
                           recommendedDest.destination.id,
                         );
 
-                    return _RecommendationCard(
-                      recommendedDestination: recommendedDest,
-                      isSaved: isSaved,
-                      onTap: () => _onDestinationTap(
-                        recommendedDest.destination.id,
-                      ),
-                      onBookmarkTap: () => _onBookmarkTap(
-                        recommendedDest.destination.id,
-                        recommendedDest.destination.name,
+                    return RepaintBoundary(
+                      child: _RecommendationCard(
+                        key: ValueKey(recommendedDest.destination.id),
+                        recommendedDestination: recommendedDest,
+                        isSaved: isSaved,
+                        onTap: () => _onDestinationTap(
+                          recommendedDest.destination.id,
+                        ),
+                        onBookmarkTap: () => _onBookmarkTap(
+                          recommendedDest.destination.id,
+                          recommendedDest.destination.name,
+                        ),
                       ),
                     );
                   },

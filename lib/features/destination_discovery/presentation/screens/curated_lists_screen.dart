@@ -255,9 +255,12 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final curatedList = filteredLists[index];
-                        return CuratedListCard(
-                          curatedList: curatedList,
-                          onTap: () => _navigateToListDetail(curatedList),
+                        return RepaintBoundary(
+                          child: CuratedListCard(
+                            key: ValueKey(curatedList.id),
+                            curatedList: curatedList,
+                            onTap: () => _navigateToListDetail(curatedList),
+                          ),
                         );
                       },
                       childCount: filteredLists.length,
@@ -318,15 +321,20 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: featuredLists.length,
+              // Add estimated item extent for better scroll performance
+              itemExtent: 296, // 280 width + 16 padding
               itemBuilder: (context, index) {
                 final curatedList = featuredLists[index];
-                return SizedBox(
-                  width: 280,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: CuratedListCard(
-                      curatedList: curatedList,
-                      onTap: () => _navigateToListDetail(curatedList),
+                return RepaintBoundary(
+                  child: SizedBox(
+                    width: 280,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: CuratedListCard(
+                        key: ValueKey(curatedList.id),
+                        curatedList: curatedList,
+                        onTap: () => _navigateToListDetail(curatedList),
+                      ),
                     ),
                   ),
                 );

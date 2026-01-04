@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/destination.dart';
@@ -51,8 +52,8 @@ class _DestinationDiscoveryScreenState
   /// Search text controller
   final TextEditingController _searchController = TextEditingController();
 
-  /// Debounce timer for search
-  DateTime? _lastSearchTime;
+  /// Timer for search debouncing
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -82,6 +83,7 @@ class _DestinationDiscoveryScreenState
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -147,20 +149,15 @@ class _DestinationDiscoveryScreenState
     final filterNotifier = ref.read(filterProvider.notifier);
     filterNotifier.updateSearchQuery(query.isEmpty ? null : query);
 
-    // Debounce search to avoid excessive API calls
-    final now = DateTime.now();
-    if (_lastSearchTime == null ||
-        now.difference(_lastSearchTime!).inMilliseconds > 500) {
-      _lastSearchTime = now;
-      _performSearch();
-    } else {
-      // Schedule search if not already scheduled
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted && DateTime.now().difference(_lastSearchTime!).inMilliseconds >= 500) {
-          _performSearch();
-        }
-      });
-    }
+    // Cancel previous timer
+    _debounceTimer?.cancel();
+
+    // Schedule new search with debounce
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _performSearch();
+      }
+    });
   }
 
   /// Clear search text and reset filter
@@ -330,6 +327,11 @@ class _DestinationDiscoveryScreenState
               mainAxisSpacing: 16,
               childAspectRatio: 0.75,
             ),
+            // Add estimated item extent for better scroll performance
+            prototypeItem: const SizedBox(
+              width: 200,
+              height: 280,
+            ),
             itemCount: state.resultCount + (state.hasMore ? 1 : 0),
             itemBuilder: (context, index) {
               // Show loading indicator at the end if more results available
@@ -339,6 +341,7 @@ class _DestinationDiscoveryScreenState
 
               final destination = state.results[index];
               return DestinationCard(
+                key: ValueKey(destination.id),
                 destination: destination,
                 onTap: () => _navigateToDetail(destination),
                 onBookmarkTap: () => _onBookmarkTap(destination),

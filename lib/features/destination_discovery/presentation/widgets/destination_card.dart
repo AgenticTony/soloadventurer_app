@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/models/destination.dart';
 import 'safety_score_badge.dart';
 import 'solo_suitability_badge.dart';
+import '../utils/image_cache_manager.dart';
 
 /// A reusable card widget for displaying destination preview with key information.
 ///
@@ -46,57 +47,59 @@ class DestinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Semantics(
-      label: 'Destination: ${destination.name}, ${destination.countryCode}',
-      value: 'Safety score ${destination.safetyScore.toStringAsFixed(1)}, '
-          'Solo suitability ${destination.soloSuitabilityScore.toStringAsFixed(1)}, '
-          '${_getBudgetInfo(destination.budgetLevel)['label']} budget',
-      hint: onTap != null ? 'Double tap to view destination details' : null,
-      button: onTap != null,
-      child: Card(
-        elevation: elevation,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadius),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(borderRadius),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image section with bookmark button overlay
-              _buildImageSection(context, theme),
+    return RepaintBoundary(
+      child: Semantics(
+        label: 'Destination: ${destination.name}, ${destination.countryCode}',
+        value: 'Safety score ${destination.safetyScore.toStringAsFixed(1)}, '
+            'Solo suitability ${destination.soloSuitabilityScore.toStringAsFixed(1)}, '
+            '${_getBudgetInfo(destination.budgetLevel)['label']} budget',
+        hint: onTap != null ? 'Double tap to view destination details' : null,
+        button: onTap != null,
+        child: Card(
+          elevation: elevation,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(borderRadius),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image section with bookmark button overlay
+                _buildImageSection(context, theme),
 
-              // Content section
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Name and location row
-                    _buildHeaderRow(context, theme),
-                    const SizedBox(height: 8),
+                // Content section
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Name and location row
+                      _buildHeaderRow(context, theme),
+                      const SizedBox(height: 8),
 
-                    // Badges row
-                    _buildBadgesRow(context, theme),
-                    const SizedBox(height: 8),
+                      // Badges row
+                      _buildBadgesRow(context, theme),
+                      const SizedBox(height: 8),
 
-                    // Description
-                    _buildDescription(context, theme),
-                    const SizedBox(height: 8),
+                      // Description
+                      _buildDescription(context, theme),
+                      const SizedBox(height: 8),
 
-                    // Budget indicator
-                    _buildBudgetIndicator(context, theme),
+                      // Budget indicator
+                      _buildBudgetIndicator(context, theme),
 
-                    // Trailing widget if provided
-                    if (trailing != null) ...[
-                      const SizedBox(height: 12),
-                      trailing!,
+                      // Trailing widget if provided
+                      if (trailing != null) ...[
+                        const SizedBox(height: 12),
+                        trailing!,
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -124,6 +127,9 @@ class DestinationCard extends StatelessWidget {
                     width: double.infinity,
                     height: 180,
                     fit: BoxFit.cover,
+                    cacheManager: destinationImageCacheManager,
+                    fadeInDuration: const Duration(milliseconds: 200),
+                    fadeOutDuration: const Duration(milliseconds: 100),
                     placeholder: (context, url) => Container(
                       color: theme.colorScheme.surfaceContainerHighest,
                       child: Center(
