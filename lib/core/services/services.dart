@@ -5,6 +5,7 @@ library;
 
 export 'image_compression_service.dart';
 export 'map_marker_clustering_service.dart';
+export 'memory_monitor.dart';
 export 'notification_service.dart';
 export 'thumbnail_service.dart';
 export 'zoom_aware_clustering_manager.dart';

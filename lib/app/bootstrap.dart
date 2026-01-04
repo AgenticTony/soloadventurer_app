@@ -10,6 +10,7 @@ import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dar
 import 'package:soloadventurer/core/errors/error_handler.dart';
 import 'package:soloadventurer/core/config/image_cache_config.dart';
 import 'package:soloadventurer/core/services/thumbnail_service.dart';
+import 'package:soloadventurer/core/services/memory_monitor.dart';
 import '../features/auth/domain/services/token_manager.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
@@ -60,6 +61,10 @@ Future<void> bootstrap() async {
     // This reduces memory footprint by 95%: 50KB thumbnails vs 1MB full images
     await ThumbnailService.initialize();
 
+    // Initialize memory monitoring with automatic cache management
+    // Monitors memory usage in real-time and clears caches when thresholds are exceeded
+    await _initializeMemoryMonitoring();
+
     // Create ProviderContainer for initialization
     final container = ProviderContainer();
 
@@ -105,4 +110,41 @@ class ProviderLogger extends ProviderObserver {
 void setupDebugConfiguration() {
   // Enable additional logging in debug mode
   // Configure development-specific settings
+}
+
+/// Initialize memory monitoring with automatic cache management
+///
+/// This sets up real-time memory tracking and automatic cache clearing
+/// when memory usage exceeds configured thresholds.
+Future<void> _initializeMemoryMonitoring() async {
+  await MemoryMonitor.initialize(
+    config: const MemoryMonitorConfig(
+      warningThresholdBytes: 150 * 1024 * 1024,  // 150 MB warning
+      criticalThresholdBytes: 180 * 1024 * 1024, // 180 MB critical
+      monitoringInterval: Duration(seconds: 5),
+    ),
+    onAlert: (alert) async {
+      debugPrint('🚨 Memory Alert [${alert.level.name}]: ${alert.message}');
+
+      // Automatic cache management based on alert level
+      if (alert.level == MemoryAlertLevel.warning) {
+        debugPrint('⚠️  Memory warning - Clearing image cache');
+        await ImageCacheConfig.clearMemoryCache();
+      } else if (alert.level == MemoryAlertLevel.critical) {
+        debugPrint('❌ Memory critical - Clearing all caches');
+        await ImageCacheConfig.clearAllCaches();
+        await ThumbnailService.clearCache();
+
+        // Clear memory monitor history to free up memory
+        MemoryMonitor.clearHistory();
+
+        debugPrint('✅ All caches cleared due to critical memory usage');
+      }
+    },
+  );
+
+  debugPrint('✅ Memory monitoring initialized');
+  debugPrint('   Warning threshold: 150 MB');
+  debugPrint('   Critical threshold: 180 MB');
+  debugPrint('   Monitoring interval: 5 seconds');
 }
