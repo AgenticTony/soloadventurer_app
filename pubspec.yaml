@@ -94,6 +94,9 @@ dependencies:
   pdf: ^3.10.7
   printing: ^5.11.1
 
+  # Social Sharing
+  share_plus: ^10.1.2
+
   # Rich Text Editor
   flutter_quill: ^10.8.4
 
