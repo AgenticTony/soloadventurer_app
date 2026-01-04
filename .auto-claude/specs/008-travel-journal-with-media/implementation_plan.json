@@ -49,16 +49,18 @@
     {
       "phase_id": "2",
       "name": "Core Journal Entry Functionality",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "2.1",
           "title": "Implement rich text editor component",
           "description": "Create a rich text editor with formatting options (bold, italic, lists, headers)",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/RichTextEditor.tsx",
-            "src/components/journal/Toolbar.tsx"
+            "lib/features/journal/presentation/widgets/rich_text_editor.dart",
+            "lib/features/journal/presentation/widgets/editor_toolbar.dart",
+            "lib/features/journal/presentation/widgets/rich_text_editor_example.dart",
+            "lib/features/journal/presentation/widgets/README.md"
           ]
         },
         {
