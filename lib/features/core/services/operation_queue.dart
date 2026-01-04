@@ -353,4 +353,113 @@ class OperationQueue extends _$OperationQueue {
       // Continue even if persistence fails - operations are still in memory
     }
   }
+
+  /// Get list of failed operations
+  List<QueueableOperation> getFailedOperations() {
+    return List.unmodifiable(_failedOperations);
+  }
+
+  /// Retry a specific failed operation by ID
+  Future<void> retryOperation(String id) async {
+    final operation = _failedOperations.cast<QueueableOperation?>().firstWhere(
+      (op) => op?.id == id,
+      orElse: () => null,
+    );
+
+    if (operation == null) {
+      debugPrint('OperationQueue: Failed operation with id $id not found');
+      return;
+    }
+
+    debugPrint('OperationQueue: Retrying failed operation ${operation.id}');
+
+    // Remove from failed queue
+    _failedOperations.remove(operation);
+
+    // Reset metadata for retry
+    final resetOperation = _resetAttemptMetadata(operation);
+
+    // Add back to pending queue
+    await addOperation(resetOperation);
+
+    debugPrint('OperationQueue: Operation ${operation.id} moved back to pending queue');
+  }
+
+  /// Retry all failed operations
+  Future<void> retryAllFailed() async {
+    debugPrint('OperationQueue: Retrying all ${_failedOperations.length} failed operations');
+
+    final operationsToRetry = List<QueueableOperation>.from(_failedOperations);
+
+    // Clear failed queue
+    _failedOperations.clear();
+
+    // Reset metadata and add back to pending queue
+    for (final operation in operationsToRetry) {
+      final resetOperation = _resetAttemptMetadata(operation);
+      await addOperation(resetOperation);
+    }
+
+    debugPrint('OperationQueue: Moved ${operationsToRetry.length} operations back to pending queue');
+  }
+
+  /// Clear all failed operations
+  Future<void> clearFailedOperations() async {
+    debugPrint('OperationQueue: Clearing all ${_failedOperations.length} failed operations');
+
+    final count = _failedOperations.length;
+    _failedOperations.clear();
+
+    await _persistQueue();
+
+    debugPrint('OperationQueue: Cleared $count failed operations');
+  }
+
+  /// Remove a specific failed operation by ID
+  Future<void> removeFailedOperation(String id) async {
+    final operation = _failedOperations.cast<QueueableOperation?>().firstWhere(
+      (op) => op?.id == id,
+      orElse: () => null,
+    );
+
+    if (operation == null) {
+      debugPrint('OperationQueue: Failed operation with id $id not found');
+      return;
+    }
+
+    debugPrint('OperationQueue: Removing failed operation ${operation.id}');
+
+    _failedOperations.remove(operation);
+
+    await _persistQueue();
+
+    debugPrint('OperationQueue: Removed failed operation ${operation.id}');
+  }
+
+  /// Reset attempt metadata for retrying a failed operation
+  QueueableOperation _resetAttemptMetadata(QueueableOperation operation) {
+    // Use type checking and copyWith to reset metadata
+    if (operation is TripPlanningOperation) {
+      return operation.copyWith(
+        lastAttempt: null,
+        attemptCount: 0,
+        lastError: null,
+      );
+    } else if (operation is TravelNoteOperation) {
+      return operation.copyWith(
+        lastAttempt: null,
+        attemptCount: 0,
+        lastError: null,
+      );
+    } else if (operation is LocationUpdateOperation) {
+      return operation.copyWith(
+        lastAttempt: null,
+        attemptCount: 0,
+        lastError: null,
+      );
+    }
+
+    // Fallback: return operation as-is if type is unknown
+    return operation;
+  }
 }
