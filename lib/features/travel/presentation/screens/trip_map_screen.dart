@@ -134,8 +134,22 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     _clusteringManager!.updateMapBounds(bounds);
   }
 
-  /// Handle cluster tap - zoom to fit cluster
+  /// Handle cluster tap - show expand options
   void _onClusterTap(MapCluster cluster) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _ClusterExpandSheet(
+        cluster: cluster,
+        onZoomToFit: () => _onZoomToFitCluster(cluster),
+        onMarkerTap: (marker) => _onMarkerTap(marker),
+      ),
+    );
+  }
+
+  /// Zoom to fit cluster bounds
+  void _onZoomToFitCluster(MapCluster cluster) {
     // Calculate bounds to fit all markers in cluster
     final bounds = _calculateBoundsForCluster(cluster);
 
@@ -150,16 +164,25 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
 
   /// Calculate bounds for a cluster
   LatLngBounds _calculateBoundsForCluster(MapCluster cluster) {
-    double minLat = cluster.lat;
-    double maxLat = cluster.lat;
-    double minLng = cluster.lng;
-    double maxLng = cluster.lng;
+    final allMarkers = ref.read(tripMapMarkersProvider);
+    final clusterMarkers = allMarkers
+        .where((marker) => cluster.markerIds.contains(marker.id))
+        .toList();
 
-    for (final marker in cluster.markers) {
-      minLat = math.min(minLat, marker.lat);
-      maxLat = math.max(maxLat, marker.lat);
-      minLng = math.min(minLng, marker.lng);
-      maxLng = math.max(maxLng, marker.lng);
+    if (clusterMarkers.isEmpty) {
+      return LatLngBounds(cluster.position, cluster.position);
+    }
+
+    double minLat = cluster.position.latitude;
+    double maxLat = cluster.position.latitude;
+    double minLng = cluster.position.longitude;
+    double maxLng = cluster.position.longitude;
+
+    for (final marker in clusterMarkers) {
+      minLat = math.min(minLat, marker.position.latitude);
+      maxLat = math.max(maxLat, marker.position.latitude);
+      minLng = math.min(minLng, marker.position.longitude);
+      maxLng = math.max(maxLng, marker.position.longitude);
     }
 
     return LatLngBounds(
@@ -496,7 +519,7 @@ class _MarkerDetailsSheet extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  '${marker.lat.toStringAsFixed(4)}, ${marker.lng.toStringAsFixed(4)}',
+                  '${marker.position.latitude.toStringAsFixed(4)}, ${marker.position.longitude.toStringAsFixed(4)}',
                   style: theme.textTheme.bodySmall,
                 ),
               ),
@@ -512,5 +535,415 @@ class _MarkerDetailsSheet extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Bottom sheet for expanding and viewing cluster contents
+class _ClusterExpandSheet extends ConsumerWidget {
+  final MapCluster cluster;
+  final VoidCallback onZoomToFit;
+  final Function(MapMarker) onMarkerTap;
+
+  const _ClusterExpandSheet({
+    required this.cluster,
+    required this.onZoomToFit,
+    required this.onMarkerTap,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final allMarkers = ref.watch(tripMapMarkersProvider);
+
+    // Get markers in this cluster
+    final clusterMarkers = allMarkers
+        .where((marker) => cluster.markerIds.contains(marker.id))
+        .toList();
+
+    // Group markers by type for better organization
+    final groupedMarkers = _groupMarkersByType(clusterMarkers);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: theme.dividerColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header with cluster info
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.layers,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${cluster.markerCount} Locations',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Tap to view details',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Divider(height: 1),
+
+          // Quick action buttons
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onZoomToFit();
+                    },
+                    icon: const Icon(Icons.zoom_in_map),
+                    label: const Text('Zoom to Fit'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.map),
+                    label: const Text('Close'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const Divider(height: 1),
+
+          // Markers list
+          Flexible(
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const ClampingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: groupedMarkers.length,
+              itemBuilder: (context, index) {
+                final entry = groupedMarkers.entries.elementAt(index);
+                final type = entry.key;
+                final markers = entry.value;
+
+                return _MarkerTypeSection(
+                  type: type,
+                  markers: markers,
+                  onMarkerTap: (marker) {
+                    Navigator.of(context).pop();
+                    onMarkerTap(marker);
+                  },
+                );
+              },
+            ),
+          ),
+
+          // Bottom padding
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  /// Group markers by type for organized display
+  Map<MarkerType, List<MapMarker>> _groupMarkersByType(List<MapMarker> markers) {
+    final grouped = <MarkerType, List<MapMarker>>{};
+
+    for (final marker in markers) {
+      grouped.putIfAbsent(marker.type, () => []).add(marker);
+    }
+
+    // Sort by marker count (most common types first)
+    final sortedEntries = grouped.entries.toList()
+      ..sort((a, b) => b.value.length.compareTo(a.value.length));
+
+    return Map.fromEntries(sortedEntries);
+  }
+}
+
+/// Widget for displaying a section of markers grouped by type
+class _MarkerTypeSection extends StatelessWidget {
+  final MarkerType type;
+  final List<MapMarker> markers;
+  final Function(MapMarker) onMarkerTap;
+
+  const _MarkerTypeSection({
+    required this.type,
+    required this.markers,
+    required this.onMarkerTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Type header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+          child: Row(
+            children: [
+              Icon(
+                _getTypeIcon(type),
+                size: 16,
+                color: _getTypeColor(type),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                _getTypeLabel(type),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: _getTypeColor(type),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${markers.length}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSecondaryContainer,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Markers in this type
+        ...markers.map((marker) => _MarkerListItem(
+              marker: marker,
+              onTap: () => onMarkerTap(marker),
+            )),
+      ],
+    );
+  }
+
+  IconData _getTypeIcon(MarkerType type) {
+    switch (type) {
+      case MarkerType.trip:
+        return Icons.flight_takeoff;
+      case MarkerType.activity:
+        return Icons.hiking;
+      case MarkerType.photo:
+        return Icons.photo_camera;
+      case MarkerType.accommodation:
+        return Icons.hotel;
+      case MarkerType.restaurant:
+        return Icons.restaurant;
+      case MarkerType.transport:
+        return Icons.directions_car;
+      case MarkerType.poi:
+        return Icons.place;
+      case MarkerType.defaultType:
+        return Icons.location_on;
+    }
+  }
+
+  Color _getTypeColor(MarkerType type) {
+    switch (type) {
+      case MarkerType.trip:
+        return Colors.blue;
+      case MarkerType.activity:
+        return Colors.orange;
+      case MarkerType.photo:
+        return Colors.purple;
+      case MarkerType.accommodation:
+        return Colors.teal;
+      case MarkerType.restaurant:
+        return Colors.red;
+      case MarkerType.transport:
+        return Colors.indigo;
+      case MarkerType.poi:
+        return Colors.amber;
+      case MarkerType.defaultType:
+        return Colors.grey;
+    }
+  }
+
+  String _getTypeLabel(MarkerType type) {
+    switch (type) {
+      case MarkerType.trip:
+        return 'Trips';
+      case MarkerType.activity:
+        return 'Activities';
+      case MarkerType.photo:
+        return 'Photos';
+      case MarkerType.accommodation:
+        return 'Accommodations';
+      case MarkerType.restaurant:
+        return 'Restaurants';
+      case MarkerType.transport:
+        return 'Transport';
+      case MarkerType.poi:
+        return 'Places';
+      case MarkerType.defaultType:
+        return 'Other';
+    }
+  }
+}
+
+/// List item for a single marker in the cluster
+class _MarkerListItem extends StatelessWidget {
+  final MapMarker marker;
+  final VoidCallback onTap;
+
+  const _MarkerListItem({
+    required this.marker,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Row(
+          children: [
+            // Marker icon
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: _getMarkerColor(context).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                _getMarkerIcon(),
+                color: _getMarkerColor(context),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+
+            // Marker info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    marker.title ?? 'Unnamed Marker',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (marker.description != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      marker.description!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            // Chevron icon
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getMarkerColor(BuildContext context) {
+    switch (marker.type) {
+      case MarkerType.trip:
+        return Colors.blue;
+      case MarkerType.activity:
+        return Colors.orange;
+      case MarkerType.photo:
+        return Colors.purple;
+      case MarkerType.accommodation:
+        return Colors.teal;
+      case MarkerType.restaurant:
+        return Colors.red;
+      case MarkerType.transport:
+        return Colors.indigo;
+      case MarkerType.poi:
+        return Colors.amber;
+      case MarkerType.defaultType:
+        return Theme.of(context).primaryColor;
+    }
+  }
+
+  IconData _getMarkerIcon() {
+    switch (marker.type) {
+      case MarkerType.trip:
+        return Icons.flight_takeoff;
+      case MarkerType.activity:
+        return Icons.hiking;
+      case MarkerType.photo:
+        return Icons.photo_camera;
+      case MarkerType.accommodation:
+        return Icons.hotel;
+      case MarkerType.restaurant:
+        return Icons.restaurant;
+      case MarkerType.transport:
+        return Icons.directions_car;
+      case MarkerType.poi:
+        return Icons.place;
+      case MarkerType.defaultType:
+        return Icons.location_on;
+    }
   }
 }

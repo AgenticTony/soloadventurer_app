@@ -20,7 +20,11 @@ Complete implementation of a Flutter Map screen with intelligent marker clusteri
 
 ### ✅ User Interactions
 
-- **Cluster tap**: Zoom to fit cluster bounds
+- **Cluster tap**: Show expand bottom sheet with all markers
+  - View all locations in the cluster
+  - Grouped by type (Trips, Activities, Restaurants, etc.)
+  - Quick actions: Zoom to Fit, Close
+  - Tap any marker to view details
 - **Marker tap**: Show marker details bottom sheet
 - **Clustering presets**: High density, low density, performance modes
 - **Map controls**: Zoom, pan, recenter
@@ -217,6 +221,159 @@ ClusteringManagerFactories.forPerformance(
 - **Min cluster size**: 2
 - **Algorithm**: Grid (fastest)
 - **Best for**: Maximum performance with many markers
+
+## Cluster Tap-to-Expand
+
+### Overview
+
+When users tap a cluster marker, a bottom sheet appears displaying all locations contained within that cluster. This allows users to explore cluster contents without zooming in.
+
+### Features
+
+**Organized Display**:
+- Markers grouped by type (Trips, Activities, Restaurants, Photos, etc.)
+- Count badges for each type
+- Visual icons and colors for each marker type
+- Scrollable list for large clusters
+
+**Quick Actions**:
+- **Zoom to Fit**: Automatically zooms map to show all cluster markers
+- **Close**: Dismisses the bottom sheet
+- **Tap Marker**: View detailed marker information
+
+**User Experience**:
+- Smooth bottom sheet animation
+- Handle bar for visual indicator
+- Responsive layout
+- Clear visual hierarchy
+
+### Implementation Details
+
+The tap-to-expand functionality consists of three main widgets:
+
+1. **`_ClusterExpandSheet`**: Main bottom sheet displaying cluster contents
+2. **`_MarkerTypeSection`**: Groups markers by type with count badges
+3. **`_MarkerListItem`**: Individual marker item with icon, title, description
+
+### Code Example
+
+```dart
+// Handle cluster tap
+void _onClusterTap(MapCluster cluster) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => _ClusterExpandSheet(
+      cluster: cluster,
+      onZoomToFit: () => _onZoomToFitCluster(cluster),
+      onMarkerTap: (marker) => _onMarkerTap(marker),
+    ),
+  );
+}
+
+// Zoom to fit cluster bounds
+void _onZoomToFitCluster(MapCluster cluster) {
+  final bounds = _calculateBoundsForCluster(cluster);
+
+  _mapController.fitCamera(
+    CameraFit.bounds(
+      bounds: bounds,
+      padding: const EdgeInsets.all(50),
+    ),
+  );
+}
+
+// Calculate bounds from all markers in cluster
+LatLngBounds _calculateBoundsForCluster(MapCluster cluster) {
+  final allMarkers = ref.read(tripMapMarkersProvider);
+  final clusterMarkers = allMarkers
+      .where((marker) => cluster.markerIds.contains(marker.id))
+      .toList();
+
+  if (clusterMarkers.isEmpty) {
+    return LatLngBounds(cluster.position, cluster.position);
+  }
+
+  double minLat = cluster.position.latitude;
+  double maxLat = cluster.position.latitude;
+  double minLng = cluster.position.longitude;
+  double maxLng = cluster.position.longitude;
+
+  for (final marker in clusterMarkers) {
+    minLat = math.min(minLat, marker.position.latitude);
+    maxLat = math.max(maxLat, marker.position.latitude);
+    minLng = math.min(minLng, marker.position.longitude);
+    maxLng = math.max(maxLng, marker.position.longitude);
+  }
+
+  return LatLngBounds(
+    LatLng(minLat, minLng),
+    LatLng(maxLat, maxLng),
+  );
+}
+```
+
+### UI Structure
+
+```
+┌────────────────────────────────┐
+│         ════════               │  ← Handle bar
+├────────────────────────────────┤
+│ [📚] 5 Locations              │  ← Header with count
+│      Tap to view details       │
+├────────────────────────────────┤
+│ [🔍 Zoom to Fit] [🗺️ Close]   │  ← Action buttons
+├────────────────────────────────┤
+│  🥾 Activities (2)            │  ← Type section with count
+│    └─ Golden Gate Bridge      │
+│    └─ Alcatraz Tour           │
+│                                │
+│  🍽️ Restaurants (1)           │
+│    └─ Seafood Restaurant      │
+│                                │
+│  ✈️ Trips (1)                 │
+│    └─ San Francisco Trip       │
+└────────────────────────────────┘
+```
+
+### Type Grouping
+
+Markers are automatically grouped by these types:
+- **Trips** (blue, ✈️)
+- **Activities** (orange, 🥾)
+- **Photos** (purple, 📷)
+- **Accommodations** (teal, 🏨)
+- **Restaurants** (red, 🍽️)
+- **Transport** (indigo, 🚗)
+- **Places** (amber, 📍)
+- **Other** (grey, 📍)
+
+### Performance
+
+- **Marker Resolution**: Efficient one-time lookup from provider
+- **Grouping**: O(n) operation where n = cluster size
+- **Bounds Calculation**: O(n) for cluster markers
+- **Scroll Physics**: ClampingScrollPhysics for smooth scrolling
+
+### Testing
+
+See `cluster_tap_handling_test.dart` for comprehensive test coverage:
+
+```bash
+flutter test test/features/travel/presentation/screens/cluster_tap_handling_test.dart
+```
+
+Tests include:
+- ✅ Cluster expand sheet displays correct information
+- ✅ Zoom to Fit button triggers callback
+- ✅ Tapping marker item triggers marker tap callback
+- ✅ Markers are grouped by type with correct counts
+- ✅ Handle bar is displayed correctly
+- ✅ Empty clusters display correctly
+- ✅ Multiple markers of same type group correctly
+
+For more details, see [CLUSTER_TAP_HANDLING_README.md](./CLUSTER_TAP_HANDLING_README.md)
 
 ## Customization
 
