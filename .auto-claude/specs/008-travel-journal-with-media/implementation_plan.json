@@ -233,16 +233,24 @@
     {
       "phase_id": "5",
       "name": "Organization & Tagging",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "5.1",
           "title": "Create trip management system",
           "description": "Allow users to create and manage trips to organize entries",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/api/trips.ts",
-            "src/components/journal/TripManager.tsx"
+            "lib/features/journal/data/datasources/trip_remote_data_source.dart",
+            "lib/features/journal/data/datasources/trip_remote_data_source_impl.dart",
+            "lib/features/journal/domain/repositories/trip_repository.dart",
+            "lib/features/journal/data/repositories/trip_repository_impl.dart",
+            "lib/features/journal/presentation/providers/trip_providers.dart",
+            "lib/features/journal/presentation/screens/trip_list_screen.dart",
+            "lib/features/journal/presentation/screens/create_trip_screen.dart",
+            "lib/features/journal/presentation/screens/trip_detail_screen.dart",
+            "lib/features/journal/data/repositories/README_TRIP.md",
+            "lib/features/journal/presentation/screens/trip_screens_example.dart"
           ]
         },
         {
