@@ -166,3 +166,21 @@ class InvalidImageException extends AppException {
     String? code,
   }) : super(code: code ?? 'invalid_image');
 }
+
+/// Exception thrown when video format is not supported
+class UnsupportedVideoFormatException extends AppException {
+  /// Creates a new [UnsupportedVideoFormatException] with the given [message] and optional [code]
+  const UnsupportedVideoFormatException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'unsupported_video_format');
+}
+
+/// Exception thrown when video file is invalid, too large, or corrupted
+class InvalidVideoException extends AppException {
+  /// Creates a new [InvalidVideoException] with the given [message] and optional [code]
+  const InvalidVideoException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'invalid_video');
+}

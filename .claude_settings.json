@@ -1,0 +1,34 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/**)",
+      "Glob(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/**)",
+      "Grep(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/.auto-claude/specs/008-travel-journal-with-media/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/.auto-claude/specs/008-travel-journal-with-media/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/008-travel-journal-with-media/.auto-claude/specs/008-travel-journal-with-media/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

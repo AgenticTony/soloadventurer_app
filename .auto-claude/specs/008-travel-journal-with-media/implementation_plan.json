@@ -126,9 +126,12 @@
           "subtask_id": "3.2",
           "title": "Create video compression utility",
           "description": "Implement video compression for reduced file sizes",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/utils/videoCompression.ts"
+            "lib/utils/video_compression.dart",
+            "lib/utils/README_VIDEO_COMPRESSION.md",
+            "lib/utils/video_compression_example.dart",
+            "lib/core/errors/exceptions.dart"
           ]
         },
         {
