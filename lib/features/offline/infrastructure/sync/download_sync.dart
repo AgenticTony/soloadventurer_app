@@ -154,7 +154,7 @@ class DownloadSync {
       // STEP 1: Sync Trips
       // ========================================================================
       onProgress?.call(1, 4);
-      final tripResult = await _syncTrips();
+      final tripResult = await syncTrips();
       downloadCount += tripResult['total'] as int;
       insertCount += tripResult['inserted'] as int;
       updateCount += tripResult['updated'] as int;
@@ -168,7 +168,7 @@ class DownloadSync {
       // STEP 2: Sync Journals
       // ========================================================================
       onProgress?.call(2, 4);
-      final journalResult = await _syncJournals();
+      final journalResult = await syncJournals();
       downloadCount += journalResult['total'] as int;
       insertCount += journalResult['inserted'] as int;
       updateCount += journalResult['updated'] as int;
@@ -182,7 +182,7 @@ class DownloadSync {
       // STEP 3: Sync User Profile
       // ========================================================================
       onProgress?.call(3, 4);
-      final userResult = await _syncUserProfile();
+      final userResult = await syncUserProfile();
       downloadCount += userResult['total'] as int;
       insertCount += userResult['inserted'] as int;
       updateCount += userResult['updated'] as int;
@@ -226,13 +226,13 @@ class DownloadSync {
   }
 
   // ==============================================================================
-  // PRIVATE METHODS - ENTITY SYNC
+  // PUBLIC METHODS - ENTITY SYNC
   // ==============================================================================
 
   /// Syncs trips from server to local database
   ///
   /// Returns a map with sync statistics.
-  Future<Map<String, int>> _syncTrips() async {
+  Future<Map<String, int>> syncTrips() async {
     try {
       debugPrint('📥 Syncing trips...');
 
@@ -367,7 +367,7 @@ class DownloadSync {
   /// Syncs journals from server to local database
   ///
   /// Returns a map with sync statistics.
-  Future<Map<String, int>> _syncJournals() async {
+  Future<Map<String, int>> syncJournals() async {
     try {
       debugPrint('📥 Syncing journals...');
 
@@ -541,7 +541,7 @@ class DownloadSync {
   /// Syncs user profile from server to local database
   ///
   /// Returns a map with sync statistics.
-  Future<Map<String, int>> _syncUserProfile() async {
+  Future<Map<String, int>> syncUserProfile() async {
     try {
       debugPrint('📥 Syncing user profile...');
 

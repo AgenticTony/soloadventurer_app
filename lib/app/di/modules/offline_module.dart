@@ -177,12 +177,19 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     ),
   );
   //
-  // TODO: Register IncrementalSync (Subtask 5.5)
-  // getIt.registerLazySingleton<IncrementalSync>(
-  //   () => IncrementalSync(
-  //     downloadSync: getIt<DownloadSync>(),
-  //   ),
-  // );
+  // Register IncrementalSync for efficient delta sync with fallback to full sync
+  // This service attempts to sync only changed data using timestamp-based filtering.
+  // If incremental sync fails or is not supported by the server, it falls back to
+  // a full sync automatically. Tracks last incremental sync time per entity type.
+  getIt.registerLazySingleton<IncrementalSync>(
+    () => IncrementalSync(
+      dio: getIt<DioApiService>().dio,
+      database: getIt<DatabaseService>().database,
+      userId: 'current-user-id', // TODO: Get from auth service
+      graphqlEndpoint: '/graphql',
+      conflictResolver: getIt<ConflictResolver>(),
+    ),
+  );
 
   // ==============================================================================
   // PHASE 6: REPOSITORY ADAPTATION (To be implemented in Phase 6)

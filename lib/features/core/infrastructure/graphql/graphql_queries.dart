@@ -292,4 +292,61 @@ class GraphQLQueries {
       }
     }
   ''';
+
+  // Incremental sync queries with 'since' parameter
+  static String getTripsIncremental = '''
+    query GetTripsIncremental(\$userId: ID!, \$since: DateTime!) {
+      getTripsIncremental(userId: \$userId, since: \$since) {
+        id
+        userId
+        title
+        description
+        startDate
+        endDate
+        destination
+        latitude
+        longitude
+        status
+        budget
+        coverImageUrl
+        travelCompanionIds
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String getJournalsIncremental = '''
+    query GetJournalsIncremental(\$tripId: ID!, \$since: DateTime!) {
+      getJournalsIncremental(tripId: \$tripId, since: \$since) {
+        id
+        tripId
+        userId
+        title
+        content
+        entryDate
+        mood
+        location
+        imageUrls
+        tags
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String getUserProfileIncremental = '''
+    query GetUserProfileIncremental(\$userId: ID!, \$since: DateTime!) {
+      getUserProfileIncremental(userId: \$userId, since: \$since) {
+        id
+        username
+        email
+        firstName
+        lastName
+        profilePictureUrl
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
 }
