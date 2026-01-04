@@ -1,0 +1,300 @@
+{
+  "feature": "Sync & Conflict Resolution System",
+  "description": "# Sync & Conflict Resolution System\n\nRobust data synchronization with conflict resolution for concurrent edits, operation queuing, retry mechanisms, and transparent sync status indicators. Handles edge cases like multiple device edits, stale data, and partial syncs.\n\n## Rationale\nAddresses critical competitor pain points: TripIt and Wanderlog sync errors (pain-1-1, pain-2-3) where users see 'There was a problem syncing changes' repeatedly. Reliable sync is essential for user trust, especially when offline-first architecture creates more opportunities for conflicts.\n\n## User Stories\n- As a user, I want my data to sync automatically so that changes on my phone appear on my tablet\n- As a user, I want clear feedback if sync fails so that I know whether my data is safe\n- As a user with multiple devices, I want conflict resolution options if I edit the same data on both devices\n\n## Acceptance Criteria\n- [ ] All data changes sync automatically when internet is available\n- [ ] Concurrent edits from multiple devices are resolved with clear conflict UI\n- [ ] Failed sync attempts retry with exponential backoff\n- [ ] Users can manually trigger sync if needed\n- [ ] Sync status is visible in real-time (syncing, success, failed, pending)\n- [ ] Operation queue persists across app restarts\n- [ ] Users are notified of conflicts and can choose which version to keep\n- [ ] Sync failures provide actionable error messages\n",
+  "created_at": "2026-01-04T18:29:49.117Z",
+  "updated_at": "2026-01-04T19:32:00.000Z",
+  "status": "in_progress",
+  "qa_sign_off": {
+    "status": "pending",
+    "issues": "",
+    "tests_passed": ""
+  },
+  "phases": [
+    {
+      "phase_id": "phase-1",
+      "title": "Core Sync Infrastructure",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "1.1",
+          "title": "Design sync state management architecture",
+          "status": "completed",
+          "description": "Define sync states (idle, syncing, success, failed, pending), data types to sync, and state management approach using Redux/Zustand",
+          "acceptance_criteria": [
+            "State schema documented",
+            "Sync state enum defined",
+            "Data types for sync identified (trips, activities, notes, etc.)"
+          ],
+          "notes": "Created SyncStatus enum with 5 states (idle, syncing, success, failed, pending). Created SyncState class following AuthState pattern with immutability, copyWith, and factory constructors. Created SyncEntityType enum defining 9 syncable entity types (authTokens, profile, trip, tripPlanning, travelNote, locationUpdate, travelPreference, companions, sharedTrips) with priorities, offline support, and conflict resolution strategies. Used Riverpod for state management (not Redux/Zustand as those are React-specific). Added comprehensive SYNC_ARCHITECTURE.md documentation (12KB). All acceptance criteria met."
+        },
+        {
+          "subtask_id": "1.2",
+          "title": "Create sync service with operation queue",
+          "status": "pending",
+          "description": "Implement SyncService class with queue management for pending operations, FIFO processing, and batch operation support",
+          "acceptance_criteria": [
+            "SyncService class created with queue methods",
+            "Operations can be added to queue",
+            "Queue processes operations in order",
+            "Batch operations supported"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "1.3",
+          "title": "Implement operation persistence layer",
+          "status": "pending",
+          "description": "Persist operation queue to AsyncStorage/SQLite for recovery across app restarts",
+          "acceptance_criteria": [
+            "Operations saved to persistent storage",
+            "Queue restored on app startup",
+            "Corrupted queue data handled gracefully"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "1.4",
+          "title": "Add network connectivity detection",
+          "status": "pending",
+          "description": "Integrate NetInfo or equivalent to detect online/offline status and trigger sync when connection restored",
+          "acceptance_criteria": [
+            "Network state monitored in real-time",
+            "Sync triggers on connection restoration",
+            "Offline mode detected and handled"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-2",
+      "title": "Conflict Detection & Resolution",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "2.1",
+          "title": "Implement conflict detection logic",
+          "status": "pending",
+          "description": "Detect when same entity was modified on multiple devices using version vectors or last-write-wins timestamps",
+          "acceptance_criteria": [
+            "Version comparison logic implemented",
+            "Conflicts detected when local and remote versions diverged",
+            "False positives minimized"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "2.2",
+          "title": "Create conflict resolution strategies",
+          "status": "pending",
+          "description": "Implement multiple strategies: last-write-wins, manual resolution, automatic merge (for non-overlapping fields)",
+          "acceptance_criteria": [
+            "Last-write-wins strategy implemented",
+            "Manual resolution strategy implemented",
+            "Automatic merge for compatible changes",
+            "Strategy selection based on conflict type"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "2.3",
+          "title": "Build conflict resolution UI components",
+          "status": "pending",
+          "description": "Create modal/dialog showing both versions of conflicted data with side-by-side comparison and user choice controls",
+          "acceptance_criteria": [
+            "Conflict modal component created",
+            "Side-by-side diff display",
+            "Keep local/keep remote/merge options available",
+            "Mobile-responsive design"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "2.4",
+          "title": "Implement user decision handling",
+          "status": "pending",
+          "description": "Process user's conflict resolution choice and apply to local and remote data",
+          "acceptance_criteria": [
+            "User choice applied to data store",
+            "Resolution operation queued for sync",
+            "UI updates after resolution"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-3",
+      "title": "Retry & Error Handling",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "3.1",
+          "title": "Implement exponential backoff retry mechanism",
+          "status": "pending",
+          "description": "Retry failed sync operations with exponential backoff (1s, 2s, 4s, 8s, max 60s) and max retry limit",
+          "acceptance_criteria": [
+            "Retry logic with exponential backoff implemented",
+            "Max retry limit enforced (e.g., 5 attempts)",
+            "Backoff reset after successful sync"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "3.2",
+          "title": "Add error categorization and messaging",
+          "status": "pending",
+          "description": "Categorize errors (network, auth, server, validation) and provide user-friendly messages",
+          "acceptance_criteria": [
+            "Error types defined",
+            "User-friendly error messages for each type",
+            "Actionable suggestions included"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "3.3",
+          "title": "Create actionable error displays",
+          "status": "pending",
+          "description": "Build UI components showing sync errors with retry buttons, dismiss options, and help links",
+          "acceptance_criteria": [
+            "Error banner/toast component",
+            "Retry button functionality",
+            "Error details expansion",
+            "Dismiss option available"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "3.4",
+          "title": "Add manual sync trigger",
+          "status": "pending",
+          "description": "Provide pull-to-refresh and sync button in settings for manual sync initiation",
+          "acceptance_criteria": [
+            "Pull-to-refresh on relevant screens",
+            "Manual sync button in settings",
+            "Visual feedback during manual sync"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-4",
+      "title": "Status Indicators",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "4.1",
+          "title": "Create sync status indicator components",
+          "status": "pending",
+          "description": "Build visual indicators (icons, badges, progress bars) showing sync state",
+          "acceptance_criteria": [
+            "Sync status icon component",
+            "State colors (green=success, red=failed, blue=syncing, orange=pending)",
+            "Animated syncing indicator",
+            "Badge showing pending count"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "4.2",
+          "title": "Add real-time status updates",
+          "status": "pending",
+          "description": "Update status indicators immediately on sync state changes using reactive state management",
+          "acceptance_criteria": [
+            "Status changes reflected in UI immediately",
+            "Multiple components receive status updates",
+            "No stale status indicators"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "4.3",
+          "title": "Implement persistent status across app restarts",
+          "status": "pending",
+          "description": "Save last sync status and restore on app launch to show if sync was previously failed",
+          "acceptance_criteria": [
+            "Last sync status persisted",
+            "Failed status shown on app restart",
+            "Pending operations count displayed"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "4.4",
+          "title": "Add sync history and logging",
+          "status": "pending",
+          "description": "Maintain log of recent sync operations with timestamps for debugging and user transparency",
+          "acceptance_criteria": [
+            "Sync history stored (last 50 operations)",
+            "Developer-accessible sync log",
+            "User-facing sync status screen"
+          ],
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-5",
+      "title": "Testing & Integration",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "5.1",
+          "title": "Write unit tests for sync logic",
+          "status": "pending",
+          "description": "Test sync service, conflict detection, resolution strategies, and retry logic",
+          "acceptance_criteria": [
+            "Sync service unit tests",
+            "Conflict detection tests with various scenarios",
+            "Resolution strategy tests",
+            "Retry logic tests",
+            "Coverage >80%"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "5.2",
+          "title": "Create integration tests for conflict scenarios",
+          "status": "pending",
+          "description": "Test end-to-end conflict scenarios with mocked backend and multiple clients",
+          "acceptance_criteria": [
+            "Simultaneous edit conflict tests",
+            "Offline-then-online sync tests",
+            "Network interruption recovery tests",
+            "Multiple device sync tests"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "5.3",
+          "title": "Implement edge case coverage",
+          "status": "pending",
+          "description": "Test stale data handling, partial syncs, corrupted queue data, and large batch operations",
+          "acceptance_criteria": [
+            "Stale data rejection tests",
+            "Partial sync recovery tests",
+            "Corrupted data handling tests",
+            "Large batch performance tests"
+          ],
+          "notes": ""
+        },
+        {
+          "subtask_id": "5.4",
+          "title": "Add end-to-end testing with network simulation",
+          "status": "pending",
+          "description": "Use React Native TestUtils or Detox to test full sync flow with simulated network conditions",
+          "acceptance_criteria": [
+            "Offline mode E2E tests",
+            "Slow network simulation tests",
+            "Server error handling E2E tests",
+            "Manual sync trigger E2E tests"
+          ],
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "planStatus": "in_progress"
+}
