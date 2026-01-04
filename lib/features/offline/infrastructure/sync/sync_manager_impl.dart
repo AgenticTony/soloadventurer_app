@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
+import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/upload_sync.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/download_sync.dart';
 
@@ -33,6 +34,9 @@ class SyncManagerImpl implements SyncManager {
 
   /// Download sync service for syncing server data to local database
   final DownloadSync _downloadSync;
+
+  /// Conflict resolver for handling sync conflicts
+  final ConflictResolver _conflictResolver;
 
   /// Stream controller for sync status updates
   final StreamController<SyncStatus> _statusController =
@@ -68,6 +72,7 @@ class SyncManagerImpl implements SyncManager {
   /// [syncQueueService] - Sync queue service for managing operations
   /// [uploadSync] - Upload sync service for syncing to server
   /// [downloadSync] - Download sync service for syncing from server
+  /// [conflictResolver] - Conflict resolver for handling sync conflicts
   /// [autoSyncMinInterval] - Minimum interval between auto-syncs (default: 30s)
   /// [syncOnlyOnWifi] - Only sync when on WiFi (default: false)
   SyncManagerImpl({
@@ -75,12 +80,14 @@ class SyncManagerImpl implements SyncManager {
     required SyncQueueService syncQueueService,
     required UploadSync uploadSync,
     required DownloadSync downloadSync,
+    required ConflictResolver conflictResolver,
     this.autoSyncMinInterval = const Duration(seconds: 30),
     this.syncOnlyOnWifi = false,
   })  : _connectivityService = connectivityService,
         _syncQueueService = syncQueueService,
         _uploadSync = uploadSync,
-        _downloadSync = downloadSync;
+        _downloadSync = downloadSync,
+        _conflictResolver = conflictResolver;
 
   // ==============================================================================
   // SYNC STATUS STREAM
@@ -304,11 +311,19 @@ class SyncManagerImpl implements SyncManager {
         pendingOperations: _currentStatus.pendingOperations,
       ));
 
-      // TODO: Implement conflict resolution in subtask 5.4
-      // For now, no conflicts to resolve
-      conflictsResolved = 0;
+      // Resolve all conflicts automatically using default strategies
+      final resolutionResult = await _conflictResolver.resolveAllConflicts();
+      conflictsResolved = resolutionResult.resolvedCount;
 
-      debugPrint('✅ Conflict resolution complete: $conflictsResolved conflicts');
+      debugPrint('✅ Conflict resolution complete: '
+          '$conflictsResolved resolved, '
+          '${resolutionResult.manualResolutionRequired} require manual action');
+
+      // Emit a warning if manual resolution is required
+      if (resolutionResult.manualResolutionRequired > 0) {
+        debugPrint('⚠️ Warning: ${resolutionResult.manualResolutionRequired} '
+            'conflicts require manual resolution');
+      }
 
       // ========================================================================
       // PHASE 4: FINALIZATION - Complete sync

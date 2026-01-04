@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'package:dio/dio.dart';
+import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
+import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
 
 /// Result of a download sync operation
@@ -95,21 +97,30 @@ class DownloadSync {
   /// GraphQL API endpoint
   final String _graphqlEndpoint;
 
+  /// Conflict resolver for recording detected conflicts
+  final ConflictResolver? _conflictResolver;
+
+  /// Uuid generator for conflict IDs
+  final Uuid _uuid = const Uuid();
+
   /// Creates a new [DownloadSync] instance
   ///
   /// [dio] - Dio HTTP client for making API requests
   /// [database] - AppDatabase instance for local operations
   /// [userId] - Current user ID
   /// [graphqlEndpoint] - GraphQL API endpoint (default: '/graphql')
+  /// [conflictResolver] - Optional conflict resolver for recording conflicts
   DownloadSync({
     required Dio dio,
     required AppDatabase database,
     required String userId,
     String graphqlEndpoint = '/graphql',
+    ConflictResolver? conflictResolver,
   })  : _dio = dio,
         _database = database,
         _userId = userId,
-        _graphqlEndpoint = graphqlEndpoint;
+        _graphqlEndpoint = graphqlEndpoint,
+        _conflictResolver = conflictResolver;
 
   // ==============================================================================
   // PUBLIC API
@@ -272,11 +283,43 @@ class DownloadSync {
           if (needsUpdate) {
             // Check for conflicts
             if (localTrip.hasPendingChanges) {
-              // Conflict detected
+              // Conflict detected - record it
               conflicts++;
               debugPrint('⚠️ Conflict detected for trip: $tripId');
-              // TODO: Will be resolved by conflict resolution in subtask 5.4
-              // For now, we'll skip updating to avoid losing local changes
+
+              // Record the conflict if resolver is available
+              if (_conflictResolver != null) {
+                final conflict = Conflict(
+                  id: 'conflict_trip_${_uuid.v4()}',
+                  entityType: EntityType.trip,
+                  entityId: tripId,
+                  type: ConflictType.concurrentUpdate,
+                  severity: ConflictSeverity.medium,
+                  clientData: {
+                    'id': localTrip.id,
+                    'title': localTrip.title,
+                    'destination': localTrip.destination,
+                    'version': localTrip.version,
+                    'updatedAt': localTrip.updatedAt.toIso8601String(),
+                  },
+                  serverData: {
+                    'id': serverTrip['id'],
+                    'title': serverTrip['title'],
+                    'destination': serverTrip['destination'],
+                    'version': serverTrip['version'],
+                    'updatedAt': serverTrip['updatedAt'],
+                  },
+                  clientUpdatedAt: localTrip.updatedAt,
+                  serverUpdatedAt: serverUpdatedAt,
+                  detectedAt: DateTime.now(),
+                );
+
+                await _conflictResolver!.recordConflict(conflict);
+                debugPrint('📝 Conflict recorded for trip: $tripId');
+              }
+
+              // Skip updating to avoid losing local changes
+              // Will be resolved by conflict resolution phase
               skipped++;
             } else {
               // Update trip
@@ -409,10 +452,44 @@ class DownloadSync {
               if (needsUpdate) {
                 // Check for conflicts
                 if (localJournal.hasPendingChanges) {
-                  // Conflict detected
+                  // Conflict detected - record it
                   totalConflicts++;
                   debugPrint('⚠️ Conflict detected for journal: $journalId');
-                  // TODO: Will be resolved by conflict resolution in subtask 5.4
+
+                  // Record the conflict if resolver is available
+                  if (_conflictResolver != null) {
+                    final conflict = Conflict(
+                      id: 'conflict_journal_${_uuid.v4()}',
+                      entityType: EntityType.journal,
+                      entityId: journalId,
+                      type: ConflictType.concurrentUpdate,
+                      severity: ConflictSeverity.low,
+                      clientData: {
+                        'id': localJournal.id,
+                        'title': localJournal.title,
+                        'content': localJournal.content,
+                        'entryDate': localJournal.entryDate.toIso8601String(),
+                        'version': localJournal.version,
+                        'updatedAt': localJournal.updatedAt.toIso8601String(),
+                      },
+                      serverData: {
+                        'id': serverJournal['id'],
+                        'title': serverJournal['title'],
+                        'content': serverJournal['content'],
+                        'entryDate': serverJournal['entryDate'],
+                        'version': serverJournal['version'],
+                        'updatedAt': serverJournal['updatedAt'],
+                      },
+                      clientUpdatedAt: localJournal.updatedAt,
+                      serverUpdatedAt: serverUpdatedAt,
+                      detectedAt: DateTime.now(),
+                    );
+
+                    await _conflictResolver!.recordConflict(conflict);
+                    debugPrint('📝 Conflict recorded for journal: $journalId');
+                  }
+
+                  // Skip updating to avoid losing local changes
                   totalSkipped++;
                 } else {
                   // Update journal
@@ -491,6 +568,8 @@ class DownloadSync {
 
       int inserted = 0;
       int updated = 0;
+      int conflicts = 0;
+      int skipped = 0;
 
       if (localUsers.isEmpty) {
         // Insert new user
@@ -506,9 +585,41 @@ class DownloadSync {
         if (needsUpdate) {
           // Check for conflicts
           if (localUser.hasPendingChanges) {
-            // Conflict detected - skip for now
+            // Conflict detected - record it
+            conflicts++;
             debugPrint('⚠️ Conflict detected for user: $_userId');
-            // TODO: Will be resolved by conflict resolution in subtask 5.4
+
+            // Record the conflict if resolver is available
+            if (_conflictResolver != null) {
+              final conflict = Conflict(
+                id: 'conflict_user_${_uuid.v4()}',
+                entityType: EntityType.userProfile,
+                entityId: _userId,
+                type: ConflictType.concurrentUpdate,
+                severity: ConflictSeverity.medium,
+                clientData: {
+                  'id': localUser.id,
+                  'displayName': localUser.displayName,
+                  'version': localUser.version,
+                  'updatedAt': localUser.updatedAt.toIso8601String(),
+                },
+                serverData: {
+                  'id': serverUser['id'],
+                  'displayName': serverUser['displayName'],
+                  'version': serverUser['version'],
+                  'updatedAt': serverUser['updatedAt'],
+                },
+                clientUpdatedAt: localUser.updatedAt,
+                serverUpdatedAt: serverUpdatedAt,
+                detectedAt: DateTime.now(),
+              );
+
+              await _conflictResolver!.recordConflict(conflict);
+              debugPrint('📝 Conflict recorded for user: $_userId');
+            }
+
+            // Skip updating to avoid losing local changes
+            skipped++;
           } else {
             // Update user
             await userDao.updateUser(_serverUserToCompanion(serverUser,
@@ -524,8 +635,8 @@ class DownloadSync {
         'inserted': inserted,
         'updated': updated,
         'deleted': 0,
-        'skipped': inserted == 0 && updated == 0 ? 1 : 0,
-        'conflicts': 0,
+        'skipped': skipped > 0 ? skipped : (inserted == 0 && updated == 0 ? 1 : 0),
+        'conflicts': conflicts,
       };
     } catch (e) {
       debugPrint('❌ Error syncing user profile: $e');

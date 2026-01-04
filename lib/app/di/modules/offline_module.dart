@@ -129,15 +129,28 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
       syncQueueService: getIt<SyncQueueService>(),
       uploadSync: getIt<UploadSync>(),
       downloadSync: getIt<DownloadSync>(),
+      conflictResolver: getIt<ConflictResolver>(),
       autoSyncMinInterval: const Duration(seconds: 30),
       syncOnlyOnWifi: false,
     ),
   );
   //
-  // TODO: Register ConflictResolver (Subtask 5.4)
-  // getIt.registerLazySingleton<ConflictResolver>(
-  //   () => ConflictResolver(),
-  // );
+  // Register ConflictResolver for handling sync conflicts
+  // This resolver handles situations where the same entity has been modified
+  // on both the client and server since the last sync. It provides multiple
+  // resolution strategies including last-write-wins, server-wins, client-wins,
+  // and manual resolution for complex conflicts.
+  getIt.registerLazySingleton<ConflictResolver>(
+    () => ConflictResolverImpl(
+      database: getIt<DatabaseService>().database,
+      defaultStrategies: const {
+        EntityType.trip: ConflictResolutionStrategy.serverWins,
+        EntityType.journal: ConflictResolutionStrategy.clientWins,
+        EntityType.userProfile: ConflictResolutionStrategy.lastWriteWins,
+        EntityType.travelPreference: ConflictResolutionStrategy.clientWins,
+      },
+    ),
+  );
   //
   // Register UploadSync for syncing queued operations to server
   // This service processes pending sync operations and uploads them to the server
@@ -160,6 +173,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
       database: getIt<DatabaseService>().database,
       userId: 'current-user-id', // TODO: Get from auth service
       graphqlEndpoint: '/graphql',
+      conflictResolver: getIt<ConflictResolver>(),
     ),
   );
   //
