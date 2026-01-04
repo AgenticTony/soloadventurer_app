@@ -271,7 +271,7 @@
     {
       "phase_id": "phase-4",
       "phase_name": "Presentation Layer - UI Components",
-      "status": "pending",
+      "status": "completed",
       "subtasks": [
         {
           "subtask_id": "4.1",
@@ -371,14 +371,15 @@
           "subtask_id": "4.7",
           "title": "Create ActivityList widget",
           "description": "Widget to display popular activities for a destination",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/presentation/widgets/activity_list.dart",
+          "notes": "Created comprehensive ActivityList widget with all required features. Implementation includes: 1) Three layout options (list, grid, horizontal) via ActivityListLayout enum, 2) Activity display with name, description, category badge, and optional cost level, 3) Icon or image support with CachedNetworkImage and fallback to category icon, 4) Solo-friendly indicator with person icon and light blue styling, 5) Contextual category icons for 15+ activity types (outdoor, cultural, food, nightlife, transport, wellness, shopping, entertainment, sports, beach, sightseeing, photography, music), 6) Cost level badges with icons (free, low, medium, high), 7) Tap handlers via onActivityTap callback, 8) Customizable options (gridCrossAxisCount, gridAspectRatio, horizontalItemHeight, showDescription, showCategory, showCostLevel, padding, itemSpacing), 9) Empty state handling with helpful message and icon, 10) Full accessibility support via Semantics widgets, 11) Private _ActivityCard widget with two layouts (detailed for list view, compact for grid/horizontal views), 12) Responsive design with proper constraints and flexible widgets. Added comprehensive documentation with usage examples. Updated widgets barrel file to export ActivityList. Follows existing patterns from SafetyInsights, DestinationCard, and CuratedListCard widgets.",
           "acceptance_criteria": [
-            "Activity name and description",
-            "Activity icon/image",
-            "Suitability for solo travelers indicator",
-            "Scrollable list or grid",
-            "Tap handlers for details"
+            "Activity name and description - COMPLETED with truncation support",
+            "Activity icon/image - COMPLETED with CachedNetworkImage and fallback icons",
+            "Suitability for solo travelers indicator - COMPLETED with SoloFriendly badge",
+            "Scrollable list or grid - COMPLETED (list, grid, horizontal layouts)",
+            "Tap handlers for details - COMPLETED via onActivityTap callback"
           ]
         }
       ]
