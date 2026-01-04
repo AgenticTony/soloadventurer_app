@@ -29,7 +29,7 @@
           "subtask_id": "1.2",
           "title": "Create data models for serialization",
           "description": "Create corresponding model classes for JSON serialization/deserialization",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/data/models/trusted_contact_model.dart",
             "lib/features/safety/data/models/check_in_model.dart",
