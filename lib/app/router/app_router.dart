@@ -12,12 +12,21 @@ import 'package:soloadventurer/features/profile/presentation/screens/edit_profil
 import 'package:soloadventurer/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/pages/cloudwatch_test_page.dart';
+import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
 
 /// App router for handling navigation
 class AppRouter {
   /// Generate routes for the app
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
-    // First check if it's a profile route
+    // First check if it's a safety route
+    if (settings.name?.startsWith('/safety') == true) {
+      final route = SafetyRoutes.onGenerateRoute(settings);
+      if (route != null) {
+        return route;
+      }
+    }
+
+    // Then check if it's a profile route
     if (settings.name?.startsWith('/profile') == true) {
       final route = ProfileRoutes.onGenerateRoute(settings);
       if (route != null) {
