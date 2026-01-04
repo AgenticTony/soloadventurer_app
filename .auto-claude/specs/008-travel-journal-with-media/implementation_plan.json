@@ -2,7 +2,7 @@
   "feature": "Travel Journal with Media",
   "description": "# Travel Journal with Media\n\nRich travel journal with photo and video uploads, text notes, location tagging, mood tracking, and media organization. Users can document daily experiences, add memories, and organize content by trip or date with automatic backups.\n\n## Rationale\nAddresses user pain point: 'Difficulty documenting and sharing travel experiences in one place.' Addresses competitor issues with clunky journal apps (pain-4-2) and crashes when adding photos (pain-2-2). Solo travelers value being able to document and share their adventures.\n\n## User Stories\n- As a traveler, I want to document my daily experiences with photos and notes so that I can remember my trip\n- As a user, I want to organize my journal by trip so that I can easily find memories from specific adventures\n- As a traveler, I want to upload photos in the background so that I can continue using the app while they sync\n\n## Acceptance Criteria\n- [ ] Users can create journal entries with rich text formatting\n- [ ] Photos and videos upload in background with compression\n- [ ] Entries are automatically tagged with location and date\n- [ ] Users can organize entries by trip, date, or custom tags\n- [ ] Media gallery views all photos/videos from a trip\n- [ ] Offline editing with sync when connection available\n- [ ] Export or share entire trips or individual entries\n- [ ] Memory timeline shows chronological view of all travel experiences\n",
   "created_at": "2026-01-04T18:29:59.629Z",
-  "updated_at": "2026-01-04T19:40:00.000Z",
+  "updated_at": "2026-01-05T10:00:00.000Z",
   "status": "in_progress",
   "phases": [
     {
@@ -23,9 +23,9 @@
           "subtask_id": "1.2",
           "title": "Set up storage buckets for media",
           "description": "Create Supabase storage buckets for photos and videos with proper RLS policies",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "supabase/migrations/XXXXXXXX_create_journal_storage_buckets.sql"
+            "supabase/migrations/20250105000000_create_journal_storage_buckets.sql"
           ]
         },
         {

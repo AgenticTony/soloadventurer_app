@@ -84,6 +84,19 @@ Created comprehensive database migration (580 lines) including:
 
 The migration supports offline-first architecture with sync status tracking on all tables.
 
+### 2026-01-05 10:00: Subtask 1.2 Completed
+Created storage buckets migration (220 lines) including:
+- **journal-photos** bucket for high-resolution images (10MB limit)
+- **journal-videos** bucket for video uploads (100MB limit)
+- **journal-thumbnails** bucket for optimized thumbnails (512KB limit)
+- Comprehensive RLS policies for all storage buckets
+- User-isolated storage with user_id folder structure
+- Helper function `generate_storage_path()` for unique, sanitized file paths
+- Proper MIME type restrictions for each bucket
+- Security with `auth.uid()` checks on all operations
+
+All storage buckets are private with access controlled via RLS policies ensuring users can only access their own media.
+
 ## Status: Phase 1 in progress
 Currently working on: Foundation & Database Schema
-Next step: Create storage buckets for media (subtask 1.2)
+Next step: Create TypeScript types for journal entities (subtask 1.3)
