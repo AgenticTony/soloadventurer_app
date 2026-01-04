@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../providers/connectivity_provider.dart';
 import '../../auth/domain/services/token_manager.dart';
+import 'operation_storage_service.dart';
+import '../../travel/domain/models/trip_planning_operation.dart';
 
 part 'operation_queue.g.dart';
 
@@ -31,6 +33,7 @@ abstract class QueueableOperation {
 @riverpod
 class OperationQueue extends _$OperationQueue {
   final Queue<QueueableOperation> _pendingOperations = Queue();
+  final List<QueueableOperation> _failedOperations = [];
   Timer? _processingTimer;
   bool _isProcessing = false;
 
@@ -39,6 +42,9 @@ class OperationQueue extends _$OperationQueue {
     // Watch connectivity and token state
     ref.watch(connectivityNotifierProvider);
     ref.watch(tokenManagerProvider);
+
+    // Initialize storage service and load saved queue
+    await _loadQueue();
 
     // Setup periodic processing
     _setupProcessing();
@@ -110,8 +116,102 @@ class OperationQueue extends _$OperationQueue {
     return tokenManager.hasValidTokens;
   }
 
+  /// Load saved queue from storage on initialization
+  Future<void> _loadQueue() async {
+    try {
+      final storageService = ref.read(operationStorageServiceProvider);
+      final result = await storageService.loadOperations();
+
+      // Restore pending operations
+      for (final opData in result.pendingOperations) {
+        try {
+          final operation = _deserializeOperation(opData);
+          if (operation != null) {
+            _pendingOperations.add(operation);
+          }
+        } catch (e, stackTrace) {
+          debugPrint('Failed to deserialize pending operation: $e');
+          debugPrint('Stack trace: $stackTrace');
+        }
+      }
+
+      // Restore failed operations
+      for (final opData in result.failedOperations) {
+        try {
+          final operation = _deserializeOperation(opData);
+          if (operation != null) {
+            _failedOperations.add(operation);
+          }
+        } catch (e, stackTrace) {
+          debugPrint('Failed to deserialize failed operation: $e');
+          debugPrint('Stack trace: $stackTrace');
+        }
+      }
+
+      if (result.hadCorruptedData) {
+        debugPrint('OperationQueue: Warning - some operations were corrupted and skipped');
+      }
+
+      debugPrint('OperationQueue: Loaded ${_pendingOperations.length} pending and ${_failedOperations.length} failed operations');
+    } catch (e, stackTrace) {
+      debugPrint('OperationQueue: Error loading queue from storage: $e');
+      debugPrint('Stack trace: $stackTrace');
+      // Continue with empty queue if loading fails
+    }
+  }
+
+  /// Deserialize operation from JSON based on type
+  QueueableOperation? _deserializeOperation(Map<String, dynamic> data) {
+    try {
+      final type = data['type'] as String?;
+
+      if (type == null) {
+        debugPrint('OperationQueue: Missing type in operation data');
+        return null;
+      }
+
+      // Dispatch to appropriate factory based on type
+      switch (type) {
+        case 'trip_planning':
+          return TripPlanningOperation.fromJson(data);
+        // Add other operation types here as they are implemented
+        // case 'location_update':
+        //   return LocationUpdateOperation.fromJson(data);
+        // case 'travel_note':
+        //   return TravelNoteOperation.fromJson(data);
+        default:
+          debugPrint('OperationQueue: Unknown operation type: $type');
+          return null;
+      }
+    } catch (e, stackTrace) {
+      debugPrint('OperationQueue: Error deserializing operation: $e');
+      debugPrint('Stack trace: $stackTrace');
+      return null;
+    }
+  }
+
+  /// Persist current queue state to storage
   Future<void> _persistQueue() async {
-    // TODO: Implement queue persistence
-    // This would save the queue to local storage for recovery after app restart
+    try {
+      final storageService = ref.read(operationStorageServiceProvider);
+
+      // Save pending operations
+      final pendingSuccess = await storageService.savePendingOperations(
+        _pendingOperations.toList(),
+      );
+
+      // Save failed operations
+      final failedSuccess = await storageService.saveFailedOperations(
+        _failedOperations,
+      );
+
+      if (!pendingSuccess || !failedSuccess) {
+        debugPrint('OperationQueue: Warning - some operations failed to persist');
+      }
+    } catch (e, stackTrace) {
+      debugPrint('OperationQueue: Error persisting queue: $e');
+      debugPrint('Stack trace: $stackTrace');
+      // Continue even if persistence fails - operations are still in memory
+    }
   }
 }

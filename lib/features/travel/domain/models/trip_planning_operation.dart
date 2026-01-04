@@ -92,7 +92,7 @@ class TripPlanningOperation
   Map<String, dynamic> toJson() => {
         'id': id,
         'tripId': tripId,
-        'planningType': planningType.toString(),
+        'planningType': planningType.name,
         'changes': changes,
         'priority': priority,
         if (plannedStartDate != null)
