@@ -214,11 +214,13 @@
           "subtask_id": "3.5",
           "title": "Configure platform-specific settings",
           "description": "Configure Android and iOS for background location and notifications",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "android/app/src/main/AndroidManifest.xml",
+            "android/app/src/main/kotlin/com/example/soloadventurer/MainActivity.kt",
             "ios/Runner/Info.plist"
-          ]
+          ],
+          "notes": "Configured Android and iOS platforms for background location and notifications. Android: Added location permissions (foreground and background), notification permissions (POST_NOTIFICATIONS for Android 13+), foreground service permissions, and workmanager background task permissions. Configured SystemForegroundService with location type. Updated MainActivity.kt to register WorkManagerPlugin. iOS: Added NSLocationWhenInUseUsageDescription and NSLocationAlwaysAndWhenInUseUsageDescription with clear user-facing descriptions. Configured UIBackgroundModes for location, background-processing, and remote-notification. These configurations enable battery-efficient location tracking, background check-in monitoring, emergency SOS functionality, and safety status updates with trusted contacts."
         }
       ]
     },
