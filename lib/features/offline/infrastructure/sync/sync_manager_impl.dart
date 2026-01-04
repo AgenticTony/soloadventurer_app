@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
+import 'package:soloadventurer/features/offline/infrastructure/sync/upload_sync.dart';
 
 /// Implementation of [SyncManager]
 ///
@@ -25,6 +26,9 @@ class SyncManagerImpl implements SyncManager {
 
   /// Sync queue service for managing pending operations
   final SyncQueueService _syncQueueService;
+
+  /// Upload sync service for syncing operations to server
+  final UploadSync _uploadSync;
 
   /// Stream controller for sync status updates
   final StreamController<SyncStatus> _statusController =
@@ -58,15 +62,18 @@ class SyncManagerImpl implements SyncManager {
   ///
   /// [connectivityService] - Connectivity service for network monitoring
   /// [syncQueueService] - Sync queue service for managing operations
+  /// [uploadSync] - Upload sync service for syncing to server
   /// [autoSyncMinInterval] - Minimum interval between auto-syncs (default: 30s)
   /// [syncOnlyOnWifi] - Only sync when on WiFi (default: false)
   SyncManagerImpl({
     required ConnectivityService connectivityService,
     required SyncQueueService syncQueueService,
+    required UploadSync uploadSync,
     this.autoSyncMinInterval = const Duration(seconds: 30),
     this.syncOnlyOnWifi = false,
   })  : _connectivityService = connectivityService,
-        _syncQueueService = syncQueueService;
+        _syncQueueService = syncQueueService,
+        _uploadSync = uploadSync;
 
   // ==============================================================================
   // SYNC STATUS STREAM
@@ -440,45 +447,37 @@ class SyncManagerImpl implements SyncManager {
 
   /// Processes pending operations in the sync queue
   ///
-  /// This is a placeholder implementation for the upload phase.
-  /// The full upload sync will be implemented in subtask 5.2.
+  /// Uses the UploadSync service to sync queued operations to the server.
   ///
   /// Returns the number of successfully processed operations,
   /// or -1 if an error occurred.
   Future<int> _processPendingOperations() async {
     try {
-      int successCount = 0;
-      int failureCount = 0;
+      debugPrint('📤 Processing pending operations with UploadSync...');
 
-      // Process operations in batches
-      final result = await _syncQueueService.processPendingOperations(
+      final result = await _uploadSync.processPendingOperations(
         limit: 10,
-        onProcess: (operation) async {
-          try {
-            debugPrint('🔄 Processing: ${operation.description}');
-
-            // TODO: In subtask 5.2, this will actually sync to server
-            // For now, we simulate successful processing
-            await Future.delayed(const Duration(milliseconds: 50));
-
-            debugPrint('✅ Processed: ${operation.description}');
-            successCount++;
-            return true;
-          } catch (e) {
-            debugPrint('❌ Failed to process operation: $e');
-            failureCount++;
-            return false;
-          }
+        onProgress: (current, total) {
+          // Update progress in sync status
+          final progress = 0.1 + (current / total * 0.4); // 10% to 50%
+          _updateStatus(SyncStatus.syncing(
+            phase: SyncPhase.upload,
+            progress: progress,
+            currentOperation: 'Uploading $current of $total operations...',
+            pendingOperations: _currentStatus.pendingOperations,
+          ));
         },
       );
 
-      if (result.success) {
-        debugPrint('✅ Processing complete: $successCount succeeded, '
-            '$failureCount failed');
-        return successCount;
+      if (result.isSuccessful) {
+        debugPrint('✅ Upload complete: ${result.successCount} operations');
+        return result.successCount;
       } else {
-        debugPrint('❌ Processing failed: ${result.errorMessage}');
-        return -1;
+        debugPrint('⚠️ Upload partial: ${result.successCount} succeeded, '
+            '${result.failureCount} failed');
+        // Return success count even if some failed
+        // Failed operations will be retried later
+        return result.successCount;
       }
     } catch (e) {
       debugPrint('❌ Error processing operations: $e');

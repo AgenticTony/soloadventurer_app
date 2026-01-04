@@ -1,13 +1,16 @@
 import 'package:get_it/get_it.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
 
 import '../../features/offline/infrastructure/database/offline_database.dart';
 import '../../features/offline/infrastructure/database/dao/sync_queue_dao.dart';
 import '../../features/offline/domain/services/offline_services.dart';
 import '../../features/offline/domain/repositories/offline_repositories.dart';
 import '../../features/offline/data/repositories/offline_repositories.dart';
+import '../../features/offline/infrastructure/sync/offline_sync.dart';
 import '../../core/network/network_reachability.dart';
+import '../../features/core/infrastructure/api/dio_api_service.dart';
 
 /// Register all offline/sync feature dependencies
 ///
@@ -124,6 +127,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     () => SyncManagerImpl(
       connectivityService: getIt<ConnectivityService>(),
       syncQueueService: getIt<SyncQueueService>(),
+      uploadSync: getIt<UploadSync>(),
       autoSyncMinInterval: const Duration(seconds: 30),
       syncOnlyOnWifi: false,
     ),
@@ -134,14 +138,17 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   //   () => ConflictResolver(),
   // );
   //
-  // TODO: Register UploadSync (Subtask 5.2)
-  // getIt.registerLazySingleton<UploadSync>(
-  //   () => UploadSync(
-  //     apiClient: getIt<ApiService>(),
-  //     syncQueueService: getIt<SyncQueueService>(),
-  //     conflictResolver: getIt<ConflictResolver>(),
-  //   ),
-  // );
+  // Register UploadSync for syncing queued operations to server
+  // This service processes pending sync operations and uploads them to the server
+  // using GraphQL mutations. It handles create, update, and delete operations for
+  // trips, journals, and user profiles.
+  getIt.registerLazySingleton<UploadSync>(
+    () => UploadSync(
+      dio: getIt<DioApiService>().dio,
+      syncQueueRepository: getIt<SyncQueueRepository>(),
+      graphqlEndpoint: '/graphql',
+    ),
+  );
   //
   // TODO: Register DownloadSync (Subtask 5.3)
   // getIt.registerLazySingleton<DownloadSync>(

@@ -105,6 +105,9 @@ class DioApiService implements ApiService {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
+  /// Exposes the underlying Dio instance for advanced use cases
+  Dio get dio => _dio;
+
   @override
   void clearAuthToken() {
     _authToken = null;
