@@ -163,9 +163,11 @@
           "subtask_id": "3.5",
           "title": "Add upload progress indicator",
           "description": "Show progress bars for media uploads in journal entries",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/media/UploadProgressIndicator.tsx"
+            "lib/features/journal/presentation/widgets/media_upload_progress_indicator.dart",
+            "lib/features/journal/presentation/widgets/media_upload_progress_indicator_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_UPLOAD_PROGRESS.md"
           ]
         }
       ]
