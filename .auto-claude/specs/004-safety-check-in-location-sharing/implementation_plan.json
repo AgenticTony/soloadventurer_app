@@ -540,11 +540,12 @@
           "subtask_id": "10.2",
           "title": "Write unit tests for data layer",
           "description": "Test repositories and datasources",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "test/features/safety/data/repositories/safety_repository_impl_test.dart",
             "test/features/safety/data/datasources/safety_local_data_source_test.dart"
-          ]
+          ],
+          "notes": "Created comprehensive unit tests for safety data layer. SafetyLocalDataSourceImpl tests cover: trusted contacts operations (cache, retrieve, update, remove with success/failure cases), check-ins operations (cache, retrieve, upcoming, single item with filtering), location updates operations (cache, retrieve, active shares), safety alerts operations (cache, retrieve, recent, missed check-in filtering), safety status operations (cache, retrieve), battery & settings operations (cache, retrieve with null handling), and cache management (clear all, expiration checks, timestamp management). All tests use MockSharedPreferences and follow AAA pattern. SafetyRepositoryImpl tests cover: trusted contacts (add, remove, update, get all, get by ID with remote/local fallback and error handling), check-in operations (create, complete, schedule, cancel, get all, get upcoming, get by ID, get by trip, update status with remote/local fallback), location sharing (share location with emergency support, stop sharing, get active shares, get updates with filters, update permissions), emergency SOS (trigger, update status, get status for current/other users with cache fallback), safety alerts (get all, get by ID, get recent with type filter, acknowledge, resolve, cancel, get missed check-in with cache fallback), battery operations (update, get with cache fallback, null handling), and settings/notification preferences operations. All tests use MockSafetyRemoteDataSource and MockSafetyLocalDataSource with proper verification of both remote and local calls. Follows existing patterns from auth feature tests using mocktail and flutter_test."
         },
         {
           "subtask_id": "10.3",

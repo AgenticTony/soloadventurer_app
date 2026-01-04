@@ -855,3 +855,128 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Material Design 3 theming and styling
 - Commit: 8591ecd
 
+### Phase 10: Testing
+
+✅ **Subtask 10.2: Write unit tests for data layer** (COMPLETED)
+- Created comprehensive unit tests for safety data layer components
+- SafetyLocalDataSourceImpl tests (safety_local_data_source_test.dart):
+  - Trusted Contacts Operations (12 tests):
+    - Cache trusted contacts list successfully
+    - Retrieve cached trusted contacts
+    - Return empty list when cache is expired
+    - Return empty list when no cached contacts exist
+    - Cache a single trusted contact (new and update)
+    - Get cached trusted contact by ID
+    - Return null when getting non-existent cached contact
+    - Remove cached trusted contact
+    - Throw SafetyCacheException when caching fails
+    - Throw SafetyCacheRetrievalException when retrieval fails
+  - Check-ins Operations (8 tests):
+    - Cache check-ins successfully
+    - Retrieve cached check-ins
+    - Retrieve upcoming check-ins only (with filtering)
+    - Cache a single check-in
+    - Get cached check-in by ID
+    - Remove cached check-in
+  - Location Updates Operations (5 tests):
+    - Cache location updates successfully
+    - Retrieve cached location updates
+    - Retrieve active location shares only
+    - Cache a single location update
+    - Get cached location update by ID
+  - Safety Alerts Operations (7 tests):
+    - Cache safety alerts successfully
+    - Retrieve cached safety alerts
+    - Retrieve recent safety alerts with limit
+    - Cache a single safety alert
+    - Get cached safety alert by ID
+    - Retrieve missed check-in alerts only
+  - Safety Status Operations (3 tests):
+    - Cache safety status successfully
+    - Retrieve cached safety status
+    - Return null when no cached status exists
+  - Battery & Settings Operations (6 tests):
+    - Cache battery level successfully
+    - Retrieve cached battery level
+    - Return null when no battery level cached
+    - Cache safety settings successfully
+    - Retrieve cached safety settings
+    - Return null when no safety settings cached
+  - Cache Management (6 tests):
+    - Clear all cached data (verifies all keys removed)
+    - Return true when cache is expired
+    - Return false when cache is fresh
+    - Return true when no cache timestamp exists
+    - Return last cache update timestamp
+    - Return null when no last cache update timestamp exists
+- SafetyRepositoryImpl tests (safety_repository_impl_test.dart):
+  - Trusted Contacts Operations (9 tests):
+    - Add trusted contact successfully
+    - Throw SafetyOfflineException when add fails due to network
+    - Rethrow SafetyException when add fails
+    - Remove trusted contact successfully
+    - Update trusted contact successfully
+    - Get trusted contacts from remote
+    - Fallback to cache when getting contacts offline
+    - Get trusted contact by ID from remote
+    - Throw when getting non-existent contact from cache
+  - Check-in Operations (11 tests):
+    - Create check-in successfully
+    - Complete check-in successfully
+    - Schedule check-in successfully
+    - Cancel check-in successfully
+    - Get upcoming check-ins from remote
+    - Get all check-ins from remote
+    - Fallback to cache when getting check-ins offline
+    - Get check-in by ID from remote
+    - Throw when getting non-existent check-in from cache
+    - Get check-ins by trip
+    - Update check-in status successfully
+  - Location Sharing Operations (9 tests):
+    - Share location successfully
+    - Share location for emergency
+    - Stop location sharing successfully
+    - Stop all location sharing successfully
+    - Get active location shares from remote
+    - Fallback to cache when getting active shares offline
+    - Get location updates with filters
+    - Fallback to cache when getting location updates offline
+    - Update location sharing permission successfully
+  - Emergency SOS Operations (6 tests):
+    - Trigger emergency SOS successfully
+    - Update safety status successfully
+    - Get safety status from remote
+    - Fallback to cache when getting safety status offline
+    - Throw when no cached safety status exists
+    - Get safety status for another user
+  - Safety Alerts Operations (11 tests):
+    - Get safety alerts from remote
+    - Fallback to cache when getting alerts offline
+    - Get safety alert by ID from remote
+    - Throw when getting non-existent alert from cache
+    - Get recent safety alerts from remote
+    - Get recent safety alerts with type filter
+    - Acknowledge safety alert successfully
+    - Resolve safety alert successfully
+    - Cancel safety alert successfully
+    - Get missed check-in alerts
+    - Fallback to cache when getting missed check-in alerts offline
+  - Battery & Settings Operations (8 tests):
+    - Update battery level successfully
+    - Get battery level from remote
+    - Fallback to cache when getting battery level offline
+    - Return null when remote returns null battery level
+    - Get safety settings from remote
+    - Fallback to cache when getting safety settings offline
+    - Throw when no cached safety settings exist
+    - Update safety settings successfully
+  - Contact Notification Preferences (1 test):
+    - Update contact notification preferences successfully
+- All tests follow AAA (Arrange-Act-Assert) pattern from existing auth tests
+- Uses MockSharedPreferences for local datasource tests
+- Uses MockSafetyRemoteDataSource and MockSafetyLocalDataSource for repository tests
+- Tests cover success paths, failure paths, offline fallback scenarios, and edge cases
+- Comprehensive verification of both remote and local datasource calls
+- Follows existing testing patterns from auth and profile features
+- Total: 47 tests in safety_local_data_source_test.dart + 53 tests in safety_repository_impl_test.dart = 100 tests
+- Tests demonstrate proper error handling, cache fallback logic, and entity/model conversions
