@@ -45,6 +45,21 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Location Permissions -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SoloAdventurer needs access to your location for check-ins, location sharing with trusted contacts, and emergency SOS features.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>SoloAdventurer needs access to your location in the background for automatic check-ins, safety monitoring, and location sharing with trusted contacts.</string>
+
+	<!-- Background Modes -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>background-processing</string>
+		<string>remote-notification</string>
+	</array>
+
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
