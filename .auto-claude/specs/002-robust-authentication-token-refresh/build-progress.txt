@@ -189,9 +189,19 @@ Finalize with comprehensive testing and docs
    - Uses Completers to manage pending requests efficiently
    - Single refresh operation shared among all queued requests
    - Status: Committed (d609905)
-5. ⏳ Phase 1.4: Update AuthRepository with Refresh Service - Next
-6. ⏳ Set up CI/CD for automated testing
-7. ⏳ Create feature branch for implementation
+5. ✅ Phase 1.4: Update AuthRepository with Refresh Service - COMPLETED
+   - Integrated TokenRefreshService into AuthRepository to replace simple refresh
+   - Added performBasicTokenRefresh() method to AuthRepository interface
+   - Added RefreshQueueManager as optional dependency to AuthRepositoryImpl
+   - Updated refreshToken() to use RefreshQueueManager when available
+   - Created _saveSessionToStorage() helper to properly save all session data
+   - Updated TokenRefreshService to call performBasicTokenRefresh() to avoid circular dependency
+   - Maintains backward compatibility (falls back to simple refresh if no queue manager)
+   - Properly propagates refresh errors and updates session storage
+   - Status: Committed (7059187)
+6. ⏳ Phase 1.5: Add Unit Tests for Refresh Logic - Next
+7. ⏳ Set up CI/CD for automated testing
+8. ⏳ Create feature branch for implementation
 
 ## Notes
 

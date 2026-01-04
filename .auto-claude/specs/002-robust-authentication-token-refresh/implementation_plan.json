@@ -61,7 +61,7 @@
           "id": "1.4",
           "title": "Update AuthRepository with Refresh Service",
           "description": "Integrate TokenRefreshService into AuthRepository to replace simple refresh with robust refresh logic",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "AuthRepository uses TokenRefreshService instead of direct refresh",
             "Maintains backward compatibility with existing interface",
