@@ -306,6 +306,32 @@ class DestinationRepositoryImpl implements DestinationRepository {
   }
 
   /// Build query variables from destination filter
+  ///
+  /// Converts a [DestinationFilter] object into a map of GraphQL query variables.
+  /// This method handles:
+  /// - Enum to string conversions for GraphQL compatibility
+  /// - Null value filtering (only includes non-null values)
+  /// - Type mapping for all filter parameters
+  ///
+  /// The returned map is used directly in GraphQL query variables.
+  ///
+  /// Example:
+  /// ```dart
+  /// final filter = DestinationFilter(
+  ///   searchQuery: 'beach',
+  ///   budgetLevel: BudgetLevel.budget,
+  ///   minSafetyScore: 7.0,
+  /// );
+  /// final variables = _buildFilterVariables(filter);
+  /// // Returns: {
+  /// //   'searchQuery': 'beach',
+  /// //   'budgetLevel': 'BUDGET',
+  /// //   'minSafetyScore': 7.0,
+  /// //   'sortBy': 'RELEVANCE',
+  /// //   'offset': 0,
+  /// //   'limit': 20,
+  /// // }
+  /// ```
   Map<String, dynamic> _buildFilterVariables(DestinationFilter filter) {
     final variables = <String, dynamic>{
       'searchQuery': filter.searchQuery,
@@ -328,7 +354,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
       'limit': filter.limit,
     };
 
-    // Remove null values
+    // Remove null values to avoid sending unnecessary parameters to GraphQL
     variables.removeWhere((key, value) => value == null);
 
     return variables;
@@ -389,6 +415,41 @@ class DestinationRepositoryImpl implements DestinationRepository {
   }
 
   /// Handle GraphQL exceptions and convert to appropriate AppException
+  ///
+  /// This method centralizes GraphQL error handling and maps different types of
+  /// exceptions to domain-specific [AppException] types. It handles:
+  ///
+  /// **Network Errors:**
+  /// - Timeouts → [NetworkTimeoutException]
+  /// - Connectivity issues → [NetworkConnectivityException]
+  /// - Other network errors → [ServerException]
+  ///
+  /// **GraphQL Errors:**
+  /// - BAD_REQUEST → [BadRequestException]
+  /// - UNAUTHORIZED → [UnauthorizedException]
+  /// - FORBIDDEN → [ForbiddenException]
+  /// - NOT_FOUND → [NotFoundException]
+  /// - VALIDATION_ERROR → [ValidationException] with error details
+  /// - Other codes → [ServerException] with code
+  ///
+  /// Error codes are extracted from the GraphQL error extensions field.
+  ///
+  /// Example GraphQL error response structure:
+  /// ```json
+  /// {
+  ///   "errors": [{
+  ///     "message": "Invalid input",
+  ///     "extensions": {
+  ///       "code": "VALIDATION_ERROR",
+  ///       "errors": {
+  ///         "email": ["Invalid email format"]
+  ///       }
+  ///     }
+  ///   }]
+  /// }
+  /// ```
+  ///
+  /// Returns an [AppException] subclass appropriate for the error type.
   AppException _handleGraphQLException(OperationException? exception) {
     if (exception == null) {
       return const UnknownException(

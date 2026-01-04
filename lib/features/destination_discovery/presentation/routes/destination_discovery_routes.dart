@@ -30,14 +30,71 @@ class DestinationDiscoveryRoutes {
 }
 
 /// Route handler for destination discovery screens
+///
+/// This class handles navigation and deep linking for all destination discovery screens.
+/// It supports:
+///
+/// **Path-based Deep Links:**
+/// - Direct navigation to specific resources using URL paths
+/// - ID extraction from URL path segments
+///
+/// **Query Parameter Filters:**
+/// - Pre-filtering destination search results from deep links
+/// - Support for all filter parameters (budget, safety, activity, tags, etc.)
+///
+/// **Legacy Navigation:**
+/// - Support for RouteSettings.arguments-based navigation
+///
+/// **Deep Link Examples:**
+/// ```dart
+/// // Navigate to destination detail
+/// // /destinations/detail/123
+/// Navigator.pushNamed(context, '/destinations/detail/123');
+///
+/// // Navigate to curated list detail
+/// // /destinations/curated-lists/detail/456
+/// Navigator.pushNamed(context, '/destinations/curated-lists/detail/456');
+///
+/// // Navigate to search with filters
+/// // /destinations?budget=budget&activity=relaxed&tags=beach,urban
+/// Navigator.pushNamed(context, '/destinations?q=beach&budget=budget&minSafety=7');
+///
+/// // Navigate to recommendations
+/// Navigator.pushNamed(context, '/destinations/recommendations');
+///
+/// // Navigate to curated lists
+/// Navigator.pushNamed(context, '/destinations/curated-lists');
+///
+/// // Navigate to saved destinations
+/// Navigator.pushNamed(context, '/destinations/saved');
+/// ```
+///
+/// **Query Parameter Reference:**
+/// - `q`: Search query text
+/// - `budget`: Budget level (budget, moderate, expensive)
+/// - `minSafety`: Minimum safety score (1-10)
+/// - `minSoloSuitability`: Minimum solo suitability score (1-10)
+/// - `activity`: Activity level (relaxed, moderate, adventurous)
+/// - `country`: Country code (e.g., JP, US, TH)
+/// - `region`: Region name
+/// - `tags`: Comma-separated tags (e.g., beach,urban,cultural)
+/// - `hiddenGems`: true/false for hidden gems only
+/// - `sortBy`: Sort order (popularity, safety, solo_suitability, budget_asc, budget_desc, newest, relevance)
+///
+/// All navigation uses [PageRouteBuilder] with fade transitions for consistent UX.
 class DestinationDiscoveryRouter {
   /// Generate route for destination discovery screens
-  /// Supports deep linking with URL path parameters and query parameters
   ///
-  /// Deep link patterns:
-  /// - /destinations/detail/:id - Navigate to destination detail
-  /// - /destinations/curated-lists/detail/:id - Navigate to curated list detail
-  /// - /destinations?budget=budget&activity=relaxed&tags=beach,urban - Navigate to search with filters
+  /// Supports deep linking with URL path parameters and query parameters.
+  ///
+  /// **Deep link patterns:**
+  /// - `/destinations/detail/:id` - Navigate to destination detail
+  /// - `/destinations/curated-lists/detail/:id` - Navigate to curated list detail
+  /// - `/destinations?budget=budget&activity=relaxed&tags=beach,urban` - Navigate to search with filters
+  ///
+  /// Returns null if the route is not handled, allowing other routers to process it.
+  ///
+  /// See [DestinationDiscoveryRouter] class documentation for detailed examples.
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     final uri = Uri.parse(settings.name ?? '');
     final path = uri.path;
@@ -110,17 +167,36 @@ class DestinationDiscoveryRouter {
 
   /// Parse query parameters into a DestinationFilter
   ///
-  /// Supported query parameters:
-  /// - q: Search query
-  /// - budget: Budget level (budget, moderate, expensive)
-  /// - minSafety: Minimum safety score (1-10)
-  /// - minSoloSuitability: Minimum solo suitability score (1-10)
-  /// - activity: Activity level (relaxed, moderate, adventurous)
-  /// - country: Country code (e.g., JP, US, TH)
-  /// - region: Region name
-  /// - tags: Comma-separated tags (e.g., beach,urban)
-  /// - hiddenGems: true/false
-  /// - sortBy: Sort order (popularity, safety, solo_suitability, budget_asc, budget_desc, newest, relevance)
+  /// Extracts and validates filter parameters from URL query strings.
+  /// Invalid parameters are safely ignored without throwing errors.
+  ///
+  /// **Supported query parameters:**
+  /// - `q`: Search query text
+  /// - `budget`: Budget level (budget, moderate, expensive)
+  /// - `minSafety`: Minimum safety score (1-10)
+  /// - `minSoloSuitability`: Minimum solo suitability score (1-10)
+  /// - `activity`: Activity level (relaxed, moderate, adventurous)
+  /// - `country`: Country code (e.g., JP, US, TH)
+  /// - `region`: Region name
+  /// - `tags`: Comma-separated tags (e.g., beach,urban,cultural)
+  /// - `hiddenGems`: true/false for hidden gems only
+  /// - `sortBy`: Sort order (popularity, safety, solo_suitability, budget_asc, budget_desc, newest, relevance)
+  ///
+  /// **Example:**
+  /// ```dart
+  /// // URL: /destinations?q=beach&budget=budget&minSafety=7&tags=urban,cultural
+  /// final params = {
+  ///   'q': 'beach',
+  ///   'budget': 'budget',
+  ///   'minSafety': '7',
+  ///   'tags': 'urban,cultural',
+  /// };
+  /// final filter = _parseFilterQueryParams(params);
+  /// // Returns: DestinationFilter with searchQuery, budgetLevel, minSafetyScore, tags set
+  /// ```
+  ///
+  /// Returns a [DestinationFilter] with parsed parameters. Invalid or unknown
+  /// parameters are ignored. Numeric parameters are clamped to valid ranges.
   static DestinationFilter _parseFilterQueryParams(Map<String, String> params) {
     // Check if there are any filter parameters
     if (params.isEmpty) {
@@ -142,6 +218,11 @@ class DestinationDiscoveryRouter {
   }
 
   /// Parse budget level from string
+  ///
+  /// Performs case-insensitive parsing of budget level strings.
+  /// Returns null for null input or unknown values (silently ignored).
+  ///
+  /// Valid values: "budget", "moderate", "expensive"
   static BudgetLevel? _parseBudgetLevel(String? value) {
     if (value == null) return null;
     switch (value.toLowerCase()) {
@@ -157,6 +238,11 @@ class DestinationDiscoveryRouter {
   }
 
   /// Parse activity level from string
+  ///
+  /// Performs case-insensitive parsing of activity level strings.
+  /// Returns null for null input or unknown values (silently ignored).
+  ///
+  /// Valid values: "relaxed", "moderate", "adventurous"
   static ActivityLevel? _parseActivityLevel(String? value) {
     if (value == null) return null;
     switch (value.toLowerCase()) {
@@ -172,6 +258,12 @@ class DestinationDiscoveryRouter {
   }
 
   /// Parse sort order from string
+  ///
+  /// Performs case-insensitive parsing of sort order strings.
+  /// Returns null for null input or unknown values (silently ignored).
+  ///
+  /// Valid values: "popularity", "safety", "solo_suitability", "budget_asc",
+  /// "budget_desc", "newest", "relevance"
   static DestinationSortOrder? _parseSortOrder(String? value) {
     if (value == null) return null;
     switch (value.toLowerCase()) {
@@ -195,6 +287,21 @@ class DestinationDiscoveryRouter {
   }
 
   /// Parse double parameter with range validation
+  ///
+  /// Parses a string to a double and validates it's within the specified range.
+  /// Returns null if parsing fails or value is out of range (silently ignored).
+  ///
+  /// **Parameters:**
+  /// - [value]: The string value to parse
+  /// - [min]: Minimum valid value (inclusive)
+  /// - [max]: Maximum valid value (inclusive)
+  ///
+  /// **Example:**
+  /// ```dart
+  /// _parseDoubleParam('7', 1, 10); // Returns 7.0
+  /// _parseDoubleParam('0', 1, 10); // Returns null (out of range)
+  /// _parseDoubleParam('invalid', 1, 10); // Returns null (parse error)
+  /// ```
   static double? _parseDoubleParam(String? value, double min, double max) {
     if (value == null) return null;
     final parsed = double.tryParse(value);

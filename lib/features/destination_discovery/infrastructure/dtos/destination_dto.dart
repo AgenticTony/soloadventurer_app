@@ -113,6 +113,25 @@ class DestinationDto {
   });
 
   /// Creates a [DestinationDto] from JSON data (GraphQL response)
+  ///
+  /// The JSON structure typically comes from a GraphQL API response. This method
+  /// handles type casting and null safety for all fields.
+  ///
+  /// Example JSON structure:
+  /// ```json
+  /// {
+  ///   "id": "123",
+  ///   "name": "Tokyo",
+  ///   "description": "A vibrant city...",
+  ///   "latitude": 35.6762,
+  ///   "longitude": 139.6503,
+  ///   "countryCode": "JP",
+  ///   "safetyScore": 8.5,
+  ///   "budgetLevel": "expensive",
+  ///   "tags": ["urban", "cultural", "food"],
+  ///   "createdAt": "2024-01-01T00:00:00Z"
+  /// }
+  /// ```
   factory DestinationDto.fromJson(Map<String, dynamic> json) {
     return DestinationDto(
       id: json['id'] as String,
@@ -154,8 +173,30 @@ class DestinationDto {
 
   /// Converts the DTO to a [Destination] domain model
   ///
-  /// Handles null values by providing sensible defaults where appropriate.
-  /// Throws [FormatException] if required fields are null.
+  /// This method transforms the API response DTO into a domain model with:
+  /// - Null safety handling and sensible defaults
+  /// - String to enum conversions for budget/activity levels
+  /// - JSON parsing for nested objects
+  /// - DateTime parsing for timestamp fields
+  ///
+  /// **Default values for null fields:**
+  /// - `description`: empty string
+  /// - `latitude/longitude`: 0.0
+  /// - `safetyScore/soloSuitabilityScore`: 5.0
+  /// - `budgetLevel`: BudgetLevel.moderate
+  /// - `activityLevels`: [ActivityLevel.moderate]
+  /// - `tags/images`: empty list
+  /// - `isHiddenGem`: false
+  /// - `popularityScore`: 0.5
+  /// - `createdAt/updatedAt`: DateTime.now()
+  ///
+  /// Example:
+  /// ```dart
+  /// final dto = DestinationDto.fromJson(apiResponse);
+  /// final destination = dto.toDomain();
+  /// print(destination.name); // "Tokyo"
+  /// print(destination.safetyScore); // 8.5 (or 5.0 if null)
+  /// ```
   Destination toDomain() {
     return Destination(
       id: id,
@@ -212,6 +253,11 @@ class DestinationDto {
   }
 
   /// Parses budget level string to enum
+  ///
+  /// Performs case-insensitive parsing of budget level strings.
+  /// Returns [BudgetLevel.moderate] for unknown values (default fallback).
+  ///
+  /// Valid values: "budget", "moderate", "expensive"
   BudgetLevel _parseBudgetLevel(String value) {
     switch (value.toLowerCase()) {
       case 'budget':
@@ -226,6 +272,11 @@ class DestinationDto {
   }
 
   /// Parses activity level string to enum
+  ///
+  /// Performs case-insensitive parsing of activity level strings.
+  /// Returns [ActivityLevel.moderate] for unknown values (default fallback).
+  ///
+  /// Valid values: "relaxed", "moderate", "adventurous"
   ActivityLevel _parseActivityLevel(String value) {
     switch (value.toLowerCase()) {
       case 'relaxed':
@@ -240,6 +291,15 @@ class DestinationDto {
   }
 
   /// Converts a list of JSON objects to a list of [DestinationDto]s
+  ///
+  /// Useful for parsing GraphQL list responses.
+  ///
+  /// Example:
+  /// ```dart
+  /// final jsonList = jsonResponse['searchDestinations'] as List;
+  /// final dtos = DestinationDto.fromJsonList(jsonList);
+  /// print(dtos.length); // Number of destinations
+  /// ```
   static List<DestinationDto> fromJsonList(List<dynamic> jsonList) {
     return jsonList
         .map((json) => DestinationDto.fromJson(json as Map<String, dynamic>))
@@ -247,6 +307,15 @@ class DestinationDto {
   }
 
   /// Converts a list of [DestinationDto]s to domain models
+  ///
+  /// Convenience method for bulk conversion of DTOs to domain models.
+  ///
+  /// Example:
+  /// ```dart
+  /// final dtos = DestinationDto.fromJsonList(jsonResponse);
+  /// final destinations = DestinationDto.toDomainList(dtos);
+  /// // destinations is now List<Destination>
+  /// ```
   static List<Destination> toDomainList(List<DestinationDto> dtos) {
     return dtos.map((dto) => dto.toDomain()).toList();
   }
