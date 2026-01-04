@@ -523,12 +523,18 @@
           "subtask_id": "10.1",
           "title": "Write unit tests for domain layer",
           "description": "Test use cases and entities",
-          "status": "pending",
+          "status": "completed",
           "files": [
+            "test/helpers/safety_test_helpers.dart",
+            "test/helpers/safety_test_setup.dart",
+            "test/features/safety/domain/entities/trusted_contact_test.dart",
+            "test/features/safety/domain/entities/check_in_test.dart",
+            "test/features/safety/domain/entities/safety_alert_test.dart",
             "test/features/safety/domain/usecases/add_trusted_contact_test.dart",
             "test/features/safety/domain/usecases/trigger_emergency_sos_test.dart",
             "test/features/safety/domain/usecases/create_check_in_test.dart"
-          ]
+          ],
+          "notes": "Created comprehensive unit tests for safety domain layer. Test infrastructure includes safety_test_helpers.dart with test data constants and helper functions for creating test entities (TrustedContact, CheckIn, SafetyAlert), and safety_test_setup.dart with mock setup and test scenario configuration. Entity tests cover TrustedContact (creation, defaults, equality, enum values, all fields, phone/community sources, all permission levels, boolean flags, timestamps), CheckIn and CheckInLocation (creation, defaults, equality, all trigger types and statuses, multiple contacts, location details), and SafetyAlert and SafetyAlertLocation (creation, defaults, equality, all types and statuses, multiple contacts, timestamps, battery levels, associations). Use case tests cover AddTrustedContactUseCase (success, failure, all contact sources, all permission levels, location sharing, notification preferences, email, notes), TriggerEmergencySOSUseCase (success, failure, all parameters including message, battery level, trip ID, multiple contacts, location details), and CreateCheckInUseCase (success, failure, all trigger types, all statuses, location details, status message, deadline, trip ID, multiple contacts, alert sent flag, completed timestamp, metadata). All tests follow existing patterns from auth feature tests using mocktail and flutter_test with AAA (Arrange-Act-Assert) pattern. Total test coverage: 3 entity tests + 3 use case tests + 2 helper files = 8 test files."
         },
         {
           "subtask_id": "10.2",
