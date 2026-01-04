@@ -467,3 +467,32 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Emergency SOS should work even with limited connectivity
 - Privacy-first approach for all location sharing
 - Follow existing project conventions and patterns
+
+### Phase 6: UI Implementation - Check-ins
+
+✅ **Subtask 6.1: Create check-in home screen** (COMPLETED)
+- Created comprehensive CheckInHomeScreen with full check-in management functionality
+- Features include:
+  - Displays status cards showing due soon count and missed count
+  - Shows next check-in prominently in a gradient card (if any)
+  - Lists all upcoming check-ins with detailed information
+  - Check-in cards show: trigger type icon, status chip, scheduled time, message, location
+  - Color-coded status indicators (green for active, orange for due soon, red for overdue)
+  - Loading, empty, and error states with appropriate UI
+  - Pull-to-refresh functionality for loading upcoming check-ins
+  - Bottom sheet for check-in details with comprehensive information
+  - Floating action button for creating new check-ins
+  - Popup menu for choosing between manual and scheduled check-ins
+  - Info dialog explaining check-in functionality
+  - Navigation placeholders for manual check-in, schedule check-in, and history screens (to be implemented in next subtasks)
+- Follows existing screen patterns from TrustedContactsScreen
+- Uses ConsumerStatefulWidget pattern for interactive screen
+- Integrates with CheckInNotifier for state management
+- Uses upcomingCheckInsProvider for reactive updates
+- Implements proper state management with loading, error, and success handling
+- Includes helper widgets: _StatusCard, _CheckInDetailsSheet, _DetailRow
+- Properly formats dates and times for user-friendly display
+- Handles different check-in trigger types (manual, scheduled, location arrival/departure)
+- Visual feedback for due soon and overdue check-ins
+- Commit: pending
+

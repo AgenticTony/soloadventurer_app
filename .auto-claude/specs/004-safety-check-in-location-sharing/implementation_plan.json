@@ -326,10 +326,11 @@
           "subtask_id": "6.1",
           "title": "Create check-in home screen",
           "description": "Build main check-in screen showing active and upcoming check-ins",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/screens/check_in_home_screen.dart"
-          ]
+          ],
+          "notes": "Created comprehensive CheckInHomeScreen with full check-in management functionality. Features include: status cards showing due soon and missed counts; prominent next check-in card; list of upcoming check-ins with detailed information; color-coded status indicators; loading, empty, and error states; check-in details bottom sheet; floating action button for new check-ins; menu for choosing manual or scheduled check-ins; info dialog explaining functionality. Follows existing screen patterns from TrustedContactsScreen. Uses ConsumerStatefulWidget pattern. Integrates with CheckInNotifier for state management. Proper state management with loading, error, and success handling. Helper widgets: _StatusCard, _CheckInDetailsSheet, _DetailRow. Formats dates/times for user display. Handles different check-in trigger types. Visual feedback for due soon and overdue check-ins."
         },
         {
           "subtask_id": "6.2",
