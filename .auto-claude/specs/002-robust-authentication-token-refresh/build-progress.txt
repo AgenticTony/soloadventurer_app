@@ -1,0 +1,189 @@
+# Build Progress: Robust Authentication & Token Refresh
+
+## Project Overview
+**Spec ID:** 002-robust-authentication-token-refresh
+**Status:** Planning Complete
+**Last Updated:** 2025-01-04
+**Estimated Effort:** 120 hours across 6 phases
+
+## Current State Assessment
+
+### Existing Auth Infrastructure
+The project already has a basic auth implementation with:
+- ✅ AWS Cognito integration via `amazon_cognito_identity_dart_2`
+- ✅ AuthRepository interface with basic CRUD operations
+- ✅ AuthInterceptor for adding tokens to requests
+- ✅ Basic token refresh on 401 errors
+- ✅ Secure storage for token persistence
+- ✅ Riverpod state management
+
+### Identified Gaps (Technical Debt)
+Based on code analysis, the following issues need to be addressed:
+
+1. **No Retry Logic** (CRITICAL)
+   - Token refresh fails immediately on network errors
+   - No exponential backoff mechanism
+   - Single point of failure in AuthInterceptor.onError()
+
+2. **No Proactive Refresh** (HIGH)
+   - Tokens only refresh when 401 occurs
+   - Users experience failed requests before refresh happens
+   - No background refresh mechanism
+
+3. **Race Condition Risk** (MEDIUM)
+   - Multiple simultaneous 401s could trigger multiple refresh attempts
+   - No mutex or queue management for refresh operations
+   - AuthInterceptor doesn't coordinate refresh calls
+
+4. **Limited Session Persistence** (HIGH)
+   - Session restoration logic exists but not robust
+   - No automatic refresh on app startup
+   - Users frequently need to re-login
+
+5. **Poor Error Handling** (MEDIUM)
+   - Generic error messages
+   - No user-friendly recovery options
+   - Limited error categorization
+
+6. **No Offline Support** (LOW)
+   - Cannot access cached data when offline
+   - No offline mode indicator
+   - No sync on reconnection
+
+## Implementation Plan Summary
+
+### Phase 1: Token Refresh Foundation (16 hours)
+Build core infrastructure with retry logic and mutex pattern
+- TokenRefreshService with exponential backoff
+- TokenExpirationTracker for proactive refresh
+- RefreshQueueManager to prevent race conditions
+- Integration with existing AuthRepository
+- Comprehensive unit tests
+
+### Phase 2: Background Token Refresh (15 hours)
+Implement automatic background refresh
+- TokenRefreshScheduler for timer-based refresh
+- App lifecycle integration (foreground/background)
+- Proactive refresh in AuthInterceptor
+- User notifications for refresh events
+- Integration tests
+
+### Phase 3: Session Persistence (11 hours)
+Enable users to stay logged across app restarts
+- PersistentSessionManager for secure token storage
+- Session validation and auto-refresh logic
+- AuthProvider enhancement for session restoration
+- Integration tests
+
+### Phase 4: Error Handling & UX (15 hours)
+Improve user experience with better error handling
+- Centralized AuthErrorHandler
+- Retry UI component with countdown
+- Dedicated error screens (session expired, network, etc.)
+- Enhanced auth screens with error display
+- Widget tests
+
+### Phase 5: Offline Authentication (16 hours)
+Add offline fallback capabilities
+- OfflineAuthManager for connectivity detection
+- CachedDataProvider for offline data access
+- Offline mode UI indicator
+- Sync on reconnection logic
+- Integration tests
+
+### Phase 6: Testing & Documentation (24 hours)
+Finalize with comprehensive testing and docs
+- End-to-end auth tests
+- Performance testing and optimization
+- Auth system documentation
+- Migration guide
+- Final QA and bug fixes
+
+## Key Technical Decisions
+
+### Token Refresh Strategy
+- **Proactive Refresh:** Trigger refresh at 75% of token lifetime
+- **Reactive Refresh:** Also refresh on 401 errors with retry
+- **Backoff Strategy:** Exponential backoff (1s, 2s, 4s, 8s, 16s, 32s max)
+- **Max Retries:** 3 attempts before giving up
+
+### Concurrency Control
+- **Mutex Pattern:** Prevent multiple simultaneous refresh attempts
+- **Queue Management:** Queue pending requests during in-progress refresh
+- **Timeout:** 30-second timeout for queued requests
+
+### Storage Strategy
+- **Tokens:** Stored in flutter_secure_storage
+- **Session Data:** Includes expiration timestamp for validation
+- **Clear on Logout:** Complete session cleanup on sign-out
+
+### Error Handling
+- **Categorization:** Network, credentials, expired, rate limit, server
+- **User Messages:** Actionable, friendly error messages
+- **Recovery Options:** Retry, re-authenticate, offline mode
+
+## Files to Modify
+
+### Core Files (Will be enhanced)
+- `lib/core/api/interceptors/auth_interceptor.dart` - Add proactive refresh and queue management
+- `lib/features/auth/data/repositories/auth_repository_impl.dart` - Integrate new services
+- `lib/features/auth/presentation/providers/auth_provider.dart` - Add session restoration
+
+### New Files (Will be created)
+- `lib/features/auth/services/token_refresh_service.dart`
+- `lib/features/auth/services/token_expiration_tracker.dart`
+- `lib/features/auth/services/refresh_queue_manager.dart`
+- `lib/features/auth/services/persistent_session_manager.dart`
+- `lib/features/auth/services/offline_auth_manager.dart`
+- `lib/features/auth/services/auth_error_handler.dart`
+- `lib/features/auth/presentation/widgets/auth_retry_button.dart`
+- `lib/features/auth/presentation/widgets/offline_indicator.dart`
+- `lib/features/auth/presentation/screens/session_expired_screen.dart`
+- `lib/features/auth/presentation/screens/network_error_screen.dart`
+
+## Risk Assessment
+
+### High Risk Areas
+1. **Thread Safety:** Mutex implementation must be bulletproof
+2. **Token Expiration Logic:** Edge cases with clock skew and app lifecycle
+3. **Storage Migration:** Existing users may have different session format
+
+### Medium Risk Areas
+1. **Performance:** Background refresh shouldn't impact UI
+2. **Network Reliability:** Handle all network failure modes gracefully
+3. **State Management:** Riverpod integration must maintain consistency
+
+### Mitigation Strategies
+- Comprehensive unit tests for all concurrent operations
+- Integration tests for app lifecycle scenarios
+- Performance benchmarks before and after changes
+- Gradual rollout with feature flags
+
+## Next Steps
+
+1. ✅ Planning complete - implementation plan created
+2. ✅ Phase 1.1: Create TokenRefreshService - COMPLETED
+   - Created TokenRefreshService with retry logic and exponential backoff
+   - Implemented mutex pattern to prevent concurrent refresh attempts
+   - Added Stream for refresh status events (TokenRefreshResult)
+   - Comprehensive error handling with smart retry logic
+   - Status: Committed (3e95d24)
+3. ✅ Phase 1.2: Implement Token Expiration Tracker - COMPLETED
+   - Created TokenExpirationTracker service that monitors token expiration
+   - Calculates time until token expiration accurately
+   - Triggers refresh at 75% of token lifetime (configurable)
+   - Handles edge cases (missing expiration, already expired, no expiration)
+   - Integrates with TokenRefreshService for automatic refresh operations
+   - Includes TokenExpirationResult class with factory methods
+   - Comprehensive unit tests covering all functionality
+   - Status: Committed (3ba57bf)
+4. ⏳ Phase 1.3: Create Refresh Queue Manager - Next
+5. ⏳ Set up CI/CD for automated testing
+6. ⏳ Create feature branch for implementation
+
+## Notes
+
+- All work will be done in feature branch to protect main branch
+- Each phase will be committed separately for easier rollback
+- Code reviews required before merging each phase
+- Performance benchmarks will be tracked throughout implementation

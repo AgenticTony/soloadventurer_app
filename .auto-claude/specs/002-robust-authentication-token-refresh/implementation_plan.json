@@ -1,0 +1,515 @@
+{
+  "feature": "Robust Authentication & Token Refresh",
+  "description": "# Robust Authentication & Token Refresh\n\nImplement reliable authentication with AWS Cognito integration, robust token refresh mechanism with retry logic, session management, and graceful handling of expired tokens. Includes fallback mechanisms for offline authentication.\n\n## Rationale\nAddresses technical debt (token refresh marked as TODO) and critical competitor pain point: TripIt login problems where users get logged out and can't log back in (pain-1-2). Also addresses competitor authentication issues (pain-3-5). Reliable auth is foundational for all user-specific features.\n\n## User Stories\n- As a user, I want to stay logged in so that I don't have to repeatedly sign in\n- As a user, I want the app to handle token refresh automatically so that my session doesn't interrupt my usage\n- As a user, I want helpful error messages if login fails so that I know how to fix the issue\n\n## Acceptance Criteria\n- [ ] Users can log in, register, and reset passwords reliably\n- [ ] Token refresh happens automatically in the background without user awareness\n- [ ] Expired tokens trigger retry mechanism with exponential backoff\n- [ ] Users remain logged in across app restarts within session validity\n- [ ] Clear error messages guide users when authentication fails\n- [ ] Offline authentication allows access to cached data during network issues\n",
+  "created_at": "2026-01-04T18:29:45.906Z",
+  "updated_at": "2026-01-04T19:30:00.000Z",
+  "status": "planned",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Token Refresh Foundation",
+      "description": "Create core token refresh infrastructure with retry logic and mutex to prevent race conditions",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "1.1",
+          "title": "Create Token Refresh Service",
+          "description": "Implement a centralized TokenRefreshService that manages token refresh operations with retry logic, exponential backoff, and mutex to prevent concurrent refresh attempts",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "TokenRefreshService class created with refresh method",
+            "Implements exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s max",
+            "Mutex pattern prevents multiple simultaneous refresh attempts",
+            "Max retry attempts: 3",
+            "Emits refresh status events via Stream",
+            "Handles network errors gracefully"
+          ],
+          "dependencies": [],
+          "estimatedHours": 4
+        },
+        {
+          "id": "1.2",
+          "title": "Implement Token Expiration Tracker",
+          "description": "Create a service that tracks token expiration time and triggers proactive refresh before expiration",
+          "status": "completed",
+          "acceptanceCriteria": [
+            "TokenExpirationTracker class created",
+            "Calculates time until token expiration",
+            "Triggers refresh at 75% of token lifetime",
+            "Handles edge cases (missing expiration, already expired)",
+            "Integrates with TokenRefreshService"
+          ],
+          "dependencies": ["1.1"],
+          "estimatedHours": 3
+        },
+        {
+          "id": "1.3",
+          "title": "Create Refresh Queue Manager",
+          "description": "Implement a queue to manage pending token refresh requests and prevent duplicate refresh attempts",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "RefreshQueueManager class created",
+            "Queues refresh requests when refresh is in progress",
+            "Resolves all queued requests with same result",
+            "Prevents duplicate refresh calls",
+            "Handles queue timeout after 30 seconds"
+          ],
+          "dependencies": ["1.1"],
+          "estimatedHours": 3
+        },
+        {
+          "id": "1.4",
+          "title": "Update AuthRepository with Refresh Service",
+          "description": "Integrate TokenRefreshService into AuthRepository to replace simple refresh with robust refresh logic",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "AuthRepository uses TokenRefreshService instead of direct refresh",
+            "Maintains backward compatibility with existing interface",
+            "Propagates refresh errors appropriately",
+            "Updates session storage after successful refresh"
+          ],
+          "dependencies": ["1.1", "1.3"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "1.5",
+          "title": "Add Unit Tests for Refresh Logic",
+          "description": "Write comprehensive unit tests for token refresh service, expiration tracker, and queue manager",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Tests for exponential backoff behavior",
+            "Tests for mutex preventing concurrent refreshes",
+            "Tests for queue management",
+            "Tests for expiration calculation",
+            "Tests for error handling and retries",
+            "Coverage > 90%"
+          ],
+          "dependencies": ["1.1", "1.2", "1.3"],
+          "estimatedHours": 4
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Background Token Refresh",
+      "description": "Implement automatic background token refresh to keep sessions alive without user awareness",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "2.1",
+          "title": "Create Token Refresh Scheduler",
+          "description": "Implement a background scheduler that triggers token refresh based on expiration time",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "TokenRefreshScheduler class created",
+            "Schedules refresh at 75% of token lifetime",
+            "Respects app lifecycle (pauses when app is backgrounded)",
+            "Wakes up when app returns to foreground",
+            "Handles edge cases (app killed, network loss)"
+          ],
+          "dependencies": ["1.2"],
+          "estimatedHours": 4
+        },
+        {
+          "id": "2.2",
+          "title": "Integrate with App Lifecycle",
+          "description": "Connect token refresh scheduler with app lifecycle events (foreground, background, terminate)",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Pauses refresh timer when app goes to background",
+            "Resumes refresh timer when app returns to foreground",
+            "Triggers immediate refresh check on app resume",
+            "Handles app termination gracefully"
+          ],
+          "dependencies": ["2.1"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "2.3",
+          "title": "Update AuthInterceptor for Proactive Refresh",
+          "description": "Modify AuthInterceptor to check token expiration before making requests and trigger refresh if needed",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Checks token expiration before each request",
+            "Triggers refresh if token expires in < 5 minutes",
+            "Waits for in-progress refresh before proceeding",
+            "Handles refresh failure gracefully"
+          ],
+          "dependencies": ["1.4", "2.1"],
+          "estimatedHours": 3
+        },
+        {
+          "id": "2.4",
+          "title": "Add Refresh Notifications",
+          "description": "Implement user-facing notifications for token refresh events (silent success, visible failures)",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Silent refresh (no notification) on success",
+            "User-friendly error message on refresh failure",
+            "Option to retry or re-authenticate on failure",
+            "Respects user notification preferences"
+          ],
+          "dependencies": ["2.1"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "2.5",
+          "title": "Add Integration Tests for Background Refresh",
+          "description": "Write integration tests to verify background refresh behavior across app lifecycle events",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Tests for refresh scheduling",
+            "Tests for app lifecycle integration",
+            "Tests for concurrent request handling during refresh",
+            "Tests for network interruption scenarios",
+            "Coverage > 85%"
+          ],
+          "dependencies": ["2.1", "2.2", "2.3"],
+          "estimatedHours": 4
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Session Persistence",
+      "description": "Implement persistent session storage and restoration across app restarts",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "3.1",
+          "title": "Create Persistent Session Manager",
+          "description": "Implement a service that manages session persistence using secure storage",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "PersistentSessionManager class created",
+            "Saves tokens with expiration timestamp on successful auth",
+            "Loads and validates session on app startup",
+            "Clears session on logout",
+            "Uses flutter_secure_storage for token storage"
+          ],
+          "dependencies": [],
+          "estimatedHours": 3
+        },
+        {
+          "id": "3.2",
+          "title": "Implement Session Validation Logic",
+          "description": "Add logic to validate stored sessions and determine if refresh or re-authentication is needed",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Validates token expiration on session load",
+            "Attempts refresh if token expired < 24 hours ago",
+            "Requires re-authentication if token expired > 24 hours ago",
+            "Handles missing or corrupted session data"
+          ],
+          "dependencies": ["3.1"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "3.3",
+          "title": "Update Auth Provider with Session Restoration",
+          "description": "Modify AuthProvider to restore session on app initialization and keep user logged in",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "AuthProvider restores session on initialization",
+            "Updates auth state based on session validity",
+            "Triggers background refresh if session is valid but expiring soon",
+            "Redirects to login if session is invalid"
+          ],
+          "dependencies": ["3.1", "3.2"],
+          "estimatedHours": 3
+        },
+        {
+          "id": "3.4",
+          "title": "Add Integration Tests for Session Persistence",
+          "description": "Write tests to verify session persistence across app restarts and various scenarios",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Tests for session save and load",
+            "Tests for session validation",
+            "Tests for auto-refresh on app restart",
+            "Tests for logout clearing session",
+            "Tests for corrupted session handling",
+            "Coverage > 85%"
+          ],
+          "dependencies": ["3.1", "3.2", "3.3"],
+          "estimatedHours": 3
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Error Handling & User Experience",
+      "description": "Implement comprehensive error handling and provide clear user feedback for auth failures",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "4.1",
+          "title": "Create Auth Error Handler",
+          "description": "Implement a centralized error handler that categorizes auth errors and provides appropriate user messages",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "AuthErrorHandler class created",
+            "Categorizes errors: network, credentials, expired, rate limit, server",
+            "Maps error codes to user-friendly messages",
+            "Suggests actionable steps for each error type",
+            "Logs errors for debugging"
+          ],
+          "dependencies": [],
+          "estimatedHours": 3
+        },
+        {
+          "id": "4.2",
+          "title": "Implement Retry UI Component",
+          "description": "Create a reusable UI component for auth retry with exponential backoff visualization",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "AuthRetryButton widget created",
+            "Shows countdown for next retry attempt",
+            "Displays retry attempt count",
+            "Disables button during countdown",
+            "Provides cancel option"
+          ],
+          "dependencies": ["4.1"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "4.3",
+          "title": "Add Auth Error Screens",
+          "description": "Create dedicated screens for common auth error scenarios with helpful guidance",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "SessionExpiredScreen with re-auth option",
+            "NetworkErrorScreen with retry and offline mode options",
+            "CredentialsErrorScreen with forgot password link",
+            "RateLimitErrorScreen with wait time display",
+            "Consistent styling and navigation"
+          ],
+          "dependencies": ["4.1"],
+          "estimatedHours": 4
+        },
+        {
+          "id": "4.4",
+          "title": "Update Auth Screens with Error Handling",
+          "description": "Enhance existing auth screens (login, register) with improved error display and recovery options",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Login screen shows user-friendly error messages",
+            "Register screen validates input and shows clear errors",
+            "Forgot password screen provides status feedback",
+            "All screens use AuthErrorHandler",
+            "Consistent error UI patterns"
+          ],
+          "dependencies": ["4.1", "4.2", "4.3"],
+          "estimatedHours": 3
+        },
+        {
+          "id": "4.5",
+          "title": "Add Widget Tests for Error UI",
+          "description": "Write widget tests for auth error screens and retry components",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Tests for error screen rendering",
+            "Tests for retry button behavior",
+            "Tests for countdown timer",
+            "Tests for navigation flows",
+            "Coverage > 85%"
+          ],
+          "dependencies": ["4.2", "4.3"],
+          "estimatedHours": 3
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "title": "Offline Authentication Support",
+      "description": "Implement fallback mechanisms for offline authentication and cached data access",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "5.1",
+          "title": "Create Offline Auth Manager",
+          "description": "Implement a service that manages offline authentication state and cached data access",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "OfflineAuthManager class created",
+            "Detects network connectivity changes",
+            "Maintains offline auth state",
+            "Provides access to cached data when offline",
+            "Syncs with server when connection restored"
+          ],
+          "dependencies": [],
+          "estimatedHours": 3
+        },
+        {
+          "id": "5.2",
+          "title": "Implement Cached Data Access",
+          "description": "Create a read-only data access layer for offline mode using cached user data",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "CachedDataProvider class created",
+            "Returns cached user profile when offline",
+            "Returns cached trip data when offline",
+            "Shows 'offline mode' indicator in UI",
+            "Prevents write operations when offline"
+          ],
+          "dependencies": ["5.1"],
+          "estimatedHours": 4
+        },
+        {
+          "id": "5.3",
+          "title": "Add Offline Mode UI Indicator",
+          "description": "Create a UI component that indicates when the app is in offline mode",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "OfflineIndicator widget created",
+            "Shows in app bar when offline",
+            "Displays last sync time",
+            "Provides visual feedback (color, icon)",
+            "Non-intrusive design"
+          ],
+          "dependencies": ["5.1"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "5.4",
+          "title": "Implement Sync on Reconnect",
+          "description": "Add logic to automatically sync data and refresh tokens when network connection is restored",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Detects network reconnection",
+            "Attempts token refresh if expired",
+            "Syncs pending changes if any",
+            "Refreshes cached data",
+            "Shows sync progress to user"
+          ],
+          "dependencies": ["5.1", "5.2"],
+          "estimatedHours": 3
+        },
+        {
+          "id": "5.5",
+          "title": "Add Integration Tests for Offline Scenarios",
+          "description": "Write tests to verify offline authentication behavior and sync on reconnect",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Tests for offline mode detection",
+            "Tests for cached data access",
+            "Tests for sync on reconnect",
+            "Tests for offline UI indicator",
+            "Tests for token refresh after reconnection",
+            "Coverage > 85%"
+          ],
+          "dependencies": ["5.1", "5.2", "5.4"],
+          "estimatedHours": 4
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "title": "Testing & Documentation",
+      "description": "Complete end-to-end testing, performance optimization, and documentation",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "6.1",
+          "title": "Write End-to-End Auth Tests",
+          "description": "Create comprehensive E2E tests covering complete auth flows including refresh, persistence, and error scenarios",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "E2E test for complete login flow",
+            "E2E test for token refresh during API call",
+            "E2E test for session restoration after app restart",
+            "E2E test for logout and re-login",
+            "E2E test for offline to online transition",
+            "All tests pass consistently"
+          ],
+          "dependencies": ["1.5", "2.5", "3.4", "4.5", "5.5"],
+          "estimatedHours": 6
+        },
+        {
+          "id": "6.2",
+          "title": "Performance Testing & Optimization",
+          "description": "Test auth performance under various conditions and optimize bottlenecks",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Login completes in < 3 seconds on 4G",
+            "Token refresh completes in < 1 second",
+            "Session restoration completes in < 500ms",
+            "Memory usage optimized (no leaks)",
+            "Background refresh doesn't block UI"
+          ],
+          "dependencies": ["6.1"],
+          "estimatedHours": 4
+        },
+        {
+          "id": "6.3",
+          "title": "Write Auth Documentation",
+          "description": "Create comprehensive documentation for auth system architecture, usage, and troubleshooting",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Architecture overview document",
+            "Token refresh flow diagram",
+            "Session management guide",
+            "Error handling reference",
+            "Integration guide for new features",
+            "Troubleshooting guide"
+          ],
+          "dependencies": ["6.2"],
+          "estimatedHours": 4
+        },
+        {
+          "id": "6.4",
+          "title": "Create Migration Guide",
+          "description": "Document migration path from existing auth implementation to new robust auth system",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "Step-by-step migration instructions",
+            "Breaking changes documented",
+            "Rollback procedure",
+            "Testing checklist",
+            "Deployment considerations"
+          ],
+          "dependencies": ["6.3"],
+          "estimatedHours": 2
+        },
+        {
+          "id": "6.5",
+          "title": "Final QA & Bug Fixes",
+          "description": "Conduct final QA testing and fix any remaining bugs",
+          "status": "pending",
+          "acceptanceCriteria": [
+            "All acceptance criteria met",
+            "All tests passing",
+            "No critical or high-priority bugs",
+            "Performance benchmarks met",
+            "Documentation reviewed and approved"
+          ],
+          "dependencies": ["6.1", "6.2", "6.3", "6.4"],
+          "estimatedHours": 8
+        }
+      ]
+    }
+  ],
+  "planStatus": "ready",
+  "metadata": {
+    "totalEstimatedHours": 120,
+    "totalPhases": 6,
+    "totalSubtasks": 30,
+    "priority": "high",
+    "complexity": "high",
+    "riskLevel": "medium",
+    "techStack": [
+      "Flutter",
+      "AWS Cognito",
+      "Riverpod",
+      "Dio",
+      "flutter_secure_storage"
+    ],
+    "keyFiles": [
+      "lib/core/api/interceptors/auth_interceptor.dart",
+      "lib/features/auth/data/repositories/auth_repository_impl.dart",
+      "lib/features/auth/data/datasources/auth_remote_data_source_impl.dart",
+      "lib/features/auth/domain/repositories/auth_repository.dart",
+      "lib/features/auth/presentation/providers/auth_provider.dart"
+    ]
+  }
+}
