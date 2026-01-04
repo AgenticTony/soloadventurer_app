@@ -341,15 +341,16 @@
           "subtask_id": "4.5",
           "title": "Create CuratedListCard widget",
           "description": "Card component for curated destination lists",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/presentation/widgets/curated_list_card.dart",
+          "notes": "Created comprehensive CuratedListCard widget with all required features. Implementation includes: 1) Cover image display with CachedNetworkImage and proper placeholder/error handling (falls back to gallery images if no cover), 2) List name and description with proper truncation (2 lines max), 3) Destination count display with icon and formatted label ('X Destinations'), 4) List type badge with color-coded display for all 12 CuratedListType types (popularSolo=trending_up/purple, hiddenGems=diamond/amber, budgetFriendly=attach_money/green, adventure=hiking/orange, cultural=museum/brown, beach=beach_access/lightBlue, urban=location_city/blueGrey, nature=park/darkGreen, food=restaurant/darkRed, wellness=spa/teal, seasonal=calendar_today/indigo, custom=playlist_add_check/cyan), 5) Tap callback support via onTap parameter, 6) Preview of destinations showing up to 3 destinations as chips with small thumbnails and names, 7) Featured badge overlay (star icon, primary color), 8) Hidden gems badge overlay (diamond icon, amber color), 9) Type badge overlay on image (shown if not hidden gems), 10) Small type badge in metadata row, 11) View count display for popular lists with formatting ('1.2k views'), 12) Customizable border radius, elevation, and preview count, 13) Optional trailing widget support, 14) Helper methods for badge creation and type info, 15) Comprehensive documentation with usage examples. Added to widgets barrel file for clean imports. Follows existing patterns from DestinationCard and other widgets with proper _build* method organization.",
           "acceptance_criteria": [
-            "Display list cover image",
-            "List name and description",
-            "Destination count",
-            "List type badge",
-            "Tap callback for navigation",
-            "Preview of destinations"
+            "Display list cover image - COMPLETED with CachedNetworkImage and fallback to gallery images",
+            "List name and description - COMPLETED with truncation (2 lines max)",
+            "Destination count - COMPLETED with icon and formatted label",
+            "List type badge - COMPLETED with color-coded display for all 12 list types",
+            "Tap callback for navigation - COMPLETED via onTap parameter",
+            "Preview of destinations - COMPLETED showing up to 3 destinations as chips with thumbnails"
           ]
         },
         {
