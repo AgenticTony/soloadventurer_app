@@ -44,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
   static const int schemaVersion = 1;
 
   /// Database filename
-  static const String _dbName = 'soloadventurer.db';
+  static const String dbName = 'soloadventurer.db';
 
   /// Creates a new AppDatabase instance
   ///
@@ -64,7 +64,7 @@ class AppDatabase extends _$AppDatabase {
   static QueryExecutor _openDatabase() {
     return LazyDatabase(() async {
       final dbDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(dbDir.path, _dbName);
+      final dbPath = p.join(dbDir.path, dbName);
 
       // Log database path for debugging (remove in production)
       // debugPrint('Database path: $dbPath');
@@ -160,7 +160,7 @@ class AppDatabase extends _$AppDatabase {
   Future<Map<String, dynamic>> getDatabaseInfo() async {
     try {
       final dbDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(dbDir.path, _dbName);
+      final dbPath = p.join(dbDir.path, dbName);
       final dbFile = File(dbPath);
 
       return {
@@ -187,7 +187,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> deleteDatabaseFile() async {
     try {
       final dbDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(dbDir.path, _dbName);
+      final dbPath = p.join(dbDir.path, dbName);
       final dbFile = File(dbPath);
 
       if (await dbFile.exists()) {

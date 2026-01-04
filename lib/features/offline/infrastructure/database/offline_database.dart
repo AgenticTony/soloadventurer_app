@@ -3,3 +3,4 @@
 
 export 'schema.dart';
 export 'database.dart';
+export 'database_service.dart';

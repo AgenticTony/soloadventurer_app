@@ -2,6 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../features/offline/infrastructure/database/offline_database.dart';
+
 /// Register all offline/sync feature dependencies
 ///
 /// This module manages dependency injection for the offline-first architecture
@@ -34,14 +36,16 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // PHASE 2: LOCAL DATABASE LAYER (To be implemented in Phase 2)
   // ==============================================================================
   //
+  // Register DatabaseService as a singleton
+  // This service manages the database lifecycle and provides error recovery
+  getIt.registerLazySingleton<DatabaseService>(
+    () => DatabaseService(),
+  );
+
   // TODO: Register AppDatabase
+  // Note: AppDatabase is accessed through DatabaseService
   // getIt.registerLazySingleton<AppDatabase>(
   //   () => AppDatabase(),
-  // );
-  //
-  // TODO: Register DatabaseService
-  // getIt.registerLazySingleton<DatabaseService>(
-  //   () => DatabaseService(),
   // );
   //
   // TODO: Register DAOs
