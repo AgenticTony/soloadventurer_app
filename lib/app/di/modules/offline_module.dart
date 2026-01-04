@@ -13,6 +13,8 @@ import '../../features/offline/domain/repositories/offline_repositories.dart';
 import '../../features/offline/data/repositories/offline_repositories.dart';
 import '../../features/offline/infrastructure/sync/offline_sync.dart';
 import '../../features/offline/infrastructure/sync/background_sync_service.dart';
+import '../../features/offline/infrastructure/sync/offline_interceptor.dart';
+import '../../features/offline/infrastructure/sync/mutation_interceptor.dart';
 import '../../core/network/network_reachability.dart';
 import '../../features/core/infrastructure/api/dio_api_service.dart';
 
@@ -123,13 +125,14 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     ),
   );
   //
-  // TODO: Register Operation Interceptors
-  // getIt.registerLazySingleton<OfflineInterceptor>(
-  //   () => OfflineInterceptor(
-  //     syncQueueService: getIt<SyncQueueService>(),
-  //     connectivityService: getIt<ConnectivityService>(),
-  //   ),
-  // );
+  // Register OfflineInterceptor for manual operation interception
+  // This service can be used directly by repositories to intercept operations
+  getIt.registerLazySingleton<OfflineInterceptor>(
+    () => OfflineInterceptor(
+      syncQueueService: getIt<SyncQueueService>(),
+      connectivityService: getIt<ConnectivityService>(),
+    ),
+  );
 
   // ==============================================================================
   // PHASE 5: DATA SYNCHRONIZATION ENGINE
