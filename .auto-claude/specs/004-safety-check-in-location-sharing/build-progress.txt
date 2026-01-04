@@ -518,3 +518,32 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Includes comprehensive documentation and error handling
 - Commit: pending
 
+✅ **Subtask 6.4: Create check-in history screen** (COMPLETED)
+- Implemented comprehensive CheckInHistoryScreen with full filtering and sorting functionality
+- Features include:
+  - Displays all check-ins (completed, missed, cancelled) with detailed information
+  - Filter by status (All, Completed, Missed, Cancelled) via filter menu in app bar
+  - Sort options (newest first, oldest first) via sort menu
+  - Pull-to-refresh for loading latest check-ins
+  - Loading, empty, and error states with appropriate UI
+  - Check-in cards showing: icon, title, status chip, date/time, location, and status message
+  - Detailed bottom sheet with full check-in information:
+    - Created time, scheduled time, deadline, completed time
+    - Location with accuracy indicator
+    - Status message
+    - Trip ID
+    - Notify contacts count
+    - Alert sent status and timestamp
+    - Last updated timestamp
+  - Context-aware empty states based on active filter
+  - Color-coded status indicators (blue=scheduled, green=active, grey=completed, red=missed)
+  - Smart date formatting (today, yesterday, weekday, or full date)
+- Updated CheckInHomeScreen navigation:
+  - Replaced placeholder snackbar with actual navigation to CheckInHistoryScreen
+  - Added import for CheckInHistoryScreen
+- Follows existing screen patterns from CheckInHomeScreen and TrustedContactsScreen
+- Uses ConsumerStatefulWidget pattern with proper state management
+- Integrates with CheckInNotifier and checkInNotifierProvider for reactive updates
+- Includes comprehensive documentation and error handling
+- Commit: f253028
+

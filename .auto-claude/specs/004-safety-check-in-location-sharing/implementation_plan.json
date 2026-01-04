@@ -356,10 +356,11 @@
           "subtask_id": "6.4",
           "title": "Create check-in history screen",
           "description": "Build screen showing check-in history",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/screens/check_in_history_screen.dart"
-          ]
+          ],
+          "notes": "Implemented comprehensive CheckInHistoryScreen with full filtering and sorting functionality. Features include: displays all check-ins (completed, missed, cancelled) with detailed information; filter by status (All, Completed, Missed, Cancelled) via filter menu in app bar; sort options (newest first, oldest first) via sort menu; pull-to-refresh for loading latest check-ins; loading, empty, and error states with appropriate UI; check-in cards showing icon, title, status chip, date/time, location, and status message; detailed bottom sheet with full check-in information (created time, scheduled time, deadline, completed time, location with accuracy, message, trip ID, notify contacts, alert sent status); context-aware empty states based on active filter; color-coded status indicators (blue=scheduled, green=active, grey=completed, red=missed); smart date formatting (today, yesterday, weekday, or full date); Updated CheckInHomeScreen navigation to use new history screen (replaced placeholder snackbar with actual navigation). Follows existing screen patterns from CheckInHomeScreen and TrustedContactsScreen with ConsumerStatefulWidget pattern, proper state management using CheckInNotifier, and comprehensive error handling."
         },
         {
           "subtask_id": "6.5",
