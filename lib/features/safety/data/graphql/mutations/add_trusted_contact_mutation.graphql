@@ -1,0 +1,27 @@
+mutation AddTrustedContact(
+  $name: String!
+  $email: String
+  $phoneNumber: String
+  $contactSource: String!
+  $notificationPreference: String!
+) {
+  addTrustedContact(
+    name: $name
+    email: $email
+    phoneNumber: $phoneNumber
+    contactSource: $contactSource
+    notificationPreference: $notificationPreference
+  ) {
+    id
+    userId
+    name
+    email
+    phoneNumber
+    contactSource
+    receivesCheckInNotifications
+    receivesEmergencyAlerts
+    receivesLocationUpdates
+    createdAt
+    updatedAt
+  }
+}
