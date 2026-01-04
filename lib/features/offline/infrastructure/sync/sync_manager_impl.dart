@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/offline/domain/services/sync_manager.dar
 import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/upload_sync.dart';
+import 'package:soloadventurer/features/offline/infrastructure/sync/download_sync.dart';
 
 /// Implementation of [SyncManager]
 ///
@@ -29,6 +30,9 @@ class SyncManagerImpl implements SyncManager {
 
   /// Upload sync service for syncing operations to server
   final UploadSync _uploadSync;
+
+  /// Download sync service for syncing server data to local database
+  final DownloadSync _downloadSync;
 
   /// Stream controller for sync status updates
   final StreamController<SyncStatus> _statusController =
@@ -63,17 +67,20 @@ class SyncManagerImpl implements SyncManager {
   /// [connectivityService] - Connectivity service for network monitoring
   /// [syncQueueService] - Sync queue service for managing operations
   /// [uploadSync] - Upload sync service for syncing to server
+  /// [downloadSync] - Download sync service for syncing from server
   /// [autoSyncMinInterval] - Minimum interval between auto-syncs (default: 30s)
   /// [syncOnlyOnWifi] - Only sync when on WiFi (default: false)
   SyncManagerImpl({
     required ConnectivityService connectivityService,
     required SyncQueueService syncQueueService,
     required UploadSync uploadSync,
+    required DownloadSync downloadSync,
     this.autoSyncMinInterval = const Duration(seconds: 30),
     this.syncOnlyOnWifi = false,
   })  : _connectivityService = connectivityService,
         _syncQueueService = syncQueueService,
-        _uploadSync = uploadSync;
+        _uploadSync = uploadSync,
+        _downloadSync = downloadSync;
 
   // ==============================================================================
   // SYNC STATUS STREAM
@@ -253,12 +260,30 @@ class SyncManagerImpl implements SyncManager {
       ));
 
       int downloadedCount = 0;
+      int insertedCount = 0;
+      int updatedCount = 0;
 
-      // TODO: Implement download sync in subtask 5.3
-      // For now, we'll simulate download (will be implemented properly later)
-      await Future.delayed(const Duration(milliseconds: 100));
+      // Download server changes using DownloadSync service
+      final downloadResult = await _downloadSync.syncServerChanges(
+        onProgress: (current, total) {
+          // Update progress in sync status
+          final progress = 0.5 + (current / total * 0.3); // 50% to 80%
+          _updateStatus(SyncStatus.syncing(
+            phase: SyncPhase.download,
+            progress: progress,
+            currentOperation: 'Downloading entity type $current of $total...',
+            pendingOperations: _currentStatus.pendingOperations,
+          ));
+        },
+      );
 
-      debugPrint('✅ Download phase complete: $downloadedCount changes');
+      downloadedCount = downloadResult.downloadCount;
+      insertedCount = downloadResult.insertCount;
+      updatedCount = downloadResult.updateCount;
+
+      debugPrint('✅ Download phase complete: '
+          '$downloadedCount changes '
+          '($insertedCount inserted, $updatedCount updated)');
 
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.download,
@@ -308,7 +333,8 @@ class SyncManagerImpl implements SyncManager {
       debugPrint('✅ Sync cycle complete in ${duration.inSeconds}s');
       debugPrint('📊 Summary: '
           'uploaded: $uploadedCount, '
-          'downloaded: $downloadedCount, '
+          'downloaded: $downloadedCount '
+          '($insertedCount inserted, $updatedCount updated), '
           'conflicts: $conflictsResolved');
 
       // Update status to idle

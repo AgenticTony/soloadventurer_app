@@ -1,6 +1,7 @@
 // Offline Infrastructure Sync
 // Export all sync-related infrastructure for offline functionality
 
+export 'download_sync.dart';
 export 'offline_interceptor.dart';
 export 'mutation_interceptor.dart';
 export 'sync_manager_impl.dart';

@@ -128,6 +128,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
       connectivityService: getIt<ConnectivityService>(),
       syncQueueService: getIt<SyncQueueService>(),
       uploadSync: getIt<UploadSync>(),
+      downloadSync: getIt<DownloadSync>(),
       autoSyncMinInterval: const Duration(seconds: 30),
       syncOnlyOnWifi: false,
     ),
@@ -150,14 +151,17 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     ),
   );
   //
-  // TODO: Register DownloadSync (Subtask 5.3)
-  // getIt.registerLazySingleton<DownloadSync>(
-  //   () => DownloadSync(
-  //     apiClient: getIt<ApiService>(),
-  //     database: getIt<AppDatabase>(),
-  //     conflictResolver: getIt<ConflictResolver>(),
-  //   ),
-  // );
+  // Register DownloadSync for syncing server data to local database
+  // This service queries the server for changes and updates the local database
+  // with new or modified records. It handles trips, journals, and user profiles.
+  getIt.registerLazySingleton<DownloadSync>(
+    () => DownloadSync(
+      dio: getIt<DioApiService>().dio,
+      database: getIt<DatabaseService>().database,
+      userId: 'current-user-id', // TODO: Get from auth service
+      graphqlEndpoint: '/graphql',
+    ),
+  );
   //
   // TODO: Register IncrementalSync (Subtask 5.5)
   // getIt.registerLazySingleton<IncrementalSync>(
