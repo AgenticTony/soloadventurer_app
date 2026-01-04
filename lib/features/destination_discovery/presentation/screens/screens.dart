@@ -5,3 +5,4 @@
 
 export 'destination_detail_screen.dart';
 export 'destination_discovery_screen.dart';
+export 'recommendations_screen.dart';
