@@ -2,7 +2,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 
 /// Offline authentication state
@@ -104,6 +107,113 @@ class CachedDataInfo {
   }
 }
 
+/// Progress of a sync operation
+enum SyncStep {
+  /// Sync is starting
+  starting,
+
+  /// Refreshing authentication token
+  refreshingToken,
+
+  /// Syncing user data
+  syncingUserData,
+
+  /// Syncing pending changes
+  syncingPendingChanges,
+
+  /// Sync completed successfully
+  completed,
+
+  /// Sync failed
+  failed,
+}
+
+/// Result of a sync operation
+class SyncProgress {
+  /// Current sync step
+  final SyncStep step;
+
+  /// Progress percentage (0-100)
+  final int progress;
+
+  /// Error message if sync failed
+  final String? errorMessage;
+
+  /// Whether the sync operation completed successfully
+  final bool isSuccess;
+
+  /// Timestamp of this progress update
+  final DateTime timestamp;
+
+  const SyncProgress({
+    required this.step,
+    required this.progress,
+    this.errorMessage,
+    required this.isSuccess,
+    DateTime? timestamp,
+  }) : timestamp = timestamp ?? DateTime.now();
+
+  /// Creates a starting progress
+  factory SyncProgress.starting() {
+    return const SyncProgress(
+      step: SyncStep.starting,
+      progress: 0,
+      isSuccess: false,
+    );
+  }
+
+  /// Creates a token refresh progress
+  factory SyncProgress.refreshingToken({required int progress}) {
+    return SyncProgress(
+      step: SyncStep.refreshingToken,
+      progress: progress,
+      isSuccess: false,
+    );
+  }
+
+  /// Creates a syncing user data progress
+  factory SyncProgress.syncingUserData({required int progress}) {
+    return SyncProgress(
+      step: SyncStep.syncingUserData,
+      progress: progress,
+      isSuccess: false,
+    );
+  }
+
+  /// Creates a syncing pending changes progress
+  factory SyncProgress.syncingPendingChanges({required int progress}) {
+    return SyncProgress(
+      step: SyncStep.syncingPendingChanges,
+      progress: progress,
+      isSuccess: false,
+    );
+  }
+
+  /// Creates a completed progress
+  factory SyncProgress.completed() {
+    return const SyncProgress(
+      step: SyncStep.completed,
+      progress: 100,
+      isSuccess: true,
+    );
+  }
+
+  /// Creates a failed progress
+  factory SyncProgress.failed({required String errorMessage}) {
+    return SyncProgress(
+      step: SyncStep.failed,
+      progress: 0,
+      isSuccess: false,
+      errorMessage: errorMessage,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'SyncProgress{step: $step, progress: $progress, isSuccess: $isSuccess, errorMessage: $errorMessage}';
+  }
+}
+
 /// Service for managing offline authentication state and cached data access
 ///
 /// This service provides offline authentication capabilities by:
@@ -112,8 +222,10 @@ class CachedDataInfo {
 /// - Providing access to cached data when offline
 /// - Syncing with server when connection is restored
 ///
-/// The service integrates with [ConnectivityService] to detect network changes
-/// and [AuthLocalDataSource] to access cached authentication data.
+/// The service integrates with [ConnectivityService] to detect network changes,
+/// [AuthLocalDataSource] to access cached authentication data,
+/// [TokenRefreshService] to refresh tokens when reconnected, and
+/// [AuthRepository] to fetch fresh data from the server.
 class OfflineAuthManager {
   /// Service for monitoring network connectivity
   final ConnectivityService _connectivityService;
@@ -121,8 +233,17 @@ class OfflineAuthManager {
   /// Local data source for accessing cached auth data
   final AuthLocalDataSource _localDataSource;
 
+  /// Service for refreshing authentication tokens
+  final TokenRefreshService? _tokenRefreshService;
+
+  /// Repository for authentication operations
+  final AuthRepository? _authRepository;
+
   /// Stream controller for emitting offline state changes
   final StreamController<OfflineAuthResult> _stateController;
+
+  /// Stream controller for emitting sync progress updates
+  final StreamController<SyncProgress> _syncProgressController;
 
   /// Stream subscription for connectivity changes
   StreamSubscription<NetworkStatus>? _connectivitySubscription;
@@ -143,15 +264,27 @@ class OfflineAuthManager {
   static const Duration _maxCacheAge = Duration(hours: 24);
 
   /// Creates a new [OfflineAuthManager]
+  ///
+  /// The [tokenRefreshService] and [authRepository] are optional but required
+  /// for full sync functionality. If not provided, sync will only handle
+  /// state transitions without refreshing tokens or fetching fresh data.
   OfflineAuthManager({
     required ConnectivityService connectivityService,
     required AuthLocalDataSource localDataSource,
+    TokenRefreshService? tokenRefreshService,
+    AuthRepository? authRepository,
   })  : _connectivityService = connectivityService,
         _localDataSource = localDataSource,
-        _stateController = StreamController<OfflineAuthResult>.broadcast();
+        _tokenRefreshService = tokenRefreshService,
+        _authRepository = authRepository,
+        _stateController = StreamController<OfflineAuthResult>.broadcast(),
+        _syncProgressController = StreamController<SyncProgress>.broadcast();
 
   /// Stream of offline authentication state changes
   Stream<OfflineAuthResult> get onStateChanged => _stateController.stream;
+
+  /// Stream of sync progress updates
+  Stream<SyncProgress> get onSyncProgress => _syncProgressController.stream;
 
   /// Current offline authentication state
   OfflineAuthState get currentState => _currentState;
@@ -433,10 +566,12 @@ class OfflineAuthManager {
   /// This method should be called when the device comes back online.
   /// It will attempt to:
   /// 1. Refresh the authentication token if needed
-  /// 2. Sync any pending local changes
+  /// 2. Sync any pending local changes (if implemented)
   /// 3. Update cached data from the server
   ///
   /// Returns [OfflineAuthResult] with the result of the sync operation.
+  ///
+  /// Emits [SyncProgress] updates to the [onSyncProgress] stream during the sync process.
   Future<OfflineAuthResult> syncWithServer() async {
     if (_isSyncing) {
       debugPrint('OfflineAuthManager: Sync already in progress');
@@ -453,17 +588,103 @@ class OfflineAuthManager {
     _isSyncing = true;
     debugPrint('OfflineAuthManager: Starting sync with server');
 
+    // Emit starting progress
+    _emitSyncProgress(SyncProgress.starting());
+
     try {
-      // Note: The actual token refresh and data sync will be handled
-      // by the TokenRefreshScheduler and other services. This method
-      // is primarily for transitioning the state back to online.
+      // Step 1: Check if we need to refresh the token
+      if (_tokenRefreshService != null) {
+        debugPrint('OfflineAuthManager: Checking if token refresh is needed');
 
-      // For now, just transition to online state
-      // The TokenRefreshService will handle token refresh automatically
-      await Future.delayed(const Duration(milliseconds: 100));
+        _emitSyncProgress(SyncProgress.refreshingToken(progress: 10));
 
+        // Check if token is expired
+        final isExpired = await _localDataSource.isTokenExpired();
+
+        if (isExpired) {
+          debugPrint('OfflineAuthManager: Token is expired, refreshing...');
+
+          _emitSyncProgress(SyncProgress.refreshingToken(progress: 20));
+
+          try {
+            // Refresh the token using TokenRefreshService
+            await _tokenRefreshService!.refreshToken();
+
+            debugPrint('OfflineAuthManager: Token refreshed successfully');
+
+            _emitSyncProgress(SyncProgress.refreshingToken(progress: 40));
+          } catch (e) {
+            debugPrint('OfflineAuthManager: Token refresh failed: $e');
+
+            _emitSyncProgress(SyncProgress.failed(
+              errorMessage: 'Token refresh failed: ${e.toString()}',
+            ));
+
+            // Don't fail the entire sync if token refresh fails
+            // The user might still be able to access cached data
+          }
+        } else {
+          debugPrint('OfflineAuthManager: Token is still valid, skipping refresh');
+          _emitSyncProgress(SyncProgress.refreshingToken(progress: 40));
+        }
+      } else {
+        debugPrint('OfflineAuthManager: TokenRefreshService not available, skipping token refresh');
+      }
+
+      // Step 2: Sync user data from server
+      if (_authRepository != null) {
+        debugPrint('OfflineAuthManager: Fetching fresh user data from server');
+
+        _emitSyncProgress(SyncProgress.syncingUserData(progress: 60));
+
+        try {
+          // Get current user from server
+          final user = await _authRepository!.getCurrentUser();
+
+          if (user != null) {
+            debugPrint('OfflineAuthManager: User data fetched: ${user.email}');
+
+            // Cache the user data with current timestamp
+            final userData = {
+              'id': user.id,
+              'email': user.email,
+              'username': user.username,
+              'created_at': user.createdAt.toIso8601String(),
+              'last_login_at': user.lastLoginAt?.toIso8601String(),
+              'cached_at': DateTime.now().toIso8601String(),
+            };
+
+            await _localDataSource.cacheUserData(userData);
+
+            debugPrint('OfflineAuthManager: User data cached successfully');
+
+            _emitSyncProgress(SyncProgress.syncingUserData(progress: 80));
+          } else {
+            debugPrint('OfflineAuthManager: No user data returned from server');
+          }
+        } catch (e) {
+          debugPrint('OfflineAuthManager: Failed to fetch user data: $e');
+
+          // Don't fail the entire sync if user data sync fails
+          // Cached data might still be available
+        }
+      } else {
+        debugPrint('OfflineAuthManager: AuthRepository not available, skipping user data sync');
+      }
+
+      // Step 3: Sync pending changes (placeholder for future implementation)
+      debugPrint('OfflineAuthManager: Checking for pending changes to sync');
+      _emitSyncProgress(SyncProgress.syncingPendingChanges(progress: 90));
+
+      // TODO: Implement pending changes sync when needed
+      // For now, just simulate this step
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      // Step 4: Mark sync as complete and transition to online state
       _currentState = OfflineAuthState.online;
       debugPrint('OfflineAuthManager: Sync complete, now online');
+
+      _emitSyncProgress(SyncProgress.completed());
 
       final result = OfflineAuthResult.success(state: OfflineAuthState.online);
       _emitState(result);
@@ -471,6 +692,10 @@ class OfflineAuthManager {
       return result;
     } catch (e) {
       debugPrint('OfflineAuthManager: Sync failed: $e');
+
+      _emitSyncProgress(SyncProgress.failed(
+        errorMessage: 'Sync failed: ${e.toString()}',
+      ));
 
       final result = OfflineAuthResult.failure(
         errorMessage: 'Sync failed: ${e.toString()}',
@@ -504,12 +729,20 @@ class OfflineAuthManager {
     }
   }
 
+  /// Emits a sync progress event to the stream
+  void _emitSyncProgress(SyncProgress progress) {
+    if (!_syncProgressController.isClosed) {
+      _syncProgressController.add(progress);
+    }
+  }
+
   /// Disposes of the service and stops monitoring connectivity
   void dispose() {
     debugPrint('OfflineAuthManager: Disposing');
 
     _connectivitySubscription?.cancel();
     _stateController.close();
+    _syncProgressController.close();
 
     _isInitialized = false;
     _isSyncing = false;

@@ -1,21 +1,30 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/offline_auth_manager.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
 class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
+class MockTokenRefreshService extends Mock implements TokenRefreshService {}
+class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
   late MockConnectivityService mockConnectivityService;
   late MockAuthLocalDataSource mockLocalDataSource;
+  late MockTokenRefreshService mockTokenRefreshService;
+  late MockAuthRepository mockAuthRepository;
   late OfflineAuthManager offlineAuthManager;
   late StreamController<NetworkStatus> connectivityStreamController;
 
   setUp(() {
     mockConnectivityService = MockConnectivityService();
     mockLocalDataSource = MockAuthLocalDataSource();
+    mockTokenRefreshService = MockTokenRefreshService();
+    mockAuthRepository = MockAuthRepository();
     connectivityStreamController = StreamController<NetworkStatus>.broadcast();
 
     // Setup default connectivity stream
@@ -34,9 +43,19 @@ void main() {
     when(() => mockLocalDataSource.getTokenExpiration())
         .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
+    // Setup default isTokenExpired (false)
+    when(() => mockLocalDataSource.isTokenExpired())
+        .thenAnswer((_) async => false);
+
+    // Setup default getCurrentUser (null)
+    when(() => mockAuthRepository.getCurrentUser())
+        .thenAnswer((_) async => null);
+
     offlineAuthManager = OfflineAuthManager(
       connectivityService: mockConnectivityService,
       localDataSource: mockLocalDataSource,
+      tokenRefreshService: mockTokenRefreshService,
+      authRepository: mockAuthRepository,
     );
   });
 
@@ -578,6 +597,213 @@ void main() {
     });
   });
 
+  group('OfflineAuthManager - Sync on Reconnect', () {
+    test('should emit sync progress events during sync', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      final progressList = <SyncProgress>[];
+      final subscription = offlineAuthManager.onSyncProgress.listen((progress) {
+        progressList.add(progress);
+      });
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      expect(result.success, isTrue);
+      expect(result.state, OfflineAuthState.online);
+
+      // Verify we got progress updates
+      expect(progressList.isNotEmpty, isTrue);
+      expect(progressList.last.step, SyncStep.completed);
+
+      await subscription.cancel();
+    });
+
+    test('should refresh token when expired during sync', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      when(() => mockLocalDataSource.isTokenExpired())
+          .thenAnswer((_) async => true);
+
+      when(() => mockTokenRefreshService.refreshToken())
+          .thenAnswer((_) async => Future.delayed(const Duration(milliseconds: 10)));
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      expect(result.success, isTrue);
+      verify(() => mockTokenRefreshService.refreshToken()).called(1);
+    });
+
+    test('should skip token refresh when token is valid', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      when(() => mockLocalDataSource.isTokenExpired())
+          .thenAnswer((_) async => false);
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      expect(result.success, isTrue);
+      verifyNever(() => mockTokenRefreshService.refreshToken());
+    });
+
+    test('should fetch and cache user data during sync', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      final testUser = User(
+        id: 'test-id',
+        email: 'test@example.com',
+        username: 'testuser',
+        createdAt: DateTime.now(),
+      );
+
+      when(() => mockAuthRepository.getCurrentUser())
+          .thenAnswer((_) async => testUser);
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      expect(result.success, isTrue);
+      verify(() => mockAuthRepository.getCurrentUser()).called(1);
+      verify(() => mockLocalDataSource.cacheUserData(any())).called(1);
+    });
+
+    test('should handle token refresh failure gracefully', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      when(() => mockLocalDataSource.isTokenExpired())
+          .thenAnswer((_) async => true);
+
+      when(() => mockTokenRefreshService.refreshToken())
+          .thenThrow(Exception('Token refresh failed'));
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      // Sync should still succeed even if token refresh fails
+      expect(result.success, isTrue);
+      expect(result.state, OfflineAuthState.online);
+    });
+
+    test('should handle user data fetch failure gracefully', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      when(() => mockAuthRepository.getCurrentUser())
+          .thenThrow(Exception('Network error'));
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      // Sync should still succeed even if user data fetch fails
+      expect(result.success, isTrue);
+      expect(result.state, OfflineAuthState.online);
+    });
+
+    test('should not sync when offline', () async {
+      // Arrange
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) async => NetworkStatus.disconnected);
+
+      await offlineAuthManager.initialize();
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      expect(result.success, isFalse);
+      expect(result.errorMessage, contains('Cannot sync while offline'));
+      verifyNever(() => mockTokenRefreshService.refreshToken());
+      verifyNever(() => mockAuthRepository.getCurrentUser());
+    });
+
+    test('should prevent concurrent sync operations', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      // Act - start two syncs concurrently
+      final firstSync = offlineAuthManager.syncWithServer();
+      final secondSync = offlineAuthManager.syncWithServer();
+
+      final results = await Future.wait([firstSync, secondSync]);
+
+      // Assert
+      expect(results[0].success, isTrue);
+      expect(results[1].success, isTrue);
+
+      // Token refresh should only be called once
+      verify(() => mockTokenRefreshService.refreshToken()).called(atMostOnce);
+    });
+
+    test('should complete all sync steps successfully', () async {
+      // Arrange
+      await offlineAuthManager.initialize();
+
+      final testUser = User(
+        id: 'test-id',
+        email: 'test@example.com',
+        username: 'testuser',
+        createdAt: DateTime.now(),
+      );
+
+      when(() => mockAuthRepository.getCurrentUser())
+          .thenAnswer((_) async => testUser);
+
+      final progressSteps = <SyncStep>[];
+      final subscription = offlineAuthManager.onSyncProgress.listen((progress) {
+        progressSteps.add(progress.step);
+      });
+
+      // Act
+      final result = await offlineAuthManager.syncWithServer();
+
+      // Assert
+      expect(result.success, isTrue);
+      expect(result.state, OfflineAuthState.online);
+
+      // Verify all steps were executed
+      expect(progressSteps, contains(SyncStep.starting));
+      expect(progressSteps, contains(SyncStep.refreshingToken));
+      expect(progressSteps, contains(SyncStep.syncingUserData));
+      expect(progressSteps, contains(SyncStep.syncingPendingChanges));
+      expect(progressSteps, contains(SyncStep.completed));
+
+      await subscription.cancel();
+    });
+
+    test('should work without TokenRefreshService', () async {
+      // Arrange
+      final managerWithoutServices = OfflineAuthManager(
+        connectivityService: mockConnectivityService,
+        localDataSource: mockLocalDataSource,
+        // tokenRefreshService and authRepository are null
+      );
+
+      await managerWithoutServices.initialize();
+
+      // Act
+      final result = await managerWithoutServices.syncWithServer();
+
+      // Assert
+      expect(result.success, isTrue);
+      expect(result.state, OfflineAuthState.online);
+
+      managerWithoutServices.dispose();
+    });
+  });
+
   group('OfflineAuthResult - Factory Methods', () {
     test('should create success result with correct values', () {
       // Act
@@ -633,6 +859,103 @@ void main() {
       expect(info.userProfile, isNull);
       expect(info.lastCachedAt, isNull);
       expect(info.isFresh, isFalse);
+    });
+  });
+
+  group('SyncProgress - Factory Methods', () {
+    test('should create starting progress', () {
+      // Act
+      final progress = SyncProgress.starting();
+
+      // Assert
+      expect(progress.step, SyncStep.starting);
+      expect(progress.progress, 0);
+      expect(progress.isSuccess, isFalse);
+      expect(progress.errorMessage, isNull);
+    });
+
+    test('should create refreshingToken progress', () {
+      // Act
+      final progress = SyncProgress.refreshingToken(progress: 25);
+
+      // Assert
+      expect(progress.step, SyncStep.refreshingToken);
+      expect(progress.progress, 25);
+      expect(progress.isSuccess, isFalse);
+      expect(progress.errorMessage, isNull);
+    });
+
+    test('should create syncingUserData progress', () {
+      // Act
+      final progress = SyncProgress.syncingUserData(progress: 60);
+
+      // Assert
+      expect(progress.step, SyncStep.syncingUserData);
+      expect(progress.progress, 60);
+      expect(progress.isSuccess, isFalse);
+      expect(progress.errorMessage, isNull);
+    });
+
+    test('should create syncingPendingChanges progress', () {
+      // Act
+      final progress = SyncProgress.syncingPendingChanges(progress: 90);
+
+      // Assert
+      expect(progress.step, SyncStep.syncingPendingChanges);
+      expect(progress.progress, 90);
+      expect(progress.isSuccess, isFalse);
+      expect(progress.errorMessage, isNull);
+    });
+
+    test('should create completed progress', () {
+      // Act
+      final progress = SyncProgress.completed();
+
+      // Assert
+      expect(progress.step, SyncStep.completed);
+      expect(progress.progress, 100);
+      expect(progress.isSuccess, isTrue);
+      expect(progress.errorMessage, isNull);
+    });
+
+    test('should create failed progress', () {
+      // Arrange
+      const errorMessage = 'Sync failed due to network error';
+
+      // Act
+      final progress = SyncProgress.failed(errorMessage: errorMessage);
+
+      // Assert
+      expect(progress.step, SyncStep.failed);
+      expect(progress.progress, 0);
+      expect(progress.isSuccess, isFalse);
+      expect(progress.errorMessage, errorMessage);
+    });
+
+    test('should include timestamp when not provided', () {
+      // Act
+      final progress = SyncProgress.starting();
+      final now = DateTime.now();
+
+      // Assert
+      expect(progress.timestamp.isBefore(now.add(const Duration(seconds: 1))), isTrue);
+      expect(progress.timestamp.isAfter(now.subtract(const Duration(seconds: 1))), isTrue);
+    });
+
+    test('should use provided timestamp', () {
+      // Arrange
+      final timestamp = DateTime(2024, 1, 1, 12, 0, 0);
+
+      // Act
+      final progress = SyncProgress(
+        step: SyncStep.completed,
+        progress: 100,
+        isSuccess: true,
+        timestamp: timestamp,
+      );
+
+      // Assert
+      expect(progress.timestamp, timestamp);
     });
   });
 }
