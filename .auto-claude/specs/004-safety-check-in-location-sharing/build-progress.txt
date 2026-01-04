@@ -838,3 +838,20 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Follows existing route patterns from auth and profile features
 - Commit: b0d1966
 
+✅ **Subtask 9.4: Add quick SOS to home screen** (COMPLETED)
+- Created comprehensive QuickSOSButton widget for quick emergency access from home screen
+- Features include:
+  - Configurable size (small/medium/large) with medium used on home screen
+  - Watches safety state to show active emergency status with 'ACTIVE' label
+  - Pulsing animation when no emergency is active
+  - Disabled state during processing
+  - Optional card display mode for inline usage
+  - Navigates to Emergency SOS screen when pressed
+- Added floating action button to HomeScreen positioned at bottom-right (endFloat)
+- Full accessibility support with semantic labels for screen readers
+- Follows existing widget patterns from TrustedContactCard and SOSButtonWidget
+- Proper Riverpod integration with safetyStateProvider
+- Comprehensive documentation with Dart doc comments
+- Material Design 3 theming and styling
+- Commit: 8591ecd
+
