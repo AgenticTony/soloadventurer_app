@@ -87,4 +87,57 @@ class NotificationService extends _$NotificationService {
   Future<void> clearForegroundNotification() async {
     await _notifications.cancel(_foregroundNotificationId);
   }
+
+  /// Shows a regular notification
+  ///
+  /// [title] - Notification title
+  /// [body] - Notification body text
+  /// [notificationId] - Unique ID for this notification
+  /// [channel] - Notification channel ID (default: background channel)
+  /// [priority] - Notification priority (default: high)
+  Future<void> show({
+    required String title,
+    required String body,
+    required int notificationId,
+    String channel = _channelId,
+    Priority priority = Priority.high,
+  }) async {
+    final androidDetails = AndroidNotificationDetails(
+      channel,
+      'Sync Notifications',
+      channelDescription: 'Notifications for sync events',
+      importance: Importance.high,
+      priority: priority,
+      autoCancel: true,
+      category: AndroidNotificationCategory.status,
+    );
+
+    const iOSDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iOSDetails,
+    );
+
+    await _notifications.show(
+      notificationId,
+      title,
+      body,
+      details,
+    );
+  }
+
+  /// Cancels a specific notification
+  Future<void> cancel(int notificationId) async {
+    await _notifications.cancel(notificationId);
+  }
+
+  /// Cancels all notifications
+  Future<void> cancelAll() async {
+    await _notifications.cancelAll();
+  }
 }
