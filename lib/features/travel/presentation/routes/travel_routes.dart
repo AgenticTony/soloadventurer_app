@@ -13,4 +13,7 @@ class TravelRoutes {
 
   /// Route for photo gallery screen
   static const String photos = '/trips/photos';
+
+  /// Route for trip map screen with clustering
+  static const String map = '/trips/map';
 }
