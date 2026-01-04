@@ -3,3 +3,10 @@ export 'conflict_resolution_dialog.dart';
 export 'conflict_comparison_view.dart';
 export 'conflict_list_view.dart';
 export 'conflict_banner.dart';
+
+// Sync Error UI Widgets
+export 'sync_error_banner.dart';
+export 'sync_error_card.dart';
+export 'sync_error_dialog.dart';
+export 'sync_error_list_view.dart';
+export 'sync_error_toast.dart';
