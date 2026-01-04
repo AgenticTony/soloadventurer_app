@@ -567,9 +567,11 @@
           "subtask_id": "10.3",
           "title": "Test offline sync functionality",
           "description": "Verify offline editing and sync behavior",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/__tests__/services/syncService.test.ts"
+            "test/features/journal/helpers/sync_test_helpers.dart",
+            "test/features/journal/data/services/sync_service_test.dart",
+            "test/features/journal/README_SYNC_TESTS.md"
           ]
         },
         {
