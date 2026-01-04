@@ -287,4 +287,50 @@ class JournalRepositoryImpl implements JournalRepository {
       throw AppException('Failed to mark upload as failed: $e');
     }
   }
+
+  // Tag-related operations
+
+  @override
+  Future<List<String>> getTagsForEntry(String entryId) async {
+    try {
+      return await _remoteDataSource.getTagsForEntry(entryId);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to get tags for entry: $e');
+    }
+  }
+
+  @override
+  Future<void> addTagToEntry(String entryId, String tagId) async {
+    try {
+      await _remoteDataSource.addTagToEntry(entryId, tagId);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to add tag to entry: $e');
+    }
+  }
+
+  @override
+  Future<void> removeTagFromEntry(String entryId, String tagId) async {
+    try {
+      await _remoteDataSource.removeTagFromEntry(entryId, tagId);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to remove tag from entry: $e');
+    }
+  }
+
+  @override
+  Future<void> updateTagsForEntry(String entryId, List<String> tagIds) async {
+    try {
+      await _remoteDataSource.updateTagsForEntry(entryId, tagIds);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to update tags for entry: $e');
+    }
+  }
 }

@@ -1079,3 +1079,127 @@ Phase 5 (Organization & Tagging) progress: 1 of 4 subtasks completed
 
 Next step: Subtask 5.2 - Implement custom tags feature
 
+### 2026-01-06 02:00: Subtask 5.2 Completed
+Implemented comprehensive custom tagging system for categorizing journal entries (11 files):
+- **TagRemoteDataSource** (data/datasources/tag_remote_data_source.dart):
+  - Interface for all tag operations
+  - Methods: createTag, getTag, getTags, getTagsForEntry, updateTag, deleteTag
+  - Tag-journal operations: addTagToEntry, removeTagFromEntry, updateTagsForEntry
+  - Query methods: getPopularTags, searchTags
+- **TagRemoteDataSourceImpl** (data/datasources/tag_remote_data_source_impl.dart - 340+ lines):
+  - Full Supabase implementation with proper error handling
+  - User authentication checks via _client.auth.currentUser
+  - PostgrestException handling with meaningful error messages
+  - Duplicate tag detection (23505 error code)
+  - Tag-journal relationship management via junction table
+  - Popularity sorting and search with ilike
+- **TagRepository** (domain/repositories/tag_repository.dart):
+  - Complete repository interface using Either<Failure, T> pattern
+  - All CRUD operations with proper error handling
+  - Methods for managing tags on entries
+  - Query methods for popular tags and search
+- **TagRepositoryImpl** (data/repositories/tag_repository_impl.dart - 180+ lines):
+  - Clean Architecture implementation
+  - Converts between entities and models
+  - Comprehensive error handling with Failure types
+- **Updated JournalRepository** (domain/repositories/journal_repository.dart):
+  - Added tag-related methods for entry operations
+  - Methods: getTagsForEntry, addTagToEntry, removeTagFromEntry, updateTagsForEntry
+  - String-based tag IDs for efficient storage
+- **Updated JournalRemoteDataSource** (data/datasources/journal_remote_data_source.dart & impl):
+  - Added tag-related data source methods
+  - Junction table management for tag-entry relationships
+  - Bulk update support for entry tags
+- **Updated JournalRepositoryImpl** (data/repositories/journal_repository_impl.dart):
+  - Implementation of tag-related methods
+  - Proper error handling with AppException
+- **Tag Providers** (presentation/providers/tag_providers.dart - 550+ lines):
+  - Dependency injection: tagRemoteDataSourceProvider, tagRepositoryProvider
+  - TagListState/TagListNotifier for managing all tags
+  - TagFormState/TagFormNotifier for creation/editing with validation
+  - EntryTagsState/EntryTagsNotifier for entry tag management
+  - Providers: tagListProvider, tagFormProvider, entryTagsProvider
+  - Search, popular tags, and form management
+- **TagListScreen** (presentation/screens/tag_list_screen.dart - 320+ lines):
+  - Complete screen for viewing and managing all tags
+  - Pull-to-refresh support
+  - Search functionality with SearchDelegate
+  - Tag tiles with color, icon, and usage count display
+  - Edit and delete actions with confirmation
+  - Empty state with call-to-action
+  - Error handling with retry option
+- **CreateTagScreen** (presentation/screens/create_tag_screen.dart - 330+ lines):
+  - Screen for creating and editing tags
+  - Form with name validation (2-50 characters)
+  - Color picker with 10 predefined colors
+  - Icon picker with 19 emoji icons
+  - Loading and error states
+  - Automatic tag loading for edit mode
+- **TagPicker** widget (presentation/widgets/tag_picker.dart - 600+ lines):
+  - Comprehensive widget for selecting tags to add to entries
+  - Two display modes: inline chips and management sheet
+  - Real-time tag availability checking
+  - Visual tag chips with color and icon
+  - Tag management bottom sheet with create functionality
+  - Quick tag creation dialog
+  - Full integration with entry tags provider
+  - Material Design 3 styling
+- **Comprehensive documentation** (data/repositories/README_TAG.md - 700+ lines):
+  - Complete architecture overview with file structure
+  - Database schema reference for tags and journal_tags tables
+  - 6+ usage examples covering all scenarios:
+    - Displaying all tags
+    - Creating new tags
+    - Using tag picker in journal entry creation
+    - Adding tags to entries
+    - Searching tags
+    - Getting popular tags
+  - State management reference for all providers
+  - Integration guide with journal entries
+  - Customization guide for colors and icons
+  - Error handling patterns and best practices
+  - Testing strategies with unit and widget test examples
+  - Performance considerations
+  - Future enhancement roadmap
+  - Troubleshooting guide
+  - Related components reference
+- **Example implementations** (presentation/screens/tag_screens_example.dart - 450+ lines):
+  - TagScreensMenu with navigation to all examples
+  - TagPickerExample: Integration with journal entry form
+  - TagRepositoryExample: Direct repository usage
+  - 4 runnable examples: create, getAll, search, getPopular
+  - Complete working code for all scenarios
+  - UI cards with code snippets and run buttons
+
+Key features implemented:
+✅ Complete CRUD operations for tags
+✅ Tag-journal entry many-to-many relationship
+✅ Custom colors (hex color codes) with visual picker
+✅ Emoji icons with 19 predefined options
+✅ Tag usage tracking via database triggers
+✅ Search functionality with ilike
+✅ Popular tags view (sorted by usage)
+✅ Three fully functional screens (list, create/edit, picker)
+✅ Comprehensive state management with Riverpod
+✅ Form validation (name: 2-50 characters)
+✅ Pull-to-refresh and loading states
+✅ Error handling throughout all layers
+✅ Empty states and user feedback
+✅ Material Design 3 styling
+✅ Full integration with journal entry system
+✅ Tag picker widget with inline and sheet modes
+✅ Quick tag creation from picker
+✅ Comprehensive documentation with examples
+
+The implementation addresses the user story: "Users can organize entries by trip, date, or custom tags" by providing a complete, user-friendly tagging system. Users can now create custom tags with colors and icons, assign multiple tags to journal entries, and use the tag picker for easy selection during entry creation.
+
+All code follows existing Flutter/Dart patterns with proper Clean Architecture principles, state management (Riverpod), Material Design 3 styling, error handling, and documentation standards consistent with trip, journal entry, and location management implementations.
+
+Phase 5 (Organization & Tagging) progress: 2 of 4 subtasks completed
+✅ 5.1 - Trip management system (COMPLETED)
+✅ 5.2 - Custom tags feature (COMPLETED)
+⏳ 5.3 - Trip overview screen (PENDING)
+⏳ 5.4 - Search and filter functionality (PENDING)
+
+Next step: Subtask 5.3 - Build trip overview screen
+

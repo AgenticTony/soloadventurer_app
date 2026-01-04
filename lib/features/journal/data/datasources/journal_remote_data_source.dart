@@ -79,4 +79,26 @@ abstract class JournalRemoteDataSource {
     String mediaId,
     String error,
   );
+
+  // Tag-related operations
+
+  /// Get all tags for a specific journal entry
+  ///
+  /// Throws [ServerException] if retrieval fails
+  Future<List<String>> getTagsForEntry(String entryId);
+
+  /// Add a tag to a journal entry
+  ///
+  /// Throws [ServerException] if operation fails
+  Future<void> addTagToEntry(String entryId, String tagId);
+
+  /// Remove a tag from a journal entry
+  ///
+  /// Throws [ServerException] if operation fails
+  Future<void> removeTagFromEntry(String entryId, String tagId);
+
+  /// Update tags for a journal entry (replaces all existing tags)
+  ///
+  /// Throws [ServerException] if operation fails
+  Future<void> updateTagsForEntry(String entryId, List<String> tagIds);
 }

@@ -585,4 +585,100 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
       );
     }
   }
+
+  // Tag-related operations
+
+  @override
+  Future<List<String>> getTagsForEntry(String entryId) async {
+    try {
+      final response = await _client
+          .from('journal_tags')
+          .select('tag_id')
+          .eq('journal_entry_id', entryId);
+
+      return (response as List).map((e) => e['tag_id'] as String).toList();
+    } on PostgrestException catch (e) {
+      throw ServerException(
+        message: 'Failed to get tags for entry: ${e.message}',
+        statusCode: e.code ?? 500,
+      );
+    } catch (e) {
+      throw ServerException(
+        message: 'Failed to get tags for entry: $e',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
+  Future<void> addTagToEntry(String entryId, String tagId) async {
+    try {
+      await _client.from('journal_tags').insert({
+        'journal_entry_id': entryId,
+        'tag_id': tagId,
+      });
+    } on PostgrestException catch (e) {
+      throw ServerException(
+        message: 'Failed to add tag to entry: ${e.message}',
+        statusCode: e.code ?? 500,
+      );
+    } catch (e) {
+      throw ServerException(
+        message: 'Failed to add tag to entry: $e',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
+  Future<void> removeTagFromEntry(String entryId, String tagId) async {
+    try {
+      await _client
+          .from('journal_tags')
+          .delete()
+          .eq('journal_entry_id', entryId)
+          .eq('tag_id', tagId);
+    } on PostgrestException catch (e) {
+      throw ServerException(
+        message: 'Failed to remove tag from entry: ${e.message}',
+        statusCode: e.code ?? 500,
+      );
+    } catch (e) {
+      throw ServerException(
+        message: 'Failed to remove tag from entry: $e',
+        statusCode: 500,
+      );
+    }
+  }
+
+  @override
+  Future<void> updateTagsForEntry(String entryId, List<String> tagIds) async {
+    try {
+      // Delete all existing tags for the entry
+      await _client
+          .from('journal_tags')
+          .delete()
+          .eq('journal_entry_id', entryId);
+
+      // Add new tags
+      if (tagIds.isNotEmpty) {
+        final inserts = tagIds.map((tagId) => {
+          'journal_entry_id': entryId,
+          'tag_id': tagId,
+        }).toList();
+
+        await _client.from('journal_tags').insert(inserts);
+      }
+    } on PostgrestException catch (e) {
+      throw ServerException(
+        message: 'Failed to update tags for entry: ${e.message}',
+        statusCode: e.code ?? 500,
+      );
+    } catch (e) {
+      throw ServerException(
+        message: 'Failed to update tags for entry: $e',
+        statusCode: 500,
+      );
+    }
+  }
 }
