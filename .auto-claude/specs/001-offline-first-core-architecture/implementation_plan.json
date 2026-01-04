@@ -479,14 +479,16 @@
           "id": "6.4",
           "title": "Adapt Profile/User Repository",
           "description": "Update ProfileRepository to use offline-first pattern",
-          "status": "pending",
+          "status": "completed",
           "file": "lib/features/profile/data/repositories/profile_repository_impl.dart",
           "acceptanceCriteria": [
             "Extend offline-aware base repository",
             "Cache user profile locally",
             "Queue profile updates",
             "Sync with server when online"
-          ]
+          ],
+          "notes": "Successfully implemented offline-first ProfileRepository extending OfflineAwareRepository:\n\n**Created Files:**\n- lib/features/profile/data/models/local_user_profile_model.dart (365 lines)\n  * LocalUserProfileModel wrapping LocalUser database entity\n  * JSON serialization for sync queue storage\n  * Entity conversion methods (fromDatabase, toDomainEntity, toDatabaseEntity)\n  * Sync status helpers (needsSync, isSyncing)\n  * copyWith method for immutable updates\n\n**Modified Files:**\n- lib/features/profile/domain/repositories/profile_repository.dart\n  * Updated interface to return RepositoryOperationResult for write operations\n  * Added offline-first documentation to all methods\n\n- lib/features/profile/data/repositories/profile_repository_impl.dart (718 lines)\n  * Extends OfflineAwareRepository<Profile, LocalUserProfileModel, Map<String, dynamic>, Map<String, dynamic>>\n  * Implements all abstract methods for local/remote operations\n  * Reads from local database first (via UserDao)\n  * Writes to local database immediately (optimistic)\n  * Queues for sync when offline (via SyncQueueService)\n  * Syncs with server when online (via DioApiService)\n\n- lib/features/core/infrastructure/graphql/graphql_queries.dart\n  * Updated getUserProfile query to match Profile entity fields\n  * Added getCurrentUserProfile, createUserProfile, deleteUserProfile mutations\n  * Added updateUserPreferences, updateUserInterests, toggleProfileVisibility mutations\n\n- lib/features/profile/presentation/providers/profile_providers.dart\n  * Updated profileRepositoryProvider to inject offline dependencies via GetIt\n  * Updated ProfileDomainNotifier to handle RepositoryOperationResult\n\n- lib/app/di/modules/offline_module.dart\n  * Added UserDao, TripDao, JournalDao registrations\n\n**Acceptance Criteria Met:**\n✓ Extend offline-aware base repository (extends OfflineAwareRepository)\n✓ Cache user profile locally (via UserDao)\n✓ Queue profile updates (via SyncQueueService when offline)\n✓ Sync with server when online (via DioApiService GraphQL mutations)\n\nAll code follows project patterns from TripRepositoryImpl and JournalRepositoryImpl with comprehensive documentation, debug logging, and error handling.\n\nCommit hash: 003dd66",
+          "updated_at": "2026-01-04T23:30:00.000Z"
         },
         {
           "id": "6.5",
