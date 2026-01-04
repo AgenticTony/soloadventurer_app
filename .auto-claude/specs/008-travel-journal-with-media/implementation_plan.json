@@ -416,7 +416,7 @@
     {
       "phase_id": "8",
       "name": "Export & Sharing",
-      "status": "in_progress",
+      "status": "completed",
       "subtasks": [
         {
           "subtask_id": "8.1",
@@ -473,9 +473,15 @@
           "subtask_id": "8.4",
           "title": "Add backup and restore functionality",
           "description": "Allow users to backup all journal data and restore it",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/services/backupService.ts"
+            "lib/features/journal/domain/services/backup_service.dart",
+            "lib/features/journal/data/services/backup_service_impl.dart",
+            "lib/features/journal/presentation/providers/backup_providers.dart",
+            "lib/features/journal/presentation/widgets/backup_restore_widget.dart",
+            "lib/features/journal/data/services/README_BACKUP_RESTORE.md",
+            "lib/features/journal/data/services/backup_service_example.dart",
+            "pubspec.yaml"
           ]
         }
       ]
