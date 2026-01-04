@@ -346,7 +346,38 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
   - Material Design UI with proper theme usage
   - Proper resource disposal (controllers, tab controller)
   - Comprehensive documentation
-- Commit: pending
+- Commit: (included in previous commits)
+
+✅ **Subtask 5.4: Create trusted contact card widget** (COMPLETED)
+- Created comprehensive TrustedContactCard widget for displaying individual trusted contact information
+- Features include:
+  - Avatar with initials using CircleAvatar
+  - Name and phone number display with proper text overflow handling
+  - Permission level chip with color coding:
+    - Emergency Only: orange with warning icon
+    - Check-ins: blue with check-circle icon
+    - Full Access: green with all-inclusive icon
+  - Contact source chip (Phone/Community) with appropriate icons
+  - Status indicators for location sharing and emergency alerts with tooltips
+  - Configurable properties:
+    - onTap callback for navigation
+    - showStatusIndicators to toggle status icons
+    - showSourceChip to toggle source chip display
+    - isCompact for compact/large display modes
+  - Chevron icon shown when tappable
+- Provides a reusable component for displaying trusted contacts in:
+  - Lists (with proper margins and spacing)
+  - Grids
+  - Detail views
+- Follows existing widget patterns from ProfileAvatar and ContactPickerWidget
+- Uses proper Material Design theming and styling
+- Supports both full and compact display modes with:
+  - Different padding (16 vs 12)
+  - Different avatar sizes (56 vs 40)
+  - Different font sizes for names and phone numbers
+  - Smaller chip and icon sizes in compact mode
+- Comprehensive documentation with proper Dart doc comments
+- Commit: 71d28f7
 
 ### Phases Overview
 
