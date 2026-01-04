@@ -46,7 +46,7 @@
           "id": "1.3",
           "title": "Create Refresh Queue Manager",
           "description": "Implement a queue to manage pending token refresh requests and prevent duplicate refresh attempts",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "RefreshQueueManager class created",
             "Queues refresh requests when refresh is in progress",
