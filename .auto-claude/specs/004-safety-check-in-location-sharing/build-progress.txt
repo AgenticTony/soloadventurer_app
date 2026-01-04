@@ -219,6 +219,53 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Proper documentation and type safety throughout
 - Commit: bb42461
 
+✅ **Subtask 4.2: Create safety notifiers** (COMPLETED)
+- Created TrustedContactsNotifier for managing trusted contacts CRUD operations
+  - Handles loading, adding, updating, and removing contacts
+  - Includes convenience methods for updating contact preferences
+  - Follows ProfileNotifier pattern with proper error handling
+- Created CheckInNotifier for check-in management
+  - Handles creating, completing, scheduling, and cancelling check-ins
+  - Supports manual and scheduled check-ins with deadline tracking
+  - Includes convenience methods for trip-specific check-ins
+- Created LocationSharingNotifier for location sharing
+  - Manages starting, stopping, and monitoring location shares
+  - Supports emergency location sharing and single/multi-contact sharing
+  - Provides filtering methods for emergency shares and check-in shares
+- Created SafetyNotifier for overall safety state
+  - Handles emergency SOS triggering and safety status updates
+  - Manages safety alerts (acknowledge, resolve, cancel)
+  - Provides convenience methods for marking user status (safe, need help, emergency)
+- All notifiers include proper resource disposal, loading states, and error handling
+- Commit: (included in previous commits)
+
+✅ **Subtask 4.3: Create safety providers** (COMPLETED)
+- Created comprehensive safety providers file with all required providers
+- Added service providers using @riverpod annotations (code generation):
+  - LocationService with proper resource disposal
+  - NotificationService with proper resource disposal
+  - BackgroundCheckInService with proper resource disposal
+  - MissedCheckInDetector with dependency injection
+- Added use case providers (14 total) for all safety domain operations:
+  - Trusted contacts: AddTrustedContactUseCase, RemoveTrustedContactUseCase, UpdateTrustedContactUseCase, GetTrustedContactsUseCase
+  - Check-ins: CreateCheckInUseCase, CompleteCheckInUseCase, ScheduleCheckInUseCase, CancelCheckInUseCase, GetUpcomingCheckInsUseCase
+  - Location sharing: ShareLocationUseCase, StopLocationSharingUseCase, GetActiveLocationSharesUseCase
+  - Emergency SOS: TriggerEmergencySOSUseCase, UpdateSafetyStatusUseCase, GetSafetyStatusUseCase
+- Created notifier providers (4 total) for state management:
+  - TrustedContactsNotifier, CheckInNotifier, LocationSharingNotifier, SafetyNotifier
+  - All include proper resource disposal with ref.onDispose()
+- Added state providers for accessing feature states (4 total)
+- Added selector providers for convenient access to common state properties (40+ total):
+  - Trusted contacts: list, loading, error, selected contact
+  - Check-ins: all list, upcoming, loading, error, selected, due soon count, missed count, next check-in
+  - Location sharing: active shares, updates, latest location, loading, error, active count, emergency status, contact IDs
+  - Safety: current status, alerts (recent/active), loading/processing states, error, contacts count, emergency flags
+- Follows existing Riverpod patterns from auth and profile features
+- Uses @riverpod annotations for services (code generation)
+- Uses classic Provider pattern for notifiers and state (matching presentation layer patterns)
+- Includes proper resource disposal with ref.onDispose() for all services and notifiers
+- Commit: 24189ad
+
 ### Phases Overview
 
 1. **Phase 1: Core Data Models & Domain Layer** (7 subtasks)

@@ -247,22 +247,24 @@
           "subtask_id": "4.2",
           "title": "Create safety notifiers",
           "description": "Implement Riverpod notifiers for safety features",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/notifiers/safety_notifier.dart",
             "lib/features/safety/presentation/notifiers/trusted_contacts_notifier.dart",
             "lib/features/safety/presentation/notifiers/check_in_notifier.dart",
             "lib/features/safety/presentation/notifiers/location_sharing_notifier.dart"
-          ]
+          ],
+          "notes": "Created comprehensive Riverpod notifiers following ProfileNotifier pattern. TrustedContactsNotifier manages CRUD operations for trusted contacts with preference management. CheckInNotifier handles creating, completing, scheduling, and cancelling check-ins. LocationSharingNotifier manages location sharing with support for emergency sharing. SafetyNotifier oversees overall safety state with SOS functionality, status updates, and safety alerts management. All notifiers include proper error handling, loading states, and state updates using copyWith pattern."
         },
         {
           "subtask_id": "4.3",
           "title": "Create safety providers",
           "description": "Define Riverpod providers for safety feature injection",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/providers/safety_providers.dart"
-          ]
+          ],
+          "notes": "Created comprehensive safety providers file with all required providers. Added service providers (LocationService, NotificationService, BackgroundCheckInService, MissedCheckInDetector). Added use case providers for all safety domain operations (14 providers total). Created notifier providers for state management (TrustedContactsNotifier, CheckInNotifier, LocationSharingNotifier, SafetyNotifier). Added state providers for accessing feature states. Added selector providers for convenient access to common state properties (40+ selectors). Follows existing Riverpod patterns from auth and profile features. Uses @riverpod annotations for services (code generation) and classic Provider pattern for notifiers and state (matching presentation layer patterns). Includes proper resource disposal with ref.onDispose() for all services and notifiers."
         }
       ]
     },
