@@ -4,6 +4,7 @@
 // Import this file to access all destination discovery widgets.
 
 export 'activity_list.dart';
+export 'add_to_trip_flow.dart';
 export 'curated_list_card.dart';
 export 'destination_card.dart';
 export 'safety_score_badge.dart';

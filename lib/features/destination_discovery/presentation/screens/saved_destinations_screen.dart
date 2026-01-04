@@ -4,6 +4,7 @@ import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../domain/models/saved_destination.dart';
 import '../../domain/models/destination.dart';
 import '../../application/providers/saved_destinations_provider.dart';
+import '../widgets/add_to_trip_flow.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
@@ -143,15 +144,21 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
 
   /// Handle add to trip
   void _onAddToTrip(Destination destination) {
-    // TODO: Implement AddToTripFlow in subtask 7.1
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Adding ${destination.name} to trip...'),
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'Coming Soon',
-          onPressed: () {},
-        ),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddToTripFlow(
+        destination: destination,
+        showDatesSelection: true,
+        showNotesStep: true,
+        onSuccess: (tripId, tripName) {
+          // Optionally navigate to the trip detail screen
+          // Navigator.pushNamed(context, '/trips/$tripId');
+        },
+        onCancel: () {
+          // Handle cancel if needed
+        },
       ),
     );
   }
