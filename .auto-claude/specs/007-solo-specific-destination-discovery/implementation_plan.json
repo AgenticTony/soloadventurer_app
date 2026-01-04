@@ -51,14 +51,15 @@
           "subtask_id": "1.3",
           "title": "Create PersonalizedRecommendation model",
           "description": "Define model for AI-generated personalized recommendations based on user preferences",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/domain/models/personalized_recommendation.dart",
+          "notes": "Created PersonalizedRecommendation model with RecommendationSource enum and RecommendedDestination helper class. Includes match scores (0-1), recommendation reasons, matching factors, and support for multiple recommendation sources (userPreferences, pastTrips, similarUsers, trending, curated, aiGenerated). Added helper methods (isExpired, isValid, highMatchRecommendations, hiddenGemRecommendations, sortedByMatchScore). Uses Freezed with proper JSON serialization. Note: build_runner needs to be run to generate .freezed.dart and .g.dart files.",
           "acceptance_criteria": [
-            "Recommended destinations list",
-            "Match score/relevance percentage",
-            "Reason for recommendation",
-            "Based on user preferences or past trips",
-            "Freezed model with JSON serialization"
+            "Recommended destinations list - Implemented as List<RecommendedDestination>",
+            "Match score/relevance percentage - Implemented as double matchScore (0-1)",
+            "Reason for recommendation - Implemented as String reason field",
+            "Based on user preferences or past trips - Implemented via RecommendationSource enum",
+            "Freezed model with JSON serialization - Fully implemented"
           ]
         },
         {
