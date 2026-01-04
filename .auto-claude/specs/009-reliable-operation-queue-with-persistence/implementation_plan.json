@@ -44,9 +44,10 @@
           "subtaskId": "1.2",
           "title": "Implement Queue Persistence in OperationQueue",
           "description": "Update OperationQueue to persist operations to storage on every change",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "lib/features/core/services/operation_queue.dart"
+            "lib/features/core/services/operation_queue.dart",
+            "lib/features/travel/domain/models/trip_planning_operation.dart"
           ],
           "details": {
             "requirements": [

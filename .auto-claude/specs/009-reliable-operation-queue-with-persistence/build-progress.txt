@@ -21,8 +21,17 @@ This feature implements a reliable operation queue with persistence to ensure no
   - Created comprehensive unit tests
   - NOTE: build_runner needs to be run to generate .g.dart file
 
+- ✅ 1.2: Implement Queue Persistence in OperationQueue (2025-01-04)
+  - Added OperationStorageService dependency to OperationQueue
+  - Implemented _loadQueue() method to restore operations on initialization
+  - Updated _persistQueue() to use storage service
+  - Added _deserializeOperation() factory method for JSON restoration
+  - Added comprehensive error handling for persistence failures
+  - Fixed TripPlanningOperation.toJson() to use enum.name for proper serialization
+  - Operations now persist across app restarts
+  - Both pending and failed operations are persisted
+
 ### In Progress
-- 1.2: Implement Queue Persistence in OperationQueue
 - 1.3: Add Operation Metadata Enhancement
 
 ### Implementation Plan Created
