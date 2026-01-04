@@ -5,6 +5,7 @@ import '../../domain/models/sync_status.dart';
 import '../../domain/entities/sync_entity_type.dart';
 import '../../domain/services/sync_service.dart';
 import '../../domain/services/sync_queue_persistence.dart';
+import '../../domain/services/network_connectivity.dart';
 
 /// Implementation of [SyncService] with queue management and persistence
 class SyncServiceImpl implements SyncService {
@@ -19,6 +20,12 @@ class SyncServiceImpl implements SyncService {
 
   /// Queue persistence service
   final SyncQueuePersistence? _persistence;
+
+  /// Network connectivity monitoring service
+  final NetworkConnectivity? _networkConnectivity;
+
+  /// Subscription to network online events
+  StreamSubscription<bool>? _networkOnlineSubscription;
 
   /// Current sync status
   SyncStatus _status = SyncStatus.idle;
@@ -37,6 +44,9 @@ class SyncServiceImpl implements SyncService {
 
   /// Whether persistence is enabled
   bool get _persistenceEnabled => _persistence != null;
+
+  /// Whether network connectivity monitoring is enabled
+  bool get _networkMonitoringEnabled => _networkConnectivity != null;
 
   @override
   List<SyncOperation> get queue => List.unmodifiable(_queue);
@@ -62,9 +72,15 @@ class SyncServiceImpl implements SyncService {
   /// Creates a new [SyncServiceImpl] instance
   ///
   /// If [persistence] is provided, the queue will be persisted across app restarts
-  SyncServiceImpl({SyncQueuePersistence? persistence})
-      : _persistence = persistence {
+  /// If [networkConnectivity] is provided, sync will automatically trigger when
+  /// connection is restored
+  SyncServiceImpl({
+    SyncQueuePersistence? persistence,
+    NetworkConnectivity? networkConnectivity,
+  })  : _persistence = persistence,
+        _networkConnectivity = networkConnectivity {
     _initializeFromPersistence();
+    _initializeNetworkMonitoring();
   }
 
   /// Initialize the service by loading persisted queue
@@ -99,6 +115,34 @@ class SyncServiceImpl implements SyncService {
       }
     } catch (e, stackTrace) {
       debugPrint('SyncService: Error loading from persistence: $e');
+      debugPrint(stackTrace.toString());
+    }
+  }
+
+  /// Initialize network connectivity monitoring
+  void _initializeNetworkMonitoring() {
+    if (!_networkMonitoringEnabled) return;
+
+    try {
+      // Subscribe to online events to trigger sync when connection is restored
+      _networkOnlineSubscription = _networkConnectivity!.onOnline.listen(
+        (_) {
+          debugPrint('SyncService: Network connection restored');
+          // Trigger sync processing when coming back online
+          if (_queue.isNotEmpty && !_isPaused && _config.autoProcess) {
+            debugPrint('SyncService: Auto-triggering sync due to connection restoration');
+            _scheduleProcessing();
+          }
+        },
+        onError: (error, stackTrace) {
+          debugPrint('SyncService: Error in network monitoring stream: $error');
+          debugPrint(stackTrace.toString());
+        },
+      );
+
+      debugPrint('SyncService: Network connectivity monitoring initialized');
+    } catch (e, stackTrace) {
+      debugPrint('SyncService: Error initializing network monitoring: $e');
       debugPrint(stackTrace.toString());
     }
   }
@@ -526,6 +570,8 @@ class SyncServiceImpl implements SyncService {
 
   @override
   void dispose() {
+    _networkOnlineSubscription?.cancel();
+    _networkOnlineSubscription = null;
     _statusController.close();
     _queueController.close();
     debugPrint('SyncService: Disposed');
