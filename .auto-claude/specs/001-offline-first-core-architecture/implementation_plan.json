@@ -765,14 +765,14 @@
             "Measure database query performance",
             "Memory leak testing"
           ],
-          "notes": "Created comprehensive performance test suite (686 lines) covering:\n- Large Dataset Tests (12 tests):\n  * 1000+ trips insert/query performance\n  * 10000+ journal entries insert/query performance\n  * Pagination efficiency with large datasets\n  * Filtered query performance\n  * Search query performance\n  * Sync queue operations performance\n  * Batch update performance\n  * Concurrent read performance\n  * Index effectiveness verification\n- Memory Usage Tests (2 tests):\n  * Memory usage tracking with large datasets\n  * Memory leak detection with repeated operations\n- Sync Performance Tests (2 tests):\n  * Simulated sync time for large datasets (500 operations)\n  * Incremental sync performance\n\nAll tests include performance thresholds with clear assertions, detailed timing metrics, proper database setup/teardown, and graceful handling when VM service is unavailable.",
-          "updated_at": "2026-01-05T10:00:00.000000+00:00"
+          "notes": "Created comprehensive performance test suite (686 lines) covering:\n\nLarge Dataset Tests (12 tests):\n- 1000+ trips insert/query performance\n- 10000+ journal entries insert/query performance\n- Pagination efficiency with large datasets\n- Filtered query performance\n- Search query performance\n- Sync queue operations performance\n- Batch update performance\n- Concurrent read performance\n- Index effectiveness verification\n\nMemory Usage Tests (2 tests):\n- Memory usage tracking with large datasets\n- Memory leak detection with repeated operations\n\nSync Performance Tests (2 tests):\n- Simulated sync time for large datasets (500 operations)\n- Incremental sync performance\n\nAll tests include performance thresholds with clear assertions, detailed timing metrics, proper database setup/teardown, and graceful handling when VM service is unavailable.",
+          "updated_at": "2026-01-04T21:08:35.453748+00:00"
         },
         {
           "id": "9.6",
           "title": "Manual Testing Scenarios",
           "description": "Create test plan for manual QA",
-          "status": "pending",
+          "status": "completed",
           "file": "./.auto-claude/specs/001-offline-first-core-architecture/manual_test_plan.md",
           "acceptanceCriteria": [
             "Flight mode test case",
@@ -781,7 +781,9 @@
             "Concurrent device editing test case",
             "Server error during sync test case",
             "Large data sync test case"
-          ]
+          ],
+          "notes": "Successfully created comprehensive manual test plan with 39 detailed test scenarios across 10 categories:\n\n1. **Flight Mode Scenarios (2 tests)** - Complete offline operation and extended offline sessions\n2. **Poor Connectivity Scenarios (3 tests)** - Intermittent connection, slow network (2G/3G), and high latency\n3. **App Interruption Scenarios (4 tests)** - App kill during sync, backgrounding, device restart, force close\n4. **Concurrent Device Editing (5 tests)** - Simultaneous edits, same-field conflicts, delete vs edit, ID collisions, three-device sync\n5. **Server Error Scenarios (6 tests)** - Timeouts, 500 errors, 401 unauthorized, malformed responses, partial failures, maintenance mode\n6. **Large Data Scenarios (5 tests)** - Large dataset sync (1000+ trips), large media files, initial downloads, memory management, storage limits\n7. **UI/UX Scenarios (4 tests)** - Status indicators, offline messaging, progress feedback, error recovery\n8. **Edge Cases (5 tests)** - Rapid connection toggles, empty queues, timezone changes, database migration, unicode handling\n9. **Performance Testing (3 tests)** - Sync speed benchmarks, battery impact, query performance\n10. **Security & Privacy (2 tests)** - Local data encryption, auth token handling\n\nEach test includes:\n- Priority level (P0/P1/P2)\n- Preconditions\n- Detailed step-by-step instructions\n- Expected results with checkboxes\n- Space for actual results\n- Results summary section with pass/fall tally\n\nThe test plan covers all acceptance criteria and provides comprehensive coverage of offline-first functionality, edge cases, and user experience scenarios.",
+          "updated_at": "2026-01-05T10:30:00.000Z"
         }
       ]
     },
@@ -865,5 +867,5 @@
       ]
     }
   ],
-  "last_updated": "2026-01-04T20:58:51.346166+00:00"
+  "last_updated": "2026-01-04T21:08:35.453756+00:00"
 }
