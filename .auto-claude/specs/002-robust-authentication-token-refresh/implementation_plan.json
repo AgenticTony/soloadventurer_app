@@ -194,7 +194,7 @@
           "id": "3.2",
           "title": "Implement Session Validation Logic",
           "description": "Add logic to validate stored sessions and determine if refresh or re-authentication is needed",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "Validates token expiration on session load",
             "Attempts refresh if token expired < 24 hours ago",
