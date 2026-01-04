@@ -175,15 +175,18 @@
     {
       "phase_id": "4",
       "name": "Location & Metadata",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "4.1",
           "title": "Implement automatic location tagging",
           "description": "Capture and store location data when creating journal entries",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/utils/locationUtils.ts"
+            "lib/utils/location_service.dart",
+            "lib/features/journal/presentation/providers/journal_entry_providers.dart",
+            "lib/features/journal/presentation/widgets/location_capture_widget.dart",
+            "lib/core/errors/exceptions.dart"
           ]
         },
         {

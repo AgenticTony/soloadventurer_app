@@ -3,6 +3,8 @@ import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/utils/location_service.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// State for journal entry creation
 class JournalEntryCreationState {
@@ -30,11 +32,17 @@ class JournalEntryCreationState {
   /// Longitude coordinate
   final double? longitude;
 
+  /// Location accuracy in meters
+  final double? locationAccuracy;
+
   /// Whether the entry is marked as favorite
   final bool isFavorite;
 
   /// Whether a save operation is in progress
   final bool isSaving;
+
+  /// Whether location is being captured
+  final bool isCapturingLocation;
 
   /// Error message if any
   final String? error;
@@ -51,8 +59,10 @@ class JournalEntryCreationState {
     this.locationName,
     this.latitude,
     this.longitude,
+    this.locationAccuracy,
     this.isFavorite = false,
     this.isSaving = false,
+    this.isCapturingLocation = false,
     this.error,
   }) : entryDate = entryDate ?? DateTime.now();
 
@@ -65,8 +75,10 @@ class JournalEntryCreationState {
     String? locationName,
     double? latitude,
     double? longitude,
+    double? locationAccuracy,
     bool? isFavorite,
     bool? isSaving,
+    bool? isCapturingLocation,
     String? error,
   }) {
     return JournalEntryCreationState(
@@ -78,8 +90,10 @@ class JournalEntryCreationState {
       locationName: locationName ?? this.locationName,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      locationAccuracy: locationAccuracy ?? this.locationAccuracy,
       isFavorite: isFavorite ?? this.isFavorite,
       isSaving: isSaving ?? this.isSaving,
+      isCapturingLocation: isCapturingLocation ?? this.isCapturingLocation,
       error: error,
     );
   }
@@ -90,10 +104,12 @@ class JournalEntryCreationNotifier
     extends StateNotifier<JournalEntryCreationState> {
   final Ref _ref;
   final JournalRepository _repository;
+  final LocationService _locationService;
   static final _uuid = const Uuid();
 
   JournalEntryCreationNotifier(this._ref, this._repository)
-      : super(const JournalEntryCreationState());
+      : _locationService = LocationService.instance,
+        super(const JournalEntryCreationState());
 
   /// Update the title
   void updateTitle(String title) {
@@ -125,11 +141,67 @@ class JournalEntryCreationNotifier
     String? locationName,
     double? latitude,
     double? longitude,
+    double? locationAccuracy,
   }) {
     state = state.copyWith(
       locationName: locationName,
       latitude: latitude,
       longitude: longitude,
+      locationAccuracy: locationAccuracy,
+      error: null,
+    );
+  }
+
+  /// Capture current device location
+  Future<void> captureCurrentLocation() async {
+    state = state.copyWith(isCapturingLocation: true, error: null);
+
+    try {
+      // Ensure location service is enabled and permissions granted
+      await _locationService.ensureLocationEnabled();
+
+      // Capture location with travel journal config
+      final location = await _locationService.getCurrentLocation(
+        LocationCaptureConfig.forTravelJournal,
+      );
+
+      // Check if accuracy is acceptable
+      if (!location.hasAcceptableAccuracy()) {
+        state = state.copyWith(
+          isCapturingLocation: false,
+          error: 'Location accuracy is poor. Please try again or move to an open area.',
+        );
+        return;
+      }
+
+      // Update state with captured location
+      state = state.copyWith(
+        latitude: location.latitude,
+        longitude: location.longitude,
+        locationAccuracy: location.accuracy,
+        locationName: location.locationName,
+        isCapturingLocation: false,
+      );
+    } on LocationException catch (e) {
+      state = state.copyWith(
+        isCapturingLocation: false,
+        error: 'Location capture failed: ${e.message}',
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isCapturingLocation: false,
+        error: 'Failed to capture location: ${e.toString()}',
+      );
+    }
+  }
+
+  /// Clear location data
+  void clearLocation() {
+    state = state.copyWith(
+      locationName: null,
+      latitude: null,
+      longitude: null,
+      locationAccuracy: null,
       error: null,
     );
   }
@@ -170,6 +242,7 @@ class JournalEntryCreationNotifier
       locationName: state.locationName,
       latitude: state.latitude,
       longitude: state.longitude,
+      locationAccuracy: state.locationAccuracy,
       entryDate: state.entryDate,
       isFavorite: state.isFavorite,
       syncStatus: SyncStatus.pending,
@@ -217,6 +290,7 @@ class JournalEntryCreationNotifier
       locationName: entry.locationName,
       latitude: entry.latitude,
       longitude: entry.longitude,
+      locationAccuracy: entry.locationAccuracy,
       isFavorite: entry.isFavorite,
     );
   }

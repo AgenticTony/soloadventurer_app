@@ -636,3 +636,101 @@ Phase 3 (Media Upload & Management) is now complete with all 5 subtasks finished
 
 Next step: Phase 4 - Location & Metadata
 
+### 2026-01-05 21:00: Subtask 4.1 Completed
+Implemented automatic location tagging with comprehensive location service and UI components (7 files):
+- **LocationService utility** (lib/utils/location_service.dart - 350+ lines):
+  - Complete location service using geolocator package
+  - LocationData class with metadata (latitude, longitude, accuracy, altitude, speed, timestamp, locationName)
+  - LocationCaptureConfig class with customizable settings
+  - Three predefined configurations: forTravelJournal, quick, precise
+  - Permission handling: checkPermission, requestPermission, ensureLocationEnabled
+  - Location capture methods: getCurrentLocation, getLastKnownLocation
+  - Real-time location updates via Stream
+  - Distance calculations between coordinates
+  - Settings integration: openAppSettings, openLocationSettings
+  - Comprehensive error handling with LocationException
+  - Helper methods: hasAcceptableAccuracy, copyWith, toJson/fromJson
+- **LocationException** (lib/core/errors/exceptions.dart):
+  - Added LocationException following existing AppException pattern
+  - Error code: 'location_error'
+  - Integrated with core error handling system
+- **Updated journal_entry_providers.dart** (lib/features/journal/presentation/providers/):
+  - Added LocationService dependency to JournalEntryCreationNotifier
+  - New state field: locationAccuracy (double?) and isCapturingLocation (bool)
+  - New method: captureCurrentLocation() with full permission handling
+  - New method: clearLocation() to remove location data
+  - Updated updateLocation() to include locationAccuracy parameter
+  - Integrated location capture into createEntry() and loadEntry()
+  - Accuracy validation (accepts locations with accuracy <= 100m)
+  - Error handling for permission denied, service disabled, poor accuracy
+- **LocationCaptureWidget** (lib/features/journal/presentation/widgets/location_capture_widget.dart - 450+ lines):
+  - Full-featured widget for capturing and displaying location
+  - Two display modes: full (with details) and compact
+  - Visual location details: coordinates, accuracy indicator, location name
+  - Action buttons: Capture, Update, Remove location
+  - Loading states during capture
+  - Error handling with user-friendly messages
+  - Color-coded accuracy indicator (green/good, orange/fair, red/poor)
+  - Material Design 3 styling with theme integration
+  - LocationCaptureButton variant for minimal inline usage
+- **Comprehensive documentation** (lib/utils/README_LOCATION_SERVICE.md - 500+ lines):
+  - Installation and platform setup instructions (Android, iOS)
+  - 15+ usage examples covering all scenarios
+  - Configuration options and predefined settings reference
+  - Complete API reference for all classes and methods
+  - Permission handling patterns and best practices
+  - Error handling guide with troubleshooting
+  - Performance considerations and limitations
+  - Platform-specific notes (Android, iOS)
+  - Testing strategies and examples
+  - Future enhancement roadmap
+- **Widget documentation** (lib/features/journal/presentation/widgets/README_LOCATION_CAPTURE_WIDGET.md - 400+ lines):
+  - Usage examples for all widget variants
+  - Widget behavior guide for all states
+  - Accuracy indicator reference table
+  - Complete integration example with journal entry screen
+  - Provider integration details
+  - Customization examples
+  - Error message reference
+  - Platform considerations and accessibility info
+  - Testing examples and troubleshooting
+- **Example implementations** (lib/utils/location_service_example.dart - 450+ lines):
+  - LocationServiceExample: Full feature demo with all operations
+  - SimpleLocationCaptureExample: Minimal implementation
+  - JournalLocationExample: Integration pattern for journal entries
+  - Demonstrations of: capture, quick capture, last known, updates, distance calculations
+  - Error handling examples for all scenarios
+- **Widget examples** (lib/features/journal/presentation/widgets/location_capture_widget_example.dart - 380+ lines):
+  - LocationCaptureWidgetExample: All widget variants and styles
+  - JournalEntryWithLocationExample: Full integration with creation screen
+  - MinimalLocationExample: Simple button-only usage
+  - Debug info display for testing
+
+Key features implemented:
+✅ Automatic location capture with configurable accuracy and timeout
+✅ Permission handling (check, request, ensure enabled)
+✅ Last known location retrieval for faster results
+✅ Real-time location updates via Stream
+✅ Distance calculations between coordinates
+✅ Accuracy validation and visual indicators
+✅ Settings integration for permissions and service
+✅ Full UI widget with loading, error, and success states
+✅ Compact and inline button variants
+✅ Integration with journal entry creation provider
+✅ Location data storage (coordinates, accuracy) in journal entries
+✅ Comprehensive error handling with user-friendly messages
+✅ Material Design 3 styling with theme support
+✅ Full documentation and examples
+
+The implementation addresses the acceptance criterion "Entries are automatically tagged with location and date" by providing automatic location capture functionality that can be integrated into journal entry creation. Users can capture their current location with one tap, and the location data (latitude, longitude, accuracy) is stored with the journal entry.
+
+All code follows existing Flutter/Dart patterns with proper error handling, state management (Riverpod), Clean Architecture principles, and documentation standards.
+
+Phase 4 (Location & Metadata) progress: 1 of 4 subtasks completed
+✅ 4.1 - Automatic location tagging (COMPLETED)
+⏳ 4.2 - Location picker component (PENDING)
+⏳ 4.3 - EXIF data extraction (PENDING)
+⏳ 4.4 - Mood tracking feature (PENDING)
+
+Next step: Subtask 4.2 - Create location picker component for manual location selection
+
