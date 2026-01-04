@@ -138,9 +138,11 @@
           "subtask_id": "3.3",
           "title": "Build media picker component",
           "description": "Create component to select photos and videos from device library",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/media/MediaPicker.tsx"
+            "lib/features/journal/presentation/widgets/media_picker.dart",
+            "lib/features/journal/presentation/widgets/media_picker_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_PICKER.md"
           ]
         },
         {

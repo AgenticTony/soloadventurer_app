@@ -401,3 +401,63 @@ The utility addresses pain-2-2 (crashes when adding photos) by extending the sam
 
 All code follows existing Flutter/Dart patterns with proper error handling, immutability, and documentation standards.
 
+### 2026-01-05 18:00: Subtask 3.3 Completed
+Implemented comprehensive media picker component for Flutter (3 files):
+- **MediaPicker widget** (media_picker.dart - 680+ lines):
+  - Complete media picker widget for photos and videos
+  - PickedMediaFile class with metadata (file, type, size, dimensions, duration)
+  - MediaPickerConfig class with customizable settings
+  - Three predefined configurations: forTravelJournal, highQuality, aggressive
+  - Support for multiple media sources:
+    - Pick photos from gallery
+    - Take photos with camera
+    - Pick videos from gallery
+    - Record videos with camera
+  - Multiple selection support with configurable limits
+  - Automatic image and video compression integration
+  - File size validation and limits
+  - Progress feedback (picking, compressing states)
+  - Two display modes: button (with bottom sheet) and inline
+  - Full error handling with user-friendly messages
+  - Theme integration with Material Design 3
+- **Example implementations** (media_picker_example.dart):
+  - MediaPickerExampleScreen: Full-featured example with quality selector
+  - InlineMediaPickerExample: Inline mode usage demonstration
+  - JournalEntryWithMediaExample: Integration with journal creation flow
+  - Complete examples showing all features and use cases
+- **Comprehensive documentation** (README_MEDIA_PICKER.md):
+  - Installation and platform setup instructions (iOS, Android, Web)
+  - Usage examples (basic, custom config, presets, inline mode)
+  - Integration with journal entry creation
+  - Complete API reference for all classes and properties
+  - Error handling patterns
+  - Compression configuration details
+  - Quality presets explanation
+  - Styling and customization guide
+  - Platform support details
+  - Troubleshooting section
+  - Best practices checklist
+  - Related components reference
+  - Contributing guidelines
+
+Key features implemented:
+✅ Photo gallery and camera support
+✅ Video gallery and recording support
+✅ Multiple selection with configurable max items
+✅ File size validation with limits
+✅ Automatic image compression with MediaCompression utility
+✅ Automatic video compression with VideoCompression utility
+✅ Quality presets (optimized, high, aggressive)
+✅ Button and inline display modes
+✅ Progress feedback during picking and compression
+✅ Comprehensive error handling
+✅ Material Design 3 styling
+✅ Theme integration
+✅ Full documentation with examples
+
+The component provides a user-friendly interface for selecting photos and videos from the device library, addressing the need for easy media attachment to journal entries (user story: "As a traveler, I want to document my daily experiences with photos and notes").
+
+All code follows existing Flutter/Dart patterns with proper state management (Riverpod), error handling, and documentation standards.
+
+Next step: Subtask 3.4 - Implement background upload service
+
