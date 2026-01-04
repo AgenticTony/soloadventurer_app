@@ -5,6 +5,9 @@ import 'package:dio/dio.dart';
 
 import '../../features/offline/infrastructure/database/offline_database.dart';
 import '../../features/offline/infrastructure/database/dao/sync_queue_dao.dart';
+import '../../features/offline/infrastructure/database/dao/user_dao.dart';
+import '../../features/offline/infrastructure/database/dao/trip_dao.dart';
+import '../../features/offline/infrastructure/database/dao/journal_dao.dart';
 import '../../features/offline/domain/services/offline_services.dart';
 import '../../features/offline/domain/repositories/offline_repositories.dart';
 import '../../features/offline/data/repositories/offline_repositories.dart';
@@ -55,6 +58,18 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // Note: These will be initialized lazily when first accessed
   getIt.registerLazySingleton<SyncQueueDao>(
     () => SyncQueueDao(getIt<DatabaseService>().database),
+  );
+
+  getIt.registerLazySingleton<UserDao>(
+    () => UserDao(getIt<DatabaseService>().database),
+  );
+
+  getIt.registerLazySingleton<TripDao>(
+    () => TripDao(getIt<DatabaseService>().database),
+  );
+
+  getIt.registerLazySingleton<JournalDao>(
+    () => JournalDao(getIt<DatabaseService>().database),
   );
 
   // ==============================================================================

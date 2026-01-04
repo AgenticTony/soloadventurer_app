@@ -1,14 +1,73 @@
 class GraphQLQueries {
-  // User queries
+  // User Profile queries
   static String getUserProfile = '''
     query GetUserProfile(\$userId: ID!) {
       getUserProfile(userId: \$userId) {
-        id
+        userId
         username
         email
-        firstName
-        lastName
-        profilePictureUrl
+        displayName
+        bio
+        avatarUrl
+        isPublic
+        interests
+        preferences
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String getCurrentUserProfile = '''
+    query GetCurrentUserProfile {
+      getCurrentUserProfile {
+        userId
+        username
+        email
+        displayName
+        bio
+        avatarUrl
+        isPublic
+        interests
+        preferences
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String createUserProfile = '''
+    mutation CreateUserProfile(
+      \$userId: ID!
+      \$username: String!
+      \$email: String!
+      \$displayName: String!
+      \$bio: String
+      \$avatarUrl: String
+      \$isPublic: Boolean
+      \$interests: [String!]
+      \$preferences: Map
+    ) {
+      createUserProfile(
+        userId: \$userId
+        username: \$username
+        email: \$email
+        displayName: \$displayName
+        bio: \$bio
+        avatarUrl: \$avatarUrl
+        isPublic: \$isPublic
+        interests: \$interests
+        preferences: \$preferences
+      ) {
+        userId
+        username
+        email
+        displayName
+        bio
+        avatarUrl
+        isPublic
+        interests
+        preferences
         createdAt
         updatedAt
       }
@@ -18,23 +77,83 @@ class GraphQLQueries {
   static String updateUserProfile = '''
     mutation UpdateUserProfile(
       \$userId: ID!
-      \$firstName: String
-      \$lastName: String
-      \$profilePictureUrl: String
+      \$username: String
+      \$email: String
+      \$displayName: String
+      \$bio: String
+      \$avatarUrl: String
+      \$isPublic: Boolean
+      \$interests: [String!]
+      \$preferences: Map
     ) {
       updateUserProfile(
         userId: \$userId
-        firstName: \$firstName
-        lastName: \$lastName
-        profilePictureUrl: \$profilePictureUrl
+        username: \$username
+        email: \$email
+        displayName: \$displayName
+        bio: \$bio
+        avatarUrl: \$avatarUrl
+        isPublic: \$isPublic
+        interests: \$interests
+        preferences: \$preferences
       ) {
-        id
+        userId
         username
         email
-        firstName
-        lastName
-        profilePictureUrl
+        displayName
+        bio
+        avatarUrl
+        isPublic
+        interests
+        preferences
         createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String deleteUserProfile = '''
+    mutation DeleteUserProfile(\$userId: ID!) {
+      deleteUserProfile(userId: \$userId) {
+        success
+      }
+    }
+  ''';
+
+  static String updateUserPreferences = '''
+    mutation UpdateUserPreferences(
+      \$userId: ID!
+      \$preferences: Map!
+    ) {
+      updateUserPreferences(userId: \$userId, preferences: \$preferences) {
+        userId
+        preferences
+        updatedAt
+      }
+    }
+  ''';
+
+  static String updateUserInterests = '''
+    mutation UpdateUserInterests(
+      \$userId: ID!
+      \$interests: [String!]!
+    ) {
+      updateUserInterests(userId: \$userId, interests: \$interests) {
+        userId
+        interests
+        updatedAt
+      }
+    }
+  ''';
+
+  static String toggleProfileVisibility = '''
+    mutation ToggleProfileVisibility(
+      \$userId: ID!
+      \$isPublic: Boolean!
+    ) {
+      toggleProfileVisibility(userId: \$userId, isPublic: \$isPublic) {
+        userId
+        isPublic
         updatedAt
       }
     }
@@ -471,12 +590,15 @@ class GraphQLQueries {
   static String getUserProfileIncremental = '''
     query GetUserProfileIncremental(\$userId: ID!, \$since: DateTime!) {
       getUserProfileIncremental(userId: \$userId, since: \$since) {
-        id
+        userId
         username
         email
-        firstName
-        lastName
-        profilePictureUrl
+        displayName
+        bio
+        avatarUrl
+        isPublic
+        interests
+        preferences
         createdAt
         updatedAt
       }
