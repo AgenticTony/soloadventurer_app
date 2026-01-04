@@ -95,11 +95,35 @@
         }
       ],
       "status": "completed"
+    },
+    "2.5": {
+      "attempts": [
+        {
+          "session": 10,
+          "timestamp": "2026-01-04T20:00:25.472960",
+          "approach": "Implemented: Create domain models that represent local data entities",
+          "success": true,
+          "error": null
+        }
+      ],
+      "status": "completed"
+    },
+    "3.1": {
+      "attempts": [
+        {
+          "session": 11,
+          "timestamp": "2026-01-04T20:02:36.148344",
+          "approach": "Implemented: Implement service to monitor network connectivity changes",
+          "success": true,
+          "error": null
+        }
+      ],
+      "status": "completed"
     }
   },
   "stuck_subtasks": [],
   "metadata": {
     "created_at": "2026-01-04T19:30:19.049589",
-    "last_updated": "2026-01-04T19:55:59.495629"
+    "last_updated": "2026-01-04T20:02:36.148360"
   }
 }

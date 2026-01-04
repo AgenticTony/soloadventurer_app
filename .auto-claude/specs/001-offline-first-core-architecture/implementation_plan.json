@@ -185,27 +185,31 @@
           "id": "3.1",
           "title": "Create Connectivity Service",
           "description": "Implement service to monitor network connectivity changes",
-          "status": "pending",
+          "status": "completed",
           "file": "lib/features/offline/domain/services/connectivity_service.dart",
           "acceptanceCriteria": [
             "Stream-based connectivity status updates",
             "Initial connectivity check on startup",
             "Differentiates between WiFi and cellular",
             "Debouncing to prevent rapid status changes"
-          ]
+          ],
+          "notes": "Successfully implemented ConnectivityService with comprehensive network monitoring:\n\n**Implementation:**\n- Created lib/features/offline/domain/services/connectivity_service.dart (303 lines)\n- ConnectionType enum: wifi, cellular, none, other\n- ConnectivityStatus data class with connection type, isConnected flag, and timestamp\n- Factory constructors for creating status from ConnectivityResult\n- Stream-based API with connectivityStream getter\n- checkConnectivity() method for one-time checks\n- Debouncing mechanism (default 300ms) to prevent rapid status changes\n- Proper resource management with dispose() method\n\n**Key Features:**\n1. Stream-based monitoring: Automatically starts monitoring when stream is listened to\n2. Initial connectivity check: Performs check on first subscription\n3. Connection type differentiation: WiFi preferred over cellular, handles ethernet/VPN/bluetooth\n4. Debouncing: Configurable debounce timer prevents flickering between states\n5. Status caching: Last emitted status stored to avoid duplicate emissions\n6. Error handling: Returns disconnected status on connectivity check errors\n\n**Integration:**\n- Registered as singleton in offline_module.dart\n- Exported in offline_services.dart barrel\n- Uses connectivity_plus plugin (already registered)\n- Follows project patterns from NetworkMonitor\n\n**Acceptance Criteria Met:**\n✓ Stream-based connectivity status updates\n✓ Initial connectivity check on startup\n✓ Differentiates between WiFi and cellular\n✓ Debouncing to prevent rapid status changes\n\nCommit hash: 0ab4f8f",
+          "updated_at": "2026-01-04T20:00:00.000Z"
         },
         {
           "id": "3.2",
           "title": "Create Connectivity State Provider",
           "description": "Create Riverpod provider to expose connectivity state to the app",
-          "status": "pending",
+          "status": "completed",
           "file": "lib/features/offline/presentation/providers/connectivity_provider.dart",
           "acceptanceCriteria": [
             "ConnectivityNotifier with state management",
             "isConnected getter for easy access",
             "connectionType enum (wifi, cellular, none)",
             "Auto-dispose on unmount"
-          ]
+          ],
+          "notes": "Successfully implemented Riverpod provider to expose connectivity state:\n\n**Implementation:**\n- Created lib/features/offline/presentation/providers/connectivity_provider.dart (247 lines)\n- ConnectivityState data class wrapping ConnectivityStatus with UI-friendly helpers\n- ConnectivityNotifier with StateNotifier pattern for reactive state management\n- Multiple provider variants for different use cases:\n  - connectivityProvider: Full state access\n  - isConnectedProvider: Boolean connection status\n  - connectionTypeProvider: Connection type only\n  - isOfflineProvider: Inverted connection status\n\n**Key Features:**\n1. ConnectivityNotifier with full state management: Subscribes to ConnectivityService stream, handles lifecycle, updates state reactively\n2. isConnected getter: Available via isConnectedProvider selector for easy access\n3. connectionType enum exposure: ConnectionType (wifi, cellular, none, other) exposed through ConnectivityState\n4. Auto-dispose on unmount: All providers use autoDispose modifier for automatic cleanup\n\n**Provider Pattern:**\n- connectivityServiceProvider: Provides ConnectivityService singleton from GetIt DI\n- connectivityProvider: Main StateNotifierProvider with autoDispose\n- Selector providers for common UI needs (isConnected, connectionType, isOffline)\n- Proper disposal of stream subscriptions via ref.onDispose\n- Error handling with fallback to disconnected state\n\n**Integration:**\n- Exported in offline_providers.dart barrel\n- Uses ConnectivityService registered in offline_module.dart\n- Follows Riverpod best practices from existing providers\n- Includes comprehensive test file with unit tests\n\n**Acceptance Criteria Met:**\n✓ ConnectivityNotifier with state management\n✓ isConnected getter for easy access (via isConnectedProvider)\n✓ connectionType enum (wifi, cellular, none) exposed through state\n✓ Auto-dispose on unmount (using autoDispose modifier)\n\n**Files Created:**\n- lib/features/offline/presentation/providers/connectivity_provider.dart\n- test/features/offline/presentation/providers/connectivity_provider_test.dart\n- Updated lib/features/offline/presentation/providers/offline_providers.dart",
+          "updated_at": "2026-01-04T20:15:00.000Z"
         },
         {
           "id": "3.3",
