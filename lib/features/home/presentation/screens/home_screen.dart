@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -41,16 +42,108 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Welcome to SoloAdventurer!',
               key: Key('home_screen_title'),
-              style: TextStyle(fontSize: 24),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+
+            // Safety Section
+            const Text(
+              'Safety',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
+
+            // Safety Hub Card
+            Card(
+              elevation: 2,
+              child: ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Colors.green,
+                  child: Icon(Icons.shield, color: Colors.white),
+                ),
+                title: const Text('Safety Hub'),
+                subtitle: const Text(
+                  'Trusted contacts, check-ins, and emergency features',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () =>
+                    ref.read(authNavigationProvider.notifier).navigateToSafetyHub(),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // Quick Actions Grid
+            Row(
+              children: [
+                Expanded(
+                  child: Card(
+                    elevation: 2,
+                    child: InkWell(
+                      onTap: () => ref
+                          .read(authNavigationProvider.notifier)
+                          .navigateToCheckInHome(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Icon(Icons.check_circle,
+                                size: 32, color: Theme.of(context).primaryColor),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Check In',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Card(
+                    elevation: 2,
+                    child: InkWell(
+                      onTap: () => ref
+                          .read(authNavigationProvider.notifier)
+                          .navigateToEmergencySOS(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Icon(Icons.emergency,
+                                size: 32, color: Colors.red.shade700),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Emergency',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
+
+            // Debug Section
+            const Text(
+              'Debug',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 12),
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, AuthRoutes.cloudWatchTest);
