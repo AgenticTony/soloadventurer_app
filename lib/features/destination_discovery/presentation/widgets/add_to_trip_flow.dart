@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/destination.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/add_to_trip_provider.dart';
 
 /// A flow for adding a destination to an existing or new trip.
 ///
@@ -1166,36 +1167,48 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
 
   /// Execute add to trip operation
   Future<void> _executeAddToTrip() async {
+    final theme = Theme.of(context);
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      // TODO: Integrate with trip planning provider (subtask 7.2)
-      // For now, simulate the operation
-      await Future.delayed(const Duration(seconds: 1));
+      final notifier = ref.read(addToTripProvider.notifier);
 
-      // Prepare trip data
-      final tripId = _selectedTripId ?? 'new_trip_${DateTime.now().millisecondsSinceEpoch}';
-      final tripTitle = _selectedTripId != null
-          ? _mockUserTrips
-              .firstWhere((trip) => trip['id'] == _selectedTripId)['title'] as String
-          : _newTripTitle!;
+      if (_selectedTripId != null) {
+        // Add to existing trip
+        final tripTitle = _mockUserTrips
+            .firstWhere((trip) => trip['id'] == _selectedTripId)['title'] as String;
 
-      // TODO: Call trip planning provider to add destination
-      // await ref.read(addToTripProvider.notifier).addDestinationToTrip(
-      //   tripId: tripId,
-      //   destination: widget.destination,
-      //   startDate: _startDate,
-      //   endDate: _endDate,
-      //   notes: _notes,
-      // );
+        await notifier.addToExistingTrip(
+          destination: widget.destination,
+          tripId: _selectedTripId!,
+          tripName: tripTitle,
+          startDate: _startDate,
+          endDate: _endDate,
+          notes: _notes.isNotEmpty ? _notes : null,
+        );
+      } else {
+        // Create new trip and add destination
+        await notifier.addToNewTrip(
+          destination: widget.destination,
+          tripTitle: _newTripTitle!,
+          tripDescription: _newTripDescription,
+          startDate: _startDate,
+          endDate: _endDate,
+          notes: _notes.isNotEmpty ? _notes : null,
+        );
+      }
 
       // Success
       setState(() {
         _isLoading = false;
       });
+
+      // Get the trip ID and name from the state
+      final tripId = ref.read(addToTripProvider).tripId ?? '';
+      final tripName = ref.read(addToTripProvider).tripName ?? _newTripTitle ?? 'New Trip';
 
       // Show success message
       if (mounted) {
@@ -1206,7 +1219,7 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Added "${widget.destination.name}" to $tripTitle'),
+                  child: Text('Added "${widget.destination.name}" to $tripName'),
                 ),
               ],
             ),
@@ -1217,7 +1230,10 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
       }
 
       // Call success callback
-      widget.onSuccess?.call(tripId, tripTitle);
+      widget.onSuccess?.call(tripId, tripName);
+
+      // Reset the provider state
+      notifier.reset();
 
       // Close flow
       if (mounted) {
