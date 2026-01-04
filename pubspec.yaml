@@ -86,8 +86,9 @@ dependencies:
   crypto: ^3.0.3
   pointycastle: ^3.7.4
 
-  # Image Picker
+  # Image Picker & Processing
   image_picker: ^1.0.7
+  image: ^4.1.7
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0
   connectivity_plus: ^6.1.3
