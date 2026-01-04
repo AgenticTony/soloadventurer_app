@@ -5,6 +5,7 @@ import '../../application/providers/destination_search_provider.dart';
 import '../../application/providers/filter_provider.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/filter_chips.dart';
+import '../widgets/filter_modal.dart';
 
 /// Main screen for destination discovery with search and filters.
 ///
@@ -146,11 +147,12 @@ class _DestinationDiscoveryScreenState
 
   /// Open advanced filter modal
   void _openFilterModal() {
-    // TODO: Implement FilterModal in subtask 5.3
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Advanced filters coming soon!'),
-        duration: Duration(seconds: 2),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => FilterModal(
+        onApply: _performSearch,
       ),
     );
   }
