@@ -222,7 +222,7 @@
           "id": "3.4",
           "title": "Add Integration Tests for Session Persistence",
           "description": "Write tests to verify session persistence across app restarts and various scenarios",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "Tests for session save and load",
             "Tests for session validation",

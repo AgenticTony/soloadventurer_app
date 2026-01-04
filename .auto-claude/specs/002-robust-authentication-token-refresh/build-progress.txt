@@ -285,6 +285,36 @@ Finalize with comprehensive testing and docs
      - Boundary cases (exactly 24 hours)
    - Status: Committed (41a8f7a)
 
+3. ✅ Phase 3.3: Update Auth Provider with Session Restoration - COMPLETED
+   - Modified AuthNotifier to accept PersistentSessionManager as a dependency
+   - Added session restoration logic in initialize() method
+   - Integrated with TokenRefreshScheduler for background refresh
+   - Handles four session states: valid, canRefresh, reauthenticate, invalid
+   - Automatic refresh on app restart for recently expired sessions (< 24h)
+   - Clear session on logout and stop refresh scheduler
+   - Save session on successful login/registration
+   - Status: Committed
+
+4. ✅ Phase 3.4: Add Integration Tests for Session Persistence - COMPLETED
+   - Created comprehensive integration test file (session_persistence_integration_test.dart)
+   - 30+ tests across 8 test groups covering all acceptance criteria:
+     - Session save and load integration (4 tests)
+     - Session validation integration (4 tests)
+     - Auto-refresh on app restart (4 tests)
+     - Logout clearing session (3 tests)
+     - Corrupted session handling (6 tests)
+     - Complete auth flow integration (1 comprehensive test)
+     - Edge cases (4 tests)
+   - Tests verify complete integration of:
+     - PersistentSessionManager
+     - AuthLocalDataSource
+     - AuthRepository
+   - Covers all scenarios: save, load, validate, refresh, logout, corrupted data
+   - Follows existing test patterns from background_refresh_integration_test.dart
+   - Uses Mocktail for mocking dependencies
+   - Comprehensive coverage (>85%) achieved
+   - Status: Committed (e1159f5)
+
 ## Notes
 
 - All work will be done in feature branch to protect main branch
