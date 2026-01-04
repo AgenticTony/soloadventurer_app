@@ -156,7 +156,7 @@
           "id": "2.5",
           "title": "Add Integration Tests for Background Refresh",
           "description": "Write integration tests to verify background refresh behavior across app lifecycle events",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "Tests for refresh scheduling",
             "Tests for app lifecycle integration",
