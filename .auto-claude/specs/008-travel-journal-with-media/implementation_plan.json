@@ -380,9 +380,12 @@
           "subtask_id": "7.2",
           "title": "Create sync service",
           "description": "Implement bidirectional sync between local and remote databases",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/services/syncService.ts"
+            "lib/features/journal/domain/services/sync_service.dart",
+            "lib/features/journal/data/services/sync_service_impl.dart",
+            "lib/features/journal/data/services/README_SYNC_SERVICE.md",
+            "lib/features/journal/data/services/sync_service_example.dart"
           ]
         },
         {
