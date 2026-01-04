@@ -49,52 +49,58 @@ class CuratedListCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final typeInfo = _getTypeInfo(curatedList.type);
 
-    return Card(
-      elevation: elevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image section with badges overlay
-            _buildImageSection(context, theme),
+    return Semantics(
+      label: 'Curated list: ${curatedList.name}, ${curatedList.destinationCountLabel}, ${typeInfo['label']} collection',
+      hint: onTap != null ? 'Double tap to view curated list details' : null,
+      button: onTap != null,
+      child: Card(
+        elevation: elevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image section with badges overlay
+              _buildImageSection(context, theme),
 
-            // Content section
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name row
-                  _buildNameRow(context, theme),
-                  const SizedBox(height: 8),
+              // Content section
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name row
+                    _buildNameRow(context, theme),
+                    const SizedBox(height: 8),
 
-                  // Type badge and destination count
-                  _buildMetadataRow(context, theme),
-                  const SizedBox(height: 8),
+                    // Type badge and destination count
+                    _buildMetadataRow(context, theme),
+                    const SizedBox(height: 8),
 
-                  // Description
-                  _buildDescription(context, theme),
-                  const SizedBox(height: 12),
-
-                  // Preview destinations
-                  if (curatedList.hasDestinations)
-                    _buildDestinationsPreview(context, theme),
-
-                  // Trailing widget if provided
-                  if (trailing != null) ...[
+                    // Description
+                    _buildDescription(context, theme),
                     const SizedBox(height: 12),
-                    trailing!,
+
+                    // Preview destinations
+                    if (curatedList.hasDestinations)
+                      _buildDestinationsPreview(context, theme),
+
+                    // Trailing widget if provided
+                    if (trailing != null) ...[
+                      const SizedBox(height: 12),
+                      trailing!,
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -382,58 +388,66 @@ class CuratedListCard extends StatelessWidget {
 
   /// Builds the featured badge
   Widget _buildFeaturedBadge(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.star,
-            size: 14,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            'Featured',
-            style: theme.textTheme.labelSmall?.copyWith(
+    return Semantics(
+      label: 'Featured curated list',
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.star,
+              size: 14,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Text(
+              'Featured',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// Builds the hidden gem badge
   Widget _buildHiddenGemBadge(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.diamond,
-            size: 14,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            'Hidden Gems',
-            style: theme.textTheme.labelSmall?.copyWith(
+    return Semantics(
+      label: 'Hidden gems collection',
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.amber.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.diamond,
+              size: 14,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Text(
+              'Hidden Gems',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -442,29 +456,33 @@ class CuratedListCard extends StatelessWidget {
   Widget _buildTypeBadge(ThemeData theme) {
     final typeInfo = _getTypeInfo(curatedList.type);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: typeInfo['color'] as Color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            typeInfo['icon'] as IconData,
-            size: 14,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            typeInfo['label'] as String,
-            style: theme.textTheme.labelSmall?.copyWith(
+    return Semantics(
+      label: '${typeInfo['label']} collection type',
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: typeInfo['color'] as Color,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              typeInfo['icon'] as IconData,
+              size: 14,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Text(
+              typeInfo['label'] as String,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -473,21 +491,25 @@ class CuratedListCard extends StatelessWidget {
   Widget _buildSmallTypeBadge(ThemeData theme) {
     final typeInfo = _getTypeInfo(curatedList.type);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: (typeInfo['color'] as Color).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: typeInfo['color'] as Color,
-          width: 1,
+    return Semantics(
+      label: '${typeInfo['label']} type',
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        decoration: BoxDecoration(
+          color: (typeInfo['color'] as Color).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: typeInfo['color'] as Color,
+            width: 1,
+          ),
         ),
-      ),
-      child: Text(
-        typeInfo['label'] as String,
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: typeInfo['color'] as Color,
-          fontWeight: FontWeight.w500,
+        child: Text(
+          typeInfo['label'] as String,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: typeInfo['color'] as Color,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

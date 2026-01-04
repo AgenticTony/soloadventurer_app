@@ -153,98 +153,104 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
     final severityIcon = _getSeverityIcon(widget.insight.severity);
     final categoryIcon = _getCategoryIcon(widget.insight.category);
 
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: severityColor.withOpacity(0.3),
-          width: 1,
+    return Semantics(
+      label: '${widget.insight.category} safety information, ${widget.insight.severity} severity',
+      value: _isExpanded ? 'Expanded' : 'Collapsed',
+      hint: 'Double tap to ${_isExpanded ? "collapse" : "expand"} safety details',
+      expandable: true,
+      child: Card(
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: severityColor.withOpacity(0.3),
+            width: 1,
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          // Header section (always visible)
-          InkWell(
-            onTap: () {
-              setState(() {
-                _isExpanded = !_isExpanded;
-              });
-            },
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(12),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  // Category icon
-                  if (widget.showIcon) ...[
-                    Icon(
-                      categoryIcon,
-                      color: severityColor,
-                      size: 24,
-                    ),
-                    const SizedBox(width: 12),
-                  ],
+        child: Column(
+          children: [
+            // Header section (always visible)
+            InkWell(
+              onTap: () {
+                setState(() {
+                  _isExpanded = !_isExpanded;
+                });
+              },
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    // Category icon
+                    if (widget.showIcon) ...[
+                      Icon(
+                        categoryIcon,
+                        color: severityColor,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                    ],
 
-                  // Category and severity
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.insight.category,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                    // Category and severity
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.insight.category,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              severityIcon,
-                              size: 14,
-                              color: severityColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.insight.severity.toUpperCase(),
-                              style: theme.textTheme.labelSmall?.copyWith(
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                severityIcon,
+                                size: 14,
                                 color: severityColor,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 4),
+                              Text(
+                                widget.insight.severity.toUpperCase(),
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: severityColor,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  // Expand/collapse icon
-                  AnimatedRotation(
-                    duration: const Duration(milliseconds: 200),
-                    turns: _isExpanded ? 0.5 : 0,
-                    child: Icon(
-                      Icons.expand_more,
-                      color: theme.colorScheme.onSurfaceVariant,
+                    // Expand/collapse icon
+                    AnimatedRotation(
+                      duration: const Duration(milliseconds: 200),
+                      turns: _isExpanded ? 0.5 : 0,
+                      child: Icon(
+                        Icons.expand_more,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
 
-          // Expanded content (description and tips)
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: _isExpanded
-                ? _buildExpandedContent(context, theme, severityColor)
-                : const SizedBox.shrink(),
-          ),
-        ],
+            // Expanded content (description and tips)
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: _isExpanded
+                  ? _buildExpandedContent(context, theme, severityColor)
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
     );
   }

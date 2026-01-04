@@ -1005,14 +1005,18 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
             // Back button
             if (!isFirstStep)
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      _currentStep--;
-                      _errorMessage = null;
-                    });
-                  },
-                  child: const Text('Back'),
+                child: Semantics(
+                  label: 'Go back to previous step',
+                  button: true,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        _currentStep--;
+                        _errorMessage = null;
+                      });
+                    },
+                    child: const Text('Back'),
+                  ),
                 ),
               ),
             if (!isFirstStep) const SizedBox(width: 12),
@@ -1020,9 +1024,13 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
             // Next/Confirm button
             Expanded(
               flex: isFirstStep ? 1 : 2,
-              child: ElevatedButton(
-                onPressed: _canProceed() ? _handleNext : null,
-                child: Text(isLastStep ? 'Confirm & Add' : 'Next'),
+              child: Semantics(
+                label: isLastStep ? 'Confirm and add destination to trip' : 'Proceed to next step',
+                button: true,
+                child: ElevatedButton(
+                  onPressed: _canProceed() ? _handleNext : null,
+                  child: Text(isLastStep ? 'Confirm & Add' : 'Next'),
+                ),
               ),
             ),
           ],

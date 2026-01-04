@@ -459,55 +459,60 @@ class _SafetyScoreSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Minimum Safety Score',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+    return Semantics(
+      label: 'Minimum safety score filter',
+      value: '${minScore.toStringAsFixed(1)} out of 10',
+      hint: 'Adjust slider to set minimum safety score for destinations',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Minimum Safety Score',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Text(
-              '${minScore.toStringAsFixed(1)}+',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: _getScoreColor(minScore),
-                fontWeight: FontWeight.bold,
+              Text(
+                '${minScore.toStringAsFixed(1)}+',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: _getScoreColor(minScore),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Slider(
-          value: minScore,
-          min: 1.0,
-          max: 10.0,
-          divisions: 18,
-          label: minScore.toStringAsFixed(1),
-          onChanged: onScoreChanged,
-          activeColor: _getScoreColor(minScore),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '1.0',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            ],
+          ),
+          const SizedBox(height: 12),
+          Slider(
+            value: minScore,
+            min: 1.0,
+            max: 10.0,
+            divisions: 18,
+            label: minScore.toStringAsFixed(1),
+            onChanged: onScoreChanged,
+            activeColor: _getScoreColor(minScore),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '1.0',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            Text(
-              '10.0',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              Text(
+                '10.0',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -532,69 +537,74 @@ class _SoloSuitabilitySection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Solo Suitability Score',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+    return Semantics(
+      label: 'Solo suitability score filter',
+      value: '${minScore.toStringAsFixed(1)} out of 10',
+      hint: 'Adjust slider to set minimum solo suitability score for destinations',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Solo Suitability Score',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.person, size: 14),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${minScore.toStringAsFixed(1)}+',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onPrimaryContainer,
-                      fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${minScore.toStringAsFixed(1)}+',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onPrimaryContainer,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Slider(
-          value: minScore,
-          min: 1.0,
-          max: 10.0,
-          divisions: 18,
-          label: minScore.toStringAsFixed(1),
-          onChanged: onScoreChanged,
-          activeColor: theme.colorScheme.primary,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '1.0',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+            ],
+          ),
+          const SizedBox(height: 12),
+          Slider(
+            value: minScore,
+            min: 1.0,
+            max: 10.0,
+            divisions: 18,
+            label: minScore.toStringAsFixed(1),
+            onChanged: onScoreChanged,
+            activeColor: theme.colorScheme.primary,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '1.0',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-            Text(
-              '10.0',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              Text(
+                '10.0',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

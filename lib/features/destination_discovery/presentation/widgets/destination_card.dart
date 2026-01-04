@@ -46,50 +46,58 @@ class DestinationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: elevation,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(borderRadius),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image section with bookmark button overlay
-            _buildImageSection(context, theme),
+    return Semantics(
+      label: 'Destination: ${destination.name}, ${destination.countryCode}',
+      value: 'Safety score ${destination.safetyScore.toStringAsFixed(1)}, '
+          'Solo suitability ${destination.soloSuitabilityScore.toStringAsFixed(1)}, '
+          '${_getBudgetInfo(destination.budgetLevel)['label']} budget',
+      hint: onTap != null ? 'Double tap to view destination details' : null,
+      button: onTap != null,
+      child: Card(
+        elevation: elevation,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image section with bookmark button overlay
+              _buildImageSection(context, theme),
 
-            // Content section
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Name and location row
-                  _buildHeaderRow(context, theme),
-                  const SizedBox(height: 8),
+              // Content section
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Name and location row
+                    _buildHeaderRow(context, theme),
+                    const SizedBox(height: 8),
 
-                  // Badges row
-                  _buildBadgesRow(context, theme),
-                  const SizedBox(height: 8),
+                    // Badges row
+                    _buildBadgesRow(context, theme),
+                    const SizedBox(height: 8),
 
-                  // Description
-                  _buildDescription(context, theme),
-                  const SizedBox(height: 8),
+                    // Description
+                    _buildDescription(context, theme),
+                    const SizedBox(height: 8),
 
-                  // Budget indicator
-                  _buildBudgetIndicator(context, theme),
+                    // Budget indicator
+                    _buildBudgetIndicator(context, theme),
 
-                  // Trailing widget if provided
-                  if (trailing != null) ...[
-                    const SizedBox(height: 12),
-                    trailing!,
+                    // Trailing widget if provided
+                    if (trailing != null) ...[
+                      const SizedBox(height: 12),
+                      trailing!,
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -271,25 +279,30 @@ class DestinationCard extends StatelessWidget {
 
   /// Builds the bookmark button
   Widget _buildBookmarkButton(BuildContext context, ThemeData theme) {
-    return Material(
-      color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(20),
-      elevation: 2,
-      child: InkWell(
-        onTap: onBookmarkTap,
+    return Semantics(
+      label: isSaved ? 'Remove from saved' : 'Save destination',
+      hint: 'Double tap to ${isSaved ? "remove" : "save"} this destination',
+      button: true,
+      child: Material(
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: theme.colorScheme.surface.withOpacity(0.9),
-          ),
-          child: Icon(
-            isSaved ? Icons.bookmark : Icons.bookmark_border,
-            size: 20,
-            color: isSaved
-                ? theme.colorScheme.primary
-                : theme.colorScheme.onSurfaceVariant,
+        elevation: 2,
+        child: InkWell(
+          onTap: onBookmarkTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.colorScheme.surface.withOpacity(0.9),
+            ),
+            child: Icon(
+              isSaved ? Icons.bookmark : Icons.bookmark_border,
+              size: 20,
+              color: isSaved
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ),
@@ -298,29 +311,33 @@ class DestinationCard extends StatelessWidget {
 
   /// Builds the hidden gem badge
   Widget _buildHiddenGemBadge(ThemeData theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.amber.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.diamond,
-            size: 14,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            'Hidden Gem',
-            style: theme.textTheme.labelSmall?.copyWith(
+    return Semantics(
+      label: 'Hidden gem destination',
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.amber.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.diamond,
+              size: 14,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Text(
+              'Hidden Gem',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

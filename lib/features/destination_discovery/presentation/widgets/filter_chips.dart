@@ -217,25 +217,32 @@ class _BudgetChip extends StatelessWidget {
     final label = _getBudgetLabel(budgetLevel);
     final icon = _getBudgetIcon(budgetLevel);
 
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 4),
-          Text(label),
-        ],
-      ),
+    return Semantics(
+      label: '$label budget filter',
+      value: isSelected ? 'Selected' : 'Not selected',
+      hint: 'Double tap to ${isSelected ? "remove" : "apply"} $label budget filter',
+      button: true,
       selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: theme.colorScheme.primaryContainer,
-      checkmarkColor: theme.colorScheme.onPrimaryContainer,
-      labelStyle: theme.textTheme.labelMedium?.copyWith(
-        color: isSelected
-            ? theme.colorScheme.onPrimaryContainer
-            : theme.colorScheme.onSurfaceVariant,
+      child: FilterChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16),
+            const SizedBox(width: 4),
+            Text(label),
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (_) => onTap(),
+        selectedColor: theme.colorScheme.primaryContainer,
+        checkmarkColor: theme.colorScheme.onPrimaryContainer,
+        labelStyle: theme.textTheme.labelMedium?.copyWith(
+          color: isSelected
+              ? theme.colorScheme.onPrimaryContainer
+              : theme.colorScheme.onSurfaceVariant,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     );
   }
 
@@ -280,25 +287,32 @@ class _ActivityChip extends StatelessWidget {
     final label = _getActivityLabel(activityLevel);
     final icon = _getActivityIcon(activityLevel);
 
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16),
-          const SizedBox(width: 4),
-          Text(label),
-        ],
-      ),
+    return Semantics(
+      label: '$label activity level filter',
+      value: isSelected ? 'Selected' : 'Not selected',
+      hint: 'Double tap to ${isSelected ? "remove" : "apply"} $label activity filter',
+      button: true,
       selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: theme.colorScheme.primaryContainer,
-      checkmarkColor: theme.colorScheme.onPrimaryContainer,
-      labelStyle: theme.textTheme.labelMedium?.copyWith(
-        color: isSelected
-            ? theme.colorScheme.onPrimaryContainer
-            : theme.colorScheme.onSurfaceVariant,
+      child: FilterChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16),
+            const SizedBox(width: 4),
+            Text(label),
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (_) => onTap(),
+        selectedColor: theme.colorScheme.primaryContainer,
+        checkmarkColor: theme.colorScheme.onPrimaryContainer,
+        labelStyle: theme.textTheme.labelMedium?.copyWith(
+          color: isSelected
+              ? theme.colorScheme.onPrimaryContainer
+              : theme.colorScheme.onSurfaceVariant,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     );
   }
 
@@ -339,33 +353,37 @@ class _HiddenGemChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.diamond, size: 16),
-          const SizedBox(width: 4),
-          Semantics(
-            label: 'Hidden gems only',
-            child: const Text('Hidden Gems'),
-          ),
-        ],
-      ),
+    return Semantics(
+      label: 'Hidden gems filter',
+      value: isSelected ? 'Selected' : 'Not selected',
+      hint: 'Double tap to ${isSelected ? "remove" : "apply"} hidden gems filter',
+      button: true,
       selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: Colors.amber.withOpacity(0.2),
-      checkmarkColor: Colors.amber.shade700,
-      labelStyle: theme.textTheme.labelMedium?.copyWith(
-        color: isSelected
-            ? Colors.amber.shade700
-            : theme.colorScheme.onSurfaceVariant,
+      child: FilterChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.diamond, size: 16),
+            const SizedBox(width: 4),
+            const Text('Hidden Gems'),
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (_) => onTap(),
+        selectedColor: Colors.amber.withOpacity(0.2),
+        checkmarkColor: Colors.amber.shade700,
+        labelStyle: theme.textTheme.labelMedium?.copyWith(
+          color: isSelected
+              ? Colors.amber.shade700
+              : theme.colorScheme.onSurfaceVariant,
+        ),
+        side: BorderSide(
+          color: isSelected
+              ? Colors.amber.shade700
+              : theme.colorScheme.outline.withOpacity(0.5),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
-      side: BorderSide(
-        color: isSelected
-            ? Colors.amber.shade700
-            : theme.colorScheme.outline.withOpacity(0.5),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     );
   }
 }
@@ -386,18 +404,25 @@ class _TagChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return FilterChip(
-      label: Text(tag),
+    return Semantics(
+      label: '$tag tag filter',
+      value: isSelected ? 'Selected' : 'Not selected',
+      hint: 'Double tap to ${isSelected ? "remove" : "apply"} $tag tag filter',
+      button: true,
       selected: isSelected,
-      onSelected: (_) => onTap(),
-      selectedColor: theme.colorScheme.secondaryContainer,
-      checkmarkColor: theme.colorScheme.onSecondaryContainer,
-      labelStyle: theme.textTheme.labelMedium?.copyWith(
-        color: isSelected
-            ? theme.colorScheme.onSecondaryContainer
-            : theme.colorScheme.onSurfaceVariant,
+      child: FilterChip(
+        label: Text(tag),
+        selected: isSelected,
+        onSelected: (_) => onTap(),
+        selectedColor: theme.colorScheme.secondaryContainer,
+        checkmarkColor: theme.colorScheme.onSecondaryContainer,
+        labelStyle: theme.textTheme.labelMedium?.copyWith(
+          color: isSelected
+              ? theme.colorScheme.onSecondaryContainer
+              : theme.colorScheme.onSurfaceVariant,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     );
   }
 }
@@ -414,29 +439,30 @@ class _ClearAllChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.clear_all, size: 16),
-          const SizedBox(width: 4),
-          Semantics(
-            label: 'Clear all filters',
-            hint: 'Removes all active filters',
-            child: const Text('Clear All'),
-          ),
-        ],
+    return Semantics(
+      label: 'Clear all filters',
+      hint: 'Removes all active filters. Double tap to clear',
+      button: true,
+      child: FilterChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.clear_all, size: 16),
+            const SizedBox(width: 4),
+            const Text('Clear All'),
+          ],
+        ),
+        selected: false,
+        onSelected: (_) => onTap(),
+        backgroundColor: theme.colorScheme.errorContainer.withOpacity(0.3),
+        labelStyle: theme.textTheme.labelMedium?.copyWith(
+          color: theme.colorScheme.onErrorContainer,
+        ),
+        side: BorderSide(
+          color: theme.colorScheme.error.withOpacity(0.5),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
-      selected: false,
-      onSelected: (_) => onTap(),
-      backgroundColor: theme.colorScheme.errorContainer.withOpacity(0.3),
-      labelStyle: theme.textTheme.labelMedium?.copyWith(
-        color: theme.colorScheme.onErrorContainer,
-      ),
-      side: BorderSide(
-        color: theme.colorScheme.error.withOpacity(0.5),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
     );
   }
 }

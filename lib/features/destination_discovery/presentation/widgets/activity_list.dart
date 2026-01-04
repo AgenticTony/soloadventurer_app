@@ -264,17 +264,22 @@ class _ActivityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        onTap: onTap != null ? () => onTap!(activity) : null,
-        borderRadius: BorderRadius.circular(12),
-        child: isGrid || isHorizontal
-            ? _buildCompactLayout(context, theme)
-            : _buildDetailedLayout(context, theme),
+    return Semantics(
+      label: 'Activity: ${activity.name}${activity.category != null ? ", ${activity.category}" : ""}${activity.isSoloFriendly ? ", Solo-friendly" : ""}',
+      hint: onTap != null ? 'Double tap to view activity details' : null,
+      button: onTap != null,
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: InkWell(
+          onTap: onTap != null ? () => onTap!(activity) : null,
+          borderRadius: BorderRadius.circular(12),
+          child: isGrid || isHorizontal
+              ? _buildCompactLayout(context, theme)
+              : _buildDetailedLayout(context, theme),
+        ),
       ),
     );
   }
