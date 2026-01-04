@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/features/auth/presentation/widgets/auth_error_display.dart';
 
 /// Screen for initiating password reset
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
@@ -19,6 +20,19 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
+  Object? _currentError;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _clearError() {
+    setState(() {
+      _currentError = null;
+    });
+  }
 
   Future<void> _requestPasswordReset() async {
     if (!_formKey.currentState!.validate()) {
@@ -26,6 +40,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
 
     setState(() => _isLoading = true);
+    _clearError();
 
     try {
       final email = _emailController.text.trim();
@@ -37,6 +52,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Password reset email sent. Please check your inbox.'),
+          backgroundColor: Colors.green,
         ),
       );
 
@@ -45,22 +61,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         AuthRoutes.confirmPasswordReset,
         arguments: {'email': email},
       );
-    } on AuthException catch (e) {
+    } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      // Store the error for display
+      setState(() {
+        _currentError = e;
+        _isLoading = false;
+      });
     }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
   }
 
   @override
@@ -69,14 +77,25 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       appBar: AppBar(
         title: const Text('Reset Password'),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      body: Column(
+        children: [
+          // Show error banner if there's an error
+          if (_currentError != null)
+            AuthErrorBanner(
+              error: _currentError!,
+              onDismiss: _clearError,
+            ),
+
+          // Form content
+          Expanded(
+            child: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                 const Text(
                   'Enter your email address and we\'ll send you instructions to reset your password.',
                   style: TextStyle(fontSize: 16),
@@ -114,10 +133,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                         )
                       : const Text('Send Reset Instructions'),
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
