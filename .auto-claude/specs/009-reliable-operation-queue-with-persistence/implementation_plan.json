@@ -403,10 +403,12 @@
           "subtaskId": "5.1",
           "title": "Create Queue State Provider",
           "description": "Build a Riverpod provider to expose queue state to UI",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/core/providers/operation_queue_provider.dart",
-            "lib/features/core/providers/operation_queue_provider.g.dart"
+            "lib/features/core/providers/operation_queue_provider.g.dart",
+            "lib/features/core/providers/operation_queue_provider.freezed.dart",
+            "lib/features/core/services/operation_queue.dart"
           ],
           "details": {
             "requirements": [
@@ -422,6 +424,22 @@
               "isProcessing: bool",
               "pendingCount: int",
               "failedCount: int"
+            ],
+            "implementation": [
+              "Created OperationQueueState freezed class with all required state fields",
+              "Created OperationQueueNotifier Riverpod provider to expose queue state",
+              "Added getPendingOperations() and isProcessing getters to OperationQueue",
+              "Implemented refreshState() method for manual state updates",
+              "Added retry/clear/remove helper methods to provider",
+              "Manually generated .freezed.dart and .g.dart files following project patterns"
+            ],
+            "notes": [
+              "Successfully created Riverpod provider to expose queue state to UI",
+              "Provider includes pending/failed operations lists and counts",
+              "Provider exposes processing status (isProcessing)",
+              "Added helper methods for retrying and clearing failed operations",
+              "State must be manually refreshed via refreshState() after queue modifications",
+              "All requirements met for subtask 5.1"
             ]
           }
         },

@@ -513,10 +513,18 @@ class OperationQueue extends _$OperationQueue {
     }
   }
 
+  /// Get list of pending operations
+  List<QueueableOperation> getPendingOperations() {
+    return List.unmodifiable(_pendingOperations);
+  }
+
   /// Get list of failed operations
   List<QueueableOperation> getFailedOperations() {
     return List.unmodifiable(_failedOperations);
   }
+
+  /// Check if queue is currently processing
+  bool get isProcessing => _isProcessing;
 
   /// Retry a specific failed operation by ID
   Future<void> retryOperation(String id) async {
