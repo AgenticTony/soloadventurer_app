@@ -482,10 +482,12 @@
           "subtask_id": "9.2",
           "title": "Add safety routes",
           "description": "Define navigation routes for safety screens",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "lib/features/safety/presentation/routes/safety_routes.dart"
-          ]
+            "lib/features/safety/presentation/routes/safety_routes.dart",
+            "lib/app/router/app_router.dart"
+          ],
+          "notes": "Created SafetyRoutes class following ProfileRoutes pattern. Defined routes for all safety screens: Safety Hub (/safety), Trusted Contacts (/safety/trusted-contacts, /safety/trusted-contacts/add, /safety/trusted-contacts/edit), Check-ins (/safety/check-ins, /safety/check-ins/manual, /safety/check-ins/schedule, /safety/check-ins/history), Emergency & SOS (/safety/emergency, /safety/status-update), Location Sharing (/safety/location-sharing). Integrated safety routes into main app router. Implemented onGenerateRoute method with proper argument handling for routes that require parameters (contact, checkIn, tripId, initialStatus). Used FadeTransition for consistent navigation transitions. Follows existing route patterns from auth and profile features with proper route structure and organization."
         },
         {
           "subtask_id": "9.3",
