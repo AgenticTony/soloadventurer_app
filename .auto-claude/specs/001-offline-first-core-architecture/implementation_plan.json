@@ -798,7 +798,7 @@
           "id": "10.1",
           "title": "Write Architecture Documentation",
           "description": "Document offline-first architecture decisions",
-          "status": "pending",
+          "status": "completed",
           "file": "docs/architecture/offline_first_architecture.md",
           "acceptanceCriteria": [
             "Architecture overview",
@@ -806,13 +806,15 @@
             "Conflict resolution strategies",
             "Sync algorithm documentation",
             "Troubleshooting guide"
-          ]
+          ],
+          "notes": "Created comprehensive offline-first architecture documentation (docs/OFFLINE_FIRST_ARCHITECTURE.md) covering:\n\n\u2713 Architecture overview with layer diagrams\n\u2713 Database schema design decisions with Drift ORM\n\u2713 Synchronization engine phases (upload/download/conflict resolution/finalization)\n\u2713 Conflict resolution strategies (last write wins, server wins, client wins, manual)\n\u2713 Offline-aware repository pattern with code examples\n\u2713 Data flow diagrams for read/write/sync operations\n\u2713 Network monitoring with connectivity service\n\u2713 UI components (sync banner, connectivity indicator, offline banner, progress dialog)\n\u2713 Integration with existing clean architecture (DI, GraphQL, Riverpod)\n\u2713 Performance and security considerations\n\u2713 Testing strategy overview\n\u2713 Troubleshooting guide\n\nDocumentation provides complete reference for developers, explaining all key design decisions and implementation patterns used in the offline-first system.",
+          "updated_at": "2026-01-04T21:15:27.544140+00:00"
         },
         {
           "id": "10.2",
           "title": "Write Developer Guide",
           "description": "Guide for adding new features to offline-first app",
-          "status": "pending",
+          "status": "completed",
           "file": "docs/developer_guide/offline_first_development.md",
           "acceptanceCriteria": [
             "How to create offline-aware repositories",
@@ -820,7 +822,8 @@
             "How to handle custom conflicts",
             "Best practices and patterns",
             "Common pitfalls to avoid"
-          ]
+          ],
+          "notes": "Created comprehensive developer guide (docs/developer_guide/offline_first_development.md) covering:\n\n\u2713 When to use offline-first vs regular API + cache\n\u2713 Creating syncable entities with local database support\n\u2713 Implementing offline-aware repositories with complete code examples\n\u2713 Adding local database support (tables, DAOs, migrations)\n\u2713 Handling conflicts with custom resolution strategies\n\u2713 Testing offline features (unit and integration tests)\n\u2713 Best practices for offline-first development (7 key practices)\n\u2713 Common pitfalls and how to avoid them (7 common mistakes)\n\u2713 Migration guide for converting existing features\n\nThe guide provides step-by-step instructions with complete code examples for:\n- Defining domain entities\n- Creating local models with sync metadata\n- Implementing DAOs with Drift ORM\n- Extending OfflineAwareRepository\n- Registering dependencies\n- Custom conflict resolution\n- Testing offline scenarios\n\nDevelopers can follow the guide to add new offline-first features following the established patterns in the codebase."
         },
         {
           "id": "10.3",
@@ -867,5 +870,5 @@
       ]
     }
   ],
-  "last_updated": "2026-01-04T21:08:35.453756+00:00"
+  "last_updated": "2026-01-04T21:15:27.544147+00:00"
 }
