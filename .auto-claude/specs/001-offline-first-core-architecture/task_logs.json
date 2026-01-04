@@ -1,7 +1,7 @@
 {
   "spec_id": "001-offline-first-core-architecture",
   "created_at": "2026-01-04T18:30:19.054390+00:00",
-  "updated_at": "2026-01-04T18:55:31.947391+00:00",
+  "updated_at": "2026-01-04T18:58:30.228515+00:00",
   "phases": {
     "planning": {
       "phase": "planning",
@@ -5198,6 +5198,504 @@
           "tool_input": "git add .auto-claude/specs/001-offline-first-co...",
           "subtask_id": "2.4",
           "session": 9
+        },
+        {
+          "timestamp": "2026-01-04T18:55:34.086908+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "2.4",
+          "session": 9,
+          "detail": "[auto-claude/001-offline-first-core-architecture 6e4dd4c] auto-claude: Update progress - Mark subtask 2.4 as completed\n 7 files changed, 903 insertions(+), 12 deletions(-)\n create mode 100644 .auto-claude/specs/001-offline-first-core-architecture/memory/session_insights/._session_008.json\n create mode 100644 .auto-claude/specs/001-offline-first-core-architecture/memory/session_insights/session_008.json\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack-504808eebc633caeed3b2c5ef21076a7f903fe03.idx\nerror: non-monotonic index /Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.git/objects/pack/._pack\n\n... [truncated - full output was 27917 chars]",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:55:59.361671+00:00",
+          "type": "text",
+          "content": "Perfect! Subtask 2.4 has been successfully completed. Let me provide a summary of what was accomplished:\n\n## ✅ Subtask 2.4 Completed: Create DAOs for Common Database Operations\n\n### What Was Implemented\n\nCreated comprehensive Data Access Objects (DAOs) for all database entities with **1,818 lines of code**:\n\n**Created Files:**\n- `trip_dao.dart` (418 lines) - Trip data operations\n- `journal_dao.dart` (499 lines) - Journal entry operations  \n- `sync_queue_dao.dart` (443 lines) - Sync queue management\n- `user_dao.dart` (442 lines) - User profile operations\n- `offline_dao.dart` (15 lines) - Barrel export file\n\n### Key Features Implemented\n\n**1. CRUD Operations:**\n- Insert (single and batch)\n- Update (single and batch)\n- Delete (hard delete and soft delete)\n- Query with various filters and pagination\n\n**2. Sync-Aware Queries:**\n- `getUnsynced*()` - Find unsynced records\n- `get*WithPendingChanges()` - Find modified records\n- `get*NeedingSync()` - Find all records needing sync\n- `getSoftDeleted*()` - Find deleted records for sync\n- `get*UpdatedAfter()` - Incremental sync queries\n- `mark*AsSynced()` - Update sync status\n- Update version and pending changes flags\n\n**3. Batch Operations:**\n- Transaction support for atomic batch operations\n- Cleanup operations for old/completed records\n- Delete operations by entity type or user\n\n### Acceptance Criteria Met\n\n✅ **CRUD operations defined for each entity** - All DAOs have comprehensive create, read, update, and delete methods\n\n✅ **Queries for offline-first scenarios** - Implemented sync-aware queries for finding pending, unsynced, and modified records\n\n✅ **Transaction support for batch operations** - All batch operations use Drift's `transaction()` for atomicity\n\n### Commits Created\n\n1. **0ddf0e3** - Initial DAO implementation with comprehensive documentation\n2. **6e4dd4c** - Updated progress tracking\n\n### Next Steps\n\nThe DAOs are now ready for integration with:\n- Subtask 2.5: Create Local Data Models\n- Phase 4: Sync Queue System\n- Phase 6: Repository Adaptation\n\nAll code follows project patterns, includes comprehensive documentation, and is ready for use by the sync infrastructure.",
+          "phase": "coding",
+          "subtask_id": "2.4",
+          "session": 9
+        },
+        {
+          "timestamp": "2026-01-04T18:56:22.277429+00:00",
+          "type": "text",
+          "content": "I'll implement subtask 2.5 to create domain models that represent local data entities. Let me start by understanding the requirements and existing patterns.",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:22.293909+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...ecs/001-offline-first-core-architecture/spec.md",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...ecs/001-offline-first-core-architecture/spec.md",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:22.308836+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...irst-core-architecture/implementation_plan.json",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...irst-core-architecture/implementation_plan.json",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:22.323105+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...01-offline-first-core-architecture/context.json",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...01-offline-first-core-architecture/context.json",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:22.336202+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...line-first-core-architecture/build-progress.txt",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...line-first-core-architecture/build-progress.txt",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:22.363096+00:00",
+          "type": "tool_end",
+          "content": "[Read] Error: <tool_use_error>File does not exist.</tool_use_error>",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "<tool_use_error>File does not exist.</tool_use_error>",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:27.789001+00:00",
+          "type": "text",
+          "content": "Let me examine the database schema and existing model patterns to understand the structure.",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:27.803371+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...res/offline/infrastructure/database/schema.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...res/offline/infrastructure/database/schema.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:27.816836+00:00",
+          "type": "tool_start",
+          "content": "[Glob] pattern: **/*model.dart",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "tool_input": "pattern: **/*model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:27.844667+00:00",
+          "type": "tool_end",
+          "content": "[Glob] Done",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "subtask_id": "2.5",
+          "session": 10,
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:30.655384+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...features/profile/data/models/profile_model.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...features/profile/data/models/profile_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:30.671116+00:00",
+          "type": "tool_start",
+          "content": "[Read] ./lib/features/auth/data/models/user_model.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "./lib/features/auth/data/models/user_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:30.692243+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "     1→import 'package:soloadventurer/core/errors/exceptions.dart';\n     2→import 'package:soloadventurer/features/profile/domain/entities/profile.dart';\n     3→\n     4→/// Model class for Profile that handles JSON serialization/deserialization and validation\n     5→class ProfileModel {\n     6→  static const int maxDisplayNameLength = 50;\n     7→  static const int maxBioLength = 500;\n     8→  static const int maxInterestsCount = 20;\n     9→  static const int maxPreferencesCount = 50;\n    10→\n    11→  final String id;\n    12→  final String userId;\n    13→  final String username;\n    14→  final String email;\n    15→  final String displayName;\n    16→  final String? bio;\n    17→  final String? avatarUrl;\n    18→  final bool isPublic;\n    19→  final List<String> interests;\n    20→  final Map<String, dynamic> preferences;\n    21→  final DateTime createdAt;\n    22→  final DateTime updatedAt;\n    23→\n    24→  const ProfileModel({\n    25→    required this.id,\n    26→    required this.userId,\n    27→    required this.username,\n    28→    required this.email,\n    29→    required this.displayName,\n    30→    this.bio,\n    31→    this.avatarUrl,\n    32→    this.isPublic = false,\n    33→    this.interests = const [],\n    34→    this.preferences = const {},\n    35→    required this.createdAt,\n    36→    required this.updatedAt,\n    37→  });\n    38→\n    39→  /// Creates a [ProfileModel] from a domain [Profile] entity\n    40→  factory ProfileModel.fromEntity(Profile profile) {\n    41→    return ProfileModel(\n    42→      id: profile.id,\n    43→      userId: profile.userId,\n    44→      username: profile.username,\n    45→      email: profile.email,\n    46→      displayName: profile.displayName,\n    47→      bio: profile.bio,\n    48→      avatarUrl: profile.avatarUrl,\n    49→      isPublic: profile.isPublic,\n    50→      interests: profile.interests,\n    51→      preferences: profile.preferences,\n    52→      createdAt: profile.createdAt,\n    53→      updatedAt: profile.updatedAt,\n    54→    );\n    55→  }\n    56→\n    57→  /// Converts this [ProfileModel] to a domain [Profile] entity\n    58→  Profile toEntity() {\n    59→    return Profile(\n    60→      id: id,\n    61→      userId: userId,\n    62→      username: username,\n    63→      email: email,\n    64→      displayName: displayName,\n    65→      bio: bio,\n    66→      avatarUrl: avatarUrl,\n    67→      isPublic: isPublic,\n    68→      interests: interests,\n    69→      preferences: preferences,\n    70→      createdAt: createdAt,\n    71→      updatedAt: updatedAt,\n    72→    );\n    73→  }\n    74→\n    75→  factory ProfileModel.fromJson(Map<String, dynamic> json) {\n    76→    final displayName = json['displayName'] as String;\n    77→    final bio = json['bio'] as String?;\n    78→    final interests =\n    79→        (json['interests'] as List<dynamic>?)?.cast<String>() ?? [];\n    80→    final preferences = (json['preferences'] as Map<String, dynamic>?) ?? {};\n    81→\n    82→    // Validate fields\n    83→    _validateDisplayName(displayName);\n    84→    if (bio != null) _validateBio(bio);\n    85→    _validateInterests(interests);\n    86→    _validatePreferences(preferences);\n    87→\n    88→    return ProfileModel(\n    89→      id: json['id'] as String,\n    90→      userId: json['userId'] as String,\n    91→      username: json['username'] as String,\n    92→      email: json['email'] as String,\n    93→      displayName: displayName,\n    94→      bio: bio,\n    95→      avatarUrl: json['avatarUrl'] as String?,\n    96→      isPublic: json['isPublic'] as bool? ?? false,\n    97→      interests: interests,\n    98→      preferences: preferences,\n    99→      createdAt: DateTime.parse(json['createdAt'] as String),\n   100→      updatedAt: DateTime.parse(json['updatedAt'] as String),\n   101→    );\n   102→  }\n   103→\n   104→  Map<String, dynamic> toJson() {\n   105→    return {\n   106→      'id': id,\n   107→      'userId': userId,\n   108→      'username': username,\n   109→      'email': email,\n   110→      'displayName': displayName,\n   111→      'bio': bio,\n   112→      'avatarUrl': avatarUrl,\n   113→      'isPublic': isPublic,\n   114→      'interests': interests,\n   115→      'preferences': preferences,\n   116→      'createdAt': createdAt.toIso8601String(),\n   117→      'updatedAt': updatedAt.toIso8601String(),\n   118→    };\n   119→  }\n   120→\n   121→  /// Creates a copy of this ProfileModel with the given fields replaced with the new values\n   122→  ProfileModel copyWith({\n   123→    String? id,\n   124→    String? userId,\n   125→    String? username,\n   126→    String? email,\n   127→    String? displayName,\n   128→    String? bio,\n   129→    String? avatarUrl,\n   130→    bool? isPublic,\n   131→    List<String>? interests,\n   132→    Map<String, dynamic>? preferences,\n   133→    DateTime? createdAt,\n   134→    DateTime? updatedAt,\n   135→  }) {\n   136→    return ProfileModel(\n   137→      id: id ?? this.id,\n   138→      userId: userId ?? this.userId,\n   139→      username: username ?? this.username,\n   140→      email: email ?? this.email,\n   141→      displayName: displayName ?? this.displayName,\n   142→      bio: bio ?? this.bio,\n   143→      avatarUrl: avatarUrl ?? this.avatarUrl,\n   144→      isPublic: isPublic ?? this.isPublic,\n   145→      interests: interests ?? this.interests,\n   146→      preferences: preferences ?? this.preferences,\n   147→      createdAt: createdAt ?? this.createdAt,\n   148→      updatedAt: updatedAt ?? this.updatedAt,\n   149→    );\n   150→  }\n   151→\n   152→  /// Validates all fields of the profile\n   153→  void validate() {\n   154→    _validateDisplayName(displayName);\n   155→    if (bio != null) _validateBio(bio!);\n   156→    _validateInterests(interests);\n   157→    _validatePreferences(preferences);\n   158→  }\n   159→\n   160→  static void _validateDisplayName(String displayName) {\n   161→    if (displayName.isEmpty) {\n   162→      throw const ValidationException(\n   163→        message: 'Display name cannot be empty',\n   164→        errors: {\n   165→          'displayName': ['Display name cannot be empty']\n   166→        },\n   167→      );\n   168→    }\n   169→    if (displayName.length > maxDisplayNameLength) {\n   170→      throw const ValidationException(\n   171→        message: 'Display name cannot exceed $maxDisplayNameLength characters',\n   172→        errors: {\n   173→          'displayName': [\n   174→            'Display name cannot exceed $maxDisplayNameLength characters'\n   175→          ]\n   176→        },\n   177→      );\n   178→    }\n   179→  }\n   180→\n   181→  static void _validateBio(String bio) {\n   182→    if (bio.length > maxBioLength) {\n   183→      throw const ValidationException(\n   184→        message: 'Bio cannot exceed $maxBioLength characters',\n   185→        errors: {\n   186→          'bio': ['Bio cannot exceed $maxBioLength characters']\n   187→        },\n   188→      );\n   189→    }\n   190→  }\n   191→\n   192→  static void _validateInterests(List<String> interests) {\n   193→    if (interests.length > maxInterestsCount) {\n   194→      throw const ValidationException(\n   195→        message: 'Cannot have more than $maxInterestsCount interests',\n   196→        errors: {\n   197→          'interests': ['Cannot have more than $maxInterestsCount interests']\n   198→        },\n   199→      );\n   200→    }\n   201→  }\n   202→\n   203→  static void _validatePreferences(Map<String, dynamic> preferences) {\n   204→    if (preferences.length > maxPreferencesCount) {\n   205→      throw const ValidationException(\n   206→        message: 'Cannot have more than $maxPreferencesCount preferences',\n   207→        errors: {\n   208→          'preferences': [\n   209→            'Cannot have more than $maxPreferencesCount preferences'\n   210→          ]\n   211→        },\n   212→      );\n   213→    }\n   214→  }\n   215→}\n   216→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:33.644587+00:00",
+          "type": "text",
+          "content": "Now let me check if there are existing domain entities for trips and journals:",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:33.662314+00:00",
+          "type": "tool_start",
+          "content": "[Glob] pattern: **/domain/entities/*.dart",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "tool_input": "pattern: **/domain/entities/*.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:33.746951+00:00",
+          "type": "tool_end",
+          "content": "[Glob] Done",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "subtask_id": "2.5",
+          "session": 10,
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:36.770974+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...s/offline/domain/entities/offline_entities.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...s/offline/domain/entities/offline_entities.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:36.784259+00:00",
+          "type": "tool_start",
+          "content": "[Glob] pattern: **/features/travel/**/entities/*.dart",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "tool_input": "pattern: **/features/travel/**/entities/*.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:36.805978+00:00",
+          "type": "tool_end",
+          "content": "[Glob] Done",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "subtask_id": "2.5",
+          "session": 10,
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:40.697048+00:00",
+          "type": "tool_start",
+          "content": "[Bash] find ./lib/features -type f -name \"*.dart\" | gr...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "find ./lib/features -type f -name \"*.dart\" | gr...",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:40.919123+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "./lib/features/travel/domain/models/trip.dart\n./lib/features/travel/domain/models/._trip.dart\n./lib/features/travel/domain/models/trip.freezed.dart\n./lib/features/travel/domain/models/._trip.freezed.dart\n./lib/features/travel/domain/models/trip.g.dart\n./lib/features/travel/domain/models/._trip.g.dart\n./lib/features/travel/domain/models/trip_planning_operation.dart\n./lib/features/travel/domain/models/._trip_planning_operation.dart\n./lib/features/travel/domain/models/trip_planning_operation.freezed.dart\n./lib/features/travel/domain/models/._trip_planning_operation.freezed.dart\n./lib/features/travel/domain/models/trip_planning_operation.g.dart\n./lib/features/travel/domain/models/._trip_planning_operation.g.dart\n./lib/features/offline/infrastructure/database/dao/._trip_dao.dart\n./lib/features/offline/infrastructure/database/dao/._journal_dao.dart\n./lib/features/offline/infrastructure/database/dao/trip_dao.dart\n./lib/features/offline/infrastructure/database/dao/journal_dao.dart",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:45.174209+00:00",
+          "type": "tool_start",
+          "content": "[Read] ./lib/features/travel/domain/models/trip.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "./lib/features/travel/domain/models/trip.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:45.190262+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "     1→import 'package:freezed_annotation/freezed_annotation.dart';\n     2→\n     3→part 'trip.freezed.dart';\n     4→part 'trip.g.dart';\n     5→\n     6→@freezed\n     7→class Trip with _$Trip {\n     8→  const factory Trip({\n     9→    required String id,\n    10→    required String userId,\n    11→    required String title,\n    12→    String? description,\n    13→    required DateTime startDate,\n    14→    required DateTime endDate,\n    15→    required String destination,\n    16→    double? latitude,\n    17→    double? longitude,\n    18→    required String status,\n    19→    required int budget,\n    20→    String? coverImageUrl,\n    21→    List<String>? travelCompanionIds,\n    22→    required DateTime createdAt,\n    23→    required DateTime updatedAt,\n    24→  }) = _Trip;\n    25→\n    26→  factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);\n    27→}\n    28→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:56:48.999590+00:00",
+          "type": "tool_start",
+          "content": "[Bash] find ./lib/features -type f -name \"*.dart\" | gr...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "find ./lib/features -type f -name \"*.dart\" | gr...",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:56:49.210636+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:57:14.169098+00:00",
+          "type": "text",
+          "content": "Now I have enough information to create the local data models. Let me create them following the project's patterns:",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:57:14.185136+00:00",
+          "type": "tool_start",
+          "content": "[Write] ...tures/offline/data/models/local_trip_model.dart",
+          "phase": "coding",
+          "tool_name": "Write",
+          "tool_input": "...tures/offline/data/models/local_trip_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:57:14.344145+00:00",
+          "type": "tool_end",
+          "content": "[Write] Done",
+          "phase": "coding",
+          "tool_name": "Write",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "File created successfully at: ./lib/features/offline/data/models/local_trip_model.dart",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:57:39.313444+00:00",
+          "type": "tool_start",
+          "content": "[Write] ...es/offline/data/models/local_journal_model.dart",
+          "phase": "coding",
+          "tool_name": "Write",
+          "tool_input": "...es/offline/data/models/local_journal_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:57:39.343323+00:00",
+          "type": "tool_end",
+          "content": "[Write] Done",
+          "phase": "coding",
+          "tool_name": "Write",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "File created successfully at: ./lib/features/offline/data/models/local_journal_model.dart",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:07.087911+00:00",
+          "type": "tool_start",
+          "content": "[Write] ...s/offline/data/models/sync_operation_model.dart",
+          "phase": "coding",
+          "tool_name": "Write",
+          "tool_input": "...s/offline/data/models/sync_operation_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:07.131987+00:00",
+          "type": "tool_end",
+          "content": "[Write] Done",
+          "phase": "coding",
+          "tool_name": "Write",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "File created successfully at: ./lib/features/offline/data/models/sync_operation_model.dart",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:10.327021+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...eatures/offline/data/models/offline_models.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...eatures/offline/data/models/offline_models.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:10.347115+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "     1→// Offline Data Models\n     2→// Export all data models for offline functionality\n     3→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:14.195020+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...eatures/offline/data/models/offline_models.dart",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...eatures/offline/data/models/offline_models.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:14.224985+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "The file ./lib/features/offline/data/models/offline_models.dart has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n     1→// Offline Data Models\n     2→// Export all data models for offline functionality\n     3→\n     4→export 'local_journal_model.dart';\n     5→export 'local_trip_model.dart';\n     6→export 'sync_operation_model.dart';\n     7→",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:17.950965+00:00",
+          "type": "text",
+          "content": "Now let me verify the implementation by running a basic build check:",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:17.962748+00:00",
+          "type": "tool_start",
+          "content": "[Bash] flutter analyze lib/features/offline/data/model...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "flutter analyze lib/features/offline/data/model...",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:17.985058+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Error: Command 'flutter' is not in the allowed commands for this project",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "Command 'flutter' is not in the allowed commands for this project",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:21.254882+00:00",
+          "type": "tool_start",
+          "content": "[Bash] dart analyze lib/features/offline/data/models/ ...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "dart analyze lib/features/offline/data/models/ ...",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:21.282562+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Error: Command 'dart' is not in the allowed commands for this project",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "Command 'dart' is not in the allowed commands for this project",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:25.626801+00:00",
+          "type": "text",
+          "content": "Let me manually verify the created models by reading them:",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:25.643429+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...tures/offline/data/models/local_trip_model.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...tures/offline/data/models/local_trip_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:25.657051+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...es/offline/data/models/local_journal_model.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...es/offline/data/models/local_journal_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:25.672488+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...s/offline/data/models/sync_operation_model.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...s/offline/data/models/sync_operation_model.dart",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:25.697123+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "2.5",
+          "session": 10,
+          "detail": "     1→import 'package:soloadventurer/features/offline/infrastructure/database/schema.dart';\n     2→import 'package:soloadventurer/features/travel/domain/models/trip.dart';\n     3→\n     4→/// Local data model for Trip that represents the database entity\n     5→///\n     6→/// This model wraps the [LocalTrip] database class with additional functionality\n     7→/// for JSON serialization, entity conversion, and sync tracking.\n     8→class LocalTripModel {\n     9→  static const int maxTitleLength = 100;\n    10→  static const int maxDescriptionLength = 1000;\n    11→  static const int maxDestinationLength = 100;\n    12→\n    13→  final String id;\n    14→  final String userId;\n    15→  final String title;\n    16→  final String? description;\n    17→  final DateTime startDate;\n    18→  final DateTime endDate;\n    19→  final String destination;\n    20→  final double? latitude;\n    21→  final double? longitude;\n    22→  final String status;\n    23→  final int budget;\n    24→  final String? coverImageUrl;\n    25→  final List<String>? travelCompanionIds;\n    26→  final DateTime createdAt;\n    27→  final DateTime updatedAt;\n    28→\n    29→  // ==============================================================================\n    30→  // SYNC FIELDS\n    31→  // ==============================================================================\n    32→\n    33→  /// Whether this record has been synced with the server\n    34→  final bool isSynced;\n    35→\n    36→  /// Whether this record has local modifications pending sync\n    37→  final bool hasPendingChanges;\n    38→\n    39→  /// Version number for conflict resolution\n    40→  final int version;\n    41→\n    42→  /// Soft delete flag - true if deleted locally pending sync\n    43→  final bool isDeleted;\n    44→\n    45→  /// Last successful sync timestamp\n    46→  final DateTime? lastSyncedAt;\n    47→\n    48→  const LocalTripModel({\n    49→    required this.id,\n    50→    required this.userId,\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T18:58:30.212436+00:00",
+          "type": "text",
+          "content": "The models look good! Now let me commit the changes and update the implementation plan:",
+          "phase": "coding",
+          "subtask_id": "2.5",
+          "session": 10
+        },
+        {
+          "timestamp": "2026-01-04T18:58:30.228487+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git add .",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git add .",
+          "subtask_id": "2.5",
+          "session": 10
         }
       ]
     },
