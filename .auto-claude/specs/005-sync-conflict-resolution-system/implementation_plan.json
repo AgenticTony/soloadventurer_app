@@ -55,14 +55,14 @@
         {
           "subtask_id": "1.4",
           "title": "Add network connectivity detection",
-          "status": "pending",
+          "status": "completed",
           "description": "Integrate NetInfo or equivalent to detect online/offline status and trigger sync when connection restored",
           "acceptance_criteria": [
             "Network state monitored in real-time",
             "Sync triggers on connection restoration",
             "Offline mode detected and handled"
           ],
-          "notes": ""
+          "notes": "Created NetworkConnectivity domain interface (155 lines) with NetworkStatus model and NetworkConnectionType enum (8 types: none, disconnected, ethernet, wifi, mobile, bluetooth, vpn, other). Implemented ConnectivityPlusNetworkMonitor (268 lines) using connectivity_plus package with real-time monitoring via streams. Integrated with SyncServiceImpl to automatically trigger sync when connection is restored. Features: connection type mapping (prioritizes WiFi over mobile), offline/online transition detection via onOnline/onOffline streams, comprehensive error handling, and optional dependency pattern. Includes 30+ tests (20+ unit tests for network monitor, 10+ integration tests with SyncService). All acceptance criteria met."
         }
       ]
     },
