@@ -78,10 +78,27 @@ Implementation of Phase 1 has begun.
 - Use cases delegate to SafetyRepository interface methods
 - Commit: d27e4d4
 
+✅ **Subtask 1.7: Create use cases for emergency SOS** (COMPLETED)
+- Created TriggerEmergencySOSUseCase for triggering emergency SOS alerts
+  - Notifies trusted contacts with user's location and optional message
+  - Supports battery level and trip ID association
+  - Returns created SafetyAlert with all alert details
+- Created UpdateSafetyStatusUseCase for updating user's safety status
+  - Main call() method for setting any status type with full parameters
+  - Convenience methods: markAsSafe(), markAsNeedHelp(), markAsEmergency()
+  - Supports optional message, location, and battery level
+  - Can link to safety alerts or check-ins
+- Created GetSafetyStatusUseCase for retrieving safety status
+  - Main call() method gets current user's status
+  - forUser() helper method retrieves status for specific users
+- All use cases follow established patterns with const constructors and proper documentation
+- Use cases delegate to SafetyRepository interface methods
+- Commit: 657b828
+
 ## Next Steps
 
-1. **Subtask 1.7**: Create use cases for emergency SOS
-2. Implement TriggerEmergencySOS, UpdateSafetyStatus, GetSafetyStatus
+1. **Phase 2**: Begin implementing the data layer
+2. Create safety-specific exceptions for error handling
 
 ### Phases Overview
 
