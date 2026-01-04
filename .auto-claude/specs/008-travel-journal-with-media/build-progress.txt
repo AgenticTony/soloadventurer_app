@@ -252,3 +252,103 @@ The implementation addresses the acceptance criterion "Display all journal locat
 The map view integrates seamlessly with existing journal features, allowing users to explore their travel memories geographically. Markers show favorite indicators, and polylines connect entries chronologically to visualize travel routes. The smart auto-centering feature ensures all markers are visible when the map loads.
 
 All code follows existing Flutter/Dart patterns with proper state management (Riverpod), Clean Architecture principles, Material Design 3 styling, error handling, and documentation standards consistent with other screen implementations.
+
+### 2026-01-06 09:00: Subtask 7.1 Completed
+Implemented comprehensive offline storage system with SQLite (10 files):
+- **DatabaseHelper** (data/datasources/database_helper.dart - 400+ lines):
+  - Singleton pattern for database connection management
+  - Automatic database initialization with version control
+  - Complete schema creation for 5 tables: journal_entries, media_items, trips, tags, entry_tags
+  - Foreign key constraints with cascade deletes
+  - Database indexes on frequently queried columns for performance
+  - Support for database migrations and upgrades
+  - Helper methods for clearing data and deleting database
+  - Column name constants for type-safe queries
+  - Proper error handling with DatabaseException
+- **JournalLocalDataSource Interface** (data/datasources/journal_local_data_source.dart - 140+ lines):
+  - Complete CRUD interface for journal entries
+  - Media management operations (add, update, delete, upload progress)
+  - Tag association operations
+  - Query methods: by trip, date range, search, favorites, location
+  - Sync status management methods
+  - Clear all data method
+- **JournalLocalDataSourceImpl** (data/datasources/journal_local_data_source_impl.dart - 650+ lines):
+  - Full SQLite implementation of all journal entry operations
+  - Complete media management with upload progress tracking
+  - Tag association management with batch operations
+  - Advanced queries: location-based search, date range filtering
+  - Sync status tracking and updates
+  - Helper methods for model-to-map conversion
+  - JSON serialization for weather_data and exif_data
+  - Comprehensive error handling with custom exceptions
+  - Foreign key relationship management
+- **TripLocalDataSource Interface** (data/datasources/trip_local_data_source.dart - 50+ lines):
+  - CRUD interface for trips
+  - Sync status management
+  - Clear all data method
+- **TripLocalDataSourceImpl** (data/datasources/trip_local_data_source_impl.dart - 200+ lines):
+  - Complete SQLite implementation for trip operations
+  - Model-to-map conversion helpers
+  - Error handling with proper exceptions
+- **TagLocalDataSource Interface** (data/datasources/tag_local_data_source.dart - 60+ lines):
+  - CRUD interface for tags
+  - Usage count management (increment/decrement)
+  - Sync status management
+  - Clear all data method
+- **TagLocalDataSourceImpl** (data/datasources/tag_local_data_source_impl.dart - 200+ lines):
+  - Complete SQLite implementation for tag operations
+  - Usage count tracking with validation
+  - Model-to-map conversion helpers
+  - Error handling with proper exceptions
+- **Comprehensive Documentation** (data/datasources/README_OFFLINE_STORAGE.md - 600+ lines):
+  - Complete feature overview and architecture breakdown
+  - Detailed database schema documentation for all tables
+  - API reference for all data sources and methods
+  - Installation and setup instructions
+  - 15+ usage examples covering all operations:
+    - Creating and retrieving journal entries
+    - Working with media items and uploads
+    - Managing trips and tags
+    - Sync status management
+  - Sync workflow explanation with status values
+  - Error handling patterns and examples
+  - Performance considerations and best practices
+  - Database indexes documentation
+  - Testing guidelines with mock examples
+  - Troubleshooting guide for common issues
+  - Future enhancements roadmap
+- **Dependencies Updated** (pubspec.yaml):
+  - Added sqflite: ^2.3.0 for SQLite support
+  - Added path: ^1.8.3 for cross-platform path handling
+- **Error Handling Enhanced** (core/errors/app_exception.dart):
+  - Added DatabaseException class for database-specific errors
+  - Consistent error handling across all data sources
+
+Key features implemented:
+✅ Complete SQLite database with 5 tables and proper relationships
+✅ Full CRUD operations for journal entries, media, trips, and tags
+✅ Sync status tracking (synced, pending, conflict, offline_only)
+✅ Database indexes for performance optimization
+✅ Foreign key constraints with cascade deletes
+✅ JSON serialization for complex data types
+✅ Comprehensive error handling with DatabaseException
+✅ Offline-first architecture with sync capabilities
+✅ Complete documentation with usage examples
+✅ Type-safe operations with Dart's strong typing
+✅ Location-based queries and search functionality
+✅ Media upload progress tracking
+✅ Tag usage count management
+
+The implementation addresses the acceptance criterion "Offline editing with sync when connection available" by providing a complete, production-ready offline storage system. Users can now create, read, update, and delete journal entries, media items, trips, and tags while offline. All data is stored locally in SQLite with automatic sync status tracking. The system is designed to work seamlessly with a future sync service that will push pending changes to the remote server when connectivity is restored.
+
+The database schema is carefully designed with proper indexes on frequently queried columns (user_id, trip_id, entry_date, sync_status) for optimal performance. Foreign key constraints ensure data integrity, and cascade deletes automatically clean up related records. Each entity tracks its sync status independently, enabling granular sync control and conflict resolution.
+
+All code follows existing Flutter/Dart patterns with Clean Architecture principles, proper error handling, and comprehensive documentation. The implementation is ready for integration with the sync service (subtask 7.2) and will enable offline-first functionality for the entire travel journal feature.
+
+Phase 7 (Offline Support & Sync) progress: 1 of 4 subtasks completed
+✅ 7.1 - Implement offline storage with SQLite (COMPLETED)
+⏳ 7.2 - Create sync service (PENDING)
+⏳ 7.3 - Add conflict resolution logic (PENDING)
+⏳ 7.4 - Implement offline mode indicator (PENDING)
+
+Next step: Subtask 7.2 - Create bidirectional sync service between local and remote databases

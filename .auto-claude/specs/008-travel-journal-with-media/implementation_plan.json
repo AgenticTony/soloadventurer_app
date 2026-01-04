@@ -356,15 +356,24 @@
     {
       "phase_id": "7",
       "name": "Offline Support & Sync",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "7.1",
           "title": "Implement offline storage with SQLite",
           "description": "Set up local database for offline journal entry storage",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/services/offlineStorage.ts"
+            "lib/features/journal/data/datasources/database_helper.dart",
+            "lib/features/journal/data/datasources/journal_local_data_source.dart",
+            "lib/features/journal/data/datasources/journal_local_data_source_impl.dart",
+            "lib/features/journal/data/datasources/trip_local_data_source.dart",
+            "lib/features/journal/data/datasources/trip_local_data_source_impl.dart",
+            "lib/features/journal/data/datasources/tag_local_data_source.dart",
+            "lib/features/journal/data/datasources/tag_local_data_source_impl.dart",
+            "lib/features/journal/data/datasources/README_OFFLINE_STORAGE.md",
+            "lib/core/errors/app_exception.dart",
+            "pubspec.yaml"
           ]
         },
         {

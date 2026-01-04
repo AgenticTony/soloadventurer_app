@@ -124,3 +124,12 @@ class UnknownException extends AppException {
     String? code,
   }) : super(code: code ?? 'unknown_error');
 }
+
+/// Exception thrown when a database operation fails
+class DatabaseException extends AppException {
+  /// Creates a new [DatabaseException] with the given [message] and optional [code]
+  const DatabaseException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'database_error');
+}
