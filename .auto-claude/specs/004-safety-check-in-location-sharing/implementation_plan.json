@@ -76,7 +76,7 @@
           "subtask_id": "1.6",
           "title": "Create use cases for location sharing",
           "description": "Implement use cases for sharing location with trusted contacts",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/domain/usecases/share_location.dart",
             "lib/features/safety/domain/usecases/stop_location_sharing.dart",

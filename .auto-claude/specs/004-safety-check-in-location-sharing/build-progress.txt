@@ -61,10 +61,27 @@ Implementation of Phase 1 has begun.
 - Use cases delegate to SafetyRepository interface methods
 - Commit: 1abdb27
 
+✅ **Subtask 1.6: Create use cases for location sharing** (COMPLETED)
+- Created ShareLocationUseCase for sharing current location with trusted contacts
+  - Supports sharing with multiple or single contacts
+  - Includes convenience method for emergency location sharing
+  - Handles battery level, address, and place name information
+- Created StopLocationSharingUseCase for managing stopping location sharing
+  - Stop sharing with specific contacts
+  - Stop sharing with a single contact
+  - Stop all location sharing
+- Created GetActiveLocationSharesUseCase for retrieving active location shares
+  - Get all currently active location shares
+  - Get recent location updates with optional filtering
+  - Get shares for specific contacts, check-ins, or emergency alerts
+- All use cases follow established patterns with const constructors and proper documentation
+- Use cases delegate to SafetyRepository interface methods
+- Commit: d27e4d4
+
 ## Next Steps
 
-1. **Subtask 1.6**: Create use cases for location sharing
-2. Implement ShareLocation, StopLocationSharing, GetActiveLocationShares
+1. **Subtask 1.7**: Create use cases for emergency SOS
+2. Implement TriggerEmergencySOS, UpdateSafetyStatus, GetSafetyStatus
 
 ### Phases Overview
 
