@@ -165,7 +165,18 @@ Implementation of Phase 3 is in progress.
   - BackgroundCheckInServiceException for error handling
 - Follows existing patterns from BackgroundTokenRefreshService
 - Includes Riverpod providers: backgroundCheckInServiceImplProvider and backgroundCheckInServiceOverrideProvider
-- Commit: pending
+- Commit: 5c4b28d
+
+✅ **Subtask 3.4: Implement missed check-in detector** (COMPLETED)
+- Created comprehensive missed check-in detector service with interface and implementation
+- Detects check-ins that have passed their deadline (with configurable 5-minute grace period)
+- Triggers safety alerts to trusted contacts with last known location
+- Includes location age validation (max 24 hours) and filters contacts by notification preferences
+- Sends local notifications to users about their missed check-ins
+- Features include status tracking, batch processing, configurable parameters, and proper error handling
+- Created SafetyRepository provider (safety_providers.dart) to support dependency injection
+- Follows existing service and infrastructure patterns with Riverpod providers
+- Commit: 2fe86a3
 
 ### Phases Overview
 

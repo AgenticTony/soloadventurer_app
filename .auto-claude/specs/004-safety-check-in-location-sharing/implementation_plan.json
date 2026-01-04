@@ -202,10 +202,13 @@
           "subtask_id": "3.4",
           "title": "Implement missed check-in detector",
           "description": "Create service to detect missed check-ins and trigger alerts",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "lib/features/safety/infrastructure/services/missed_checkin_detector.dart"
-          ]
+            "lib/features/safety/infrastructure/services/missed_checkin_detector.dart",
+            "lib/features/safety/infrastructure/services/missed_checkin_detector_impl.dart",
+            "lib/features/safety/data/repositories/safety_providers.dart"
+          ],
+          "notes": "Created comprehensive missed check-in detector service with interface and implementation. Detects check-ins that have passed their deadline (with configurable grace period) and triggers safety alerts to trusted contacts. Includes last known location in alerts (with age validation), filters contacts by notification preferences, and sends local notifications to users. Features include status tracking, batch processing of missed check-ins, configurable detection parameters, and proper error handling. Also created SafetyRepository provider to support dependency injection. Follows existing service and infrastructure patterns."
         },
         {
           "subtask_id": "3.5",
