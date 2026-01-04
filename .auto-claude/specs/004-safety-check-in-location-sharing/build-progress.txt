@@ -758,3 +758,49 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
   - Compact mode: Card-based view with essential information
 - Commit: 4fae5dc
 
+✅ **Subtask 8.3: Create location privacy settings widget** (COMPLETED)
+- Created comprehensive location privacy widget with granular privacy controls
+- **LocationPrivacyWidget** - Full-featured widget with complete privacy management:
+  - Privacy level selector (minimal, balanced, detailed) with auto-adjusting settings
+  - When to share controls (check-ins only, emergencies only, check-ins & emergencies, always)
+  - What to share toggles (coordinates, place name, battery level, speed & altitude)
+  - Location accuracy slider (10m to 3km with 100 divisions)
+  - Battery optimization toggle for power saving
+  - Auto-expiration settings (0 to 8 hours with warnings)
+  - Section headers with descriptions for each control group
+- **LocationPrivacyWidgetCompact** - Compact inline variant:
+  - Privacy level dropdown selector
+  - Filter chips for quick toggle of sharing options
+  - Space-efficient design for inline usage
+- **LocationPrivacyDisplay** - Display-only widget for showing settings:
+  - Three display styles: detailed (card), compact (inline), badge
+  - Shows privacy level, sharing timing, accuracy, and expiration
+  - Color-coded by privacy level (green/blue/orange)
+- **LocationPrivacySettings** data class:
+  - Comprehensive settings with all privacy options
+  - JSON serialization support (toJson/fromJson)
+  - copyWith method for immutable updates
+  - Default values balanced for safety and privacy
+- Enums for type-safe configuration:
+  - LocationPrivacyLevel (minimal, balanced, detailed)
+  - LocationSharingTiming (4 options for when to share)
+  - LocationPrivacyDisplayStyle (3 display options)
+- All widgets include:
+  - Type-safe callbacks with PrivacySettingsChangedCallback typedef
+  - Proper Material Design 3 theming and color schemes
+  - Comprehensive documentation with Dart doc comments
+  - Disabled states for loading/error conditions
+  - Riverpod integration support with ConsumerStatefulWidget
+  - Follows existing patterns from LocationSharingControls and StatusSelectorWidget
+- Auto-adjustment of settings based on privacy level:
+  - Minimal: City-level, no coordinates/place, battery only
+  - Balanced: Approximate location, coordinates + place + battery (recommended)
+  - Detailed: Precise location, all sharing options enabled
+- Granular controls allow users to customize:
+  - What location data to share (coordinates, place name, battery, speed/altitude)
+  - When to share (check-ins, emergencies, always, combinations)
+  - How precise the location is (10m to 3km accuracy)
+  - Battery optimization vs accuracy trade-off
+  - Auto-expiration for automatic privacy protection
+- Commit: pending
+
