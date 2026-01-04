@@ -128,7 +128,7 @@
           "id": "2.3",
           "title": "Update AuthInterceptor for Proactive Refresh",
           "description": "Modify AuthInterceptor to check token expiration before making requests and trigger refresh if needed",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "Checks token expiration before each request",
             "Triggers refresh if token expires in < 5 minutes",
@@ -142,7 +142,7 @@
           "id": "2.4",
           "title": "Add Refresh Notifications",
           "description": "Implement user-facing notifications for token refresh events (silent success, visible failures)",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "Silent refresh (no notification) on success",
             "User-friendly error message on refresh failure",
