@@ -330,10 +330,13 @@
           "subtask_id": "6.3",
           "title": "Build memory timeline view",
           "description": "Create chronological timeline of all travel experiences",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/screens/journal/MemoryTimelineScreen.tsx",
-            "src/components/journal/TimelineItem.tsx"
+            "lib/features/journal/presentation/providers/memory_timeline_provider.dart",
+            "lib/features/journal/presentation/widgets/timeline_item.dart",
+            "lib/features/journal/presentation/screens/memory_timeline_screen.dart",
+            "lib/features/journal/presentation/screens/memory_timeline_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_MEMORY_TIMELINE.md"
           ]
         },
         {
