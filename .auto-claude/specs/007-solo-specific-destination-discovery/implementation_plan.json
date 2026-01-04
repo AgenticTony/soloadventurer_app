@@ -81,14 +81,15 @@
           "subtask_id": "1.5",
           "title": "Create CuratedList model",
           "description": "Define model for curated destination collections (popular solo destinations, hidden gems, etc.)",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/domain/models/curated_list.dart",
+          "notes": "Created CuratedList model with CuratedListType enum (12 types: popularSolo, hiddenGems, budgetFriendly, adventure, cultural, beach, urban, nature, food, wellness, seasonal, custom). Includes comprehensive properties: id, name, description, type, destinations list, coverImageUrl, images gallery, curator info, metadata (viewCount, saveCount, isFeatured), pre-calculated scores for filtering, and tags. Added 15+ helper methods including: hasCoverImage, hasDestinations, destinationCountLabel, previewDestinations, typeLabel, isHiddenGemsList, isBudgetFriendly, isPopular, withIncrementedViewCount, withIncrementedSaveCount, withUpdatedTimestamp, hasSafetyScores, hasSoloSuitabilityScores, matchesTag. Uses Freezed for immutability with proper JSON serialization. Note: build_runner needs to be run to generate .freezed.dart and .g.dart files.",
           "acceptance_criteria": [
-            "List id, name, description",
-            "List type (popular_solo, hidden_gems, budget_friendly, etc.)",
-            "Destinations list",
-            "Cover image",
-            "Freezed model with JSON serialization"
+            "List id, name, description - Implemented",
+            "List type (popular_solo, hidden_gems, budget_friendly, etc.) - Implemented with CuratedListType enum (12 types)",
+            "Destinations list - Implemented as required List<Destination> field",
+            "Cover image - Implemented as coverImageUrl field with optional String",
+            "Freezed model with JSON serialization - Fully implemented"
           ]
         }
       ]
