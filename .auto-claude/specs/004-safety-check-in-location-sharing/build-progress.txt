@@ -51,10 +51,20 @@ Implementation of Phase 1 has begun.
 - Use cases delegate to SafetyRepository interface methods
 - Commit: c88b399
 
+✅ **Subtask 1.5: Create use cases for check-ins** (COMPLETED)
+- Created CreateCheckInUseCase for creating new manual or scheduled check-ins
+- Created CompleteCheckInUseCase for completing check-ins with location and optional status message
+- Created ScheduleCheckInUseCase for scheduling automatic check-ins with deadline and notifications
+- Created CancelCheckInUseCase for canceling scheduled check-ins
+- Created GetUpcomingCheckInsUseCase for retrieving upcoming, all, and trip-specific check-ins with helper methods
+- All use cases follow established patterns with const constructors and proper documentation
+- Use cases delegate to SafetyRepository interface methods
+- Commit: 1abdb27
+
 ## Next Steps
 
-1. **Subtask 1.5**: Create use cases for check-ins
-2. Implement CreateCheckIn, CompleteCheckIn, ScheduleCheckIn, CancelCheckIn, GetUpcomingCheckIns
+1. **Subtask 1.6**: Create use cases for location sharing
+2. Implement ShareLocation, StopLocationSharing, GetActiveLocationShares
 
 ### Phases Overview
 

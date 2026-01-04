@@ -63,7 +63,7 @@
           "subtask_id": "1.5",
           "title": "Create use cases for check-ins",
           "description": "Implement use cases for manual and scheduled check-ins",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/domain/usecases/create_check_in.dart",
             "lib/features/safety/domain/usecases/complete_check_in.dart",
