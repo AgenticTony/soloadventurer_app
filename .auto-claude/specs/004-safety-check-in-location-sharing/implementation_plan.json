@@ -366,12 +366,13 @@
           "subtask_id": "6.5",
           "title": "Create check-in widgets",
           "description": "Build reusable widgets for check-in UI",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/widgets/check_in_card.dart",
             "lib/features/safety/presentation/widgets/check_in_scheduler.dart",
             "lib/features/safety/presentation/widgets/check_in_status_indicator.dart"
-          ]
+          ],
+          "notes": "Created three comprehensive reusable widgets for check-in functionality. CheckInCard displays check-in information in a card format with type, time, status, message, and location. Features color-coded status chips, visual indicators for due soon and overdue check-ins, configurable display options, and optional callbacks for tap, view, and complete actions. CheckInStatusIndicator displays check-in status in four styles (chip, icon, circular, badge) with color coding and optional labels/tooltips. Includes CheckInStatusDisplay for detailed status with time until due/deadline. CheckInScheduler provides complete scheduling interface with trigger type selector, date/time picker, deadline configuration, location acquisition, message input, multi-contact selector, and optional trip ID association. All widgets follow existing codebase patterns with Material Design theming, comprehensive documentation, and proper error handling. Commit: ade26aa"
         }
       ]
     },
