@@ -1,0 +1,746 @@
+{
+  "spec_id": "007-solo-specific-destination-discovery",
+  "spec_title": "Solo-Specific Destination Discovery",
+  "status": "pending",
+  "phases": [
+    {
+      "phase_id": "phase-1",
+      "phase_name": "Domain Layer & Data Models",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "1.1",
+          "title": "Create Destination domain models",
+          "description": "Define core domain entities for destinations including safety ratings, solo suitability scores, and metadata",
+          "status": "completed",
+          "file_path": "./lib/features/destination_discovery/domain/models/destination.dart",
+          "notes": "Created Destination model with all required properties including safety scores, solo suitability factors, helper models (SoloSuitabilityFactors, SafetyInsight, Activity), and enums (BudgetLevel, ActivityLevel). Note: build_runner needs to be run to generate .freezed.dart and .g.dart files.",
+          "acceptance_criteria": [
+            "Destination model with id, name, description, location (lat/lng)",
+            "Safety score (1-10) and safety insights list",
+            "Solo suitability score (1-10) with factors (nightlife, walkability, etc.)",
+            "Budget level (budget, moderate, expensive)",
+            "Activity level options (relaxed, moderate, adventurous)",
+            "Tags/categories (beach, mountain, urban, cultural, etc.)",
+            "Images list with URLs",
+            "Popular activities list",
+            "Best time to visit",
+            "Freezed models with proper equality",
+            "JSON serialization"
+          ]
+        },
+        {
+          "subtask_id": "1.2",
+          "title": "Create DestinationFilter model",
+          "description": "Define filter options for destination search including budget, safety, activity level, and solo-friendliness",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/domain/models/destination_filter.dart",
+          "acceptance_criteria": [
+            "Budget range filter",
+            "Minimum safety score filter",
+            "Activity level filter",
+            "Solo suitability score filter",
+            "Location/region filter",
+            "Tags/categories multi-select",
+            "Text search query",
+            "Freezed model with JSON serialization"
+          ]
+        },
+        {
+          "subtask_id": "1.3",
+          "title": "Create PersonalizedRecommendation model",
+          "description": "Define model for AI-generated personalized recommendations based on user preferences",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/domain/models/personalized_recommendation.dart",
+          "acceptance_criteria": [
+            "Recommended destinations list",
+            "Match score/relevance percentage",
+            "Reason for recommendation",
+            "Based on user preferences or past trips",
+            "Freezed model with JSON serialization"
+          ]
+        },
+        {
+          "subtask_id": "1.4",
+          "title": "Create SavedDestination model",
+          "description": "Define model for destinations saved to wishlist or trips",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/domain/models/saved_destination.dart",
+          "acceptance_criteria": [
+            "Destination reference",
+            "Save type (wishlist, trip_id)",
+            "Notes field",
+            "Created at timestamp",
+            "Freezed model with JSON serialization"
+          ]
+        },
+        {
+          "subtask_id": "1.5",
+          "title": "Create CuratedList model",
+          "description": "Define model for curated destination collections (popular solo destinations, hidden gems, etc.)",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/domain/models/curated_list.dart",
+          "acceptance_criteria": [
+            "List id, name, description",
+            "List type (popular_solo, hidden_gems, budget_friendly, etc.)",
+            "Destinations list",
+            "Cover image",
+            "Freezed model with JSON serialization"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-2",
+      "phase_name": "Data Layer & API Integration",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "2.1",
+          "title": "Create DestinationRepository interface",
+          "description": "Define repository contract for destination data operations",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/domain/repositories/destination_repository.dart",
+          "acceptance_criteria": [
+            "searchDestinations(DestinationFilter filter) method",
+            "getDestinationById(String id) method",
+            "getPersonalizedRecommendations(String userId) method",
+            "getCuratedLists() method",
+            "getCuratedListById(String id) method",
+            "saveDestination(SavedDestination saved) method",
+            "unsaveDestination(String destinationId) method",
+            "getSavedDestinations(String userId) method",
+            "Return types use domain models"
+          ]
+        },
+        {
+          "subtask_id": "2.2",
+          "title": "Implement DestinationRepository with GraphQL",
+          "description": "Create repository implementation using GraphQL API for destination data",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/infrastructure/repositories/destination_repository_impl.dart",
+          "acceptance_criteria": [
+            "Implements DestinationRepository interface",
+            "Uses GraphQL client for API calls",
+            "Proper error handling and exceptions",
+            "Maps API responses to domain models",
+            "Search query with filter parameters",
+            "Recommendations query",
+            "Curated lists queries",
+            "Save/unsave mutations"
+          ]
+        },
+        {
+          "subtask_id": "2.3",
+          "title": "Create GraphQL queries and mutations",
+          "description": "Define GraphQL documents for destination operations",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/infrastructure/graphql/destination_queries.dart",
+          "acceptance_criteria": [
+            "Search destinations query with filters",
+            "Get destination by ID query",
+            "Get personalized recommendations query",
+            "Get curated lists query",
+            "Get curated list by ID query",
+            "Save destination mutation",
+            "Unsave destination mutation",
+            "Get saved destinations query"
+          ]
+        },
+        {
+          "subtask_id": "2.4",
+          "title": "Create data transfer objects (DTOs)",
+          "description": "Create DTOs for API request/response mapping if needed",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/infrastructure/dtos/",
+          "acceptance_criteria": [
+            "Destination DTO with from/to domain model mapping",
+            "Proper JSON serialization",
+            "Handles null values appropriately"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-3",
+      "phase_name": "Application Layer (State Management)",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "3.1",
+          "title": "Create DestinationSearchProvider",
+          "description": "Riverpod provider for managing destination search state and operations",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/destination_search_provider.dart",
+          "acceptance_criteria": [
+            "State for search results, loading, error",
+            "Search method with filter parameters",
+            "Load more/pagination support",
+            "Clear search method",
+            "Error handling state",
+            "Notifier implementation"
+          ]
+        },
+        {
+          "subtask_id": "3.2",
+          "title": "Create DestinationDetailProvider",
+          "description": "Riverpod provider for managing single destination detail state",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/destination_detail_provider.dart",
+          "acceptance_criteria": [
+            "State for destination data, loading, error",
+            "Load destination by ID method",
+            "Related destinations suggestions",
+            "Error handling",
+            "Notifier implementation"
+          ]
+        },
+        {
+          "subtask_id": "3.3",
+          "title": "Create RecommendationProvider",
+          "description": "Riverpod provider for managing personalized recommendations",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/recommendation_provider.dart",
+          "acceptance_criteria": [
+            "State for recommendations, loading, error",
+            "Load recommendations method",
+            "Refresh recommendations method",
+            "Error handling",
+            "Notifier implementation"
+          ]
+        },
+        {
+          "subtask_id": "3.4",
+          "title": "Create CuratedListsProvider",
+          "description": "Riverpod provider for managing curated destination lists",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/curated_lists_provider.dart",
+          "acceptance_criteria": [
+            "State for curated lists, loading, error",
+            "Load all curated lists method",
+            "Load specific curated list method",
+            "Error handling",
+            "Notifier implementation"
+          ]
+        },
+        {
+          "subtask_id": "3.5",
+          "title": "Create SavedDestinationsProvider",
+          "description": "Riverpod provider for managing saved destinations (wishlist and trips)",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/saved_destinations_provider.dart",
+          "acceptance_criteria": [
+            "State for saved destinations, loading, error",
+            "Save destination method",
+            "Unsave destination method",
+            "Load saved destinations method",
+            "Check if destination is saved",
+            "Error handling",
+            "Notifier implementation"
+          ]
+        },
+        {
+          "subtask_id": "3.6",
+          "title": "Create FilterProvider",
+          "description": "Riverpod provider for managing destination search filter state",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/filter_provider.dart",
+          "acceptance_criteria": [
+            "State for active DestinationFilter",
+            "Update filter methods",
+            "Reset filter method",
+            "Notifier implementation"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-4",
+      "phase_name": "Presentation Layer - UI Components",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "4.1",
+          "title": "Create DestinationCard widget",
+          "description": "Reusable card component for displaying destination preview",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/destination_card.dart",
+          "acceptance_criteria": [
+            "Display destination image",
+            "Destination name and brief description",
+            "Safety score badge with color coding",
+            "Solo suitability badge",
+            "Budget level indicator",
+            "Location/distance indicator",
+            "Tap callback for navigation",
+            "Save/bookmark button",
+            "Responsive layout"
+          ]
+        },
+        {
+          "subtask_id": "4.2",
+          "title": "Create SafetyScoreBadge widget",
+          "description": "Widget to display safety score with visual indicators",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/safety_score_badge.dart",
+          "acceptance_criteria": [
+            "Display score 1-10",
+            "Color coding (red for low, yellow medium, green high)",
+            "Icon indicator",
+            "Optional label",
+            "Accessible labeling"
+          ]
+        },
+        {
+          "subtask_id": "4.3",
+          "title": "Create SoloSuitabilityBadge widget",
+          "description": "Widget to display solo suitability score",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/solo_suitability_badge.dart",
+          "acceptance_criteria": [
+            "Display score 1-10",
+            "Color coding",
+            "Solo traveler icon",
+            "Optional label",
+            "Accessible labeling"
+          ]
+        },
+        {
+          "subtask_id": "4.4",
+          "title": "Create FilterChips widget",
+          "description": "Filter chips for quick filtering by category",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/filter_chips.dart",
+          "acceptance_criteria": [
+            "Horizontal scrollable chips",
+            "Selected state styling",
+            "On selection callback",
+            "Categories (budget, safety, activity level, etc.)",
+            "Clear all filters option"
+          ]
+        },
+        {
+          "subtask_id": "4.5",
+          "title": "Create CuratedListCard widget",
+          "description": "Card component for curated destination lists",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/curated_list_card.dart",
+          "acceptance_criteria": [
+            "Display list cover image",
+            "List name and description",
+            "Destination count",
+            "List type badge",
+            "Tap callback for navigation",
+            "Preview of destinations"
+          ]
+        },
+        {
+          "subtask_id": "4.6",
+          "title": "Create SafetyInsights widget",
+          "description": "Widget to display detailed safety insights for a destination",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/safety_insights.dart",
+          "acceptance_criteria": [
+            "List of safety insights",
+            "Icon for each insight type",
+            "Expandable/collapsible sections",
+            "Clear typography and spacing"
+          ]
+        },
+        {
+          "subtask_id": "4.7",
+          "title": "Create ActivityList widget",
+          "description": "Widget to display popular activities for a destination",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/activity_list.dart",
+          "acceptance_criteria": [
+            "Activity name and description",
+            "Activity icon/image",
+            "Suitability for solo travelers indicator",
+            "Scrollable list or grid",
+            "Tap handlers for details"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-5",
+      "phase_name": "Presentation Layer - Screens",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "5.1",
+          "title": "Create DestinationDiscoveryScreen",
+          "description": "Main screen for destination discovery with search and filters",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/screens/destination_discovery_screen.dart",
+          "acceptance_criteria": [
+            "Search bar at top",
+            "Filter chips horizontal list",
+            "Results grid/list below",
+            "Pull to refresh",
+            "Load more on scroll",
+            "Empty state design",
+            "Loading and error states",
+            "Filter button opens advanced filters modal/bottom sheet",
+            "Responsive design"
+          ]
+        },
+        {
+          "subtask_id": "5.2",
+          "title": "Create DestinationDetailScreen",
+          "description": "Detailed view of a single destination with all information",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/screens/destination_detail_screen.dart",
+          "acceptance_criteria": [
+            "Hero image gallery",
+            "Destination name and description",
+            "Safety score prominently displayed",
+            "Solo suitability score",
+            "Safety insights section",
+            "Popular activities list",
+            "Best time to visit",
+            "Budget level indicator",
+            "Location on map",
+            "Save/bookmark button",
+            "Add to trip button",
+            "Related destinations section",
+            "Loading and error states",
+            "Smooth animations"
+          ]
+        },
+        {
+          "subtask_id": "5.3",
+          "title": "Create FilterModal widget",
+          "description": "Modal or bottom sheet for advanced filtering options",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/filter_modal.dart",
+          "acceptance_criteria": [
+            "Budget range selector",
+            "Safety score slider",
+            "Activity level dropdown/chips",
+            "Solo suitability slider",
+            "Location/region selector",
+            "Tags multi-select",
+            "Apply and reset buttons",
+            "Active filters display",
+            "Clear all option"
+          ]
+        },
+        {
+          "subtask_id": "5.4",
+          "title": "Create RecommendationsScreen",
+          "description": "Screen showing personalized recommendations",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/screens/recommendations_screen.dart",
+          "acceptance_criteria": [
+            "Personalized greeting/message",
+            "Recommended destinations in order of relevance",
+            "Match score/reason displayed",
+            "Pull to refresh",
+            "Empty state when no recommendations",
+            "Loading and error states",
+            "Filter/save options"
+          ]
+        },
+        {
+          "subtask_id": "5.5",
+          "title": "Create CuratedListsScreen",
+          "description": "Screen displaying all curated destination collections",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/screens/curated_lists_screen.dart",
+          "acceptance_criteria": [
+            "Grid of curated list cards",
+            "Featured/hero section for highlighted lists",
+            "Filter by list type",
+            "Pull to refresh",
+            "Loading and error states",
+            "Empty state"
+          ]
+        },
+        {
+          "subtask_id": "5.6",
+          "title": "Create CuratedListDetailScreen",
+          "description": "Screen showing destinations within a curated list",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/screens/curated_list_detail_screen.dart",
+          "acceptance_criteria": [
+            "List header with image, title, description",
+            "Destinations grid/list",
+            "List metadata (destination count, curator)",
+            "Share list functionality",
+            "Loading and error states"
+          ]
+        },
+        {
+          "subtask_id": "5.7",
+          "title": "Create SavedDestinationsScreen",
+          "description": "Screen showing user's saved destinations (wishlist)",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/screens/saved_destinations_screen.dart",
+          "acceptance_criteria": [
+            "Tab or section for wishlist vs trip destinations",
+            "Destinations grid/list",
+            "Notes for saved destinations",
+            "Remove from saved option",
+            "Add to trip option",
+            "Pull to refresh",
+            "Loading and error states",
+            "Empty state with CTA to discover"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-6",
+      "phase_name": "Navigation & Routing",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "6.1",
+          "title": "Add destination discovery routes",
+          "description": "Define routes for all destination discovery screens",
+          "status": "pending",
+          "file_path": "./lib/app/router/app_router.dart",
+          "acceptance_criteria": [
+            "Destination discovery base route",
+            "Destination detail route with ID parameter",
+            "Recommendations route",
+            "Curated lists route",
+            "Curated list detail route with ID parameter",
+            "Saved destinations route",
+            "Filter modal route",
+            "Proper navigation transitions"
+          ]
+        },
+        {
+          "subtask_id": "6.2",
+          "title": "Update app navigation",
+          "description": "Add destination discovery entry point to main navigation",
+          "status": "pending",
+          "file_path": "./lib/screens/home_screen.dart or ./lib/features/home/presentation/screens/home_screen.dart",
+          "acceptance_criteria": [
+            "Add Discover/Trending destinations section to home screen",
+            "Add navigation to destination discovery feature",
+            "Add recommendations widget on home",
+            "Add quick link to curated collections"
+          ]
+        },
+        {
+          "subtask_id": "6.3",
+          "title": "Implement deep linking",
+          "description": "Support deep links to destination details and curated lists",
+          "status": "pending",
+          "file_path": "./lib/app/router/app_router.dart",
+          "acceptance_criteria": [
+            "Handle deep link to destination detail",
+            "Handle deep link to curated list",
+            "Handle deep link to search with filters",
+            "Proper error handling for invalid links"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-7",
+      "phase_name": "Integration with Trip Planning",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "7.1",
+          "title": "Create AddToTripFlow",
+          "description": "Flow for adding a destination to an existing or new trip",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/widgets/add_to_trip_flow.dart",
+          "acceptance_criteria": [
+            "Select existing trip or create new",
+            "Add destination to trip itinerary",
+            "Optional dates selection",
+            "Optional notes",
+            "Success confirmation",
+            "Error handling"
+          ]
+        },
+        {
+          "subtask_id": "7.2",
+          "title": "Integrate with trip planning provider",
+          "description": "Connect destination discovery with trip planning state management",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/application/providers/add_to_trip_provider.dart",
+          "acceptance_criteria": [
+            "Provider for managing add to trip operation",
+            "State for loading, success, error",
+            "Methods to add destination to trip",
+            "Integration with existing trip planning providers"
+          ]
+        },
+        {
+          "subtask_id": "7.3",
+          "title": "Update trip planning to include discovered destinations",
+          "description": "Ensure trip planning UI can display destinations from discovery",
+          "status": "pending",
+          "file_path": "./lib/features/trip_planning/presentation/screens/trip_detail_screen.dart",
+          "acceptance_criteria": [
+            "Display destination data from discovery feature",
+            "Show safety and suitability info in trip context",
+            "Link back to destination details",
+            "Maintain trip-destination association"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-8",
+      "phase_name": "Testing",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "8.1",
+          "title": "Unit tests for domain models",
+          "description": "Test all domain models for proper serialization and equality",
+          "status": "pending",
+          "file_path": "./test/features/destination_discovery/domain/models/",
+          "acceptance_criteria": [
+            "Test Destination model creation and serialization",
+            "Test DestinationFilter model",
+            "Test PersonalizedRecommendation model",
+            "Test SavedDestination model",
+            "Test CuratedList model",
+            "Test equality and copyWith for freezed models"
+          ]
+        },
+        {
+          "subtask_id": "8.2",
+          "title": "Unit tests for providers",
+          "description": "Test state management providers",
+          "status": "pending",
+          "file_path": "./test/features/destination_discovery/application/providers/",
+          "acceptance_criteria": [
+            "Mock repository implementations",
+            "Test DestinationSearchProvider states and methods",
+            "Test DestinationDetailProvider",
+            "Test RecommendationProvider",
+            "Test CuratedListsProvider",
+            "Test SavedDestinationsProvider",
+            "Test FilterProvider",
+            "Test error handling"
+          ]
+        },
+        {
+          "subtask_id": "8.3",
+          "title": "Widget tests for UI components",
+          "description": "Test custom widgets for proper rendering and interactions",
+          "status": "pending",
+          "file_path": "./test/features/destination_discovery/presentation/widgets/",
+          "acceptance_criteria": [
+            "Test DestinationCard rendering",
+            "Test SafetyScoreBadge",
+            "Test SoloSuitabilityBadge",
+            "Test FilterChips interactions",
+            "Test CuratedListCard",
+            "Test SafetyInsights",
+            "Test ActivityList",
+            "Test FilterModal"
+          ]
+        },
+        {
+          "subtask_id": "8.4",
+          "title": "Integration tests",
+          "description": "Test full user flows from UI to data layer",
+          "status": "pending",
+          "file_path": "./integration_test/destination_discovery_test.dart",
+          "acceptance_criteria": [
+            "Test search destinations flow",
+            "Test view destination detail flow",
+            "Test filter destinations flow",
+            "Test save destination flow",
+            "Test add to trip flow",
+            "Test view recommendations flow",
+            "Test view curated lists flow"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "phase-9",
+      "phase_name": "Documentation & Polish",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "9.1",
+          "title": "Add code documentation",
+          "description": "Document all public APIs and complex logic",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/",
+          "acceptance_criteria": [
+            "Dartdoc comments on all public classes",
+            "Documentation for provider methods",
+            "Documentation for widget parameters",
+            "Examples in complex logic"
+          ]
+        },
+        {
+          "subtask_id": "9.2",
+          "title": "Add accessibility labels",
+          "description": "Ensure all UI components have proper semantic labels",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/",
+          "acceptance_criteria": [
+            "Semantics labels on all interactive elements",
+            "Proper screen reader support",
+            "Focus handling",
+            "Contrast ratios meet WCAG standards"
+          ]
+        },
+        {
+          "subtask_id": "9.3",
+          "title": "Performance optimization",
+          "description": "Optimize image loading, list rendering, and API calls",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/",
+          "acceptance_criteria": [
+            "Image caching implemented",
+            "List pagination or lazy loading",
+            "Debounced search queries",
+            "Proper widget const usage",
+            "No unnecessary rebuilds"
+          ]
+        },
+        {
+          "subtask_id": "9.4",
+          "title": "Error handling refinement",
+          "description": "Polish error messages and recovery options",
+          "status": "pending",
+          "file_path": "./lib/features/destination_discovery/presentation/",
+          "acceptance_criteria": [
+            "User-friendly error messages",
+            "Retry buttons on failures",
+            "Empty state designs",
+            "Offline handling where appropriate"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "created_at": "2025-01-04",
+    "total_phases": 9,
+    "total_subtasks": 47,
+    "estimated_complexity": "high",
+    "key_features": [
+      "AI-powered destination search with solo-suitability filters",
+      "Safety scores and insights",
+      "Personalized recommendations",
+      "Curated destination collections",
+      "Save to wishlist or trips",
+      "Advanced filtering options",
+      "Trip planning integration"
+    ],
+    "tech_stack": {
+      "framework": "Flutter",
+      "state_management": "Riverpod",
+      "api": "GraphQL",
+      "architecture": "Clean Architecture (feature-based)"
+    }
+  }
+}
