@@ -1,0 +1,792 @@
+{
+  "feature": "Offline-First Core Architecture",
+  "description": "# Offline-First Core Architecture\n\nImplement comprehensive offline-first architecture with local data persistence, queued operations, and transparent sync status. The app remains fully functional without internet connectivity, automatically syncing when connection is restored.\n\n## Rationale\nAddresses critical user pain point: 'Lack of offline access to travel plans when internet is unavailable.' Also addresses competitor pain points: TripIt server downtime (pain-1-1), Wanderlog sync errors (pain-2-3), and general travel app offline functionality issues (gap-2). This is foundational for travelers in remote areas, flights, or regions with poor connectivity.\n\n## User Stories\n- As a solo traveler, I want to access my trip plans offline so that I can view my itinerary during flights or in remote areas without internet\n- As a traveler, I want the app to automatically save my changes locally so that I don't lose data if my connection drops\n- As a user, I want clear indicators of my sync status so that I know when my data is safe in the cloud\n\n## Acceptance Criteria\n- [ ] App remains fully functional without internet connection\n- [ ] All data changes are queued and sync automatically when connection is restored\n- [ ] Clear visual indicators show offline/online status and sync progress\n- [ ] Local database persists all user data, trips, journals, and preferences\n- [ ] Conflict resolution handles concurrent edits gracefully\n- [ ] Users can read, create, edit, and delete all data types while offline\n",
+  "created_at": "2026-01-04T18:29:44.381Z",
+  "updated_at": "2026-01-04T19:30:00.000Z",
+  "status": "in_progress",
+  "planStatus": "ready",
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Phase 1: Foundation & Dependencies",
+      "description": "Set up the foundational dependencies and project structure for offline-first architecture",
+      "order": 1,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "1.1",
+          "title": "Add Local Storage Dependencies",
+          "description": "Add sqflite and drift packages for local SQLite database with type-safe queries",
+          "status": "completed",
+          "file": "pubspec.yaml",
+          "acceptanceCriteria": [
+            "sqflite: ^2.3.0 added to dependencies",
+            "drift: ^2.14.0 added to dependencies",
+            "sqlite3: ^2.4.0 added to dev_dependencies",
+            "drift_dev: ^2.14.0 added to dev_dependencies"
+          ],
+          "notes": "Successfully added sqflite and drift dependencies to pubspec.yaml:\n- sqflite: ^2.3.0 added to dependencies\n- drift: ^2.14.0 added to dependencies  \n- sqlite3: ^2.4.0 added to dev_dependencies\n- drift_dev: ^2.14.0 added to dev_dependencies\n\nAll dependencies added in appropriate sections following the project's existing structure. Changes committed with hash bfc3f06.",
+          "updated_at": "2026-01-04T18:33:34.064062+00:00"
+        },
+        {
+          "id": "1.2",
+          "title": "Add Connectivity & Path Provider Dependencies",
+          "description": "Add packages for network connectivity monitoring and file system access",
+          "status": "pending",
+          "file": "pubspec.yaml",
+          "acceptanceCriteria": [
+            "connectivity_plus: ^6.1.3 already present",
+            "path_provider: ^2.1.0 added to dependencies",
+            "path: ^1.8.0 added to dependencies"
+          ]
+        },
+        {
+          "id": "1.3",
+          "title": "Create Offline Core Module Structure",
+          "description": "Create directory structure for offline/sync feature following clean architecture",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/data/datasources",
+            "lib/features/offline/data/models",
+            "lib/features/offline/data/repositories",
+            "lib/features/offline/domain/entities",
+            "lib/features/offline/domain/repositories",
+            "lib/features/offline/domain/services",
+            "lib/features/offline/infrastructure/database",
+            "lib/features/offline/infrastructure/sync",
+            "lib/features/offline/presentation/providers",
+            "lib/features/offline/presentation/widgets"
+          ],
+          "acceptanceCriteria": [
+            "All directories created",
+            "Barrel files (export index) created in each directory"
+          ]
+        },
+        {
+          "id": "1.4",
+          "title": "Create Offline Core DI Module",
+          "description": "Create dependency injection module for offline/sync services",
+          "status": "pending",
+          "file": "lib/app/di/modules/offline_module.dart",
+          "acceptanceCriteria": [
+            "OfflineModule created with providers for database, sync queue, and sync manager",
+            "Module registered in service_locator.dart"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "name": "Phase 2: Local Database Layer",
+      "description": "Implement the local SQLite database with Drift ORM for data persistence",
+      "order": 2,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "2.1",
+          "title": "Design Database Schema",
+          "description": "Define database tables for trips, journals, users, sync queue, and sync metadata",
+          "status": "pending",
+          "file": "lib/features/offline/infrastructure/database/schema.dart",
+          "acceptanceCriteria": [
+            "Trips table defined with all necessary fields",
+            "Journals table defined with foreign key to trips",
+            "Users table defined for caching user data",
+            "SyncQueue table defined for pending operations",
+            "SyncMetadata table defined for tracking sync state",
+            "Indexes defined for common queries"
+          ]
+        },
+        {
+          "id": "2.2",
+          "title": "Create Database Entity Models",
+          "description": "Create Drift entity classes that map to database tables",
+          "status": "pending",
+          "file": "lib/features/offline/infrastructure/database/database.dart",
+          "acceptanceCriteria": [
+            "AppDatabase class extending Drift database created",
+            "All tables registered in database",
+            "Database version migration system set up"
+          ]
+        },
+        {
+          "id": "2.3",
+          "title": "Implement Database Initialization",
+          "description": "Create service to initialize and manage database lifecycle",
+          "status": "pending",
+          "file": "lib/features/offline/infrastructure/database/database_service.dart",
+          "acceptanceCriteria": [
+            "DatabaseService singleton created",
+            "Lazy initialization implemented",
+            "Database file stored in app documents directory",
+            "Error handling for corrupted database"
+          ]
+        },
+        {
+          "id": "2.4",
+          "title": "Create DAOs (Data Access Objects)",
+          "description": "Create DAOs for common database operations",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/infrastructure/database/dao/trip_dao.dart",
+            "lib/features/offline/infrastructure/database/dao/journal_dao.dart",
+            "lib/features/offline/infrastructure/database/dao/sync_queue_dao.dart",
+            "lib/features/offline/infrastructure/database/dao/user_dao.dart"
+          ],
+          "acceptanceCriteria": [
+            "CRUD operations defined for each entity",
+            "Queries for offline-first scenarios (get all pending, get by sync status)",
+            "Transaction support for batch operations"
+          ]
+        },
+        {
+          "id": "2.5",
+          "title": "Create Local Data Models",
+          "description": "Create domain models that represent local data entities",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/data/models/local_trip_model.dart",
+            "lib/features/offline/data/models/local_journal_model.dart",
+            "lib/features/offline/data/models/sync_operation_model.dart"
+          ],
+          "acceptanceCriteria": [
+            "Models match database schema",
+            "JSON serialization implemented",
+            "To/From entity conversion methods",
+            "Sync status tracking fields"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Phase 3: Network Monitoring",
+      "description": "Implement network connectivity monitoring and state management",
+      "order": 3,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "3.1",
+          "title": "Create Connectivity Service",
+          "description": "Implement service to monitor network connectivity changes",
+          "status": "pending",
+          "file": "lib/features/offline/domain/services/connectivity_service.dart",
+          "acceptanceCriteria": [
+            "Stream-based connectivity status updates",
+            "Initial connectivity check on startup",
+            "Differentiates between WiFi and cellular",
+            "Debouncing to prevent rapid status changes"
+          ]
+        },
+        {
+          "id": "3.2",
+          "title": "Create Connectivity State Provider",
+          "description": "Create Riverpod provider to expose connectivity state to the app",
+          "status": "pending",
+          "file": "lib/features/offline/presentation/providers/connectivity_provider.dart",
+          "acceptanceCriteria": [
+            "ConnectivityNotifier with state management",
+            "isConnected getter for easy access",
+            "connectionType enum (wifi, cellular, none)",
+            "Auto-dispose on unmount"
+          ]
+        },
+        {
+          "id": "3.3",
+          "title": "Implement Network Reachability Testing",
+          "description": "Add actual network testing beyond basic connectivity checks",
+          "status": "pending",
+          "file": "lib/core/network/network_reachability.dart",
+          "acceptanceCriteria": [
+            "Actual HTTP request to test API reachability",
+            "Configurable test endpoints",
+            "Timeout handling",
+            "Cached result with TTL to avoid excessive tests"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Phase 4: Sync Queue System",
+      "description": "Implement operation queue for tracking and syncing offline changes",
+      "order": 4,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "4.1",
+          "title": "Define Sync Operation Types",
+          "description": "Create enum and models for sync operations (create, update, delete)",
+          "status": "pending",
+          "file": "lib/features/offline/domain/entities/sync_operation.dart",
+          "acceptanceCriteria": [
+            "SyncOperation enum (create, update, delete)",
+            "SyncPriority enum (high, normal, low)",
+            "SyncOperationEntity with all metadata",
+            "JSON serialization"
+          ]
+        },
+        {
+          "id": "4.2",
+          "title": "Create Sync Queue Repository",
+          "description": "Implement repository for managing sync queue in local database",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/domain/repositories/sync_queue_repository.dart",
+            "lib/features/offline/data/repositories/sync_queue_repository_impl.dart"
+          ],
+          "acceptanceCriteria": [
+            "Enqueue operation method",
+            "Dequeue operation method",
+            "Get pending operations by priority",
+            "Mark operation as completed/failed",
+            "Clear completed operations",
+            "Get queue size for UI"
+          ]
+        },
+        {
+          "id": "4.3",
+          "title": "Create Sync Queue Service",
+          "description": "Implement service to manage sync queue lifecycle",
+          "status": "pending",
+          "file": "lib/features/offline/domain/services/sync_queue_service.dart",
+          "acceptanceCriteria": [
+            "Queue operations when offline",
+            "Persist queue to database",
+            "Recover queue on app restart",
+            "Retry logic for failed operations",
+            "Batch operation support"
+          ]
+        },
+        {
+          "id": "4.4",
+          "title": "Implement Operation Interceptors",
+          "description": "Create interceptors that capture write operations and queue them",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/infrastructure/sync/offline_interceptor.dart",
+            "lib/features/offline/infrastructure/sync/mutation_interceptor.dart"
+          ],
+          "acceptanceCriteria": [
+            "Intercept create/update/delete operations",
+            "Check connectivity status before executing",
+            "Queue operation if offline",
+            "Return optimistic response to UI",
+            "Update local database immediately"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Phase 5: Data Synchronization Engine",
+      "description": "Implement bidirectional synchronization with conflict resolution",
+      "order": 5,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "5.1",
+          "title": "Create Sync Manager",
+          "description": "Implement core sync coordinator that orchestrates all sync operations",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/domain/services/sync_manager.dart",
+            "lib/features/offline/infrastructure/sync/sync_manager_impl.dart"
+          ],
+          "acceptanceCriteria": [
+            "Singleton sync manager",
+            "Start/stop sync process",
+            "Listen to connectivity changes",
+            "Trigger sync when connection restored",
+            "Prevent concurrent sync cycles"
+          ]
+        },
+        {
+          "id": "5.2",
+          "title": "Implement Upload Sync (Local \u2192 Server)",
+          "description": "Implement syncing queued operations to server",
+          "status": "pending",
+          "file": "lib/features/offline/infrastructure/sync/upload_sync.dart",
+          "acceptanceCriteria": [
+            "Process pending operations in queue",
+            "Send mutations to GraphQL API",
+            "Handle server responses",
+            "Update local database with server IDs",
+            "Remove from queue on success",
+            "Retry on failure with exponential backoff"
+          ]
+        },
+        {
+          "id": "5.3",
+          "title": "Implement Download Sync (Server \u2192 Local)",
+          "description": "Implement syncing server data to local database",
+          "status": "pending",
+          "file": "lib/features/offline/infrastructure/sync/download_sync.dart",
+          "acceptanceCriteria": [
+            "Query for server changes since last sync",
+            "Compare with local data versions",
+            "Insert/update local database",
+            "Handle deletions from server",
+            "Update sync metadata timestamp"
+          ]
+        },
+        {
+          "id": "5.4",
+          "title": "Implement Conflict Resolution",
+          "description": "Create strategy for handling concurrent edit conflicts",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/domain/services/conflict_resolver.dart",
+            "lib/features/offline/infrastructure/sync/conflict_strategies.dart"
+          ],
+          "acceptanceCriteria": [
+            "Detect version conflicts (server changed since last sync)",
+            "Last-write-wins strategy for simple conflicts",
+            "Server-wins strategy for critical data",
+            "Client-wins strategy for user preferences",
+            "Manual resolution option for complex conflicts",
+            "Conflict log for auditing"
+          ]
+        },
+        {
+          "id": "5.5",
+          "title": "Implement Incremental Sync",
+          "description": "Add incremental sync based on timestamps/version vectors",
+          "status": "pending",
+          "file": "lib/features/offline/infrastructure/sync/incremental_sync.dart",
+          "acceptanceCriteria": [
+            "Track last synced timestamp per entity type",
+            "Query only changed data from server",
+            "Delta updates to reduce bandwidth",
+            "Version vector or last-write-wins tracking",
+            "Full sync fallback if delta fails"
+          ]
+        },
+        {
+          "id": "5.6",
+          "title": "Create Sync Status Provider",
+          "description": "Create provider to expose sync status and progress to UI",
+          "status": "pending",
+          "file": "lib/features/offline/presentation/providers/sync_status_provider.dart",
+          "acceptanceCriteria": [
+            "SyncStatus enum (synced, syncing, error, offline)",
+            "Sync progress (0-100) for active operations",
+            "Pending operations count",
+            "Last synced timestamp",
+            "Error messages for failed syncs"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Phase 6: Repository Adaptation",
+      "description": "Adapt existing repositories to work with offline-first pattern",
+      "order": 6,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "6.1",
+          "title": "Create Offline-Aware Base Repository",
+          "description": "Create base repository class with offline-first logic",
+          "status": "pending",
+          "file": "lib/features/offline/data/repositories/offline_aware_repository.dart",
+          "acceptanceCriteria": [
+            "Abstract base repository with common sync logic",
+            "Read from local database first",
+            "Write to local database immediately",
+            "Queue mutations for sync",
+            "Fallback to API when local unavailable"
+          ]
+        },
+        {
+          "id": "6.2",
+          "title": "Adapt Trip Repository",
+          "description": "Update TripRepository to use offline-first pattern",
+          "status": "pending",
+          "file": "lib/features/travel/infrastructure/repositories/trip_repository_impl.dart",
+          "acceptanceCriteria": [
+            "Extend offline-aware base repository",
+            "Read trips from local database",
+            "Write trips to local database",
+            "Queue trip mutations",
+            "Sync with server when online"
+          ]
+        },
+        {
+          "id": "6.3",
+          "title": "Adapt Journal Repository",
+          "description": "Update JournalRepository to use offline-first pattern",
+          "status": "pending",
+          "file": "lib/features/travel/infrastructure/repositories/journal_repository_impl.dart",
+          "acceptanceCriteria": [
+            "Extend offline-aware base repository",
+            "Read journals from local database",
+            "Write journals to local database",
+            "Queue journal mutations",
+            "Sync with server when online"
+          ]
+        },
+        {
+          "id": "6.4",
+          "title": "Adapt Profile/User Repository",
+          "description": "Update ProfileRepository to use offline-first pattern",
+          "status": "pending",
+          "file": "lib/features/profile/data/repositories/profile_repository_impl.dart",
+          "acceptanceCriteria": [
+            "Extend offline-aware base repository",
+            "Cache user profile locally",
+            "Queue profile updates",
+            "Sync with server when online"
+          ]
+        },
+        {
+          "id": "6.5",
+          "title": "Implement Optimistic UI Updates",
+          "description": "Add optimistic response handling for immediate UI feedback",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/domain/services/optimistic_update_handler.dart"
+          ],
+          "acceptanceCriteria": [
+            "Return optimistic response on mutation",
+            "Update UI immediately",
+            "Rollback on sync failure",
+            "Track pending operations for rollback"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "name": "Phase 7: UI & Status Indicators",
+      "description": "Create UI components for sync status and offline indicators",
+      "order": 7,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "7.1",
+          "title": "Create Sync Status Banner",
+          "description": "Create dismissible banner showing sync status",
+          "status": "pending",
+          "file": "lib/features/offline/presentation/widgets/sync_status_banner.dart",
+          "acceptanceCriteria": [
+            "Shows current sync status",
+            "Animated icon for syncing state",
+            "Error message display with retry button",
+            "Offline indicator with different styling",
+            "Auto-dismiss on successful sync"
+          ]
+        },
+        {
+          "id": "7.2",
+          "title": "Create Connectivity Indicator Widget",
+          "description": "Create small indicator widget showing connection status",
+          "status": "pending",
+          "file": "lib/features/offline/presentation/widgets/connectivity_indicator.dart",
+          "acceptanceCriteria": [
+            "Small icon in app bar or status bar",
+            "Green check for online",
+            "Gray icon for offline",
+            "Animated sync icon when syncing",
+            "Tap to show detailed status"
+          ]
+        },
+        {
+          "id": "7.3",
+          "title": "Create Sync Progress Indicator",
+          "description": "Create modal or bottom sheet showing detailed sync progress",
+          "status": "pending",
+          "file": "lib/features/offline/presentation/widgets/sync_progress_dialog.dart",
+          "acceptanceCriteria": [
+            "Progress bar for active sync",
+            "List of operations being synced",
+            "Pending operations count",
+            "Failed operations with error messages",
+            "Cancel sync button",
+            "Retry failed operations button"
+          ]
+        },
+        {
+          "id": "7.4",
+          "title": "Add Offline Mode Banner",
+          "description": "Create prominent banner when app is in offline mode",
+          "status": "pending",
+          "file": "lib/features/offline/presentation/widgets/offline_banner.dart",
+          "acceptanceCriteria": [
+            "Shows when connectivity is lost",
+            "Explains that data will sync later",
+            "Optionally show cached data count",
+            "Dismissible but reappears on app foreground",
+            "Different styling from sync banner"
+          ]
+        },
+        {
+          "id": "7.5",
+          "title": "Create Sync Settings Screen",
+          "description": "Create settings screen for sync preferences",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/presentation/screens/sync_settings_screen.dart",
+            "lib/features/offline/presentation/routes/offline_routes.dart"
+          ],
+          "acceptanceCriteria": [
+            "Toggle sync on/off",
+            "Force sync now button",
+            "Sync only on WiFi option",
+            "Clear local data option",
+            "View sync history/log",
+            "Pending operations list"
+          ]
+        },
+        {
+          "id": "7.6",
+          "title": "Integrate Indicators into App Shell",
+          "description": "Add sync and connectivity indicators to main app UI",
+          "status": "pending",
+          "file": "lib/app/my_app.dart",
+          "acceptanceCriteria": [
+            "Connectivity indicator in app bar",
+            "Sync status banner at top when active",
+            "Offline mode banner when applicable",
+            "Sync progress accessible from settings"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "name": "Phase 8: Background Sync & Notifications",
+      "description": "Add background sync capabilities and user notifications",
+      "order": 8,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "8.1",
+          "title": "Implement Background Sync with Workmanager",
+          "description": "Configure periodic background sync tasks",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/infrastructure/sync/background_sync_service.dart",
+            "android/app/src/main/AndroidManifest.xml"
+          ],
+          "acceptanceCriteria": [
+            "Workmanager configured for periodic sync",
+            "Background task runs every 15-30 minutes",
+            "Only syncs when network available",
+            "Wakes up device if needed (with permissions)",
+            "Respects battery optimization settings"
+          ]
+        },
+        {
+          "id": "8.2",
+          "title": "Create Sync Notification Service",
+          "description": "Implement local notifications for sync events",
+          "status": "pending",
+          "files": [
+            "lib/features/offline/infrastructure/sync/sync_notification_service.dart",
+            "android/app/src/main/AndroidManifest.xml",
+            "ios/Runner/Info.plist"
+          ],
+          "acceptanceCriteria": [
+            "Notification on sync completion",
+            "Notification on sync failure",
+            "Notification when pending operations exceed threshold",
+            "Notification on conflict requiring user action",
+            "Configurable notification preferences"
+          ]
+        },
+        {
+          "id": "8.3",
+          "title": "Add Sync on App Foreground",
+          "description": "Trigger sync when app returns to foreground",
+          "status": "pending",
+          "file": "lib/app/bootstrap.dart",
+          "acceptanceCriteria": [
+            "App lifecycle listener for foreground event",
+            "Debounce to avoid excessive syncs",
+            "Only sync if enough time has passed",
+            "Respect user preferences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-9",
+      "name": "Phase 9: Testing & Quality Assurance",
+      "description": "Comprehensive testing of offline-first functionality",
+      "order": 9,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "9.1",
+          "title": "Unit Tests for Database Layer",
+          "description": "Test database operations and DAOs",
+          "status": "pending",
+          "file": "test/features/offline/infrastructure/database/database_test.dart",
+          "acceptanceCriteria": [
+            "Test CRUD operations",
+            "Test transaction rollback on error",
+            "Test migration between versions",
+            "Test query performance with large datasets",
+            "Test concurrent access safety"
+          ]
+        },
+        {
+          "id": "9.2",
+          "title": "Unit Tests for Sync Queue",
+          "description": "Test sync queue operations and persistence",
+          "status": "pending",
+          "file": "test/features/offline/domain/services/sync_queue_service_test.dart",
+          "acceptanceCriteria": [
+            "Test enqueue/dequeue operations",
+            "Test priority ordering",
+            "Test persistence across app restarts",
+            "Test retry logic",
+            "Test batch operations"
+          ]
+        },
+        {
+          "id": "9.3",
+          "title": "Unit Tests for Conflict Resolution",
+          "description": "Test various conflict scenarios",
+          "status": "pending",
+          "file": "test/features/offline/domain/services/conflict_resolver_test.dart",
+          "acceptanceCriteria": [
+            "Test last-write-wins strategy",
+            "Test server-wins strategy",
+            "Test client-wins strategy",
+            "Test manual resolution flow",
+            "Test conflict logging"
+          ]
+        },
+        {
+          "id": "9.4",
+          "title": "Integration Tests for Offline-First Flow",
+          "description": "Test complete offline-to-online sync cycle",
+          "status": "pending",
+          "file": "integration_test/offline_first_flow_test.dart",
+          "acceptanceCriteria": [
+            "Test creating trip while offline",
+            "Test editing journal while offline",
+            "Test deleting item while offline",
+            "Test sync when connection restored",
+            "Test conflict scenarios",
+            "Test UI updates throughout"
+          ]
+        },
+        {
+          "id": "9.5",
+          "title": "Performance Testing",
+          "description": "Test performance with large datasets",
+          "status": "pending",
+          "files": [
+            "test/performance/offline_performance_test.dart"
+          ],
+          "acceptanceCriteria": [
+            "Test with 1000+ trips",
+            "Test with 10000+ journal entries",
+            "Measure sync time for large datasets",
+            "Measure database query performance",
+            "Memory leak testing"
+          ]
+        },
+        {
+          "id": "9.6",
+          "title": "Manual Testing Scenarios",
+          "description": "Create test plan for manual QA",
+          "status": "pending",
+          "file": "./.auto-claude/specs/001-offline-first-core-architecture/manual_test_plan.md",
+          "acceptanceCriteria": [
+            "Flight mode test case",
+            "Poor connectivity test case",
+            "App kill during sync test case",
+            "Concurrent device editing test case",
+            "Server error during sync test case",
+            "Large data sync test case"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase-10",
+      "name": "Phase 10: Documentation & Deployment",
+      "description": "Final documentation and deployment preparation",
+      "order": 10,
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "10.1",
+          "title": "Write Architecture Documentation",
+          "description": "Document offline-first architecture decisions",
+          "status": "pending",
+          "file": "docs/architecture/offline_first_architecture.md",
+          "acceptanceCriteria": [
+            "Architecture overview",
+            "Data flow diagrams",
+            "Conflict resolution strategies",
+            "Sync algorithm documentation",
+            "Troubleshooting guide"
+          ]
+        },
+        {
+          "id": "10.2",
+          "title": "Write Developer Guide",
+          "description": "Guide for adding new features to offline-first app",
+          "status": "pending",
+          "file": "docs/developer_guide/offline_first_development.md",
+          "acceptanceCriteria": [
+            "How to create offline-aware repositories",
+            "How to add syncable entities",
+            "How to handle custom conflicts",
+            "Best practices and patterns",
+            "Common pitfalls to avoid"
+          ]
+        },
+        {
+          "id": "10.3",
+          "title": "Update User Documentation",
+          "description": "Update help docs with offline mode information",
+          "status": "pending",
+          "file": "docs/user_guide/offline_mode.md",
+          "acceptanceCriteria": [
+            "How offline mode works",
+            "What data is available offline",
+            "How sync works",
+            "Troubleshooting sync issues",
+            "FAQ section"
+          ]
+        },
+        {
+          "id": "10.4",
+          "title": "Create Migration Guide",
+          "description": "Document migrating existing users to offline-first",
+          "status": "pending",
+          "file": "docs/migration/offline_first_migration.md",
+          "acceptanceCriteria": [
+            "Database migration strategy",
+            "Initial sync for existing users",
+            "Handling stale data",
+            "Rollback plan",
+            "Testing checklist"
+          ]
+        },
+        {
+          "id": "10.5",
+          "title": "Prepare Deployment Checklist",
+          "description": "Create checklist for deploying offline-first architecture",
+          "status": "pending",
+          "file": "./.auto-claude/specs/001-offline-first-core-architecture/deployment_checklist.md",
+          "acceptanceCriteria": [
+            "Pre-deployment testing checklist",
+            "Feature flag configuration",
+            "Monitoring setup",
+            "Rollback plan",
+            "Post-deployment validation"
+          ]
+        }
+      ]
+    }
+  ],
+  "last_updated": "2026-01-04T18:33:34.064070+00:00"
+}
