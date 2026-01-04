@@ -2,7 +2,7 @@
 
 ### Current Status
 Phase: Phase 3 - Retry & Error Handling
-Last Updated: 2026-01-05 03:15
+Last Updated: 2026-01-05 04:00
 
 ### Completed Subtasks
 - 1.1 - Design sync state management architecture
@@ -13,9 +13,112 @@ Last Updated: 2026-01-05 03:15
 - 2.2 - Create conflict resolution strategies
 - 2.3 - Build conflict resolution UI components
 - 2.4 - Implement user decision handling
-- 3.1 - Implement exponential backoff retry mechanism ✨ NEW
+- 3.1 - Implement exponential backoff retry mechanism
+- 3.2 - Add error categorization and messaging ✨ NEW
 
 ### Current Work
+Completed error categorization and messaging implementation:
+
+**New Domain Model Created:**
+- lib/features/sync/domain/models/sync_error.dart (500+ lines)
+  - SyncErrorType enum: 10 error types (network, authentication, server, validation, conflict, timeout, notFound, rateLimited, quotaExceeded, unknown)
+  - SyncErrorSeverity enum: 3 severity levels (low, medium, high)
+  - SyncError class: Comprehensive error information model
+    - errorId: Unique identifier
+    - type: Error category
+    - severity: Error severity level
+    - code: Server error code
+    - technicalMessage: Technical error message
+    - userMessage: User-friendly message
+    - suggestion: Actionable suggestion
+    - statusCode: HTTP status code
+    - entityType, entityId, operationType: Context information
+    - retryCount: Number of retry attempts
+    - isRetryable: Whether error is retryable
+    - occurredAt: Timestamp
+    - details: Additional error details
+  - SyncErrorResult class: Result of sync operations
+    - isSuccess, error, successCount, failureCount, totalCount
+    - Factory constructors: success(), failure(), partial()
+    - successRate: Percentage calculation
+    - isPartial: Check for partial failures
+  - Factory method: SyncError.fromException() - Auto-categorizes exceptions
+    - Parses exception messages to determine error type
+    - Maps HTTP status codes to error categories
+    - Sets appropriate severity and retryability
+    - Provides user-friendly messages and suggestions
+  - JSON serialization support (toJson/fromJson)
+  - Equatable implementation for value equality
+  - Computed properties: age, shouldNotify
+
+**New Domain Service Created:**
+- lib/features/sync/domain/services/sync_error_categorizer.dart (250+ lines)
+  - SyncErrorCategorizer abstract interface with categorization methods
+  - SyncErrorCategorizerImpl implementation with:
+    - User-friendly messages for all error types
+    - Actionable suggestions for each error type
+    - Retryability rules per error type
+    - Severity levels per error type
+    - HTTP status code categorization (400-599)
+    - Convenience factory methods:
+      - createNetworkError()
+      - createAuthenticationError()
+      - createServerError()
+      - createValidationError()
+      - createConflictError()
+      - createTimeoutError()
+    - categorizeError(): Main categorization method
+    - getUserMessage(): Get user-friendly message
+    - getSuggestion(): Get actionable suggestion
+    - isRetryable(): Check if error is retryable
+    - getSeverity(): Get error severity
+    - categorizeStatusCode(): Categorize HTTP status codes
+
+**Test Files Created:**
+- test/features/sync/domain/models/sync_error_test.dart (450+ lines, 30+ test cases)
+  - Constructor and factory method tests
+  - Exception categorization tests (all error types)
+  - Computed property tests (age, shouldNotify)
+  - copyWith() method tests
+  - JSON serialization tests
+  - SyncErrorType enum tests
+  - SyncErrorSeverity enum tests
+  - SyncErrorResult tests (success, failure, partial)
+  - Success rate calculation tests
+
+- test/features/sync/domain/services/sync_error_categorizer_test.dart (380+ lines, 35+ test cases)
+  - getUserMessage() tests for all error types
+  - getSuggestion() tests for all error types
+  - isRetryable() tests for all error types
+  - getSeverity() tests for all error types
+  - categorizeStatusCode() tests (400-599 and unknown codes)
+  - createError() tests (full and minimal fields)
+  - Convenience factory method tests (6 methods)
+  - categorizeError() integration tests
+
+**Key Features:**
+✓ 10 error types categorized (network, auth, server, validation, conflict, timeout, notFound, rateLimited, quotaExceeded, unknown)
+✓ User-friendly messages for each error type
+✓ Actionable suggestions for each error type
+✓ Severity levels (low, medium, high) based on impact
+✓ Retryability flags (auth/validation/conflict errors not retryable)
+✓ Automatic exception categorization from exception messages
+✓ HTTP status code mapping (400-599)
+✓ JSON serialization for persistence
+✓ Comprehensive test coverage (65+ test cases)
+✓ Integration with existing error handling patterns
+
+All acceptance criteria for subtask 3.2 met:
+✓ Error types defined (10 error types in SyncErrorType enum)
+✓ User-friendly error messages for each type (userMessage field)
+✓ Actionable suggestions included (suggestion field)
+
+**Total Implementation:** 1,580+ lines of code
+- SyncError model: 500 lines
+- SyncErrorCategorizer service: 250 lines
+- Tests: 830 lines (450 + 380)
+
+### Previous Work (Subtask 3.1)
 Completed exponential backoff retry mechanism implementation:
 
 **New Domain Service Created:**
