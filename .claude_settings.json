@@ -1,0 +1,34 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/**)",
+      "Glob(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/**)",
+      "Grep(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/.auto-claude/specs/006-performance-optimization-for-large-trips/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/.auto-claude/specs/006-performance-optimization-for-large-trips/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/006-performance-optimization-for-large-trips/.auto-claude/specs/006-performance-optimization-for-large-trips/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

@@ -102,3 +102,4 @@ library;
 
 export 'test_data_generator.dart';
 export 'photo_data_generator.dart';
+export 'performance_reporter.dart';
