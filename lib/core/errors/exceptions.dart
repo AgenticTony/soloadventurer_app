@@ -202,3 +202,12 @@ class GeocodingException extends AppException {
     String? code,
   }) : super(code: code ?? 'geocoding_error');
 }
+
+/// Exception thrown when EXIF data extraction fails
+class ExifException extends AppException {
+  /// Creates a new [ExifException] with the given [message] and optional [code]
+  const ExifException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'exif_error');
+}

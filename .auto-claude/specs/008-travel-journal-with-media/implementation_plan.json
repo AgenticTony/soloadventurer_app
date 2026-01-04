@@ -193,18 +193,27 @@
           "subtask_id": "4.2",
           "title": "Create location picker component",
           "description": "Allow users to manually select or edit location for entries",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/LocationPicker.tsx"
+            "lib/utils/geocoding_service.dart",
+            "lib/utils/geocoding_service_example.dart",
+            "lib/features/journal/presentation/widgets/location_picker_widget.dart",
+            "lib/features/journal/presentation/widgets/location_picker_widget_example.dart",
+            "lib/features/journal/presentation/widgets/README_LOCATION_PICKER.md",
+            "lib/core/errors/exceptions.dart"
           ]
         },
         {
           "subtask_id": "4.3",
           "title": "Extract EXIF data from photos",
           "description": "Pull location and date metadata from uploaded photos",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/utils/exifUtils.ts"
+            "lib/utils/exif_utils.dart",
+            "lib/utils/exif_utils_example.dart",
+            "lib/utils/README_EXIF_UTILS.md",
+            "lib/core/errors/exceptions.dart",
+            "pubspec.yaml"
           ]
         },
         {
