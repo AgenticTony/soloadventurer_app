@@ -1,12 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
 import '../../domain/entities/profile.dart';
 import '../../domain/entities/profile_state.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../data/repositories/profile_repository_impl.dart';
-import '../../data/datasources/profile_remote_data_source.dart';
-import '../../data/datasources/profile_local_data_source.dart';
 import '../../../../core/network/network_providers.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../offline/domain/services/connectivity_service.dart';
+import '../../../offline/domain/services/sync_queue_service.dart';
+import '../../../offline/infrastructure/database/dao/user_dao.dart';
 import '../state/profile_state.dart';
 import '../../domain/usecases/get_current_profile_use_case.dart';
 import '../../domain/usecases/update_profile_use_case.dart';
@@ -16,28 +18,18 @@ import '../../domain/usecases/create_profile_use_case.dart';
 import '../notifiers/profile_notifier.dart';
 import '../state/profile_navigation_state.dart';
 
-// Data Sources
-final profileRemoteDataSourceProvider =
-    Provider.autoDispose<ProfileRemoteDataSource>((ref) {
-  return ProfileRemoteDataSourceImpl(dio: ref.read(dioProvider));
-});
-
-final profileLocalDataSourceProvider =
-    Provider.autoDispose<ProfileLocalDataSource>((ref) {
-  final storage = ref.read(secureStorageProvider);
-  final prefs = ref.read(sharedPreferencesProvider);
-  return ProfileLocalDataSourceImpl(
-    storage: storage,
-    sharedPreferences: prefs,
-  );
-});
-
 /// Repository provider
+///
+/// Uses GetIt service locator to inject offline-aware dependencies
 final profileRepositoryProvider =
     Provider.autoDispose<ProfileRepository>((ref) {
+  final getIt = GetIt.instance;
+
   return ProfileRepositoryImpl(
-    remoteDataSource: ref.read(profileRemoteDataSourceProvider),
-    localDataSource: ref.read(profileLocalDataSourceProvider),
+    userDao: getIt<UserDao>(),
+    apiService: getIt<DioApiService>(),
+    connectivityService: getIt<ConnectivityService>(),
+    syncQueueService: getIt<SyncQueueService>(),
   );
 });
 
@@ -97,9 +89,16 @@ class ProfileDomainNotifier extends StateNotifier<ProfileDomainState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.updateProfile(profile);
+      final result = await _repository.updateProfile(profile);
       if (!mounted) return;
-      state = state.copyWith(profile: profile, isLoading: false);
+
+      // Use the result data (either from immediate execution or queued operation)
+      final updatedProfile = result.data;
+      state = state.copyWith(
+        profile: updatedProfile,
+        isLoading: false,
+        // You could track sync status here if needed
+      );
     } catch (e) {
       if (!mounted) return;
       state = state.copyWith(error: e.toString(), isLoading: false);
@@ -121,7 +120,7 @@ class ProfileDomainNotifier extends StateNotifier<ProfileDomainState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.deleteProfile(state.profile?.id ?? '');
+      await _repository.deleteProfile(state.profile?.userId ?? '');
       if (!mounted) return;
       state = const ProfileDomainState();
     } catch (e) {

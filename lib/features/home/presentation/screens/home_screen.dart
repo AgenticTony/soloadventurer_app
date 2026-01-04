@@ -4,6 +4,10 @@ import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dar
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
+import 'package:soloadventurer/features/offline/presentation/widgets/connectivity_indicator.dart';
+import 'package:soloadventurer/features/offline/presentation/widgets/sync_status_banner.dart';
+import 'package:soloadventurer/features/offline/presentation/widgets/offline_banner.dart';
+import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -20,6 +24,14 @@ class HomeScreen extends ConsumerWidget {
         title: const Text('SoloAdventurer'),
         actions: [
           const QueueStatusIndicator(),
+          const ConnectivityIndicator(),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.pushNamed(context, OfflineRoutes.syncSettings);
+            },
+            tooltip: 'Settings',
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () =>
@@ -43,24 +55,37 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Welcome to SoloAdventurer!',
-              key: Key('home_screen_title'),
-              style: TextStyle(fontSize: 24),
+      body: Column(
+        children: [
+          // Offline mode banner (shows when offline)
+          const OfflineBanner(),
+
+          // Sync status banner (shows during sync, errors, or pending operations)
+          const SyncStatusBanner(),
+
+          // Main content
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Welcome to SoloAdventurer!',
+                    key: Key('home_screen_title'),
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AuthRoutes.cloudWatchTest);
+                    },
+                    child: const Text('Test CloudWatch Logging'),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, AuthRoutes.cloudWatchTest);
-              },
-              child: const Text('Test CloudWatch Logging'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

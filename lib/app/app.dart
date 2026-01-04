@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/app/router/app_router.dart';
 import 'package:soloadventurer/app/theme/app_theme.dart';
+import 'package:soloadventurer/app/app_lifecycle_sync_manager.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_route_guard.dart';
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
@@ -88,24 +89,26 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final navigatorKey = ref.watch(navigatorKeyProvider);
 
-    return TokenRefreshOverlay(
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        title: 'SoloAdventurer',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        debugShowCheckedModeBanner: false,
-        onGenerateRoute: AppRouter.onGenerateRoute,
-        initialRoute: '/',
-        navigatorObservers: [
-          NavigatorObserver(),
-          ref.watch(profileRouteObserverProvider),
-        ],
-        builder: (context, child) {
-          if (child == null) return const SizedBox();
-          return NavigationHandler(child: child);
-        },
+    return AppLifecycleSyncManager(
+      child: TokenRefreshOverlay(
+        child: MaterialApp(
+          navigatorKey: navigatorKey,
+          title: 'SoloAdventurer',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
+          debugShowCheckedModeBanner: false,
+          onGenerateRoute: AppRouter.onGenerateRoute,
+          initialRoute: '/',
+          navigatorObservers: [
+            NavigatorObserver(),
+            ref.watch(profileRouteObserverProvider),
+          ],
+          builder: (context, child) {
+            if (child == null) return const SizedBox();
+            return NavigationHandler(child: child);
+          },
+        ),
       ),
     );
   }

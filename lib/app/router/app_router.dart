@@ -5,6 +5,7 @@ import 'package:soloadventurer/features/auth/presentation/screens/signup_screen.
 import 'package:soloadventurer/features/auth/presentation/screens/verify_email_screen.dart';
 import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
+import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/confirm_password_reset_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/screens/profile_screen.dart';
@@ -21,6 +22,14 @@ class AppRouter {
     // First check if it's a profile route
     if (settings.name?.startsWith('/profile') == true) {
       final route = ProfileRoutes.onGenerateRoute(settings);
+      if (route != null) {
+        return route;
+      }
+    }
+
+    // Check if it's an offline route
+    if (settings.name?.startsWith('/settings/sync') == true) {
+      final route = OfflineRoutes.onGenerateRoute(settings);
       if (route != null) {
         return route;
       }
