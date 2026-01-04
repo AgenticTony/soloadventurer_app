@@ -206,6 +206,43 @@ When adding new widgets to this directory:
 4. Export the widget from `widgets.dart`
 5. Add usage examples to this README
 
+## Performance Tracking
+
+The `VirtualListPerformanceTracker` widget can be used to monitor render times, memory usage, and frame rates for virtual lists.
+
+### Basic Usage
+
+```dart
+VirtualListPerformanceTracker(
+  itemName: 'Trip Items List',
+  showOverlay: true, // Show performance overlay in debug mode
+  onMetricsUpdated: (metrics) {
+    if (kDebugMode) {
+      debugPrint('FPS: ${metrics.averageFPS.toStringAsFixed(1)}');
+      debugPrint('Memory: ${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(1)} MB');
+    }
+  },
+  child: VirtualListView<Trip>(
+    itemCount: trips.length,
+    itemBuilder: (context, index) => TripCard(trip: trips[index]),
+  ),
+)
+```
+
+### Features
+
+- **Real-time Metrics**: Tracks render time, memory usage, FPS, and janky frames
+- **Visual Overlay**: Optional overlay showing performance metrics in debug mode
+- **Custom Callbacks**: Receive metrics via callbacks for logging or analytics
+- **Performance Targets**: Validates against performance targets (render < 1000ms, memory < 150MB, FPS ≥ 55, janky < 10%)
+- **Production Safe**: Automatically disabled in release builds
+
+### Complete Documentation
+
+For detailed documentation on performance tracking, see:
+- [Performance Tracking Guide](./PERFORMANCE_TRACKING_GUIDE.md)
+- [Example Implementations](./example_performance_tracking.dart)
+
 ## Future Enhancements
 
 Potential improvements for VirtualListView:
@@ -213,4 +250,3 @@ Potential improvements for VirtualListView:
 - Add infinite scroll pagination support
 - Add animated list transitions
 - Add group headers with sticky positioning (using flutter_sticky_headers)
-- Add grid layout support (VirtualGridView)

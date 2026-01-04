@@ -10,6 +10,8 @@
 ///   rendering of large datasets (500+ items)
 /// - [VirtualGridView]: A generic virtual scrolling grid for efficient
 ///   rendering of large photo galleries (500+ items)
+/// - [VirtualListPerformanceTracker]: A performance tracking wrapper that
+///   monitors render times, memory usage, and frame rates for virtual lists
 ///
 /// ## Usage
 ///
@@ -28,7 +30,23 @@
 ///   crossAxisCount: 3,
 ///   itemBuilder: (context, index) => ImageCard(photo: photos[index]),
 /// )
+///
+/// // With performance tracking
+/// VirtualListPerformanceTracker(
+///   itemName: 'Trip Items',
+///   showOverlay: true,
+///   onMetricsUpdated: (metrics) {
+///     if (kDebugMode) {
+///       debugPrint(metrics.toString());
+///     }
+///   },
+///   child: VirtualListView<Trip>(
+///     itemCount: trips.length,
+///     itemBuilder: (context, index) => TripCard(trip: trips[index]),
+///   ),
+/// )
 /// ```
 
 export 'virtual_list_view.dart';
 export 'virtual_grid_view.dart';
+export 'virtual_list_performance_tracker.dart';
