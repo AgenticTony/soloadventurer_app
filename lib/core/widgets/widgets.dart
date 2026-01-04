@@ -20,6 +20,10 @@
 ///   for image loading states (shimmer, skeleton, color, blurred)
 /// - [ImageErrorWidget]: Enhanced error widget with retry functionality,
 ///   offline detection, and error type classification
+/// - [MapMarkerWidget]: Customizable widget for displaying single map markers
+///   with type-based styling and tap handling
+/// - [MapClusterWidget]: Widget for displaying marker clusters with count
+///   and size-based color coding
 ///
 /// ## Usage
 ///
@@ -93,3 +97,4 @@ export 'virtual_list_performance_tracker.dart';
 export 'lazy_load_image.dart';
 export 'image_placeholder.dart';
 export 'image_error_widget.dart';
+export 'map_marker_widgets.dart';
