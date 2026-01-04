@@ -14,7 +14,12 @@
       "description": "Dependency injection uses get_it package with modular approach. Each feature has its own DI module (e.g., auth_module.dart, core_module.dart). Need to create offline_module.dart for offline/sync services.",
       "category": "di",
       "discovered_at": "2026-01-04T18:32:05.986589+00:00"
+    },
+    "lib/features/offline/presentation/widgets/offline_banner.dart": {
+      "description": "OfflineBanner widget implements prominent offline mode indicator with errorContainer styling (orange/amber), Watches connectivityProvider and syncStatusProvider, Uses WidgetsBindingObserver to reappear on app foreground, Shows pending operations badge conditionally, Different styling from sync_status_banner.dart (primaryContainer blue vs errorContainer orange/amber)",
+      "category": "UI Implementation",
+      "discovered_at": "2026-01-04T20:28:00.716965+00:00"
     }
   },
-  "last_updated": "2026-01-04T18:32:05.986597+00:00"
+  "last_updated": "2026-01-04T20:28:00.716974+00:00"
 }

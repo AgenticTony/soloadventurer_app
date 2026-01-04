@@ -1,6 +1,7 @@
 // Offline Infrastructure Sync
 // Export all sync-related infrastructure for offline functionality
 
+export 'background_sync_service.dart';
 export 'conflict_resolver_impl.dart';
 export 'download_sync.dart';
 export 'incremental_sync.dart';

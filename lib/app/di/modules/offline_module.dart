@@ -12,6 +12,7 @@ import '../../features/offline/domain/services/offline_services.dart';
 import '../../features/offline/domain/repositories/offline_repositories.dart';
 import '../../features/offline/data/repositories/offline_repositories.dart';
 import '../../features/offline/infrastructure/sync/offline_sync.dart';
+import '../../features/offline/infrastructure/sync/background_sync_service.dart';
 import '../../core/network/network_reachability.dart';
 import '../../features/core/infrastructure/api/dio_api_service.dart';
 
@@ -243,12 +244,18 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // PHASE 8: BACKGROUND SYNC & NOTIFICATIONS (To be implemented in Phase 8)
   // ==============================================================================
   //
-  // TODO: Register BackgroundSyncService
-  // getIt.registerLazySingleton<BackgroundSyncService>(
-  //   () => BackgroundSyncService(
-  //     syncManager: getIt<SyncManager>(),
-  //   ),
-  // );
+  // Register BackgroundSyncService for periodic background sync tasks
+  // This service configures Workmanager to run periodic sync tasks even when
+  // the app is not in the foreground. It respects battery optimization,
+  // network availability, and user preferences.
+  getIt.registerLazySingleton<BackgroundSyncService>(
+    () => BackgroundSyncService(
+      syncManager: getIt<SyncManager>(),
+      connectivityService: getIt<ConnectivityService>(),
+      periodicSyncInterval: const Duration(minutes: 15),
+      initialDelay: const Duration(minutes: 5),
+    ),
+  );
   //
   // TODO: Register SyncNotificationService
   // getIt.registerLazySingleton<SyncNotificationService>(
