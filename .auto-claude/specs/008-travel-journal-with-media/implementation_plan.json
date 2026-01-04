@@ -437,9 +437,15 @@
           "subtask_id": "8.2",
           "title": "Add social media sharing",
           "description": "Allow sharing individual entries or media to social platforms",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/utils/shareUtils.ts"
+            "lib/features/journal/domain/services/social_sharing_service.dart",
+            "lib/features/journal/data/services/social_sharing_service_impl.dart",
+            "lib/features/journal/presentation/providers/social_sharing_providers.dart",
+            "lib/features/journal/presentation/widgets/social_share_sheet.dart",
+            "lib/features/journal/data/services/README_SOCIAL_SHARING.md",
+            "lib/features/journal/data/services/social_sharing_service_example.dart",
+            "pubspec.yaml"
           ]
         },
         {
