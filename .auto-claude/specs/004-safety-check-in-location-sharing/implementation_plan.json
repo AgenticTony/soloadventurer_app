@@ -145,13 +145,18 @@
           "subtask_id": "2.5",
           "title": "Add GraphQL mutations and queries",
           "description": "Define GraphQL operations for safety features",
-          "status": "pending",
+          "status": "completed",
           "files": [
+            "lib/features/safety/data/graphql/README.md",
             "lib/features/safety/data/graphql/mutations/add_trusted_contact_mutation.graphql",
+            "lib/features/safety/data/graphql/mutations/complete_check_in.graphql",
             "lib/features/safety/data/graphql/mutations/create_check_in.graphql",
             "lib/features/safety/data/graphql/mutations/trigger_sos.graphql",
+            "lib/features/safety/data/graphql/mutations/update_safety_status.graphql",
+            "lib/features/safety/data/graphql/queries/get_check_ins.graphql",
+            "lib/features/safety/data/graphql/queries/get_trusted_contact.graphql",
             "lib/features/safety/data/graphql/queries/get_trusted_contacts.graphql",
-            "lib/features/safety/data/graphql/queries/get_check_ins.graphql"
+            "lib/features/safety/data/graphql/queries/get_upcoming_check_ins.graphql"
           ]
         }
       ]
