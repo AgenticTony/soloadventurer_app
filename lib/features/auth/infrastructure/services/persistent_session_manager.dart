@@ -22,6 +22,21 @@ enum SessionOperationStatus {
   failed,
 }
 
+/// Action to take based on session validation
+enum SessionValidationAction {
+  /// Session is valid and can be used immediately
+  valid,
+
+  /// Session is expired but can be refreshed (expired < 24 hours ago)
+  canRefresh,
+
+  /// Session is expired and requires re-authentication (expired > 24 hours ago)
+  reauthenticate,
+
+  /// Session data is missing or corrupted
+  invalid,
+}
+
 /// Result of a session operation
 class SessionOperationResult {
   /// The status of the operation
@@ -89,6 +104,77 @@ class SessionOperationResult {
   @override
   String toString() {
     return 'SessionOperationResult{status: $status, isValid: $isValid, hasSession: ${session != null}}';
+  }
+}
+
+/// Result of session validation for restoration
+///
+/// This class provides detailed information about the session state
+/// and what action should be taken to restore the user's session.
+class SessionValidationResult {
+  /// The action that should be taken based on validation
+  final SessionValidationAction action;
+
+  /// The session data (if available)
+  final AuthSession? session;
+
+  /// The error that caused validation to fail (if applicable)
+  final AuthException? error;
+
+  /// How long ago the token expired (null if not expired or no session)
+  final Duration? timeSinceExpiration;
+
+  const SessionValidationResult({
+    required this.action,
+    this.session,
+    this.error,
+    this.timeSinceExpiration,
+  });
+
+  /// Creates a result for a valid session
+  factory SessionValidationResult.valid(AuthSession session) {
+    return SessionValidationResult(
+      action: SessionValidationAction.valid,
+      session: session,
+    );
+  }
+
+  /// Creates a result for a session that can be refreshed
+  factory SessionValidationResult.canRefresh({
+    required AuthSession session,
+    required Duration timeSinceExpiration,
+  }) {
+    return SessionValidationResult(
+      action: SessionValidationAction.canRefresh,
+      session: session,
+      timeSinceExpiration: timeSinceExpiration,
+    );
+  }
+
+  /// Creates a result for a session that requires re-authentication
+  factory SessionValidationResult.reauthenticate({
+    required AuthSession session,
+    required Duration timeSinceExpiration,
+  }) {
+    return SessionValidationResult(
+      action: SessionValidationAction.reauthenticate,
+      session: session,
+      timeSinceExpiration: timeSinceExpiration,
+    );
+  }
+
+  /// Creates a result for invalid/missing session data
+  factory SessionValidationResult.invalid({AuthException? error}) {
+    return SessionValidationResult(
+      action: SessionValidationAction.invalid,
+      error: error,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'SessionValidationResult{action: $action, hasSession: ${session != null}, '
+        'timeSinceExpiration: $timeSinceExpiration}';
   }
 }
 
@@ -248,6 +334,84 @@ class PersistentSessionManager {
       debugPrint('PersistentSessionManager: Failed to validate session: $e');
       return SessionOperationResult.failure(
         AuthException(
+          'Failed to validate session: ${e.toString()}',
+          code: 'SESSION_VALIDATION_FAILED',
+        ),
+      );
+    }
+  }
+
+  /// Validates a session for restoration and determines the required action
+  ///
+  /// This method validates the stored session and determines what action
+  /// should be taken to restore the user's session:
+  ///
+  /// - **valid**: Session is not expired, can be used immediately
+  /// - **canRefresh**: Session expired less than 24 hours ago, can be refreshed
+  /// - **reauthenticate**: Session expired more than 24 hours ago, user must re-authenticate
+  /// - **invalid**: Session data is missing or corrupted
+  ///
+  /// Returns a [SessionValidationResult] with the action and session data.
+  Future<SessionValidationResult> validateSessionForRestoration() async {
+    try {
+      debugPrint('PersistentSessionManager: Validating session for restoration');
+
+      // Load the session
+      final session = await loadSession();
+
+      // Handle missing or corrupted session data
+      if (session == null) {
+        debugPrint('PersistentSessionManager: No session found or corrupted data');
+        return SessionValidationResult.invalid(
+          error: AuthException(
+            'No valid session found in storage',
+            code: 'NO_SESSION',
+          ),
+        );
+      }
+
+      // Check if token is expired
+      final now = DateTime.now();
+      final isExpired = now.isAfter(session.expiresAt);
+
+      if (!isExpired) {
+        // Session is valid
+        final timeUntilExpiration = session.expiresAt.difference(now);
+        debugPrint('PersistentSessionManager: Session is valid');
+        debugPrint('  - Expires in: ${timeUntilExpiration.inMinutes} minutes');
+        return SessionValidationResult.valid(session);
+      }
+
+      // Token is expired, calculate how long ago
+      final timeSinceExpiration = now.difference(session.expiresAt);
+      debugPrint('PersistentSessionManager: Session expired');
+      debugPrint('  - Expired at: ${session.expiresAt.toIso8601String()}');
+      debugPrint('  - Time since expiration: ${timeSinceExpiration.inHours} hours');
+
+      // Determine if we can refresh or need re-authentication
+      // AWS Cognito refresh tokens are typically valid for 30 days,
+      // but we use 24 hours as a safety threshold
+      const refreshThreshold = Duration(hours: 24);
+
+      if (timeSinceExpiration <= refreshThreshold) {
+        debugPrint('PersistentSessionManager: Session can be refreshed '
+            '(expired ${timeSinceExpiration.inHours}h ago, threshold is ${refreshThreshold.inHours}h)');
+        return SessionValidationResult.canRefresh(
+          session: session,
+          timeSinceExpiration: timeSinceExpiration,
+        );
+      } else {
+        debugPrint('PersistentSessionManager: Session requires re-authentication '
+            '(expired ${timeSinceExpiration.inHours}h ago, threshold is ${refreshThreshold.inHours}h)');
+        return SessionValidationResult.reauthenticate(
+          session: session,
+          timeSinceExpiration: timeSinceExpiration,
+        );
+      }
+    } catch (e) {
+      debugPrint('PersistentSessionManager: Failed to validate session for restoration: $e');
+      return SessionValidationResult.invalid(
+        error: AuthException(
           'Failed to validate session: ${e.toString()}',
           code: 'SESSION_VALIDATION_FAILED',
         ),

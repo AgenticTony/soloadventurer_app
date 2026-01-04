@@ -602,4 +602,201 @@ void main() {
       expect(masked, equals('****'));
     });
   });
+
+  group('PersistentSessionManager - validateSessionForRestoration', () {
+    final validSession = AuthSession(
+      accessToken: 'test_access_token',
+      idToken: 'test_id_token',
+      refreshToken: 'test_refresh_token',
+      expiresAt: DateTime.now().add(const Duration(hours: 1)),
+    );
+
+    final recentlyExpiredSession = AuthSession(
+      accessToken: 'test_access_token',
+      idToken: 'test_id_token',
+      refreshToken: 'test_refresh_token',
+      expiresAt: DateTime.now().subtract(const Duration(hours: 12)),
+    );
+
+    final longExpiredSession = AuthSession(
+      accessToken: 'test_access_token',
+      idToken: 'test_id_token',
+      refreshToken: 'test_refresh_token',
+      expiresAt: DateTime.now().subtract(const Duration(hours: 30)),
+    );
+
+    test('should return valid result for non-expired session', () async {
+      // Arrange
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => validSession.accessToken);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => validSession.idToken);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => validSession.refreshToken);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => validSession.expiresAt);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      expect(result.action, equals(SessionValidationAction.valid));
+      expect(result.session, isNotNull);
+      expect(result.session!.accessToken, equals(validSession.accessToken));
+      expect(result.timeSinceExpiration, isNull);
+    });
+
+    test('should return canRefresh for session expired less than 24 hours ago', () async {
+      // Arrange
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => recentlyExpiredSession.accessToken);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => recentlyExpiredSession.idToken);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => recentlyExpiredSession.refreshToken);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => recentlyExpiredSession.expiresAt);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      expect(result.action, equals(SessionValidationAction.canRefresh));
+      expect(result.session, isNotNull);
+      expect(result.timeSinceExpiration, isNotNull);
+      expect(result.timeSinceExpiration!.inHours, greaterThan(11));
+      expect(result.timeSinceExpiration!.inHours, lessThan(13));
+    });
+
+    test('should return reauthenticate for session expired more than 24 hours ago', () async {
+      // Arrange
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => longExpiredSession.accessToken);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => longExpiredSession.idToken);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => longExpiredSession.refreshToken);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => longExpiredSession.expiresAt);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      expect(result.action, equals(SessionValidationAction.reauthenticate));
+      expect(result.session, isNotNull);
+      expect(result.timeSinceExpiration, isNotNull);
+      expect(result.timeSinceExpiration!.inHours, greaterThan(29));
+    });
+
+    test('should return invalid for missing session', () async {
+      // Arrange
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => null);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => null);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => null);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => null);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      expect(result.action, equals(SessionValidationAction.invalid));
+      expect(result.session, isNull);
+      expect(result.error, isNotNull);
+      expect(result.error!.code, equals('NO_SESSION'));
+    });
+
+    test('should return invalid when session loading fails', () async {
+      // Arrange
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenThrow(Exception('Storage error'));
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      expect(result.action, equals(SessionValidationAction.invalid));
+      expect(result.session, isNull);
+      expect(result.error, isNotNull);
+      expect(result.error!.code, equals('SESSION_VALIDATION_FAILED'));
+    });
+
+    test('should handle exactly 24 hour expiration boundary', () async {
+      // Arrange - session expired exactly 24 hours ago
+      final boundarySession = AuthSession(
+        accessToken: 'test_access_token',
+        idToken: 'test_id_token',
+        refreshToken: 'test_refresh_token',
+        expiresAt: DateTime.now().subtract(const Duration(hours: 24)),
+      );
+
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => boundarySession.accessToken);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => boundarySession.idToken);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => boundarySession.refreshToken);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => boundarySession.expiresAt);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      // Exactly 24 hours should still be canRefresh (<= threshold)
+      expect(result.action, equals(SessionValidationAction.canRefresh));
+      expect(result.timeSinceExpiration, isNotNull);
+    });
+
+    test('should handle session expired just over 24 hours', () async {
+      // Arrange - session expired 24 hours and 1 second ago
+      final overBoundarySession = AuthSession(
+        accessToken: 'test_access_token',
+        idToken: 'test_id_token',
+        refreshToken: 'test_refresh_token',
+        expiresAt: DateTime.now().subtract(const Duration(hours: 24, seconds: 1)),
+      );
+
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => overBoundarySession.accessToken);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => overBoundarySession.idToken);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => overBoundarySession.refreshToken);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => overBoundarySession.expiresAt);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      // Just over 24 hours should be reauthenticate
+      expect(result.action, equals(SessionValidationAction.reauthenticate));
+      expect(result.timeSinceExpiration, isNotNull);
+    });
+
+    test('should handle corrupted session data (missing access token)', () async {
+      // Arrange
+      when(() => mockLocalDataSource.getAuthToken())
+          .thenAnswer((_) async => null);
+      when(() => mockLocalDataSource.getIdToken())
+          .thenAnswer((_) async => validSession.idToken);
+      when(() => mockLocalDataSource.getRefreshToken())
+          .thenAnswer((_) async => validSession.refreshToken);
+      when(() => mockLocalDataSource.getTokenExpiration())
+          .thenAnswer((_) async => validSession.expiresAt);
+
+      // Act
+      final result = await sessionManager.validateSessionForRestoration();
+
+      // Assert
+      expect(result.action, equals(SessionValidationAction.invalid));
+      expect(result.session, isNull);
+      expect(result.error, isNotNull);
+    });
+  });
 }
