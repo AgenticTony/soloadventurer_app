@@ -125,7 +125,7 @@
           "subtask_id": "2.3",
           "title": "Implement remote data source",
           "description": "Create SafetyRemoteDataSource for API communication",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/data/datasources/safety_remote_data_source.dart",
             "lib/features/safety/data/datasources/safety_remote_data_source_impl.dart",

@@ -97,8 +97,27 @@ Implementation of Phase 1 has begun.
 
 ## Next Steps
 
-1. **Phase 2**: Begin implementing the data layer
-2. Create safety-specific exceptions for error handling
+1. **Phase 2**: Continue implementing the data layer
+2. Implement local data source (SafetyLocalDataSource)
+
+### Phase 2: Data Layer Implementation
+
+✅ **Subtask 2.1: Create safety exceptions** (COMPLETED)
+- Created comprehensive safety-specific exceptions following project patterns
+- Base SafetyException class extending AppException from core errors
+- Trusted Contact exceptions (not found, already exists, limit exceeded, invalid info, no notification method)
+- Check-in exceptions (not found, already completed, overdue, invalid schedule, creation failed, cannot be canceled)
+- Location Sharing exceptions (service unavailable, permission denied, invalid data, not active, failed)
+- Emergency SOS exceptions (already active, trigger failed, no trusted contacts)
+- Safety Alert exceptions (not found, already acknowledged/resolved, creation failed)
+- Background & Notification exceptions (permission denied, scheduling failed, background task registration/initialization failed, missed check-in detection failed)
+- Battery & Power exceptions (critically low, monitoring unavailable)
+- Settings & Configuration exceptions (invalid settings, save/load failed)
+- Cache & Storage exceptions (cache errors, retrieval errors)
+- Network & Sync exceptions (sync failed, offline mode)
+- All exceptions follow established patterns with const constructors, unique error codes, and comprehensive documentation
+- File: lib/core/error/safety_exceptions.dart
+- Commit: 8d5d3a2
 
 ### Phases Overview
 
