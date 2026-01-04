@@ -139,3 +139,30 @@ class CacheException extends AppException {
     String? code,
   }) : super(code: code ?? 'cache_error');
 }
+
+/// Exception thrown when media compression fails
+class MediaCompressionException extends AppException {
+  /// Creates a new [MediaCompressionException] with the given [message] and optional [code]
+  const MediaCompressionException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'media_compression_error');
+}
+
+/// Exception thrown when image format is not supported
+class UnsupportedImageFormatException extends AppException {
+  /// Creates a new [UnsupportedImageFormatException] with the given [message] and optional [code]
+  const UnsupportedImageFormatException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'unsupported_image_format');
+}
+
+/// Exception thrown when image file is too large or corrupted
+class InvalidImageException extends AppException {
+  /// Creates a new [InvalidImageException] with the given [message] and optional [code]
+  const InvalidImageException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'invalid_image');
+}
