@@ -1,0 +1,482 @@
+{
+  "specId": "006-performance-optimization-for-large-trips",
+  "title": "Performance Optimization for Large Trips",
+  "description": "Optimize app performance for handling large, complex trips with hundreds of locations, activities, and photos. Implements lazy loading, data pagination, efficient rendering, virtual scrolling, and optimized data structures.",
+  "status": "pending",
+  "created_at": "2026-01-04T18:29:51.022Z",
+  "updated_at": "2026-01-04T19:31:00.000Z",
+  "phases": [
+    {
+      "id": "phase-1",
+      "title": "Phase 1: Setup & Infrastructure",
+      "description": "Set up performance monitoring infrastructure, benchmarking tools, and establish baseline metrics",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-1-subtask-1",
+          "title": "Create performance testing utilities",
+          "description": "Create utilities to generate test data with 500+ items for benchmarking",
+          "status": "completed",
+          "estimatedEffort": "2h",
+          "dependencies": [],
+          "completed_at": "2026-01-04T19:45:00.000Z",
+          "notes": "Created comprehensive performance test data generators including: PerformanceTestDataGenerator for trips, PhotoDataGenerator for images, example tests, and documentation"
+        },
+        {
+          "id": "phase-1-subtask-2",
+          "title": "Establish performance baseline",
+          "description": "Measure current app performance with large datasets (startup time, memory usage, render times)",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-1-subtask-1"]
+        },
+        {
+          "id": "phase-1-subtask-3",
+          "title": "Add performance monitoring dependencies",
+          "description": "Add Flutter packages for performance optimization and monitoring",
+          "status": "pending",
+          "estimatedEffort": "1h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-1-subtask-4",
+          "title": "Create performance benchmark dashboard",
+          "description": "Create a test screen to display performance metrics and benchmark results",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-1-subtask-1", "phase-1-subtask-2"]
+        }
+      ]
+    },
+    {
+      "id": "phase-2",
+      "title": "Phase 2: Virtual Scrolling Implementation",
+      "description": "Implement virtual scrolling for all large list views to handle 500+ items efficiently",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-2-subtask-1",
+          "title": "Add virtual scrolling dependencies",
+          "description": "Add virtual scrolling package to pubspec.yaml (e.g., flutter_sticky_headers, collection)",
+          "status": "pending",
+          "estimatedEffort": "0.5h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-2-subtask-2",
+          "title": "Create reusable virtual list widget",
+          "description": "Create a generic VirtualListView widget that wraps list rendering with virtual scrolling",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": ["phase-2-subtask-1"]
+        },
+        {
+          "id": "phase-2-subtask-3",
+          "title": "Implement virtualized trip items list",
+          "description": "Replace ListView.builder with virtual scrolling in trip items/activities screens",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-2-subtask-2"]
+        },
+        {
+          "id": "phase-2-subtask-4",
+          "title": "Implement virtualized photo gallery",
+          "description": "Create virtualized grid view for photo galleries to handle hundreds of photos",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": ["phase-2-subtask-2"]
+        },
+        {
+          "id": "phase-2-subtask-5",
+          "title": "Add performance metrics to virtual lists",
+          "description": "Track render times, memory usage, and frame rates for virtualized lists",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-2-subtask-3", "phase-2-subtask-4"]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "title": "Phase 3: Lazy Loading & Image Optimization",
+      "description": "Implement lazy loading for images and optimize image caching/compression",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-3-subtask-1",
+          "title": "Implement advanced image lazy loading",
+          "description": "Add visibility-based lazy loading for images using visibility_detector package",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-3-subtask-2",
+          "title": "Configure image caching strategy",
+          "description": "Optimize cached_network_image settings for memory efficiency and cache size limits",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-3-subtask-3",
+          "title": "Implement image thumbnail generation",
+          "description": "Generate and cache thumbnails for photos to reduce memory footprint",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": ["phase-3-subtask-2"]
+        },
+        {
+          "id": "phase-3-subtask-4",
+          "title": "Add image compression utilities",
+          "description": "Create utilities to compress images before upload/cache to reduce storage",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-3-subtask-5",
+          "title": "Implement placeholder & error handling",
+          "description": "Add optimized placeholders and error states for lazy-loaded images",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-3-subtask-1"]
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "title": "Phase 4: Data Pagination & Query Optimization",
+      "description": "Implement pagination for API calls and optimize data fetching strategies",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-4-subtask-1",
+          "title": "Design pagination data models",
+          "description": "Create PaginatedData and PageInfo models for handling paginated responses",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-4-subtask-2",
+          "title": "Implement pagination repository pattern",
+          "description": "Add pagination methods to trip/activity repositories with cursor-based pagination",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": ["phase-4-subtask-1"]
+        },
+        {
+          "id": "phase-4-subtask-3",
+          "title": "Create infinite scroll pagination widget",
+          "description": "Build reusable InfiniteScrollListView that loads more data on scroll",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": ["phase-4-subtask-2"]
+        },
+        {
+          "id": "phase-4-subtask-4",
+          "title": "Implement query batching and debouncing",
+          "description": "Batch multiple queries and implement debouncing for search/filter operations",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-4-subtask-2"]
+        },
+        {
+          "id": "phase-4-subtask-5",
+          "title": "Add preloading strategy",
+          "description": "Implement intelligent preloading of next page data before user reaches end",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-4-subtask-3"]
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "title": "Phase 5: Map Marker Clustering",
+      "description": "Implement intelligent clustering for map markers in high-density areas",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-5-subtask-1",
+          "title": "Add map clustering dependencies",
+          "description": "Add clustering package or custom implementation for map markers",
+          "status": "pending",
+          "estimatedEffort": "1h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-5-subtask-2",
+          "title": "Implement marker clustering algorithm",
+          "description": "Create clustering logic that groups nearby markers based on zoom level",
+          "status": "pending",
+          "estimatedEffort": "5h",
+          "dependencies": ["phase-5-subtask-1"]
+        },
+        {
+          "id": "phase-5-subtask-3",
+          "title": "Create clustered marker widget",
+          "description": "Design and implement custom marker widgets that show cluster count",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-5-subtask-2"]
+        },
+        {
+          "id": "phase-5-subtask-4",
+          "title": "Implement zoom-based cluster updates",
+          "description": "Dynamically update clusters based on map zoom level changes",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-5-subtask-2"]
+        },
+        {
+          "id": "phase-5-subtask-5",
+          "title": "Add cluster tap handling",
+          "description": "Implement tap-to-expand functionality for clustered markers",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-5-subtask-3"]
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "title": "Phase 6: Memory Optimization",
+      "description": "Optimize memory usage to ensure app stays within mobile device limits",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-6-subtask-1",
+          "title": "Implement memory monitoring",
+          "description": "Add real-time memory usage tracking and alerting",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-6-subtask-2",
+          "title": "Add image cache size limits",
+          "description": "Configure maximum cache sizes for images and implement LRU eviction",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-6-subtask-3",
+          "title": "Implement data unload strategy",
+          "description": "Unload off-screen data and images when memory pressure is high",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-6-subtask-1"]
+        },
+        {
+          "id": "phase-6-subtask-4",
+          "title": "Optimize state management",
+          "description": "Review and optimize Riverpod providers to prevent unnecessary rebuilds and memory leaks",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-6-subtask-5",
+          "title": "Add memory leak detection",
+          "description": "Implement dev-mode memory leak detection tools and logging",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-6-subtask-1"]
+        }
+      ]
+    },
+    {
+      "id": "phase-7",
+      "title": "Phase 7: App Startup Optimization",
+      "description": "Optimize app startup time to remain under 2 seconds even with large datasets",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-7-subtask-1",
+          "title": "Profile app startup performance",
+          "description": "Identify bottlenecks in app initialization using Flutter DevTools",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-7-subtask-2",
+          "title": "Implement deferred loading",
+          "description": "Defer loading of non-critical data until after initial render",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-7-subtask-1"]
+        },
+        {
+          "id": "phase-7-subtask-3",
+          "title": "Optimize dependency injection",
+          "description": "Lazy-initialize services and providers that aren't needed immediately",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-7-subtask-1"]
+        },
+        {
+          "id": "phase-7-subtask-4",
+          "title": "Implement local data caching",
+          "description": "Cache essential data locally for faster startup and reduce API calls",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-7-subtask-5",
+          "title": "Add skeleton loading screens",
+          "description": "Implement skeleton screens to improve perceived performance during data load",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-7-subtask-2"]
+        }
+      ]
+    },
+    {
+      "id": "phase-8",
+      "title": "Phase 8: Testing & Validation",
+      "description": "Test performance optimizations with 500+ items and validate acceptance criteria",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-8-subtask-1",
+          "title": "Create performance integration tests",
+          "description": "Write tests to validate performance with 500+ trip items/locations",
+          "status": "pending",
+          "estimatedEffort": "4h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-8-subtask-2",
+          "title": "Test memory limits",
+          "description": "Validate app stays within memory limits on low-end devices",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-8-subtask-1"]
+        },
+        {
+          "id": "phase-8-subtask-3",
+          "title": "Measure app startup time",
+          "description": "Verify app startup remains under 2 seconds with large datasets",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-8-subtask-1"]
+        },
+        {
+          "id": "phase-8-subtask-4",
+          "title": "Validate map performance",
+          "description": "Test map marker clustering with hundreds of locations",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": ["phase-8-subtask-1"]
+        },
+        {
+          "id": "phase-8-subtask-5",
+          "title": "Performance regression tests",
+          "description": "Add automated performance regression tests to CI/CD pipeline",
+          "status": "pending",
+          "estimatedEffort": "3h",
+          "dependencies": ["phase-8-subtask-1", "phase-8-subtask-2", "phase-8-subtask-3", "phase-8-subtask-4"]
+        }
+      ]
+    },
+    {
+      "id": "phase-9",
+      "title": "Phase 9: Documentation & Cleanup",
+      "description": "Document performance optimizations and clean up code",
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": "phase-9-subtask-1",
+          "title": "Document performance patterns",
+          "description": "Create documentation for performance optimization patterns used",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-9-subtask-2",
+          "title": "Add code comments",
+          "description": "Add comments explaining complex performance optimizations",
+          "status": "pending",
+          "estimatedEffort": "2h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-9-subtask-3",
+          "title": "Remove debug code",
+          "description": "Clean up temporary debugging and benchmarking code",
+          "status": "pending",
+          "estimatedEffort": "1h",
+          "dependencies": []
+        },
+        {
+          "id": "phase-9-subtask-4",
+          "title": "Create performance checklist",
+          "description": "Document checklist for developers to maintain performance standards",
+          "status": "pending",
+          "estimatedEffort": "1h",
+          "dependencies": ["phase-9-subtask-1"]
+        }
+      ]
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "ac-1",
+      "title": "App loads and renders smoothly with trips containing 500+ items",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-8"
+    },
+    {
+      "id": "ac-2",
+      "title": "List views use virtual scrolling for memory efficiency",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-2"
+    },
+    {
+      "id": "ac-3",
+      "title": "Images are lazy-loaded and compressed for optimal performance",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-3"
+    },
+    {
+      "id": "ac-4",
+      "title": "Database queries are optimized with proper indexing",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-4"
+    },
+    {
+      "id": "ac-5",
+      "title": "Map markers cluster intelligently for high-density areas",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-5"
+    },
+    {
+      "id": "ac-6",
+      "title": "App startup time remains under 2 seconds even with large datasets",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-7"
+    },
+    {
+      "id": "ac-7",
+      "title": "Memory usage stays within reasonable limits for mobile devices",
+      "status": "pending",
+      "verified": false,
+      "phaseId": "phase-6"
+    }
+  ],
+  "estimatedTotalEffort": "102h",
+  "planStatus": "ready",
+  "notes": "This is a comprehensive performance optimization initiative that addresses critical competitor pain points. Phases can be worked in parallel where dependencies allow, but Phases 1-2 and Phase 8 should be prioritized to establish baselines and validate improvements."
+}
