@@ -646,9 +646,10 @@
         },
         {
           "id": "8.2",
+          "completed_at": "2026-01-05T00:00:00.000Z",
           "title": "Create Sync Notification Service",
           "description": "Implement local notifications for sync events",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/offline/infrastructure/sync/sync_notification_service.dart",
             "android/app/src/main/AndroidManifest.xml",
@@ -666,14 +667,16 @@
           "id": "8.3",
           "title": "Add Sync on App Foreground",
           "description": "Trigger sync when app returns to foreground",
-          "status": "pending",
+          "status": "completed",
           "file": "lib/app/bootstrap.dart",
           "acceptanceCriteria": [
             "App lifecycle listener for foreground event",
             "Debounce to avoid excessive syncs",
             "Only sync if enough time has passed",
             "Respect user preferences"
-          ]
+          ],
+          "notes": "Successfully implemented AppLifecycleSyncManager widget with comprehensive foreground sync functionality:\n\n1. Created AppLifecycleSyncManager (lib/app/app_lifecycle_sync_manager.dart):\n   - Uses WidgetsBindingObserver to monitor app lifecycle state changes\n   - Triggers sync on AppLifecycleState.resumed (app returns to foreground)\n   - Implements 30-second minimum debounce interval between syncs\n   - Comprehensive validation before triggering sync:\n     * Checks sync enabled preference\n     * Verifies network connectivity\n     * Honors WiFi-only mode setting\n     * Prevents duplicate syncs if already syncing\n   - Detailed debug logging for troubleshooting\n\n2. Integrated into app.dart:\n   - Wrapped TokenRefreshOverlay with AppLifecycleSyncManager\n   - Ensures lifecycle monitoring starts at app initialization\n\nAll acceptance criteria met:\n- \u2705 App lifecycle listener for foreground event\n- \u2705 Debounce to avoid excessive syncs (30-second min interval)\n- \u2705 Only sync if enough time has passed (timeSinceLastSync check)\n- \u2705 Respect user preferences (syncEnabled, syncOnlyOnWifi)\n\nImplementation follows existing patterns:\n- Similar structure to NavigationHandler widget\n- Uses Riverpod providers for state management\n- Proper disposal of lifecycle observer\n- Uses debugPrint for logging (matching existing patterns)",
+          "updated_at": "2026-01-04T20:44:52.257387+00:00"
         }
       ]
     },
@@ -854,5 +857,5 @@
       ]
     }
   ],
-  "last_updated": "2026-01-04T20:37:14.122468+00:00"
+  "last_updated": "2026-01-04T20:44:52.257397+00:00"
 }
