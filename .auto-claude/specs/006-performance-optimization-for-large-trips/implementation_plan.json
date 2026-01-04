@@ -340,9 +340,11 @@
           "id": "phase-6-subtask-2",
           "title": "Add image cache size limits",
           "description": "Configure maximum cache sizes for images and implement LRU eviction",
-          "status": "pending",
+          "status": "completed",
           "estimatedEffort": "2h",
-          "dependencies": []
+          "dependencies": [],
+          "completed_at": "2026-01-05T01:55:00.000Z",
+          "notes": "Implemented proper cache limit configuration on Flutter's image cache with automatic LRU eviction.\n\n**Fixed Issue:** Cache limits were defined but not actually applied to Flutter's image cache.\n\n**Implementation:**\n- Modified _configureCacheSettings() to properly set:\n  - imageCache.maximumSize = maxMemoryCacheImages (200 default)\n  - imageCache.maximumSizeBytes = maxMemoryCacheBytes (150 MB default)\n- Added 3 new utility methods:\n  - isCacheConfigured() - Verify cache limits are properly set\n  - getCurrentMaximumSize() - Get current maximum image count\n  - getCurrentMaximumSizeBytes() - Get current maximum memory size\n\n**How LRU Eviction Works:**\nFlutter's image cache tracks last access time for each image. When either limit is exceeded (image count OR memory bytes), it sorts images by last access time (oldest first) and removes images until both limits are satisfied.\n\n**Performance Benefits:**\n- Memory bounded: Never exceeds configured limit\n- Automatic management: LRU eviction happens automatically\n- Smooth scrolling: Recently viewed photos stay cached\n- Predictable behavior: Memory usage stays within device limits\n\n**Testing:**\n- Added 6 new test cases verifying cache limit configuration\n- Tests check both maximumSize and maximumSizeBytes are properly set\n- Tests verify isCacheConfigured() works correctly\n\n**Documentation:**\n- Created CACHE_LIMITS_README.md (500+ lines) with comprehensive guide\n- Explains LRU eviction algorithm, dual-limit checking, and access pattern tracking\n- Includes troubleshooting guide and best practices\n- Updated IMAGE_CACHE_CONFIG_README.md with new information\n\n**Integration Points:**\n- MemoryMonitor (phase-6-subtask-1): Automatic cache clearing on alerts\n- LazyLoadImage (phase-3-subtask-1): Uses configured cache limits\n- ThumbnailService (phase-3-subtask-3): Thumbnails cached with same limits"
         },
         {
           "id": "phase-6-subtask-3",
