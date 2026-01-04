@@ -10,3 +10,7 @@ export 'sync_error_card.dart';
 export 'sync_error_dialog.dart';
 export 'sync_error_list_view.dart';
 export 'sync_error_toast.dart';
+
+// Manual Sync UI Widgets
+export 'manual_sync_button.dart';
+export 'sync_pull_to_refresh.dart';
