@@ -17,6 +17,8 @@ import 'package:soloadventurer/features/core/domain/services/logging_service.dar
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// Provider for the auth repository
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -46,6 +48,12 @@ final authLocalDataSourceProvider =
   throw UnimplementedError('authLocalDataSourceProvider must be overridden');
 });
 
+/// Provider for the persistent session manager
+final persistentSessionManagerProvider =
+    Provider<PersistentSessionManager>((ref) {
+  throw UnimplementedError('persistentSessionManagerProvider must be overridden');
+});
+
 /// Auth notifier that manages the authentication state
 class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final GetCurrentUser _getCurrentUser;
@@ -60,6 +68,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final LoggingService _logger;
   final TokenRefreshScheduler _refreshScheduler;
   final AuthLocalDataSource _localDataSource;
+  final PersistentSessionManager _sessionManager;
+  final AuthRepository _authRepository;
 
   /// Creates a new [AuthNotifier]
   AuthNotifier({
@@ -75,6 +85,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     required LoggingService logger,
     required TokenRefreshScheduler refreshScheduler,
     required AuthLocalDataSource localDataSource,
+    required PersistentSessionManager sessionManager,
+    required AuthRepository authRepository,
   })  : _getCurrentUser = getCurrentUser,
         _isSignedIn = isSignedIn,
         _login = login,
@@ -87,6 +99,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         _logger = logger,
         _refreshScheduler = refreshScheduler,
         _localDataSource = localDataSource,
+        _sessionManager = sessionManager,
+        _authRepository = authRepository,
         super(const AsyncValue.data(AuthState.initial()));
 
   /// Initialize the auth state
@@ -94,16 +108,64 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     state = const AsyncValue.loading();
 
     final newState = await AsyncValue.guard(() async {
-      final isAuthenticated = await _isSignedIn();
-      if (isAuthenticated) {
-        final user = await _getCurrentUser();
-        if (user != null) {
-          // Start the refresh scheduler with the current session
-          await _startRefreshScheduler();
-          return AuthState.authenticated(user);
-        }
+      debugPrint('AuthNotifier: Starting session restoration');
+
+      // Validate the stored session and determine the required action
+      final validationResult = await _sessionManager.validateSessionForRestoration();
+
+      switch (validationResult.action) {
+        case SessionValidationAction.valid:
+          // Session is valid, restore it
+          debugPrint('AuthNotifier: Session is valid, restoring user session');
+          final user = await _getCurrentUser();
+          if (user != null) {
+            // Start the refresh scheduler with the current session
+            if (validationResult.session != null) {
+              _refreshScheduler.start(validationResult.session!);
+            }
+            return AuthState.authenticated(user);
+          }
+          return const AuthState.initial();
+
+        case SessionValidationAction.canRefresh:
+          // Session is expired but can be refreshed (expired < 24 hours ago)
+          debugPrint('AuthNotifier: Session expired but can be refreshed, '
+              'expired ${validationResult.timeSinceExpiration?.inHours ?? 0}h ago');
+          try {
+            // Attempt to refresh the tokens
+            final newSession = await _authRepository.refreshToken();
+
+            // Save the refreshed session
+            await _sessionManager.saveSession(newSession);
+
+            // Get the current user
+            final user = await _getCurrentUser();
+            if (user != null) {
+              // Start the refresh scheduler with the new session
+              _refreshScheduler.start(newSession);
+              debugPrint('AuthNotifier: Session refreshed successfully');
+              return AuthState.authenticated(user);
+            }
+            return const AuthState.initial();
+          } catch (e) {
+            debugPrint('AuthNotifier: Failed to refresh session: $e');
+            // Refresh failed, user needs to re-authenticate
+            return const AuthState.initial();
+          }
+
+        case SessionValidationAction.reauthenticate:
+          // Session is expired and requires re-authentication (expired > 24 hours ago)
+          debugPrint('AuthNotifier: Session requires re-authentication, '
+              'expired ${validationResult.timeSinceExpiration?.inHours ?? 0}h ago');
+          // Clear the invalid session
+          await _sessionManager.clearSession();
+          return const AuthState.initial();
+
+        case SessionValidationAction.invalid:
+          // Session data is missing or corrupted
+          debugPrint('AuthNotifier: Session is invalid or missing');
+          return const AuthState.initial();
       }
-      return const AuthState.initial();
     });
 
     state = newState;
@@ -149,8 +211,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
     try {
       final user = await _login(LoginParams(email: email, password: password));
-      // Start the refresh scheduler after successful login
-      await _startRefreshScheduler();
+
+      // Get the current session and save it
+      final session = await _authRepository.getSession();
+      if (session != null) {
+        await _sessionManager.saveSession(session);
+        // Start the refresh scheduler after successful login
+        _refreshScheduler.start(session);
+      }
+
       state = AsyncValue.data(AuthState.authenticated(user));
     } catch (e, stack) {
       state = AsyncValue.error(e.toString(), stack);
@@ -175,8 +244,13 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       if (needsVerification) {
         state = AsyncValue.data(AuthState.unverified(user: user));
       } else {
-        // Start the refresh scheduler after successful registration (if logged in)
-        await _startRefreshScheduler();
+        // Get the current session and save it (if logged in)
+        final session = await _authRepository.getSession();
+        if (session != null) {
+          await _sessionManager.saveSession(session);
+          // Start the refresh scheduler after successful registration
+          _refreshScheduler.start(session);
+        }
         state = AsyncValue.data(AuthState.authenticated(user));
       }
     } catch (e, stack) {
@@ -191,6 +265,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     try {
       // Stop the refresh scheduler before signing out
       _stopRefreshScheduler();
+
+      // Clear the persistent session
+      await _sessionManager.clearSession();
+
       await _signOut();
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {

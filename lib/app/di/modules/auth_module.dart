@@ -22,6 +22,7 @@ import 'package:soloadventurer/features/auth/infrastructure/services/token_expir
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/refresh_queue_manager.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
 
 /// Register all auth feature dependencies
 void registerAuthModule(GetIt getIt, {bool isTest = false}) {
@@ -76,6 +77,12 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
   getIt.registerLazySingleton<TokenRefreshScheduler>(
     () => TokenRefreshScheduler(
       expirationTracker: getIt<TokenExpirationTracker>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<PersistentSessionManager>(
+    () => PersistentSessionManager(
+      localDataSource: getIt<AuthLocalDataSource>(),
     ),
   );
 

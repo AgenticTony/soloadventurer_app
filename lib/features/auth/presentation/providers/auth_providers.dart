@@ -17,6 +17,7 @@ import 'package:soloadventurer/features/auth/infrastructure/services/token_refre
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
 
 /// Provider for the auth repository
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -78,6 +79,16 @@ final tokenRefreshSchedulerProvider = Provider<TokenRefreshScheduler>((ref) {
   return getIt<TokenRefreshScheduler>();
 });
 
+/// Provider for the auth local data source
+final authLocalDataSourceProvider = Provider<AuthLocalDataSource>((ref) {
+  return getIt<AuthLocalDataSource>();
+});
+
+/// Provider for the persistent session manager
+final persistentSessionManagerProvider = Provider<PersistentSessionManager>((ref) {
+  return getIt<PersistentSessionManager>();
+});
+
 /// Provider for the auth notifier
 final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>((ref) {
   return AuthNotifier(
@@ -93,6 +104,8 @@ final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<Auth
     logger: ref.watch(loggingServiceProvider),
     refreshScheduler: ref.watch(tokenRefreshSchedulerProvider),
     localDataSource: ref.watch(authLocalDataSourceProvider),
+    sessionManager: ref.watch(persistentSessionManagerProvider),
+    authRepository: ref.watch(authRepositoryProvider),
   );
 });
 
