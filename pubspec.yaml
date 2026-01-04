@@ -90,6 +90,10 @@ dependencies:
   exif: ^0.3.0
   image: ^4.1.7
 
+  # PDF Generation
+  pdf: ^3.10.7
+  printing: ^5.11.1
+
   # Rich Text Editor
   flutter_quill: ^10.8.4
 
