@@ -4,6 +4,8 @@ import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dar
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
+import 'package:soloadventurer/features/safety/presentation/widgets/sos_button_widget.dart';
+import 'package:soloadventurer/features/home/presentation/widgets/quick_sos_button.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -16,6 +18,10 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      floatingActionButton: const QuickSOSButton(
+        size: SOSButtonSize.medium,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
         title: const Text('SoloAdventurer'),
         actions: [
