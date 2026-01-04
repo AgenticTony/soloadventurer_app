@@ -397,7 +397,7 @@
       "phaseId": "phase-5",
       "phaseTitle": "User Interface for Queue Management",
       "phaseDescription": "Build UI for users to view and manage pending operations",
-      "status": "pending",
+      "status": "completed",
       "subtasks": [
         {
           "subtaskId": "5.1",
@@ -543,10 +543,12 @@
           "subtaskId": "5.4",
           "title": "Integrate Queue Screen into Navigation",
           "description": "Add queue screen to app navigation and settings",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/app/router/app_router.dart",
-            "lib/features/profile/presentation/screens/settings_screen.dart"
+            "lib/features/profile/presentation/screens/profile_settings_screen.dart",
+            "lib/features/home/presentation/screens/home_screen.dart",
+            "lib/features/core/presentation/widgets/queue_status_indicator.dart"
           ],
           "details": {
             "requirements": [
@@ -554,6 +556,25 @@
               "Add menu item in settings",
               "Add queue status indicator to home screen",
               "Handle deep links if applicable"
+            ],
+            "implementation": [
+              "Route '/operation-queue' already added to AppRouter (from subtask 5.3)",
+              "QueueStatusIndicator already integrated into HomeScreen AppBar (from subtask 5.3)",
+              "Added 'Data & Sync' section to ProfileSettingsScreen",
+              "Added 'Operation Queue' ListTile with cloud_sync icon",
+              "Navigates to /operation-queue route on tap",
+              "Follows existing settings screen patterns with ListTile structure"
+            ],
+            "notes": [
+              "Successfully integrated queue screen into app navigation",
+              "Users can now access queue from three entry points:",
+              "- HomeScreen AppBar via QueueStatusIndicator badge",
+              "- Profile Settings via 'Operation Queue' menu item under 'Data & Sync' section",
+              "- Direct navigation via /operation-queue route",
+              "All navigation flows follow existing app patterns",
+              "Consistent use of Icons.cloud_sync for queue-related UI",
+              "Settings menu item placed logically under 'Data & Sync' section",
+              "Phase 5 (User Interface for Queue Management) now complete! ✅"
             ]
           }
         }

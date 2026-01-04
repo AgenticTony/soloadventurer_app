@@ -10,7 +10,7 @@
 
 This feature implements a reliable operation queue with persistence to ensure no data loss during offline operations. The implementation plan has been created with 7 phases covering core persistence, retry logic, deduplication, priority handling, UI, testing, and documentation.
 
-## Current Phase: Phase 5 - User Interface for Queue Management (In Progress)
+## Current Phase: Phase 6 - Testing & Quality Assurance (Next)
 
 ### Completed Subtasks (Phase 5)
 - ✅ 5.1: Create Queue State Provider (2025-01-04)
@@ -58,6 +58,23 @@ This feature implements a reliable operation queue with persistence to ensure no
   - Tooltip displays dynamic count information
   - Follows existing app patterns (ConsumerWidget, Riverpod)
   - All requirements met - Phase 5 subtask 5.3 complete!
+
+- ✅ 5.4: Integrate Queue Screen into Navigation (2025-01-04)
+  - Added 'Data & Sync' section to ProfileSettingsScreen
+  - Added 'Operation Queue' menu item with cloud_sync icon
+  - Navigates to /operation-queue route on tap
+  - Route already configured in AppRouter (from subtask 5.3)
+  - QueueStatusIndicator already integrated in HomeScreen (from subtask 5.3)
+  - Users can now access queue from three entry points:
+    - HomeScreen AppBar via QueueStatusIndicator badge
+    - Profile Settings via 'Operation Queue' menu item
+    - Direct navigation via /operation-queue route
+  - Follows existing settings screen patterns with ListTile structure
+  - Consistent use of Icons.cloud_sync across all queue UI
+  - Settings menu item logically placed under 'Data & Sync' section
+  - All navigation flows follow existing app patterns
+  - All requirements met - Phase 5 subtask 5.4 complete!
+  - **Phase 5 (User Interface for Queue Management) now complete! ✅**
 
 ### Completed Subtasks
 - ✅ 1.1: Create OperationStorageService (2025-01-04)
@@ -265,8 +282,8 @@ This feature implements a reliable operation queue with persistence to ensure no
 - Phase 2 complete! ✅
 - Phase 3 complete! ✅
 - Phase 4 complete! ✅
-- Phase 5 pending: User Interface for Queue Management
-- Next: Create queue state provider (subtask 5.1)
+- Phase 5 complete! ✅
+- Next: Create unit tests for queue core (subtask 6.1)
 
 ### Implementation Plan Created
 - 7 phases defined
