@@ -301,15 +301,17 @@
     {
       "phase_id": "6",
       "name": "Media Gallery & Views",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "6.1",
           "title": "Create media gallery grid view",
           "description": "Build grid layout to display all photos and videos from a trip",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/MediaGallery.tsx"
+            "lib/features/journal/presentation/widgets/media_gallery.dart",
+            "lib/features/journal/presentation/widgets/media_gallery_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_GALLERY.md"
           ]
         },
         {
