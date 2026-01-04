@@ -120,8 +120,8 @@ class AddToTripNotifier extends StateNotifier<AddToTripState> {
       // Create a trip planning operation to add destination to existing trip
       final operation = TripPlanningOperation.update(
         tripId: tripId,
-        // Note: The actual destination addition will be handled by the travel feature
-        // This operation serves as a trigger/record for the action
+        // Include destination ID in changes
+        destinations: [destination.id],
         startDate: startDate,
         endDate: endDate,
       );
@@ -182,7 +182,8 @@ class AddToTripNotifier extends StateNotifier<AddToTripState> {
       // Create a trip planning operation to create a new trip
       final operation = TripPlanningOperation.create(
         tripName: tripTitle,
-        destinations: [destination.name],
+        // Include destination IDs in changes
+        destinations: [destination.id],
         startDate: startDate,
         endDate: endDate,
       );
