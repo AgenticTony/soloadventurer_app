@@ -67,19 +67,26 @@
           "subtask_id": "2.2",
           "title": "Create journal entry creation flow",
           "description": "Build UI and logic for creating new journal entries with title, content, and date",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/journal/JournalEntryForm.tsx",
-            "src/screens/journal/CreateJournalEntryScreen.tsx"
+            "lib/features/journal/presentation/providers/journal_entry_providers.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen_example.dart"
           ]
         },
         {
           "subtask_id": "2.3",
           "title": "Implement journal entry API functions",
           "description": "Create CRUD operations for journal entries using Supabase",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/api/journal.ts"
+            "lib/features/journal/domain/repositories/journal_repository.dart",
+            "lib/features/journal/data/datasources/journal_remote_data_source.dart",
+            "lib/features/journal/data/datasources/journal_remote_data_source_impl.dart",
+            "lib/features/journal/data/repositories/journal_repository_impl.dart",
+            "lib/features/journal/data/repositories/README.md",
+            "lib/features/journal/presentation/providers/journal_entry_providers.dart",
+            "pubspec.yaml"
           ]
         },
         {
