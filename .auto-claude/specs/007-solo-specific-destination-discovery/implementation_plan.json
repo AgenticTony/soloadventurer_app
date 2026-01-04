@@ -632,15 +632,16 @@
           "subtask_id": "8.1",
           "title": "Unit tests for domain models",
           "description": "Test all domain models for proper serialization and equality",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./test/features/destination_discovery/domain/models/",
+          "notes": "Created comprehensive unit tests for all domain models:\n\n1. **destination_test.dart** - Enhanced existing tests with:\n   - JSON serialization/deserialization tests for all models (SoloSuitabilityFactors, SafetyInsight, Activity, Destination)\n   - Equality tests using hashCode verification\n   - copyWith functionality tests\n   - Enum serialization tests (BudgetLevel, ActivityLevel)\n   - 15 test groups covering all aspects\n\n2. **destination_filter_test.dart** - New test file with:\n   - Default value tests\n   - JSON serialization/deserialization\n   - Equality and copyWith tests\n   - Helper method tests (isDefault, resetPagination, hasActiveFilters)\n   - DestinationSortOrder enum tests (7 values)\n   - 12 test groups covering filter functionality\n\n3. **personalized_recommendation_test.dart** - New test file with:\n   - RecommendationSource enum tests (6 values)\n   - RecommendedDestination model tests\n   - PersonalizedRecommendation model tests\n   - Helper method tests (isExpired, isValid, highMatchRecommendations, hiddenGemRecommendations, sortedByMatchScore)\n   - 13 test groups covering recommendation logic\n\n4. **saved_destination_test.dart** - New test file with:\n   - SaveType enum tests\n   - JSON serialization/deserialization\n   - Equality and copyWith tests\n   - Helper method tests (isWishlist, isTrip, hasNotes, withUpdatedTimestamp, withNotes)\n   - Edge case tests (empty notes, whitespace handling)\n   - 14 test groups covering saved destination functionality\n\n5. **curated_list_test.dart** - New test file with:\n   - CuratedListType enum tests (12 values)\n   - JSON serialization/deserialization for complex nested structure\n   - Equality and copyWith tests\n   - 15+ helper method tests (hasCoverImage, hasDestinations, destinationCountLabel, previewDestinations, typeLabel, isHiddenGemsList, isBudgetFriendly, isPopular, withIncrementedViewCount, withIncrementedSaveCount, withUpdatedTimestamp, hasSafetyScores, hasSoloSuitabilityScores, matchesTag)\n   - Edge case tests (empty destinations, null values, large counts)\n   - 19 test groups covering all curated list functionality\n\nAll tests follow Flutter testing best practices with proper group organization, setUp methods, and comprehensive coverage of:\n- Model creation with required and optional fields\n- JSON serialization (toJson) and deserialization (fromJson)\n- Equality comparison (== operator and hashCode)\n- Immutable copyWith functionality\n- Enum serialization\n- Helper method behavior\n- Edge cases and null handling",
           "acceptance_criteria": [
-            "Test Destination model creation and serialization",
-            "Test DestinationFilter model",
-            "Test PersonalizedRecommendation model",
-            "Test SavedDestination model",
-            "Test CuratedList model",
-            "Test equality and copyWith for freezed models"
+            "Test Destination model creation and serialization - COMPLETED",
+            "Test DestinationFilter model - COMPLETED",
+            "Test PersonalizedRecommendation model - COMPLETED",
+            "Test SavedDestination model - COMPLETED",
+            "Test CuratedList model - COMPLETED",
+            "Test equality and copyWith for freezed models - COMPLETED"
           ]
         },
         {
