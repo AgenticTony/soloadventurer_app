@@ -739,7 +739,7 @@
           "id": "9.4",
           "title": "Integration Tests for Offline-First Flow",
           "description": "Test complete offline-to-online sync cycle",
-          "status": "pending",
+          "status": "completed",
           "file": "integration_test/offline_first_flow_test.dart",
           "acceptanceCriteria": [
             "Test creating trip while offline",
