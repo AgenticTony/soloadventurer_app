@@ -19,6 +19,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/refresh_queue_manager.dart';
 
 /// Register all auth feature dependencies
 void registerAuthModule(GetIt getIt, {bool isTest = false}) {
@@ -47,12 +49,27 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
       remoteDataSource: getIt<AuthRemoteDataSource>(),
       localDataSource: getIt<AuthLocalDataSource>(),
       securityManager: getIt<SecurityManager>(),
+      refreshQueueManager: getIt<RefreshQueueManager>(),
     ),
   );
 
   // Register token refresh infrastructure services
   getIt.registerLazySingleton<TokenExpirationTracker>(
-    () => TokenExpirationTracker(),
+    () => TokenExpirationTracker(
+      refreshService: getIt<TokenRefreshService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<TokenRefreshService>(
+    () => TokenRefreshService(
+      authRepository: getIt<AuthRepository>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<RefreshQueueManager>(
+    () => RefreshQueueManager(
+      refreshService: getIt<TokenRefreshService>(),
+    ),
   );
 
   getIt.registerLazySingleton<TokenRefreshScheduler>(

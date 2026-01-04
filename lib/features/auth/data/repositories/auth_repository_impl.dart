@@ -359,4 +359,43 @@ class AuthRepositoryImpl implements AuthRepository {
     );
     return user;
   }
+
+  @override
+  Future<AuthSession?> getSession() async {
+    try {
+      // Check if user is authenticated
+      if (!await securityManager.isKnownDevice()) {
+        return null;
+      }
+
+      // Check if session is valid
+      if (!await localDataSource.hasValidSession()) {
+        return null;
+      }
+
+      // Get all session components
+      final accessToken = await localDataSource.getAuthToken();
+      final idToken = await localDataSource.getIdToken();
+      final refreshToken = await localDataSource.getRefreshToken();
+      final expiresAt = await localDataSource.getTokenExpiration();
+
+      // Validate we have all required data
+      if (accessToken == null ||
+          refreshToken == null ||
+          expiresAt == null) {
+        return null;
+      }
+
+      // Construct and return AuthSession
+      return AuthSession(
+        accessToken: accessToken,
+        idToken: idToken ?? '',
+        refreshToken: refreshToken,
+        expiresAt: expiresAt,
+      );
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Error getting session: $e');
+      return null;
+    }
+  }
 }

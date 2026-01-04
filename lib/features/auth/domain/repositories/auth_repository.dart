@@ -75,6 +75,11 @@ abstract class AuthRepository {
   /// robust refresh with retry logic and exponential backoff
   Future<AuthSession> performBasicTokenRefresh();
 
+  /// Get the current authentication session
+  /// Returns the current [AuthSession] with tokens and expiration information
+  /// Returns null if no valid session exists
+  Future<AuthSession?> getSession();
+
   /// Register a new user with email and password
   Future<User> registerWithEmailAndPassword(
       String email, String password, String username);
