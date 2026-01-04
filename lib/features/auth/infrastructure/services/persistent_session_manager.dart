@@ -185,6 +185,7 @@ class SessionValidationResult {
 /// - Loading and validating sessions on app startup
 /// - Clearing sessions on logout
 /// - Using flutter_secure_storage (via SecurityManager) for token storage
+/// - Session caching for improved performance
 ///
 /// The service acts as a wrapper around [AuthLocalDataSource] and provides
 /// additional validation and error handling for session operations.
@@ -196,6 +197,15 @@ class PersistentSessionManager {
   static const String _sessionVersionKey = 'session_version';
   static const String _currentSessionVersion = '1.0';
 
+  /// Cache for loaded session to avoid repeated storage reads
+  AuthSession? _cachedSession;
+
+  /// Timestamp when cache was last updated
+  DateTime? _cacheTimestamp;
+
+  /// Cache validity duration (5 minutes)
+  static const Duration _cacheValidDuration = Duration(minutes: 5);
+
   /// Creates a new [PersistentSessionManager]
   PersistentSessionManager({
     required AuthLocalDataSource localDataSource,
@@ -205,16 +215,18 @@ class PersistentSessionManager {
   ///
   /// This method saves the access token, ID token, refresh token, and expiration
   /// timestamp to secure storage. It also stores a session version for future
-  /// migration purposes.
+  /// migration purposes. The session is also cached for faster subsequent access.
   ///
   /// Throws [AuthException] if saving fails.
   Future<void> saveSession(AuthSession session) async {
     try {
-      debugPrint('PersistentSessionManager: Saving session');
-      debugPrint('  - Access token: ${_maskToken(session.accessToken)}');
-      debugPrint('  - ID token: ${_maskToken(session.idToken)}');
-      debugPrint('  - Refresh token: ${_maskToken(session.refreshToken)}');
-      debugPrint('  - Expires at: ${session.expiresAt.toIso8601String()}');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Saving session');
+        debugPrint('  - Access token: ${_maskToken(session.accessToken)}');
+        debugPrint('  - ID token: ${_maskToken(session.idToken)}');
+        debugPrint('  - Refresh token: ${_maskToken(session.refreshToken)}');
+        debugPrint('  - Expires at: ${session.expiresAt.toIso8601String()}');
+      }
 
       // Save tokens and expiration to secure storage
       await _localDataSource.saveAuthData(
@@ -230,9 +242,17 @@ class PersistentSessionManager {
         'saved_at': DateTime.now().toIso8601String(),
       });
 
-      debugPrint('PersistentSessionManager: Session saved successfully');
+      // Update cache
+      _cachedSession = session;
+      _cacheTimestamp = DateTime.now();
+
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Session saved successfully (cached)');
+      }
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to save session: $e');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Failed to save session: $e');
+      }
       throw AuthException(
         'Failed to save session: ${e.toString()}',
         code: 'SESSION_SAVE_FAILED',
@@ -246,12 +266,23 @@ class PersistentSessionManager {
   /// - Checks if all required tokens are present
   /// - Validates the expiration timestamp
   /// - Returns the session if valid, null otherwise
+  /// - Uses cache if available and valid
   ///
   /// Returns null if no valid session exists.
   /// Throws [AuthException] if loading fails.
   Future<AuthSession?> loadSession() async {
     try {
-      debugPrint('PersistentSessionManager: Loading session from storage');
+      // Check if we have a valid cached session
+      if (_isCacheValid()) {
+        if (kDebugMode) {
+          debugPrint('PersistentSessionManager: Returning cached session');
+        }
+        return _cachedSession;
+      }
+
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Loading session from storage');
+      }
 
       // Get all session components
       final accessToken = await _localDataSource.getAuthToken();
@@ -259,15 +290,19 @@ class PersistentSessionManager {
       final refreshToken = await _localDataSource.getRefreshToken();
       final expiresAt = await _localDataSource.getTokenExpiration();
 
-      debugPrint('PersistentSessionManager: Retrieved data:');
-      debugPrint('  - Has access token: ${accessToken != null}');
-      debugPrint('  - Has ID token: ${idToken != null}');
-      debugPrint('  - Has refresh token: ${refreshToken != null}');
-      debugPrint('  - Expires at: ${expiresAt?.toIso8601String() ?? "null"}');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Retrieved data:');
+        debugPrint('  - Has access token: ${accessToken != null}');
+        debugPrint('  - Has ID token: ${idToken != null}');
+        debugPrint('  - Has refresh token: ${refreshToken != null}');
+        debugPrint('  - Expires at: ${expiresAt?.toIso8601String() ?? "null"}');
+      }
 
       // Validate we have all required data
       if (accessToken == null || refreshToken == null || expiresAt == null) {
-        debugPrint('PersistentSessionManager: Missing required session data');
+        if (kDebugMode) {
+          debugPrint('PersistentSessionManager: Missing required session data');
+        }
         return null;
       }
 
@@ -279,10 +314,18 @@ class PersistentSessionManager {
         expiresAt: expiresAt,
       );
 
-      debugPrint('PersistentSessionManager: Session loaded successfully');
+      // Update cache
+      _cachedSession = session;
+      _cacheTimestamp = DateTime.now();
+
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Session loaded successfully (cached)');
+      }
       return session;
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to load session: $e');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Failed to load session: $e');
+      }
       throw AuthException(
         'Failed to load session: ${e.toString()}',
         code: 'SESSION_LOAD_FAILED',
@@ -422,18 +465,28 @@ class PersistentSessionManager {
   /// Clears the current session from secure storage
   ///
   /// This method removes all tokens and session data from secure storage.
-  /// It should be called on logout.
+  /// It also clears the session cache. It should be called on logout.
   ///
   /// Throws [AuthException] if clearing fails.
   Future<void> clearSession() async {
     try {
-      debugPrint('PersistentSessionManager: Clearing session');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Clearing session');
+      }
 
       await _localDataSource.clearAuthData();
 
-      debugPrint('PersistentSessionManager: Session cleared successfully');
+      // Clear cache
+      _cachedSession = null;
+      _cacheTimestamp = null;
+
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Session cleared successfully (cache cleared)');
+      }
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to clear session: $e');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Failed to clear session: $e');
+      }
       throw AuthException(
         'Failed to clear session: ${e.toString()}',
         code: 'SESSION_CLEAR_FAILED',
@@ -494,18 +547,64 @@ class PersistentSessionManager {
     return '$start...$end (${token.length} chars)';
   }
 
+  /// Checks if the cached session is still valid
+  ///
+  /// A cached session is valid if:
+  /// - A cached session exists
+  /// - The cache timestamp is not too old (< 5 minutes)
+  /// - The session itself is not expired
+  bool _isCacheValid() {
+    if (_cachedSession == null || _cacheTimestamp == null) {
+      return false;
+    }
+
+    // Check if cache is too old
+    final cacheAge = DateTime.now().difference(_cacheTimestamp!);
+    if (cacheAge > _cacheValidDuration) {
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Cache expired (age: ${cacheAge.inMinutes}m)');
+      }
+      return false;
+    }
+
+    // Check if session is expired
+    final isExpired = DateTime.now().isAfter(_cachedSession!.expiresAt);
+    if (isExpired) {
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Cached session is expired');
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Clears the session cache
+  ///
+  /// This method clears the in-memory cache without touching secure storage.
+  /// Use this when you need to force a reload from storage.
+  void clearCache() {
+    if (kDebugMode) {
+      debugPrint('PersistentSessionManager: Clearing session cache');
+    }
+    _cachedSession = null;
+    _cacheTimestamp = null;
+  }
+
   /// Gets the current access token from storage
   ///
   /// Returns null if no access token is stored.
   Future<String?> getAccessToken() async {
     try {
       final token = await _localDataSource.getAuthToken();
-      if (token != null) {
+      if (token != null && kDebugMode) {
         debugPrint('PersistentSessionManager: Retrieved access token: ${_maskToken(token)}');
       }
       return token;
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to get access token: $e');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Failed to get access token: $e');
+      }
       return null;
     }
   }
@@ -516,12 +615,14 @@ class PersistentSessionManager {
   Future<String?> getIdToken() async {
     try {
       final token = await _localDataSource.getIdToken();
-      if (token != null) {
+      if (token != null && kDebugMode) {
         debugPrint('PersistentSessionManager: Retrieved ID token: ${_maskToken(token)}');
       }
       return token;
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to get ID token: $e');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Failed to get ID token: $e');
+      }
       return null;
     }
   }
@@ -532,12 +633,14 @@ class PersistentSessionManager {
   Future<String?> getRefreshToken() async {
     try {
       final token = await _localDataSource.getRefreshToken();
-      if (token != null) {
+      if (token != null && kDebugMode) {
         debugPrint('PersistentSessionManager: Retrieved refresh token: ${_maskToken(token)}');
       }
       return token;
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to get refresh token: $e');
+      if (kDebugMode) {
+        debugPrint('PersistentSessionManager: Failed to get refresh token: $e');
+      }
       return null;
     }
   }

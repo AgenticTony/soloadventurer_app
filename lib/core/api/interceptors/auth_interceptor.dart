@@ -12,6 +12,12 @@ class AuthInterceptor extends Interceptor {
   /// Flag to track if a refresh is currently in progress
   bool _isRefreshing = false;
 
+  /// Cached repository reference to avoid repeated service locator lookups
+  final AuthRepository _authRepository;
+
+  /// Creates a new [AuthInterceptor]
+  AuthInterceptor() : _authRepository = getIt<AuthRepository>();
+
   /// Add authentication token to requests
   @override
   void onRequest(
@@ -24,19 +30,18 @@ class AuthInterceptor extends Interceptor {
     }
 
     try {
-      // Get auth repository from service locator
-      final authRepository = getIt<AuthRepository>();
-
       // Get current session to check expiration
-      final session = await authRepository.getSession();
+      final session = await _authRepository.getSession();
 
       if (session != null) {
         // Check if token is expiring soon and needs proactive refresh
         if (_shouldRefreshToken(session)) {
-          debugPrint('AuthInterceptor: Token expiring soon, triggering proactive refresh');
+          if (kDebugMode) {
+            debugPrint('AuthInterceptor: Token expiring soon, triggering proactive refresh');
+          }
 
           // Wait for in-progress refresh or start a new one
-          final newSession = await _performProactiveRefresh(authRepository);
+          final newSession = await _performProactiveRefresh();
 
           // Use the new session if refresh was successful
           if (newSession != null) {
@@ -53,7 +58,9 @@ class AuthInterceptor extends Interceptor {
 
       return handler.next(options);
     } catch (e) {
-      debugPrint('Error in AuthInterceptor: $e');
+      if (kDebugMode) {
+        debugPrint('Error in AuthInterceptor: $e');
+      }
       return handler.next(options);
     }
   }
@@ -67,11 +74,8 @@ class AuthInterceptor extends Interceptor {
     // Check if error is due to authentication
     if (err.response?.statusCode == 401) {
       try {
-        // Get auth repository from service locator
-        final authRepository = getIt<AuthRepository>();
-
         // Try to refresh token
-        final session = await authRepository.refreshToken();
+        final session = await _authRepository.refreshToken();
 
         // Get new token from session
         final newToken = session.accessToken;
@@ -89,7 +93,9 @@ class AuthInterceptor extends Interceptor {
         // If token refresh failed, proceed with error
         return handler.next(err);
       } catch (e) {
-        debugPrint('Error refreshing token: $e');
+        if (kDebugMode) {
+          debugPrint('Error refreshing token: $e');
+        }
         return handler.next(err);
       }
     }
@@ -129,18 +135,22 @@ class AuthInterceptor extends Interceptor {
   /// This method implements a mutex-like pattern to ensure that only one
   /// refresh operation is in progress at a time. Multiple concurrent requests
   /// will wait for the same refresh operation to complete.
-  Future<AuthSession?> _performProactiveRefresh(AuthRepository authRepository) async {
+  Future<AuthSession?> _performProactiveRefresh() async {
     // If a refresh is already in progress, wait for it to complete
     if (_isRefreshing) {
-      debugPrint('AuthInterceptor: Refresh already in progress, waiting...');
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: Refresh already in progress, waiting...');
+      }
       // Wait a bit for the refresh to complete
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Try to get the new session
       try {
-        return await authRepository.getSession();
+        return await _authRepository.getSession();
       } catch (e) {
-        debugPrint('AuthInterceptor: Error waiting for refresh: $e');
+        if (kDebugMode) {
+          debugPrint('AuthInterceptor: Error waiting for refresh: $e');
+        }
         return null;
       }
     }
@@ -148,12 +158,18 @@ class AuthInterceptor extends Interceptor {
     // Start a new refresh operation
     _isRefreshing = true;
     try {
-      debugPrint('AuthInterceptor: Starting proactive token refresh');
-      final newSession = await authRepository.refreshToken();
-      debugPrint('AuthInterceptor: Proactive token refresh successful');
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: Starting proactive token refresh');
+      }
+      final newSession = await _authRepository.refreshToken();
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: Proactive token refresh successful');
+      }
       return newSession;
     } catch (e) {
-      debugPrint('AuthInterceptor: Proactive token refresh failed: $e');
+      if (kDebugMode) {
+        debugPrint('AuthInterceptor: Proactive token refresh failed: $e');
+      }
       // Return null to indicate refresh failure
       // The request will proceed with the old token and 401 will be handled if needed
       return null;
