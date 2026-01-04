@@ -10,6 +10,8 @@
 ///   rendering of large datasets (500+ items)
 /// - [VirtualGridView]: A generic virtual scrolling grid for efficient
 ///   rendering of large photo galleries (500+ items)
+/// - [InfiniteScrollListView]: A generic infinite scroll list with automatic
+///   pagination for handling large datasets with efficient memory usage
 /// - [VirtualListPerformanceTracker]: A performance tracking wrapper that
 ///   monitors render times, memory usage, and frame rates for virtual lists
 /// - [LazyLoadImage]: A visibility-based lazy loading image widget that
@@ -24,10 +26,22 @@
 /// ```dart
 /// import 'package:soloadventurer/core/widgets/widgets.dart';
 ///
-/// // List view
+/// // Simple list view
 /// VirtualListView<String>(
 ///   itemCount: items.length,
 ///   itemBuilder: (context, index) => Text(items[index]),
+/// )
+///
+/// // Infinite scroll with pagination
+/// InfiniteScrollListView<Trip>(
+///   fetchData: (cursor) async {
+///     return await tripRepository.getTripsCursor(
+///       userId: 'user123',
+///       cursor: cursor,
+///       pageSize: 20,
+///     );
+///   },
+///   itemBuilder: (context, trip) => TripCard(trip: trip),
 /// )
 ///
 /// // Grid view
@@ -74,6 +88,7 @@
 
 export 'virtual_list_view.dart';
 export 'virtual_grid_view.dart';
+export 'infinite_scroll_list_view.dart';
 export 'virtual_list_performance_tracker.dart';
 export 'lazy_load_image.dart';
 export 'image_placeholder.dart';

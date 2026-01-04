@@ -6,6 +6,7 @@ Reusable widgets that can be used across the entire application.
 
 - **[VirtualListView](#virtuallistview)**: Virtual scrolling list for 500+ items
 - **[VirtualGridView](#virtualgridview)**: Virtual scrolling grid for photo galleries
+- **[InfiniteScrollListView](#infinitescrolllistview)**: Infinite scroll with automatic pagination
 - **[LazyLoadImage](#lazyloadimage)**: Visibility-based lazy loading for images
 - **[ImagePlaceholder](#optimized-placeholders)**: Optimized placeholder widgets (shimmer, skeleton, color, blurred)
 - **[ImageErrorWidget](#error-handling)**: Enhanced error handling with retry functionality
@@ -280,6 +281,173 @@ VirtualGridView<Photo>(
 ```
 
 For more details, see [VirtualGridView README](./VIRTUAL_GRID_VIEW_README.md).
+
+---
+
+## InfiniteScrollListView
+
+A generic infinite scroll list widget that automatically loads more data as the user scrolls towards the end. Combines `VirtualListView` for efficient rendering with automatic pagination logic.
+
+### Features
+
+- **Automatic Pagination**: Loads next page when scrolling near the end
+- **Pull-to-Refresh**: Refresh data with pull-to-refresh gesture
+- **Loading States**: Show initial loading and "loading more" indicators
+- **Error Handling**: Display errors and provide retry functionality
+- **Configurable Preload**: Adjust threshold for loading next page (default: 500px)
+- **Virtual Scrolling**: Efficient memory usage with VirtualListView
+- **Cursor/Offset Support**: Works with both pagination strategies
+- **End Detection**: Shows "end of list" when no more data
+- **Custom Widgets**: Customize all states (loading, error, empty, end)
+
+### Basic Usage
+
+#### Minimal Example
+
+```dart
+InfiniteScrollListView<Trip>(
+  fetchData: (cursor) async {
+    return await tripRepository.getTripsCursor(
+      userId: 'user123',
+      cursor: cursor,
+      pageSize: 20,
+    );
+  },
+  itemBuilder: (context, trip) => TripCard(trip: trip),
+)
+```
+
+#### With Separators
+
+```dart
+InfiniteScrollListView<Trip>.withSeparators(
+  fetchData: (cursor) => tripRepository.getTripsCursor(
+    userId: 'user123',
+    cursor: cursor,
+    pageSize: 20,
+  ),
+  itemBuilder: (context, trip) => TripCard(trip: trip),
+  separatorBuilder: (context, index) => Divider(height: 1),
+)
+```
+
+#### With Custom Widgets
+
+```dart
+InfiniteScrollListView<Trip>(
+  fetchData: (cursor) async => await tripRepository.getTripsCursor(
+    userId: 'user123',
+    cursor: cursor,
+    pageSize: 20,
+  ),
+  itemBuilder: (context, trip) => TripCard(trip: trip),
+
+  // Custom loading states
+  initialLoadingWidget: Center(child: CircularProgressIndicator()),
+  loadingMoreWidget: Padding(
+    padding: EdgeInsets.all(16),
+    child: Center(child: CircularProgressIndicator()),
+  ),
+
+  // Custom error state
+  errorWidget: Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.error_outline, size: 48),
+        SizedBox(height: 16),
+        Text('Failed to load trips'),
+        ElevatedButton(onPressed: () => _retry(), child: Text('Retry')),
+      ],
+    ),
+  ),
+
+  // Custom empty state
+  emptyWidget: Center(
+    child: Text('No trips yet. Start your adventure!'),
+  ),
+
+  // Custom end of list indicator
+  endOfListWidget: Padding(
+    padding: EdgeInsets.all(16),
+    child: Text('You\'ve reached the end'),
+  ),
+
+  // Configure preload threshold
+  preloadThreshold: 300.0, // Load 300px before end
+)
+```
+
+### Integration with Repository
+
+```dart
+class TripsScreen extends StatelessWidget {
+  final TripRepository tripRepository;
+  final String userId;
+
+  const TripsScreen({
+    super.key,
+    required this.tripRepository,
+    required this.userId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InfiniteScrollListView<Trip>(
+      fetchData: (cursor) async {
+        return await tripRepository.getTripsCursor(
+          userId: userId,
+          cursor: cursor,
+          pageSize: 20,
+          sortBy: 'createdAt',
+          sortOrder: SortOrder.descending,
+        );
+      },
+      itemBuilder: (context, trip) => TripCard(trip: trip),
+      separatorBuilder: (context, index) => Divider(height: 1),
+      emptyWidget: Center(child: Text('No trips found')),
+    );
+  }
+}
+```
+
+### Performance Benefits
+
+- **Memory Efficient**: Only renders visible items (virtual scrolling)
+- **Network Efficient**: Loads data in pages (20 items per page by default)
+- **Smooth Scrolling**: Preloads next page before user reaches end
+- **Scalable**: Handles 500+ items without performance degradation
+
+### Performance Tips
+
+1. **Use appropriate page size**: 20-50 items typically
+2. **Adjust preload threshold**: Lower values load sooner
+3. **Use ValueKey in itemBuilder**: Proper widget recycling
+4. **Lazy load images**: Use `LazyLoadImage` for photos
+5. **Use metadata queries**: For list views (80% memory reduction)
+
+### Comparison with VirtualListView
+
+| Feature | InfiniteScrollListView | VirtualListView |
+|---------|----------------------|-----------------|
+| Automatic pagination | ✅ Yes | ❌ No |
+| Pull-to-refresh | ✅ Built-in | ❌ Manual |
+| Error handling | ✅ Built-in | ⚠️ Manual |
+| Loading states | ✅ Built-in | ⚠️ Manual |
+| Virtual scrolling | ✅ Yes | ✅ Yes |
+| Use case | Server data | Local/loaded data |
+
+**Use InfiniteScrollListView when:**
+- Data is loaded from a server/API
+- Data is paginated
+- You want automatic pagination
+
+**Use VirtualListView when:**
+- All data is already loaded
+- You need manual control over loading
+- Data is small (< 500 items)
+
+For comprehensive documentation, see [InfiniteScrollListView README](./INFINITE_SCROLL_README.md) and [Examples](./example_infinite_scroll_list_view.dart).
 
 ---
 
