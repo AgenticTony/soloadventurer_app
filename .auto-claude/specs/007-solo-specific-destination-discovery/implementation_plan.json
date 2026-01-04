@@ -97,7 +97,7 @@
     {
       "phase_id": "phase-2",
       "phase_name": "Data Layer & API Integration",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "2.1",
@@ -122,34 +122,36 @@
           "subtask_id": "2.2",
           "title": "Implement DestinationRepository with GraphQL",
           "description": "Create repository implementation using GraphQL API for destination data",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/infrastructure/repositories/destination_repository_impl.dart",
+          "notes": "Created DestinationRepositoryImpl with GraphQL client integration. Implemented all 8 methods from DestinationRepository interface: searchDestinations (with comprehensive filter support via _buildFilterVariables), getDestinationById, getPersonalizedRecommendations, getCuratedLists, getCuratedListById, saveDestination (mutation), unsaveDestination (mutation), and getSavedDestinations. Added comprehensive error handling with _handleGraphQLException method that maps GraphQL exceptions to appropriate AppException types (NetworkTimeoutException, NetworkConnectivityException, BadRequestException, UnauthorizedException, ForbiddenException, NotFoundException, ValidationException, ServerException). Includes helper methods for enum conversion: _budgetLevelToString, _activityLevelToString, _sortOrderToString, and _saveTypeToString. All queries use FetchPolicy.networkOnly to ensure fresh data. Follows existing code patterns from auth and profile features with proper const constructor and dependency injection.",
           "acceptance_criteria": [
-            "Implements DestinationRepository interface",
-            "Uses GraphQL client for API calls",
-            "Proper error handling and exceptions",
-            "Maps API responses to domain models",
-            "Search query with filter parameters",
-            "Recommendations query",
-            "Curated lists queries",
-            "Save/unsave mutations"
+            "Implements DestinationRepository interface - COMPLETED",
+            "Uses GraphQL client for API calls - COMPLETED",
+            "Proper error handling and exceptions - COMPLETED",
+            "Maps API responses to domain models - COMPLETED",
+            "Search query with filter parameters - COMPLETED",
+            "Recommendations query - COMPLETED",
+            "Curated lists queries - COMPLETED",
+            "Save/unsave mutations - COMPLETED"
           ]
         },
         {
           "subtask_id": "2.3",
           "title": "Create GraphQL queries and mutations",
           "description": "Define GraphQL documents for destination operations",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/infrastructure/graphql/destination_queries.dart",
+          "notes": "Created DestinationQueries class with all GraphQL documents for destination discovery feature. Includes 8 GraphQL operations: 1) SearchDestinations query with comprehensive filter parameters (searchQuery, budgetLevel, minSafetyScore, minSoloSuitabilityScore, activityLevel, countryCode, region, tags, hiddenGemsOnly, minPopularityScore, maxDailyCost, sortBy, offset, limit) returning full destination objects with nested safetyInsights, soloSuitabilityFactors, and popularActivities, 2) GetDestinationById query for single destination retrieval, 3) GetPersonalizedRecommendations query returning recommendations with nested destinations, match scores, reasons, and matching factors, 4) GetCuratedLists query returning all curated lists with full destination details, 5) GetCuratedListById query for specific curated list, 6) SaveDestination mutation with userId, destinationId, saveType, optional tripId and notes, 7) UnsaveDestination mutation with destinationId, userId, and optional saveType filter, 8) GetSavedDestinations query with userId and optional saveType filter. All queries include proper GraphQL type definitions and complete field selections matching domain model structure.",
           "acceptance_criteria": [
-            "Search destinations query with filters",
-            "Get destination by ID query",
-            "Get personalized recommendations query",
-            "Get curated lists query",
-            "Get curated list by ID query",
-            "Save destination mutation",
-            "Unsave destination mutation",
-            "Get saved destinations query"
+            "Search destinations query with filters - COMPLETED",
+            "Get destination by ID query - COMPLETED",
+            "Get personalized recommendations query - COMPLETED",
+            "Get curated lists query - COMPLETED",
+            "Get curated list by ID query - COMPLETED",
+            "Save destination mutation - COMPLETED",
+            "Unsave destination mutation - COMPLETED",
+            "Get saved destinations query - COMPLETED"
           ]
         },
         {
