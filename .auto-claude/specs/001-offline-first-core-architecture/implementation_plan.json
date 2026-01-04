@@ -845,7 +845,7 @@
           "id": "10.4",
           "title": "Create Migration Guide",
           "description": "Document migrating existing users to offline-first",
-          "status": "pending",
+          "status": "completed",
           "file": "docs/migration/offline_first_migration.md",
           "acceptanceCriteria": [
             "Database migration strategy",
@@ -853,7 +853,9 @@
             "Handling stale data",
             "Rollback plan",
             "Testing checklist"
-          ]
+          ],
+          "notes": "Created comprehensive migration guide (docs/migration/offline_first_migration.md - 1259 lines) covering:\n\n\u2705 **Migration Strategy** - Phased rollout approach (feature flag → 10% → 50% → 100%), dual-mode operation architecture, user eligibility checks\n\n\u2705 **Database Migration** - Schema version management with Drift ORM, initial database creation for existing users, migration state tracking\n\n\u2705 **Initial Data Sync** - Prioritized download approach (critical data → active trips → historical data → reference data), batch processing for large datasets, progress indication\n\n\u2705 **Handling Stale Data** - Stale data detection by comparing timestamps, server-wins conflict resolution for migration, data validation after sync\n\n\u2705 **User Experience** - Welcome screen with explanation, progress dialog with phase indicators, completion screen, migration flow diagram\n\n\u2705 **Rollback Plan** - Rollback triggers (error rate, data loss, performance, crashes), step-by-step rollback procedure (disable flags → revert APIs → clear databases → restore data), user communication\n\n\u2705 **Testing Checklist** - Comprehensive testing coverage:\n   - Unit tests (database migration, initial sync, conflict resolution)\n   - Integration tests (end-to-end migration, API compatibility)\n   - Performance tests (large datasets, concurrent users)\n   - Manual testing scenarios (new users, existing users, edge cases)\n   - Device testing (iOS/Android, various network conditions)\n   - Automated testing examples with Flutter tests\n\n\u2705 **Post-Migration Monitoring** - Key metrics (engagement, technical, error tracking), health checks, alerting configuration with CloudWatch examples\n\n\u2705 **Troubleshooting** - Common issues (migration stuck, storage space, database corruption) with diagnosis and solutions, debug tools, diagnostic information collection, support escalation template\n\n**Code Examples Include:**\n- Feature flag configuration and user eligibility checks\n- Database migration state tracking\n- Initial sync service implementation (prioritized download)\n- Incremental sync for large datasets\n- Sync progress dialog UI components\n- Stale data detection and conflict resolution\n- Migration welcome/progress/completion screens\n- Rollback service implementation\n- Migration metrics and health checks\n- Diagnostic and debug tools\n\nAll acceptance criteria met with comprehensive documentation covering database migration strategy, initial sync for existing users, handling stale data, rollback plan, and testing checklist.",
+          "updated_at": "2026-01-05T11:00:00.000Z"
         },
         {
           "id": "10.5",
