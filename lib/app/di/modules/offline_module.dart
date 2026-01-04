@@ -89,14 +89,20 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
       syncQueueDao: getIt<SyncQueueDao>(),
     ),
   );
-  //
-  // TODO: Register SyncQueueService
-  // getIt.registerLazySingleton<SyncQueueService>(
-  //   () => SyncQueueService(
-  //     repository: getIt<SyncQueueRepository>(),
-  //     connectivityService: getIt<ConnectivityService>(),
-  //   ),
-  // );
+
+  // Register SyncQueueService for managing sync queue lifecycle
+  // This service provides high-level operations for queueing, retrying, and
+  // cleaning up sync operations. It integrates with connectivity monitoring
+  // and handles offline scenarios gracefully.
+  getIt.registerLazySingleton<SyncQueueService>(
+    () => SyncQueueService(
+      repository: getIt<SyncQueueRepository>(),
+      connectivityService: getIt<ConnectivityService>(),
+      cleanupInterval: const Duration(hours: 1),
+      completedOperationMaxAge: const Duration(days: 7),
+      failedOperationMaxAge: const Duration(days: 30),
+    ),
+  );
   //
   // TODO: Register Operation Interceptors
   // getIt.registerLazySingleton<OfflineInterceptor>(
