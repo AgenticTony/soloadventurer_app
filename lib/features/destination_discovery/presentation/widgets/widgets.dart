@@ -5,3 +5,4 @@
 
 export 'destination_card.dart';
 export 'safety_score_badge.dart';
+export 'solo_suitability_badge.dart';

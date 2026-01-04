@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/models/destination.dart';
 import 'safety_score_badge.dart';
+import 'solo_suitability_badge.dart';
 
 /// A reusable card widget for displaying destination preview with key information.
 ///
@@ -218,44 +219,9 @@ class DestinationCard extends StatelessWidget {
 
   /// Builds the solo suitability badge
   Widget _buildSoloSuitabilityBadge(BuildContext context, ThemeData theme) {
-    final score = destination.soloSuitabilityScore;
-    final color = _getSoloSuitabilityColor(score, theme);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.person_outline,
-            size: 14,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            score.toStringAsFixed(1),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(width: 2),
-          Text(
-            'Solo',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-            ),
-          ),
-        ],
-      ),
+    return SoloSuitabilityBadge(
+      score: destination.soloSuitabilityScore,
+      label: 'Solo',
     );
   }
 
@@ -357,17 +323,6 @@ class DestinationCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// Returns the color for the solo suitability score
-  Color _getSoloSuitabilityColor(double score, ThemeData theme) {
-    if (score >= 8) {
-      return theme.colorScheme.primary;
-    } else if (score >= 6) {
-      return theme.colorScheme.secondary;
-    } else {
-      return theme.colorScheme.tertiary;
-    }
   }
 
   /// Returns budget information based on budget level
