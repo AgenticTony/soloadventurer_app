@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/models/destination.dart';
+import 'safety_score_badge.dart';
 
 /// A reusable card widget for displaying destination preview with key information.
 ///
@@ -209,44 +210,9 @@ class DestinationCard extends StatelessWidget {
 
   /// Builds the safety score badge
   Widget _buildSafetyScoreBadge(BuildContext context, ThemeData theme) {
-    final score = destination.safetyScore;
-    final color = _getSafetyScoreColor(score, theme);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            _getSafetyScoreIcon(score),
-            size: 14,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            score.toStringAsFixed(1),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(width: 2),
-          Text(
-            'Safety',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: color,
-            ),
-          ),
-        ],
-      ),
+    return SafetyScoreBadge(
+      score: destination.safetyScore,
+      label: 'Safety',
     );
   }
 
@@ -391,28 +357,6 @@ class DestinationCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  /// Returns the color for the safety score
-  Color _getSafetyScoreColor(double score, ThemeData theme) {
-    if (score >= 8) {
-      return Colors.green;
-    } else if (score >= 6) {
-      return Colors.orange;
-    } else {
-      return Colors.red;
-    }
-  }
-
-  /// Returns the icon for the safety score
-  IconData _getSafetyScoreIcon(double score) {
-    if (score >= 8) {
-      return Icons.security;
-    } else if (score >= 6) {
-      return Icons.warning_amber;
-    } else {
-      return Icons.dangerous;
-    }
   }
 
   /// Returns the color for the solo suitability score
