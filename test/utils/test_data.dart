@@ -1,6 +1,6 @@
-import 'package:soloadventurer/models/user.dart';
-import 'package:soloadventurer/models/trip.dart';
-import 'package:soloadventurer/models/travel_preference.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/travel/domain/entities/trip.dart';
+import 'package:soloadventurer/features/profile/domain/entities/travel_preference.dart';
 
 /// Factory functions for creating test data.
 class TestData {

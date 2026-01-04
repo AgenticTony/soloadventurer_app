@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/login_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
-import 'package:soloadventurer/services/auth_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/auth_service.dart';
 
 // Mock classes
 class MockAuthService extends Mock implements AuthService {}

@@ -77,7 +77,13 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       if (isAuthenticated) {
         final user = await _getCurrentUser();
         if (user != null) {
-          return AuthState.authenticated(user);
+          return AuthState.authenticated(
+            user: user,
+            accessToken: user.accessToken,
+            idToken: user.idToken,
+            refreshToken: user.refreshToken,
+            tokenExpiresAt: user.tokenExpiresAt,
+          );
         }
       }
       return const AuthState.initial();
@@ -92,7 +98,13 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
     try {
       final user = await _login(LoginParams(email: email, password: password));
-      state = AsyncValue.data(AuthState.authenticated(user));
+      state = AsyncValue.data(AuthState.authenticated(
+        user: user,
+        accessToken: user.accessToken,
+        idToken: user.idToken,
+        refreshToken: user.refreshToken,
+        tokenExpiresAt: user.tokenExpiresAt,
+      ));
     } catch (e, stack) {
       state = AsyncValue.error(e.toString(), stack);
     }
@@ -116,7 +128,13 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       if (needsVerification) {
         state = AsyncValue.data(AuthState.unverified(user: user));
       } else {
-        state = AsyncValue.data(AuthState.authenticated(user));
+        state = AsyncValue.data(AuthState.authenticated(
+          user: user,
+          accessToken: user.accessToken,
+          idToken: user.idToken,
+          refreshToken: user.refreshToken,
+          tokenExpiresAt: user.tokenExpiresAt,
+        ));
       }
     } catch (e, stack) {
       state = AsyncValue.error(e.toString(), stack);

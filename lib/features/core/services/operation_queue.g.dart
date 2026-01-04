@@ -6,9 +6,46 @@ part of 'operation_queue.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$operationQueueHash() => r'a14303a5e3e5e990a21809e4d8947e59f91c1fda';
+String _$operationQueueHash() => r'f643f478a785d38234e167d57e1611539fa0725e';
 
-/// See also [OperationQueue].
+/// A persistent priority queue for managing offline-capable operations.
+///
+/// The queue handles execution, retry logic, deduplication, and persistence of
+/// operations across app restarts. Operations are processed based on priority,
+/// network connectivity, and authentication status.
+///
+/// ## Features
+/// - **Priority-based processing**: Critical operations execute first
+/// - **Exponential backoff retry**: Failed operations retry with increasing delays
+/// - **Deduplication**: Prevents redundant operations from accumulating
+/// - **Persistence**: Survives app restarts and device reboots
+/// - **Aging mechanism**: Low-priority operations get priority boost over time
+/// - **Round-robin**: Ensures fair processing across priority levels
+///
+/// ## Thread Safety
+/// All public methods are thread-safe. The queue processes operations
+/// sequentially on a 30-second timer, preventing concurrent execution.
+///
+/// ## Usage Example
+/// ```dart
+/// final queue = ref.read(operationQueueProvider.notifier);
+///
+/// // Add an operation to the queue
+/// await queue.addOperation(myOperation);
+///
+/// // Get pending operations
+/// final pending = queue.getPendingOperations();
+///
+/// // Retry a failed operation
+/// await queue.retryOperation(operationId);
+///
+/// // Clear all failed operations
+/// await queue.clearFailedOperations();
+/// ```
+///
+/// See [QueueableOperation] for creating custom operations.
+///
+/// Copied from [OperationQueue].
 @ProviderFor(OperationQueue)
 final operationQueueProvider =
     AutoDisposeAsyncNotifierProvider<OperationQueue, void>.internal(

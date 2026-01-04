@@ -44,10 +44,10 @@ class AuthState {
   /// Creates an authenticated state with the given user and tokens
   const AuthState.authenticated({
     required User user,
-    required String accessToken,
-    required String idToken,
-    required String refreshToken,
-    required DateTime tokenExpiresAt,
+    String? accessToken,
+    String? idToken,
+    String? refreshToken,
+    DateTime? tokenExpiresAt,
     bool requiresMFA = false,
   })  : user = user,
         isAuthenticated = true,

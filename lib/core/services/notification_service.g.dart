@@ -7,7 +7,7 @@ part of 'notification_service.dart';
 // **************************************************************************
 
 String _$notificationServiceHash() =>
-    r'c3084ffa5288dbfbb13e6a539a8c24a17ef4a220';
+    r'331afff2705469751e3e36621e8969fb1e2e5999';
 
 /// Service for managing notifications in the app
 ///

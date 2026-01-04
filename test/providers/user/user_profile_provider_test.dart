@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/models/user.dart';
-import 'package:soloadventurer/providers/user_profile_provider.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/profile/presentation/providers/user_profile_provider.dart';
 import 'package:soloadventurer/core/api/api_service.dart';
 import '../../utils/provider_container_utils.dart';
 import '../../utils/test_data.dart';

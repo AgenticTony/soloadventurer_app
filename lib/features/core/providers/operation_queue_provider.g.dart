@@ -6,16 +6,26 @@ part of 'operation_queue_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$operationQueueNotifierHash() => r'3a7f9c2e1d8b4f6a0e5c9d7b2a8f4e1c3d5a7b9f';
+String _$operationQueueNotifierHash() =>
+    r'3ce94f895390e0387a91fb64f0d1ec3e391de1cc';
 
-/// See also [OperationQueueNotifier].
+/// Provider that exposes the operation queue state to the UI
+///
+/// This provider provides a reactive state object that UI components can
+/// consume to display queue status, pending/failed operations, and processing state.
+///
+/// Note: Call refreshState() to update the state after operations are added
+/// or processed. The state does not auto-update to avoid excessive rebuilds.
+///
+/// Copied from [OperationQueueNotifier].
 @ProviderFor(OperationQueueNotifier)
-final operationQueueNotifierProvider =
-    AutoDisposeNotifierProvider<OperationQueueNotifier, OperationQueueState>.internal(
+final operationQueueNotifierProvider = AutoDisposeNotifierProvider<
+    OperationQueueNotifier, OperationQueueState>.internal(
   OperationQueueNotifier.new,
   name: r'operationQueueNotifierProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$operationQueueNotifierHash,
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$operationQueueNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );

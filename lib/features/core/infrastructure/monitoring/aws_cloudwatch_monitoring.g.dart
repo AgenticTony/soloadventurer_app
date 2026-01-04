@@ -7,7 +7,7 @@ part of 'aws_cloudwatch_monitoring.dart';
 // **************************************************************************
 
 String _$awsCloudWatchMonitoringHash() =>
-    r'04177cf564dbd2addd243aa0d7c2740d9471a0e6';
+    r'430cc0d683fc55ae0f3b09d079311b8ad04eb7c8';
 
 /// Provider for AWS CloudWatch monitoring service
 ///

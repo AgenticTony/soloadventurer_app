@@ -16,10 +16,21 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$OperationQueueState {
-  List<QueueableOperation> get pendingOperations => throw _privateConstructorUsedError;
-  List<QueueableOperation> get failedOperations => throw _privateConstructorUsedError;
+  /// List of pending operations waiting to be processed
+  List<QueueableOperation> get pendingOperations =>
+      throw _privateConstructorUsedError;
+
+  /// List of failed operations that exceeded max retries
+  List<QueueableOperation> get failedOperations =>
+      throw _privateConstructorUsedError;
+
+  /// Whether the queue is currently processing operations
   bool get isProcessing => throw _privateConstructorUsedError;
+
+  /// Count of pending operations
   int get pendingCount => throw _privateConstructorUsedError;
+
+  /// Count of failed operations
   int get failedCount => throw _privateConstructorUsedError;
 
   /// Create a copy of OperationQueueState
@@ -92,8 +103,8 @@ class _$OperationQueueStateCopyWithImpl<$Res, $Val extends OperationQueueState>
 /// @nodoc
 abstract class _$$OperationQueueStateImplCopyWith<$Res>
     implements $OperationQueueStateCopyWith<$Res> {
-  factory _$$OperationQueueStateImplCopyWith(
-          _$OperationQueueStateImpl value, $Res Function(_$OperationQueueStateImpl) then) =
+  factory _$$OperationQueueStateImplCopyWith(_$OperationQueueStateImpl value,
+          $Res Function(_$OperationQueueStateImpl) then) =
       __$$OperationQueueStateImplCopyWithImpl<$Res>;
   @override
   @useResult
@@ -109,8 +120,8 @@ abstract class _$$OperationQueueStateImplCopyWith<$Res>
 class __$$OperationQueueStateImplCopyWithImpl<$Res>
     extends _$OperationQueueStateCopyWithImpl<$Res, _$OperationQueueStateImpl>
     implements _$$OperationQueueStateImplCopyWith<$Res> {
-  __$$OperationQueueStateImplCopyWithImpl(
-      _$OperationQueueStateImpl _value, $Res Function(_$OperationQueueStateImpl) _then)
+  __$$OperationQueueStateImplCopyWithImpl(_$OperationQueueStateImpl _value,
+      $Res Function(_$OperationQueueStateImpl) _then)
       : super(_value, _then);
 
   /// Create a copy of OperationQueueState
@@ -126,11 +137,11 @@ class __$$OperationQueueStateImplCopyWithImpl<$Res>
   }) {
     return _then(_$OperationQueueStateImpl(
       pendingOperations: null == pendingOperations
-          ? _value.pendingOperations
+          ? _value._pendingOperations
           : pendingOperations // ignore: cast_nullable_to_non_nullable
               as List<QueueableOperation>,
       failedOperations: null == failedOperations
-          ? _value.failedOperations
+          ? _value._failedOperations
           : failedOperations // ignore: cast_nullable_to_non_nullable
               as List<QueueableOperation>,
       isProcessing: null == isProcessing
@@ -150,23 +161,57 @@ class __$$OperationQueueStateImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-class _$OperationQueueStateImpl implements _OperationQueueState {
-  const _$OperationQueueStateImpl(
-      {required this.pendingOperations,
-      required this.failedOperations,
-      required this.isProcessing,
-      required this.pendingCount,
-      required this.failedCount});
 
+class _$OperationQueueStateImpl extends _OperationQueueState {
+  const _$OperationQueueStateImpl(
+      {final List<QueueableOperation> pendingOperations = const [],
+      final List<QueueableOperation> failedOperations = const [],
+      this.isProcessing = false,
+      this.pendingCount = 0,
+      this.failedCount = 0})
+      : _pendingOperations = pendingOperations,
+        _failedOperations = failedOperations,
+        super._();
+
+  /// List of pending operations waiting to be processed
+  final List<QueueableOperation> _pendingOperations;
+
+  /// List of pending operations waiting to be processed
   @override
-  final List<QueueableOperation> pendingOperations;
+  @JsonKey()
+  List<QueueableOperation> get pendingOperations {
+    if (_pendingOperations is EqualUnmodifiableListView)
+      return _pendingOperations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_pendingOperations);
+  }
+
+  /// List of failed operations that exceeded max retries
+  final List<QueueableOperation> _failedOperations;
+
+  /// List of failed operations that exceeded max retries
   @override
-  final List<QueueableOperation> failedOperations;
+  @JsonKey()
+  List<QueueableOperation> get failedOperations {
+    if (_failedOperations is EqualUnmodifiableListView)
+      return _failedOperations;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_failedOperations);
+  }
+
+  /// Whether the queue is currently processing operations
   @override
+  @JsonKey()
   final bool isProcessing;
+
+  /// Count of pending operations
   @override
+  @JsonKey()
   final int pendingCount;
+
+  /// Count of failed operations
   @override
+  @JsonKey()
   final int failedCount;
 
   @override
@@ -179,10 +224,10 @@ class _$OperationQueueStateImpl implements _OperationQueueState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$OperationQueueStateImpl &&
-            (identical(other.pendingOperations, pendingOperations) ||
-                other.pendingOperations == pendingOperations) &&
-            (identical(other.failedOperations, failedOperations) ||
-                other.failedOperations == failedOperations) &&
+            const DeepCollectionEquality()
+                .equals(other._pendingOperations, _pendingOperations) &&
+            const DeepCollectionEquality()
+                .equals(other._failedOperations, _failedOperations) &&
             (identical(other.isProcessing, isProcessing) ||
                 other.isProcessing == isProcessing) &&
             (identical(other.pendingCount, pendingCount) ||
@@ -192,8 +237,13 @@ class _$OperationQueueStateImpl implements _OperationQueueState {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, pendingOperations, failedOperations, isProcessing, pendingCount, failedCount);
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_pendingOperations),
+      const DeepCollectionEquality().hash(_failedOperations),
+      isProcessing,
+      pendingCount,
+      failedCount);
 
   /// Create a copy of OperationQueueState
   /// with the given fields replaced by the non-null parameter values.
@@ -201,25 +251,36 @@ class _$OperationQueueStateImpl implements _OperationQueueState {
   @override
   @pragma('vm:prefer-inline')
   _$$OperationQueueStateImplCopyWith<_$OperationQueueStateImpl> get copyWith =>
-      __$$OperationQueueStateImplCopyWithImpl<_$OperationQueueStateImpl>(this, _$identity);
+      __$$OperationQueueStateImplCopyWithImpl<_$OperationQueueStateImpl>(
+          this, _$identity);
 }
 
-abstract class _OperationQueueState implements OperationQueueState {
+abstract class _OperationQueueState extends OperationQueueState {
   const factory _OperationQueueState(
-      {required final List<QueueableOperation> pendingOperations,
-      required final List<QueueableOperation> failedOperations,
-      required final bool isProcessing,
-      required final int pendingCount,
-      required final int failedCount}) = _$OperationQueueStateImpl;
+      {final List<QueueableOperation> pendingOperations,
+      final List<QueueableOperation> failedOperations,
+      final bool isProcessing,
+      final int pendingCount,
+      final int failedCount}) = _$OperationQueueStateImpl;
+  const _OperationQueueState._() : super._();
 
+  /// List of pending operations waiting to be processed
   @override
   List<QueueableOperation> get pendingOperations;
+
+  /// List of failed operations that exceeded max retries
   @override
   List<QueueableOperation> get failedOperations;
+
+  /// Whether the queue is currently processing operations
   @override
   bool get isProcessing;
+
+  /// Count of pending operations
   @override
   int get pendingCount;
+
+  /// Count of failed operations
   @override
   int get failedCount;
 

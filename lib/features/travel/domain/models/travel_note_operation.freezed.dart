@@ -28,7 +28,13 @@ mixin _$TravelNoteOperation {
   String? get locationName => throw _privateConstructorUsedError;
   double? get latitude => throw _privateConstructorUsedError;
   double? get longitude => throw _privateConstructorUsedError;
-  DateTime? get timestamp => throw _privateConstructorUsedError;
+  DateTime? get timestamp =>
+      throw _privateConstructorUsedError; // Retry metadata
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get lastAttempt => throw _privateConstructorUsedError;
+  int get attemptCount => throw _privateConstructorUsedError;
+  String? get lastError => throw _privateConstructorUsedError;
+  int get maxRetries => throw _privateConstructorUsedError;
 
   /// Serializes this TravelNoteOperation to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -55,7 +61,12 @@ abstract class $TravelNoteOperationCopyWith<$Res> {
       String? locationName,
       double? latitude,
       double? longitude,
-      DateTime? timestamp});
+      DateTime? timestamp,
+      DateTime? createdAt,
+      DateTime? lastAttempt,
+      int attemptCount,
+      String? lastError,
+      int maxRetries});
 }
 
 /// @nodoc
@@ -82,6 +93,11 @@ class _$TravelNoteOperationCopyWithImpl<$Res, $Val extends TravelNoteOperation>
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? timestamp = freezed,
+    Object? createdAt = freezed,
+    Object? lastAttempt = freezed,
+    Object? attemptCount = null,
+    Object? lastError = freezed,
+    Object? maxRetries = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -120,6 +136,26 @@ class _$TravelNoteOperationCopyWithImpl<$Res, $Val extends TravelNoteOperation>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastAttempt: freezed == lastAttempt
+          ? _value.lastAttempt
+          : lastAttempt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      attemptCount: null == attemptCount
+          ? _value.attemptCount
+          : attemptCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastError: freezed == lastError
+          ? _value.lastError
+          : lastError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      maxRetries: null == maxRetries
+          ? _value.maxRetries
+          : maxRetries // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -141,7 +177,12 @@ abstract class _$$TravelNoteOperationImplCopyWith<$Res>
       String? locationName,
       double? latitude,
       double? longitude,
-      DateTime? timestamp});
+      DateTime? timestamp,
+      DateTime? createdAt,
+      DateTime? lastAttempt,
+      int attemptCount,
+      String? lastError,
+      int maxRetries});
 }
 
 /// @nodoc
@@ -166,6 +207,11 @@ class __$$TravelNoteOperationImplCopyWithImpl<$Res>
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? timestamp = freezed,
+    Object? createdAt = freezed,
+    Object? lastAttempt = freezed,
+    Object? attemptCount = null,
+    Object? lastError = freezed,
+    Object? maxRetries = null,
   }) {
     return _then(_$TravelNoteOperationImpl(
       id: null == id
@@ -204,6 +250,26 @@ class __$$TravelNoteOperationImplCopyWithImpl<$Res>
           ? _value.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastAttempt: freezed == lastAttempt
+          ? _value.lastAttempt
+          : lastAttempt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      attemptCount: null == attemptCount
+          ? _value.attemptCount
+          : attemptCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastError: freezed == lastError
+          ? _value.lastError
+          : lastError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      maxRetries: null == maxRetries
+          ? _value.maxRetries
+          : maxRetries // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -216,11 +282,16 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
       required this.tripId,
       required this.noteType,
       required final Map<String, dynamic> content,
-      this.priority = 1,
+      this.priority = OperationPriority.normal,
       this.locationName,
       this.latitude,
       this.longitude,
-      this.timestamp})
+      this.timestamp,
+      this.createdAt,
+      this.lastAttempt,
+      this.attemptCount = 0,
+      this.lastError,
+      this.maxRetries = 3})
       : _content = content,
         super._();
 
@@ -252,10 +323,23 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
   final double? longitude;
   @override
   final DateTime? timestamp;
+// Retry metadata
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? lastAttempt;
+  @override
+  @JsonKey()
+  final int attemptCount;
+  @override
+  final String? lastError;
+  @override
+  @JsonKey()
+  final int maxRetries;
 
   @override
   String toString() {
-    return 'TravelNoteOperation(id: $id, tripId: $tripId, noteType: $noteType, content: $content, priority: $priority, locationName: $locationName, latitude: $latitude, longitude: $longitude, timestamp: $timestamp)';
+    return 'TravelNoteOperation(id: $id, tripId: $tripId, noteType: $noteType, content: $content, priority: $priority, locationName: $locationName, latitude: $latitude, longitude: $longitude, timestamp: $timestamp, createdAt: $createdAt, lastAttempt: $lastAttempt, attemptCount: $attemptCount, lastError: $lastError, maxRetries: $maxRetries)';
   }
 
   @override
@@ -277,7 +361,17 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
             (identical(other.timestamp, timestamp) ||
-                other.timestamp == timestamp));
+                other.timestamp == timestamp) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.lastAttempt, lastAttempt) ||
+                other.lastAttempt == lastAttempt) &&
+            (identical(other.attemptCount, attemptCount) ||
+                other.attemptCount == attemptCount) &&
+            (identical(other.lastError, lastError) ||
+                other.lastError == lastError) &&
+            (identical(other.maxRetries, maxRetries) ||
+                other.maxRetries == maxRetries));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -292,7 +386,12 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
       locationName,
       latitude,
       longitude,
-      timestamp);
+      timestamp,
+      createdAt,
+      lastAttempt,
+      attemptCount,
+      lastError,
+      maxRetries);
 
   /// Create a copy of TravelNoteOperation
   /// with the given fields replaced by the non-null parameter values.
@@ -321,7 +420,12 @@ abstract class _TravelNoteOperation extends TravelNoteOperation {
       final String? locationName,
       final double? latitude,
       final double? longitude,
-      final DateTime? timestamp}) = _$TravelNoteOperationImpl;
+      final DateTime? timestamp,
+      final DateTime? createdAt,
+      final DateTime? lastAttempt,
+      final int attemptCount,
+      final String? lastError,
+      final int maxRetries}) = _$TravelNoteOperationImpl;
   const _TravelNoteOperation._() : super._();
 
   factory _TravelNoteOperation.fromJson(Map<String, dynamic> json) =
@@ -344,7 +448,17 @@ abstract class _TravelNoteOperation extends TravelNoteOperation {
   @override
   double? get longitude;
   @override
-  DateTime? get timestamp;
+  DateTime? get timestamp; // Retry metadata
+  @override
+  DateTime? get createdAt;
+  @override
+  DateTime? get lastAttempt;
+  @override
+  int get attemptCount;
+  @override
+  String? get lastError;
+  @override
+  int get maxRetries;
 
   /// Create a copy of TravelNoteOperation
   /// with the given fields replaced by the non-null parameter values.

@@ -1,0 +1,41 @@
+# Build configuration for SoloAdventurer
+# Exclude development directories from code generation
+targets:
+  $default:
+    sources:
+      include:
+        - lib/**
+        - test/**
+      exclude:
+        - .worktrees/**
+        - .auto-claude/**
+        - lib/features/safety/**
+    builders:
+      # Riverpod generator - exclude dev directories
+      riverpod_generator|riverpod_generator:
+        enabled: true
+        generate_for:
+          exclude:
+            - .worktrees/**
+            - .auto-claude/**
+      # Freezed - exclude dev directories
+      freezed|freezed:
+        enabled: true
+        generate_for:
+          exclude:
+            - .worktrees/**
+            - .auto-claude/**
+      # JSON Serializable - exclude dev directories
+      json_serializable|json_serializable:
+        enabled: true
+        generate_for:
+          exclude:
+            - .worktrees/**
+            - .auto-claude/**
+      # Drift (database) - exclude dev directories
+      drift_dev|drift_dev:
+        enabled: true
+        generate_for:
+          exclude:
+            - .worktrees/**
+            - .auto-claude/**

@@ -1,6 +1,6 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/services/auth_service.dart';
-import 'package:soloadventurer/services/session_manager.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/auth_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/session_manager.dart';
 
 /// A mock implementation of [AuthService] for testing.
 class MockAuthService extends Mock implements AuthService {

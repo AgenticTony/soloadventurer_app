@@ -1,7 +1,7 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:soloadventurer/services/secure_storage_service.dart';
+import 'package:soloadventurer/core/storage/secure_storage_service.dart';
 
 /// A mock implementation of [SharedPreferences] for testing.
 class MockSharedPreferences extends Mock implements SharedPreferences {

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/services/auth_service.dart';
-import 'package:soloadventurer/providers/auth_provider.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/auth_service.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
 import 'package:soloadventurer/features/auth/domain/entities/auth_session.dart';
 
 /// Mock classes for testing

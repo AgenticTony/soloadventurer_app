@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/utils/performance_monitoring.dart';
 import 'package:soloadventurer/utils/performance_metrics.dart';
-import 'package:soloadventurer/services/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/core/monitoring/monitoring_service.dart';
 
 /// Example screen demonstrating performance monitoring
 class PerformanceExampleScreen extends ConsumerStatefulWidget {

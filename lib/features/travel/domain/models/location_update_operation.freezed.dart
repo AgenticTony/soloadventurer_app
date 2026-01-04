@@ -25,7 +25,12 @@ mixin _$LocationUpdateOperation {
   double get latitude => throw _privateConstructorUsedError;
   double get longitude => throw _privateConstructorUsedError;
   DateTime get timestamp => throw _privateConstructorUsedError;
-  int get priority => throw _privateConstructorUsedError;
+  int get priority => throw _privateConstructorUsedError; // Retry metadata
+  DateTime? get createdAt => throw _privateConstructorUsedError;
+  DateTime? get lastAttempt => throw _privateConstructorUsedError;
+  int get attemptCount => throw _privateConstructorUsedError;
+  String? get lastError => throw _privateConstructorUsedError;
+  int get maxRetries => throw _privateConstructorUsedError;
 
   /// Serializes this LocationUpdateOperation to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,7 +53,12 @@ abstract class $LocationUpdateOperationCopyWith<$Res> {
       double latitude,
       double longitude,
       DateTime timestamp,
-      int priority});
+      int priority,
+      DateTime? createdAt,
+      DateTime? lastAttempt,
+      int attemptCount,
+      String? lastError,
+      int maxRetries});
 }
 
 /// @nodoc
@@ -72,6 +82,11 @@ class _$LocationUpdateOperationCopyWithImpl<$Res,
     Object? longitude = null,
     Object? timestamp = null,
     Object? priority = null,
+    Object? createdAt = freezed,
+    Object? lastAttempt = freezed,
+    Object? attemptCount = null,
+    Object? lastError = freezed,
+    Object? maxRetries = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -94,6 +109,26 @@ class _$LocationUpdateOperationCopyWithImpl<$Res,
           ? _value.priority
           : priority // ignore: cast_nullable_to_non_nullable
               as int,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastAttempt: freezed == lastAttempt
+          ? _value.lastAttempt
+          : lastAttempt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      attemptCount: null == attemptCount
+          ? _value.attemptCount
+          : attemptCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastError: freezed == lastError
+          ? _value.lastError
+          : lastError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      maxRetries: null == maxRetries
+          ? _value.maxRetries
+          : maxRetries // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -112,7 +147,12 @@ abstract class _$$LocationUpdateOperationImplCopyWith<$Res>
       double latitude,
       double longitude,
       DateTime timestamp,
-      int priority});
+      int priority,
+      DateTime? createdAt,
+      DateTime? lastAttempt,
+      int attemptCount,
+      String? lastError,
+      int maxRetries});
 }
 
 /// @nodoc
@@ -135,6 +175,11 @@ class __$$LocationUpdateOperationImplCopyWithImpl<$Res>
     Object? longitude = null,
     Object? timestamp = null,
     Object? priority = null,
+    Object? createdAt = freezed,
+    Object? lastAttempt = freezed,
+    Object? attemptCount = null,
+    Object? lastError = freezed,
+    Object? maxRetries = null,
   }) {
     return _then(_$LocationUpdateOperationImpl(
       id: null == id
@@ -157,6 +202,26 @@ class __$$LocationUpdateOperationImplCopyWithImpl<$Res>
           ? _value.priority
           : priority // ignore: cast_nullable_to_non_nullable
               as int,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastAttempt: freezed == lastAttempt
+          ? _value.lastAttempt
+          : lastAttempt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      attemptCount: null == attemptCount
+          ? _value.attemptCount
+          : attemptCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastError: freezed == lastError
+          ? _value.lastError
+          : lastError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      maxRetries: null == maxRetries
+          ? _value.maxRetries
+          : maxRetries // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -169,7 +234,12 @@ class _$LocationUpdateOperationImpl extends _LocationUpdateOperation {
       required this.latitude,
       required this.longitude,
       required this.timestamp,
-      this.priority = 1})
+      this.priority = OperationPriority.low,
+      this.createdAt,
+      this.lastAttempt,
+      this.attemptCount = 0,
+      this.lastError,
+      this.maxRetries = 3})
       : super._();
 
   factory _$LocationUpdateOperationImpl.fromJson(Map<String, dynamic> json) =>
@@ -186,10 +256,23 @@ class _$LocationUpdateOperationImpl extends _LocationUpdateOperation {
   @override
   @JsonKey()
   final int priority;
+// Retry metadata
+  @override
+  final DateTime? createdAt;
+  @override
+  final DateTime? lastAttempt;
+  @override
+  @JsonKey()
+  final int attemptCount;
+  @override
+  final String? lastError;
+  @override
+  @JsonKey()
+  final int maxRetries;
 
   @override
   String toString() {
-    return 'LocationUpdateOperation(id: $id, latitude: $latitude, longitude: $longitude, timestamp: $timestamp, priority: $priority)';
+    return 'LocationUpdateOperation(id: $id, latitude: $latitude, longitude: $longitude, timestamp: $timestamp, priority: $priority, createdAt: $createdAt, lastAttempt: $lastAttempt, attemptCount: $attemptCount, lastError: $lastError, maxRetries: $maxRetries)';
   }
 
   @override
@@ -205,13 +288,33 @@ class _$LocationUpdateOperationImpl extends _LocationUpdateOperation {
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
             (identical(other.priority, priority) ||
-                other.priority == priority));
+                other.priority == priority) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.lastAttempt, lastAttempt) ||
+                other.lastAttempt == lastAttempt) &&
+            (identical(other.attemptCount, attemptCount) ||
+                other.attemptCount == attemptCount) &&
+            (identical(other.lastError, lastError) ||
+                other.lastError == lastError) &&
+            (identical(other.maxRetries, maxRetries) ||
+                other.maxRetries == maxRetries));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, latitude, longitude, timestamp, priority);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      latitude,
+      longitude,
+      timestamp,
+      priority,
+      createdAt,
+      lastAttempt,
+      attemptCount,
+      lastError,
+      maxRetries);
 
   /// Create a copy of LocationUpdateOperation
   /// with the given fields replaced by the non-null parameter values.
@@ -236,7 +339,12 @@ abstract class _LocationUpdateOperation extends LocationUpdateOperation {
       required final double latitude,
       required final double longitude,
       required final DateTime timestamp,
-      final int priority}) = _$LocationUpdateOperationImpl;
+      final int priority,
+      final DateTime? createdAt,
+      final DateTime? lastAttempt,
+      final int attemptCount,
+      final String? lastError,
+      final int maxRetries}) = _$LocationUpdateOperationImpl;
   const _LocationUpdateOperation._() : super._();
 
   factory _LocationUpdateOperation.fromJson(Map<String, dynamic> json) =
@@ -251,7 +359,17 @@ abstract class _LocationUpdateOperation extends LocationUpdateOperation {
   @override
   DateTime get timestamp;
   @override
-  int get priority;
+  int get priority; // Retry metadata
+  @override
+  DateTime? get createdAt;
+  @override
+  DateTime? get lastAttempt;
+  @override
+  int get attemptCount;
+  @override
+  String? get lastError;
+  @override
+  int get maxRetries;
 
   /// Create a copy of LocationUpdateOperation
   /// with the given fields replaced by the non-null parameter values.

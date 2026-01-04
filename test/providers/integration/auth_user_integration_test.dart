@@ -1,10 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/models/user.dart';
-import 'package:soloadventurer/providers/auth_provider.dart';
-import 'package:soloadventurer/providers/user_profile_provider.dart'
-    as user_profile;
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
+import 'package:soloadventurer/features/profile/presentation/providers/user_profile_provider.dart' as user_profile;
 import '../../utils/provider_container_utils.dart';
 import '../../utils/test_data.dart';
 import '../../mocks/repositories/auth_repository_mock.dart';

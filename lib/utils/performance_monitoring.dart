@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/services/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/core/monitoring/monitoring_service.dart';
 import 'package:soloadventurer/utils/performance_metrics.dart';
 
 /// Performance thresholds for different operations in milliseconds
@@ -167,4 +167,4 @@ class PerformanceMonitoring {
 /// // Generate a report
 /// final report = PerformanceMonitoring.generatePerformanceReport();
 /// print(report);
-/// ``` 
+/// ```
