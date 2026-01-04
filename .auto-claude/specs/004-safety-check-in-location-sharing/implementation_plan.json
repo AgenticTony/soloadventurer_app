@@ -136,7 +136,7 @@
           "subtask_id": "2.4",
           "title": "Implement repository",
           "description": "Create SafetyRepositoryImpl implementing the repository interface",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/data/repositories/safety_repository_impl.dart"
           ]
