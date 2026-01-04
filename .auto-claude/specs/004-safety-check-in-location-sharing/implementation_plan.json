@@ -278,10 +278,11 @@
           "subtask_id": "5.1",
           "title": "Create trusted contacts list screen",
           "description": "Build screen to display and manage trusted contacts",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/screens/trusted_contacts_screen.dart"
-          ]
+          ],
+          "notes": "Created comprehensive trusted contacts list screen with full CRUD functionality. Features: displays list of trusted contacts with avatar, name, phone, source, and permission chips; shows location sharing and emergency alerts status indicators; loading, empty, and error states; pull-to-refresh; info dialog explaining trusted contacts and permission levels; popup menu for edit, toggle location sharing, toggle emergency alerts, and delete actions; contact details bottom sheet showing all contact information; confirmation dialog for delete; proper state management using Riverpod notifiers; follows existing screen patterns from profile feature."
         },
         {
           "subtask_id": "5.2",
