@@ -19,9 +19,21 @@ import '../widgets/filter_modal.dart';
 ///
 /// The screen integrates with [DestinationSearchProvider] for search state
 /// and [FilterProvider] for filter management.
+///
+/// Deep linking support:
+/// The [initialFilter] parameter allows pre-filtering from deep links.
+/// Example: `DestinationDiscoveryScreen(initialFilter: DestinationFilter(...))`
 class DestinationDiscoveryScreen extends ConsumerStatefulWidget {
   /// Creates a new [DestinationDiscoveryScreen]
-  const DestinationDiscoveryScreen({super.key});
+  ///
+  /// The [initialFilter] parameter can be used to pre-apply filters from deep links.
+  const DestinationDiscoveryScreen({
+    super.key,
+    this.initialFilter,
+  });
+
+  /// Optional initial filter from deep link
+  final DestinationFilter? initialFilter;
 
   /// Route name for navigation
   static const String routeName = '/destinations';
@@ -46,10 +58,24 @@ class _DestinationDiscoveryScreenState
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    // Perform initial search on load
+    // Apply initial filter from deep link and perform search
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _applyInitialFilter();
       _performSearch();
     });
+  }
+
+  /// Apply initial filter from deep link if provided
+  void _applyInitialFilter() {
+    if (widget.initialFilter != null && widget.initialFilter!.hasActiveFilters) {
+      final filterNotifier = ref.read(filterProvider.notifier);
+      filterNotifier.updateFilter(widget.initialFilter!);
+
+      // Update search controller if search query is provided
+      if (widget.initialFilter!.searchQuery != null) {
+        _searchController.text = widget.initialFilter!.searchQuery!;
+      }
+    }
   }
 
   @override
