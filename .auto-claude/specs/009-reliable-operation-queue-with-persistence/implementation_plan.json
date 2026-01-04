@@ -178,7 +178,7 @@
           "subtaskId": "2.3",
           "title": "Add Failed Operations Queue",
           "description": "Maintain separate queue for failed operations with user-initiated retry",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/core/services/operation_queue.dart"
           ],
@@ -196,6 +196,26 @@
               "retryAllFailed()",
               "clearFailedOperations()",
               "removeFailedOperation(String id)"
+            ],
+            "implementation": [
+              "Implemented getFailedOperations() to return unmodifiable list of failed operations",
+              "Implemented retryOperation(String id) to retry individual failed operations by ID",
+              "Implemented retryAllFailed() to bulk retry all failed operations",
+              "Implemented clearFailedOperations() to clear all failed operations from queue",
+              "Implemented removeFailedOperation(String id) to remove specific failed operation",
+              "Added _resetAttemptMetadata() helper to reset operation metadata for retry",
+              "All retry operations reset attemptCount to 0 and clear lastError",
+              "Failed operations moved back to pending queue when retried",
+              "All modifications persist to storage automatically",
+              "Error handling for operation not found cases",
+              "Debug logging for all operations"
+            ],
+            "notes": [
+              "Failed operations queue fully functional with user-initiated retry support",
+              "Operations can be retried individually or in bulk",
+              "Failed operations persist across app restarts",
+              "All retry metadata properly reset when moving operations back to pending queue",
+              "Complete API for failed operations management"
             ]
           }
         }

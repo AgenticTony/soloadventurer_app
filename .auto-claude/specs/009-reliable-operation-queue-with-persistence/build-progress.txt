@@ -105,10 +105,31 @@ This feature implements a reliable operation queue with persistence to ensure no
   - All retry metadata properly tracked and persisted
   - Manual code review completed - all requirements met
 
+- ✅ 2.3: Add Failed Operations Queue (2025-01-04)
+  - Implemented comprehensive failed operations management API:
+    - **getFailedOperations()**: Returns unmodifiable list of failed operations
+    - **retryOperation(String id)**: Retries a specific failed operation by ID
+    - **retryAllFailed()**: Retries all failed operations in bulk
+    - **clearFailedOperations()**: Clears all failed operations from queue
+    - **removeFailedOperation(String id)**: Removes a specific failed operation
+  - Added **_resetAttemptMetadata()** helper to reset operation metadata for retry:
+    - Resets attemptCount to 0
+    - Clears lastAttempt timestamp
+    - Clears lastError field
+  - When retrying failed operations:
+    - Operations removed from failed queue
+    - Metadata reset to initial state
+    - Moved back to pending queue for immediate processing
+    - Changes automatically persisted to storage
+  - Error handling for operation not found cases
+  - Debug logging for all failed operations operations
+  - All requirements met - Phase 2 now complete! ✅
+
 ### Next Steps
 - Phase 1 complete! ✅
-- Phase 2 in progress: Retry Logic & Failure Recovery
-- Next: Add Failed Operations Queue with user-initiated retry (subtask 2.3)
+- Phase 2 complete! ✅
+- Phase 3 pending: Operation Deduplication (subtasks 3.1, 3.2)
+- Next: Implement Operation Deduplication Logic (subtask 3.1)
 
 ### Implementation Plan Created
 - 7 phases defined
