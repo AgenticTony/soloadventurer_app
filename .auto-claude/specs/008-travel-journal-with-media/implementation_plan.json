@@ -275,9 +275,12 @@
           "subtask_id": "5.3",
           "title": "Build trip overview screen",
           "description": "Show all entries and media for a specific trip",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/screens/journal/TripOverviewScreen.tsx"
+            "lib/features/journal/presentation/providers/trip_overview_provider.dart",
+            "lib/features/journal/presentation/screens/trip_overview_screen.dart",
+            "lib/features/journal/presentation/screens/README_TRIP_OVERVIEW.md",
+            "lib/features/journal/presentation/screens/trip_overview_screen_example.dart"
           ]
         },
         {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/create_trip_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/trip_overview_screen.dart';
 
 /// Screen displaying trip details
 class TripDetailScreen extends ConsumerWidget {
@@ -245,10 +246,10 @@ class TripDetailScreen extends ConsumerWidget {
                         : 'No entries yet',
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
-                      // TODO: Navigate to trip entries list
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Coming soon: View trip entries'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TripOverviewScreen(tripId: trip.id),
                         ),
                       );
                     },
@@ -265,10 +266,10 @@ class TripDetailScreen extends ConsumerWidget {
                     subtitle: const Text('View all photos and videos'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
-                      // TODO: Navigate to media gallery
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Coming soon: Media gallery'),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TripOverviewScreen(tripId: trip.id),
                         ),
                       );
                     },
