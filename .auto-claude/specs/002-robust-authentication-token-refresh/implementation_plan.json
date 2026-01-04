@@ -208,7 +208,7 @@
           "id": "3.3",
           "title": "Update Auth Provider with Session Restoration",
           "description": "Modify AuthProvider to restore session on app initialization and keep user logged in",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "AuthProvider restores session on initialization",
             "Updates auth state based on session validity",
