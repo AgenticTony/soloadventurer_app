@@ -392,9 +392,12 @@
           "subtask_id": "7.3",
           "title": "Add conflict resolution logic",
           "description": "Handle conflicts when same entry is edited offline and online",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/services/conflictResolution.ts"
+            "lib/features/journal/domain/services/conflict_resolution_service.dart",
+            "lib/features/journal/data/services/conflict_resolution_service_impl.dart",
+            "lib/features/journal/data/services/README_CONFLICT_RESOLUTION.md",
+            "lib/features/journal/data/services/conflict_resolution_service_example.dart"
           ]
         },
         {
