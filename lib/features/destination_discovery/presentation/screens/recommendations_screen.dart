@@ -8,6 +8,7 @@ import '../../domain/models/saved_destination.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
+import '../utils/error_handler.dart';
 
 /// Screen displaying personalized destination recommendations for the user.
 ///
@@ -386,41 +387,12 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
   Widget _buildEmptyState(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.explore_off,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No recommendations yet',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getEmptyStateMessage(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _refreshRecommendations,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Refresh'),
-            ),
-          ],
-        ),
-      ),
+    return DestinationEmptyStateWidget(
+      title: 'No recommendations yet',
+      message: _getEmptyStateMessage(),
+      icon: Icons.explore_off,
+      actionLabel: 'Refresh',
+      onAction: _refreshRecommendations,
     );
   }
 
@@ -430,6 +402,16 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
     Object error, {
     bool isAuthError = false,
   }) {
+    // Use custom error widget for non-auth errors
+    if (!isAuthError) {
+      return DestinationErrorWidget(
+        error: error,
+        onRetry: _refreshRecommendations,
+        customMessage: _getCustomErrorMessage(error),
+      );
+    }
+
+    // Keep existing sign-in prompt for auth errors
     final theme = Theme.of(context);
 
     return Center(
@@ -439,19 +421,15 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isAuthError ? Icons.lock_outline : Icons.error_outline,
+              Icons.lock_outline,
               size: 64,
-              color: isAuthError
-                  ? theme.colorScheme.onSurfaceVariant
-                  : theme.colorScheme.error,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
             Text(
-              isAuthError ? 'Authentication Required' : 'Something went wrong',
+              'Authentication Required',
               style: theme.textTheme.titleLarge?.copyWith(
-                color: isAuthError
-                    ? theme.colorScheme.onSurfaceVariant
-                    : theme.colorScheme.error,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -462,18 +440,22 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
               ),
               textAlign: TextAlign.center,
             ),
-            if (!isAuthError) ...[
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _refreshRecommendations,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Try Again'),
-              ),
-            ],
           ],
         ),
       ),
     );
+  }
+
+  /// Get custom error message for recommendations
+  String? _getCustomErrorMessage(Object error) {
+    if (error is NetworkConnectivityException) {
+      return 'Unable to load recommendations. Please check your internet connection.';
+    } else if (error is NetworkTimeoutException) {
+      return 'Loading recommendations timed out. Please try again.';
+    } else if (error is ServerException) {
+      return 'Unable to load recommendations due to a server error. Please try again later.';
+    }
+    return null;
   }
 
   /// Build sign in prompt widget

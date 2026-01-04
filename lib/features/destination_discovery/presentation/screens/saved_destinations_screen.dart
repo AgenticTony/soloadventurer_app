@@ -8,6 +8,7 @@ import '../widgets/add_to_trip_flow.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
+import '../utils/error_handler.dart';
 
 /// Screen showing user's saved destinations (wishlist and trips).
 ///
@@ -394,54 +395,24 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
 
   /// Build empty state widget
   Widget _buildEmptyState() {
-    final theme = Theme.of(context);
     final isWishlistTab = _tabController.index == 0;
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isWishlistTab ? Icons.bookmark_border : Icons.flight_takeoff,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              isWishlistTab ? 'Your wishlist is empty' : 'No trips planned yet',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              isWishlistTab
-                  ? 'Start exploring and save destinations you\'re interested in!'
-                  : 'Add destinations to your trips to start planning your adventure!',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                // TODO: Navigate to destination discovery screen in subtask 6.1
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Navigate to discovery - to be implemented'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.explore),
-              label: const Text('Discover Destinations'),
-            ),
-          ],
-        ),
-      ),
+    return DestinationEmptyStateWidget(
+      title: isWishlistTab ? 'Your wishlist is empty' : 'No trips planned yet',
+      message: isWishlistTab
+          ? 'Start exploring and save destinations you\'re interested in!'
+          : 'Add destinations to your trips to start planning your adventure!',
+      icon: isWishlistTab ? Icons.bookmark_border : Icons.flight_takeoff,
+      actionLabel: 'Discover Destinations',
+      onAction: () {
+        // TODO: Navigate to destination discovery screen in subtask 6.1
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Navigate to discovery - to be implemented'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      },
     );
   }
 
@@ -450,6 +421,16 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
     Object error, {
     bool isAuthError = false,
   }) {
+    // Use custom error widget for non-auth errors
+    if (!isAuthError) {
+      return DestinationErrorWidget(
+        error: error,
+        onRetry: _refreshSavedDestinations,
+        customMessage: _getCustomErrorMessage(error),
+      );
+    }
+
+    // Keep existing auth error handling
     final theme = Theme.of(context);
 
     return Center(
@@ -459,19 +440,15 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              isAuthError ? Icons.lock_outline : Icons.error_outline,
+              Icons.lock_outline,
               size: 64,
-              color: isAuthError
-                  ? theme.colorScheme.onSurfaceVariant
-                  : theme.colorScheme.error,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
             Text(
-              isAuthError ? 'Authentication Required' : 'Something went wrong',
+              'Authentication Required',
               style: theme.textTheme.titleLarge?.copyWith(
-                color: isAuthError
-                    ? theme.colorScheme.onSurfaceVariant
-                    : theme.colorScheme.error,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -482,18 +459,22 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
               ),
               textAlign: TextAlign.center,
             ),
-            if (!isAuthError) ...[
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _refreshSavedDestinations,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Try Again'),
-              ),
-            ],
           ],
         ),
       ),
     );
+  }
+
+  /// Get custom error message for saved destinations
+  String? _getCustomErrorMessage(Object error) {
+    if (error is NetworkConnectivityException) {
+      return 'Unable to load your saved destinations. Please check your internet connection.';
+    } else if (error is NetworkTimeoutException) {
+      return 'Loading saved destinations timed out. Please try again.';
+    } else if (error is ServerException) {
+      return 'Unable to load saved destinations due to a server error. Please try again later.';
+    }
+    return null;
   }
 
   /// Build sign in prompt widget

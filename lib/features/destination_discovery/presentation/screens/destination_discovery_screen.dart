@@ -7,6 +7,7 @@ import '../../application/providers/filter_provider.dart';
 import '../widgets/destination_card.dart';
 import '../widgets/filter_chips.dart';
 import '../widgets/filter_modal.dart';
+import '../utils/error_handler.dart';
 
 /// Main screen for destination discovery with search and filters.
 ///
@@ -359,85 +360,46 @@ class _DestinationDiscoveryScreenState
 
   /// Build empty state widget
   Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.search_off,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No destinations found',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Try adjusting your filters or search terms',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () {
-                ref.read(filterProvider.notifier).reset();
-                _clearSearch();
-              },
-              icon: const Icon(Icons.clear_all),
-              label: const Text('Clear All Filters'),
-            ),
-          ],
-        ),
-      ),
+    final filter = ref.read(filterProvider);
+    final hasActiveFilters = filter.hasActiveFilters;
+
+    return DestinationEmptyStateWidget(
+      title: hasActiveFilters ? 'No destinations found' : 'No destinations yet',
+      message: hasActiveFilters
+          ? 'Try adjusting your filters or search terms to find more destinations.'
+          : 'Start exploring destinations around the world!',
+      icon: hasActiveFilters ? Icons.filter_list_off : Icons.explore,
+      actionLabel: hasActiveFilters ? 'Clear All Filters' : 'Discover Now',
+      onAction: hasActiveFilters
+          ? () {
+              ref.read(filterProvider.notifier).reset();
+              _clearSearch();
+            }
+          : null,
     );
   }
 
   /// Build error state widget
   Widget _buildErrorState(ThemeData theme, Object error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Something went wrong',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.error,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _performSearch,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-            ),
-          ],
-        ),
-      ),
+    return DestinationErrorWidget(
+      error: error,
+      onRetry: _performSearch,
+      customMessage: _getCustomErrorMessage(error),
     );
+  }
+
+  /// Get custom error message based on error type
+  String? _getCustomErrorMessage(Object error) {
+    // Provide contextual error messages for search
+    if (error is NetworkConnectivityException) {
+      return 'Unable to search destinations. Please check your internet connection and try again.';
+    } else if (error is NetworkTimeoutException) {
+      return 'Search request timed out. Please try again.';
+    } else if (error is ServerException) {
+      return 'Our servers are experiencing issues. Please try again later.';
+    }
+    // Use default message from error handler
+    return null;
   }
 
   /// Build loading indicator for "load more" pagination

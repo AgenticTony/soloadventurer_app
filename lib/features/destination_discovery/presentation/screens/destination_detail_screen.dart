@@ -12,6 +12,7 @@ import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
 import '../widgets/safety_insights.dart';
 import '../widgets/activity_list.dart';
+import '../utils/error_handler.dart';
 
 /// Detailed view of a single destination with comprehensive information.
 ///
@@ -777,35 +778,16 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
   Widget _buildEmptyState(ThemeData theme) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.place,
-                size: 64,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Destination not found',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'The destination you\'re looking for doesn\'t exist or has been removed.',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+      body: DestinationEmptyStateWidget(
+        title: 'Destination not found',
+        message: 'The destination you\'re looking for doesn\'t exist or has been removed. '
+            'Try browsing our other amazing destinations!',
+        icon: Icons.place,
+        actionLabel: 'Browse Destinations',
+        onAction: () {
+          // Navigate back to discovery screen
+          Navigator.of(context).pop();
+        },
       ),
     );
   }
@@ -814,43 +796,26 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
   Widget _buildErrorState(ThemeData theme, Object error) {
     return Scaffold(
       appBar: AppBar(),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: theme.colorScheme.error,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Something went wrong',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: theme.colorScheme.error,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                error.toString(),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _refreshDestination,
-                icon: const Icon(Icons.refresh),
-                label: const Text('Try Again'),
-              ),
-            ],
-          ),
-        ),
+      body: DestinationErrorWidget(
+        error: error,
+        onRetry: _refreshDestination,
+        customMessage: _getCustomErrorMessage(error),
       ),
     );
+  }
+
+  /// Get custom error message for destination detail
+  String? _getCustomErrorMessage(Object error) {
+    if (error is NetworkConnectivityException) {
+      return 'Unable to load destination details. Please check your internet connection.';
+    } else if (error is NetworkTimeoutException) {
+      return 'Loading destination details timed out. Please try again.';
+    } else if (error is NotFoundException) {
+      return 'This destination could not be found. It may have been removed.';
+    } else if (error is ServerException) {
+      return 'Unable to load destination details due to a server error. Please try again later.';
+    }
+    return null;
   }
 
   /// Returns budget level icon

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/curated_list.dart';
 import '../../application/providers/curated_lists_provider.dart';
 import '../widgets/curated_list_card.dart';
+import '../utils/error_handler.dart';
 import 'curated_list_detail_screen.dart';
 
 /// Screen displaying all curated destination collections.
@@ -348,82 +349,34 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
 
   /// Build empty state widget
   Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.collections_bookmark,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No curated collections found',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getEmptyStateMessage(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _refreshLists,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Refresh'),
-            ),
-          ],
-        ),
-      ),
+    return DestinationEmptyStateWidget(
+      title: 'No curated collections found',
+      message: _getEmptyStateMessage(),
+      icon: Icons.collections_bookmark,
+      actionLabel: 'Refresh',
+      onAction: _refreshLists,
     );
   }
 
   /// Build error state widget
   Widget _buildErrorState(ThemeData theme, Object error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Something went wrong',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.error,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: _refreshLists,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Try Again'),
-            ),
-          ],
-        ),
-      ),
+    return DestinationErrorWidget(
+      error: error,
+      onRetry: _refreshLists,
+      customMessage: _getCustomErrorMessage(error),
     );
+  }
+
+  /// Get custom error message for curated lists
+  String? _getCustomErrorMessage(Object error) {
+    if (error is NetworkConnectivityException) {
+      return 'Unable to load curated collections. Please check your internet connection.';
+    } else if (error is NetworkTimeoutException) {
+      return 'Loading collections timed out. Please try again.';
+    } else if (error is ServerException) {
+      return 'Unable to load collections due to a server error. Please try again later.';
+    }
+    return null;
   }
 
   /// Build filter menu item
