@@ -34,7 +34,13 @@ class LocationUpdateOperation
   bool get requiresNetwork => true;
 
   @override
-  String? get deduplicationKey => null; // TODO: Add deduplication in subtask 3.2
+  String? get deduplicationKey {
+    // Location updates form a time-series data stream and should not be deduplicated.
+    // Each location update represents the user's location at a specific point in time,
+    // and losing any updates would result in gaps in the location history.
+    // The queue system will process them in timestamp order to maintain chronological integrity.
+    return null;
+  }
 
   @override
   Future<void> execute() async {

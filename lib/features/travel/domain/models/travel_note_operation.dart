@@ -98,7 +98,14 @@ class TravelNoteOperation
   bool get requiresNetwork => false; // Notes work offline
 
   @override
-  String? get deduplicationKey => null; // TODO: Add deduplication in subtask 3.2
+  String? get deduplicationKey {
+    // Notes are unique user actions and should not be deduplicated.
+    // Each note operation has its own UUID and represents a distinct
+    // piece of content created by the user (text, expense, photo, etc.).
+    // Even if multiple notes of the same type are created for the same trip,
+    // they should all be processed to ensure no data loss.
+    return null;
+  }
 
   @override
   Future<void> execute() async {

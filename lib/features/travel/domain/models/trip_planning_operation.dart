@@ -90,7 +90,20 @@ class TripPlanningOperation
   bool get requiresNetwork => false; // Can work offline initially
 
   @override
-  String? get deduplicationKey => null; // TODO: Add deduplication in subtask 3.2
+  String? get deduplicationKey {
+    // Deduplicate update operations for the same trip
+    // This ensures that if multiple updates are queued for the same trip,
+    // only the most recent update is processed
+    if (planningType == TripPlanningType.update ||
+        planningType == TripPlanningType.addDestination ||
+        planningType == TripPlanningType.removeDestination ||
+        planningType == TripPlanningType.updateDates) {
+      return 'trip_$tripId';
+    }
+    // Create and delete operations should not be deduplicated
+    // as they represent unique user actions
+    return null;
+  }
 
   @override
   Future<void> execute() async {
