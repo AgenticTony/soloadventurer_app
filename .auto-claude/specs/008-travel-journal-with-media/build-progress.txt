@@ -461,3 +461,99 @@ All code follows existing Flutter/Dart patterns with proper state management (Ri
 
 Next step: Subtask 3.4 - Implement background upload service
 
+### 2026-01-05 19:00: Subtask 3.4 Completed
+Implemented comprehensive background media upload service with queue management (6 files):
+- **UploadTask model** (data/models/upload_task.dart - 400+ lines):
+  - Complete task model for tracking upload state
+  - UploadStatus enum with 7 states (queued, uploading, completed, failed, permanentFailure, paused, cancelled)
+  - UploadStatusExtension with helper methods (toValue, fromValue, isTerminal, canRetry, isActive)
+  - Task properties: id, filePath, mediaType, journalEntryId, status, progress, retryCount, maxRetries, errorMessage, storagePath, fileSize, timestamps, priority, compression flags
+  - Helper methods: shouldRetry, isReady, isComplete, hasPermanentlyFailed, uploadDuration, currentFilePath
+  - JSON serialization for persistence (toJson, fromJson)
+  - copyWith method for immutability
+  - Full Equatable integration
+- **MediaUploadService interface** (domain/services/media_upload_service.dart - 350+ lines):
+  - Complete service interface for media upload operations
+  - UploadResult class for operation results
+  - UploadConfig class with configurable settings
+  - Predefined configs: defaultConfig, slowNetworkConfig
+  - Queue management: enqueueUpload, enqueueMultipleUploads, startUploads, pauseUploads, resumeUploads
+  - Task control: cancelUpload, cancelAllUploads, retryUpload, clearCompletedTasks, clearAllTasks
+  - Query methods: getTasks, getTasksForEntry, getTask
+  - Progress monitoring: getTaskProgress, getQueueStatus, onProgressUpdate, onStatusChange
+  - UploadStatistics class with comprehensive metrics
+  - Configuration management and lifecycle methods
+- **MediaUploadServiceImpl** (data/services/media_upload_service_impl.dart - 700+ lines):
+  - Full implementation with background processing support
+  - SharedPreferences persistence for upload queue
+  - Workmanager integration for background uploads (15-min intervals)
+  - Concurrent upload management (configurable)
+  - Automatic retry with exponential backoff (5s base delay, max 5 min)
+  - Progress tracking with Stream support
+  - Compression integration (MediaCompression, VideoCompression)
+  - Supabase storage integration (journal-photos, journal-videos buckets)
+  - Database update after successful upload
+  - Error handling with specific exception types
+  - Memory management with proper cleanup
+  - Stream controllers for task and queue updates
+  - Statistics tracking (total uploads, success/failure rates, speed, progress)
+- **Riverpod providers** (presentation/providers/media_upload_providers.dart - 200+ lines):
+  - sharedPreferencesProvider for dependency injection
+  - mediaUploadServiceProvider for service instance
+  - uploadStatisticsProvider for statistics access
+  - uploadTasksProvider for all tasks
+  - uploadTasksForEntryProvider for entry-specific tasks
+  - uploadTaskProvider for single task
+  - uploadQueueStatusProvider for queue stream
+  - uploadTaskProgressProvider for task progress stream
+  - MediaUploadNotifier with full CRUD operations
+- **Comprehensive documentation** (README_MEDIA_UPLOAD.md - 600+ lines):
+  - Complete architecture overview with diagram
+  - Installation and setup instructions
+  - Quick start guide with code examples
+  - Upload task model reference
+  - Configuration options and predefined configs
+  - Complete API reference for all methods
+  - Riverpod integration guide
+  - Background processing explanation
+  - Error handling and retry logic
+  - Persistence strategy
+  - Compression integration details
+  - Best practices and patterns
+  - Troubleshooting guide
+  - Testing strategies with mock example
+  - Future enhancement roadmap
+  - Related components reference
+- **Example implementations** (media_upload_service_example.dart - 450+ lines):
+  - MediaUploadExampleScreen: Full-featured UI demonstrating all features
+  - Statistics section with comprehensive metrics display
+  - Queue section with task tiles showing status, progress, errors
+  - Task icons for different states (completed, failed, uploading, paused, etc.)
+  - Action buttons for all operations (enqueue, start, pause, resume, clear)
+  - Task-specific actions (cancel, retry) based on status
+  - MediaPickerUploadExample: Integration pattern with MediaPicker
+  - SingleUploadMonitorExample: Monitor individual upload progress
+  - JournalEntryUploadFlowExample: Real-world usage pattern in journal creation
+
+Key features implemented:
+✅ Complete queue management system with priority support
+✅ Background upload processing with Workmanager integration
+✅ Automatic retry with exponential backoff (configurable)
+✅ Real-time progress tracking via Streams
+✅ Upload statistics and metrics tracking
+✅ Persistent queue state across app restarts
+✅ Concurrent upload control (max 3 simultaneous by default)
+✅ Full error handling with specific exception types
+✅ Compression integration for photos and videos
+✅ Supabase storage integration (photos/videos buckets)
+✅ Database updates after successful uploads
+✅ Riverpod state management with providers and notifiers
+✅ Comprehensive documentation with examples
+✅ Material Design 3 UI examples
+
+The service addresses the user story: "As a traveler, I want to upload photos in the background so that I can continue using the app while they sync" and supports the offline-first architecture with queue persistence and automatic retry.
+
+All code follows existing Flutter/Dart patterns with proper error handling, state management (Riverpod), Clean Architecture principles, and documentation standards.
+
+Next step: Subtask 3.5 - Add upload progress indicator
+

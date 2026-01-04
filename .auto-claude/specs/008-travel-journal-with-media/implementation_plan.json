@@ -149,10 +149,14 @@
           "subtask_id": "3.4",
           "title": "Implement background upload service",
           "description": "Create service to upload media in background with queue management",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/services/mediaUploadService.ts",
-            "src/services/uploadQueue.ts"
+            "lib/features/journal/data/models/upload_task.dart",
+            "lib/features/journal/domain/services/media_upload_service.dart",
+            "lib/features/journal/data/services/media_upload_service_impl.dart",
+            "lib/features/journal/presentation/providers/media_upload_providers.dart",
+            "lib/features/journal/data/services/README_MEDIA_UPLOAD.md",
+            "lib/features/journal/data/services/media_upload_service_example.dart"
           ]
         },
         {
