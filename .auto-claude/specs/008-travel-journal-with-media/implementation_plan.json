@@ -93,9 +93,13 @@
           "subtask_id": "2.4",
           "title": "Build journal entry detail view",
           "description": "Create screen to view individual journal entries with all content",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/screens/journal/JournalEntryDetailScreen.tsx"
+            "lib/features/journal/presentation/providers/journal_entry_detail_provider.dart",
+            "lib/features/journal/presentation/widgets/rich_text_viewer.dart",
+            "lib/features/journal/presentation/screens/journal_entry_detail_screen.dart",
+            "lib/features/journal/presentation/screens/journal_entry_detail_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_ENTRY_DETAIL.md"
           ]
         }
       ]
