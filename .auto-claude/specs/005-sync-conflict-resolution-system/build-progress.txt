@@ -2,7 +2,7 @@
 
 ### Current Status
 Phase: Phase 3 - Retry & Error Handling
-Last Updated: 2026-01-05 04:00
+Last Updated: 2026-01-05 05:30
 
 ### Completed Subtasks
 - 1.1 - Design sync state management architecture
@@ -14,7 +14,9 @@ Last Updated: 2026-01-05 04:00
 - 2.3 - Build conflict resolution UI components
 - 2.4 - Implement user decision handling
 - 3.1 - Implement exponential backoff retry mechanism
-- 3.2 - Add error categorization and messaging ✨ NEW
+- 3.2 - Add error categorization and messaging
+- 3.3 - Create actionable error displays
+- 3.4 - Add manual sync trigger ✨ NEW
 
 ### Current Work
 Completed error categorization and messaging implementation:
@@ -490,5 +492,130 @@ All acceptance criteria for subtask 2.4 met:
 - Tests: 325 lines
 
 ### Next Steps
-Continue with Phase 3: Retry & Error Handling
-- Subtask 3.2 - Add error categorization and messaging
+Continue with Phase 4: Status Indicators
+- Subtask 4.1 - Create sync status indicator components
+
+### Recent Achievements (Subtask 3.4) ✨ NEW
+Implemented comprehensive manual sync trigger system for user-initiated sync operations.
+
+**New Presentation State Created:**
+- lib/features/sync/presentation/state/manual_sync_state.dart (185 lines)
+  - ManualSyncState with comprehensive state tracking
+  - Factory constructors: initial(), syncing(), success(), failure()
+  - Progress metrics: successCount, failureCount, totalProcessed
+  - Computed properties: isCompleted, isFailed, hasResults, totalOperations
+  - Duration calculation and success rate computation
+  - Full Equatable implementation for efficient rebuilds
+
+**New Presentation Notifier Created:**
+- lib/features/sync/presentation/notifiers/manual_sync_notifier.dart (180 lines)
+  - ManualSyncNotifier: StateNotifier for managing manual sync
+  - triggerSync(): Initiate manual sync operation
+  - Status change listening from sync service
+  - Automatic result tracking and error handling
+  - reset(): Reset state to initial
+  - clearError(): Clear error messages
+  - Proper async/await handling with mounted checks
+
+**New Providers Created:**
+- lib/features/sync/presentation/providers/sync_providers.dart (180+ lines)
+  - syncServiceProvider: Provider for sync service
+  - manualSyncNotifierProvider: Main notifier provider
+  - manualSyncStateProvider: Current state provider
+  - isSyncingProvider: Boolean indicating if sync is running
+  - lastSyncSuccessProvider: Last sync success status
+  - syncStatusProvider: Current sync status
+  - syncResultSummaryProvider: Formatted result summary
+  - pendingOperationsCountProvider: Number of pending operations
+  - hasPendingOperationsProvider: Boolean for pending operations
+  - syncStatusTextProvider: User-friendly status text
+  - lastSyncTimeProvider: Timestamp of last completed sync
+
+**New UI Widgets Created:**
+- lib/features/sync/presentation/widgets/manual_sync_button.dart (220+ lines)
+  - ManualSyncButton with 3 style variants (elevated, text, outlined)
+  - Dynamic labels and icons based on sync state
+  - Loading indicator during sync operations
+  - Success/failure visual feedback
+  - Pending operations count display
+  - Disabled state during active sync
+  - Color-coded styling (primary/error/success)
+
+- lib/features/sync/presentation/widgets/sync_pull_to_refresh.dart (230+ lines)
+  - SyncPullToRefresh wrapper widget for pull-to-refresh
+  - Works with any scrollable content
+  - Optional success/error snackbar notifications
+  - Auto-trigger on mount support
+  - Prevents duplicate sync triggers
+  - Disables refresh during active sync
+  - Retry action in error notifications
+  - View action for partial failures
+
+**Integration with Settings:**
+- Updated lib/features/profile/presentation/screens/profile_settings_screen.dart
+  - Added sync section with comprehensive status card
+  - Status card features:
+    - Icon with color coding based on state
+    - Status text (Syncing..., Ready to sync, Synced successfully, Sync failed)
+    - Pending operations count badge
+    - Last sync time with relative formatting (Just now, Xm ago, Xh ago, Xd ago)
+    - Sync result summary after completion
+  - Manual sync button in sync section
+  - Pull-to-refresh wrapper around entire ListView
+  - "Pull down to sync" hint text
+
+**Test Files Created:**
+- test/features/sync/presentation/state/manual_sync_state_test.dart (340+ lines)
+  - 40+ test cases covering all state functionality
+  - Factory constructor tests (initial, syncing, success, failure)
+  - Computed property tests (isCompleted, isFailed, hasResults, totalOperations)
+  - Duration calculation tests
+  - Success rate computation tests
+  - copyWith() method tests
+  - Equatable/toString() tests
+
+- test/features/sync/presentation/widgets/manual_sync_button_test.dart (170+ lines)
+  - 7+ test cases for ManualSyncButton
+  - Label and icon display tests for all states
+  - Loading indicator test
+  - Sync trigger test
+  - Disabled state test
+  - Mock providers for testing
+
+- test/features/sync/presentation/widgets/sync_pull_to_refresh_test.dart (240+ lines)
+  - 8+ test cases for SyncPullToRefresh
+  - Child widget wrapping test
+  - Pull-to-refresh trigger test
+  - Success snackbar notification test
+  - Error snackbar notification test
+  - Notification disable test
+  - Auto-trigger on mount test
+  - Duplicate sync prevention test
+
+**Key Features:**
+✓ Pull-to-refresh on any scrollable screen (SyncPullToRefresh wrapper)
+✓ Manual sync button in settings (sync section with status card)
+✓ Visual feedback during manual sync (loading indicators, color-coded status, progress spinners)
+✓ Success/error notifications with actionable messages
+✓ Pending operations count display
+✓ Relative time formatting (Just now, Xm ago, Xh ago, Xd ago)
+✓ Prevents duplicate sync triggers
+✓ Disabled state during active sync
+✓ Color-coded sync states (primary for success/syncing, error for failure)
+✓ Comprehensive test coverage (55+ test cases)
+
+All acceptance criteria for subtask 3.4 met:
+✓ Pull-to-refresh on relevant screens (SyncPullToRefresh wrapper implemented)
+✓ Manual sync button in settings (sync section added to ProfileSettingsScreen)
+✓ Visual feedback during manual sync (loading indicators, status cards, notifications)
+
+**Total Implementation:** 1,500+ lines of code
+- State model: 185 lines
+- Notifier: 180 lines
+- Providers: 180+ lines
+- ManualSyncButton widget: 220+ lines
+- SyncPullToRefresh widget: 230+ lines
+- Settings integration: 180+ lines (modifications)
+- Tests: 750+ lines (340 + 170 + 240)
+
+### Previous Work (Subtask 3.3)
