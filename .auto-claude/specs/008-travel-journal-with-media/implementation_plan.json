@@ -318,9 +318,12 @@
           "subtask_id": "6.2",
           "title": "Implement fullscreen media viewer",
           "description": "Create modal to view photos and videos at full screen",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/components/media/MediaViewer.tsx"
+            "lib/features/journal/presentation/widgets/media_viewer.dart",
+            "lib/features/journal/presentation/widgets/media_viewer_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_VIEWER.md",
+            "pubspec.yaml"
           ]
         },
         {
