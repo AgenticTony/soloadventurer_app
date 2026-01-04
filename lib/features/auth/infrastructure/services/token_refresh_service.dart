@@ -191,8 +191,8 @@ class TokenRefreshService {
       }
 
       try {
-        // Attempt to refresh the token
-        final session = await _authRepository.refreshToken();
+        // Attempt to refresh the token using basic refresh (no retry logic)
+        final session = await _authRepository.performBasicTokenRefresh();
 
         debugPrint('TokenRefreshService: Token refresh successful on attempt $attemptNumber');
 
