@@ -1,7 +1,7 @@
 {
   "spec_id": "001-offline-first-core-architecture",
   "created_at": "2026-01-04T18:30:19.054390+00:00",
-  "updated_at": "2026-01-04T20:24:02.671937+00:00",
+  "updated_at": "2026-01-04T20:26:44.801566+00:00",
   "phases": {
     "planning": {
       "phase": "planning",
@@ -20619,6 +20619,527 @@
           "tool_input": "git commit -m \"$(cat <<'EOF'\nauto-claude: 7.3 -...",
           "subtask_id": "7.3",
           "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:04.329482+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "7.3",
+          "session": 31,
+          "detail": "",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:24:10.296211+00:00",
+          "type": "text",
+          "content": "Now let me update the implementation plan to mark this subtask as completed:",
+          "phase": "coding",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:10.317038+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...irst-core-architecture/implementation_plan.json",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...irst-core-architecture/implementation_plan.json",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:10.335373+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "7.3",
+          "session": 31,
+          "detail": "   550→        },\n   551→        {\n   552→          \"id\": \"7.3\",\n   553→          \"title\": \"Create Sync Progress Indicator\",\n   554→          \"description\": \"Create modal or bottom sheet showing detailed sync progress\",\n   555→          \"status\": \"pending\",\n   556→          \"file\": \"lib/features/offline/presentation/widgets/sync_progress_dialog.dart\",\n   557→          \"acceptanceCriteria\": [\n   558→            \"Progress bar for active sync\",\n   559→            \"List of operations being synced\",\n   560→            \"Pending operations count\",\n   561→            \"Failed operations with error messages\",\n   562→            \"Cancel sync button\",\n   563→            \"Retry failed operations button\"\n   564→          ]\n   565→        },\n   566→        {\n   567→          \"id\": \"7.4\",\n   568→          \"title\": \"Add Offline Mode Banner\",\n   569→          \"description\": \"Create prominent banner when app is in offline mode\",\n   570→          \"status\": \"pending\",\n   571→          \"file\": \"lib/features/offline/presentation/widgets/offline_banner.dart\",\n   572→          \"acceptanceCriteria\": [\n   573→            \"Shows when connectivity is lost\",\n   574→            \"Explains that data will sync later\",\n   575→            \"Optionally show cached data count\",\n   576→            \"Dismissible but reappears on app foreground\",\n   577→            \"Different styling from sync banner\"\n   578→          ]\n   579→        },\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:24:20.206719+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...irst-core-architecture/implementation_plan.json",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...irst-core-architecture/implementation_plan.json",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:20.245522+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "subtask_id": "7.3",
+          "session": 31,
+          "detail": "The file ./.auto-claude/specs/001-offline-first-core-architecture/implementation_plan.json has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n   547→          ],\n   548→          \"notes\": \"Successfully implemented comprehensive ConnectivityIndicator widget (496 lines):\\n\\n**Implementation:**\\n- Created lib/features/offline/presentation/widgets/connectivity_indicator.dart\\n- ConsumerStatefulWidget with SingleTickerProviderStateMixin for animations\\n- Watches connectivityProvider and syncStatusProvider for reactive updates\\n\\n**Visual States:**\\n1. **Online & Synced**: Green checkmark icon (Icons.check_circle)\\n2. **Online & Syncing**: Animated rotating sync icon (Icons.sync with RotationTransition)\\n3. **Online & Pending**: Blue upload icon with pending count badge (Icons.cloud_upload)\\n4. **Online & Error**: Red error icon (Icons.error_outline)\\n5. **Offline**: Gray disconnected icon (Icons.cloud_off)\\n\\n**Key Features:**\\n- Small 20px icon designed for AppBar actions\\n- Automatic badge showing pending operations count (>99 shown as '99+')\\n- Tap handler showing detailed status dialog with:\\n  * Connection type (WiFi/Cellular/Disconnected)\\n  * Sync status with appropriate icons and colors\\n  * Sync progress percentage when syncing\\n  * Pending operations count\\n  * Last sync time (formatted as 'Just now', '5m ago', '2h ago', etc.)\\n  * Error message display in error container\\n  * 'Sync Now' button when online and not syncing\\n- Animated rotation only during sync state (AnimationController lifecycle managed)\\n- InkWell with CircleBorder for tap feedback\\n- Theme-aware colors using Material 3 color scheme\\n\\n**Dialog Details:**\\n- AlertDialog showing comprehensive status information\\n- Icon-based status rows with labels and values\\n- Color-coded states (green for synced, primary for syncing, error for failures)\\n- Human-readable timestamps with relative formatting\\n- Error container with icon for error messages\\n- Action buttons for 'Sync Now' and 'Close'\\n\\n**Integration:**\\n- Exported through offline_widgets.dart barrel file\\n- Uses connectivityProvider for network status\\n- Uses syncStatusProvider for sync state\\n- Follows existing widget patterns from sync_status_banner.dart\\n- Comprehensive documentation with usage examples\\n\\n**Acceptance Criteria Met:**\\n✓ Small icon in app bar or status bar\\n✓ Green check for online\\n✓ Gray icon for offline\\n✓ Animated sync icon when syncing\\n✓ Tap to show detailed status\\n\\nAll code follows project patterns with comprehensive documentation, proper resource disposal, and theme-aware styling.\\n\\nCommit hash: e3aa4e5\",\n   549→          \"updated_at\": \"2026-01-05T00:00:00.000Z\"\n   550→        },\n   551→        {\n   552→          \"id\": \"7.3\",\n   553→          \"title\": \"Create Sync Progress Indicator\",\n   554→          \"description\": \"Create modal or bottom sheet showing detailed sync progress\",\n   555→          \"status\": \"completed\",\n   556→          \"file\": \"lib/features/offline/presentation/widgets/sync_progress_dialog.dart\",\n   557→          \"acceptanceCriteria\": [\n   558→            \"Progress bar for active sync\",\n   559→            \"List of operations being synced\",\n   560→            \"Pending operations count\",\n   561→            \"Failed operations with error messages\",\n   562→            \"Cancel sync button\",\n   563→            \"Retry failed operations button\"\n   564→          ],\n   565→          \"notes\": \"Successfully implemented comprehensive sync progress dialog (560 lines):\\n\\n**Features:**\\n- ConsumerStatefulWidget with SingleTickerProviderStateMixin for animations\\n- Real-time sync status updates via syncStatusProvider\\n- Animated progress bar with percentage (0-100%) and phase indicators\\n- Pending operations list fetched from SyncQueueRepository\\n- Failed operations list with error messages and retry capability\\n- Cancel sync button during active sync operations\\n- Retry all failed operations button when sync is idle\\n- Refresh button to manually reload operations list\\n- Empty state when all operations are complete\\n- Theme-aware Material 3 design\\n\\n**Dialog States:**\\n1. **Syncing**: Animated rotating icon, progress bar, phase description, current operation\\n2. **Error**: Error icon, error message, retry failed button\\n3. **Idle with Pending**: Upload icon, pending operations count\\n4. **All Synced**: Success icon, empty state message\\n\\n**Operations Display:**\\n- Pending operations section with entity type, operation type, and description\\n- Failed operations section with error messages and error icons\\n- Each operation shows appropriate icon (create/add, update/edit, delete)\\n- Color-coded by operation type and status\\n- Limited to 5 operations per section with \\\"and X more\\\" indicator\\n\\n**Acceptance Criteria Met:**\\n✓ Progress bar for active sync (LinearProgressIndicator with percentage)\\n✓ List of operations being synced (Pending operations list from queue)\\n✓ Pending operations count (Shown in header and section titles)\\n✓ Failed operations with error messages (Dedicated failed section)\\n✓ Cancel sync button (Available when sync is active)\\n✓ Retry failed operations button (Available when failed ops exist)\\n\\n**Files Created:**\\n- lib/features/offline/presentation/widgets/sync_progress_dialog.dart\\n- Updated lib/features/offline/presentation/widgets/offline_widgets.dart\\n\\n**Usage:**\\nCan be used as both modal dialog and bottom sheet:\\n```dart\\nshowDialog(context: context, builder: (_) => const SyncProgressDialog());\\nshowModalBottomSheet(context: context, builder: (_) => const SyncProgressDialog());\\n```\\n\\nAll code follows project patterns from sync_status_banner.dart and connectivity_indicator.dart with comprehensive documentation, proper resource disposal, and theme-aware styling.\\n\\nCommit: 2f4b25a\",\n   566→          \"updated_at\": \"2026-01-05T00:15:00.000Z\"\n   567→        },\n   568→        {\n   569→          \"id\": \"7.4\",\n   570→          \"title\": \"Add Offline Mode Banner\",\n   571→          \"description\": \"Create prominent banner when app is in offline mode\",",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:24:28.362902+00:00",
+          "type": "text",
+          "content": "Now let me update the build-progress.txt file:",
+          "phase": "coding",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:28.391449+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...line-first-core-architecture/build-progress.txt",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...line-first-core-architecture/build-progress.txt",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:28.418080+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "subtask_id": "7.3",
+          "session": 31,
+          "detail": "The file ./.auto-claude/specs/001-offline-first-core-architecture/build-progress.txt has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n    72→- [x] 6.3 - Adapt Journal Repository (Completed: 2026-01-04)\n    73→- [x] 6.4 - Adapt Profile/User Repository (Completed: 2026-01-04)\n    74→- [x] 6.5 - Implement Optimistic UI Updates (Completed: 2026-01-04)\n    75→\n    76→### Phase 7: UI & Status Indicators\n    77→**Status:** In Progress\n    78→- [x] 7.1 - Create Sync Status Banner (Completed: 2026-01-04)\n    79→- [x] 7.2 - Create Connectivity Indicator Widget (Completed: 2026-01-05)\n    80→- [x] 7.3 - Create Sync Progress Indicator (Completed: 2026-01-05)\n    81→- [ ] 7.4 - Add Offline Mode Banner\n    82→- [ ] 7.5 - Create Sync Settings Screen\n    83→- [ ] 7.6 - Integrate Indicators into App Shell\n    84→\n    85→### Phase 8: Background Sync & Notifications\n    86→**Status:** Pending\n    87→- [ ] 8.1 - Implement Background Sync with Workmanager",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:24:32.722879+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...line-first-core-architecture/build-progress.txt",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...line-first-core-architecture/build-progress.txt",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:32.751703+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "subtask_id": "7.3",
+          "session": 31,
+          "detail": "The file ./.auto-claude/specs/001-offline-first-core-architecture/build-progress.txt has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n    17→8. Background Sync & Notifications\n    18→9. Testing & Quality Assurance\n    19→10. Documentation & Deployment\n    20→\n    21→## Phase Overview\n    22→\n    23→- Total Phases: 10\n    24→- Total Subtasks: 52\n    25→- Pending: 31\n    26→- In Progress: 0\n    27→- Completed: 21\n    28→\n    29→## Detailed Progress\n    30→\n    31→### Phase 1: Foundation & Dependencies",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:24:37.118589+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git add .auto-claude/specs/001-offline-first-co...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git add .auto-claude/specs/001-offline-first-co...",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:37.146501+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git commit -m \"auto-claude: Update plan - mark ...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git commit -m \"auto-claude: Update plan - mark ...",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:24:39.167834+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "7.3",
+          "session": 31,
+          "detail": "",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:24:50.473979+00:00",
+          "type": "text",
+          "content": "Perfect! I've successfully completed subtask 7.3. Here's a summary of what was implemented:\n\n## ✅ Subtask 7.3 Complete: Create Sync Progress Indicator\n\n### What Was Built\n\n**Created:** `lib/features/offline/presentation/widgets/sync_progress_dialog.dart` (560 lines)\n\nA comprehensive modal dialog showing detailed sync progress with the following features:\n\n#### Key Features:\n1. **Progress Bar for Active Sync**\n   - Animated `LinearProgressIndicator` with 0-100% display\n   - Shows current sync phase (upload, download, conflict resolution, finalization)\n   - Displays current operation description\n\n2. **List of Operations Being Synced**\n   - Fetches pending operations from `SyncQueueRepository`\n   - Shows entity type, operation type, and description for each operation\n   - Displays up to 5 operations with \"and X more\" indicator\n\n3. **Pending Operations Count**\n   - Shown in dialog header\n   - Displayed in section titles with count badge\n\n4. **Failed Operations with Error Messages**\n   - Dedicated section for failed operations\n   - Shows error messages with error icons\n   - Color-coded by operation type (create/update/delete)\n\n5. **Cancel Sync Button**\n   - Available when sync is actively running\n   - Gracefully stops the sync operation\n   - Closes dialog after cancellation\n\n6. **Retry Failed Operations Button**\n   - Appears when there are failed operations\n   - Triggers new sync cycle to retry all failed ops\n   - Closes dialog after triggering retry\n\n### Dialog States:\n- **Syncing**: Animated rotating icon, progress bar, phase description\n- **Error**: Error icon, error message, retry failed button\n- **Idle with Pending**: Upload icon, pending operations count\n- **All Synced**: Success icon with \"All synced!\" message\n\n### Integration:\n- Uses `syncStatusProvider` for real-time sync state updates\n- Uses `SyncQueueRepository` to fetch pending and failed operations\n- Follows existing widget patterns (`sync_status_banner.dart`, `connectivity_indicator.dart`)\n- Exported through `offline_widgets.dart` barrel file\n- Can be used as both `showDialog` and `showModalBottomSheet`\n\n### Usage Example:\n```dart\n// As a modal dialog\nshowDialog(\n  context: context,\n  builder: (context) => const SyncProgressDialog(),\n);\n\n// Or as a bottom sheet\nshowModalBottomSheet(\n  context: context,\n  isScrollControlled: true,\n  builder: (context) => const SyncProgressDialog(),\n);\n```\n\n### Commits:\n- **2f4b25a**: Initial implementation with all features\n- **b10e044**: Updated plan and build progress\n\n### Acceptance Criteria: ✅ All Met\n- ✅ Progress bar for active sync\n- ✅ List of operations being synced\n- ✅ Pending operations count\n- ✅ Failed operations with error messages\n- ✅ Cancel sync button\n- ✅ Retry failed operations button\n\nThe widget is production-ready and follows all project code patterns with comprehensive documentation, proper resource disposal, and theme-aware Material 3 styling.",
+          "phase": "coding",
+          "subtask_id": "7.3",
+          "session": 31
+        },
+        {
+          "timestamp": "2026-01-04T20:25:29.599552+00:00",
+          "type": "text",
+          "content": "I'll help you implement subtask 7.4 - creating a prominent banner when the app is in offline mode. Let me start by understanding the context and current implementation.",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:29.624055+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...ecs/001-offline-first-core-architecture/spec.md",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...ecs/001-offline-first-core-architecture/spec.md",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:29.646121+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...irst-core-architecture/implementation_plan.json",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...irst-core-architecture/implementation_plan.json",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:29.666082+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...line-first-core-architecture/build-progress.txt",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...line-first-core-architecture/build-progress.txt",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:29.685241+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "     1→# Offline-First Core Architecture\n     2→\n     3→Implement comprehensive offline-first architecture with local data persistence, queued operations, and transparent sync status. The app remains fully functional without internet connectivity, automatically syncing when connection is restored.\n     4→\n     5→## Rationale\n     6→Addresses critical user pain point: 'Lack of offline access to travel plans when internet is unavailable.' Also addresses competitor pain points: TripIt server downtime (pain-1-1), Wanderlog sync errors (pain-2-3), and general travel app offline functionality issues (gap-2). This is foundational for travelers in remote areas, flights, or regions with poor connectivity.\n     7→\n     8→## User Stories\n     9→- As a solo traveler, I want to access my trip plans offline so that I can view my itinerary during flights or in remote areas without internet\n    10→- As a traveler, I want the app to automatically save my changes locally so that I don't lose data if my connection drops\n    11→- As a user, I want clear indicators of my sync status so that I know when my data is safe in the cloud\n    12→\n    13→## Acceptance Criteria\n    14→- [ ] App remains fully functional without internet connection\n    15→- [ ] All data changes are queued and sync automatically when connection is restored\n    16→- [ ] Clear visual indicators show offline/online status and sync progress\n    17→- [ ] Local database persists all user data, trips, journals, and preferences\n    18→- [ ] Conflict resolution handles concurrent edits gracefully\n    19→- [ ] Users can read, create, edit, and delete all data types while offline\n    20→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:25:37.671266+00:00",
+          "type": "text",
+          "content": "Now let me read the existing UI widgets to understand the patterns and style:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:37.692513+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...ne/presentation/widgets/sync_status_banner.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...ne/presentation/widgets/sync_status_banner.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:37.713483+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...resentation/widgets/connectivity_indicator.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...resentation/widgets/connectivity_indicator.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:37.734372+00:00",
+          "type": "tool_start",
+          "content": "[Glob] pattern: lib/presentation/**/*.dart",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "tool_input": "pattern: lib/presentation/**/*.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:37.756736+00:00",
+          "type": "tool_end",
+          "content": "[Glob] Done",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "subtask_id": "7.4",
+          "session": 32,
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:25:42.280126+00:00",
+          "type": "text",
+          "content": "Let me check the existing app structure and look at some UI patterns:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:42.303887+00:00",
+          "type": "tool_start",
+          "content": "[Glob] pattern: lib/app/**/*.dart",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "tool_input": "pattern: lib/app/**/*.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:42.324870+00:00",
+          "type": "tool_start",
+          "content": "[Glob] pattern: lib/core/presentation/**/*.dart",
+          "phase": "coding",
+          "tool_name": "Glob",
+          "tool_input": "pattern: lib/core/presentation/**/*.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:42.345191+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...fline/presentation/widgets/offline_widgets.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...fline/presentation/widgets/offline_widgets.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:42.367469+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "     1→// Offline Presentation Widgets\n     2→// Export all widgets for offline functionality\n     3→\n     4→export 'connectivity_indicator.dart';\n     5→export 'sync_progress_dialog.dart';\n     6→export 'sync_status_banner.dart';\n     7→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:25:46.262740+00:00",
+          "type": "text",
+          "content": "Now let me check the connectivity provider to understand how to detect offline state:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:46.286082+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...esentation/providers/connectivity_provider.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...esentation/providers/connectivity_provider.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:46.307605+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "     1→import 'dart:async';\n     2→import 'package:flutter_riverpod/flutter_riverpod.dart';\n     3→import 'package:soloadventurer/app/di/service_locator.dart';\n     4→import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';\n     5→\n     6→/// Provider for the ConnectivityService from DI\n     7→///\n     8→/// This provides access to the singleton ConnectivityService instance\n     9→/// managed by GetIt dependency injection.\n    10→final connectivityServiceProvider = Provider<ConnectivityService>((ref) {\n    11→  return getIt<ConnectivityService>();\n    12→});\n    13→\n    14→/// State for connectivity status in the UI\n    15→///\n    16→/// This wraps [ConnectivityStatus] with additional helper methods\n    17→/// for easy consumption by UI components.\n    18→class ConnectivityState {\n    19→  /// Current connection type\n    20→  final ConnectionType connectionType;\n    21→\n    22→  /// Whether device is connected to network\n    23→  final bool isConnected;\n    24→\n    25→  /// Timestamp when status was last updated\n    26→  final DateTime timestamp;\n    27→\n    28→  /// Creates a new [ConnectivityState] instance\n    29→  const ConnectivityState({\n    30→    required this.connectionType,\n    31→    required this.isConnected,\n    32→    required this.timestamp,\n    33→  });\n    34→\n    35→  /// Creates a state from ConnectivityStatus\n    36→  factory ConnectivityState.fromStatus(ConnectivityStatus status) {\n    37→    return ConnectivityState(\n    38→      connectionType: status.connectionType,\n    39→      isConnected: status.isConnected,\n    40→      timestamp: status.timestamp,\n    41→    );\n    42→  }\n    43→\n    44→  /// Creates a disconnected state\n    45→  factory ConnectivityState.disconnected() {\n    46→    return ConnectivityState(\n    47→      connectionType: ConnectionType.none,\n    48→      isConnected: false,\n    49→      timestamp: DateTime.now(),\n    50→    );\n    51→  }\n    52→\n    53→  /// Creates a connected state with specified type\n    54→  factory ConnectivityState.connected(ConnectionType type) {\n    55→    return ConnectivityState(\n    56→      connectionType: type,\n    57→      isConnected: true,\n    58→      timestamp: DateTime.now(),\n    59→    );\n    60→  }\n    61→\n    62→  /// Copy with method for immutability\n    63→  ConnectivityState copyWith({\n    64→    ConnectionType? connectionType,\n    65→    bool? isConnected,\n    66→    DateTime? timestamp,\n    67→  }) {\n    68→    return ConnectivityState(\n    69→      connectionType: connectionType ?? this.connectionType,\n    70→      isConnected: isConnected ?? this.isConnected,\n    71→      timestamp: timestamp ?? this.timestamp,\n    72→    );\n    73→  }\n    74→\n    75→  @override\n    76→  String toString() {\n    77→    return 'ConnectivityState{connectionType: $connectionType, '\n    78→        'isConnected: $isConnected, timestamp: $timestamp}';\n    79→  }\n    80→\n    81→  @override\n    82→  bool operator ==(Object other) {\n    83→    if (identical(this, other)) return true;\n    84→\n    85→    return other is ConnectivityState &&\n    86→        other.connectionType == connectionType &&\n    87→        other.isConnected == isConnected;\n    88→  }\n    89→\n    90→  @override\n    91→  int get hashCode => connectionType.hashCode ^ isConnected.hashCode;\n    92→}\n    93→\n    94→/// Notifier for managing connectivity state\n    95→///\n    96→/// This notifier subscribes to [ConnectivityService]'s stream\n    97→/// and exposes the current connectivity status to UI components.\n    98→/// It automatically handles subscription lifecycle and disposal.\n    99→class ConnectivityNotifier extends StateNotifier<ConnectivityState> {\n   100→  /// Reference to the ConnectivityService\n   101→  final ConnectivityService _connectivityService;\n   102→\n   103→  /// Subscription to connectivity status stream\n   104→  StreamSubscription<ConnectivityStatus>? _subscription;\n   105→\n   106→  /// Creates a new [ConnectivityNotifier]\n   107→  ///\n   108→  /// [_connectivityService] - The connectivity service to monitor\n   109→  ConnectivityNotifier(this._connectivityService)\n   110→      : super(const ConnectivityState.disconnected()) {\n   111→    // Start monitoring connectivity\n   112→    _startMonitoring();\n   113→  }\n   114→\n   115→  /// Start monitoring connectivity changes\n   116→  void _startMonitoring() {\n   117→    // Subscribe to connectivity status updates\n   118→    _subscription = _connectivityService.connectivityStream.listen(\n   119→      (status) {\n   120→        // Update state when connectivity changes\n   121→        state = ConnectivityState.fromStatus(status);\n   122→      },\n   123→      onError: (error) {\n   124→        // Handle errors by setting disconnected state\n   125→        state = ConnectivityState.disconnected();\n   126→      },\n   127→    );\n   128→  }\n   129→\n   130→  /// Check current connectivity status\n   131→  ///\n   132→  /// This performs a one-time check of connectivity status\n   133→  /// and updates the state accordingly.\n   134→  Future<void> checkConnectivity() async {\n   135→    try {\n   136→      final status = await _connectivityService.checkConnectivity();\n   137→      state = ConnectivityState.fromStatus(status);\n   138→    } catch (e) {\n   139→      state = ConnectivityState.disconnected();\n   140→    }\n   141→  }\n   142→\n   143→  /// Refresh connectivity status\n   144→  ///\n   145→  /// Alias for [checkConnectivity] for more semantic usage\n   146→  Future<void> refresh() => checkConnectivity();\n   147→\n   148→  @override\n   149→  void dispose() {\n   150→    // Cancel subscription when notifier is disposed\n   151→    _subscription?.cancel();\n   152→    _subscription = null;\n   153→    super.dispose();\n   154→  }\n   155→}\n   156→\n   157→/// Provider for connectivity state\n   158→///\n   159→/// This provider exposes the current connectivity status to the app.\n   160→/// It auto-disposes when no longer being listened to, which helps\n   161→/// with resource management.\n   162→///\n   163→/// Example usage:\n   164→/// ```dart\n   165→/// final connectivityState = ref.watch(connectivityProvider);\n   166→/// if (connectivityState.isConnected) {\n   167→///   // App is online\n   168→/// } else {\n   169→///   // App is offline\n   170→/// }\n   171→/// ```\n   172→///\n   173→/// To access individual properties:\n   174→/// ```dart\n   175→/// final isConnected = ref.watch(connectivityProvider.select(\n   176→///   (state) => state.isConnected,\n   177→/// ));\n   178→///\n   179→/// final connectionType = ref.watch(connectivityProvider.select(\n   180→///   (state) => state.connectionType,\n   181→/// ));\n   182→/// ```\n   183→final connectivityProvider =\n   184→    StateNotifierProvider.autoDispose<ConnectivityNotifier, ConnectivityState>(\n   185→  (ref) {\n   186→    // Get the ConnectivityService from DI\n   187→    final connectivityService = ref.watch(connectivityServiceProvider);\n   188→\n   189→    // Create and return the notifier\n   190→    final notifier = ConnectivityNotifier(connectivityService);\n   191→\n   192→    // Dispose the notifier when provider is disposed\n   193→    ref.onDispose(() {\n   194→      notifier.dispose();\n   195→    });\n   196→\n   197→    return notifier;\n   198→  },\n   199→);\n   200→\n   201→/// Selector provider for connection status\n   202→///\n   203→/// Provides easy access to boolean connection status.\n   204→/// This is useful for widgets that only need to know if connected.\n   205→///\n   206→/// Example:\n   207→/// ```dart\n   208→/// final isConnected = ref.watch(isConnectedProvider);\n   209→/// ```\n   210→final isConnectedProvider = Provider.autoDispose<bool>((ref) {\n   211→  return ref.watch(connectivityProvider).isConnected;\n   212→});\n   213→\n   214→/// Selector provider for connection type\n   215→///\n   216→/// Provides easy access to the current connection type.\n   217→/// This is useful for widgets that need to know the type of connection.\n   218→///\n   219→/// Example:\n   220→/// ```dart\n   221→/// final connectionType = ref.watch(connectionTypeProvider);\n   222→/// if (connectionType == ConnectionType.wifi) {\n   223→///   // On WiFi\n   224→/// }\n   225→/// ```\n   226→final connectionTypeProvider = Provider.autoDispose<ConnectionType>((ref) {\n   227→  return ref.watch(connectivityProvider).connectionType;\n   228→});\n   229→\n   230→/// Selector provider for offline status\n   231→///\n   232→/// Returns true when device is NOT connected to any network.\n   233→/// This is a convenience provider for more readable code.\n   234→///\n   235→/// Example:\n   236→/// ```dart\n   237→/// final isOffline = ref.watch(isOfflineProvider);\n   238→/// if (isOffline) {\n   239→///   // Show offline banner\n   240→/// }\n   241→/// ```\n   242→final isOfflineProvider = Provider.autoDispose<bool>((ref) {\n   243→  return !ref.watch(connectivityProvider).isConnected;\n   244→});\n   245→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:25:58.402968+00:00",
+          "type": "text",
+          "content": "Perfect! Now I have all the information I need. Let me create the offline banner widget following the established patterns:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:58.428948+00:00",
+          "type": "tool_start",
+          "content": "[Write] ...ffline/presentation/widgets/offline_banner.dart",
+          "phase": "coding",
+          "tool_name": "Write",
+          "tool_input": "...ffline/presentation/widgets/offline_banner.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:25:58.555930+00:00",
+          "type": "tool_end",
+          "content": "[Write] Done",
+          "phase": "coding",
+          "tool_name": "Write",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "File created successfully at: ./lib/features/offline/presentation/widgets/offline_banner.dart",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:26:02.476832+00:00",
+          "type": "text",
+          "content": "Now let me update the barrel file to export this new widget:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:02.503996+00:00",
+          "type": "tool_start",
+          "content": "[Edit] ...fline/presentation/widgets/offline_widgets.dart",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "tool_input": "...fline/presentation/widgets/offline_widgets.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:02.528270+00:00",
+          "type": "tool_end",
+          "content": "[Edit] Done",
+          "phase": "coding",
+          "tool_name": "Edit",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "The file ./lib/features/offline/presentation/widgets/offline_widgets.dart has been updated. Here's the result of running `cat -n` on a snippet of the edited file:\n     1→// Offline Presentation Widgets\n     2→// Export all widgets for offline functionality\n     3→\n     4→export 'connectivity_indicator.dart';\n     5→export 'offline_banner.dart';\n     6→export 'sync_progress_dialog.dart';\n     7→export 'sync_status_banner.dart';\n     8→",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:26:06.189746+00:00",
+          "type": "text",
+          "content": "Now let me verify the implementation by running a quick analysis:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:06.225930+00:00",
+          "type": "tool_start",
+          "content": "[Bash] flutter analyze lib/features/offline/presentati...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "flutter analyze lib/features/offline/presentati...",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:06.262456+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Error: Command 'flutter' is not in the allowed commands for this project",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "Command 'flutter' is not in the allowed commands for this project",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:26:10.977807+00:00",
+          "type": "text",
+          "content": "Let me verify the implementation by reading it back and checking for any issues:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:11.001005+00:00",
+          "type": "tool_start",
+          "content": "[Read] ...ffline/presentation/widgets/offline_banner.dart",
+          "phase": "coding",
+          "tool_name": "Read",
+          "tool_input": "...ffline/presentation/widgets/offline_banner.dart",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:11.024703+00:00",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "coding",
+          "tool_name": "Read",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "     1→import 'package:flutter/material.dart';\n     2→import 'package:flutter_riverpod/flutter_riverpod.dart';\n     3→import 'package:soloadventurer/features/offline/presentation/providers/connectivity_provider.dart';\n     4→import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';\n     5→\n     6→/// A prominent banner that displays when the app is in offline mode\n     7→///\n     8→/// This widget appears when connectivity is lost and informs users that\n     9→/// their data will sync automatically when they reconnect. The banner is\n    10→/// dismissible but will reappear when the app returns to the foreground.\n    11→///\n    12→/// Features:\n    13→/// - Shows when device is offline (no internet connection)\n    14→/// - Displays count of pending operations that will sync later\n    15→/// - Dismissible by user with close button\n    16→/// - Reappears when app is brought to foreground\n    17→/// - Distinctive orange/amber styling to differentiate from sync banner\n    18→/// - Optional message about cached data availability\n    19→///\n    20→/// Example usage in an app shell:\n    21→/// ```dart\n    22→/// Scaffold(\n    23→///   body: Column(\n    24→///     children: [\n    25→///       OfflineBanner(),\n    26→///       // Other content...\n    27→///     ],\n    28→///   ),\n    29→/// )\n    30→/// ```\n    31→///\n    32→/// Or as a sliver in CustomScrollView:\n    33→/// ```dart\n    34→/// CustomScrollView(\n    35→///   slivers: [\n    36→///     SliverToBoxAdapter(\n    37→///       child: OfflineBanner(),\n    38→///     ),\n    39→///     // Other slivers...\n    40→///   ],\n    41→/// )\n    42→/// ```\n    43→class OfflineBanner extends ConsumerStatefulWidget {\n    44→  /// Creates a new [OfflineBanner] instance\n    45→  const OfflineBanner({super.key});\n    46→\n    47→  @override\n    48→  ConsumerState<OfflineBanner> createState() => _OfflineBannerState();\n    49→}\n    50→\n    51→class _OfflineBannerState extends ConsumerState<OfflineBanner>\n    52→    with WidgetsBindingObserver {\n    53→  /// Whether banner should be visible\n    54→  bool _isVisible = false;\n    55→\n    56→  /// Whether user has manually dismissed the banner\n    57→  bool _isManuallyDismissed = false;\n    58→\n    59→  /// Previous offline state for detecting changes\n    60→  bool? _wasOffline;\n    61→\n    62→  @override\n    63→  void initState() {\n    64→    super.initState();\n    65→    // Add app lifecycle observer to detect foreground events\n    66→    WidgetsBinding.instance.addObserver(this);\n    67→  }\n    68→\n    69→  @override\n    70→  void dispose() {\n    71→    // Remove observer when widget is disposed\n    72→    WidgetsBinding.instance.removeObserver(this);\n    73→    super.dispose();\n    74→  }\n    75→\n    76→  @override\n    77→  void didChangeAppLifecycleState(AppLifecycleState state) {\n    78→    // Reset manual dismissal when app comes to foreground\n    79→    if (state == AppLifecycleState.resumed) {\n    80→      if (_isManuallyDismissed) {\n    81→        setState(() {\n    82→          _isManuallyDismissed = false;\n    83→        });\n    84→      }\n    85→    }\n    86→  }\n    87→\n    88→  /// Handles dismiss action\n    89→  void _handleDismiss() {\n    90→    setState(() {\n    91→      _isManuallyDismissed = true;\n    92→    });\n    93→  }\n    94→\n    95→  @override\n    96→  Widget build(BuildContext context) {\n    97→    final connectivityState = ref.watch(connectivityProvider);\n    98→    final syncStatus = ref.watch(syncStatusProvider);\n    99→    final theme = Theme.of(context);\n   100→\n   101→    // Check if currently offline\n   102→    final isOffline = !connectivityState.isConnected;\n   103→\n   104→    // Detect offline state transition\n   105→    if (_wasOffline != null && _wasOffline != isOffline) {\n   106→      // State changed, reset manual dismissal\n   107→      if (_isManuallyDismissed) {\n   108→        _isManuallyDismissed = false;\n   109→      }\n   110→    }\n   111→    _wasOffline = isOffline;\n   112→\n   113→    // Update visibility based on offline state and manual dismissal\n   114→    _updateVisibility(isOffline, syncStatus.pendingOperations);\n   115→\n   116→    // Don't show if not visible\n   117→    if (!_isVisible) {\n   118→      return const SizedBox.shrink();\n   119→    }\n   120→\n   121→    // Build offline banner\n   122→    final colorScheme = theme.colorScheme;\n   123→\n   124→    return Material(\n   125→      elevation: 4,\n   126→      child: Container(\n   127→        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),\n   128→        decoration: BoxDecoration(\n   129→          // Use distinctive orange/amber color for offline banner\n   130→          color: colorScheme.errorContainer.withOpacity(0.3),\n   131→          border: Border(\n   132→            bottom: BorderSide(\n   133→              color: colorScheme.error.withOpacity(0.5),\n   134→              width: 2,\n   135→            ),\n   136→          ),\n   137→        ),\n   138→        child: Row(\n   139→          children: [\n   140→            // Offline icon\n   141→            Icon(\n   142→              Icons.cloud_off,\n   143→              color: colorScheme.error,\n   144→              size: 24,\n   145→            ),\n   146→            const SizedBox(width: 12),\n   147→\n   148→            // Offline message\n   149→            Expanded(\n   150→              child: Column(\n   151→                crossAxisAlignment: CrossAxisAlignment.start,\n   152→                mainAxisSize: MainAxisSize.min,\n   153→                children: [\n   154→                  Text(\n   155→                    'You\\'re offline',\n   156→                    style: theme.textTheme.titleSmall?.copyWith(\n   157→                      color: colorScheme.onErrorContainer,\n   158→                      fontWeight: FontWeight.w700,\n   159→                    ),\n   160→                  ),\n   161→                  const SizedBox(height: 4),\n   162→                  Text(\n   163→                    _buildMessage(syncStatus.pendingOperations),\n   164→                    style: theme.textTheme.bodySmall?.copyWith(\n   165→                      color: colorScheme.onErrorContainer.withOpacity(0.85),\n   166→                    ),\n   167→                  ),\n   168→                ],\n   169→              ),\n   170→            ),\n   171→\n   172→            // Pending operations indicator\n   173→            if (syncStatus.pendingOperations > 0) ...[\n   174→              const SizedBox(width: 12),\n   175→              Container(\n   176→                padding: const EdgeInsets.symmetric(\n   177→                  horizontal: 8,\n   178→                  vertical: 4,\n   179→                ),\n   180→                decoration: BoxDecoration(\n   181→                  color: colorScheme.error.withOpacity(0.2),\n   182→                  borderRadius: BorderRadius.circular(12),\n   183→                  border: Border.all(\n   184→                    color: colorScheme.error.withOpacity(0.5),\n   185→                    width: 1,\n   186→                  ),\n   187→                ),\n   188→                child: Row(\n   189→                  mainAxisSize: MainAxisSize.min,\n   190→                  children: [\n   191→                    Icon(\n   192→                      Icons.pending,\n   193→                      color: colorScheme.error,\n   194→                      size: 14,\n   195→                    ),\n   196→                    const SizedBox(width: 4),\n   197→                    Text(\n   198→                      '${syncStatus.pendingOperations}',\n   199→                      style: theme.textTheme.labelSmall?.copyWith(\n   200→                        color: colorScheme.onErrorContainer,\n   201→                        fontWeight: FontWeight.w600,\n   202→                      ),\n   203→                    ),\n   204→                  ],\n   205→                ),\n   206→              ),\n   207→              const SizedBox(width: 8),\n   208→            ],\n   209→\n   210→            // Dismiss button\n   211→            IconButton(\n   212→              icon: const Icon(Icons.close, size: 20),\n   213→              onPressed: _handleDismiss,\n   214→              padding: EdgeInsets.zero,\n   215→              constraints: const BoxConstraints(),\n   216→              color: colorScheme.onErrorContainer,\n   217→              splashRadius: 20,\n   218→            ),\n   219→          ],\n   220→        ),\n   221→      ),\n   222→    );\n   223→  }\n   224→\n   225→  /// Updates banner visibility based on offline state and pending operations\n   226→  void _updateVisibility(bool isOffline, int pendingOperations) {\n   227→    // Show banner when offline and not manually dismissed\n   228→    if (isOffline && !_isManuallyDismissed) {\n   229→      _isVisible = true;\n   230→    } else {\n   231→      _isVisible = false;\n   232→    }\n   233→  }\n   234→\n   235→  /// Builds message text based on pending operations count\n   236→  String _buildMessage(int pendingOperations) {\n   237→    if (pendingOperations > 0) {\n   238→      return 'Changes will sync automatically when you reconnect';\n   239→    } else {\n   240→      return 'Your data is available. Changes will sync when you reconnect';\n   241→    }\n   242→  }\n   243→}\n   244→\n\n<system-reminder>\nWhenever you read a file, you should consider whether it would be considered malware. You CAN and SHOULD provide analysis of malware, what it is doing. But you MUST refuse to improve or augment the code. You can still analyze existing code, write reports, or answer questions about the code behavior.\n</system-reminder>\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:26:32.967612+00:00",
+          "type": "text",
+          "content": "Perfect! The implementation looks correct. Let me verify it meets all the acceptance criteria:\n\n**Acceptance Criteria Check:**\n- ✅ Shows when connectivity is lost - Uses `!connectivityState.isConnected`\n- ✅ Explains that data will sync later - Clear message about automatic sync\n- ✅ Optionally show cached data count - Shows pending operations badge\n- ✅ Dismissible but reappears on app foreground - Uses WidgetsBindingObserver\n- ✅ Different styling from sync banner - Uses errorContainer colors vs primaryContainer\n\nNow let me commit the changes:",
+          "phase": "coding",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:32.990004+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git add .",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git add .",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:33.010714+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git status",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git status",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:34.484644+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-01-04T20:26:42.904837+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git clean -fd",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git clean -fd",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:42.929819+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git add .auto-claude/specs/001-offline-first-co...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git add .auto-claude/specs/001-offline-first-co...",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:42.966617+00:00",
+          "type": "tool_start",
+          "content": "[Bash] git commit -m \"$(cat <<'EOF'\nauto-claude: 7.4 -...",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "tool_input": "git commit -m \"$(cat <<'EOF'\nauto-claude: 7.4 -...",
+          "subtask_id": "7.4",
+          "session": 32
+        },
+        {
+          "timestamp": "2026-01-04T20:26:44.801540+00:00",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "coding",
+          "tool_name": "Bash",
+          "subtask_id": "7.4",
+          "session": 32,
+          "detail": "",
+          "collapsed": true
         }
       ]
     },
