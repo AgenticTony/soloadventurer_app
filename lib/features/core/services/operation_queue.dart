@@ -68,6 +68,18 @@ class OperationQueue extends _$OperationQueue {
     jitterFactor: 0.1,
   );
 
+  /// Track consecutive operations processed per priority level for round-robin
+  final Map<int, int> _consecutiveProcessedByPriority = {};
+
+  /// Maximum consecutive operations to process per priority level
+  static const int _maxConsecutivePerPriority = 3;
+
+  /// Age threshold after which low-priority operations get a priority boost
+  static const Duration _agingBoostThreshold = Duration(minutes: 5);
+
+  /// Priority boost amount for operations that have been waiting too long
+  static const int _agingBoostAmount = 20;
+
   @override
   Future<void> build() async {
     // Watch connectivity and token state
@@ -122,9 +134,13 @@ class OperationQueue extends _$OperationQueue {
       final tokenManager = ref.read(tokenManagerProvider);
       final isOnline = ref.read(connectivityNotifierProvider);
 
-      // Process operations in priority order
+      // Process operations in effective priority order (with aging boost)
       final operations = _pendingOperations.toList()
-        ..sort((a, b) => b.priority.compareTo(a.priority));
+        ..sort((a, b) {
+          final priorityA = _getEffectivePriority(a);
+          final priorityB = _getEffectivePriority(b);
+          return priorityB.compareTo(priorityA); // Higher priority first
+        });
 
       final operationsToRemove = <QueueableOperation>[];
       final operationsToAdd = <QueueableOperation>[];
@@ -133,6 +149,9 @@ class OperationQueue extends _$OperationQueue {
       for (final operation in operations) {
         // Skip operations that cannot be processed (offline, auth, or in backoff)
         if (!_canProcess(operation)) continue;
+
+        // Skip if round-robin limit reached for this priority level
+        if (_shouldSkipDueToRoundRobin(operation)) continue;
 
         // Check if operation has exceeded max retries
         if (!_shouldRetry(operation)) {
@@ -145,6 +164,11 @@ class OperationQueue extends _$OperationQueue {
         try {
           await operation.execute();
           operationsToRemove.add(operation);
+
+          // Update consecutive counter for successful processing
+          final effectivePriority = _getEffectivePriority(operation);
+          _consecutiveProcessedByPriority[effectivePriority] =
+              (_consecutiveProcessedByPriority[effectivePriority] ?? 0) + 1;
         } catch (e, stackTrace) {
           debugPrint('Failed to execute operation ${operation.id}: $e');
           debugPrint('Stack trace: $stackTrace');
@@ -162,6 +186,9 @@ class OperationQueue extends _$OperationQueue {
             operationsToRemove.add(operation);
             operationsToAdd.add(failedOperation);
           }
+
+          // Reset round-robin counters on failure to allow retry in next cycle
+          _resetRoundRobinCounters();
         }
       }
 
@@ -177,6 +204,9 @@ class OperationQueue extends _$OperationQueue {
       }
 
       await _persistQueue();
+
+      // Reset round-robin counters at the end of each processing cycle
+      _resetRoundRobinCounters();
     } finally {
       _isProcessing = false;
     }
@@ -268,6 +298,81 @@ class OperationQueue extends _$OperationQueue {
     }
 
     return inBackoff;
+  }
+
+  /// Calculate the effective priority of an operation with aging boost
+  ///
+  /// This prevents starvation by gradually increasing the priority of operations
+  /// that have been waiting in the queue for a long time. Low-priority operations
+  /// that exceed the aging threshold get a priority boost to ensure they eventually
+  /// get processed.
+  int _getEffectivePriority(QueueableOperation operation) {
+    final basePriority = operation.priority;
+
+    // Check if operation has a creation timestamp
+    final createdAt = operation.createdAt;
+    if (createdAt == null) {
+      // No timestamp, return base priority
+      return basePriority;
+    }
+
+    // Calculate how long the operation has been waiting
+    final now = DateTime.now();
+    final age = now.difference(createdAt);
+
+    // If operation has been waiting longer than the threshold, apply priority boost
+    if (age > _agingBoostThreshold) {
+      final boostedPriority = basePriority + _agingBoostAmount;
+
+      // Log the priority boost for debugging
+      if (boostedPriority > basePriority) {
+        final ageMinutes = age.inMinutes;
+        debugPrint(
+          'Operation ${operation.id} has been waiting ${ageMinutes}min, '
+          'boosting priority from $basePriority to $boostedPriority'
+        );
+      }
+
+      return boostedPriority;
+    }
+
+    // Return base priority if no aging boost needed
+    return basePriority;
+  }
+
+  /// Check if we should skip processing this operation due to round-robin limits
+  ///
+  /// This prevents the queue from processing too many consecutive operations
+  /// of the same priority level, which ensures fair processing across all
+  /// priority levels and prevents high-priority floods from starving lower
+  /// priority operations completely.
+  bool _shouldSkipDueToRoundRobin(QueueableOperation operation) {
+    final effectivePriority = _getEffectivePriority(operation);
+    final consecutiveCount = _consecutiveProcessedByPriority[effectivePriority] ?? 0;
+
+    // Always process critical operations immediately (no round-robin limit)
+    if (effectivePriority >= 1000) {
+      return false;
+    }
+
+    // Skip if we've already processed too many operations of this priority level
+    if (consecutiveCount >= _maxConsecutivePerPriority) {
+      debugPrint(
+        'Skipping operation ${operation.id} (priority $effectivePriority) - '
+        'already processed $consecutiveCount consecutive operations of this priority'
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+  /// Reset the round-robin counters when an operation fails to process
+  ///
+  /// This ensures that a failed operation doesn't count toward the consecutive
+  /// limit, preventing the round-robin from being too aggressive.
+  void _resetRoundRobinCounters() {
+    _consecutiveProcessedByPriority.clear();
   }
 
   /// Find a duplicate operation in the pending queue based on deduplication key
