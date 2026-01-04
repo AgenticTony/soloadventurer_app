@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/performance/presentation/routes/performance_routes.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -56,6 +57,13 @@ class HomeScreen extends ConsumerWidget {
                 Navigator.pushNamed(context, AuthRoutes.cloudWatchTest);
               },
               child: const Text('Test CloudWatch Logging'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, PerformanceRoutes.benchmark);
+              },
+              child: const Text('Performance Benchmark'),
             ),
           ],
         ),

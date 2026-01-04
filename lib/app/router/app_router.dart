@@ -12,6 +12,8 @@ import 'package:soloadventurer/features/profile/presentation/screens/edit_profil
 import 'package:soloadventurer/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/pages/cloudwatch_test_page.dart';
+import 'package:soloadventurer/features/performance/presentation/screens/performance_benchmark_screen.dart';
+import 'package:soloadventurer/features/performance/presentation/routes/performance_routes.dart';
 
 /// App router for handling navigation
 class AppRouter {
@@ -54,6 +56,9 @@ class AppRouter {
         break;
       case AuthRoutes.cloudWatchTest:
         screen = const CloudWatchTestPage();
+        break;
+      case PerformanceRoutes.benchmark:
+        screen = const PerformanceBenchmarkScreen();
         break;
       case '/edit-profile':
         screen = const EditProfileScreen();
