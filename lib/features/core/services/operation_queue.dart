@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../providers/connectivity_provider.dart';
 import '../../auth/domain/services/token_manager.dart';
 import 'operation_storage_service.dart';
+import 'retry_strategy.dart';
 import '../../travel/domain/models/trip_planning_operation.dart';
 import '../../travel/domain/models/travel_note_operation.dart';
 import '../../travel/domain/models/location_update_operation.dart';
@@ -53,6 +54,13 @@ class OperationQueue extends _$OperationQueue {
   final List<QueueableOperation> _failedOperations = [];
   Timer? _processingTimer;
   bool _isProcessing = false;
+
+  /// Retry strategy for calculating backoff delays
+  final RetryStrategy retryStrategy = const ExponentialBackoffStrategy(
+    baseDelay: Duration(seconds: 1),
+    maxDelay: Duration(minutes: 5),
+    jitterFactor: 0.1,
+  );
 
   @override
   Future<void> build() async {
@@ -106,12 +114,19 @@ class OperationQueue extends _$OperationQueue {
 
       final operationsToRemove = <QueueableOperation>[];
       final operationsToAdd = <QueueableOperation>[];
+      final operationsToFail = <QueueableOperation>[];
 
       for (final operation in operations) {
+        // Skip operations that cannot be processed (offline, auth, or in backoff)
         if (!_canProcess(operation)) continue;
 
-        // Create updated operation with attempt metadata
-        final updatedOperation = _updateAttemptMetadata(operation, null);
+        // Check if operation has exceeded max retries
+        if (!_shouldRetry(operation)) {
+          debugPrint('Operation ${operation.id} exceeded max retries (${operation.maxRetries}), moving to failed queue');
+          operationsToFail.add(operation);
+          operationsToRemove.add(operation);
+          continue;
+        }
 
         try {
           await operation.execute();
@@ -120,12 +135,19 @@ class OperationQueue extends _$OperationQueue {
           debugPrint('Failed to execute operation ${operation.id}: $e');
           debugPrint('Stack trace: $stackTrace');
 
-          // Update operation with error information
+          // Update operation with error information and increment attempt count
           final failedOperation = _updateAttemptMetadata(operation, e.toString());
 
-          // Replace the operation with the updated one
-          operationsToRemove.add(operation);
-          operationsToAdd.add(failedOperation);
+          // Check if this was the last retry attempt
+          if (failedOperation.attemptCount >= failedOperation.maxRetries) {
+            debugPrint('Operation ${operation.id} reached max retries, moving to failed queue');
+            operationsToFail.add(failedOperation);
+            operationsToRemove.add(operation);
+          } else {
+            // Replace the operation with the updated one for retry later
+            operationsToRemove.add(operation);
+            operationsToAdd.add(failedOperation);
+          }
         }
       }
 
@@ -135,6 +157,9 @@ class OperationQueue extends _$OperationQueue {
       }
       for (final op in operationsToAdd) {
         _pendingOperations.add(op);
+      }
+      for (final op in operationsToFail) {
+        _failedOperations.add(op);
       }
 
       await _persistQueue();
@@ -177,11 +202,58 @@ class OperationQueue extends _$OperationQueue {
     final tokenManager = ref.read(tokenManagerProvider);
     final isOnline = ref.read(connectivityNotifierProvider);
 
+    // Check network and token requirements
     if (operation.requiresNetwork) {
-      return isOnline && tokenManager.canPerformOnlineOperations;
+      if (!isOnline || !tokenManager.canPerformOnlineOperations) {
+        return false;
+      }
+    } else if (!tokenManager.hasValidTokens) {
+      return false;
     }
 
-    return tokenManager.hasValidTokens;
+    // Check if operation is in backoff period (has been attempted before and needs to wait)
+    if (_isInBackoffPeriod(operation)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Check if an operation should be retried based on attempt count
+  bool _shouldRetry(QueueableOperation operation) {
+    // Always retry if attempts haven't exceeded max
+    return operation.attemptCount < operation.maxRetries;
+  }
+
+  /// Check if an operation is currently in its backoff period
+  ///
+  /// Returns true if the operation was attempted recently and the calculated
+  /// backoff delay hasn't elapsed yet
+  bool _isInBackoffPeriod(QueueableOperation operation) {
+    // No backoff for first attempt
+    if (operation.lastAttempt == null || operation.attemptCount == 0) {
+      return false;
+    }
+
+    // Calculate expected backoff duration based on attempt count
+    final backoffDelay = retryStrategy.calculateDelay(operation.attemptCount);
+
+    // Calculate when this operation can be retried
+    final retryTime = operation.lastAttempt!.add(backoffDelay);
+
+    // Check if current time is past the retry time
+    final now = DateTime.now();
+    final inBackoff = now.isBefore(retryTime);
+
+    if (inBackoff) {
+      final timeUntilRetry = retryTime.difference(now);
+      debugPrint(
+        'Operation ${operation.id} is in backoff period. '
+        'Can retry in ${timeUntilRetry.inSeconds}s'
+      );
+    }
+
+    return inBackoff;
   }
 
   /// Load saved queue from storage on initialization
