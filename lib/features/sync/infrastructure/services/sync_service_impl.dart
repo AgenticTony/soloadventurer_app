@@ -2,11 +2,14 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../../domain/models/sync_operation.dart';
 import '../../domain/models/sync_status.dart';
+import '../../domain/models/sync_error.dart';
 import '../../domain/entities/sync_entity_type.dart';
 import '../../domain/services/sync_service.dart';
 import '../../domain/services/sync_queue_persistence.dart';
 import '../../domain/services/network_connectivity.dart';
 import '../../domain/services/exponential_backoff.dart';
+import '../../domain/services/sync_history_service.dart';
+import '../../domain/models/sync_history_entry.dart';
 
 /// Implementation of [SyncService] with queue management and persistence
 class SyncServiceImpl implements SyncService {
@@ -24,6 +27,9 @@ class SyncServiceImpl implements SyncService {
 
   /// Network connectivity monitoring service
   final NetworkConnectivity? _networkConnectivity;
+
+  /// Sync history service for logging operations
+  final SyncHistoryService? _historyService;
 
   /// Subscription to network online events
   StreamSubscription<bool>? _networkOnlineSubscription;
@@ -46,11 +52,20 @@ class SyncServiceImpl implements SyncService {
   /// Operation processing lock
   bool _processingLock = false;
 
+  /// Current history entry ID for the active sync operation
+  String? _currentHistoryEntryId;
+
+  /// Whether this is a manual sync operation
+  bool _isManualSync = false;
+
   /// Whether persistence is enabled
   bool get _persistenceEnabled => _persistence != null;
 
   /// Whether network connectivity monitoring is enabled
   bool get _networkMonitoringEnabled => _networkConnectivity != null;
+
+  /// Whether history logging is enabled
+  bool get _historyEnabled => _historyService != null;
 
   @override
   List<SyncOperation> get queue => List.unmodifiable(_queue);
@@ -79,12 +94,15 @@ class SyncServiceImpl implements SyncService {
   /// If [networkConnectivity] is provided, sync will automatically trigger when
   /// connection is restored
   /// If [backoff] is provided, it will be used for retry delay calculation
+  /// If [historyService] is provided, sync operations will be logged to history
   SyncServiceImpl({
     SyncQueuePersistence? persistence,
     NetworkConnectivity? networkConnectivity,
     ExponentialBackoff? backoff,
+    SyncHistoryService? historyService,
   })  : _persistence = persistence,
         _networkConnectivity = networkConnectivity,
+        _historyService = historyService,
         _backoff = backoff ?? ExponentialBackoff.standard {
     _initializeFromPersistence();
     _initializeNetworkMonitoring();
@@ -285,6 +303,21 @@ class SyncServiceImpl implements SyncService {
     _isProcessing = true;
     _updateStatus(SyncStatus.syncing);
 
+    // Create history entry for this sync operation
+    final entryId = 'sync_${DateTime.now().millisecondsSinceEpoch}';
+    _currentHistoryEntryId = entryId;
+
+    if (_historyEnabled) {
+      final connectionType = await _getCurrentConnectionType();
+      final entry = SyncHistoryEntry.start(
+        id: entryId,
+        isManual: _isManualSync,
+        connectionType: connectionType,
+      );
+      await _historyService!.addEntry(entry);
+      debugPrint('SyncService: Created history entry $entryId');
+    }
+
     int successCount = 0;
     int failureCount = 0;
     String? lastError;
@@ -296,7 +329,6 @@ class SyncServiceImpl implements SyncService {
       // Process operations in FIFO order (already sorted by priority)
       while (_queue.isNotEmpty && !_isPaused) {
         final operation = _queue.removeAt(0);
-
         // Skip operations that aren't ready for retry yet
         if (!operation.isReadyForRetry) {
           // Put it back in the queue
@@ -379,6 +411,7 @@ class SyncServiceImpl implements SyncService {
       }
 
       // Determine final result
+      final totalCount = successCount + failureCount;
       if (failureCount > 0) {
         lastError ??= 'Some operations failed';
         lastErrorCode ??= 'PARTIAL_FAILURE';
@@ -389,6 +422,15 @@ class SyncServiceImpl implements SyncService {
           _updateStatus(SyncStatus.failed);
         }
 
+        // Complete history entry
+        await _completeHistoryEntry(
+          isSuccess: false,
+          successCount: successCount,
+          failureCount: failureCount,
+          totalCount: totalCount,
+          error: lastError,
+        );
+
         return SyncResult.failure(
           lastError,
           code: lastErrorCode,
@@ -397,6 +439,15 @@ class SyncServiceImpl implements SyncService {
         );
       } else {
         _updateStatus(SyncStatus.success);
+
+        // Complete history entry
+        await _completeHistoryEntry(
+          isSuccess: true,
+          successCount: successCount,
+          failureCount: failureCount,
+          totalCount: totalCount,
+        );
+
         return SyncResult.success(
           successCount: successCount,
           failureCount: failureCount,
@@ -407,6 +458,17 @@ class SyncServiceImpl implements SyncService {
       debugPrint(stackTrace.toString());
 
       _updateStatus(SyncStatus.failed);
+
+      final totalCount = successCount + failureCount;
+
+      // Complete history entry
+      await _completeHistoryEntry(
+        isSuccess: false,
+        successCount: successCount,
+        failureCount: failureCount,
+        totalCount: totalCount,
+        error: 'Queue processing failed: ${e.toString()}',
+      );
 
       return SyncResult.failure(
         'Queue processing failed: ${e.toString()}',
@@ -722,5 +784,77 @@ class SyncServiceImpl implements SyncService {
         processBatch();
       }
     });
+  }
+
+  /// Get current network connection type for history logging
+  Future<String?> _getCurrentConnectionType() async {
+    if (!_networkMonitoringEnabled) return null;
+
+    try {
+      final connection = await _networkConnectivity!.currentConnection;
+      return connection?.type.name;
+    } catch (e) {
+      debugPrint('SyncService: Error getting connection type: $e');
+      return null;
+    }
+  }
+
+  /// Complete history entry when sync finishes
+  Future<void> _completeHistoryEntry({
+    required bool isSuccess,
+    required int successCount,
+    required int failureCount,
+    required int totalCount,
+    String? error,
+  }) async {
+    if (!_historyEnabled || _currentHistoryEntryId == null) return;
+
+    try {
+      final connectionType = await _getCurrentConnectionType();
+      SyncHistoryEntry updatedEntry;
+
+      if (isSuccess) {
+        updatedEntry = SyncHistoryEntry.success(
+          id: _currentHistoryEntryId!,
+          startedAt: DateTime.now(), // Will be updated when we add startedAt tracking
+          successCount: successCount,
+          failureCount: failureCount,
+          totalCount: totalCount,
+          isManual: _isManualSync,
+          connectionType: connectionType,
+        );
+      } else {
+        // Import SyncError here to avoid circular dependency
+        // For now, create a basic error
+        final syncError = error != null
+            ? SyncError(
+                errorId: 'error_${DateTime.now().millisecondsSinceEpoch}',
+                type: SyncErrorType.unknown,
+                severity: SyncErrorSeverity.medium,
+                technicalMessage: error,
+                userMessage: error,
+                occurredAt: DateTime.now(),
+              )
+            : null;
+
+        updatedEntry = SyncHistoryEntry.failure(
+          id: _currentHistoryEntryId!,
+          startedAt: DateTime.now(), // Will be updated when we add startedAt tracking
+          successCount: successCount,
+          failureCount: failureCount,
+          totalCount: totalCount,
+          error: syncError!,
+          isManual: _isManualSync,
+          connectionType: connectionType,
+        );
+      }
+
+      await _historyService!.updateEntry(_currentHistoryEntryId!, updatedEntry);
+      debugPrint('SyncService: Updated history entry $_currentHistoryEntryId');
+    } catch (e) {
+      debugPrint('SyncService: Error updating history entry: $e');
+    } finally {
+      _currentHistoryEntryId = null;
+    }
   }
 }
