@@ -93,13 +93,13 @@
       "id": "phase-2",
       "title": "Background Token Refresh",
       "description": "Implement automatic background token refresh to keep sessions alive without user awareness",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "id": "2.1",
           "title": "Create Token Refresh Scheduler",
           "description": "Implement a background scheduler that triggers token refresh based on expiration time",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "TokenRefreshScheduler class created",
             "Schedules refresh at 75% of token lifetime",
