@@ -605,14 +605,16 @@
           "id": "7.6",
           "title": "Integrate Indicators into App Shell",
           "description": "Add sync and connectivity indicators to main app UI",
-          "status": "pending",
-          "file": "lib/app/my_app.dart",
+          "status": "completed",
+          "file": "lib/features/home/presentation/screens/home_screen.dart",
           "acceptanceCriteria": [
             "Connectivity indicator in app bar",
             "Sync status banner at top when active",
             "Offline mode banner when applicable",
             "Sync progress accessible from settings"
-          ]
+          ],
+          "notes": "Successfully integrated all sync and connectivity indicators into HomeScreen:\n\n1. **ConnectivityIndicator**: Added to AppBar actions showing real-time connection status (online/syncing/offline/error)\n2. **OfflineBanner**: Placed at top of body Column, shows when device is offline with pending operations count\n3. **SyncStatusBanner**: Placed below OfflineBanner, displays sync progress, errors, or pending changes\n4. **Settings Button**: Added to AppBar, navigates to OfflineRoutes.syncSettings for detailed sync management\n\nAll indicators automatically show/hide based on state changes from providers:\n- ConnectivityIndicator uses connectivityProvider and syncStatusProvider\n- OfflineBanner watches connectivityProvider\n- SyncStatusBanner watches syncStatusProvider\n\nIntegration follows Material 3 design patterns and matches existing app UI structure.\n\nAcceptance Criteria Met:\n✓ Connectivity indicator in app bar\n✓ Sync status banner at top when active\n✓ Offline mode banner when applicable\n✓ Sync progress accessible from settings\n\nCommit: 8f6765f",
+          "updated_at": "2026-01-05T00:45:00.000Z"
         }
       ]
     },
