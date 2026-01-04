@@ -214,9 +214,24 @@ Finalize with comprehensive testing and docs
    - Includes comprehensive unit tests (17 test groups covering all functionality)
    - Status: Committed (9462f6d)
 
+2. ✅ Phase 2.2: Integrate with App Lifecycle - COMPLETED
+   - Registered TokenRefreshScheduler and TokenExpirationTracker in service locator (auth_module.dart)
+   - Updated AuthNotifier to accept TokenRefreshScheduler and AuthLocalDataSource as dependencies
+   - Added _startRefreshScheduler() helper method to initialize scheduler with current session
+   - Added _stopRefreshScheduler() helper method to stop scheduler on logout
+   - Integrated scheduler start in initialize() method (for restored sessions)
+   - Integrated scheduler start in signIn() method (after successful login)
+   - Integrated scheduler start in signUp() method (after successful registration without verification)
+   - Integrated scheduler stop in signOut() method (before logout)
+   - Added provider definitions in presentation layer (auth_providers.dart)
+   - Created comprehensive integration tests for lifecycle behavior
+   - TokenRefreshScheduler automatically pauses/resumes with app lifecycle states
+   - Tests cover: pause on inactive/paused/hidden, resume on foreground, stop on detached
+   - Tests cover: multiple pause/resume cycles, rapid state changes, edge cases
+   - Status: Committed
+
 ## Next Steps
 
-2. ⏳ Phase 2.2: Integrate with App Lifecycle - Next
 3. ⏳ Phase 2.3: Update AuthInterceptor for Proactive Refresh
 4. ⏳ Phase 2.4: Add Refresh Notifications
 5. ⏳ Phase 2.5: Add Integration Tests for Background Refresh

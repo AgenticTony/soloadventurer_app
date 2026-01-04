@@ -14,6 +14,9 @@ import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dar
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
 /// Provider for the auth repository
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -31,6 +34,18 @@ final loggingServiceProvider = Provider<LoggingService>((ref) {
   throw UnimplementedError('loggingServiceProvider must be overridden');
 });
 
+/// Provider for the token refresh scheduler
+final tokenRefreshSchedulerProvider =
+    Provider<TokenRefreshScheduler>((ref) {
+  throw UnimplementedError('tokenRefreshSchedulerProvider must be overridden');
+});
+
+/// Provider for the auth local data source
+final authLocalDataSourceProvider =
+    Provider<AuthLocalDataSource>((ref) {
+  throw UnimplementedError('authLocalDataSourceProvider must be overridden');
+});
+
 /// Auth notifier that manages the authentication state
 class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final GetCurrentUser _getCurrentUser;
@@ -43,6 +58,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final ForgotPassword _forgotPassword;
   final ConfirmPasswordReset _confirmPasswordReset;
   final LoggingService _logger;
+  final TokenRefreshScheduler _refreshScheduler;
+  final AuthLocalDataSource _localDataSource;
 
   /// Creates a new [AuthNotifier]
   AuthNotifier({
@@ -56,6 +73,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     required ForgotPassword forgotPassword,
     required ConfirmPasswordReset confirmPasswordReset,
     required LoggingService logger,
+    required TokenRefreshScheduler refreshScheduler,
+    required AuthLocalDataSource localDataSource,
   })  : _getCurrentUser = getCurrentUser,
         _isSignedIn = isSignedIn,
         _login = login,
@@ -66,6 +85,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         _forgotPassword = forgotPassword,
         _confirmPasswordReset = confirmPasswordReset,
         _logger = logger,
+        _refreshScheduler = refreshScheduler,
+        _localDataSource = localDataSource,
         super(const AsyncValue.data(AuthState.initial()));
 
   /// Initialize the auth state
@@ -77,6 +98,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       if (isAuthenticated) {
         final user = await _getCurrentUser();
         if (user != null) {
+          // Start the refresh scheduler with the current session
+          await _startRefreshScheduler();
           return AuthState.authenticated(user);
         }
       }
@@ -86,12 +109,48 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     state = newState;
   }
 
+  /// Starts the token refresh scheduler with the current session
+  Future<void> _startRefreshScheduler() async {
+    try {
+      final accessToken = await _localDataSource.getAuthToken();
+      final idToken = await _localDataSource.getIdToken();
+      final refreshToken = await _localDataSource.getRefreshToken();
+      final expiresAt = await _localDataSource.getTokenExpiration();
+
+      if (accessToken != null &&
+          idToken != null &&
+          refreshToken != null &&
+          expiresAt != null) {
+        final session = AuthSession(
+          accessToken: accessToken,
+          idToken: idToken,
+          refreshToken: refreshToken,
+          expiresAt: expiresAt,
+        );
+        _refreshScheduler.start(session);
+        debugPrint('AuthNotifier: Token refresh scheduler started');
+      } else {
+        debugPrint('AuthNotifier: Incomplete session data, scheduler not started');
+      }
+    } catch (e) {
+      debugPrint('AuthNotifier: Failed to start refresh scheduler: $e');
+    }
+  }
+
+  /// Stops the token refresh scheduler
+  void _stopRefreshScheduler() {
+    _refreshScheduler.stop();
+    debugPrint('AuthNotifier: Token refresh scheduler stopped');
+  }
+
   /// Sign in with email and password
   Future<void> signIn(String email, String password) async {
     state = const AsyncValue.loading();
 
     try {
       final user = await _login(LoginParams(email: email, password: password));
+      // Start the refresh scheduler after successful login
+      await _startRefreshScheduler();
       state = AsyncValue.data(AuthState.authenticated(user));
     } catch (e, stack) {
       state = AsyncValue.error(e.toString(), stack);
@@ -116,6 +175,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       if (needsVerification) {
         state = AsyncValue.data(AuthState.unverified(user: user));
       } else {
+        // Start the refresh scheduler after successful registration (if logged in)
+        await _startRefreshScheduler();
         state = AsyncValue.data(AuthState.authenticated(user));
       }
     } catch (e, stack) {
@@ -128,6 +189,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     state = const AsyncValue.loading();
 
     try {
+      // Stop the refresh scheduler before signing out
+      _stopRefreshScheduler();
       await _signOut();
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {

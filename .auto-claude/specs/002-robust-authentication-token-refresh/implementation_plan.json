@@ -114,7 +114,7 @@
           "id": "2.2",
           "title": "Integrate with App Lifecycle",
           "description": "Connect token refresh scheduler with app lifecycle events (foreground, background, terminate)",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "Pauses refresh timer when app goes to background",
             "Resumes refresh timer when app returns to foreground",

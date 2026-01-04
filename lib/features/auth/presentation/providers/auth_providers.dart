@@ -13,6 +13,9 @@ import 'package:soloadventurer/features/auth/domain/usecases/resend_verification
 import 'package:soloadventurer/features/auth/presentation/notifiers/auth_notifier.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
 
 /// Provider for the auth repository
@@ -70,6 +73,11 @@ final loggingServiceProvider = Provider<LoggingService>((ref) {
   return getIt<LoggingService>();
 });
 
+/// Provider for the token refresh scheduler
+final tokenRefreshSchedulerProvider = Provider<TokenRefreshScheduler>((ref) {
+  return getIt<TokenRefreshScheduler>();
+});
+
 /// Provider for the auth notifier
 final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>((ref) {
   return AuthNotifier(
@@ -83,6 +91,8 @@ final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<Auth
     forgotPassword: ref.watch(forgotPasswordProvider),
     confirmPasswordReset: ref.watch(confirmPasswordResetProvider),
     logger: ref.watch(loggingServiceProvider),
+    refreshScheduler: ref.watch(tokenRefreshSchedulerProvider),
+    localDataSource: ref.watch(authLocalDataSourceProvider),
   );
 });
 

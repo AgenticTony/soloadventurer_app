@@ -17,6 +17,8 @@ import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_re
 import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
 
 /// Register all auth feature dependencies
 void registerAuthModule(GetIt getIt, {bool isTest = false}) {
@@ -45,6 +47,17 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
       remoteDataSource: getIt<AuthRemoteDataSource>(),
       localDataSource: getIt<AuthLocalDataSource>(),
       securityManager: getIt<SecurityManager>(),
+    ),
+  );
+
+  // Register token refresh infrastructure services
+  getIt.registerLazySingleton<TokenExpirationTracker>(
+    () => TokenExpirationTracker(),
+  );
+
+  getIt.registerLazySingleton<TokenRefreshScheduler>(
+    () => TokenRefreshScheduler(
+      expirationTracker: getIt<TokenExpirationTracker>(),
     ),
   );
 
