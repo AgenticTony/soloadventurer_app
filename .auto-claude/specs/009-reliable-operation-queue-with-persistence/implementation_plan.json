@@ -1,0 +1,552 @@
+{
+  "specId": "009-reliable-operation-queue-with-persistence",
+  "specTitle": "Reliable Operation Queue with Persistence",
+  "createdAt": "2025-01-04T00:00:00Z",
+  "lastUpdated": "2025-01-04T00:00:00Z",
+  "overallStatus": "in_progress",
+  "phases": [
+    {
+      "phaseId": "phase-1",
+      "phaseTitle": "Core Queue Persistence",
+      "phaseDescription": "Implement persistent storage for the operation queue to survive app restarts and device reboots",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtaskId": "1.1",
+          "title": "Create Operation Storage Service",
+          "description": "Build a dedicated service for persisting and retrieving queued operations using shared_preferences",
+          "status": "completed",
+          "files": [
+            "lib/features/core/services/operation_storage_service.dart",
+            "lib/features/core/services/operation_storage_service.g.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Save operations to persistent storage",
+              "Load operations on app startup",
+              "Clear completed/failed operations",
+              "Handle serialization errors gracefully",
+              "Use secure storage for sensitive operation data"
+            ],
+            "dependencies": [
+              "shared_preferences for basic persistence",
+              "flutter_secure_storage for sensitive data"
+            ],
+            "testing": [
+              "Test save and load operations",
+              "Test serialization/deserialization",
+              "Test error handling for corrupted data",
+              "Test storage limits and cleanup"
+            ]
+          }
+        },
+        {
+          "subtaskId": "1.2",
+          "title": "Implement Queue Persistence in OperationQueue",
+          "description": "Update OperationQueue to persist operations to storage on every change",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Persist queue when operations are added",
+              "Persist queue after processing completes",
+              "Load saved queue on initialization",
+              "Handle corrupted saved queue state",
+              "Ensure atomic operations during persistence"
+            ],
+            "dependencies": [
+              "OperationStorageService from subtask 1.1"
+            ],
+            "changes": [
+              "Add OperationStorageService dependency",
+              "Implement _loadQueue() on build",
+              "Update _persistQueue() to use storage service",
+              "Add error handling for persistence failures"
+            ]
+          }
+        },
+        {
+          "subtaskId": "1.3",
+          "title": "Add Operation Metadata Enhancement",
+          "description": "Enhance QueueableOperation with retry tracking and metadata",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Add createdAt timestamp",
+              "Add lastAttempt timestamp",
+              "Add attemptCount field",
+              "Add lastError field for debugging",
+              "Add maxRetries configuration"
+            ],
+            "changes": [
+              "Update QueueableOperation interface",
+              "Update all existing operation implementations",
+              "Update toJson() to include metadata"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phaseId": "phase-2",
+      "phaseTitle": "Retry Logic & Failure Recovery",
+      "phaseDescription": "Implement intelligent retry mechanism with exponential backoff",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtaskId": "2.1",
+          "title": "Implement Exponential Backoff Strategy",
+          "description": "Add exponential backoff with jitter for retry attempts",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/retry_strategy.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Calculate delay based on attempt count",
+              "Add jitter to prevent thundering herd",
+              "Configurable base delay and max delay",
+              "Support custom backoff strategies per operation type"
+            ],
+            "implementation": [
+              "Create RetryStrategy class",
+              "Implement calculateDelay() method",
+              "Add ExponentialBackoffStrategy",
+              "Add FixedDelayStrategy for specific cases"
+            ]
+          }
+        },
+        {
+          "subtaskId": "2.2",
+          "title": "Integrate Retry Logic into OperationQueue",
+          "description": "Update queue processing to respect retry delays and limits",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Check attempt count before execution",
+              "Skip operations in backoff period",
+              "Remove operations after max retries exceeded",
+              "Track last attempt time for backoff calculation"
+            ],
+            "changes": [
+              "Update _canProcess() to check retry eligibility",
+              "Add _shouldRetry() method",
+              "Add _isInBackoffPeriod() method",
+              "Update execute() to increment attempt count",
+              "Move failed operations to failed queue after max retries"
+            ]
+          }
+        },
+        {
+          "subtaskId": "2.3",
+          "title": "Add Failed Operations Queue",
+          "description": "Maintain separate queue for failed operations with user-initiated retry",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Separate queue for failed operations",
+              "Persist failed operations",
+              "Allow manual retry of individual operations",
+              "Allow bulk retry of all failed operations",
+              "Clear failed operations queue"
+            ],
+            "methods": [
+              "getFailedOperations()",
+              "retryOperation(String id)",
+              "retryAllFailed()",
+              "clearFailedOperations()",
+              "removeFailedOperation(String id)"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phaseId": "phase-3",
+      "phaseTitle": "Operation Deduplication",
+      "phaseDescription": "Prevent redundant operations from being queued",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtaskId": "3.1",
+          "title": "Implement Operation Deduplication Logic",
+          "description": "Add deduplication based on operation type and data hash",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Add deduplicationKey to QueueableOperation",
+              "Check for duplicates before adding",
+              "Replace existing operation with newer version",
+              "Configure deduplication per operation type"
+            ],
+            "implementation": [
+              "Add deduplicationKey getter to QueueableOperation",
+              "Create _findDuplicate() method",
+              "Update addOperation() to check duplicates",
+              "Add _replaceOperation() method"
+            ]
+          }
+        },
+        {
+          "subtaskId": "3.2",
+          "title": "Update Existing Operations with Deduplication Keys",
+          "description": "Add deduplication keys to all existing operation implementations",
+          "status": "pending",
+          "files": [
+            "lib/features/travel/domain/models/trip_planning_operation.dart",
+            "lib/features/travel/domain/models/travel_note_operation.dart",
+            "lib/features/travel/domain/models/location_update_operation.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Define deduplication strategy per operation type",
+              "Generate stable keys for same operation",
+              "Handle partial updates vs full replacements"
+            ],
+            "examples": [
+              "Trip update: 'trip_update_${tripId}'",
+              "Location update: 'location_update_${tripId}_${timestamp}'",
+              "Note: 'note_${noteId}'"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phaseId": "phase-4",
+      "phaseTitle": "Priority Queue Enhancement",
+      "phaseDescription": "Ensure proper priority handling for critical operations like SOS",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtaskId": "4.1",
+          "title": "Define Operation Priority Levels",
+          "description": "Create priority enum and assign levels to operation types",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_priority.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Define priority enum (critical, high, normal, low)",
+              "Assign priority values (critical: 1000, high: 100, normal: 10, low: 1)",
+              "Document which operations should use each level",
+              "Support dynamic priority adjustment"
+            ],
+            "priorities": [
+              "SOS/Emergency: Critical (1000)",
+              "Authentication: High (100)",
+              "Trip updates: Normal (10)",
+              "Location updates: Low (1)"
+            ]
+          }
+        },
+        {
+          "subtaskId": "4.2",
+          "title": "Update Queue Processing for Priority",
+          "description": "Ensure priority-based processing with starvation prevention",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Always sort by priority before processing",
+              "Add aging mechanism to prevent low-priority starvation",
+              "Process all critical operations before others",
+              "Limit consecutive operations of same priority"
+            ],
+            "implementation": [
+              "Update processQueue() sorting logic",
+              "Add age-based priority boost for old operations",
+              "Add priority round-robin mechanism"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phaseId": "phase-5",
+      "phaseTitle": "User Interface for Queue Management",
+      "phaseDescription": "Build UI for users to view and manage pending operations",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtaskId": "5.1",
+          "title": "Create Queue State Provider",
+          "description": "Build a Riverpod provider to expose queue state to UI",
+          "status": "pending",
+          "files": [
+            "lib/features/core/providers/operation_queue_provider.dart",
+            "lib/features/core/providers/operation_queue_provider.g.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Expose pending operations count",
+              "Expose failed operations count",
+              "Provide list of pending operations",
+              "Provide list of failed operations",
+              "Expose processing status"
+            ],
+            "state": [
+              "pendingOperations: List<QueueableOperation>",
+              "failedOperations: List<QueueableOperation>",
+              "isProcessing: bool",
+              "pendingCount: int",
+              "failedCount: int"
+            ]
+          }
+        },
+        {
+          "subtaskId": "5.2",
+          "title": "Build Queue Status Screen",
+          "description": "Create screen to display all pending and failed operations",
+          "status": "pending",
+          "files": [
+            "lib/features/core/presentation/screens/operation_queue_screen.dart",
+            "lib/features/core/presentation/widgets/operation_list_item.dart"
+          ],
+          "details": {
+            "requirements": [
+              "List pending operations with metadata",
+              "List failed operations with error details",
+              "Show operation progress/status",
+              "Pull to refresh",
+              "Manual retry button for failed operations",
+              "Clear all failed button",
+              "Operation count badge"
+            ],
+            "ui_elements": [
+              "Pending operations section",
+              "Failed operations section",
+              "Operation cards with details",
+              "Retry buttons",
+              "Delete operation buttons",
+              "Clear all button",
+              "Status indicators"
+            ]
+          }
+        },
+        {
+          "subtaskId": "5.3",
+          "title": "Add Queue Status Indicator",
+          "description": "Add persistent indicator showing pending operation count",
+          "status": "pending",
+          "files": [
+            "lib/features/core/presentation/widgets/queue_status_indicator.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Show badge with pending count",
+              "Display in app bar or navigation",
+              "Navigate to queue screen on tap",
+              "Animate when count changes",
+              "Hide when queue is empty"
+            ]
+          }
+        },
+        {
+          "subtaskId": "5.4",
+          "title": "Integrate Queue Screen into Navigation",
+          "description": "Add queue screen to app navigation and settings",
+          "status": "pending",
+          "files": [
+            "lib/app/router/app_router.dart",
+            "lib/features/profile/presentation/screens/settings_screen.dart"
+          ],
+          "details": {
+            "requirements": [
+              "Add route for queue screen",
+              "Add menu item in settings",
+              "Add queue status indicator to home screen",
+              "Handle deep links if applicable"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phaseId": "phase-6",
+      "phaseTitle": "Testing & Quality Assurance",
+      "phaseDescription": "Comprehensive testing of all queue functionality",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtaskId": "6.1",
+          "title": "Unit Tests for Queue Core",
+          "description": "Test queue persistence, retry logic, and deduplication",
+          "status": "pending",
+          "files": [
+            "test/features/core/services/operation_queue_test.dart",
+            "test/features/core/services/operation_storage_service_test.dart",
+            "test/features/core/services/retry_strategy_test.dart"
+          ],
+          "details": {
+            "test_cases": [
+              "Queue persists operations correctly",
+              "Queue loads saved operations on startup",
+              "Handles corrupted storage gracefully",
+              "Retry delay calculations are correct",
+              "Exponential backoff works as expected",
+              "Duplicate operations are prevented",
+              "Priority sorting works correctly",
+              "Failed operations are moved to failed queue",
+              "Max retries limit is enforced"
+            ]
+          }
+        },
+        {
+          "subtaskId": "6.2",
+          "title": "Integration Tests for Queue Processing",
+          "description": "Test end-to-end queue behavior with network operations",
+          "status": "pending",
+          "files": [
+            "integration_test/operation_queue_test.dart"
+          ],
+          "details": {
+            "test_scenarios": [
+              "Operations execute when online",
+              "Operations queue when offline",
+              "Queue processes when connection restored",
+              "Failed operations retry correctly",
+              "Manual retry works from UI",
+              "App restart preserves queue",
+              "Priority queue processes SOS first"
+            ]
+          }
+        },
+        {
+          "subtaskId": "6.3",
+          "title": "Widget Tests for Queue UI",
+          "description": "Test queue screen and status indicator widgets",
+          "status": "pending",
+          "files": [
+            "test/features/core/presentation/widgets/operation_list_item_test.dart",
+            "test/features/core/presentation/screens/operation_queue_screen_test.dart",
+            "test/features/core/presentation/widgets/queue_status_indicator_test.dart"
+          ],
+          "details": {
+            "test_cases": [
+              "Queue screen displays operations",
+              "Retry buttons trigger retry",
+              "Clear button clears failed operations",
+              "Status indicator shows correct count",
+              "Pull to refresh updates state",
+              "Empty states display correctly"
+            ]
+          }
+        },
+        {
+          "subtaskId": "6.4",
+          "title": "Manual Testing & Edge Cases",
+          "description": "Manual testing of real-world scenarios",
+          "status": "pending",
+          "files": [],
+          "details": {
+            "scenarios": [
+              "Airplane mode on/off cycles",
+              "App restart with pending operations",
+              "Device reboot with pending operations",
+              "Rapid network state changes",
+              "Low memory conditions",
+              "Operation queue with 100+ operations",
+              "Concurrent operation additions",
+              "SOS operation during queue processing"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phaseId": "phase-7",
+      "phaseTitle": "Documentation & Cleanup",
+      "phaseDescription": "Document the queue system and clean up technical debt",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtaskId": "7.1",
+          "title": "Create Queue Documentation",
+          "description": "Document operation queue architecture and usage",
+          "status": "pending",
+          "files": [
+            "docs/features/operation_queue.md"
+          ],
+          "details": {
+            "sections": [
+              "Overview and purpose",
+              "Architecture diagram",
+              "How to create custom operations",
+              "Priority levels and when to use them",
+              "Deduplication strategies",
+              "Retry configuration",
+              "Integration examples"
+            ]
+          }
+        },
+        {
+          "subtaskId": "7.2",
+          "title": "Update Existing Code Documentation",
+          "description": "Add inline documentation to queue-related code",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart",
+            "lib/features/core/services/operation_storage_service.dart"
+          ],
+          "details": {
+            "documentation": [
+              "Add Dart doc comments for all public APIs",
+              "Add usage examples in comments",
+              "Document thread safety guarantees",
+              "Document error handling behavior"
+            ]
+          }
+        },
+        {
+          "subtaskId": "7.3",
+          "title": "Remove TODO Comments",
+          "description": "Clean up TODO comments now that persistence is implemented",
+          "status": "pending",
+          "files": [
+            "lib/features/core/services/operation_queue.dart"
+          ],
+          "details": {
+            "cleanup": [
+              "Remove TODO at line 114-115",
+              "Update any related TODOs in other files",
+              "Verify no TODOs remain related to queue persistence"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "acceptanceCriteria": [
+    "All write operations are queued when offline and executed when online",
+    "Queue persists across app restarts and device reboots",
+    "Operations are deduplicated to prevent redundant requests",
+    "Failed operations retry with exponential backoff up to a limit",
+    "Users can view pending operations and manually retry if needed",
+    "Queue priority ensures critical operations (like SOS) execute first",
+    "Clear UI shows pending, in-progress, and completed operations"
+  ],
+  "notes": [
+    "Consider using workmanager for background processing on Android/iOS",
+    "Evaluate if we need a more sophisticated persistence solution (e.g., SQLite) for large queues",
+    "Monitor queue size and implement cleanup strategies for old completed operations",
+    "Consider adding analytics to track queue performance and failure patterns"
+  ]
+}
