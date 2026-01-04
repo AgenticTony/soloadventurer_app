@@ -302,6 +302,130 @@ class GraphQLQueries {
     }
   ''';
 
+  // Journal queries
+  static String getJournals = '''
+    query GetJournals(\$tripId: ID!) {
+      getJournals(tripId: \$tripId) {
+        id
+        tripId
+        userId
+        title
+        content
+        entryDate
+        mood
+        location
+        imageUrls
+        tags
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String getJournal = '''
+    query GetJournal(\$id: ID!) {
+      getJournal(id: \$id) {
+        id
+        tripId
+        userId
+        title
+        content
+        entryDate
+        mood
+        location
+        imageUrls
+        tags
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String createJournal = '''
+    mutation CreateJournal(
+      \$tripId: ID!
+      \$userId: ID!
+      \$title: String!
+      \$content: String!
+      \$entryDate: String
+      \$mood: String
+      \$location: String
+      \$imageUrls: [String!]
+      \$tags: [String!]
+    ) {
+      createJournal(
+        tripId: \$tripId
+        userId: \$userId
+        title: \$title
+        content: \$content
+        entryDate: \$entryDate
+        mood: \$mood
+        location: \$location
+        imageUrls: \$imageUrls
+        tags: \$tags
+      ) {
+        id
+        tripId
+        userId
+        title
+        content
+        entryDate
+        mood
+        location
+        imageUrls
+        tags
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String updateJournal = '''
+    mutation UpdateJournal(
+      \$id: ID!
+      \$title: String
+      \$content: String
+      \$entryDate: String
+      \$mood: String
+      \$location: String
+      \$imageUrls: [String!]
+      \$tags: [String!]
+    ) {
+      updateJournal(
+        id: \$id
+        title: \$title
+        content: \$content
+        entryDate: \$entryDate
+        mood: \$mood
+        location: \$location
+        imageUrls: \$imageUrls
+        tags: \$tags
+      ) {
+        id
+        tripId
+        userId
+        title
+        content
+        entryDate
+        mood
+        location
+        imageUrls
+        tags
+        createdAt
+        updatedAt
+      }
+    }
+  ''';
+
+  static String deleteJournal = '''
+    mutation DeleteJournal(\$id: ID!) {
+      deleteJournal(id: \$id) {
+        id
+        success
+      }
+    }
+  ''';
+
   // Incremental sync queries with 'since' parameter
   static String getTripsIncremental = '''
     query GetTripsIncremental(\$userId: ID!, \$since: DateTime!) {
