@@ -66,14 +66,15 @@
           "subtask_id": "1.4",
           "title": "Create SavedDestination model",
           "description": "Define model for destinations saved to wishlist or trips",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/domain/models/saved_destination.dart",
+          "notes": "Created SavedDestination model with SaveType enum (wishlist, trip). Includes destination reference, userId, saveType, optional tripId (for trip saves), optional notes field for user annotations, and createdAt/updatedAt timestamps. Added helper methods: isWishlist, isTrip, hasNotes, withUpdatedTimestamp, and withNotes. Uses Freezed for immutability with JSON serialization. Note: build_runner needs to be run to generate .freezed.dart and .g.dart files.",
           "acceptance_criteria": [
-            "Destination reference",
-            "Save type (wishlist, trip_id)",
-            "Notes field",
-            "Created at timestamp",
-            "Freezed model with JSON serialization"
+            "Destination reference - Implemented as required Destination field",
+            "Save type (wishlist, trip_id) - Implemented with SaveType enum",
+            "Notes field - Implemented as optional String field",
+            "Created at timestamp - Implemented with createdAt and updatedAt fields",
+            "Freezed model with JSON serialization - Fully implemented"
           ]
         },
         {
