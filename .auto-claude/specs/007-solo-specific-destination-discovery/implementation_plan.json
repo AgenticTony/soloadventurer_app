@@ -277,18 +277,19 @@
           "subtask_id": "4.1",
           "title": "Create DestinationCard widget",
           "description": "Reusable card component for displaying destination preview",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/presentation/widgets/destination_card.dart",
+          "notes": "Created comprehensive DestinationCard widget with all required features. Implementation includes: 1) Image display with CachedNetworkImage and proper placeholder/error handling, 2) Destination name and truncated description (2 lines max), 3) Safety score badge with color-coded display (green ≥8, orange ≥6, red <6) and appropriate icons (security/warning/dangerous), 4) Solo suitability badge with person icon and color coding based on theme colors, 5) Budget level indicator with icons (attach_money for budget, money for moderate, trending_up for luxury) and optional daily cost display, 6) Location indicator showing country code with location icon, 7) Tap callback support via onTap parameter, 8) Bookmark/save button with visual state (filled/border icon) and onBookmarkTap callback, 9) Responsive layout with proper constraints and flexible widgets. Added hidden gem badge overlay, customizable border radius and elevation, optional trailing widget, and comprehensive documentation. Uses pattern from ProfileAvatar and ProfileActions widgets. Created widgets barrel file for clean imports.",
           "acceptance_criteria": [
-            "Display destination image",
-            "Destination name and brief description",
-            "Safety score badge with color coding",
-            "Solo suitability badge",
-            "Budget level indicator",
-            "Location/distance indicator",
-            "Tap callback for navigation",
-            "Save/bookmark button",
-            "Responsive layout"
+            "Display destination image - COMPLETED with CachedNetworkImage and fallback",
+            "Destination name and brief description - COMPLETED with truncation",
+            "Safety score badge with color coding - COMPLETED (green/orange/red)",
+            "Solo suitability badge - COMPLETED with person icon",
+            "Budget level indicator - COMPLETED with icons and labels",
+            "Location/distance indicator - COMPLETED with country code",
+            "Tap callback for navigation - COMPLETED via onTap parameter",
+            "Save/bookmark button - COMPLETED with visual state",
+            "Responsive layout - COMPLETED with proper constraints"
           ]
         },
         {
