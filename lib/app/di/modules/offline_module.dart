@@ -3,7 +3,10 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../features/offline/infrastructure/database/offline_database.dart';
+import '../../features/offline/infrastructure/database/dao/sync_queue_dao.dart';
 import '../../features/offline/domain/services/offline_services.dart';
+import '../../features/offline/domain/repositories/offline_repositories.dart';
+import '../../features/offline/data/repositories/offline_repositories.dart';
 import '../../core/network/network_reachability.dart';
 
 /// Register all offline/sync feature dependencies
@@ -44,25 +47,12 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     () => DatabaseService(),
   );
 
-  // TODO: Register AppDatabase
-  // Note: AppDatabase is accessed through DatabaseService
-  // getIt.registerLazySingleton<AppDatabase>(
-  //   () => AppDatabase(),
-  // );
-  //
-  // TODO: Register DAOs
-  // getIt.registerLazySingleton<TripDao>(
-  //   () => TripDao(getIt<AppDatabase>()),
-  // );
-  // getIt.registerLazySingleton<JournalDao>(
-  //   () => JournalDao(getIt<AppDatabase>()),
-  // );
-  // getIt.registerLazySingleton<SyncQueueDao>(
-  //   () => SyncQueueDao(getIt<AppDatabase>()),
-  // );
-  // getIt.registerLazySingleton<UserDao>(
-  //   () => UserDao(getIt<AppDatabase>()),
-  // );
+  // Register DAOs for database operations
+  // DAOs are registered as singletons and depend on AppDatabase
+  // Note: These will be initialized lazily when first accessed
+  getIt.registerLazySingleton<SyncQueueDao>(
+    () => SyncQueueDao(getIt<DatabaseService>().database),
+  );
 
   // ==============================================================================
   // PHASE 3: NETWORK MONITORING
@@ -88,15 +78,17 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   );
 
   // ==============================================================================
-  // PHASE 4: SYNC QUEUE SYSTEM (To be implemented in Phase 4)
+  // PHASE 4: SYNC QUEUE SYSTEM
   // ==============================================================================
   //
-  // TODO: Register SyncQueueRepository
-  // getIt.registerLazySingleton<SyncQueueRepository>(
-  //   () => SyncQueueRepositoryImpl(
-  //     syncQueueDao: getIt<SyncQueueDao>(),
-  //   ),
-  // );
+  // Register SyncQueueRepository for managing sync queue operations
+  // The repository provides high-level operations for enqueueing, dequeueing,
+  // and managing sync operations in the local database.
+  getIt.registerLazySingleton<SyncQueueRepository>(
+    () => SyncQueueRepositoryImpl(
+      syncQueueDao: getIt<SyncQueueDao>(),
+    ),
+  );
   //
   // TODO: Register SyncQueueService
   // getIt.registerLazySingleton<SyncQueueService>(

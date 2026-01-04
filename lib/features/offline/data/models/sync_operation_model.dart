@@ -288,6 +288,26 @@ class SyncOperationModel {
     return timeSinceFailure >= Duration(seconds: backoffSeconds);
   }
 
+  /// Converts this [SyncOperationModel] to a [SyncOperationEntity] domain entity
+  SyncOperationEntity toDomainEntity() {
+    return SyncOperationEntity(
+      id: id,
+      entityType: entityType,
+      entityId: entityId,
+      operation: operation,
+      data: data,
+      priority: priority,
+      retryCount: retryCount,
+      maxRetries: maxRetries,
+      status: status,
+      errorMessage: errorMessage,
+      createdAt: createdAt,
+      lastAttemptedAt: lastAttemptedAt,
+      completedAt: completedAt,
+      version: version,
+    );
+  }
+
   @override
   String toString() {
     return 'SyncOperationModel(id: $id, operation: ${operation.value}, '
