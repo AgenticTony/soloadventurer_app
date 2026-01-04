@@ -3,6 +3,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../features/offline/infrastructure/database/offline_database.dart';
+import '../../features/offline/domain/services/offline_services.dart';
 
 /// Register all offline/sync feature dependencies
 ///
@@ -63,17 +64,18 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // );
 
   // ==============================================================================
-  // PHASE 3: NETWORK MONITORING (To be implemented in Phase 3)
+  // PHASE 3: NETWORK MONITORING
   // ==============================================================================
   //
-  // TODO: Register ConnectivityService
-  // getIt.registerLazySingleton<ConnectivityService>(
-  //   () => ConnectivityService(
-  //     connectivity: getIt<Connectivity>(),
-  //   ),
-  // );
-  //
-  // TODO: Register NetworkReachability
+  // Register ConnectivityService for monitoring network connectivity changes
+  getIt.registerLazySingleton<ConnectivityService>(
+    () => ConnectivityService(
+      connectivity: getIt<Connectivity>(),
+      debounceMs: 300,
+    ),
+  );
+
+  // TODO: Register NetworkReachability (Subtask 3.3)
   // getIt.registerLazySingleton<NetworkReachability>(
   //   () => NetworkReachability(
   //     apiClient: getIt<ApiService>(),
