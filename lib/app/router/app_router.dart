@@ -12,6 +12,7 @@ import 'package:soloadventurer/features/profile/presentation/screens/edit_profil
 import 'package:soloadventurer/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/pages/cloudwatch_test_page.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/routes/destination_discovery_routes.dart';
 
 /// App router for handling navigation
 class AppRouter {
@@ -20,6 +21,14 @@ class AppRouter {
     // First check if it's a profile route
     if (settings.name?.startsWith('/profile') == true) {
       final route = ProfileRoutes.onGenerateRoute(settings);
+      if (route != null) {
+        return route;
+      }
+    }
+
+    // Check if it's a destination discovery route
+    if (settings.name?.startsWith('/destinations') == true) {
+      final route = DestinationDiscoveryRouter.onGenerateRoute(settings);
       if (route != null) {
         return route;
       }
