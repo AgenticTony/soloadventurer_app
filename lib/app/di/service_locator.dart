@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/app/di/modules/auth_module.dart';
 import 'package:soloadventurer/app/di/modules/core_module.dart';
 import 'package:soloadventurer/app/di/modules/offline_module.dart';
+import 'package:soloadventurer/app/di/modules/travel_module.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 
@@ -68,6 +69,9 @@ Future<void> _registerFeatureModules() async {
 
   // Register offline/sync feature module
   registerOfflineModule(getIt, isTest: _isTestMode);
+
+  // Register travel feature module
+  registerTravelModule(getIt, isTest: _isTestMode);
 }
 
 /// Reset all registered dependencies (useful for testing)

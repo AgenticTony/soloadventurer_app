@@ -293,6 +293,15 @@ class GraphQLQueries {
     }
   ''';
 
+  static String deleteTrip = '''
+    mutation DeleteTrip(\$id: ID!) {
+      deleteTrip(id: \$id) {
+        id
+        success
+      }
+    }
+  ''';
+
   // Incremental sync queries with 'since' parameter
   static String getTripsIncremental = '''
     query GetTripsIncremental(\$userId: ID!, \$since: DateTime!) {
