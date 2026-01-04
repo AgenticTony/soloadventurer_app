@@ -60,6 +60,23 @@ class ProfileSettingsScreen extends ConsumerWidget {
           ),
           _buildSection(
             context,
+            'Data & Sync',
+            [
+              ListTile(
+                title: const Text('Operation Queue'),
+                subtitle: const Text(
+                  'View pending operations and sync status',
+                ),
+                leading: const Icon(Icons.cloud_sync),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.pushNamed(context, '/operation-queue');
+                },
+              ),
+            ],
+          ),
+          _buildSection(
+            context,
             'Account',
             [
               ListTile(
