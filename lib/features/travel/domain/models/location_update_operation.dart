@@ -34,6 +34,9 @@ class LocationUpdateOperation
   bool get requiresNetwork => true;
 
   @override
+  String? get deduplicationKey => null; // TODO: Add deduplication in subtask 3.2
+
+  @override
   Future<void> execute() async {
     // TODO: Implement actual location update
     // This would call your travel service to update the user's location

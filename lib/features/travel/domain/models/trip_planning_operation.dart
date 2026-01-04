@@ -90,6 +90,9 @@ class TripPlanningOperation
   bool get requiresNetwork => false; // Can work offline initially
 
   @override
+  String? get deduplicationKey => null; // TODO: Add deduplication in subtask 3.2
+
+  @override
   Future<void> execute() async {
     // TODO: Implement actual trip planning operation
     // This would update local storage and sync when online

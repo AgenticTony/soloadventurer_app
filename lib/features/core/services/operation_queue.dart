@@ -41,6 +41,12 @@ abstract class QueueableOperation {
   /// Maximum number of retry attempts allowed
   int get maxRetries;
 
+  /// Optional deduplication key to prevent duplicate operations
+  /// If two operations have the same deduplication key, the newer one
+  /// will replace the older one in the queue. Return null to disable
+  /// deduplication for this operation type.
+  String? get deduplicationKey;
+
   /// Execute the operation
   Future<void> execute();
 
@@ -90,7 +96,15 @@ class OperationQueue extends _$OperationQueue {
 
   /// Add an operation to the queue
   Future<void> addOperation(QueueableOperation operation) async {
-    _pendingOperations.add(operation);
+    // Check for duplicate operations if this operation has a deduplication key
+    final duplicate = _findDuplicate(operation);
+    if (duplicate != null) {
+      debugPrint('OperationQueue: Found duplicate operation ${duplicate.id}, replacing with ${operation.id}');
+      _replaceOperation(duplicate, operation);
+    } else {
+      _pendingOperations.add(operation);
+    }
+
     await _persistQueue();
 
     // Try to process immediately if conditions are right
@@ -254,6 +268,46 @@ class OperationQueue extends _$OperationQueue {
     }
 
     return inBackoff;
+  }
+
+  /// Find a duplicate operation in the pending queue based on deduplication key
+  ///
+  /// Returns the duplicate operation if found, or null if no duplicate exists
+  /// or if the operation doesn't have a deduplication key
+  QueueableOperation? _findDuplicate(QueueableOperation operation) {
+    final dedupKey = operation.deduplicationKey;
+    if (dedupKey == null) {
+      // No deduplication key for this operation type
+      return null;
+    }
+
+    try {
+      return _pendingOperations.cast<QueueableOperation?>().firstWhere(
+        (op) => op?.deduplicationKey == dedupKey && op?.id != operation.id,
+        orElse: () => null,
+      );
+    } catch (e) {
+      // If there's any error searching, just return null (no duplicate found)
+      debugPrint('OperationQueue: Error searching for duplicate: $e');
+      return null;
+    }
+  }
+
+  /// Replace an existing operation with a newer version
+  ///
+  /// Removes the old operation from the queue and adds the new one.
+  /// This is used when a duplicate operation is detected.
+  void _replaceOperation(
+    QueueableOperation oldOperation,
+    QueueableOperation newOperation,
+  ) {
+    _pendingOperations.remove(oldOperation);
+    _pendingOperations.add(newOperation);
+
+    debugPrint(
+      'OperationQueue: Replaced operation ${oldOperation.id} with ${newOperation.id} '
+      '(deduplication key: ${newOperation.deduplicationKey})'
+    );
   }
 
   /// Load saved queue from storage on initialization

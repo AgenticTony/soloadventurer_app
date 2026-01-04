@@ -98,6 +98,9 @@ class TravelNoteOperation
   bool get requiresNetwork => false; // Notes work offline
 
   @override
+  String? get deduplicationKey => null; // TODO: Add deduplication in subtask 3.2
+
+  @override
   Future<void> execute() async {
     // TODO: Implement actual note storage
     // This would save to local storage and sync when online
