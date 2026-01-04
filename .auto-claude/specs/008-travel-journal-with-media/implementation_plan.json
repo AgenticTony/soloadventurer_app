@@ -416,15 +416,21 @@
     {
       "phase_id": "8",
       "name": "Export & Sharing",
-      "status": "pending",
+      "status": "in_progress",
       "subtasks": [
         {
           "subtask_id": "8.1",
           "title": "Implement trip export to PDF",
           "description": "Generate PDF document with all entries and media from a trip",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/utils/exportUtils.ts"
+            "lib/features/journal/domain/services/pdf_export_service.dart",
+            "lib/features/journal/data/services/pdf_export_service_impl.dart",
+            "lib/features/journal/presentation/providers/pdf_export_providers.dart",
+            "lib/features/journal/presentation/widgets/pdf_export_widget.dart",
+            "lib/features/journal/data/services/README_PDF_EXPORT.md",
+            "lib/features/journal/data/services/pdf_export_service_example.dart",
+            "pubspec.yaml"
           ]
         },
         {
