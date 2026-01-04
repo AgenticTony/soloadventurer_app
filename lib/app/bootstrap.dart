@@ -11,6 +11,7 @@ import 'package:soloadventurer/core/errors/error_handler.dart';
 import 'package:soloadventurer/core/config/image_cache_config.dart';
 import 'package:soloadventurer/core/services/thumbnail_service.dart';
 import 'package:soloadventurer/core/services/memory_monitor.dart';
+import 'package:soloadventurer/core/services/data_unload_strategy.dart';
 import '../features/auth/domain/services/token_manager.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
@@ -64,6 +65,10 @@ Future<void> bootstrap() async {
     // Initialize memory monitoring with automatic cache management
     // Monitors memory usage in real-time and clears caches when thresholds are exceeded
     await _initializeMemoryMonitoring();
+
+    // Initialize data unload strategy for automatic off-screen data unloading
+    // Works with MemoryMonitor to free memory when pressure is high
+    await _initializeDataUnloadStrategy();
 
     // Create ProviderContainer for initialization
     final container = ProviderContainer();
@@ -147,4 +152,29 @@ Future<void> _initializeMemoryMonitoring() async {
   debugPrint('   Warning threshold: 150 MB');
   debugPrint('   Critical threshold: 180 MB');
   debugPrint('   Monitoring interval: 5 seconds');
+}
+
+/// Initialize data unload strategy for automatic off-screen data management
+///
+/// This sets up intelligent data unloading that responds to memory pressure
+/// by automatically unloading off-screen data when memory is high.
+Future<void> _initializeDataUnloadStrategy() async {
+  await DataUnloadStrategy.initialize(
+    config: const DataUnloadConfig(
+      autoUnloadOnWarning: true,   // Unload data at warning level (150 MB)
+      autoUnloadOnCritical: true,  // Aggressively unload at critical level (180 MB)
+      targetFreePercentageWarning: 0.1,    // Free 10% at warning
+      targetFreePercentageCritical: 0.3,   // Free 30% at critical
+      maxUnloadDuration: Duration(milliseconds: 100), // Don't block UI
+      prioritizeByPriority: true,   // Unload low priority data first
+      prioritizeByVisibility: true, // Unload off-screen data first
+      enableDebugLogging: true,     // Log unload operations in debug
+    ),
+  );
+
+  debugPrint('✅ Data unload strategy initialized');
+  debugPrint('   Auto-unload on warning: true (10% target)');
+  debugPrint('   Auto-unload on critical: true (30% target)');
+  debugPrint('   Priority-based: true');
+  debugPrint('   Visibility-aware: true');
 }
