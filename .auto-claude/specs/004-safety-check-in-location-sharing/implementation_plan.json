@@ -563,10 +563,11 @@
           "subtask_id": "10.4",
           "title": "Write integration tests",
           "description": "Test complete safety flows end-to-end",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "integration_test/features/safety/safety_flow_test.dart"
-          ]
+          ],
+          "notes": "Created comprehensive integration tests for safety features testing complete end-to-end user flows. Total of 8 integration tests covering: 1) Trusted Contacts CRUD flow - tests adding, viewing, updating preferences, and removing trusted contacts with full state verification, 2) Manual Check-in flow - tests creating manual check-ins with location acquisition, status messages, and contact notifications, 3) Scheduled Check-in flow - tests scheduling automatic check-ins with deadlines, location, and notification settings, 4) Emergency SOS flow - tests triggering emergency alerts with location, message, battery level, and contact notifications, 5) Safety Status Update flow - tests updating user safety status (safe/need help/emergency) with location sharing, 6) Location Sharing flow - tests starting location sharing with multiple contacts, viewing active shares, and stopping sharing, 7) Missed Check-in Detection flow - tests detection of missed check-ins past their deadline and automatic alert triggering to contacts, 8) Multi-step Safety Workflow - tests complete workflow combining trusted contacts, location sharing, scheduled check-ins, completion, and cleanup. All tests use comprehensive mocking with MockSafetyRemoteDataSource and MockLocationService. Tests verify state changes, provider updates, and integration between notifiers, use cases, and repository. Follows existing integration test patterns from auth feature with proper setup/teardown, ProviderContainer management, and service locator initialization. Added helper functions for creating test SafetyStatus and LocationUpdate entities. All tests use pumpAndSettle() for proper async handling and verify multiple assertions per flow. Commit: pending"
         }
       ]
     }

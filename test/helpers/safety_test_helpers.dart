@@ -2,7 +2,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
+import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
+import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
 import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 import 'package:soloadventurer/features/safety/domain/repositories/safety_repository.dart';
 
@@ -222,6 +224,103 @@ List<SafetyAlert> createTestSafetyAlertsList({int count = 3}) {
     (index) => createTestSafetyAlert(
       id: 'alert-$index',
       triggeredAt: testDateTime.add(Duration(hours: index)),
+    ),
+  );
+}
+
+/// Creates a test safety status
+SafetyStatus createTestSafetyStatus({
+  String id = 'status-123',
+  String userId = testUserId,
+  SafetyStatusType statusType = SafetyStatusType.safe,
+  String? message,
+  SafetyStatusLocation? location,
+  int? batteryLevel,
+  String? alertId,
+  String? checkInId,
+  DateTime? createdAt,
+  DateTime? updatedAt,
+}) {
+  return SafetyStatus(
+    id: id,
+    userId: userId,
+    statusType: statusType,
+    message: message,
+    location: location ?? SafetyStatusLocation(
+      latitude: testLatitude,
+      longitude: testLongitude,
+      accuracy: testAccuracy,
+      timestamp: testDateTime,
+    ),
+    batteryLevel: batteryLevel ?? 85,
+    alertId: alertId,
+    checkInId: checkInId,
+    createdAt: createdAt ?? testDateTime,
+    updatedAt: updatedAt,
+  );
+}
+
+/// Creates a test location update
+LocationUpdate createTestLocationUpdate({
+  String id = 'location-update-123',
+  String userId = testUserId,
+  double latitude = testLatitude,
+  double longitude = testLongitude,
+  double? accuracy = testAccuracy,
+  double? altitude = testAltitude,
+  String? address,
+  String? placeName,
+  int? batteryLevel,
+  LocationSharingStatus sharingStatus = LocationSharingStatus.active,
+  List<String>? sharedWithContactIds,
+  bool emergency = false,
+  String? checkInId,
+  String? alertId,
+  String? tripId,
+  DateTime? expiresAt,
+  DateTime? createdAt,
+  DateTime? updatedAt,
+}) {
+  return LocationUpdate(
+    id: id,
+    userId: userId,
+    latitude: latitude,
+    longitude: longitude,
+    accuracy: accuracy,
+    altitude: altitude,
+    address: address,
+    placeName: placeName,
+    batteryLevel: batteryLevel ?? 85,
+    sharingStatus: sharingStatus,
+    sharedWithContactIds: sharedWithContactIds ?? [testContactId],
+    emergency: emergency,
+    checkInId: checkInId,
+    alertId: alertId,
+    tripId: tripId,
+    expiresAt: expiresAt,
+    createdAt: createdAt ?? testDateTime,
+    updatedAt: updatedAt,
+  );
+}
+
+/// Creates a list of test safety statuses
+List<SafetyStatus> createTestSafetyStatusesList({int count = 3}) {
+  return List.generate(
+    count,
+    (index) => createTestSafetyStatus(
+      id: 'status-$index',
+      createdAt: testDateTime.add(Duration(hours: index)),
+    ),
+  );
+}
+
+/// Creates a list of test location updates
+List<LocationUpdate> createTestLocationUpdatesList({int count = 3}) {
+  return List.generate(
+    count,
+    (index) => createTestLocationUpdate(
+      id: 'location-update-$index',
+      createdAt: testDateTime.add(Duration(hours: index)),
     ),
   );
 }
