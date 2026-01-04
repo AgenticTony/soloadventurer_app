@@ -488,7 +488,7 @@
           "id": "6.1",
           "title": "Write End-to-End Auth Tests",
           "description": "Create comprehensive E2E tests covering complete auth flows including refresh, persistence, and error scenarios",
-          "status": "pending",
+          "status": "completed",
           "acceptanceCriteria": [
             "E2E test for complete login flow",
             "E2E test for token refresh during API call",
@@ -504,7 +504,9 @@
             "4.5",
             "5.5"
           ],
-          "estimatedHours": 6
+          "estimatedHours": 6,
+          "notes": "Successfully created comprehensive E2E tests (807 lines) with 13 tests across 6 test groups covering all acceptance criteria. Tests verify: complete login flow with session creation and error handling, token refresh during API calls with retry logic and exponential backoff, session restoration after app restart for valid/recently expired/old sessions, logout and re-login scenarios with proper state management, and offline to online transitions with sync on reconnection. All tests use Mocktail for mocking, follow existing integration test patterns, and verify complete integration of all auth components (AuthRepository, TokenRefreshService, TokenExpirationTracker, TokenRefreshScheduler, PersistentSessionManager, OfflineAuthManager, AuthProvider). Status: Ready to commit",
+          "updated_at": "2026-01-04T23:30:00.000000+00:00"
         },
         {
           "id": "6.2",
