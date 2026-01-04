@@ -143,6 +143,30 @@ Implementation of Phase 3 is in progress.
 - Includes Riverpod providers: locationServiceImplProvider and locationServiceOverrideProvider
 - Commit: 6a0688b
 
+✅ **Subtask 3.2: Create background check-in service** (COMPLETED)
+- Created BackgroundCheckInService interface with comprehensive background task management
+  - initialize() for setting up workmanager
+  - scheduleCheckInReminder() for scheduling one-time check-in reminders
+  - scheduleMissedCheckInMonitoring() for periodic monitoring of check-ins
+  - cancelCheckInReminder() and cancelAllReminders() for managing scheduled tasks
+  - processDueCheckIns() for processing check-ins from background tasks
+  - status tracking and status change streams
+- Created BackgroundCheckInServiceImpl using workmanager for background execution
+  - Registers periodic monitoring task (every 15 minutes)
+  - Supports one-time reminder tasks for individual check-ins
+  - Configurable constraints (network required, battery not low preferred)
+  - Exponential backoff policy for failed tasks
+  - Proper task lifecycle management (initialization, scheduling, cancellation)
+  - Global callback dispatcher for background task execution
+- Added supporting classes:
+  - BackgroundCheckInConfig with all configuration constants
+  - BackgroundCheckInResult for tracking operation success/failure
+  - BackgroundCheckInServiceStatus enum for service state
+  - BackgroundCheckInServiceException for error handling
+- Follows existing patterns from BackgroundTokenRefreshService
+- Includes Riverpod providers: backgroundCheckInServiceImplProvider and backgroundCheckInServiceOverrideProvider
+- Commit: pending
+
 ### Phases Overview
 
 1. **Phase 1: Core Data Models & Domain Layer** (7 subtasks)

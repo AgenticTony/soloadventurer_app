@@ -181,7 +181,7 @@
           "subtask_id": "3.2",
           "title": "Create background check-in service",
           "description": "Implement background service using workmanager for scheduled check-ins",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/core/services/background_checkin_service.dart",
             "lib/core/services/background_checkin_service_impl.dart"
