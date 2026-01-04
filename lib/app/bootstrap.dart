@@ -9,6 +9,7 @@ import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
 import 'package:soloadventurer/core/config/image_cache_config.dart';
+import 'package:soloadventurer/core/services/thumbnail_service.dart';
 import '../features/auth/domain/services/token_manager.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
@@ -54,6 +55,10 @@ Future<void> bootstrap() async {
     // Initialize image cache configuration for memory efficiency
     // This configures cached_network_image to handle 500+ photos efficiently
     await ImageCacheConfig.initialize();
+
+    // Initialize thumbnail service for generating and caching photo thumbnails
+    // This reduces memory footprint by 95%: 50KB thumbnails vs 1MB full images
+    await ThumbnailService.initialize();
 
     // Create ProviderContainer for initialization
     final container = ProviderContainer();
