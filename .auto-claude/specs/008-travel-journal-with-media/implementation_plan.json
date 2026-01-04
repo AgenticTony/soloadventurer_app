@@ -608,8 +608,14 @@
           "subtask_id": "10.6",
           "title": "Accessibility audit",
           "description": "Ensure all screens are accessible with screen readers",
-          "status": "pending",
-          "files": []
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/screens/journal_list_screen.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen.dart",
+            "lib/features/journal/presentation/widgets/journal_entry_card.dart",
+            "lib/features/journal/presentation/widgets/mood_picker.dart",
+            "lib/features/journal/presentation/ACCESSIBILITY.md"
+          ]
         }
       ]
     }

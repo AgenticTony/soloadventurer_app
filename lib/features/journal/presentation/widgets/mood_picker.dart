@@ -124,81 +124,92 @@ class MoodPicker extends ConsumerWidget {
       );
     }
 
-    return Container(
-      padding: padding ?? const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: selectedMoodId != null
-              ? theme.colorScheme.primary.withOpacity(0.5)
-              : theme.dividerColor,
+    return Semantics(
+      label: 'Mood picker',
+      hint: 'Select your current mood for this journal entry',
+      child: Container(
+        padding: padding ?? const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: selectedMoodId != null
+                ? theme.colorScheme.primary.withOpacity(0.5)
+                : theme.dividerColor,
+          ),
+          borderRadius: BorderRadius.circular(12),
+          color: theme.colorScheme.surface,
         ),
-        borderRadius: BorderRadius.circular(12),
-        color: theme.colorScheme.surface,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            children: [
-              Icon(
-                Icons.sentiment_satisfied_alt,
-                color: theme.colorScheme.primary,
-                size: 20,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Semantics(
+              headingLevel: 2,
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.sentiment_satisfied_alt,
+                    color: theme.colorScheme.primary,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'How are you feeling?',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (selectedMoodId != null)
+                    Semantics(
+                      button: true,
+                      label: 'Clear selected mood',
+                      child: TextButton.icon(
+                        onPressed: () {
+                          ref
+                              .read(journalEntryCreationProvider.notifier)
+                              .updateMood(null);
+                        },
+                        icon: const Icon(Icons.clear, size: 16),
+                        label: const Text('Clear'),
+                        style: TextButton.styleFrom(
+                          foregroundColor: theme.colorScheme.onSurface.withOpacity(0.6),
+                        ),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Text(
-                'How are you feeling?',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Mood grid
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 1.5,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
               ),
-              const Spacer(),
-              if (selectedMoodId != null)
-                TextButton.icon(
-                  onPressed: () {
+              itemCount: MoodOptions.all.length,
+              itemBuilder: (context, index) {
+                final mood = MoodOptions.all[index];
+                final isSelected = mood.id == selectedMoodId;
+
+                return _MoodTile(
+                  mood: mood,
+                  isSelected: isSelected,
+                  onTap: () {
                     ref
                         .read(journalEntryCreationProvider.notifier)
-                        .updateMood(null);
+                        .updateMood(mood.id);
                   },
-                  icon: const Icon(Icons.clear, size: 16),
-                  label: const Text('Clear'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Mood grid
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 1.5,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+                );
+              },
             ),
-            itemCount: MoodOptions.all.length,
-            itemBuilder: (context, index) {
-              final mood = MoodOptions.all[index];
-              final isSelected = mood.id == selectedMoodId;
-
-              return _MoodTile(
-                mood: mood,
-                isSelected: isSelected,
-                onTap: () {
-                  ref
-                      .read(journalEntryCreationProvider.notifier)
-                      .updateMood(mood.id);
-                },
-              );
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -220,43 +231,51 @@ class _MoodTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primaryContainer
-              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: mood.label,
+      hint: 'Set mood to ${mood.label}',
+      child: ExcludeSemantics(
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : Colors.transparent,
-            width: 2,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              mood.emoji,
-              style: const TextStyle(
-                fontSize: 32,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              mood.label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          child: Container(
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.colorScheme.primaryContainer
+                  : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
                 color: isSelected
-                    ? theme.colorScheme.onPrimaryContainer
-                    : theme.colorScheme.onSurface,
+                    ? theme.colorScheme.primary
+                    : Colors.transparent,
+                width: 2,
               ),
-              textAlign: TextAlign.center,
             ),
-          ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  mood.emoji,
+                  style: const TextStyle(
+                    fontSize: 32,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  mood.label,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimaryContainer
+                        : theme.colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -381,49 +400,58 @@ class MoodPickerButton extends ConsumerWidget {
         ? MoodOptions.findById(selectedMoodId!)
         : null;
 
-    return InkWell(
-      onTap: () => _showMoodBottomSheet(context),
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: padding ??
-            const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 16,
-            ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: selectedMood != null
-                ? theme.colorScheme.primary
-                : theme.dividerColor,
-          ),
+    return Semantics(
+      button: true,
+      label: selectedMood != null ? 'Mood: ${selectedMood.label}' : 'Add mood',
+      hint: selectedMood != null
+          ? 'Current mood is ${selectedMood.label}, tap to change'
+          : 'Tap to select a mood',
+      child: ExcludeSemantics(
+        child: InkWell(
+          onTap: () => _showMoodBottomSheet(context),
           borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              selectedMood != null ? Icons.sentiment_satisfied_alt : Icons.add,
-              color: selectedMood != null
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withOpacity(0.6),
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Text(
-              selectedMood != null
-                  ? '${selectedMood!.emoji} ${selectedMood.label}'
-                  : 'Add mood',
-              style: theme.textTheme.titleMedium?.copyWith(
+          child: Container(
+            padding: padding ??
+                const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 16,
+                ),
+            decoration: BoxDecoration(
+              border: Border.all(
                 color: selectedMood != null
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface,
+                    : theme.dividerColor,
               ),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const Spacer(),
-            Icon(
-              Icons.arrow_drop_down,
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+            child: Row(
+              children: [
+                Icon(
+                  selectedMood != null ? Icons.sentiment_satisfied_alt : Icons.add,
+                  color: selectedMood != null
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withOpacity(0.6),
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  selectedMood != null
+                      ? '${selectedMood!.emoji} ${selectedMood.label}'
+                      : 'Add mood',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: selectedMood != null
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.onSurface,
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -444,48 +472,56 @@ class _MoodTileForBottomSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    return InkWell(
-      onTap: () {
-        ref
-            .read(journalEntryCreationProvider.notifier)
-            .updateMood(mood.id);
-        Navigator.of(context).pop();
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primaryContainer
-              : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: mood.label,
+      hint: isSelected ? 'Currently selected, tap to keep' : 'Set mood to ${mood.label}',
+      child: ExcludeSemantics(
+        child: InkWell(
+          onTap: () {
+            ref
+                .read(journalEntryCreationProvider.notifier)
+                .updateMood(mood.id);
+            Navigator.of(context).pop();
+          },
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : Colors.transparent,
-            width: 2,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              mood.emoji,
-              style: const TextStyle(
-                fontSize: 32,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              mood.label,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          child: Container(
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.colorScheme.primaryContainer
+                  : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
                 color: isSelected
-                    ? theme.colorScheme.onPrimaryContainer
-                    : theme.colorScheme.onSurface,
+                    ? theme.colorScheme.primary
+                    : Colors.transparent,
+                width: 2,
               ),
-              textAlign: TextAlign.center,
             ),
-          ],
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  mood.emoji,
+                  style: const TextStyle(
+                    fontSize: 32,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  mood.label,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimaryContainer
+                        : theme.colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

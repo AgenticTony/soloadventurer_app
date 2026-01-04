@@ -49,8 +49,23 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'By Date', icon: Icon(Icons.calendar_today)),
-            Tab(text: 'By Trip', icon: Icon(Icons.flight_takeoff)),
+            Tab(
+              text: 'By Date',
+              icon: Icon(Icons.calendar_today),
+              child: Semantics(
+                label: 'By Date',
+                selected: true,
+                child: Text('By Date'),
+              ),
+            ),
+            Tab(
+              text: 'By Trip',
+              icon: Icon(Icons.flight_takeoff),
+              child: Semantics(
+                label: 'By Trip',
+                child: Text('By Trip'),
+              ),
+            ),
           ],
         ),
         actions: [
@@ -61,6 +76,7 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
               Navigator.pushNamed(context, '/journal/search');
             },
             tooltip: 'Search entries',
+            label: 'Search entries',
           ),
         ],
       ),
@@ -83,68 +99,88 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
         },
         icon: const Icon(Icons.add),
         label: const Text('New Entry'),
+        tooltip: 'Create a new journal entry',
       ),
     );
   }
 
   /// Build error state
   Widget _buildError(BuildContext context, String error) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.error_outline, size: 64, color: Colors.red),
-          const SizedBox(height: 16),
-          Text(
-            'Error Loading Journal',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            error,
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              ref.read(journalListProvider.notifier).refresh();
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text('Retry'),
-          ),
-        ],
+    return Semantics(
+      label: 'Error loading journal entries',
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Semantics(
+              label: 'Error icon',
+              child: const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Error Loading Journal',
+              style: Theme.of(context).textTheme.titleLarge,
+              semanticsLabel: 'Error Loading Journal',
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+              semanticsLabel: 'Error message: $error',
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.read(journalListProvider.notifier).refresh();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   /// Build empty state
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.book_outlined,
-            size: 80,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'No Journal Entries Yet',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          const Text('Start documenting your travel adventures'),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: () {
-              Navigator.pushNamed(context, '/journal/create');
-            },
-            icon: const Icon(Icons.add),
-            label: const Text('Create First Entry'),
-          ),
-        ],
+    return Semantics(
+      label: 'No journal entries yet',
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Semantics(
+              label: 'Empty journal icon',
+              child: Icon(
+                Icons.book_outlined,
+                size: 80,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No Journal Entries Yet',
+              style: Theme.of(context).textTheme.titleLarge,
+              semanticsLabel: 'No Journal Entries Yet',
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Start documenting your travel adventures',
+              semanticsLabel: 'Start documenting your travel adventures',
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.pushNamed(context, '/journal/create');
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Create First Entry'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -216,62 +252,67 @@ class _DateGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Date header
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  dateKey,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
+    return Semantics(
+      headingLevel: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Date header
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    dateKey,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: theme.colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    semanticsLabel: 'Date: $dateKey',
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSecondaryContainer,
+                    ),
+                    semanticsLabel: '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'} in this date',
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        // Entries for this date
-        ...entries.map((entry) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: JournalEntryCard(
-                entry: entry,
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/journal/entry/${entry.id}',
-                  );
-                },
-              ),
-            )),
+          // Entries for this date
+          ...entries.map((entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: JournalEntryCard(
+                  entry: entry,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/journal/entry/${entry.id}',
+                    );
+                  },
+                ),
+              )),
 
-        const SizedBox(height: 16),
-      ],
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }
@@ -293,72 +334,77 @@ class _TripGroup extends StatelessWidget {
     // For entries without a trip, show "Uncategorized"
     final tripName = tripId ?? 'Uncategorized Entries';
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Trip header
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      tripId == null ? Icons.folder_outlined : Icons.flight_takeoff,
-                      size: 18,
-                      color: theme.colorScheme.onPrimaryContainer,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      tripName,
-                      style: theme.textTheme.titleMedium?.copyWith(
+    return Semantics(
+      headingLevel: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Trip header
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        tripId == null ? Icons.folder_outlined : Icons.flight_takeoff,
+                        size: 18,
                         color: theme.colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSecondaryContainer,
+                      const SizedBox(width: 6),
+                      Text(
+                        tripName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        semanticsLabel: 'Trip: $tripName',
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSecondaryContainer,
+                    ),
+                    semanticsLabel: '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'} in this trip',
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
 
-        // Entries for this trip
-        ...entries.map((entry) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: JournalEntryCard(
-                entry: entry,
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/journal/entry/${entry.id}',
-                  );
-                },
-              ),
-            )),
+          // Entries for this trip
+          ...entries.map((entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: JournalEntryCard(
+                  entry: entry,
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/journal/entry/${entry.id}',
+                    );
+                  },
+                ),
+              )),
 
-        const SizedBox(height: 16),
-      ],
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }

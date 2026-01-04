@@ -206,7 +206,9 @@ class _CreateJournalEntryScreenState
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: Semantics(
+        label: 'Create new journal entry form',
+        child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -214,42 +216,52 @@ class _CreateJournalEntryScreenState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Date picker
-              InkWell(
-                onTap: creationState.isSaving ? null : _selectDate,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: theme.dividerColor,
-                    ),
+              Semantics(
+                label: 'Entry date',
+                hint: 'Tap to change the entry date',
+                button: true,
+                value: DateFormat('EEEE, MMMM d, y').format(
+                  creationState.entryDate,
+                ),
+                child: ExcludeSemantics(
+                  child: InkWell(
+                    onTap: creationState.isSaving ? null : _selectDate,
                     borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        color: theme.colorScheme.primary,
-                        size: 20,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 16,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        DateFormat('EEEE, MMMM d, y').format(
-                          creationState.entryDate,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: theme.dividerColor,
                         ),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                        ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const Spacer(),
-                      Icon(
-                        Icons.arrow_drop_down,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            color: theme.colorScheme.primary,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            DateFormat('EEEE, MMMM d, y').format(
+                              creationState.entryDate,
+                            ),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                          const Spacer(),
+                          Icon(
+                            Icons.arrow_drop_down,
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -257,69 +269,81 @@ class _CreateJournalEntryScreenState
               const SizedBox(height: 16),
 
               // Title field
-              TextFormField(
-                controller: _titleController,
-                initialValue: creationState.title,
-                decoration: const InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'Give your entry a title...',
-                  prefixIcon: Icon(Icons.title),
-                  border: OutlineInputBorder(),
+              Semantics(
+                label: 'Title',
+                hint: 'Enter a title for your journal entry, at least 3 characters',
+                textField: true,
+                child: TextFormField(
+                  controller: _titleController,
+                  initialValue: creationState.title,
+                  decoration: const InputDecoration(
+                    labelText: 'Title',
+                    hintText: 'Give your entry a title...',
+                    prefixIcon: Icon(Icons.title),
+                    border: OutlineInputBorder(),
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                  validator: _validateTitle,
+                  onChanged: (value) {
+                    ref
+                        .read(journalEntryCreationProvider.notifier)
+                        .updateTitle(value);
+                  },
+                  enabled: !creationState.isSaving,
                 ),
-                textCapitalization: TextCapitalization.sentences,
-                validator: _validateTitle,
-                onChanged: (value) {
-                  ref
-                      .read(journalEntryCreationProvider.notifier)
-                      .updateTitle(value);
-                },
-                enabled: !creationState.isSaving,
               ),
 
               const SizedBox(height: 24),
 
               // Content label
-              Row(
-                children: [
-                  Icon(
-                    Icons.edit_note,
-                    color: theme.colorScheme.primary,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Content',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+              Semantics(
+                headingLevel: 2,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_note,
+                      color: theme.colorScheme.primary,
+                      size: 20,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Text(
+                      'Content',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 12),
 
               // Rich text editor
-              Container(
-                height: 400,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: creationState.content.trim().isEmpty
-                        ? theme.colorScheme.error.withOpacity(0.5)
-                        : theme.dividerColor,
+              Semantics(
+                label: 'Journal entry content',
+                hint: 'Write the main content of your journal entry',
+                child: Container(
+                  height: 400,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: creationState.content.trim().isEmpty
+                          ? theme.colorScheme.error.withOpacity(0.5)
+                          : theme.dividerColor,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: RichTextEditor(
-                  initialContent: creationState.content,
-                  onContentChanged: (content) {
-                    ref
-                        .read(journalEntryCreationProvider.notifier)
-                        .updateContent(content);
-                    _contentController.value = content;
-                  },
-                  placeholder: 'Start writing your journal entry...',
-                  enabled: !creationState.isSaving,
-                  padding: const EdgeInsets.all(16),
+                  child: RichTextEditor(
+                    initialContent: creationState.content,
+                    onContentChanged: (content) {
+                      ref
+                          .read(journalEntryCreationProvider.notifier)
+                          .updateContent(content);
+                      _contentController.value = content;
+                    },
+                    placeholder: 'Start writing your journal entry...',
+                    enabled: !creationState.isSaving,
+                    padding: const EdgeInsets.all(16),
+                  ),
                 ),
               ),
 
@@ -337,51 +361,60 @@ class _CreateJournalEntryScreenState
               const SizedBox(height: 24),
 
               // Favorite toggle
-              InkWell(
-                onTap: creationState.isSaving
-                    ? null
-                    : () {
-                        ref
-                            .read(journalEntryCreationProvider.notifier)
-                            .toggleFavorite();
-                      },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: theme.dividerColor),
+              Semantics(
+                label: 'Mark as favorite',
+                hint: creationState.isFavorite
+                    ? 'Entry is marked as favorite, tap to remove'
+                    : 'Mark this entry as favorite',
+                button: true,
+                child: MergeSemantics(
+                  child: InkWell(
+                    onTap: creationState.isSaving
+                        ? null
+                        : () {
+                            ref
+                                .read(journalEntryCreationProvider.notifier)
+                                .toggleFavorite();
+                          },
                     borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        creationState.isFavorite
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: creationState.isFavorite
-                            ? Colors.red
-                            : theme.colorScheme.onSurface.withOpacity(0.6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 16,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Mark as favorite',
-                        style: theme.textTheme.titleMedium,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: theme.dividerColor),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      const Spacer(),
-                      Switch(
-                        value: creationState.isFavorite,
-                        onChanged: creationState.isSaving
-                            ? null
-                            : (value) {
-                                ref
-                                    .read(journalEntryCreationProvider.notifier)
-                                    .toggleFavorite();
-                              },
+                      child: Row(
+                        children: [
+                          Icon(
+                            creationState.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: creationState.isFavorite
+                                ? Colors.red
+                                : theme.colorScheme.onSurface.withOpacity(0.6),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Mark as favorite',
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          const Spacer(),
+                          Switch(
+                            value: creationState.isFavorite,
+                            onChanged: creationState.isSaving
+                                ? null
+                                : (value) {
+                                    ref
+                                        .read(journalEntryCreationProvider.notifier)
+                                        .toggleFavorite();
+                                  },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -389,12 +422,17 @@ class _CreateJournalEntryScreenState
               const SizedBox(height: 24),
 
               // Mood picker
-              const MoodPicker(),
+              Semantics(
+                headingLevel: 2,
+                child: const MoodPicker(),
+              ),
 
               const SizedBox(height: 32),
 
               // Additional options hint
-              Card(
+              Semantics(
+                container: true,
+                child: Card(
                 color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
