@@ -554,9 +554,13 @@
           "subtask_id": "10.2",
           "title": "Test media upload and compression",
           "description": "Verify media compression and upload functionality",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "src/__tests__/utils/mediaCompression.test.ts"
+            "test/utils/media_test_helpers.dart",
+            "test/utils/media_compression_test.dart",
+            "test/utils/video_compression_test.dart",
+            "test/features/journal/data/services/media_upload_service_test.dart",
+            "test/utils/README_MEDIA_TESTS.md"
           ]
         },
         {

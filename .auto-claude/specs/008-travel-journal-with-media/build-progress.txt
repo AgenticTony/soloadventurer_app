@@ -215,9 +215,101 @@ The implementation provides comprehensive test coverage for the journal feature'
 
 All code follows existing Flutter/Dart testing patterns with mocktail, proper test organization, clear test names, comprehensive assertions, and documentation standards consistent with other feature tests in the project (auth, profile).
 
-Phase 10 (Testing & Polish) progress: 1 of 6 subtasks completed
+### 2026-01-06 22:00: Subtask 10.2 Completed
+Implemented comprehensive test suite for media compression and upload functionality (5 files, 2,774 lines):
+- **Test Helpers** (test/utils/media_test_helpers.dart - 355 lines):
+  - Test constants for dimensions, quality, file sizes, formats
+  - Factory methods for test data (images, videos, upload tasks, media items)
+  - Assertion helpers for compressed results (assertCompressedImageResultValid, assertCompressedVideoResultValid, assertUploadTaskValid)
+  - Mock file creation helpers
+  - Test scenarios: file sizes (small/medium/large/veryLarge), quality levels, image dimensions, video formats
+- **Media Compression Tests** (test/utils/media_compression_test.dart - 558 lines):
+  - CompressedImageResult tests (compressionRatio, sizeReductionPercent, isEffective, toString)
+  - ImageCompressionConfig tests (presets, validation, copyWith)
+  - MediaCompression static methods (estimateCompressedSize, needsCompression, getRecommendedConfig)
+  - MediaCompression instance methods (compressImage, compressBytes, file validation)
+  - Edge cases (tiny images, very large images, square/panoramic/portrait, EXIF rotation)
+  - Performance tests (compression speed for small/large images, batch compression)
+  - Configuration tests (aspect ratio, dimensions, quality levels)
+- **Video Compression Tests** (test/utils/video_compression_test.dart - 715 lines):
+  - CompressedVideoResult tests (compressionRatio, sizeReductionPercent, isEffective, toString with duration)
+  - VideoCompressionConfig tests (presets, validation of quality/dimensions/frameRate/audioBitrate, copyWith)
+  - VideoCompressionProgress tests (progress value, status message, toString)
+  - VideoCompression static methods (estimateCompressedSize, needsCompression, getRecommendedConfig)
+  - VideoCompression instance methods (compressVideo, cleanup, file validation)
+  - Edge cases (very short/long videos, 4K resolution, vertical/square videos, different frame rates, audio handling)
+  - Format support tests (MP4, MOV, AVI, MKV, WebM)
+  - Configuration tests (aspect ratio, dimensions, quality, frame rate, audio bitrate, include/exclude audio)
+  - Performance tests (compression speed for short/long videos, memory efficiency, progress updates)
+  - Constants verification (maxFileSize: 500MB, minQuality: 50, minDuration: 1.0s)
+- **Media Upload Service Tests** (test/features/journal/data/services/media_upload_service_test.dart - 706 lines):
+  - Initialization tests (default config, config updates, background task registration)
+  - Queue management tests (retrieving tasks, filtering by entry, finding by ID, empty queue handling)
+  - Enqueue upload tests (single/multiple uploads, priority handling, journal entry association, compression settings)
+  - Upload lifecycle tests (start, pause, resume, cancel single/all, retry)
+  - Progress tracking tests (progress callbacks, status change callbacks, task progress streams, queue status streams, callback removal)
+  - Queue cleanup tests (clear completed tasks, clear all tasks)
+  - Statistics tests (upload counts, active uploads, byte calculations, average upload speed)
+  - Error handling tests (file not found, network errors, authentication errors, retry logic with exponential backoff, max retries)
+  - Priority management tests (queue sorting by priority, FIFO for equal priority)
+  - Concurrent upload tests (concurrent limits, queue progression, parallel uploads)
+  - Persistence tests (queue saving/loading, corrupted data handling)
+  - Storage integration tests (bucket selection, unique path generation, database updates)
+  - UploadTask state tests (status transitions, state properties, serialization/deserialization)
+- **Comprehensive Documentation** (test/utils/README_MEDIA_TESTS.md - 440 lines):
+  - Complete test suite overview and architecture breakdown
+  - Detailed test file descriptions with test groups
+  - Running tests instructions (all tests, specific groups, coverage, verbose)
+  - Test coverage breakdown (image, video, upload)
+  - Testing approach (unit testing strategy, test categories)
+  - Test data documentation (file sizes, quality levels, dimensions, formats)
+  - Mocking strategy (external dependencies, benefits)
+  - Future enhancements (integration tests, performance tests, memory tests, concurrency tests, network tests)
+  - Troubleshooting guide for common issues
+  - Best practices for adding/modifying tests and debugging
+  - Related documentation references
+  - Test maintenance guidelines and metrics
+  - Contributing guidelines
+
+Key features tested:
+✅ Image compression calculations and validation (ratio, reduction, effectiveness)
+✅ Image compression configuration (presets, validation, copyWith)
+✅ Image compression static methods (estimation, needs compression, recommended config)
+✅ Image compression instance methods (file and byte compression, format checking)
+✅ Image compression edge cases (tiny/large images, aspect ratios, EXIF rotation)
+✅ Video compression calculations and validation (ratio, reduction, effectiveness with duration)
+✅ Video compression configuration (presets, validation of all parameters)
+✅ Video compression progress tracking (0.0 to 1.0 with status messages)
+✅ Video compression static methods (estimation with dimensions/duration/frame rate)
+✅ Video compression instance methods (compression, cleanup, validation)
+✅ Video compression edge cases (duration, resolution, orientation, frame rates, audio)
+✅ Video compression format support (MP4, MOV, AVI, MKV, WebM)
+✅ Media upload service initialization and configuration
+✅ Media upload queue management (CRUD operations, filtering)
+✅ Media upload lifecycle (enqueue, start, pause, resume, cancel, retry)
+✅ Media upload progress tracking (callbacks, streams, statistics)
+✅ Media upload error handling (file not found, network, auth, retry logic)
+✅ Media upload priority management (sorting, FIFO)
+✅ Media upload concurrent handling (limits, progression)
+✅ Media upload persistence (queue saving/loading, recovery)
+✅ Media upload storage integration (bucket selection, path generation)
+✅ UploadTask state management (transitions, properties, serialization)
+✅ 80+ test groups across 4 test files
+✅ 2,774 lines of test code and documentation
+✅ Comprehensive README with running instructions and troubleshooting
+
+The implementation addresses the acceptance criterion "Photos and videos upload in background with compression" by providing comprehensive test coverage for media compression (both image and video) and background upload functionality. The test suite verifies that media files are properly compressed before upload to prevent crashes (addressing pain-2-2), upload efficiently in the background with queue management, handle errors gracefully with retry logic, and track progress accurately for UI feedback.
+
+The test suite ensures:
+1. **Image Compression**: Reduces file sizes while maintaining quality, supports JPEG/PNG formats, provides presets for different scenarios, validates all parameters, handles edge cases, and estimates output sizes.
+2. **Video Compression**: Reduces video file sizes with configurable quality, supports common formats (MP4, MOV, AVI, MKV, WebM), provides progress tracking, validates all parameters including frame rate and audio settings, and handles various resolutions and orientations.
+3. **Background Upload**: Manages upload queue with priority, supports concurrent uploads, tracks progress via callbacks and streams, handles errors with exponential backoff retry, persists queue across app restarts, integrates with Supabase storage, and provides comprehensive statistics.
+
+All tests follow established Flutter/Dart testing patterns with mocktail for mocking, AAA (Arrange-Act-Assert) structure, descriptive test names, comprehensive assertions, and thorough edge case coverage. Tests are organized by functionality and use helper functions for common operations to maintain consistency and reduce duplication.
+
+Phase 10 (Testing & Polish) progress: 2 of 6 subtasks completed
 ✅ 10.1 - Write unit tests for journal API functions (COMPLETED)
-⏳ 10.2 - Test media upload and compression (PENDING)
+✅ 10.2 - Test media upload and compression (COMPLETED)
 ⏳ 10.3 - Test offline sync functionality (PENDING)
 ⏳ 10.4 - Performance optimization (PENDING)
 ⏳ 10.5 - Error handling improvements (PENDING)
