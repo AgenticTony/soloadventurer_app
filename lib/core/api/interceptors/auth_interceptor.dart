@@ -9,9 +9,6 @@ class AuthInterceptor extends Interceptor {
   /// Threshold for proactive token refresh (5 minutes)
   static const _refreshThreshold = Duration(minutes: 5);
 
-  /// Flag to track if a refresh is currently in progress
-  bool _isRefreshing = false;
-
   /// Cached repository reference to avoid repeated service locator lookups
   final AuthRepository _authRepository;
 
@@ -132,31 +129,9 @@ class AuthInterceptor extends Interceptor {
 
   /// Performs a proactive token refresh
   ///
-  /// This method implements a mutex-like pattern to ensure that only one
-  /// refresh operation is in progress at a time. Multiple concurrent requests
-  /// will wait for the same refresh operation to complete.
+  /// This method relies on the RefreshQueueManager in AuthRepository
+  /// to handle concurrent refresh requests and prevent duplicate refresh attempts.
   Future<AuthSession?> _performProactiveRefresh() async {
-    // If a refresh is already in progress, wait for it to complete
-    if (_isRefreshing) {
-      if (kDebugMode) {
-        debugPrint('AuthInterceptor: Refresh already in progress, waiting...');
-      }
-      // Wait a bit for the refresh to complete
-      await Future.delayed(const Duration(milliseconds: 100));
-
-      // Try to get the new session
-      try {
-        return await _authRepository.getSession();
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint('AuthInterceptor: Error waiting for refresh: $e');
-        }
-        return null;
-      }
-    }
-
-    // Start a new refresh operation
-    _isRefreshing = true;
     try {
       if (kDebugMode) {
         debugPrint('AuthInterceptor: Starting proactive token refresh');
@@ -173,8 +148,6 @@ class AuthInterceptor extends Interceptor {
       // Return null to indicate refresh failure
       // The request will proceed with the old token and 401 will be handled if needed
       return null;
-    } finally {
-      _isRefreshing = false;
     }
   }
 }

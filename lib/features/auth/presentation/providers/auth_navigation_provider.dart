@@ -152,20 +152,16 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Pre-navigation middleware
   void _beforeNavigation(String route, Map<String, dynamic>? arguments) {
-    print(
-        '[Navigation Debug] Before navigation to $route with arguments: $arguments');
     state = state.copyWith(isNavigating: true);
   }
 
   /// Post-navigation middleware
   void _afterNavigation(String route, {bool success = true}) {
-    print('[Navigation Debug] After navigation to $route (success: $success)');
     state = state.copyWith(isNavigating: false);
   }
 
   /// Navigate to verification screen
   void navigateToVerification(String? email) {
-    print('[Navigation Debug] Requesting navigation to verification screen');
     navigateTo(
       AuthRoutes.verifyEmail,
       arguments: {'email': email},
@@ -262,7 +258,6 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Mark the current navigation request as handled
   void markCurrentRequestHandled() {
-    print('[Navigation Debug] Marking current request as handled');
     if (state.currentRequest == null) return;
 
     final handledRequest = state.currentRequest!.copyWith(handled: true);
@@ -277,9 +272,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Request back navigation
   void navigateBack() {
-    print('[Navigation Debug] Requesting back navigation');
     if (state.history.isEmpty) {
-      print('[Navigation Debug] No history to navigate back to');
       return;
     }
 
