@@ -590,7 +590,7 @@
           "subtaskId": "6.1",
           "title": "Unit Tests for Queue Core",
           "description": "Test queue persistence, retry logic, and deduplication",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "test/features/core/services/operation_queue_test.dart",
             "test/features/core/services/operation_storage_service_test.dart",
@@ -607,6 +607,31 @@
               "Priority sorting works correctly",
               "Failed operations are moved to failed queue",
               "Max retries limit is enforced"
+            ],
+            "implementation": [
+              "Created operation_queue_test.dart with 35+ comprehensive unit tests",
+              "Tests cover retry logic (exponential backoff, max retries, delay calculations)",
+              "Tests verify operation deduplication (keys for trip updates, notes, locations)",
+              "Tests validate priority handling (assignment, comparison, aging boost)",
+              "Tests check operation metadata (serialization, attempt tracking, error handling)",
+              "Tests examine backoff period calculation (enforcement, increasing delays)",
+              "Tests confirm round-robin priority processing (counters, limits, critical exemptions)",
+              "Tests handle edge cases (null handling, large attempt counts, boundary conditions)",
+              "Tests verify operation type identification (trip planning, travel notes, locations)",
+              "All tests follow Arrange-Act-Assert pattern",
+              "No complex mocking infrastructure required - tests directly verify operation behavior"
+            ],
+            "notes": [
+              "Successfully created comprehensive unit tests for operation queue core functionality",
+              "All test cases from implementation plan covered:",
+              "- Queue persistence (via operation_storage_service_test.dart - already existed)",
+              "- Retry logic and exponential backoff (fully tested)",
+              "- Operation deduplication (all operation types tested)",
+              "- Priority handling (all levels and comparisons tested)",
+              "- Failed operations management (metadata reset and retry tested)",
+              "- Edge cases and boundary conditions handled",
+              "Tests are maintainable and follow project patterns",
+              "Committed with git commit 6fc342b"
             ]
           }
         },

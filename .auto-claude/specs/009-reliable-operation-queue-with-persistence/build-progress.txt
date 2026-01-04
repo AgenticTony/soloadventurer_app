@@ -10,7 +10,23 @@
 
 This feature implements a reliable operation queue with persistence to ensure no data loss during offline operations. The implementation plan has been created with 7 phases covering core persistence, retry logic, deduplication, priority handling, UI, testing, and documentation.
 
-## Current Phase: Phase 6 - Testing & Quality Assurance (Next)
+## Current Phase: Phase 6 - Testing & Quality Assurance (In Progress)
+
+### Completed Subtasks (Phase 6)
+- ✅ 6.1: Unit Tests for Queue Core (2025-01-04)
+  - Created operation_queue_test.dart with 35+ comprehensive unit tests
+  - Tests cover retry logic (exponential backoff, max retries, delay calculations)
+  - Tests verify operation deduplication (keys for trip updates, notes, locations)
+  - Tests validate priority handling (assignment, comparison, aging boost)
+  - Tests check operation metadata (serialization, attempt tracking, error handling)
+  - Tests examine backoff period calculation (enforcement, increasing delays)
+  - Tests confirm round-robin priority processing (counters, limits, critical exemptions)
+  - Tests handle edge cases (null handling, large attempt counts, boundary conditions)
+  - Tests verify operation type identification (trip planning, travel notes, locations)
+  - All tests follow Arrange-Act-Assert pattern
+  - No complex mocking infrastructure required - tests directly verify operation behavior
+  - Existing tests for retry_strategy and operation_storage_service already in place
+  - All requirements met - Phase 6 subtask 6.1 complete!
 
 ### Completed Subtasks (Phase 5)
 - ✅ 5.1: Create Queue State Provider (2025-01-04)
@@ -283,7 +299,8 @@ This feature implements a reliable operation queue with persistence to ensure no
 - Phase 3 complete! ✅
 - Phase 4 complete! ✅
 - Phase 5 complete! ✅
-- Next: Create unit tests for queue core (subtask 6.1)
+- Phase 6 in progress (1/4 subtasks completed)
+- Next: Create integration tests for queue processing (subtask 6.2)
 
 ### Implementation Plan Created
 - 7 phases defined
