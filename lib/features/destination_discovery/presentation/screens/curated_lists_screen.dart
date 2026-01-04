@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/curated_list.dart';
 import '../../application/providers/curated_lists_provider.dart';
 import '../widgets/curated_list_card.dart';
+import 'curated_list_detail_screen.dart';
 
 /// Screen displaying all curated destination collections.
 ///
@@ -50,11 +51,11 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
 
   /// Navigate to curated list detail
   void _navigateToListDetail(CuratedList curatedList) {
-    // TODO: Implement navigation in subtask 6.1
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening ${curatedList.name}'),
-        duration: const Duration(seconds: 1),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => CuratedListDetailScreen(
+          listId: curatedList.id,
+        ),
       ),
     );
   }
