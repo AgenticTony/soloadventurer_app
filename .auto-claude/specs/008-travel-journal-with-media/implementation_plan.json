@@ -1,0 +1,458 @@
+{
+  "feature": "Travel Journal with Media",
+  "description": "# Travel Journal with Media\n\nRich travel journal with photo and video uploads, text notes, location tagging, mood tracking, and media organization. Users can document daily experiences, add memories, and organize content by trip or date with automatic backups.\n\n## Rationale\nAddresses user pain point: 'Difficulty documenting and sharing travel experiences in one place.' Addresses competitor issues with clunky journal apps (pain-4-2) and crashes when adding photos (pain-2-2). Solo travelers value being able to document and share their adventures.\n\n## User Stories\n- As a traveler, I want to document my daily experiences with photos and notes so that I can remember my trip\n- As a user, I want to organize my journal by trip so that I can easily find memories from specific adventures\n- As a traveler, I want to upload photos in the background so that I can continue using the app while they sync\n\n## Acceptance Criteria\n- [ ] Users can create journal entries with rich text formatting\n- [ ] Photos and videos upload in background with compression\n- [ ] Entries are automatically tagged with location and date\n- [ ] Users can organize entries by trip, date, or custom tags\n- [ ] Media gallery views all photos/videos from a trip\n- [ ] Offline editing with sync when connection available\n- [ ] Export or share entire trips or individual entries\n- [ ] Memory timeline shows chronological view of all travel experiences\n",
+  "created_at": "2026-01-04T18:29:59.629Z",
+  "updated_at": "2026-01-04T19:40:00.000Z",
+  "status": "in_progress",
+  "phases": [
+    {
+      "phase_id": "1",
+      "name": "Foundation & Database Schema",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "1.1",
+          "title": "Design database schema for journal entries and media",
+          "description": "Create Supabase tables for journal_entries, media_items, trips, and tags with proper relationships",
+          "status": "completed",
+          "files": [
+            "supabase/migrations/20250104000000_create_travel_journal_tables.sql"
+          ]
+        },
+        {
+          "subtask_id": "1.2",
+          "title": "Set up storage buckets for media",
+          "description": "Create Supabase storage buckets for photos and videos with proper RLS policies",
+          "status": "pending",
+          "files": [
+            "supabase/migrations/XXXXXXXX_create_journal_storage_buckets.sql"
+          ]
+        },
+        {
+          "subtask_id": "1.3",
+          "title": "Create TypeScript types for journal entities",
+          "description": "Define TypeScript interfaces for JournalEntry, MediaItem, Trip, and Tag",
+          "status": "pending",
+          "files": [
+            "src/types/journal.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "2",
+      "name": "Core Journal Entry Functionality",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "2.1",
+          "title": "Implement rich text editor component",
+          "description": "Create a rich text editor with formatting options (bold, italic, lists, headers)",
+          "status": "pending",
+          "files": [
+            "src/components/journal/RichTextEditor.tsx",
+            "src/components/journal/Toolbar.tsx"
+          ]
+        },
+        {
+          "subtask_id": "2.2",
+          "title": "Create journal entry creation flow",
+          "description": "Build UI and logic for creating new journal entries with title, content, and date",
+          "status": "pending",
+          "files": [
+            "src/components/journal/JournalEntryForm.tsx",
+            "src/screens/journal/CreateJournalEntryScreen.tsx"
+          ]
+        },
+        {
+          "subtask_id": "2.3",
+          "title": "Implement journal entry API functions",
+          "description": "Create CRUD operations for journal entries using Supabase",
+          "status": "pending",
+          "files": [
+            "src/api/journal.ts"
+          ]
+        },
+        {
+          "subtask_id": "2.4",
+          "title": "Build journal entry detail view",
+          "description": "Create screen to view individual journal entries with all content",
+          "status": "pending",
+          "files": [
+            "src/screens/journal/JournalEntryDetailScreen.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "3",
+      "name": "Media Upload & Management",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "3.1",
+          "title": "Implement image compression utility",
+          "description": "Create utility to compress images before upload while maintaining quality",
+          "status": "pending",
+          "files": [
+            "src/utils/mediaCompression.ts"
+          ]
+        },
+        {
+          "subtask_id": "3.2",
+          "title": "Create video compression utility",
+          "description": "Implement video compression for reduced file sizes",
+          "status": "pending",
+          "files": [
+            "src/utils/videoCompression.ts"
+          ]
+        },
+        {
+          "subtask_id": "3.3",
+          "title": "Build media picker component",
+          "description": "Create component to select photos and videos from device library",
+          "status": "pending",
+          "files": [
+            "src/components/media/MediaPicker.tsx"
+          ]
+        },
+        {
+          "subtask_id": "3.4",
+          "title": "Implement background upload service",
+          "description": "Create service to upload media in background with queue management",
+          "status": "pending",
+          "files": [
+            "src/services/mediaUploadService.ts",
+            "src/services/uploadQueue.ts"
+          ]
+        },
+        {
+          "subtask_id": "3.5",
+          "title": "Add upload progress indicator",
+          "description": "Show progress bars for media uploads in journal entries",
+          "status": "pending",
+          "files": [
+            "src/components/media/UploadProgressIndicator.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "4",
+      "name": "Location & Metadata",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "4.1",
+          "title": "Implement automatic location tagging",
+          "description": "Capture and store location data when creating journal entries",
+          "status": "pending",
+          "files": [
+            "src/utils/locationUtils.ts"
+          ]
+        },
+        {
+          "subtask_id": "4.2",
+          "title": "Create location picker component",
+          "description": "Allow users to manually select or edit location for entries",
+          "status": "pending",
+          "files": [
+            "src/components/journal/LocationPicker.tsx"
+          ]
+        },
+        {
+          "subtask_id": "4.3",
+          "title": "Extract EXIF data from photos",
+          "description": "Pull location and date metadata from uploaded photos",
+          "status": "pending",
+          "files": [
+            "src/utils/exifUtils.ts"
+          ]
+        },
+        {
+          "subtask_id": "4.4",
+          "title": "Add mood tracking feature",
+          "description": "Allow users to tag entries with mood emojis",
+          "status": "pending",
+          "files": [
+            "src/components/journal/MoodPicker.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "5",
+      "name": "Organization & Tagging",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "5.1",
+          "title": "Create trip management system",
+          "description": "Allow users to create and manage trips to organize entries",
+          "status": "pending",
+          "files": [
+            "src/api/trips.ts",
+            "src/components/journal/TripManager.tsx"
+          ]
+        },
+        {
+          "subtask_id": "5.2",
+          "title": "Implement custom tags feature",
+          "description": "Create tagging system for categorizing entries",
+          "status": "pending",
+          "files": [
+            "src/api/tags.ts",
+            "src/components/journal/TagManager.tsx"
+          ]
+        },
+        {
+          "subtask_id": "5.3",
+          "title": "Build trip overview screen",
+          "description": "Show all entries and media for a specific trip",
+          "status": "pending",
+          "files": [
+            "src/screens/journal/TripOverviewScreen.tsx"
+          ]
+        },
+        {
+          "subtask_id": "5.4",
+          "title": "Add search and filter functionality",
+          "description": "Allow searching entries by text, location, date, or tags",
+          "status": "pending",
+          "files": [
+            "src/components/journal/JournalSearch.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "6",
+      "name": "Media Gallery & Views",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "6.1",
+          "title": "Create media gallery grid view",
+          "description": "Build grid layout to display all photos and videos from a trip",
+          "status": "pending",
+          "files": [
+            "src/components/journal/MediaGallery.tsx"
+          ]
+        },
+        {
+          "subtask_id": "6.2",
+          "title": "Implement fullscreen media viewer",
+          "description": "Create modal to view photos and videos at full screen",
+          "status": "pending",
+          "files": [
+            "src/components/media/MediaViewer.tsx"
+          ]
+        },
+        {
+          "subtask_id": "6.3",
+          "title": "Build memory timeline view",
+          "description": "Create chronological timeline of all travel experiences",
+          "status": "pending",
+          "files": [
+            "src/screens/journal/MemoryTimelineScreen.tsx",
+            "src/components/journal/TimelineItem.tsx"
+          ]
+        },
+        {
+          "subtask_id": "6.4",
+          "title": "Add map view for trip locations",
+          "description": "Display all journal locations on an interactive map",
+          "status": "pending",
+          "files": [
+            "src/components/journal/TripMapView.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "7",
+      "name": "Offline Support & Sync",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "7.1",
+          "title": "Implement offline storage with SQLite",
+          "description": "Set up local database for offline journal entry storage",
+          "status": "pending",
+          "files": [
+            "src/services/offlineStorage.ts"
+          ]
+        },
+        {
+          "subtask_id": "7.2",
+          "title": "Create sync service",
+          "description": "Implement bidirectional sync between local and remote databases",
+          "status": "pending",
+          "files": [
+            "src/services/syncService.ts"
+          ]
+        },
+        {
+          "subtask_id": "7.3",
+          "title": "Add conflict resolution logic",
+          "description": "Handle conflicts when same entry is edited offline and online",
+          "status": "pending",
+          "files": [
+            "src/services/conflictResolution.ts"
+          ]
+        },
+        {
+          "subtask_id": "7.4",
+          "title": "Implement offline mode indicator",
+          "description": "Show visual indicator when app is in offline mode",
+          "status": "pending",
+          "files": [
+            "src/components/common/OfflineIndicator.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "8",
+      "name": "Export & Sharing",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "8.1",
+          "title": "Implement trip export to PDF",
+          "description": "Generate PDF document with all entries and media from a trip",
+          "status": "pending",
+          "files": [
+            "src/utils/exportUtils.ts"
+          ]
+        },
+        {
+          "subtask_id": "8.2",
+          "title": "Add social media sharing",
+          "description": "Allow sharing individual entries or media to social platforms",
+          "status": "pending",
+          "files": [
+            "src/utils/shareUtils.ts"
+          ]
+        },
+        {
+          "subtask_id": "8.3",
+          "title": "Create public trip sharing links",
+          "description": "Generate shareable links for trips with optional password protection",
+          "status": "pending",
+          "files": [
+            "src/api/sharing.ts"
+          ]
+        },
+        {
+          "subtask_id": "8.4",
+          "title": "Add backup and restore functionality",
+          "description": "Allow users to backup all journal data and restore it",
+          "status": "pending",
+          "files": [
+            "src/services/backupService.ts"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "9",
+      "name": "Journal List Screen",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "9.1",
+          "title": "Build main journal list screen",
+          "description": "Create screen showing all journal entries organized by trip or date",
+          "status": "pending",
+          "files": [
+            "src/screens/journal/JournalListScreen.tsx"
+          ]
+        },
+        {
+          "subtask_id": "9.2",
+          "title": "Add entry preview cards",
+          "description": "Create cards showing entry summary, date, location, and thumbnail",
+          "status": "pending",
+          "files": [
+            "src/components/journal/JournalEntryCard.tsx"
+          ]
+        },
+        {
+          "subtask_id": "9.3",
+          "title": "Implement pull-to-refresh",
+          "description": "Add pull-to-refresh gesture to update journal list",
+          "status": "pending",
+          "files": [
+            "src/components/journal/JournalListRefresh.tsx"
+          ]
+        },
+        {
+          "subtask_id": "9.4",
+          "title": "Add empty state and onboarding",
+          "description": "Show helpful message when no journal entries exist yet",
+          "status": "pending",
+          "files": [
+            "src/components/journal/JournalEmptyState.tsx"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "10",
+      "name": "Testing & Polish",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "10.1",
+          "title": "Write unit tests for journal API functions",
+          "description": "Test all CRUD operations and edge cases",
+          "status": "pending",
+          "files": [
+            "src/__tests__/api/journal.test.ts"
+          ]
+        },
+        {
+          "subtask_id": "10.2",
+          "title": "Test media upload and compression",
+          "description": "Verify media compression and upload functionality",
+          "status": "pending",
+          "files": [
+            "src/__tests__/utils/mediaCompression.test.ts"
+          ]
+        },
+        {
+          "subtask_id": "10.3",
+          "title": "Test offline sync functionality",
+          "description": "Verify offline editing and sync behavior",
+          "status": "pending",
+          "files": [
+            "src/__tests__/services/syncService.test.ts"
+          ]
+        },
+        {
+          "subtask_id": "10.4",
+          "title": "Performance optimization",
+          "description": "Optimize image loading, list rendering, and database queries",
+          "status": "pending",
+          "files": []
+        },
+        {
+          "subtask_id": "10.5",
+          "title": "Error handling improvements",
+          "description": "Add better error messages and recovery options",
+          "status": "pending",
+          "files": []
+        },
+        {
+          "subtask_id": "10.6",
+          "title": "Accessibility audit",
+          "description": "Ensure all screens are accessible with screen readers",
+          "status": "pending",
+          "files": []
+        }
+      ]
+    }
+  ],
+  "planStatus": "planned"
+}
