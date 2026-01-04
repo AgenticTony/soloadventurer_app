@@ -158,12 +158,13 @@
           "subtask_id": "2.4",
           "title": "Create data transfer objects (DTOs)",
           "description": "Create DTOs for API request/response mapping if needed",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/infrastructure/dtos/",
+          "notes": "Created comprehensive DTOs for all domain models: DestinationDto, SavedDestinationDto, CuratedListDto, and PersonalizedRecommendationDto. Each DTO includes: 1) Explicit fromJson factory constructors for GraphQL API response parsing, 2) toDomain() methods for conversion to domain models with null safety handling and sensible defaults, 3) Enum parsing methods for type conversions (BudgetLevel, ActivityLevel, SaveType, CuratedListType, RecommendationSource), 4) Static helper methods for list operations (fromJsonList, toDomainList), 5) Support for complex nested objects and maps. Added barrel file (dtos.dart) for clean imports. Provides clear separation between infrastructure and domain layers, enables easier testing, and allows for future API contract changes without affecting domain models.",
           "acceptance_criteria": [
-            "Destination DTO with from/to domain model mapping",
-            "Proper JSON serialization",
-            "Handles null values appropriately"
+            "Destination DTO with from/to domain model mapping - COMPLETED",
+            "Proper JSON serialization - COMPLETED",
+            "Handles null values appropriately - COMPLETED"
           ]
         }
       ]
