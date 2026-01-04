@@ -199,7 +199,28 @@ Finalize with comprehensive testing and docs
    - Maintains backward compatibility (falls back to simple refresh if no queue manager)
    - Properly propagates refresh errors and updates session storage
    - Status: Committed (7059187)
-6. ⏳ Phase 1.5: Add Unit Tests for Refresh Logic - Next
+
+## Phase 2: Background Token Refresh
+
+1. ✅ Phase 2.1: Create Token Refresh Scheduler - COMPLETED
+   - Created TokenRefreshScheduler class with app lifecycle awareness
+   - Implements WidgetsBindingObserver for lifecycle state changes
+   - Schedules refresh at 75% of token lifetime (via TokenExpirationTracker)
+   - Pauses tracking when app goes to background (inactive, paused, hidden states)
+   - Resumes tracking when app returns to foreground (resumed state)
+   - Stops tracking when app is detached (destroyed)
+   - Handles edge cases: multiple start/stop cycles, rapid state changes, no session
+   - Provides methods: start(), stop(), pause(), resume(), updateSession(), checkExpiration()
+   - Includes comprehensive unit tests (17 test groups covering all functionality)
+   - Status: Committed (9462f6d)
+
+## Next Steps
+
+2. ⏳ Phase 2.2: Integrate with App Lifecycle - Next
+3. ⏳ Phase 2.3: Update AuthInterceptor for Proactive Refresh
+4. ⏳ Phase 2.4: Add Refresh Notifications
+5. ⏳ Phase 2.5: Add Integration Tests for Background Refresh
+6. ⏳ Phase 1.5: Add Unit Tests for Refresh Logic
 7. ⏳ Set up CI/CD for automated testing
 8. ⏳ Create feature branch for implementation
 
