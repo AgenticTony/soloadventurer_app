@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../features/offline/infrastructure/database/offline_database.dart';
 import '../../features/offline/domain/services/offline_services.dart';
+import '../../core/network/network_reachability.dart';
 
 /// Register all offline/sync feature dependencies
 ///
@@ -75,12 +76,16 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     ),
   );
 
-  // TODO: Register NetworkReachability (Subtask 3.3)
-  // getIt.registerLazySingleton<NetworkReachability>(
-  //   () => NetworkReachability(
-  //     apiClient: getIt<ApiService>(),
-  //   ),
-  // );
+  // Register NetworkReachabilityService for actual API reachability testing
+  // This service performs real HTTP requests to test if the server is reachable
+  // beyond just checking device connectivity. Includes caching to avoid excessive requests.
+  getIt.registerLazySingleton<NetworkReachabilityService>(
+    () => NetworkReachabilityService(
+      testEndpointPath: '/health',
+      timeoutMs: 5000,
+      cacheTtlMs: 30000,
+    ),
+  );
 
   // ==============================================================================
   // PHASE 4: SYNC QUEUE SYSTEM (To be implemented in Phase 4)
