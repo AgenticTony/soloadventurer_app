@@ -39,6 +39,9 @@ class SyncOperation extends Equatable {
   /// Number of retry attempts
   final int retryCount;
 
+  /// When this operation should be retried (null if not failed yet)
+  final DateTime? nextRetryAt;
+
   /// Priority for ordering (higher = processed first)
   final int priority;
 
@@ -59,6 +62,7 @@ class SyncOperation extends Equatable {
     this.data,
     required this.createdAt,
     this.retryCount = 0,
+    this.nextRetryAt,
     this.priority = 0,
     this.canBatch = false,
     this.batchId,
@@ -74,6 +78,7 @@ class SyncOperation extends Equatable {
     Map<String, dynamic>? data,
     DateTime? createdAt,
     int? retryCount,
+    DateTime? nextRetryAt,
     int? priority,
     bool? canBatch,
     String? batchId,
@@ -87,6 +92,7 @@ class SyncOperation extends Equatable {
       data: data ?? this.data,
       createdAt: createdAt ?? this.createdAt,
       retryCount: retryCount ?? this.retryCount,
+      nextRetryAt: nextRetryAt ?? this.nextRetryAt,
       priority: priority ?? this.priority,
       canBatch: canBatch ?? this.canBatch,
       batchId: batchId ?? this.batchId,
@@ -177,7 +183,20 @@ class SyncOperation extends Equatable {
   }
 
   /// Whether this operation has exceeded max retry attempts
-  bool get shouldRetry => retryCount < 5;
+  bool shouldRetry([int maxAttempts = 5]) => retryCount < maxAttempts;
+
+  /// Whether this operation is ready to be retried
+  /// Returns true if there's no nextRetryAt or if current time is past nextRetryAt
+  bool get isReadyForRetry =>
+      nextRetryAt == null || DateTime.now().isAfter(nextRetryAt!);
+
+  /// Time until this operation is ready for retry
+  /// Returns null if operation is ready or not scheduled for retry
+  Duration? get timeUntilRetry {
+    if (nextRetryAt == null) return null;
+    final diff = nextRetryAt!.difference(DateTime.now());
+    return diff.isNegative ? Duration.zero : diff;
+  }
 
   /// Whether this operation is a batch operation
   bool get isBatch => operationType == SyncOperationType.batch;
@@ -194,6 +213,7 @@ class SyncOperation extends Equatable {
         data,
         createdAt,
         retryCount,
+        nextRetryAt,
         priority,
         canBatch,
         batchId,
@@ -204,7 +224,8 @@ class SyncOperation extends Equatable {
   String toString() =>
       'SyncOperation(id: $id, entityType: $entityType, '
       'operationType: $operationType, entityId: $entityId, '
-      'createdAt: $createdAt, retryCount: $retryCount, priority: $priority)';
+      'createdAt: $createdAt, retryCount: $retryCount, '
+      'nextRetryAt: $nextRetryAt, priority: $priority)';
 
   /// Convert to JSON for persistence
   Map<String, dynamic> toJson() {
@@ -216,6 +237,7 @@ class SyncOperation extends Equatable {
       'data': data,
       'createdAt': createdAt.toIso8601String(),
       'retryCount': retryCount,
+      'nextRetryAt': nextRetryAt?.toIso8601String(),
       'priority': priority,
       'canBatch': canBatch,
       'batchId': batchId,
@@ -235,6 +257,9 @@ class SyncOperation extends Equatable {
       data: json['data'] as Map<String, dynamic>?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       retryCount: json['retryCount'] as int? ?? 0,
+      nextRetryAt: json['nextRetryAt'] != null
+          ? DateTime.parse(json['nextRetryAt'] as String)
+          : null,
       priority: json['priority'] as int? ?? 0,
       canBatch: json['canBatch'] as bool? ?? false,
       batchId: json['batchId'] as String?,

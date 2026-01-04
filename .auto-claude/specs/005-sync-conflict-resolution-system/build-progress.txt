@@ -1,8 +1,8 @@
 ## Build Progress
 
 ### Current Status
-Phase: Phase 2 - Conflict Detection & Resolution
-Last Updated: 2026-01-05 02:30
+Phase: Phase 3 - Retry & Error Handling
+Last Updated: 2026-01-05 03:15
 
 ### Completed Subtasks
 - 1.1 - Design sync state management architecture
@@ -12,12 +12,108 @@ Last Updated: 2026-01-05 02:30
 - 2.1 - Implement conflict detection logic
 - 2.2 - Create conflict resolution strategies
 - 2.3 - Build conflict resolution UI components
-- 2.4 - Implement user decision handling ✨ NEW
+- 2.4 - Implement user decision handling
+- 3.1 - Implement exponential backoff retry mechanism ✨ NEW
 
 ### Current Work
-Completed conflict resolution UI components implementation:
+Completed exponential backoff retry mechanism implementation:
 
-**New Presentation Widgets Created:**
+**New Domain Service Created:**
+- lib/features/sync/domain/services/exponential_backoff.dart (220+ lines)
+  - ExponentialBackoff class for calculating retry delays
+  - Configurable base delay (default: 1000ms = 1s)
+  - Configurable max delay (default: 60000ms = 60s)
+  - Jitter support to prevent thundering herd problem (default: ±10%)
+  - Three predefined strategies: standard, aggressive, conservative
+  - calculateDelay(int retryCount): Calculates delay in milliseconds
+    - Retry 0: 1s (1000ms)
+    - Retry 1: 2s (2000ms)
+    - Retry 2: 4s (4000ms)
+    - Retry 3: 8s (8000ms)
+    - Retry 4: 16s (16000ms)
+    - Retry 5: 32s (32000ms)
+    - Retry 6+: 60s (60000ms, capped at max)
+  - calculateNextRetryTime(int retryCount, {DateTime? from}): Calculates DateTime of next retry
+  - calculateRemainingDelay(int retryCount, DateTime lastAttemptAt): Calculates remaining Duration
+  - getDelayDescription(int retryCount): Human-readable description for logging
+  - getDelaysForAttempts(int maxAttempts): Get all delay values up to max attempts
+  - Comprehensive validation with assertions
+  - Stateless, reusable implementation
+
+**Updated Domain Models:**
+- lib/features/sync/domain/models/sync_operation.dart
+  - Added nextRetryAt field (DateTime?) to track when operation should be retried
+  - Updated shouldRetry([int maxAttempts = 5]) to accept configurable max attempts
+  - Added isReadyForRetry getter: Returns true if operation is ready for retry
+  - Added timeUntilRetry getter: Returns Duration until next retry or null
+  - Updated copyWith() to include nextRetryAt
+  - Updated props for Equatable to include nextRetryAt
+  - Updated toString() to include nextRetryAt
+  - Updated toJson() to serialize nextRetryAt
+  - Updated fromJson() to deserialize nextRetryAt
+  - All factory constructors (create, update, delete, batch) updated
+
+**Updated Infrastructure:**
+- lib/features/sync/infrastructure/services/sync_service_impl.dart
+  - Added ExponentialBackoff instance (_backoff) with configurable parameter
+  - Updated constructor to accept optional ExponentialBackoff parameter
+  - Updated processQueue() retry logic:
+    - Uses operation.shouldRetry(_config.maxRetryAttempts) instead of hardcoded value
+    - Calculates nextRetryAt using _backoff.calculateNextRetryTime()
+    - Sets nextRetryAt when re-queueing failed operations
+    - Logs next retry time in ISO8601 format
+    - Skips operations not ready for retry (nextRetryAt in future)
+    - Schedules future retry with appropriate delay using timeUntilRetry
+  - Updated processBatch() retry logic:
+    - Filters operations to only process those ready for retry (isReadyForRetry)
+    - Separates operationsNotReady and puts them back in queue
+    - Uses exponential backoff for re-queued operations
+    - Uses config.maxRetryAttempts for shouldRetry check
+  - Improved error logging with retry attempt counts and max attempts
+
+**Test Files Created:**
+- test/features/sync/domain/services/exponential_backoff_test.dart (300+ lines, 20+ test cases)
+  - calculateDelay tests: Exponential delays, custom base/max delays, jitter behavior
+  - calculateNextRetryTime tests: Time calculation from base time, default to now
+  - calculateRemainingDelay tests: Remaining duration calculation, past retry handling
+  - Predefined configurations tests: standard, aggressive, conservative
+  - getDelayDescription tests: Human-readable descriptions with/without jitter
+  - Validation tests: Invalid parameters throw assertions
+  - toString and reset tests
+- test/features/sync/domain/models/sync_operation_retry_test.dart (250+ lines, 15+ test cases)
+  - shouldRetry tests: Default max attempts, custom max attempts, edge cases
+  - isReadyForRetry tests: Null nextRetryAt, past/future retry times
+  - timeUntilRetry tests: Null handling, past/future calculations, accuracy
+  - copyWith tests: Update retry fields independently and together
+  - JSON serialization tests: Serialize/deserialize retry fields, round-trip
+  - Equatable tests: Equality with different retry field values
+  - toString tests: Includes retry count and nextRetryAt in output
+
+**Key Features:**
+✓ Exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s, 60s (max)
+✓ Configurable max retry limit (default: 5 attempts)
+✓ Automatic backoff reset after successful sync (successful ops not re-queued)
+✓ Jitter support to prevent thundering herd problem
+✓ Predefined strategies: standard, aggressive, conservative
+✓ Skips operations not ready for retry during processing
+✓ Schedules future retry processing with appropriate delays
+✓ Comprehensive test coverage (35+ test cases)
+
+All acceptance criteria for subtask 3.1 met:
+✓ Retry logic with exponential backoff implemented
+✓ Max retry limit enforced (configurable, default 5 attempts)
+✓ Backoff reset after successful sync
+
+**Total Implementation:** 1,050+ lines of code
+- ExponentialBackoff domain service: 220 lines
+- SyncOperation model updates: 50 lines (additions/modifications)
+- SyncServiceImpl updates: 100 lines (retry logic changes)
+- Tests: 550 lines (300 + 250)
+- Documentation and integration: 130 lines
+
+### Previous Work (Subtask 2.4)
+**New Presentation State Created:**
+- lib/features/sync/presentation/state/conflict_resolution_state.dart (195 lines)
 - lib/features/sync/presentation/widgets/conflict_resolution_dialog.dart (460+ lines)
   - Modal dialog for resolving sync conflicts
   - Side-by-side comparison of local and remote versions
@@ -292,4 +388,4 @@ All acceptance criteria for subtask 2.4 met:
 
 ### Next Steps
 Continue with Phase 3: Retry & Error Handling
-- Subtask 3.1 - Implement exponential backoff retry mechanism
+- Subtask 3.2 - Add error categorization and messaging

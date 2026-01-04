@@ -6,6 +6,7 @@ import '../../domain/entities/sync_entity_type.dart';
 import '../../domain/services/sync_service.dart';
 import '../../domain/services/sync_queue_persistence.dart';
 import '../../domain/services/network_connectivity.dart';
+import '../../domain/services/exponential_backoff.dart';
 
 /// Implementation of [SyncService] with queue management and persistence
 class SyncServiceImpl implements SyncService {
@@ -38,6 +39,9 @@ class SyncServiceImpl implements SyncService {
 
   /// Queue configuration
   SyncQueueConfig _config = SyncQueueConfig.defaultConfig;
+
+  /// Exponential backoff calculator for retry delays
+  final ExponentialBackoff _backoff;
 
   /// Operation processing lock
   bool _processingLock = false;
@@ -74,11 +78,14 @@ class SyncServiceImpl implements SyncService {
   /// If [persistence] is provided, the queue will be persisted across app restarts
   /// If [networkConnectivity] is provided, sync will automatically trigger when
   /// connection is restored
+  /// If [backoff] is provided, it will be used for retry delay calculation
   SyncServiceImpl({
     SyncQueuePersistence? persistence,
     NetworkConnectivity? networkConnectivity,
+    ExponentialBackoff? backoff,
   })  : _persistence = persistence,
-        _networkConnectivity = networkConnectivity {
+        _networkConnectivity = networkConnectivity,
+        _backoff = backoff ?? ExponentialBackoff.standard {
     _initializeFromPersistence();
     _initializeNetworkMonitoring();
   }
@@ -290,6 +297,28 @@ class SyncServiceImpl implements SyncService {
       while (_queue.isNotEmpty && !_isPaused) {
         final operation = _queue.removeAt(0);
 
+        // Skip operations that aren't ready for retry yet
+        if (!operation.isReadyForRetry) {
+          // Put it back in the queue
+          _queue.insert(0, operation);
+
+          debugPrint('SyncService: Operation ${operation.id} not ready for retry yet, '
+              'will retry at ${operation.nextRetryAt?.toIso8601String()}');
+
+          // Calculate delay until next retry and schedule processing
+          final delayUntilRetry = operation.timeUntilRetry;
+          if (delayUntilRetry != null) {
+            Future.delayed(delayUntilRetry, () {
+              if (!_isPaused && _queue.isNotEmpty) {
+                _scheduleProcessing();
+              }
+            });
+          }
+
+          // Break out of the loop for now
+          break;
+        }
+
         // Persist the updated queue after removal
         await _persistQueue();
 
@@ -304,14 +333,21 @@ class SyncServiceImpl implements SyncService {
             failureCount++;
 
             // Re-queue for retry if applicable
-            if (operation.shouldRetry) {
+            if (operation.shouldRetry(_config.maxRetryAttempts)) {
+              final nextRetryCount = operation.retryCount + 1;
+              final nextRetryAt = _backoff.calculateNextRetryTime(nextRetryCount);
+
               final retryOp = operation.copyWith(
-                retryCount: operation.retryCount + 1,
+                retryCount: nextRetryCount,
+                nextRetryAt: nextRetryAt,
               );
               _queue.add(retryOp);
 
               debugPrint('SyncService: Re-queueing operation ${operation.id} '
-                  '(attempt ${retryOp.retryCount})');
+                  '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
+            } else {
+              debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+                  '(${operation.retryCount}/${_config.maxRetryAttempts})');
             }
           }
         } catch (e, stackTrace) {
@@ -323,11 +359,21 @@ class SyncServiceImpl implements SyncService {
           debugPrint(stackTrace.toString());
 
           // Re-queue for retry if applicable
-          if (operation.shouldRetry) {
+          if (operation.shouldRetry(_config.maxRetryAttempts)) {
+            final nextRetryCount = operation.retryCount + 1;
+            final nextRetryAt = _backoff.calculateNextRetryTime(nextRetryCount);
+
             final retryOp = operation.copyWith(
-              retryCount: operation.retryCount + 1,
+              retryCount: nextRetryCount,
+              nextRetryAt: nextRetryAt,
             );
             _queue.add(retryOp);
+
+            debugPrint('SyncService: Re-queueing operation ${operation.id} '
+                '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
+          } else {
+            debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+                '(${operation.retryCount}/${_config.maxRetryAttempts})');
           }
         }
       }
@@ -403,11 +449,28 @@ class SyncServiceImpl implements SyncService {
     _updateStatus(SyncStatus.syncing);
 
     final batchSize = maxBatchSize ?? _config.maxBatchSize;
-    final operationsToProcess =
-        _queue.take(batchSize < _queue.length ? batchSize : _queue.length).toList();
 
-    // Remove operations from queue
-    _queue.removeRange(0, operationsToProcess.length);
+    // Filter and collect operations ready for processing
+    final operationsToProcess = <SyncOperation>[];
+    final operationsNotReady = <SyncOperation>[];
+    var collected = 0;
+
+    for (final operation in _queue) {
+      if (collected >= batchSize) break;
+
+      if (operation.isReadyForRetry) {
+        operationsToProcess.add(operation);
+        collected++;
+      } else {
+        operationsNotReady.add(operation);
+      }
+    }
+
+    // Remove processed operations from queue
+    _queue.removeWhere((op) => operationsToProcess.contains(op));
+
+    // Put back operations that aren't ready
+    _queue.insertAll(0, operationsNotReady);
 
     // Persist the updated queue
     await _persistQueue();
@@ -432,11 +495,21 @@ class SyncServiceImpl implements SyncService {
             failureCount++;
 
             // Re-queue for retry if applicable
-            if (operation.shouldRetry) {
+            if (operation.shouldRetry(_config.maxRetryAttempts)) {
+              final nextRetryCount = operation.retryCount + 1;
+              final nextRetryAt = _backoff.calculateNextRetryTime(nextRetryCount);
+
               final retryOp = operation.copyWith(
-                retryCount: operation.retryCount + 1,
+                retryCount: nextRetryCount,
+                nextRetryAt: nextRetryAt,
               );
               _queue.add(retryOp);
+
+              debugPrint('SyncService: Re-queueing operation ${operation.id} '
+                  '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
+            } else {
+              debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+                  '(${operation.retryCount}/${_config.maxRetryAttempts})');
             }
           }
         } catch (e) {
@@ -445,11 +518,21 @@ class SyncServiceImpl implements SyncService {
           lastErrorCode = 'OPERATION_ERROR';
 
           // Re-queue for retry if applicable
-          if (operation.shouldRetry) {
+          if (operation.shouldRetry(_config.maxRetryAttempts)) {
+            final nextRetryCount = operation.retryCount + 1;
+            final nextRetryAt = _backoff.calculateNextRetryTime(nextRetryCount);
+
             final retryOp = operation.copyWith(
-              retryCount: operation.retryCount + 1,
+              retryCount: nextRetryCount,
+              nextRetryAt: nextRetryAt,
             );
             _queue.add(retryOp);
+
+            debugPrint('SyncService: Re-queueing operation ${operation.id} '
+                '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
+          } else {
+            debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+                '(${operation.retryCount}/${_config.maxRetryAttempts})');
           }
         }
       }
