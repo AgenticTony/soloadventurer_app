@@ -503,9 +503,11 @@
           "subtaskId": "5.3",
           "title": "Add Queue Status Indicator",
           "description": "Add persistent indicator showing pending operation count",
-          "status": "pending",
+          "status": "completed",
           "files": [
-            "lib/features/core/presentation/widgets/queue_status_indicator.dart"
+            "lib/features/core/presentation/widgets/queue_status_indicator.dart",
+            "lib/app/router/app_router.dart",
+            "lib/features/home/presentation/screens/home_screen.dart"
           ],
           "details": {
             "requirements": [
@@ -514,6 +516,26 @@
               "Navigate to queue screen on tap",
               "Animate when count changes",
               "Hide when queue is empty"
+            ],
+            "implementation": [
+              "Created QueueStatusIndicator widget with Badge showing pending count",
+              "Integrated into HomeScreen AppBar actions",
+              "Navigates to OperationQueueScreen using pushNamed",
+              "Badge automatically animates count changes via Material Design",
+              "Returns SizedBox.shrink() when pendingCount == 0 to hide",
+              "Added '/operation-queue' route to AppRouter",
+              "Uses Icons.cloud_sync for sync/queue visualization",
+              "Tooltip shows dynamic count information"
+            ],
+            "notes": [
+              "Successfully created persistent queue status indicator",
+              "Widget follows existing app patterns (ConsumerWidget, Riverpod)",
+              "Badge shows '99+' for counts over 99 for layout stability",
+              "Hides automatically when queue is empty (pendingCount == 0)",
+              "Tappable icon navigates to full queue screen",
+              "Integrated into HomeScreen AppBar for visibility",
+              "Route added to AppRouter for proper navigation",
+              "All requirements met for subtask 5.3"
             ]
           }
         },

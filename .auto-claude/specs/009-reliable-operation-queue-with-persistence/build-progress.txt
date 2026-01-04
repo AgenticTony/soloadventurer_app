@@ -45,6 +45,20 @@ This feature implements a reliable operation queue with persistence to ensure no
   - Follows existing app theme and Material Design 3 patterns
   - All requirements met - Phase 5 subtask 5.2 complete!
 
+- ✅ 5.3: Add Queue Status Indicator (2025-01-04)
+  - Created queue_status_indicator.dart widget with persistent badge indicator
+  - Implemented Badge widget showing pending operation count
+  - Added automatic hiding when queue is empty (pendingCount == 0)
+  - Integrated into HomeScreen AppBar actions for visibility
+  - Added '/operation-queue' route to AppRouter for navigation
+  - Navigates to OperationQueueScreen on tap using pushNamed
+  - Badge automatically animates count changes via Material Design
+  - Shows '99+' for counts over 99 to maintain layout stability
+  - Uses Icons.cloud_sync icon for sync/queue visualization
+  - Tooltip displays dynamic count information
+  - Follows existing app patterns (ConsumerWidget, Riverpod)
+  - All requirements met - Phase 5 subtask 5.3 complete!
+
 ### Completed Subtasks
 - ✅ 1.1: Create OperationStorageService (2025-01-04)
   - Created operation_storage_service.dart with full persistence support
