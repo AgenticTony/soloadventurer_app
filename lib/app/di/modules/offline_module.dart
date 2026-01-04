@@ -210,6 +210,20 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // PHASE 6: REPOSITORY ADAPTATION (To be implemented in Phase 6)
   // ==============================================================================
   //
+  // Register OptimisticUpdateHandler for managing optimistic UI updates
+  // This service tracks optimistic updates made while offline and provides
+  // rollback functionality when sync operations fail. It enables immediate
+  // UI feedback with safety nets for failed operations.
+  getIt.registerLazySingleton<OptimisticUpdateHandler>(
+    () => OptimisticUpdateHandler(
+      config: OptimisticUpdateConfig(
+        autoRollbackOnFailure: true,
+        maxAgeMs: 7 * 24 * 60 * 60 * 1000, // 7 days
+        enableTracking: true,
+      ),
+    ),
+  );
+
   // TODO: Register Offline-Aware Repositories
   // These will extend existing repositories with offline capabilities
   //
@@ -219,6 +233,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   //     localDatabase: getIt<AppDatabase>(),
   //     syncQueueService: getIt<SyncQueueService>(),
   //     connectivityService: getIt<ConnectivityService>(),
+  //     optimisticUpdateHandler: getIt<OptimisticUpdateHandler>(),
   //   ),
   // );
   //
