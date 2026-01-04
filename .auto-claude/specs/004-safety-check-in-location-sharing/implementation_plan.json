@@ -106,7 +106,7 @@
           "subtask_id": "2.1",
           "title": "Create safety exceptions",
           "description": "Define safety-specific exceptions for error handling",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/core/error/safety_exceptions.dart"
           ]
@@ -115,7 +115,7 @@
           "subtask_id": "2.2",
           "title": "Implement local data source",
           "description": "Create SafetyLocalDataSource for caching safety data using SharedPreferences",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/data/datasources/safety_local_data_source.dart",
             "lib/features/safety/data/datasources/safety_local_data_source_impl.dart"
