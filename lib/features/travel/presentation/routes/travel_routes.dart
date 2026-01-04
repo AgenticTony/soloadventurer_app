@@ -10,4 +10,7 @@ class TravelRoutes {
 
   /// Route for activities list screen
   static const String activities = '/trips/activities';
+
+  /// Route for photo gallery screen
+  static const String photos = '/trips/photos';
 }
