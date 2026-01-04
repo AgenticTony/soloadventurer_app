@@ -1,0 +1,34 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/**)",
+      "Glob(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/**)",
+      "Grep(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/.auto-claude/specs/001-offline-first-core-architecture/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/.auto-claude/specs/001-offline-first-core-architecture/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/001-offline-first-core-architecture/.auto-claude/specs/001-offline-first-core-architecture/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}

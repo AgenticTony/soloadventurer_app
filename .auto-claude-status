@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "001-offline-first-core-architecture",
+  "state": "building",
+  "subtasks": {
+    "completed": 3,
+    "total": 47,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Phase 1: Foundation & Dependencies",
+    "id": null,
+    "total": 4
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 5,
+    "started_at": "2026-01-04T19:30:19.052285"
+  },
+  "last_update": "2026-01-04T19:39:07.697132"
+}
