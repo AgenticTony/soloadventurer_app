@@ -33,17 +33,18 @@
           "subtask_id": "1.2",
           "title": "Create DestinationFilter model",
           "description": "Define filter options for destination search including budget, safety, activity level, and solo-friendliness",
-          "status": "pending",
+          "status": "completed",
           "file_path": "./lib/features/destination_discovery/domain/models/destination_filter.dart",
+          "notes": "Created DestinationFilter model with all required filters (budget, safety, solo suitability, activity level, location, tags, search query). Added DestinationSortOrder enum with 7 sort options (popularity, safety, soloSuitability, budgetAsc, budgetDesc, newest, relevance). Included pagination support (offset, limit) and helper methods (isDefault, hasActiveFilters, resetPagination, defaultFilter). Uses Freezed for immutability with JSON serialization. Note: build_runner needs to be run to generate .freezed.dart and .g.dart files.",
           "acceptance_criteria": [
-            "Budget range filter",
-            "Minimum safety score filter",
-            "Activity level filter",
-            "Solo suitability score filter",
-            "Location/region filter",
-            "Tags/categories multi-select",
-            "Text search query",
-            "Freezed model with JSON serialization"
+            "Budget range filter - Implemented with BudgetLevel enum",
+            "Minimum safety score filter - Implemented (1-10 range)",
+            "Activity level filter - Implemented with ActivityLevel enum",
+            "Solo suitability score filter - Implemented (1-10 range)",
+            "Location/region filter - Implemented (countryCode, region)",
+            "Tags/categories multi-select - Implemented (List<String>)",
+            "Text search query - Implemented (searchQuery field)",
+            "Freezed model with JSON serialization - Implemented with @freezed annotation"
           ]
         },
         {
