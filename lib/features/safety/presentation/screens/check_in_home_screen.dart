@@ -4,6 +4,7 @@ import '../../domain/entities/check_in.dart';
 import '../providers/safety_providers.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
 import 'manual_check_in_screen.dart';
+import 'schedule_check_in_screen.dart';
 
 /// Main check-in screen showing active and upcoming check-ins
 /// Provides quick actions to create manual check-ins, schedule check-ins, and view history
@@ -518,17 +519,11 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
   }
 
   void _navigateToScheduleCheckIn(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Schedule check-in screen will be implemented in next subtask'),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ScheduleCheckInScreen(),
       ),
     );
-    // TODO: Navigate to ScheduleCheckInScreen when it's implemented
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => const ScheduleCheckInScreen(),
-    //   ),
-    // );
   }
 
   void _navigateToHistory(BuildContext context) {

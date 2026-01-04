@@ -336,19 +336,21 @@
           "subtask_id": "6.2",
           "title": "Create manual check-in screen",
           "description": "Build screen for manual check-in with location and status",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/screens/manual_check_in_screen.dart"
-          ]
+          ],
+          "notes": "Implemented comprehensive ManualCheckInScreen with automatic location acquisition, optional status message input, safety status selector (Just Check In, I'm Safe, Need Help, Emergency), and support for both new check-ins and completing existing scheduled check-ins. Features include: high-accuracy GPS tracking with visible coordinates (lat/long/altitude), location refresh capability with loading and error states, integration with LocationService for GPS data and CheckInNotifier/SafetyNotifier for state management, proper error handling and user feedback. UI includes location card with accuracy indicator, status message text field, radio button status selector with icons, and loading/error states. Updated CheckInHomeScreen to navigate to ManualCheckInScreen (added import, connected Complete button and Manual Check-in menu option). Follows existing screen patterns from AddEditTrustedContactScreen with ConsumerStatefulWidget and proper state management. Commit: c8e6843"
         },
         {
           "subtask_id": "6.3",
           "title": "Create schedule check-in screen",
           "description": "Build screen for scheduling automatic check-ins",
-          "status": "pending",
+          "status": "completed",
           "files": [
             "lib/features/safety/presentation/screens/schedule_check_in_screen.dart"
-          ]
+          ],
+          "notes": "Implemented comprehensive ScheduleCheckInScreen with full scheduling functionality for automatic check-ins. Features include: trigger type selector (Scheduled Time, Location Arrival, Location Departure), date/time picker for scheduling, optional custom deadline configuration with default 1-hour deadline, location acquisition for location-based triggers with accuracy indicator, optional status message input, multi-contact selector for choosing which trusted contacts to notify, empty state handling, and proper loading/error/success states. Uses CheckInNotifier.scheduleCheckIn(), integrates with LocationService for GPS, watches trustedContactsNotifierProvider, supports optional tripId parameter. Updated CheckInHomeScreen navigation. Follows existing patterns from ManualCheckInScreen and AddEditTrustedContactScreen with ConsumerStatefulWidget pattern, proper state management, and form validation."
         },
         {
           "subtask_id": "6.4",

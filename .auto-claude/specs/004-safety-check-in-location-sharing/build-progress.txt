@@ -496,3 +496,25 @@ Phase 3 (Location Services & Background Tasks) is now complete. All 5 subtasks h
 - Visual feedback for due soon and overdue check-ins
 - Commit: pending
 
+✅ **Subtask 6.3: Create schedule check-in screen** (COMPLETED)
+- Implemented comprehensive ScheduleCheckInScreen with full scheduling functionality for automatic check-ins
+- Features include:
+  - Trigger type selector: Scheduled Time, Location Arrival, Location Departure
+  - Date/time picker for scheduling check-ins at specific times
+  - Optional custom deadline configuration with default 1-hour deadline
+  - Location acquisition for location-based triggers with accuracy indicator
+  - Optional status message input
+  - Multi-contact selector for choosing which trusted contacts to notify
+  - Empty state handling when no trusted contacts available
+  - Loading, error, and success states with proper user feedback
+- Integration:
+  - Uses CheckInNotifier.scheduleCheckIn() for creating scheduled check-ins
+  - Integrates with LocationService for GPS location acquisition
+  - Watches trustedContactsNotifierProvider for contact selection
+  - Supports optional tripId parameter for associating check-ins with trips
+- Updated CheckInHomeScreen navigation to use ScheduleCheckInScreen (replaced placeholder snackbar with actual navigation)
+- Follows existing screen patterns from ManualCheckInScreen and AddEditTrustedContactScreen
+- Uses ConsumerStatefulWidget pattern with proper state management and form validation
+- Includes comprehensive documentation and error handling
+- Commit: pending
+
