@@ -1,7 +1,7 @@
 {
   "active": true,
   "spec": "004-safety-check-in-location-sharing",
-  "state": "building",
+  "state": "complete",
   "subtasks": {
     "completed": 0,
     "total": 0,
@@ -18,8 +18,8 @@
     "max": 1
   },
   "session": {
-    "number": 43,
+    "number": 45,
     "started_at": "2026-01-04T19:31:38.912976"
   },
-  "last_update": "2026-01-04T21:50:04.459779"
+  "last_update": "2026-01-04T22:04:02.079471"
 }

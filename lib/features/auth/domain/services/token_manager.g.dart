@@ -6,7 +6,7 @@ part of 'token_manager.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tokenManagerHash() => r'65e93c5d447a6e09a6f1bbdd24355d5816eb9c5b';
+String _$tokenManagerHash() => r'dd3150e81a3484b0609d5d95f24cf8f4481f51f1';
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
 ///

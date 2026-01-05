@@ -105,9 +105,9 @@ class _LocationSharingScreenState
 
           // Active shares list
           if (activeShares.isEmpty) {
-            _buildEmptyState(context);
+            return _buildEmptyState(context);
           } else {
-            ListView.separated(
+            return ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: activeShares.length,
@@ -121,8 +121,8 @@ class _LocationSharingScreenState
                   isStopping,
                 );
               },
-            ),
-          },
+            );
+          }
 
           // Stop all sharing button (if there are active shares)
           if (activeShares.isNotEmpty) ...[

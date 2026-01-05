@@ -118,9 +118,9 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
 
           // Check-ins list
           if (upcomingCheckIns.isEmpty) {
-            _buildEmptyCheckInsState(context);
+            return _buildEmptyCheckInsState(context);
           } else {
-            ListView.separated(
+            return ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: upcomingCheckIns.length,
@@ -129,8 +129,8 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
                 final checkIn = upcomingCheckIns[index];
                 return _buildCheckInCard(context, checkIn);
               },
-            ),
-          },
+            );
+          }
         ],
       ),
     );
