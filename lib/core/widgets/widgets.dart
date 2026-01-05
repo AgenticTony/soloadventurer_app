@@ -24,6 +24,8 @@
 ///   with type-based styling and tap handling
 /// - [MapClusterWidget]: Widget for displaying marker clusters with count
 ///   and size-based color coding
+/// - [OptimizedListItem]: A wrapper widget that adds RepaintBoundary to
+///   isolate repaints and improve list performance
 ///
 /// ## Usage
 ///
@@ -98,3 +100,4 @@ export 'lazy_load_image.dart';
 export 'image_placeholder.dart';
 export 'image_error_widget.dart';
 export 'map_marker_widgets.dart';
+export 'optimized_list_item.dart';

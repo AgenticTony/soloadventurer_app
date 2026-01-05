@@ -13,7 +13,7 @@ class Activity {
   final String category;
   final double? estimatedCost;
 
-  Activity({
+  const Activity({
     required this.id,
     required this.title,
     this.description,
@@ -112,12 +112,14 @@ class ActivitiesScreen extends ConsumerWidget {
         ),
         itemBuilder: (context, index) {
           final activity = activities[index];
-          return _ActivityCard(
-            key: ValueKey(activity.id),
-            activity: activity,
-            onTap: () {
-              // Navigate to activity details
-            },
+          return OptimizedListItem(
+            child: _ActivityCard(
+              key: ValueKey(activity.id),
+              activity: activity,
+              onTap: () {
+                // Navigate to activity details
+              },
+            ),
           );
         },
       ),
@@ -144,6 +146,8 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final grey600 = Colors.grey[600];
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       child: InkWell(
@@ -186,19 +190,19 @@ class _ActivityCard extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
+                  Icon(Icons.access_time, size: 14, color: grey600),
                   const SizedBox(width: 4),
                   Text(
                     _formatTimeRange(activity.startTime, activity.endTime),
-                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                    style: TextStyle(color: grey600, fontSize: 12),
                   ),
                   const SizedBox(width: 16),
-                  Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                  Icon(Icons.location_on, size: 14, color: grey600),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       activity.location,
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(color: grey600, fontSize: 12),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -228,38 +232,8 @@ class _CategoryIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    IconData iconData;
-    Color iconColor;
-
-    switch (category.toLowerCase()) {
-      case 'food':
-      case 'restaurant':
-        iconData = Icons.restaurant;
-        iconColor = Colors.orange;
-        break;
-      case 'transport':
-      case 'travel':
-        iconData = Icons.directions_car;
-        iconColor = Colors.blue;
-        break;
-      case 'accommodation':
-      case 'hotel':
-        iconData = Icons.hotel;
-        iconColor = Colors.purple;
-        break;
-      case 'activity':
-      case 'entertainment':
-        iconData = Icons.local_activity;
-        iconColor = Colors.green;
-        break;
-      case 'sightseeing':
-        iconData = Icons.photo_camera;
-        iconColor = Colors.teal;
-        break;
-      default:
-        iconData = Icons.event;
-        iconColor = Colors.grey;
-    }
+    final iconData = _getIconData();
+    final iconColor = _getIconColor();
 
     return Container(
       width: 40,
@@ -270,6 +244,48 @@ class _CategoryIcon extends StatelessWidget {
       ),
       child: Icon(iconData, color: iconColor),
     );
+  }
+
+  IconData _getIconData() {
+    switch (category.toLowerCase()) {
+      case 'food':
+      case 'restaurant':
+        return Icons.restaurant;
+      case 'transport':
+      case 'travel':
+        return Icons.directions_car;
+      case 'accommodation':
+      case 'hotel':
+        return Icons.hotel;
+      case 'activity':
+      case 'entertainment':
+        return Icons.local_activity;
+      case 'sightseeing':
+        return Icons.photo_camera;
+      default:
+        return Icons.event;
+    }
+  }
+
+  Color _getIconColor() {
+    switch (category.toLowerCase()) {
+      case 'food':
+      case 'restaurant':
+        return Colors.orange;
+      case 'transport':
+      case 'travel':
+        return Colors.blue;
+      case 'accommodation':
+      case 'hotel':
+        return Colors.purple;
+      case 'activity':
+      case 'entertainment':
+        return Colors.green;
+      case 'sightseeing':
+        return Colors.teal;
+      default:
+        return Colors.grey;
+    }
   }
 }
 
