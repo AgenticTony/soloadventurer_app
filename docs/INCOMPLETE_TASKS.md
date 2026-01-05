@@ -163,42 +163,58 @@ Safety check-in and location sharing features have been merged, combining offlin
 
 ### TODO: Fix Data Layer Type Mismatches
 
-**Location:** `lib/features/safety/data/datasources/mock_safety_remote_data_source.dart`
+**Status:** PARTIALLY FIXED - Mock data source fixed, but architectural issue remains
+
+**Location:** Multiple model files in `lib/features/safety/data/models/`
 
 **Problems:**
 
-1. **Entity/Model Confusion**:
-   ```dart
-   // WRONG: Returns entity when model expected
-   Future<TrustedContactModel> updateTrustedContact(...)
-     => TrustedContact(...); // Should be TrustedContactModel
+1. **ARCHITECTURAL ISSUE - Models Extending Freezed Entities**:
+   - Models like `CheckInModel`, `TrustedContactModel`, `LocationUpdateModel`, etc. try to extend freezed entities
+   - Freezed entities only have factory constructors, so they cannot be extended
+   - This causes errors like:
+     ```
+     The class 'CheckInModel' can't extend 'CheckIn' because 'CheckIn' only has factory constructors
+     ```
 
-   // WRONG: Returns entity when model expected
-   Future<CheckInModel> completeCheckIn(...)
-     => CheckIn(...); // Should be CheckInModel
-   ```
+2. **Mock Data Source - FIXED** ✅:
+   - Fixed all incorrect field names (`contactSource` → `source`, `alertType` → `type`)
+   - Fixed enum values (`CheckInTriggerType.scheduled` → `CheckInTriggerType.scheduledTime`)
+   - Fixed enum values (`LocationSharingStatus.stopped` → `LocationSharingStatus.ended`)
+   - Wrapped `copyWith` results with `Model.fromEntity()` where needed
+   - Added missing required parameters (`timestamp` for SafetyStatusModel, etc.)
 
-2. **Missing Required Parameters**:
-   - `addedAt`, `permission`, `source` missing in TrustedContactModel constructor
-   - `latitude`, `longitude` missing in LocationUpdateLocation constructor
+**Root Cause:**
 
-3. **Enum Naming Issues**:
-   - Looking for `CheckInTriggerType.scheduled` (doesn't exist)
-   - Looking for `LocationSharingStatus.stopped` (doesn't exist)
+The safety feature uses an invalid pattern where:
+```dart
+// WRONG - Can't extend freezed entities
+class CheckInModel extends CheckIn {
+  const CheckInModel({required super.id, ...});
+}
+```
 
-**Required Fix:**
+Freezed generates immutable classes with only factory constructors, so they cannot be extended with generative constructors.
 
-1. Update all data source methods to return models, not entities:
-   - Convert entities to models before returning
-   - Or change repository interfaces to accept entities
+**Required Fix (Architecture Decision Needed):**
 
-2. Fix constructor calls with missing required parameters:
-   - Add all required fields to model constructors
-   - Check entity/model definitions for correct field names
+**Option 1 - Remove Models, Use Entities Directly**:
+- Delete all model classes
+- Use freezed entities everywhere
+- Add `toJson`/`fromJson` directly to entities via freezed's `@JsonSerializable`
+- Simpler, less boilerplate
 
-3. Fix enum constant references:
-   - Check actual enum definitions in domain/entities/
-   - Update to use correct enum values
+**Option 2 - Change Models to Composition**:
+- Models don't extend entities, they contain them
+- Add conversion methods
+- More separation between layers
+
+**Option 3 - Don't Use Freezed for Entities**:
+- Convert entities to regular classes
+- Lose freezed benefits (copyWith, equality, pattern matching)
+- More code to maintain
+
+**Recommendation:** Option 1 - Use freezed entities directly with JSON serialization. This is the standard Flutter/Dart pattern and eliminates the need for separate model classes.
 
 ### TODO: Fix Integration Tests
 

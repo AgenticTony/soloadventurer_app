@@ -86,12 +86,16 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       name: contact.name,
       email: contact.email,
       phoneNumber: contact.phoneNumber,
-      contactSource: contact.contactSource,
-      receivesCheckInNotifications: contact.receivesCheckInNotifications,
+      source: contact.source,
+      communityUserId: contact.communityUserId,
+      permission: contact.permission,
+      locationSharingEnabled: contact.locationSharingEnabled,
+      receivesCheckIns: contact.receivesCheckIns,
       receivesEmergencyAlerts: contact.receivesEmergencyAlerts,
-      receivesLocationUpdates: contact.receivesLocationUpdates,
-      createdAt: DateTime.now(),
+      addedAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      revokedAt: contact.revokedAt,
+      notes: contact.notes,
     );
 
     _trustedContacts[newContact.id] = newContact;
@@ -122,7 +126,9 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const TrustedContactNotFoundException();
     }
 
-    final updatedContact = contact.copyWith(updatedAt: DateTime.now());
+    final updatedContact = TrustedContactModel.fromEntity(
+      contact.copyWith(updatedAt: DateTime.now()),
+    );
     _trustedContacts[contact.id] = updatedContact;
     debugPrint('Mock: Updated trusted contact ${contact.id}');
     return updatedContact;
@@ -195,12 +201,15 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const CheckInAlreadyCompletedException();
     }
 
-    final completedCheckIn = checkIn.copyWith(
-      status: CheckInStatus.completed,
-      location: location,
-      statusMessage: statusMessage ?? checkIn.statusMessage,
-      completedAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+    final locationModel = CheckInLocationModel.fromEntity(location);
+    final completedCheckIn = CheckInModel.fromEntity(
+      checkIn.copyWith(
+        status: CheckInStatus.completed,
+        location: locationModel,
+        statusMessage: statusMessage ?? checkIn.statusMessage,
+        completedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
     );
 
     _checkIns[checkInId] = completedCheckIn;
@@ -228,16 +237,20 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       );
     }
 
+    final locationModel = location != null
+        ? CheckInLocationModel.fromEntity(location)
+        : null;
+
     final checkIn = CheckInModel(
       id: _generateId(),
       userId: userId,
       scheduledTime: scheduledTime,
       deadline: deadline,
-      location: location,
+      location: locationModel,
       status: CheckInStatus.scheduled,
       statusMessage: statusMessage,
-      triggerType: triggerType ?? CheckInTriggerType.scheduled,
-      notifyContactIds: notifyContactIds,
+      triggerType: triggerType ?? CheckInTriggerType.scheduledTime,
+      notifyContactIds: notifyContactIds ?? const [],
       tripId: tripId,
       completedAt: null,
       createdAt: DateTime.now(),
@@ -275,9 +288,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     return _checkIns.values
         .where((checkIn) =>
             checkIn.status == CheckInStatus.scheduled &&
-            checkIn.scheduledTime.isAfter(DateTime.now()))
+            checkIn.scheduledTime != null &&
+            checkIn.scheduledTime!.isAfter(DateTime.now()))
         .toList()
-      ..sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
+      ..sort((a, b) => a.scheduledTime!.compareTo(b.scheduledTime!));
   }
 
   @override
@@ -326,9 +340,11 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const CheckInNotFoundException();
     }
 
-    final updatedCheckIn = checkIn.copyWith(
-      status: status,
-      updatedAt: DateTime.now(),
+    final updatedCheckIn = CheckInModel.fromEntity(
+      checkIn.copyWith(
+        status: status,
+        updatedAt: DateTime.now(),
+      ),
     );
 
     _checkIns[checkInId] = updatedCheckIn;
@@ -366,25 +382,20 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     final locationUpdate = LocationUpdateModel(
       id: _generateId(),
       userId: 'mock-user-id',
-      location: LocationUpdateLocation(
-        latitude: latitude,
-        longitude: longitude,
-        accuracy: accuracy,
-        altitude: altitude,
-        speed: speed,
-        heading: heading,
-        timestamp: DateTime.now(),
-      ),
+      latitude: latitude,
+      longitude: longitude,
+      accuracy: accuracy,
+      altitude: altitude,
+      speed: speed,
+      heading: heading,
       address: address,
       placeName: placeName,
       sharedWithContactIds: shareWithContactIds,
       sharingStatus: LocationSharingStatus.active,
       batteryLevel: batteryLevel,
-      isEmergencyShare: isEmergency,
+      isEmergency: isEmergency,
       emergencyAlertId: emergencyAlertId,
       checkInId: checkInId,
-      startedAt: DateTime.now(),
-      expiresAt: DateTime.now().add(const Duration(hours: 24)),
       createdAt: DateTime.now(),
     );
 
@@ -403,8 +414,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       if (update.sharingStatus == LocationSharingStatus.active &&
           update.sharedWithContactIds
               .any((contactId) => contactIds.contains(contactId))) {
-        _locationUpdates[id] = update.copyWith(
-          sharingStatus: LocationSharingStatus.stopped,
+        _locationUpdates[id] = LocationUpdateModel.fromEntity(
+          update.copyWith(
+            sharingStatus: LocationSharingStatus.ended,
+          ),
         );
       }
     });
@@ -420,8 +433,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     // Stop all active location shares
     _locationUpdates.forEach((id, update) {
       if (update.sharingStatus == LocationSharingStatus.active) {
-        _locationUpdates[id] = update.copyWith(
-          sharingStatus: LocationSharingStatus.stopped,
+        _locationUpdates[id] = LocationUpdateModel.fromEntity(
+          update.copyWith(
+            sharingStatus: LocationSharingStatus.ended,
+          ),
         );
       }
     });
@@ -437,7 +452,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     return _locationUpdates.values
         .where((update) => update.sharingStatus == LocationSharingStatus.active)
         .toList()
-      ..sort((a, b) => b.startedAt.compareTo(a.startedAt));
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   @override
@@ -476,9 +491,11 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     final contact = _trustedContacts[contactId]!;
-    _trustedContacts[contactId] = contact.copyWith(
-      receivesLocationUpdates: enabled,
-      updatedAt: DateTime.now(),
+    _trustedContacts[contactId] = TrustedContactModel.fromEntity(
+      contact.copyWith(
+        locationSharingEnabled: enabled,
+        updatedAt: DateTime.now(),
+      ),
     );
 
     debugPrint('Mock: Updated location sharing permission for $contactId');
@@ -501,8 +518,9 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     // Check if there's already an active emergency alert
     final hasActiveSOS = _safetyAlerts.values.any(
       (alert) =>
-          alert.alertType == SafetyAlertType.emergencySOS &&
-          alert.status == SafetyAlertStatus.active,
+          alert.type == SafetyAlertType.emergencySOS &&
+          (alert.status == SafetyAlertStatus.sent ||
+           alert.status == SafetyAlertStatus.acknowledged),
     );
 
     if (hasActiveSOS) {
@@ -516,16 +534,16 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     final alert = SafetyAlertModel(
       id: _generateId(),
       userId: userId,
-      alertType: SafetyAlertType.emergencySOS,
-      status: SafetyAlertStatus.active,
+      type: SafetyAlertType.emergencySOS,
+      status: SafetyAlertStatus.sent,
       location: location,
       message: message,
       notifiedContactIds: notifyContactIds,
-      acknowledgedByContactIds: [],
-      batteryLevel: batteryLevel,
+      acknowledgedByContactIds: const [],
       triggeredAt: DateTime.now(),
+      batteryLevel: batteryLevel,
       resolvedAt: null,
-      canceledAt: null,
+      cancelledAt: null,
       tripId: tripId,
       checkInId: null,
       createdAt: DateTime.now(),
@@ -556,9 +574,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       message: message,
       location: location,
       batteryLevel: batteryLevel,
+      timestamp: DateTime.now(),
+      updatedAt: DateTime.now(),
       safetyAlertId: safetyAlertId,
       checkInId: checkInId,
-      updatedAt: DateTime.now(),
     );
 
     _currentSafetyStatus = safetyStatus;
@@ -577,6 +596,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
         id: _generateId(),
         userId: 'mock-user-id',
         status: SafetyStatusType.safe,
+        timestamp: DateTime.now(),
         updatedAt: DateTime.now(),
       );
     }
@@ -628,7 +648,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     var alerts = _safetyAlerts.values.toList();
 
     if (type != null) {
-      alerts = alerts.where((alert) => alert.alertType == type).toList();
+      alerts = alerts.where((alert) => alert.type == type).toList();
     }
 
     alerts.sort((a, b) => b.triggeredAt.compareTo(a.triggeredAt));
@@ -645,7 +665,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const SafetyAlertNotFoundException();
     }
 
-    if (alert.status != SafetyAlertStatus.active) {
+    if (alert.status == SafetyAlertStatus.resolved ||
+        alert.status == SafetyAlertStatus.cancelled) {
       throw const SafetyAlertAlreadyAcknowledgedException();
     }
 
@@ -655,9 +676,12 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     acknowledgedBy.add(contactId);
-    _safetyAlerts[alertId] = alert.copyWith(
-      acknowledgedByContactIds: acknowledgedBy,
-      updatedAt: DateTime.now(),
+    _safetyAlerts[alertId] = SafetyAlertModel.fromEntity(
+      alert.copyWith(
+        acknowledgedByContactIds: acknowledgedBy,
+        status: SafetyAlertStatus.acknowledged,
+        updatedAt: DateTime.now(),
+      ),
     );
 
     debugPrint('Mock: Acknowledged safety alert $alertId by contact $contactId');
@@ -677,10 +701,12 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const SafetyAlertAlreadyResolvedException();
     }
 
-    _safetyAlerts[alertId] = alert.copyWith(
-      status: SafetyAlertStatus.resolved,
-      resolvedAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+    _safetyAlerts[alertId] = SafetyAlertModel.fromEntity(
+      alert.copyWith(
+        status: SafetyAlertStatus.resolved,
+        resolvedAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
     );
 
     debugPrint('Mock: Resolved safety alert $alertId');
@@ -696,14 +722,17 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const SafetyAlertNotFoundException();
     }
 
-    if (alert.status != SafetyAlertStatus.active) {
+    if (alert.status == SafetyAlertStatus.resolved ||
+        alert.status == SafetyAlertStatus.cancelled) {
       throw const SafetyAlertAlreadyResolvedException();
     }
 
-    _safetyAlerts[alertId] = alert.copyWith(
-      status: SafetyAlertStatus.canceled,
-      canceledAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+    _safetyAlerts[alertId] = SafetyAlertModel.fromEntity(
+      alert.copyWith(
+        status: SafetyAlertStatus.cancelled,
+        cancelledAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
     );
 
     debugPrint('Mock: Canceled safety alert $alertId');
@@ -715,7 +744,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     _checkOffline();
 
     return _safetyAlerts.values
-        .where((alert) => alert.alertType == SafetyAlertType.missedCheckIn)
+        .where((alert) => alert.type == SafetyAlertType.missedCheckIn)
         .toList()
       ..sort((a, b) => b.triggeredAt.compareTo(a.triggeredAt));
   }
@@ -761,10 +790,12 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const TrustedContactNotFoundException();
     }
 
-    _trustedContacts[contactId] = contact.copyWith(
-      receivesCheckInNotifications: receivesCheckIns,
-      receivesEmergencyAlerts: receivesEmergencyAlerts,
-      updatedAt: DateTime.now(),
+    _trustedContacts[contactId] = TrustedContactModel.fromEntity(
+      contact.copyWith(
+        receivesCheckIns: receivesCheckIns,
+        receivesEmergencyAlerts: receivesEmergencyAlerts,
+        updatedAt: DateTime.now(),
+      ),
     );
 
     debugPrint('Mock: Updated notification preferences for $contactId');
