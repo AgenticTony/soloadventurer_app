@@ -1,0 +1,23 @@
+query GetUpcomingCheckIns {
+  getUpcomingCheckIns {
+    id
+    userId
+    scheduledTime
+    deadline
+    location {
+      latitude
+      longitude
+      accuracy
+      altitude
+      timestamp
+      address
+      placeName
+    }
+    status
+    statusMessage
+    triggerType
+    completedAt
+    createdAt
+    updatedAt
+  }
+}

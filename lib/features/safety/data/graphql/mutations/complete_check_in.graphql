@@ -1,0 +1,31 @@
+mutation CompleteCheckIn(
+  $checkInId: ID!
+  $location: LocationInput!
+  $statusMessage: String
+) {
+  completeCheckIn(
+    checkInId: $checkInId
+    location: $location
+    statusMessage: $statusMessage
+  ) {
+    id
+    userId
+    scheduledTime
+    deadline
+    location {
+      latitude
+      longitude
+      accuracy
+      altitude
+      timestamp
+      address
+      placeName
+    }
+    status
+    statusMessage
+    triggerType
+    completedAt
+    createdAt
+    updatedAt
+  }
+}

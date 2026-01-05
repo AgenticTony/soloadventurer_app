@@ -3,6 +3,7 @@ import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dar
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
 import 'package:flutter/material.dart';
 import '../../domain/services/token_manager.dart';
 
@@ -285,6 +286,75 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
     final previousRequest = state.history[state.history.length - 2];
     navigateTo(previousRequest.route, arguments: previousRequest.arguments);
+  }
+
+  // Safety feature navigation methods
+
+  /// Navigate to safety hub screen
+  void navigateToSafetyHub() {
+    navigateTo(SafetyRoutes.safetyHub);
+  }
+
+  /// Navigate to trusted contacts screen
+  void navigateToTrustedContacts() {
+    navigateTo(SafetyRoutes.trustedContacts);
+  }
+
+  /// Navigate to add trusted contact screen
+  void navigateToAddTrustedContact() {
+    navigateTo(SafetyRoutes.addEditTrustedContact);
+  }
+
+  /// Navigate to edit trusted contact screen
+  void navigateToEditTrustedContact(dynamic contact) {
+    navigateTo(
+      SafetyRoutes.editTrustedContact,
+      arguments: {'contact': contact},
+    );
+  }
+
+  /// Navigate to check-in home screen
+  void navigateToCheckInHome() {
+    navigateTo(SafetyRoutes.checkInHome);
+  }
+
+  /// Navigate to manual check-in screen
+  void navigateToManualCheckIn({dynamic checkIn}) {
+    navigateTo(
+      SafetyRoutes.manualCheckIn,
+      arguments: {'checkIn': checkIn},
+    );
+  }
+
+  /// Navigate to schedule check-in screen
+  void navigateToScheduleCheckIn({String? tripId}) {
+    navigateTo(
+      SafetyRoutes.scheduleCheckIn,
+      arguments: {'tripId': tripId},
+    );
+  }
+
+  /// Navigate to check-in history screen
+  void navigateToCheckInHistory() {
+    navigateTo(SafetyRoutes.checkInHistory);
+  }
+
+  /// Navigate to emergency SOS screen
+  void navigateToEmergencySOS() {
+    navigateTo(SafetyRoutes.emergencySOS);
+  }
+
+  /// Navigate to status update screen
+  void navigateToStatusUpdate({String? initialStatus}) {
+    navigateTo(
+      SafetyRoutes.statusUpdate,
+      arguments: {'initialStatus': initialStatus},
+    );
+  }
+
+  /// Navigate to location sharing screen
+  void navigateToLocationSharing() {
+    navigateTo(SafetyRoutes.locationSharing);
   }
 }
 
