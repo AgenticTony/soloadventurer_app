@@ -133,21 +133,83 @@ No user notifications when sync operations complete/fail.
 ## 004: Safety Check-in & Location Sharing
 
 **Branch:** `auto-claude/004-safety-check-in-location-sharing`
-**Status:** Syntax errors prevent build
+**Status:** ✅ Merged to main (2026-01-05)
+**Merge Commit:** `9f9adde`
+**Implementation Status:** ~70% Complete
 
-### Issues
+### Overview
 
-**Syntax Errors:**
-- `lib/features/safety/presentation/screens/check_in_home_screen.dart:121:46`
-- `lib/features/safety/presentation/screens/location_sharing_screen.dart:108:38`
+Safety check-in and location sharing features have been merged, combining offline sync indicators with safety functionality. Core UI and navigation are complete, but data layer has type mismatches that need fixing.
 
-**Root Cause:** Missing closing braces `}`
+### Completed Features ✅
+
+1. **UI Components**: All safety screens and widgets merged
+   - Safety Hub, Check-In Home, Emergency SOS
+   - Location Sharing, Trusted Contacts screens
+   - Quick SOS button on home screen
+
+2. **Navigation**: Routes integrated with app router
+   - Safety routes (`/safety/*`) properly configured
+   - Navigation providers updated
+
+3. **Platform Permissions**: Android and iOS configured
+   - Location permissions (fine, coarse, background)
+   - Background modes for location tracking
+   - Notification permissions
+
+4. **Home Screen**: Merged offline banners with safety cards
+   - OfflineBanner and SyncStatusBanner from 001
+   - Safety Hub, Check-In, Emergency cards from 004
+
+### TODO: Fix Data Layer Type Mismatches
+
+**Location:** `lib/features/safety/data/datasources/mock_safety_remote_data_source.dart`
+
+**Problems:**
+
+1. **Entity/Model Confusion**:
+   ```dart
+   // WRONG: Returns entity when model expected
+   Future<TrustedContactModel> updateTrustedContact(...)
+     => TrustedContact(...); // Should be TrustedContactModel
+
+   // WRONG: Returns entity when model expected
+   Future<CheckInModel> completeCheckIn(...)
+     => CheckIn(...); // Should be CheckInModel
+   ```
+
+2. **Missing Required Parameters**:
+   - `addedAt`, `permission`, `source` missing in TrustedContactModel constructor
+   - `latitude`, `longitude` missing in LocationUpdateLocation constructor
+
+3. **Enum Naming Issues**:
+   - Looking for `CheckInTriggerType.scheduled` (doesn't exist)
+   - Looking for `LocationSharingStatus.stopped` (doesn't exist)
 
 **Required Fix:**
-1. Check lines 121 in check_in_home_screen.dart
-2. Check line 108 in location_sharing_screen.dart
-3. Add missing closing braces
-4. Run `flutter analyze` to verify
+
+1. Update all data source methods to return models, not entities:
+   - Convert entities to models before returning
+   - Or change repository interfaces to accept entities
+
+2. Fix constructor calls with missing required parameters:
+   - Add all required fields to model constructors
+   - Check entity/model definitions for correct field names
+
+3. Fix enum constant references:
+   - Check actual enum definitions in domain/entities/
+   - Update to use correct enum values
+
+### TODO: Fix Integration Tests
+
+**Location:** `integration_test/features/safety/safety_flow_test.dart`
+
+**Issues:**
+- Missing test helpers (`safety_test_helpers.dart`)
+- API parameter mismatches
+- Provider conflicts
+
+**Status:** Non-blocking - can be fixed after data layer works
 
 ---
 
@@ -170,22 +232,36 @@ No user notifications when sync operations complete/fail.
 
 ## General Tasks
 
-### Task 1: Run Build Runner
+### Task 1: Fix Safety Data Layer Type Mismatches
 
-**Blocker:** Worktrees with syntax errors
+**Location:** `lib/features/safety/data/datasources/mock_safety_remote_data_source.dart`
 
 **Required:**
-1. Fix syntax errors in worktrees 004 and 008
-2. Ensure `build.yaml` excludes worktrees (already configured)
+1. Update data source methods to return models instead of entities
+2. Fix missing required parameters in model constructors
+3. Fix enum constant references
+4. Run `flutter analyze` to verify no errors
+
+### Task 2: Run Build Runner
+
+**Blocker:** Data layer errors must be fixed first
+
+**Required:**
+1. Fix safety data layer type mismatches
+2. Fix dependency in worktree 008
 3. Run `dart run build_runner build --delete-conflicting-outputs`
 4. Verify all `.g.dart` files generated
 
-### Task 2: Clean up macOS Resource Files
+### Task 3: Clean up macOS Resource Files
 
-**Issue:** `._*` files keep appearing (macOS resource forks)
+**Status:** Ongoing issue
 
-**Required:**
-1. Consider adding to `.gitignore`:
+**Current:**
+- `._*` files keep appearing (macOS resource forks)
+- Already added `.worktrees/` to `.gitignore`
+
+**Recommended:**
+1. Add to `.gitignore`:
    ```
    ._*
    .DS_Store
@@ -194,22 +270,20 @@ No user notifications when sync operations complete/fail.
    ```
 2. Add pre-commit hook to clean these files
 
-### Task 3: Git Remote Repository
+### Task 4: Git Remote Repository
 
 **Issue:** Repository `PhoenixTiger007/SoloAdventurer_app` doesn't exist on GitHub
 
 **Required:**
 1. Create repository on GitHub OR
 2. Update remote URL to correct repository
-3. Push 121 local commits
+3. Push local commits
 
 ---
 
 ## Testing Checklist
 
-Once all TODOs complete:
-
-### Offline Functionality
+### Offline Functionality (001)
 - [ ] Create entity while offline
 - [ ] Verify queued in sync queue
 - [ ] Verify local database updated
@@ -217,12 +291,14 @@ Once all TODOs complete:
 - [ ] Verify conflict resolution works
 
 ### Safety Features (004)
+- [ ] Fix data layer type mismatches
 - [ ] Create check-in while offline
 - [ ] Trigger SOS while offline
 - [ ] Share location while offline
 - [ ] Verify location updates sync when online
 
 ### Media Features (008)
+- [ ] Fix invalid dependency
 - [ ] Add photo to journal while offline
 - [ ] Verify EXIF data extracted
 - [ ] Verify photo syncs when online
@@ -231,24 +307,26 @@ Once all TODOs complete:
 
 ## Worktree Status
 
-| Worktree | Status | Blocker |
-|----------|--------|---------|
-| 001 - Offline-First | Merged, 75% complete | Hardcoded userIds, missing repositories |
-| 004 - Safety | Not merged | Syntax errors |
-| 008 - Travel Journal | Not merged | Invalid dependency |
+| Worktree | Status | Completion |
+|----------|--------|------------|
+| 001 - Offline-First | Merged | ~75% - userIds fixed, missing repos |
+| 004 - Safety | Merged | ~70% - UI complete, data layer broken |
+| 008 - Travel Journal | Not merged | Blocked by invalid dependency |
+| 002-003, 005-007, 009-012 | Not started | - |
 
 ---
 
 ## Recommended Implementation Order
 
-1. **Fix syntax errors in worktree 004** (quick win)
-2. **Fix dependency in worktree 008** (quick win)
-3. **Run build_runner** (unblocks all)
-4. ~~**Complete offline TODO 1** (hardcoded userIds)~~ ✅ **COMPLETED**
-5. **Complete offline TODO 3** (notifications - nice to have)
-6. **Complete offline TODO 2** (offline-aware repositories - complex)
-7. **Test all features**
-8. **Merge remaining worktrees**
+1. ~~**Fix syntax errors in worktree 004**~~ ✅ **COMPLETED**
+2. ~~**Fix hardcoded userIds in 001**~~ ✅ **COMPLETED**
+3. **Fix data layer type mismatches in 004** (HIGH PRIORITY)
+4. **Fix dependency in worktree 008** (quick win)
+5. **Run build_runner** (unlocks all generated code)
+6. **Complete offline TODO 3** (notifications - nice to have)
+7. **Complete offline TODO 2** (offline-aware repositories - complex)
+8. **Test all features**
+9. **Fix and merge remaining worktrees**
 
 ---
 
@@ -271,8 +349,11 @@ Once all TODOs complete:
 | 2026-01-04 | 001 | Registered OfflineInterceptor | ✅ Complete |
 | 2026-01-04 | 001 | Documented remaining TODOs | ✅ Complete |
 | 2026-01-04 | 001 | Fix hardcoded userIds | ✅ Complete |
+| 2026-01-05 | 004 | Fixed syntax errors in screens | ✅ Complete |
+| 2026-01-05 | 004 | Merged to main | ✅ Complete |
+| 2026-01-05 | 004 | Documented data layer issues | ✅ Complete |
+| Pending | 004 | Fix data layer type mismatches | ⏳ TODO |
 | Pending | 001 | Implement offline-aware repos | ⏳ TODO |
 | Pending | 001 | Implement sync notifications | ⏳ TODO |
-| Pending | 004 | Fix syntax errors | ⏳ TODO |
 | Pending | 008 | Fix dependency | ⏳ TODO |
 | Pending | All | Run build_runner | ⏳ Blocked |
