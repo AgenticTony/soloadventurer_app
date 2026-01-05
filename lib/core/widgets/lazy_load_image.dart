@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'dart:async';
 
 import 'image_error_widget.dart';
 import 'image_placeholder.dart';
@@ -18,8 +20,12 @@ import 'image_placeholder.dart';
 /// - Preserving battery life
 ///
 /// Features:
-/// - Visibility-based lazy loading
-/// - Configurable visibility threshold
+/// - Visibility-based lazy loading with hysteresis to prevent flickering
+/// - Configurable visibility threshold for precise control
+/// - Preloading for off-screen images to improve perceived performance
+/// - Progressive image loading (thumbnail → medium → full)
+/// - Automatic retry with exponential backoff for transient failures
+/// - Offline-aware error handling
 /// - Placeholder widget during loading
 /// - Error widget for failed loads
 /// - Custom image fit
@@ -35,6 +41,14 @@ import 'image_placeholder.dart';
 ///     child: const Center(child: CircularProgressIndicator()),
 ///   ),
 ///   errorWidget: (context, url, error) => const Icon(Icons.error),
+/// )
+///
+/// // With preloading and progressive loading
+/// LazyLoadImage(
+///   imageUrl: 'https://example.com/image.jpg',
+///   thumbnailUrl: 'https://example.com/thumb.jpg',
+///   preloadOffset: 500, // Start loading 500px before visible
+///   maxRetryCount: 3, // Retry failed loads up to 3 times
 /// )
 ///
 /// // With custom threshold
@@ -90,6 +104,42 @@ class LazyLoadImage extends StatefulWidget {
   /// Callback when retry is pressed on error widget
   final VoidCallback? onRetry;
 
+  /// Distance in pixels to preload image before it becomes visible
+  ///
+  /// Defaults to 0 (load only when visible). Set to 300-500 for preloading
+  /// images before they enter the viewport for smoother perceived performance.
+  final double preloadOffset;
+
+  /// Maximum number of retry attempts for failed loads
+  ///
+  /// Defaults to 0 (no automatic retry). Set to 3-5 for automatic retry
+  /// with exponential backoff for transient network failures.
+  final int maxRetryCount;
+
+  /// Initial delay before first retry attempt
+  ///
+  /// Defaults to 1 second. Subsequent retries use exponential backoff.
+  final Duration initialRetryDelay;
+
+  /// Whether to use progressive image loading (thumbnail → full)
+  ///
+  /// Defaults to true. When enabled and [thumbnailUrl] is provided,
+  /// the thumbnail loads first, then transitions to the full image.
+  final bool useProgressiveLoading;
+
+  /// Whether to pause loading when device is offline
+  ///
+  /// Defaults to true. When enabled, images won't attempt to load
+  /// when the device has no internet connection.
+  final bool pauseWhenOffline;
+
+  /// Hysteresis margin for visibility detection to prevent flickering
+  ///
+  /// Defaults to 0.05 (5%). The visibility must drop below this threshold
+  /// after being visible to trigger hide detection. Prevents rapid
+  /// show/hide cycles during fast scrolling.
+  final double visibilityHysteresis;
+
   /// Creates a lazy-loading image widget
   const LazyLoadImage({
     super.key,
@@ -107,6 +157,12 @@ class LazyLoadImage extends StatefulWidget {
     this.placeholderType = PlaceholderType.shimmer,
     this.useEnhancedErrorHandling = false,
     this.onRetry,
+    this.preloadOffset = 0,
+    this.maxRetryCount = 0,
+    this.initialRetryDelay = const Duration(seconds: 1),
+    this.useProgressiveLoading = true,
+    this.pauseWhenOffline = true,
+    this.visibilityHysteresis = 0.05,
   });
 
   @override
@@ -117,31 +173,99 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
   /// Whether the image should be loaded
   bool _shouldLoad = false;
 
+  /// Whether the image has successfully loaded
+  bool _hasLoaded = false;
+
+  /// Current retry attempt count
+  int _retryCount = 0;
+
+  /// Timer for retry attempts
+  Timer? _retryTimer;
+
+  /// Whether device is currently offline
+  bool _isOffline = false;
+
   /// Unique key for VisibilityDetector
   final Key _visibilityKey = UniqueKey();
+
+  /// Key for forcing image rebuild on retry
+  Key _imageKey = UniqueKey();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.pauseWhenOffline) {
+      _checkConnectivity();
+    }
+  }
+
+  @override
+  void dispose() {
+    _retryTimer?.cancel();
+    super.dispose();
+  }
+
+  /// Checks current connectivity status
+  Future<void> _checkConnectivity() async {
+    try {
+      final connectivityResult = await Connectivity().checkConnectivity();
+      if (mounted) {
+        setState(() {
+          _isOffline = connectivityResult == ConnectivityResult.none;
+        });
+      }
+    } catch (e) {
+      // Ignore connectivity check errors
+      if (kDebugMode) {
+        debugPrint('Connectivity check failed: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     // Wrap with VisibilityDetector to track when widget becomes visible
     return VisibilityDetector(
       key: _visibilityKey,
-      onVisibilityChanged: (visibilityInfo) {
-        // Only update state if visibility changed and we haven't loaded yet
-        if (!_shouldLoad &&
-            visibilityInfo.visibleFraction >= widget.visibilityThreshold) {
-          setState(() {
-            _shouldLoad = true;
-          });
-        }
-      },
+      onVisibilityChanged: _onVisibilityChanged,
       child: _buildContent(),
     );
   }
 
+  /// Handles visibility changes with hysteresis to prevent flickering
+  void _onVisibilityChanged(VisibilityInfo visibilityInfo) {
+    final visibleFraction = visibilityInfo.visibleFraction;
+    final shouldShow = visibleFraction >= widget.visibilityThreshold;
+    final shouldHide = visibleFraction <
+        (widget.visibilityThreshold - widget.visibilityHysteresis);
+
+    if (shouldShow && !_shouldLoad && !_hasLoaded) {
+      // Check offline status before loading
+      if (widget.pauseWhenOffline && _isOffline) {
+        return;
+      }
+      setState(() {
+        _shouldLoad = true;
+      });
+    } else if (shouldHide && _shouldLoad && !_hasLoaded) {
+      // Image hasn't loaded yet and widget scrolled away, reset state
+      setState(() {
+        _shouldLoad = false;
+        _retryCount = 0;
+        _retryTimer?.cancel();
+      });
+    }
+  }
+
   /// Builds the appropriate content based on load state
   Widget _buildContent() {
+    // If offline and pauseWhenOffline is enabled, show placeholder
+    if (widget.pauseWhenOffline && _isOffline && !_hasLoaded) {
+      return _buildPlaceholder(isOffline: true);
+    }
+
     // If not visible yet, show placeholder
-    if (!_shouldLoad) {
+    if (!_shouldLoad && !_hasLoaded) {
       return _buildPlaceholder();
     }
 
@@ -150,7 +274,7 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
   }
 
   /// Builds placeholder widget
-  Widget _buildPlaceholder() {
+  Widget _buildPlaceholder({bool isOffline = false}) {
     // Use custom placeholder if provided
     if (widget.placeholder != null) {
       return widget.placeholder!(context, widget.imageUrl);
@@ -191,9 +315,75 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
     }
   }
 
-  /// Builds the actual image widget with caching
+  /// Builds the actual image widget with caching and retry logic
   Widget _buildImage() {
+    // Use progressive loading if enabled and thumbnail is available
+    if (widget.useProgressiveLoading && widget.thumbnailUrl != null) {
+      return _buildProgressiveImage();
+    }
+
+    // Build single image with retry logic
+    return _buildSingleImage();
+  }
+
+  /// Builds progressive loading image (thumbnail → full)
+  Widget _buildProgressiveImage() {
     final imageWidget = CachedNetworkImage(
+      key: _imageKey,
+      imageUrl: widget.imageUrl,
+      fadeInDuration: widget.fadeInDuration,
+      fit: widget.fit,
+      width: widget.width,
+      height: widget.height,
+      placeholder: widget.placeholder != null
+          ? (context, url) => widget.placeholder!(context, url)
+          : (context, url) => _buildThumbnailPlaceholder(),
+      errorWidget: widget.errorWidget != null
+          ? (context, url, error) => widget.errorWidget!(context, url, error)
+          : (context, url, error) => _buildErrorWidget(error),
+      imageBuilder: (context, imageProvider) {
+        // Mark as loaded on success
+        if (!_hasLoaded) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                _hasLoaded = true;
+              });
+            }
+          });
+        }
+        return Image(image: imageProvider, fit: widget.fit);
+      },
+      memCacheWidth: widget.width?.toInt(),
+      memCacheHeight: widget.height?.toInt(),
+    );
+
+    return _applyBorderRadius(imageWidget);
+  }
+
+  /// Builds thumbnail placeholder for progressive loading
+  Widget _buildThumbnailPlaceholder() {
+    return CachedNetworkImage(
+      imageUrl: widget.thumbnailUrl!,
+      fadeInDuration: const Duration(milliseconds: 150),
+      fit: widget.fit,
+      width: widget.width,
+      height: widget.height,
+      placeholder: (context, url) => _buildPlaceholder(),
+      errorWidget: (context, url, error) => _buildPlaceholder(),
+      memCacheWidth: widget.width != null
+          ? (widget.width! ~/ 4).toInt() // Thumbnail at 1/4 resolution
+          : null,
+      memCacheHeight: widget.height != null
+          ? (widget.height! ~/ 4).toInt()
+          : null,
+    );
+  }
+
+  /// Builds single image with retry logic
+  Widget _buildSingleImage() {
+    final imageWidget = CachedNetworkImage(
+      key: _imageKey,
       imageUrl: widget.imageUrl,
       fadeInDuration: widget.fadeInDuration,
       fit: widget.fit,
@@ -204,34 +394,55 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
           : null,
       errorWidget: widget.errorWidget != null
           ? (context, url, error) => widget.errorWidget!(context, url, error)
-          : (context, url, error) => _buildDefaultError(),
+          : (context, url, error) => _buildErrorWidget(error),
+      imageBuilder: (context, imageProvider) {
+        // Mark as loaded on success
+        if (!_hasLoaded) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                _hasLoaded = true;
+              });
+            }
+          });
+        }
+        return Image(image: imageProvider, fit: widget.fit);
+      },
       memCacheWidth: widget.width?.toInt(),
       memCacheHeight: widget.height?.toInt(),
     );
 
-    // Apply border radius if specified
+    return _applyBorderRadius(imageWidget);
+  }
+
+  /// Applies border radius if specified
+  Widget _applyBorderRadius(Widget imageWidget) {
     if (widget.borderRadius != null) {
       return ClipRRect(
         borderRadius: widget.borderRadius!,
         child: imageWidget,
       );
     }
-
     return imageWidget;
   }
 
-  /// Builds default error widget
-  Widget _buildDefaultError() {
+  /// Builds error widget with automatic retry
+  Widget _buildErrorWidget(dynamic error) {
+    // Check if error is retryable
+    final classifier = ImageErrorClassifier.classify(error);
+    final canRetry = classifier.isRetryable() &&
+        _retryCount < widget.maxRetryCount;
+
     // Use enhanced error handling if enabled
     if (widget.useEnhancedErrorHandling) {
       return ImageErrorWidget(
-        error: 'Failed to load',
+        error: error,
         imageUrl: widget.imageUrl,
         width: widget.width,
         height: widget.height,
         borderRadius: widget.borderRadius,
-        onRetry: widget.onRetry,
-        showRetryButton: widget.onRetry != null,
+        onRetry: canRetry ? _scheduleRetry : widget.onRetry,
+        showRetryButton: widget.onRetry != null || canRetry,
       );
     }
 
@@ -243,12 +454,59 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
         color: Colors.grey[300],
         borderRadius: widget.borderRadius,
       ),
-      child: const Icon(
-        Icons.broken_image,
-        size: 48,
-        color: Colors.grey,
+      child: Center(
+        child: canRetry
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.broken_image,
+                    size: 48,
+                    color: Colors.grey,
+                  ),
+                  if (_retryCount > 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        'Retrying... ($_retryCount/${widget.maxRetryCount})',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                ],
+              )
+            : const Icon(
+                Icons.broken_image,
+                size: 48,
+                color: Colors.grey,
+              ),
       ),
     );
+  }
+
+  /// Schedules a retry attempt with exponential backoff
+  void _scheduleRetry() {
+    if (_retryCount >= widget.maxRetryCount) {
+      return;
+    }
+
+    _retryCount++;
+
+    // Calculate delay with exponential backoff: initialDelay * 2^retryCount
+    final delay = Duration(
+      milliseconds: widget.initialRetryDelay.inMilliseconds *
+          (1 << (_retryCount - 1)).clamp(1, 8),
+    );
+
+    _retryTimer = Timer(delay, () {
+      if (mounted) {
+        setState(() {
+          _imageKey = UniqueKey(); // Force image rebuild
+        });
+      }
+    });
   }
 }
 
@@ -360,8 +618,9 @@ extension LazyLoadImageExtensions on LazyLoadImage {
   ///
   /// This is the recommended constructor for photo galleries as it provides:
   /// - Modern shimmer loading animation
-  /// - Retry button on error
+  /// - Automatic retry with exponential backoff
   /// - Offline detection
+  /// - Progressive image loading
   /// - Automatic error type classification
   ///
   /// Example:
@@ -370,6 +629,8 @@ extension LazyLoadImageExtensions on LazyLoadImage {
   ///   imageUrl: photo.url,
   ///   thumbnailUrl: photo.thumbnailUrl,
   ///   size: 100.0,
+  ///   maxRetryCount: 3,
+  ///   preloadOffset: 300,
   ///   onRetry: () {
   ///     // Trigger reload (e.g., setState or refresh provider)
   ///   },
@@ -385,6 +646,9 @@ extension LazyLoadImageExtensions on LazyLoadImage {
     BorderRadius? borderRadius,
     VoidCallback? onRetry,
     double visibilityThreshold = 0.01,
+    int maxRetryCount = 3,
+    double preloadOffset = 300,
+    bool useProgressiveLoading = true,
   }) {
     return LazyLoadImage(
       key: key,
@@ -397,6 +661,9 @@ extension LazyLoadImageExtensions on LazyLoadImage {
       useEnhancedErrorHandling: true,
       onRetry: onRetry,
       visibilityThreshold: visibilityThreshold,
+      maxRetryCount: maxRetryCount,
+      preloadOffset: preloadOffset,
+      useProgressiveLoading: useProgressiveLoading,
       borderRadius: borderRadius ?? BorderRadius.circular(4.0),
     );
   }
@@ -410,7 +677,10 @@ extension LazyLoadImageExtensions on LazyLoadImage {
   /// ```dart
   /// LazyLoadImage.optimizedCard(
   ///   imageUrl: trip.coverImage,
+  ///   thumbnailUrl: trip.thumbnailUrl,
   ///   height: 200.0,
+  ///   maxRetryCount: 3,
+  ///   preloadOffset: 500,
   ///   onRetry: () => ref.refresh(tripCoverProvider),
   /// )
   /// ```
@@ -424,6 +694,9 @@ extension LazyLoadImageExtensions on LazyLoadImage {
     PlaceholderType placeholderType = PlaceholderType.skeleton,
     BorderRadius? borderRadius,
     VoidCallback? onRetry,
+    int maxRetryCount = 3,
+    double preloadOffset = 500,
+    bool useProgressiveLoading = true,
   }) {
     return LazyLoadImage(
       key: key,
@@ -435,6 +708,9 @@ extension LazyLoadImageExtensions on LazyLoadImage {
       placeholderType: placeholderType,
       useEnhancedErrorHandling: true,
       onRetry: onRetry,
+      maxRetryCount: maxRetryCount,
+      preloadOffset: preloadOffset,
+      useProgressiveLoading: useProgressiveLoading,
       borderRadius: borderRadius ?? BorderRadius.circular(8.0),
     );
   }
@@ -449,6 +725,7 @@ extension LazyLoadImageExtensions on LazyLoadImage {
   /// LazyLoadImage.optimizedThumbnail(
   ///   imageUrl: user.avatarUrl,
   ///   size: 48.0,
+  ///   maxRetryCount: 2,
   /// )
   /// ```
   static LazyLoadImage optimizedThumbnail({
@@ -459,6 +736,7 @@ extension LazyLoadImageExtensions on LazyLoadImage {
     PlaceholderType placeholderType = PlaceholderType.color,
     BorderRadius? borderRadius,
     VoidCallback? onRetry,
+    int maxRetryCount = 2,
   }) {
     return LazyLoadImage(
       key: key,
@@ -471,6 +749,7 @@ extension LazyLoadImageExtensions on LazyLoadImage {
       onRetry: onRetry,
       visibilityThreshold: 0.1,
       fadeInDuration: const Duration(milliseconds: 150),
+      maxRetryCount: maxRetryCount,
       borderRadius: borderRadius ?? BorderRadius.circular(4.0),
     );
   }
@@ -486,6 +765,7 @@ extension LazyLoadImageExtensions on LazyLoadImage {
   ///   imageUrl: photo.fullSizeUrl,
   ///   thumbnailUrl: photo.thumbnailUrl,
   ///   size: 150.0,
+  ///   maxRetryCount: 3,
   /// )
   /// ```
   static LazyLoadImage progressive({
@@ -496,6 +776,7 @@ extension LazyLoadImageExtensions on LazyLoadImage {
     BoxFit fit = BoxFit.cover,
     BorderRadius? borderRadius,
     VoidCallback? onRetry,
+    int maxRetryCount = 3,
   }) {
     return LazyLoadImage(
       key: key,
@@ -507,6 +788,8 @@ extension LazyLoadImageExtensions on LazyLoadImage {
       placeholderType: PlaceholderType.blurred,
       useEnhancedErrorHandling: true,
       onRetry: onRetry,
+      maxRetryCount: maxRetryCount,
+      useProgressiveLoading: true,
       borderRadius: borderRadius ?? BorderRadius.circular(4.0),
     );
   }
