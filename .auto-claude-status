@@ -3,23 +3,23 @@
   "spec": "006-performance-optimization-for-large-trips",
   "state": "building",
   "subtasks": {
-    "completed": 24,
-    "total": 43,
+    "completed": 0,
+    "total": 31,
     "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "",
-    "id": 0,
-    "total": 0
+    "current": "UI List Performance",
+    "id": null,
+    "total": 4
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 27,
-    "started_at": "2026-01-04T19:31:34.576327"
+    "number": 10,
+    "started_at": "2026-01-05T12:48:43.006712"
   },
-  "last_update": "2026-01-04T22:04:38.736395"
+  "last_update": "2026-01-05T13:28:05.318485"
 }

@@ -12,6 +12,8 @@
 ///   rendering of large photo galleries (500+ items)
 /// - [InfiniteScrollListView]: A generic infinite scroll list with automatic
 ///   pagination for handling large datasets with efficient memory usage
+/// - [InfiniteScrollGridView]: A generic infinite scroll grid with automatic
+///   pagination for handling large photo galleries with efficient memory usage
 /// - [VirtualListPerformanceTracker]: A performance tracking wrapper that
 ///   monitors render times, memory usage, and frame rates for virtual lists
 /// - [LazyLoadImage]: A visibility-based lazy loading image widget that
@@ -55,6 +57,19 @@
 ///   itemCount: photos.length,
 ///   crossAxisCount: 3,
 ///   itemBuilder: (context, index) => ImageCard(photo: photos[index]),
+/// )
+///
+/// // Infinite scroll grid with pagination
+/// InfiniteScrollGridView<Photo>(
+///   crossAxisCount: 3,
+///   fetchData: (cursor) async {
+///     return await photoRepository.getPhotosCursor(
+///       tripId: 'trip123',
+///       cursor: cursor,
+///       pageSize: 20,
+///     );
+///   },
+///   itemBuilder: (context, photo) => PhotoGridItem(photo: photo),
 /// )
 ///
 /// // Optimized lazy loading image with shimmer placeholder

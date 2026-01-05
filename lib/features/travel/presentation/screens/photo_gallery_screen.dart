@@ -1,27 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/core/widgets/widgets.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
 import 'package:soloadventurer/features/travel/domain/models/photo.dart';
 
-/// Provider for photos data
+/// Screen displaying a photo gallery with infinite scroll pagination
 ///
-/// In a real implementation, this would fetch data from a repository
-/// For demonstration purposes, we're using a simple provider
-final photosProvider = Provider<List<Photo>>((ref) {
-  // This would normally come from a repository
-  return [];
-});
-
-/// Provider for loading state
-final photosLoadingProvider = Provider<bool>((ref) => false);
-
-/// Provider for error state
-final photosErrorProvider = Provider<bool>((ref) => false);
-
-/// Screen displaying a photo gallery with virtual scrolling grid
-///
-/// This screen demonstrates the use of [VirtualGridView] for efficiently
-/// rendering large photo galleries (500+ items) in a grid layout.
+/// This screen demonstrates the use of [InfiniteScrollGridView] for efficiently
+/// loading and rendering large photo galleries (500+ items) in a grid layout
+/// with automatic pagination as the user scrolls.
 class PhotoGalleryScreen extends ConsumerWidget {
   /// Creates a new [PhotoGalleryScreen]
   const PhotoGalleryScreen({super.key});
@@ -29,12 +16,61 @@ class PhotoGalleryScreen extends ConsumerWidget {
   /// Route name for navigation
   static const String routeName = '/trips/photos';
 
+  /// Fetches paginated photo data
+  ///
+  /// In a real implementation, this would call a repository method:
+  /// ```dart
+  /// return await ref.read(photoRepositoryProvider).getPhotosCursor(
+  ///   tripId: tripId,
+  ///   cursor: cursor,
+  ///   pageSize: 20,
+  /// );
+  /// ```
+  Future<PaginatedData<Photo>> _fetchPhotos(String? cursor) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Parse cursor (page number)
+    final page = cursor == null ? 1 : int.parse(cursor);
+    final itemsPerPage = 20;
+
+    // Generate mock photos
+    final photos = List.generate(
+      page == 5 ? 10 : itemsPerPage, // Last page has fewer items
+      (i) => Photo(
+        id: '${page}_$i',
+        imageUrl: 'https://picsum.photos/300/${page}_$i',
+        thumbnailUrl: 'https://picsum.photos/150/${page}_$i',
+        caption: i % 3 == 0 ? 'Photo caption ${(page - 1) * itemsPerPage + i + 1}' : null,
+        tripId: 'trip123',
+        location: i % 2 == 0 ? 'Location ${(page - 1) * itemsPerPage + i + 1}' : null,
+        latitude: i % 2 == 0 ? 40.7128 + (i * 0.01) : null,
+        longitude: i % 2 == 0 ? -74.0060 + (i * 0.01) : null,
+        takenAt: DateTime.now().subtract(Duration(days: i)),
+        width: 300,
+        height: 300,
+        sizeInBytes: 1024 * 100, // 100KB
+        createdAt: DateTime.now().subtract(Duration(days: i)),
+      ),
+    );
+
+    return PaginatedData(
+      items: photos,
+      pageInfo: PageInfo(
+        currentPage: page,
+        itemsPerPage: itemsPerPage,
+        totalItems: 90,
+        totalPages: 5,
+        hasNextPage: page < 5,
+        hasPreviousPage: page > 1,
+        nextCursor: page < 5 ? '$page' : null,
+        previousCursor: page > 1 ? '${page - 2}' : null,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final photos = ref.watch(photosProvider);
-    final isLoading = ref.watch(photosLoadingProvider);
-    final hasError = ref.watch(photosErrorProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Photo Gallery'),
@@ -74,32 +110,21 @@ class PhotoGalleryScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: VirtualGridView.photoGrid<Photo>(
-        itemCount: photos.length,
-        isLoading: isLoading,
-        hasError: hasError,
+      body: InfiniteScrollGridView<Photo>(
+        fetchData: _fetchPhotos,
+        itemBuilder: (context, photo) => _PhotoGridItem(
+          key: ValueKey(photo.id),
+          photo: photo,
+          onTap: () {
+            // Navigate to full-screen photo viewer
+          },
+        ),
         crossAxisCount: _getCrossAxisCount(context),
+        childAspectRatio: 1.0,
+        crossAxisSpacing: 4.0,
+        mainAxisSpacing: 4.0,
         padding: const EdgeInsets.all(4.0),
-        loadingWidget: const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorWidget: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              const Text('Failed to load photos'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  // Retry logic would go here
-                },
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+        // Custom empty state
         emptyWidget: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -115,16 +140,26 @@ class PhotoGalleryScreen extends ConsumerWidget {
             ],
           ),
         ),
-        itemBuilder: (context, index) {
-          final photo = photos[index];
-          return _PhotoGridItem(
-            key: ValueKey(photo.id),
-            photo: photo,
-            onTap: () {
-              // Navigate to full-screen photo viewer
-            },
-          );
-        },
+        // Custom error state
+        errorWidget: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text('Failed to load photos'),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  // Retry is handled automatically by InfiniteScrollGridView
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        // Load next page 300px before reaching end for faster perceived speed
+        preloadThreshold: 300.0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

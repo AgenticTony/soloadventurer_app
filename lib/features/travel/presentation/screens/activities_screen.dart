@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/core/widgets/widgets.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
 
 /// Model representing an activity in a trip
 class Activity {
@@ -25,25 +26,11 @@ class Activity {
   });
 }
 
-/// Provider for activities data
+/// Screen displaying a list of activities with infinite scroll pagination
 ///
-/// In a real implementation, this would fetch data from a repository
-/// For demonstration purposes, we're using a simple provider
-final activitiesProvider = Provider<List<Activity>>((ref) {
-  // This would normally come from a repository
-  return [];
-});
-
-/// Provider for loading state
-final activitiesLoadingProvider = Provider<bool>((ref) => false);
-
-/// Provider for error state
-final activitiesErrorProvider = Provider<bool>((ref) => false);
-
-/// Screen displaying a list of activities with virtual scrolling
-///
-/// This screen demonstrates the use of [VirtualListView] for efficiently
-/// rendering large lists of activities (500+ items).
+/// This screen demonstrates the use of [InfiniteScrollListView] for efficiently
+/// loading and rendering large lists of activities (500+ items) with automatic
+/// pagination as the user scrolls.
 class ActivitiesScreen extends ConsumerWidget {
   /// Creates a new [ActivitiesScreen]
   const ActivitiesScreen({super.key});
@@ -51,12 +38,56 @@ class ActivitiesScreen extends ConsumerWidget {
   /// Route name for navigation
   static const String routeName = '/trips/activities';
 
+  /// Fetches paginated activity data
+  ///
+  /// In a real implementation, this would call a repository method:
+  /// ```dart
+  /// return await ref.read(activityRepositoryProvider).getActivitiesCursor(
+  ///   tripId: tripId,
+  ///   cursor: cursor,
+  ///   pageSize: 20,
+  /// );
+  /// ```
+  Future<PaginatedData<Activity>> _fetchActivities(String? cursor) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    // Parse cursor (page number)
+    final page = cursor == null ? 1 : int.parse(cursor);
+    final itemsPerPage = 20;
+
+    // Generate mock activities
+    final activities = List.generate(
+      page == 5 ? 10 : itemsPerPage, // Last page has fewer items
+      (i) => Activity(
+        id: '${page}_$i',
+        title: 'Activity ${(page - 1) * itemsPerPage + i + 1}',
+        description: 'Description for activity ${(page - 1) * itemsPerPage + i + 1}',
+        startTime: DateTime.now().add(Duration(hours: i)),
+        endTime: DateTime.now().add(Duration(hours: i + 2)),
+        location: 'Location ${(page - 1) * itemsPerPage + i + 1}',
+        category: ['Food', 'Transport', 'Accommodation', 'Activity', 'Sightseeing'][i % 5],
+        estimatedCost: (i % 3 + 1) * 20.0,
+      ),
+    );
+
+    return PaginatedData(
+      items: activities,
+      pageInfo: PageInfo(
+        currentPage: page,
+        itemsPerPage: itemsPerPage,
+        totalItems: 90,
+        totalPages: 5,
+        hasNextPage: page < 5,
+        hasPreviousPage: page > 1,
+        nextCursor: page < 5 ? '$page' : null,
+        previousCursor: page > 1 ? '${page - 2}' : null,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activities = ref.watch(activitiesProvider);
-    final isLoading = ref.watch(activitiesLoadingProvider);
-    final hasError = ref.watch(activitiesErrorProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Activities'),
@@ -70,31 +101,20 @@ class ActivitiesScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: VirtualListView<Activity>(
-        itemCount: activities.length,
-        isLoading: isLoading,
-        hasError: hasError,
-        padding: const EdgeInsets.all(8.0),
-        loadingWidget: const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorWidget: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48, color: Colors.red),
-              const SizedBox(height: 16),
-              const Text('Failed to load activities'),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () {
-                  // Retry logic would go here
-                },
-                child: const Text('Retry'),
-              ),
-            ],
+      body: InfiniteScrollListView<Activity>(
+        fetchData: _fetchActivities,
+        itemBuilder: (context, activity) => OptimizedListItem(
+          child: _ActivityCard(
+            key: ValueKey(activity.id),
+            activity: activity,
+            onTap: () {
+              // Navigate to activity details
+            },
           ),
         ),
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        padding: const EdgeInsets.all(8.0),
+        // Custom empty state
         emptyWidget: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -110,18 +130,26 @@ class ActivitiesScreen extends ConsumerWidget {
             ],
           ),
         ),
-        itemBuilder: (context, index) {
-          final activity = activities[index];
-          return OptimizedListItem(
-            child: _ActivityCard(
-              key: ValueKey(activity.id),
-              activity: activity,
-              onTap: () {
-                // Navigate to activity details
-              },
-            ),
-          );
-        },
+        // Custom error state
+        errorWidget: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 48, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text('Failed to load activities'),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  // Retry is handled automatically by InfiniteScrollListView
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+        // Load next page 300px before reaching end for faster perceived speed
+        preloadThreshold: 300.0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

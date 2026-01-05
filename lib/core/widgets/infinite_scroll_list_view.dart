@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/paginated_data.dart';
 import '../utils/preloading_strategy.dart';
 import 'virtual_list_view.dart';
+import 'virtual_grid_view.dart';
 
 /// Pagination state for the infinite scroll list
 enum InfiniteScrollStatus {
@@ -421,6 +422,413 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
     return RefreshIndicator(
       onRefresh: _onRefresh,
       child: list,
+    );
+  }
+
+  /// Builds the footer widget (loading more or end of list)
+  Widget? _buildFooter() {
+    // If there's a custom footer, show it
+    if (widget.footer != null) {
+      return widget.footer;
+    }
+
+    // Show loading more indicator
+    if (_state.status == InfiniteScrollStatus.loadingMore) {
+      return widget.loadingMoreWidget ??
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(child: CircularProgressIndicator()),
+          );
+    }
+
+    // Show end of list indicator
+    if (_state.status == InfiniteScrollStatus.reachedEnd &&
+        _state.items.isNotEmpty) {
+      return widget.endOfListWidget ??
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Center(
+              child: Text(
+                'You\'ve reached the end',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+          );
+    }
+
+    return null;
+  }
+
+  /// Builds the default error widget
+  Widget _buildDefaultErrorWidget() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 16),
+            Text(
+              _state.errorMessage ?? 'An error occurred',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _retry,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A generic infinite scroll grid widget that automatically loads more data
+/// as the user scrolls towards the end.
+///
+/// This widget combines [VirtualGridView] for efficient rendering with
+/// automatic pagination logic, providing a complete solution for large
+/// photo galleries and other grid-based datasets (500+ items).
+///
+/// Features:
+/// - Automatic loading when scrolling near the end
+/// - Pull-to-refresh support
+/// - Loading and error states
+/// - Configurable preload threshold
+/// - Efficient virtual scrolling for memory management
+/// - Grid layout with configurable columns
+///
+/// Example:
+/// ```dart
+/// InfiniteScrollGridView<Photo>(
+///   crossAxisCount: 3,
+///   fetchData: (cursor) async {
+///     return await photoRepository.getPhotosCursor(
+///       tripId: 'trip123',
+///       cursor: cursor,
+///       pageSize: 20,
+///     );
+///   },
+///   itemBuilder: (context, photo) => PhotoGridItem(photo: photo),
+/// )
+/// ```
+class InfiniteScrollGridView<T> extends StatefulWidget {
+  /// Function to fetch paginated data
+  final PaginatedDataFetcher<T> fetchData;
+
+  /// Builds the widget for each item
+  final ItemWidgetBuilder<T> itemBuilder;
+
+  /// Optional separator builder between items (not commonly used in grids)
+  final NullableItemWidgetBuilder<T>? separatorBuilder;
+
+  /// Optional widget to display at the top of the grid
+  final Widget? header;
+
+  /// Optional widget to display at the bottom of the grid
+  final Widget? footer;
+
+  /// Optional widget to display when the grid is empty
+  final Widget? emptyWidget;
+
+  /// Optional custom widget for initial loading state
+  final Widget? initialLoadingWidget;
+
+  /// Optional custom widget for loading more indicator
+  final Widget? loadingMoreWidget;
+
+  /// Optional custom widget for error state
+  final Widget? errorWidget;
+
+  /// Optional custom widget for "end of list" indicator
+  final Widget? endOfListWidget;
+
+  /// Whether to enable pull-to-refresh
+  final bool enablePullToRefresh;
+
+  /// Distance from end (in pixels) to trigger loading next page
+  final double preloadThreshold;
+
+  /// Configuration for intelligent preloading
+  final PreloadConfig? preloadConfig;
+
+  /// Callback when preload metrics are updated
+  final void Function(PreloadMetrics)? onPreloadMetricsUpdated;
+
+  /// Padding around the grid
+  final EdgeInsets? padding;
+
+  /// Optional scroll controller
+  final ScrollController? controller;
+
+  /// Number of columns in the grid
+  final int crossAxisCount;
+
+  /// Aspect ratio of each grid item
+  final double childAspectRatio;
+
+  /// Spacing between columns
+  final double crossAxisSpacing;
+
+  /// Spacing between rows
+  final double mainAxisSpacing;
+
+  /// Optional key for the widget
+  final Key? key;
+
+  const InfiniteScrollGridView({
+    this.key,
+    required this.fetchData,
+    required this.itemBuilder,
+    this.separatorBuilder,
+    this.header,
+    this.footer,
+    this.emptyWidget,
+    this.initialLoadingWidget,
+    this.loadingMoreWidget,
+    this.errorWidget,
+    this.endOfListWidget,
+    this.enablePullToRefresh = true,
+    this.preloadThreshold = 500.0,
+    this.preloadConfig,
+    this.onPreloadMetricsUpdated,
+    this.padding,
+    this.controller,
+    required this.crossAxisCount,
+    this.childAspectRatio = 1.0,
+    this.crossAxisSpacing = 4.0,
+    this.mainAxisSpacing = 4.0,
+  }) : super(key: key);
+
+  @override
+  State<InfiniteScrollGridView<T>> createState() =>
+      _InfiniteScrollGridViewState<T>();
+}
+
+class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
+  late ScrollController _scrollController;
+  InfiniteScrollState<T> _state = const InfiniteScrollState();
+  bool _isLoadingNextPage = false;
+  late PreloadingManager _preloadingManager;
+  DateTime? _lastScrollUpdate;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = widget.controller ?? ScrollController();
+    _scrollController.addListener(_onScroll);
+    _preloadingManager = PreloadingManager(
+      config: widget.preloadConfig ?? PreloadConfig.defaultConfig,
+    );
+    _loadInitialData();
+  }
+
+  @override
+  void dispose() {
+    if (widget.controller == null) {
+      _scrollController.dispose();
+    } else {
+      _scrollController.removeListener(_onScroll);
+    }
+    super.dispose();
+  }
+
+  /// Loads the first page of data
+  Future<void> _loadInitialData() async {
+    if (_state.status == InfiniteScrollStatus.initialLoading) {
+      setState(() {
+        _state = _state.copyWith(
+          status: InfiniteScrollStatus.initialLoading,
+          items: [],
+          pageInfo: null,
+          errorMessage: null,
+        );
+      });
+    }
+
+    try {
+      final pageData = await widget.fetchData(null);
+
+      if (!mounted) return;
+
+      setState(() {
+        _state = _state.copyWith(
+          items: pageData.items,
+          pageInfo: pageData.pageInfo,
+          status: pageData.items.isEmpty
+              ? InfiniteScrollStatus.reachedEnd
+              : InfiniteScrollStatus.loaded,
+          errorMessage: null,
+        );
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _state = _state.copyWith(
+          status: InfiniteScrollStatus.error,
+          errorMessage: e.toString(),
+        );
+      });
+    }
+  }
+
+  /// Loads the next page of data
+  Future<void> _loadNextPage() async {
+    // Guard against multiple simultaneous loads
+    if (_isLoadingNextPage) return;
+    if (!_state.hasNextPage) return;
+    if (_state.isLoading) return;
+
+    final startTime = DateTime.now();
+    setState(() {
+      _state = _state.copyWith(status: InfiniteScrollStatus.loadingMore);
+      _isLoadingNextPage = true;
+    });
+
+    try {
+      final cursor = _state.pageInfo?.nextCursor;
+      final pageData = await widget.fetchData(cursor);
+
+      if (!mounted) return;
+
+      // Calculate load time
+      final loadTimeMs =
+          DateTime.now().difference(startTime).inMilliseconds;
+
+      // Record successful load
+      if (widget.preloadConfig != null) {
+        _preloadingManager.recordSuccessfulLoad(loadTimeMs);
+        widget.onPreloadMetricsUpdated?.call(_preloadingManager.metrics);
+      }
+
+      setState(() {
+        _state = _state.copyWith(
+          items: [..._state.items, ...pageData.items],
+          pageInfo: pageData.pageInfo,
+          status: pageData.hasNextPage
+              ? InfiniteScrollStatus.loaded
+              : InfiniteScrollStatus.reachedEnd,
+          errorMessage: null,
+        );
+        _isLoadingNextPage = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      // Record failed load
+      if (widget.preloadConfig != null) {
+        _preloadingManager.recordFailedLoad();
+        widget.onPreloadMetricsUpdated?.call(_preloadingManager.metrics);
+      }
+
+      setState(() {
+        _state = _state.copyWith(
+          status: InfiniteScrollStatus.error,
+          errorMessage: e.toString(),
+        );
+        _isLoadingNextPage = false;
+      });
+    }
+  }
+
+  /// Handles scroll events to trigger pagination
+  void _onScroll() {
+    if (!_state.hasNextPage) return;
+    if (_state.isLoading) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+
+    // Calculate velocity
+    if (_lastScrollUpdate != null) {
+      final timeDiff = DateTime.now().difference(_lastScrollUpdate!);
+      if (timeDiff.inMicroseconds > 0) {
+        final velocity = (timeDiff.inMicroseconds > 0)
+            ? (_scrollController.position.pixels - currentScroll) /
+                timeDiff.inMicroseconds * 1000000
+            : 0.0;
+
+        // Update velocity in preloading manager
+        if (widget.preloadConfig != null) {
+          _preloadingManager.updateVelocity(velocity.abs());
+        }
+      }
+    }
+    _lastScrollUpdate = DateTime.now();
+
+    // Use intelligent preloading if configured
+    if (widget.preloadConfig != null) {
+      if (_preloadingManager.shouldPreload(maxScroll, currentScroll)) {
+        _preloadingManager.markPreloadTriggered();
+        _loadNextPage();
+      }
+    } else {
+      // Fallback to simple threshold-based preloading
+      if (maxScroll - currentScroll <= widget.preloadThreshold) {
+        _loadNextPage();
+      }
+    }
+  }
+
+  /// Handles pull-to-refresh
+  Future<void> _onRefresh() async {
+    // Reset preloading manager on refresh
+    if (widget.preloadConfig != null) {
+      _preloadingManager.reset();
+    }
+    await _loadInitialData();
+  }
+
+  /// Retries loading the next page after an error
+  void _retry() {
+    if (_state.items.isEmpty) {
+      _loadInitialData();
+    } else {
+      _loadNextPage();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Show initial loading state
+    if (_state.status == InfiniteScrollStatus.initialLoading) {
+      return widget.initialLoadingWidget ??
+          const Center(child: CircularProgressIndicator());
+    }
+
+    // Show error state
+    if (_state.status == InfiniteScrollStatus.error) {
+      return widget.errorWidget ?? _buildDefaultErrorWidget();
+    }
+
+    // Build the grid with pull-to-refresh wrapper
+    final grid = VirtualGridView<T>(
+      itemCount: _state.loadedItemCount,
+      itemBuilder: (context, index) {
+        return widget.itemBuilder(context, _state.items[index]);
+      },
+      header: widget.header,
+      footer: _buildFooter(),
+      padding: widget.padding,
+      controller: _scrollController,
+      crossAxisCount: widget.crossAxisCount,
+      childAspectRatio: widget.childAspectRatio,
+      crossAxisSpacing: widget.crossAxisSpacing,
+      mainAxisSpacing: widget.mainAxisSpacing,
+      emptyWidget: widget.emptyWidget,
+    );
+
+    if (!widget.enablePullToRefresh) {
+      return grid;
+    }
+
+    return RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: grid,
     );
   }
 
