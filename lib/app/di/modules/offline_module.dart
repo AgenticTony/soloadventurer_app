@@ -142,6 +142,11 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // This manager orchestrates all sync operations and triggers sync
   // when connectivity is restored. It prevents concurrent sync cycles
   // and provides status updates via a stream for UI consumption.
+  //
+  // Note: The getCurrentUserId callback is registered as a placeholder.
+  // This should be overridden in a Riverpod provider where the auth
+  // state is accessible. The placeholder returns empty string which
+  // will cause sync to be skipped until properly configured.
   getIt.registerLazySingleton<SyncManager>(
     () => SyncManagerImpl(
       connectivityService: getIt<ConnectivityService>(),
@@ -149,6 +154,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
       uploadSync: getIt<UploadSync>(),
       downloadSync: getIt<DownloadSync>(),
       conflictResolver: getIt<ConflictResolver>(),
+      getCurrentUserId: () => '', // TODO: Override in provider with actual userId
       autoSyncMinInterval: const Duration(seconds: 30),
       syncOnlyOnWifi: false,
     ),
@@ -190,7 +196,6 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     () => DownloadSync(
       dio: getIt<DioApiService>().dio,
       database: getIt<DatabaseService>().database,
-      userId: 'current-user-id', // TODO: Get from auth service
       graphqlEndpoint: '/graphql',
       conflictResolver: getIt<ConflictResolver>(),
     ),
@@ -204,7 +209,6 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
     () => IncrementalSync(
       dio: getIt<DioApiService>().dio,
       database: getIt<DatabaseService>().database,
-      userId: 'current-user-id', // TODO: Get from auth service
       graphqlEndpoint: '/graphql',
       conflictResolver: getIt<ConflictResolver>(),
     ),

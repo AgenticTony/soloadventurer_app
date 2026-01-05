@@ -91,9 +91,6 @@ class DownloadSync {
   /// AppDatabase instance for local data operations
   final AppDatabase _database;
 
-  /// Current user ID
-  final String _userId;
-
   /// GraphQL API endpoint
   final String _graphqlEndpoint;
 
@@ -107,18 +104,15 @@ class DownloadSync {
   ///
   /// [dio] - Dio HTTP client for making API requests
   /// [database] - AppDatabase instance for local operations
-  /// [userId] - Current user ID
   /// [graphqlEndpoint] - GraphQL API endpoint (default: '/graphql')
   /// [conflictResolver] - Optional conflict resolver for recording conflicts
   DownloadSync({
     required Dio dio,
     required AppDatabase database,
-    required String userId,
     String graphqlEndpoint = '/graphql',
     ConflictResolver? conflictResolver,
   })  : _dio = dio,
         _database = database,
-        _userId = userId,
         _graphqlEndpoint = graphqlEndpoint,
         _conflictResolver = conflictResolver;
 
@@ -135,8 +129,11 @@ class DownloadSync {
   /// The [onProgress] callback is invoked after each entity type sync completes,
   /// providing the current count and total count of entity types.
   ///
+  /// [userId] is the ID of the user to sync data for.
+  ///
   /// Returns a [DownloadSyncResult] with detailed sync statistics.
   Future<DownloadSyncResult> syncServerChanges({
+    required String userId,
     void Function(int current, int total)? onProgress,
   }) async {
     final startTime = DateTime.now();
@@ -154,7 +151,7 @@ class DownloadSync {
       // STEP 1: Sync Trips
       // ========================================================================
       onProgress?.call(1, 4);
-      final tripResult = await syncTrips();
+      final tripResult = await syncTrips(userId);
       downloadCount += tripResult['total'] as int;
       insertCount += tripResult['inserted'] as int;
       updateCount += tripResult['updated'] as int;
@@ -168,7 +165,7 @@ class DownloadSync {
       // STEP 2: Sync Journals
       // ========================================================================
       onProgress?.call(2, 4);
-      final journalResult = await syncJournals();
+      final journalResult = await syncJournals(userId);
       downloadCount += journalResult['total'] as int;
       insertCount += journalResult['inserted'] as int;
       updateCount += journalResult['updated'] as int;
@@ -182,7 +179,7 @@ class DownloadSync {
       // STEP 3: Sync User Profile
       // ========================================================================
       onProgress?.call(3, 4);
-      final userResult = await syncUserProfile();
+      final userResult = await syncUserProfile(userId);
       downloadCount += userResult['total'] as int;
       insertCount += userResult['inserted'] as int;
       updateCount += userResult['updated'] as int;
@@ -196,7 +193,7 @@ class DownloadSync {
       // STEP 4: Update Sync Metadata
       // ========================================================================
       onProgress?.call(4, 4);
-      await _updateSyncMetadata();
+      await _updateSyncMetadata(userId);
 
       debugPrint('✅ Sync metadata updated');
 
@@ -231,8 +228,10 @@ class DownloadSync {
 
   /// Syncs trips from server to local database
   ///
+  /// [userId] is the ID of the user to sync trips for.
+  ///
   /// Returns a map with sync statistics.
-  Future<Map<String, int>> syncTrips() async {
+  Future<Map<String, int>> syncTrips(String userId) async {
     try {
       debugPrint('📥 Syncing trips...');
 
@@ -241,7 +240,7 @@ class DownloadSync {
         _graphqlEndpoint,
         data: {
           'query': GraphQLQueries.getTrips,
-          'variables': {'userId': _userId},
+          'variables': {'userId': userId},
         },
       );
 
@@ -256,7 +255,7 @@ class DownloadSync {
 
       // Get all local trips
       final tripDao = _database.tripDao;
-      final localTrips = await tripDao.getAllTripsForUser(_userId);
+      final localTrips = await tripDao.getAllTripsForUser(userId);
       final localTripsMap = {for (var t in localTrips) t.id: t};
 
       int inserted = 0;
@@ -366,14 +365,16 @@ class DownloadSync {
 
   /// Syncs journals from server to local database
   ///
+  /// [userId] is the ID of the user to sync journals for.
+  ///
   /// Returns a map with sync statistics.
-  Future<Map<String, int>> syncJournals() async {
+  Future<Map<String, int>> syncJournals(String userId) async {
     try {
       debugPrint('📥 Syncing journals...');
 
       // Get all trips to fetch journals for
       final tripDao = _database.tripDao;
-      final trips = await tripDao.getAllTripsForUser(_userId);
+      final trips = await tripDao.getAllTripsForUser(userId);
 
       if (trips.isEmpty) {
         debugPrint('📭 No trips to fetch journals for');
@@ -540,8 +541,10 @@ class DownloadSync {
 
   /// Syncs user profile from server to local database
   ///
+  /// [userId] is the ID of the user to sync profile for.
+  ///
   /// Returns a map with sync statistics.
-  Future<Map<String, int>> syncUserProfile() async {
+  Future<Map<String, int>> syncUserProfile(String userId) async {
     try {
       debugPrint('📥 Syncing user profile...');
 
@@ -549,7 +552,7 @@ class DownloadSync {
         _graphqlEndpoint,
         data: {
           'query': GraphQLQueries.getUserProfile,
-          'variables': {'userId': _userId},
+          'variables': {'userId': userId},
         },
       );
 
@@ -564,7 +567,7 @@ class DownloadSync {
 
       // Get local user
       final userDao = _database.userDao;
-      final localUsers = await userDao.getUserById(_userId);
+      final localUsers = await userDao.getUserById(userId);
 
       int inserted = 0;
       int updated = 0;
@@ -575,7 +578,7 @@ class DownloadSync {
         // Insert new user
         await userDao.insertUser(_serverUserToCompanion(serverUser));
         inserted = 1;
-        debugPrint('➕ Inserted user: $_userId');
+        debugPrint('➕ Inserted user: $userId');
       } else {
         final localUser = localUsers.first;
         // Check if update is needed
@@ -587,14 +590,14 @@ class DownloadSync {
           if (localUser.hasPendingChanges) {
             // Conflict detected - record it
             conflicts++;
-            debugPrint('⚠️ Conflict detected for user: $_userId');
+            debugPrint('⚠️ Conflict detected for user: $userId');
 
             // Record the conflict if resolver is available
             if (_conflictResolver != null) {
               final conflict = Conflict(
                 id: 'conflict_user_${_uuid.v4()}',
                 entityType: EntityType.userProfile,
-                entityId: _userId,
+                entityId: userId,
                 type: ConflictType.concurrentUpdate,
                 severity: ConflictSeverity.medium,
                 clientData: {
@@ -615,7 +618,7 @@ class DownloadSync {
               );
 
               await _conflictResolver!.recordConflict(conflict);
-              debugPrint('📝 Conflict recorded for user: $_userId');
+              debugPrint('📝 Conflict recorded for user: $userId');
             }
 
             // Skip updating to avoid losing local changes
@@ -625,7 +628,7 @@ class DownloadSync {
             await userDao.updateUser(_serverUserToCompanion(serverUser,
                 existing: localUser));
             updated = 1;
-            debugPrint('🔄 Updated user: $_userId');
+            debugPrint('🔄 Updated user: $userId');
           }
         }
       }
@@ -649,7 +652,7 @@ class DownloadSync {
   // ==============================================================================
 
   /// Updates sync metadata after successful download
-  Future<void> _updateSyncMetadata() async {
+  Future<void> _updateSyncMetadata(String userId) async {
     try {
       debugPrint('📊 Updating sync metadata...');
 
@@ -662,7 +665,7 @@ class DownloadSync {
         // Check if metadata exists
         final metadataList = await (_database.select(_database.syncMetadataTable)
               ..where((tbl) => tbl.entityType.equals(entityType))
-              ..where((tbl) => tbl.userId.equals(_userId)))
+              ..where((tbl) => tbl.userId.equals(userId)))
             .get();
 
         if (metadataList.isEmpty) {
@@ -670,7 +673,7 @@ class DownloadSync {
           await _database
               .into(_database.syncMetadataTable)
               .insert(SyncMetadataTableCompanion.insert(
-                userId: _userId,
+                userId: userId,
                 entityType: entityType,
                 lastSyncedAt: now,
                 lastSyncStatus: 'success',
@@ -682,7 +685,7 @@ class DownloadSync {
               .update(_database.syncMetadataTable)
               .replace(SyncMetadataTable(
                 id: metadata.id,
-                userId: _userId,
+                userId: userId,
                 entityType: entityType,
                 lastSyncedAt: now,
                 lastSyncStatus: 'success',

@@ -38,6 +38,9 @@ class SyncManagerImpl implements SyncManager {
   /// Conflict resolver for handling sync conflicts
   final ConflictResolver _conflictResolver;
 
+  /// Function to get the current user ID
+  final String Function() _getCurrentUserId;
+
   /// Stream controller for sync status updates
   final StreamController<SyncStatus> _statusController =
       StreamController<SyncStatus>.broadcast();
@@ -73,6 +76,7 @@ class SyncManagerImpl implements SyncManager {
   /// [uploadSync] - Upload sync service for syncing to server
   /// [downloadSync] - Download sync service for syncing from server
   /// [conflictResolver] - Conflict resolver for handling sync conflicts
+  /// [getCurrentUserId] - Function to get the current user ID
   /// [autoSyncMinInterval] - Minimum interval between auto-syncs (default: 30s)
   /// [syncOnlyOnWifi] - Only sync when on WiFi (default: false)
   SyncManagerImpl({
@@ -81,13 +85,15 @@ class SyncManagerImpl implements SyncManager {
     required UploadSync uploadSync,
     required DownloadSync downloadSync,
     required ConflictResolver conflictResolver,
+    required String Function() getCurrentUserId,
     this.autoSyncMinInterval = const Duration(seconds: 30),
     this.syncOnlyOnWifi = false,
   })  : _connectivityService = connectivityService,
         _syncQueueService = syncQueueService,
         _uploadSync = uploadSync,
         _downloadSync = downloadSync,
-        _conflictResolver = conflictResolver;
+        _conflictResolver = conflictResolver,
+        _getCurrentUserId = getCurrentUserId;
 
   // ==============================================================================
   // SYNC STATUS STREAM
@@ -212,6 +218,17 @@ class SyncManagerImpl implements SyncManager {
     try {
       debugPrint('🚀 Starting sync cycle...');
 
+      // Get current user ID for sync operations
+      final userId = _getCurrentUserId();
+      if (userId.isEmpty) {
+        debugPrint('⚠️ No user authenticated, skipping sync');
+        _isSyncing = false;
+        return SyncResult.failure(
+          'No authenticated user',
+          duration: Duration.zero,
+        );
+      }
+
       // Update status to syncing
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.upload,
@@ -272,6 +289,7 @@ class SyncManagerImpl implements SyncManager {
 
       // Download server changes using DownloadSync service
       final downloadResult = await _downloadSync.syncServerChanges(
+        userId: userId,
         onProgress: (current, total) {
           // Update progress in sync status
           final progress = 0.5 + (current / total * 0.3); // 50% to 80%
