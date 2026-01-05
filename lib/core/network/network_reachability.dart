@@ -176,7 +176,7 @@ class NetworkReachabilityService {
             '(age: ${age.inSeconds}s, valid for: ${(_cacheTtlMs - age.inMilliseconds) / 1000}s)');
         return NetworkReachabilityResult.cached(_cachedResult!);
       } else {
-        debugPrint('🔍 Cached result expired (age: ${age.inSeconds)s)');
+        debugPrint('🔍 Cached result expired (age: ${age.inSeconds}s)');
         _cachedResult = null;
       }
     }
@@ -237,7 +237,7 @@ class NetworkReachabilityService {
       _updateCache(result);
 
       debugPrint(
-          '🔍 Reachability test result: ${result.isReachable ? "✅ REACHABLE" : "❌ UNREACHABLE"} '
+          '🔍 Reachability test result: ${result.isReachable ? "REACHABLE" : "UNREACHABLE"} '
           '(${stopwatch.elapsedMilliseconds}ms, status: ${result.statusCode})');
 
       return result;

@@ -2,11 +2,6 @@ import 'package:soloadventurer/core/error/exceptions.dart';
 import 'package:soloadventurer/core/error/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
-import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
@@ -31,10 +26,9 @@ class SafetyRepositoryImpl implements SafetyRepository {
   @override
   Future<TrustedContact> addTrustedContact(TrustedContact contact) async {
     try {
-      final contactModel = TrustedContactModel.fromEntity(contact);
-      final createdContact = await _remoteDataSource.addTrustedContact(contactModel);
+      final createdContact = await _remoteDataSource.addTrustedContact(contact);
       await _localDataSource.cacheTrustedContact(createdContact);
-      return createdContact.toEntity();
+      return createdContact;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -63,10 +57,9 @@ class SafetyRepositoryImpl implements SafetyRepository {
   @override
   Future<TrustedContact> updateTrustedContact(TrustedContact contact) async {
     try {
-      final contactModel = TrustedContactModel.fromEntity(contact);
-      final updatedContact = await _remoteDataSource.updateTrustedContact(contactModel);
+      final updatedContact = await _remoteDataSource.updateTrustedContact(contact);
       await _localDataSource.cacheTrustedContact(updatedContact);
-      return updatedContact.toEntity();
+      return updatedContact;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -82,11 +75,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final contacts = await _remoteDataSource.getTrustedContacts();
       await _localDataSource.cacheTrustedContacts(contacts);
-      return contacts.map((model) => model.toEntity()).toList();
+      return contacts;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedContacts = await _localDataSource.getCachedTrustedContacts();
-      return cachedContacts.map((model) => model.toEntity()).toList();
+      return await _localDataSource.getCachedTrustedContacts();
     } catch (e) {
       throw SafetyException('Failed to get trusted contacts: ${e.toString()}',
           code: 'get_trusted_contacts_failed');
@@ -98,14 +90,14 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final contact = await _remoteDataSource.getTrustedContact(contactId);
       await _localDataSource.cacheTrustedContact(contact);
-      return contact.toEntity();
+      return contact;
     } on AppException catch (_) {
       // Fallback to cache when offline
       final cachedContact = await _localDataSource.getCachedTrustedContact(contactId);
       if (cachedContact == null) {
         throw const TrustedContactNotFoundException();
       }
-      return cachedContact.toEntity();
+      return cachedContact;
     } catch (e) {
       throw SafetyException('Failed to get trusted contact: ${e.toString()}',
           code: 'get_trusted_contact_failed');
@@ -117,10 +109,9 @@ class SafetyRepositoryImpl implements SafetyRepository {
   @override
   Future<CheckIn> createCheckIn(CheckIn checkIn) async {
     try {
-      final checkInModel = CheckInModel.fromEntity(checkIn);
-      final createdCheckIn = await _remoteDataSource.createCheckIn(checkInModel);
+      final createdCheckIn = await _remoteDataSource.createCheckIn(checkIn);
       await _localDataSource.cacheCheckIn(createdCheckIn);
-      return createdCheckIn.toEntity();
+      return createdCheckIn;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -144,7 +135,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         statusMessage: statusMessage,
       );
       await _localDataSource.cacheCheckIn(completedCheckIn);
-      return completedCheckIn.toEntity();
+      return completedCheckIn;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -178,7 +169,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         triggerType: triggerType,
       );
       await _localDataSource.cacheCheckIn(scheduledCheckIn);
-      return scheduledCheckIn.toEntity();
+      return scheduledCheckIn;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -209,11 +200,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final checkIns = await _remoteDataSource.getUpcomingCheckIns();
       await _localDataSource.cacheCheckIns(checkIns);
-      return checkIns.map((model) => model.toEntity()).toList();
+      return checkIns;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedCheckIns = await _localDataSource.getCachedUpcomingCheckIns();
-      return cachedCheckIns.map((model) => model.toEntity()).toList();
+      return await _localDataSource.getCachedUpcomingCheckIns();
     } catch (e) {
       throw SafetyException('Failed to get upcoming check-ins: ${e.toString()}',
           code: 'get_upcoming_check_ins_failed');
@@ -225,11 +215,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final checkIns = await _remoteDataSource.getAllCheckIns();
       await _localDataSource.cacheCheckIns(checkIns);
-      return checkIns.map((model) => model.toEntity()).toList();
+      return checkIns;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedCheckIns = await _localDataSource.getCachedCheckIns();
-      return cachedCheckIns.map((model) => model.toEntity()).toList();
+      return await _localDataSource.getCachedCheckIns();
     } catch (e) {
       throw SafetyException('Failed to get all check-ins: ${e.toString()}',
           code: 'get_all_check_ins_failed');
@@ -241,14 +230,14 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final checkIn = await _remoteDataSource.getCheckIn(checkInId);
       await _localDataSource.cacheCheckIn(checkIn);
-      return checkIn.toEntity();
+      return checkIn;
     } on AppException catch (_) {
       // Fallback to cache when offline
       final cachedCheckIn = await _localDataSource.getCachedCheckIn(checkInId);
       if (cachedCheckIn == null) {
         throw const CheckInNotFoundException();
       }
-      return cachedCheckIn.toEntity();
+      return cachedCheckIn;
     } catch (e) {
       throw SafetyException('Failed to get check-in: ${e.toString()}',
           code: 'get_check_in_failed');
@@ -259,14 +248,14 @@ class SafetyRepositoryImpl implements SafetyRepository {
   Future<List<CheckIn>> getCheckInsByTrip(String tripId) async {
     try {
       final checkIns = await _remoteDataSource.getCheckInsByTrip(tripId);
-      return checkIns.map((model) => model.toEntity()).toList();
+      return checkIns;
     } on AppException catch (_) {
       // Fallback to cache when offline - filter by tripId
       final cachedCheckIns = await _localDataSource.getCachedCheckIns();
       final filteredCheckIns = cachedCheckIns
           .where((checkIn) => checkIn.tripId == tripId)
           .toList();
-      return filteredCheckIns.map((model) => model.toEntity()).toList();
+      return filteredCheckIns;
     } catch (e) {
       throw SafetyException('Failed to get check-ins by trip: ${e.toString()}',
           code: 'get_check_ins_by_trip_failed');
@@ -284,7 +273,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         status: status,
       );
       await _localDataSource.cacheCheckIn(updatedCheckIn);
-      return updatedCheckIn.toEntity();
+      return updatedCheckIn;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -330,7 +319,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         checkInId: checkInId,
       );
       await _localDataSource.cacheLocationUpdate(locationUpdate);
-      return locationUpdate.toEntity();
+      return locationUpdate;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -376,11 +365,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final locationUpdates = await _remoteDataSource.getActiveLocationShares();
       await _localDataSource.cacheLocationUpdates(locationUpdates);
-      return locationUpdates.map((model) => model.toEntity()).toList();
+      return locationUpdates;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedUpdates = await _localDataSource.getCachedActiveLocationShares();
-      return cachedUpdates.map((model) => model.toEntity()).toList();
+      return await _localDataSource.getCachedActiveLocationShares();
     } catch (e) {
       throw SafetyException('Failed to get active location shares: ${e.toString()}',
           code: 'get_active_location_shares_failed');
@@ -399,7 +387,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         startDate: startDate,
         endDate: endDate,
       );
-      return locationUpdates.map((model) => model.toEntity()).toList();
+      return locationUpdates;
     } on AppException catch (_) {
       // Fallback to cache when offline
       final cachedUpdates = await _localDataSource.getCachedLocationUpdates();
@@ -407,18 +395,18 @@ class SafetyRepositoryImpl implements SafetyRepository {
       var filteredUpdates = cachedUpdates;
       if (startDate != null) {
         filteredUpdates = filteredUpdates
-            .where((update) => update.timestamp.isAfter(startDate))
+            .where((update) => update.createdAt.isAfter(startDate))
             .toList();
       }
       if (endDate != null) {
         filteredUpdates = filteredUpdates
-            .where((update) => update.timestamp.isBefore(endDate))
+            .where((update) => update.createdAt.isBefore(endDate))
             .toList();
       }
       if (filteredUpdates.length > limit) {
         filteredUpdates = filteredUpdates.take(limit).toList();
       }
-      return filteredUpdates.map((model) => model.toEntity()).toList();
+      return filteredUpdates;
     } catch (e) {
       throw SafetyException('Failed to get location updates: ${e.toString()}',
           code: 'get_location_updates_failed');
@@ -474,7 +462,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         tripId: tripId,
       );
       await _localDataSource.cacheSafetyAlert(alert);
-      return alert.toEntity();
+      return alert;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -504,7 +492,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         checkInId: checkInId,
       );
       await _localDataSource.cacheSafetyStatus(safetyStatus);
-      return safetyStatus.toEntity();
+      return safetyStatus;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -520,7 +508,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final safetyStatus = await _remoteDataSource.getSafetyStatus();
       await _localDataSource.cacheSafetyStatus(safetyStatus);
-      return safetyStatus.toEntity();
+      return safetyStatus;
     } on AppException catch (_) {
       // Fallback to cache when offline
       final cachedStatus = await _localDataSource.getCachedSafetyStatus();
@@ -528,7 +516,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
         throw const SafetyException('No safety status available',
             code: 'safety_status_not_found');
       }
-      return cachedStatus.toEntity();
+      return cachedStatus;
     } catch (e) {
       throw SafetyException('Failed to get safety status: ${e.toString()}',
           code: 'get_safety_status_failed');
@@ -540,7 +528,7 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final safetyStatus = await _remoteDataSource.getSafetyStatusForUser(userId);
       // Note: We don't cache other users' status
-      return safetyStatus.toEntity();
+      return safetyStatus;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
@@ -558,11 +546,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final alerts = await _remoteDataSource.getSafetyAlerts();
       await _localDataSource.cacheSafetyAlerts(alerts);
-      return alerts.map((model) => model.toEntity()).toList();
+      return alerts;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedAlerts = await _localDataSource.getCachedSafetyAlerts();
-      return cachedAlerts.map((model) => model.toEntity()).toList();
+      return await _localDataSource.getCachedSafetyAlerts();
     } catch (e) {
       throw SafetyException('Failed to get safety alerts: ${e.toString()}',
           code: 'get_safety_alerts_failed');
@@ -574,14 +561,14 @@ class SafetyRepositoryImpl implements SafetyRepository {
     try {
       final alert = await _remoteDataSource.getSafetyAlert(alertId);
       await _localDataSource.cacheSafetyAlert(alert);
-      return alert.toEntity();
+      return alert;
     } on AppException catch (_) {
       // Fallback to cache when offline
       final cachedAlert = await _localDataSource.getCachedSafetyAlert(alertId);
       if (cachedAlert == null) {
         throw const SafetyAlertNotFoundException();
       }
-      return cachedAlert.toEntity();
+      return cachedAlert;
     } catch (e) {
       throw SafetyException('Failed to get safety alert: ${e.toString()}',
           code: 'get_safety_alert_failed');
@@ -598,15 +585,15 @@ class SafetyRepositoryImpl implements SafetyRepository {
         limit: limit,
         type: type,
       );
-      return alerts.map((model) => model.toEntity()).toList();
+      return alerts;
     } on AppException catch (_) {
       // Fallback to cache when offline
       final cachedAlerts = await _localDataSource.getCachedRecentSafetyAlerts(limit: limit);
       if (type != null) {
         final filteredAlerts = cachedAlerts.where((alert) => alert.type == type).toList();
-        return filteredAlerts.map((model) => model.toEntity()).toList();
+        return filteredAlerts;
       }
-      return cachedAlerts.map((model) => model.toEntity()).toList();
+      return cachedAlerts;
     } catch (e) {
       throw SafetyException('Failed to get recent safety alerts: ${e.toString()}',
           code: 'get_recent_safety_alerts_failed');
@@ -620,10 +607,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
       // Update cached alert
       final cachedAlert = await _localDataSource.getCachedSafetyAlert(alertId);
       if (cachedAlert != null) {
-        final acknowledgedBy = [...cachedAlert.acknowledgedBy, contactId];
+        final acknowledgedBy = [...cachedAlert.acknowledgedByContactIds, contactId];
         final updatedAlert = cachedAlert.copyWith(
-          acknowledgedBy: acknowledgedBy,
-          acknowledgedAt: DateTime.now(),
+          acknowledgedByContactIds: acknowledgedBy,
+          firstAcknowledgedAt: DateTime.now(),
         );
         await _localDataSource.cacheSafetyAlert(updatedAlert);
       }
@@ -668,8 +655,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
       final cachedAlert = await _localDataSource.getCachedSafetyAlert(alertId);
       if (cachedAlert != null) {
         final updatedAlert = cachedAlert.copyWith(
-          status: SafetyAlertStatus.canceled,
-          resolvedAt: DateTime.now(),
+          status: SafetyAlertStatus.cancelled,
+          cancelledAt: DateTime.now(),
         );
         await _localDataSource.cacheSafetyAlert(updatedAlert);
       }
@@ -687,11 +674,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
   Future<List<SafetyAlert>> getMissedCheckInAlerts() async {
     try {
       final alerts = await _remoteDataSource.getMissedCheckInAlerts();
-      return alerts.map((model) => model.toEntity()).toList();
+      return alerts;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedAlerts = await _localDataSource.getCachedMissedCheckInAlerts();
-      return cachedAlerts.map((model) => model.toEntity()).toList();
+      return await _localDataSource.getCachedMissedCheckInAlerts();
     } catch (e) {
       throw SafetyException('Failed to get missed check-in alerts: ${e.toString()}',
           code: 'get_missed_check_in_alerts_failed');

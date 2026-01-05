@@ -1,17 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
 import 'package:soloadventurer/core/error/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
-import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
+import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 
 /// Implementation of [SafetyRemoteDataSource] using GraphQL API
 ///
@@ -132,7 +127,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       return const CheckInAlreadyCompletedException();
     }
     if (lowerMessage.contains('check-in is overdue')) {
-      return const CheckInOverdueException(DateTime.now());
+      return CheckInOverdueException(DateTime.now());
     }
     if (lowerMessage.contains('invalid check-in schedule')) {
       return const InvalidCheckInScheduleException();
@@ -196,8 +191,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   // ==================== Trusted Contacts Operations ====================
 
   @override
-  Future<TrustedContactModel> addTrustedContact(
-      TrustedContactModel contact) async {
+  Future<TrustedContact> addTrustedContact(TrustedContact contact) async {
     try {
       const mutation = '''
         mutation AddTrustedContact(
@@ -233,12 +227,12 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
         'name': contact.name,
         'email': contact.email,
         'phoneNumber': contact.phoneNumber,
-        'contactSource': contact.contactSource.name,
-        'notificationPreference': 'all', // Default to all notifications
+        'contactSource': contact.source.name,
+        'notificationPreference': 'all',
       });
 
       final data = response['addTrustedContact'] as Map<String, dynamic>;
-      return TrustedContactModel.fromJson(data);
+      return TrustedContact.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -271,8 +265,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<TrustedContactModel> updateTrustedContact(
-      TrustedContactModel contact) async {
+  Future<TrustedContact> updateTrustedContact(TrustedContact contact) async {
     try {
       const mutation = '''
         mutation UpdateTrustedContact(
@@ -313,13 +306,13 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
         'name': contact.name,
         'email': contact.email,
         'phoneNumber': contact.phoneNumber,
-        'receivesCheckInNotifications': contact.receivesCheckInNotifications,
+        'receivesCheckInNotifications': contact.receivesCheckIns,
         'receivesEmergencyAlerts': contact.receivesEmergencyAlerts,
-        'receivesLocationUpdates': contact.receivesLocationUpdates,
+        'receivesLocationUpdates': contact.locationSharingEnabled,
       });
 
       final data = response['updateTrustedContact'] as Map<String, dynamic>;
-      return TrustedContactModel.fromJson(data);
+      return TrustedContact.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -330,7 +323,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<TrustedContactModel>> getTrustedContacts() async {
+  Future<List<TrustedContact>> getTrustedContacts() async {
     try {
       const query = '''
         query GetTrustedContacts {
@@ -353,7 +346,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       final response = await _query(query);
       final data = response['getTrustedContacts'] as List;
       return data
-          .map((json) => TrustedContactModel.fromJson(json))
+          .map((json) => TrustedContact.fromJson(json))
           .toList();
     } on SafetyException {
       rethrow;
@@ -365,7 +358,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<TrustedContactModel> getTrustedContact(String contactId) async {
+  Future<TrustedContact> getTrustedContact(String contactId) async {
     try {
       const query = '''
         query GetTrustedContact(\$contactId: ID!) {
@@ -387,7 +380,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query, variables: {'contactId': contactId});
       final data = response['getTrustedContact'] as Map<String, dynamic>;
-      return TrustedContactModel.fromJson(data);
+      return TrustedContact.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -400,7 +393,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   // ==================== Check-in Operations ====================
 
   @override
-  Future<CheckInModel> createCheckIn(CheckInModel checkIn) async {
+  Future<CheckIn> createCheckIn(CheckIn checkIn) async {
     try {
       const mutation = '''
         mutation CreateCheckIn(
@@ -448,7 +441,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _mutation(mutation, variables: {
         'userId': checkIn.userId,
-        'scheduledTime': checkIn.scheduledTime.toIso8601String(),
+        'scheduledTime': checkIn.scheduledTime?.toIso8601String() ?? '',
         'deadline': checkIn.deadline?.toIso8601String(),
         'location': checkIn.location?.toJson(),
         'statusMessage': checkIn.statusMessage,
@@ -458,7 +451,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['createCheckIn'] as Map<String, dynamic>;
-      return CheckInModel.fromJson(data);
+      return CheckIn.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -467,7 +460,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> completeCheckIn({
+  Future<CheckIn> completeCheckIn({
     required String checkInId,
     required CheckInLocation location,
     String? statusMessage,
@@ -514,7 +507,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['completeCheckIn'] as Map<String, dynamic>;
-      return CheckInModel.fromJson(data);
+      return CheckIn.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -525,7 +518,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> scheduleCheckIn({
+  Future<CheckIn> scheduleCheckIn({
     required String userId,
     required DateTime scheduledTime,
     DateTime? deadline,
@@ -592,7 +585,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['scheduleCheckIn'] as Map<String, dynamic>;
-      return CheckInModel.fromJson(data);
+      return CheckIn.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -625,7 +618,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getUpcomingCheckIns() async {
+  Future<List<CheckIn>> getUpcomingCheckIns() async {
     try {
       const query = '''
         query GetUpcomingCheckIns {
@@ -655,7 +648,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getUpcomingCheckIns'] as List;
-      return data.map((json) => CheckInModel.fromJson(json)).toList();
+      return data.map((json) => CheckIn.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -666,7 +659,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getAllCheckIns() async {
+  Future<List<CheckIn>> getAllCheckIns() async {
     try {
       const query = '''
         query GetAllCheckIns {
@@ -696,7 +689,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getAllCheckIns'] as List;
-      return data.map((json) => CheckInModel.fromJson(json)).toList();
+      return data.map((json) => CheckIn.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -707,7 +700,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> getCheckIn(String checkInId) async {
+  Future<CheckIn> getCheckIn(String checkInId) async {
     try {
       const query = '''
         query GetCheckIn(\$checkInId: ID!) {
@@ -737,7 +730,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query, variables: {'checkInId': checkInId});
       final data = response['getCheckIn'] as Map<String, dynamic>;
-      return CheckInModel.fromJson(data);
+      return CheckIn.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -748,7 +741,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getCheckInsByTrip(String tripId) async {
+  Future<List<CheckIn>> getCheckInsByTrip(String tripId) async {
     try {
       const query = '''
         query GetCheckInsByTrip(\$tripId: ID!) {
@@ -778,7 +771,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query, variables: {'tripId': tripId});
       final data = response['getCheckInsByTrip'] as List;
-      return data.map((json) => CheckInModel.fromJson(json)).toList();
+      return data.map((json) => CheckIn.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -789,7 +782,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> updateCheckInStatus({
+  Future<CheckIn> updateCheckInStatus({
     required String checkInId,
     required CheckInStatus status,
   }) async {
@@ -832,7 +825,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['updateCheckInStatus'] as Map<String, dynamic>;
-      return CheckInModel.fromJson(data);
+      return CheckIn.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -845,7 +838,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   // ==================== Location Sharing Operations ====================
 
   @override
-  Future<LocationUpdateModel> shareLocation({
+  Future<LocationUpdate> shareLocation({
     required double latitude,
     required double longitude,
     double? accuracy,
@@ -935,7 +928,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['shareLocation'] as Map<String, dynamic>;
-      return LocationUpdateModel.fromJson(data);
+      return LocationUpdate.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -986,7 +979,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<LocationUpdateModel>> getActiveLocationShares() async {
+  Future<List<LocationUpdate>> getActiveLocationShares() async {
     try {
       const query = '''
         query GetActiveLocationShares {
@@ -1019,7 +1012,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getActiveLocationShares'] as List;
-      return data.map((json) => LocationUpdateModel.fromJson(json)).toList();
+      return data.map((json) => LocationUpdate.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1030,7 +1023,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<LocationUpdateModel>> getLocationUpdates({
+  Future<List<LocationUpdate>> getLocationUpdates({
     int limit = 20,
     DateTime? startDate,
     DateTime? endDate,
@@ -1080,7 +1073,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['getLocationUpdates'] as List;
-      return data.map((json) => LocationUpdateModel.fromJson(json)).toList();
+      return data.map((json) => LocationUpdate.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1126,7 +1119,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   // ==================== Emergency SOS Operations ====================
 
   @override
-  Future<SafetyAlertModel> triggerEmergencySOS({
+  Future<SafetyAlert> triggerEmergencySOS({
     required String userId,
     String? message,
     required SafetyAlertLocation location,
@@ -1190,7 +1183,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['triggerEmergencySOS'] as Map<String, dynamic>;
-      return SafetyAlertModel.fromJson(data);
+      return SafetyAlert.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1199,7 +1192,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyStatusModel> updateSafetyStatus({
+  Future<SafetyStatus> updateSafetyStatus({
     required SafetyStatusType status,
     String? message,
     SafetyStatusLocation? location,
@@ -1256,7 +1249,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['updateSafetyStatus'] as Map<String, dynamic>;
-      return SafetyStatusModel.fromJson(data);
+      return SafetyStatus.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1267,7 +1260,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyStatusModel> getSafetyStatus() async {
+  Future<SafetyStatus> getSafetyStatus() async {
     try {
       const query = '''
         query GetSafetyStatus {
@@ -1295,7 +1288,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getSafetyStatus'] as Map<String, dynamic>;
-      return SafetyStatusModel.fromJson(data);
+      return SafetyStatus.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1306,7 +1299,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyStatusModel> getSafetyStatusForUser(String userId) async {
+  Future<SafetyStatus> getSafetyStatusForUser(String userId) async {
     try {
       const query = '''
         query GetSafetyStatusForUser(\$userId: ID!) {
@@ -1334,7 +1327,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query, variables: {'userId': userId});
       final data = response['getSafetyStatusForUser'] as Map<String, dynamic>;
-      return SafetyStatusModel.fromJson(data);
+      return SafetyStatus.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1347,7 +1340,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   // ==================== Safety Alerts Operations ====================
 
   @override
-  Future<List<SafetyAlertModel>> getSafetyAlerts() async {
+  Future<List<SafetyAlert>> getSafetyAlerts() async {
     try {
       const query = '''
         query GetSafetyAlerts {
@@ -1382,7 +1375,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getSafetyAlerts'] as List;
-      return data.map((json) => SafetyAlertModel.fromJson(json)).toList();
+      return data.map((json) => SafetyAlert.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1393,7 +1386,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyAlertModel> getSafetyAlert(String alertId) async {
+  Future<SafetyAlert> getSafetyAlert(String alertId) async {
     try {
       const query = '''
         query GetSafetyAlert(\$alertId: ID!) {
@@ -1428,7 +1421,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query, variables: {'alertId': alertId});
       final data = response['getSafetyAlert'] as Map<String, dynamic>;
-      return SafetyAlertModel.fromJson(data);
+      return SafetyAlert.fromJson(data);
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1439,7 +1432,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<SafetyAlertModel>> getRecentSafetyAlerts({
+  Future<List<SafetyAlert>> getRecentSafetyAlerts({
     int limit = 20,
     SafetyAlertType? type,
   }) async {
@@ -1481,7 +1474,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
       });
 
       final data = response['getRecentSafetyAlerts'] as List;
-      return data.map((json) => SafetyAlertModel.fromJson(json)).toList();
+      return data.map((json) => SafetyAlert.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -1564,7 +1557,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<SafetyAlertModel>> getMissedCheckInAlerts() async {
+  Future<List<SafetyAlert>> getMissedCheckInAlerts() async {
     try {
       const query = '''
         query GetMissedCheckInAlerts {
@@ -1599,7 +1592,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getMissedCheckInAlerts'] as List;
-      return data.map((json) => SafetyAlertModel.fromJson(json)).toList();
+      return data.map((json) => SafetyAlert.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {

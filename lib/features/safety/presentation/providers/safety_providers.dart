@@ -248,7 +248,6 @@ TrustedContactsNotifier trustedContactsNotifier(TrustedContactsNotifierRef ref) 
     removeContact: ref.watch(removeTrustedContactUseCaseProvider),
     updateContact: ref.watch(updateTrustedContactUseCaseProvider),
     getContacts: ref.watch(getTrustedContactsUseCaseProvider),
-    ref: ref,
   );
 
   ref.onDispose(() => notifier.dispose());
@@ -269,7 +268,6 @@ CheckInNotifier checkInNotifier(CheckInNotifierRef ref) {
     scheduleCheckIn: ref.watch(scheduleCheckInUseCaseProvider),
     cancelCheckIn: ref.watch(cancelCheckInUseCaseProvider),
     getUpcomingCheckIns: ref.watch(getUpcomingCheckInsUseCaseProvider),
-    ref: ref,
   );
 
   ref.onDispose(() => notifier.dispose());
@@ -288,7 +286,6 @@ LocationSharingNotifier locationSharingNotifier(LocationSharingNotifierRef ref) 
     shareLocation: ref.watch(shareLocationUseCaseProvider),
     stopLocationSharing: ref.watch(stopLocationSharingUseCaseProvider),
     getActiveShares: ref.watch(getActiveLocationSharesUseCaseProvider),
-    ref: ref,
   );
 
   ref.onDispose(() => notifier.dispose());
@@ -308,7 +305,6 @@ SafetyNotifier safetyNotifier(SafetyNotifierRef ref) {
     updateStatus: ref.watch(updateSafetyStatusUseCaseProvider),
     getStatus: ref.watch(getSafetyStatusUseCaseProvider),
     repository: ref.watch(safetyRepositoryOverrideProvider),
-    ref: ref,
   );
 
   ref.onDispose(() => notifier.dispose());
@@ -327,22 +323,22 @@ final trustedContactsStateProvider = Provider<TrustedContactsState>((ref) {
 
 /// Provider for trusted contacts list
 final trustedContactsListProvider = Provider((ref) {
-  return ref.watch(trustedContactsNotifierProvider).contacts;
+  return ref.watch(trustedContactsStateProvider).contacts;
 });
 
 /// Provider for trusted contacts loading state
 final trustedContactsLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(trustedContactsNotifierProvider).isLoading;
+  return ref.watch(trustedContactsStateProvider).isLoading;
 });
 
 /// Provider for trusted contacts error
 final trustedContactsErrorProvider = Provider<String?>((ref) {
-  return ref.watch(trustedContactsNotifierProvider).error;
+  return ref.watch(trustedContactsStateProvider).error;
 });
 
 /// Provider for selected trusted contact
 final selectedTrustedContactProvider = Provider((ref) {
-  return ref.watch(trustedContactsNotifierProvider).selectedContact;
+  return ref.watch(trustedContactsStateProvider).selectedContact;
 });
 
 // ============================================================================

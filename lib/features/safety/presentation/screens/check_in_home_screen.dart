@@ -117,10 +117,10 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
           const SizedBox(height: 12),
 
           // Check-ins list
-          if (upcomingCheckIns.isEmpty) {
-            return _buildEmptyCheckInsState(context);
-          } else {
-            return ListView.separated(
+          if (upcomingCheckIns.isEmpty)
+            _buildEmptyCheckInsState(context)
+          else
+            ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: upcomingCheckIns.length,
@@ -129,8 +129,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
                 final checkIn = upcomingCheckIns[index];
                 return _buildCheckInCard(context, checkIn);
               },
-            );
-          }
+            ),
         ],
       ),
     );

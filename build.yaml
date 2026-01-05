@@ -9,7 +9,6 @@ targets:
       exclude:
         - .worktrees/**
         - .auto-claude/**
-        - lib/features/safety/**
     builders:
       # Riverpod generator - exclude dev directories
       riverpod_generator|riverpod_generator:

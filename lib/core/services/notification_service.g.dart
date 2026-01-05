@@ -7,15 +7,15 @@ part of 'notification_service.dart';
 // **************************************************************************
 
 String _$notificationServiceHash() =>
-    r'331afff2705469751e3e36621e8969fb1e2e5999';
+    r'e8e65b0356034645a62c729c5271e3eaa84ad3b8';
 
-/// Service for managing notifications in the app
+/// Provider for the notification service implementation
 ///
-/// Copied from [NotificationService].
-@ProviderFor(NotificationService)
+/// Copied from [notificationService].
+@ProviderFor(notificationService)
 final notificationServiceProvider =
-    AutoDisposeAsyncNotifierProvider<NotificationService, void>.internal(
-  NotificationService.new,
+    AutoDisposeProvider<NotificationService>.internal(
+  notificationService,
   name: r'notificationServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
@@ -24,6 +24,8 @@ final notificationServiceProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$NotificationService = AutoDisposeAsyncNotifier<void>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef NotificationServiceRef = AutoDisposeProviderRef<NotificationService>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

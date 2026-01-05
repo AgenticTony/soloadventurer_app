@@ -1,12 +1,8 @@
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
-import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
+import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 
 /// Remote data source for safety-related operations
 ///
@@ -17,34 +13,34 @@ abstract class SafetyRemoteDataSource {
   // ==================== Trusted Contacts Operations ====================
 
   /// Add a new trusted contact for the user
-  Future<TrustedContactModel> addTrustedContact(TrustedContactModel contact);
+  Future<TrustedContact> addTrustedContact(TrustedContact contact);
 
   /// Remove a trusted contact
   Future<void> removeTrustedContact(String contactId);
 
   /// Update an existing trusted contact
-  Future<TrustedContactModel> updateTrustedContact(TrustedContactModel contact);
+  Future<TrustedContact> updateTrustedContact(TrustedContact contact);
 
   /// Get all trusted contacts for the current user
-  Future<List<TrustedContactModel>> getTrustedContacts();
+  Future<List<TrustedContact>> getTrustedContacts();
 
   /// Get a specific trusted contact by ID
-  Future<TrustedContactModel> getTrustedContact(String contactId);
+  Future<TrustedContact> getTrustedContact(String contactId);
 
   // ==================== Check-in Operations ====================
 
   /// Create a new check-in (manual or scheduled)
-  Future<CheckInModel> createCheckIn(CheckInModel checkIn);
+  Future<CheckIn> createCheckIn(CheckIn checkIn);
 
   /// Complete a check-in manually
-  Future<CheckInModel> completeCheckIn({
+  Future<CheckIn> completeCheckIn({
     required String checkInId,
     required CheckInLocation location,
     String? statusMessage,
   });
 
   /// Schedule a check-in for a specific time or location
-  Future<CheckInModel> scheduleCheckIn({
+  Future<CheckIn> scheduleCheckIn({
     required String userId,
     required DateTime scheduledTime,
     DateTime? deadline,
@@ -59,19 +55,19 @@ abstract class SafetyRemoteDataSource {
   Future<void> cancelCheckIn(String checkInId);
 
   /// Get upcoming scheduled check-ins
-  Future<List<CheckInModel>> getUpcomingCheckIns();
+  Future<List<CheckIn>> getUpcomingCheckIns();
 
   /// Get all check-ins (completed, missed, scheduled)
-  Future<List<CheckInModel>> getAllCheckIns();
+  Future<List<CheckIn>> getAllCheckIns();
 
   /// Get a specific check-in by ID
-  Future<CheckInModel> getCheckIn(String checkInId);
+  Future<CheckIn> getCheckIn(String checkInId);
 
   /// Get check-ins for a specific trip
-  Future<List<CheckInModel>> getCheckInsByTrip(String tripId);
+  Future<List<CheckIn>> getCheckInsByTrip(String tripId);
 
   /// Update check-in status (e.g., mark as missed)
-  Future<CheckInModel> updateCheckInStatus({
+  Future<CheckIn> updateCheckInStatus({
     required String checkInId,
     required CheckInStatus status,
   });
@@ -79,7 +75,7 @@ abstract class SafetyRemoteDataSource {
   // ==================== Location Sharing Operations ====================
 
   /// Share current location with trusted contacts
-  Future<LocationUpdateModel> shareLocation({
+  Future<LocationUpdate> shareLocation({
     required double latitude,
     required double longitude,
     double? accuracy,
@@ -102,10 +98,10 @@ abstract class SafetyRemoteDataSource {
   Future<void> stopAllLocationSharing();
 
   /// Get currently active location shares
-  Future<List<LocationUpdateModel>> getActiveLocationShares();
+  Future<List<LocationUpdate>> getActiveLocationShares();
 
   /// Get recent location updates
-  Future<List<LocationUpdateModel>> getLocationUpdates({
+  Future<List<LocationUpdate>> getLocationUpdates({
     int limit = 20,
     DateTime? startDate,
     DateTime? endDate,
@@ -120,7 +116,7 @@ abstract class SafetyRemoteDataSource {
   // ==================== Emergency SOS Operations ====================
 
   /// Trigger an emergency SOS alert
-  Future<SafetyAlertModel> triggerEmergencySOS({
+  Future<SafetyAlert> triggerEmergencySOS({
     required String userId,
     String? message,
     required SafetyAlertLocation location,
@@ -130,7 +126,7 @@ abstract class SafetyRemoteDataSource {
   });
 
   /// Update the user's safety status
-  Future<SafetyStatusModel> updateSafetyStatus({
+  Future<SafetyStatus> updateSafetyStatus({
     required SafetyStatusType status,
     String? message,
     SafetyStatusLocation? location,
@@ -140,21 +136,21 @@ abstract class SafetyRemoteDataSource {
   });
 
   /// Get the current safety status
-  Future<SafetyStatusModel> getSafetyStatus();
+  Future<SafetyStatus> getSafetyStatus();
 
   /// Get the latest safety status for a user
-  Future<SafetyStatusModel> getSafetyStatusForUser(String userId);
+  Future<SafetyStatus> getSafetyStatusForUser(String userId);
 
   // ==================== Safety Alerts Operations ====================
 
   /// Get all safety alerts for the current user
-  Future<List<SafetyAlertModel>> getSafetyAlerts();
+  Future<List<SafetyAlert>> getSafetyAlerts();
 
   /// Get a specific safety alert by ID
-  Future<SafetyAlertModel> getSafetyAlert(String alertId);
+  Future<SafetyAlert> getSafetyAlert(String alertId);
 
   /// Get recent safety alerts
-  Future<List<SafetyAlertModel>> getRecentSafetyAlerts({
+  Future<List<SafetyAlert>> getRecentSafetyAlerts({
     int limit = 20,
     SafetyAlertType? type,
   });
@@ -169,7 +165,7 @@ abstract class SafetyRemoteDataSource {
   Future<void> cancelSafetyAlert(String alertId);
 
   /// Get alerts triggered by missed check-ins
-  Future<List<SafetyAlertModel>> getMissedCheckInAlerts();
+  Future<List<SafetyAlert>> getMissedCheckInAlerts();
 
   // ==================== Battery & Location Services ====================
 

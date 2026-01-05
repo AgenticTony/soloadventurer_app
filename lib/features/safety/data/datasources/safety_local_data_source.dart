@@ -1,24 +1,24 @@
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
-import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
+import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
+import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
+import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
+import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
+import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 
 /// Interface for local safety data operations
 abstract class SafetyLocalDataSource {
   // ==================== Trusted Contacts Operations ====================
 
   /// Cache trusted contacts list
-  Future<void> cacheTrustedContacts(List<TrustedContactModel> contacts);
+  Future<void> cacheTrustedContacts(List<TrustedContact> contacts);
 
   /// Get cached trusted contacts
-  Future<List<TrustedContactModel>> getCachedTrustedContacts();
+  Future<List<TrustedContact>> getCachedTrustedContacts();
 
   /// Cache a single trusted contact
-  Future<void> cacheTrustedContact(TrustedContactModel contact);
+  Future<void> cacheTrustedContact(TrustedContact contact);
 
   /// Get cached trusted contact by ID
-  Future<TrustedContactModel?> getCachedTrustedContact(String contactId);
+  Future<TrustedContact?> getCachedTrustedContact(String contactId);
 
   /// Remove cached trusted contact
   Future<void> removeCachedTrustedContact(String contactId);
@@ -26,19 +26,19 @@ abstract class SafetyLocalDataSource {
   // ==================== Check-ins Operations ====================
 
   /// Cache check-ins list
-  Future<void> cacheCheckIns(List<CheckInModel> checkIns);
+  Future<void> cacheCheckIns(List<CheckIn> checkIns);
 
   /// Get cached check-ins
-  Future<List<CheckInModel>> getCachedCheckIns();
+  Future<List<CheckIn>> getCachedCheckIns();
 
   /// Get upcoming check-ins from cache
-  Future<List<CheckInModel>> getCachedUpcomingCheckIns();
+  Future<List<CheckIn>> getCachedUpcomingCheckIns();
 
   /// Cache a single check-in
-  Future<void> cacheCheckIn(CheckInModel checkIn);
+  Future<void> cacheCheckIn(CheckIn checkIn);
 
   /// Get cached check-in by ID
-  Future<CheckInModel?> getCachedCheckIn(String checkInId);
+  Future<CheckIn?> getCachedCheckIn(String checkInId);
 
   /// Remove cached check-in
   Future<void> removeCachedCheckIn(String checkInId);
@@ -46,47 +46,47 @@ abstract class SafetyLocalDataSource {
   // ==================== Location Updates Operations ====================
 
   /// Cache location updates list
-  Future<void> cacheLocationUpdates(List<LocationUpdateModel> updates);
+  Future<void> cacheLocationUpdates(List<LocationUpdate> updates);
 
   /// Get cached location updates
-  Future<List<LocationUpdateModel>> getCachedLocationUpdates();
+  Future<List<LocationUpdate>> getCachedLocationUpdates();
 
   /// Get active location shares from cache
-  Future<List<LocationUpdateModel>> getCachedActiveLocationShares();
+  Future<List<LocationUpdate>> getCachedActiveLocationShares();
 
   /// Cache a single location update
-  Future<void> cacheLocationUpdate(LocationUpdateModel update);
+  Future<void> cacheLocationUpdate(LocationUpdate update);
 
   /// Get cached location update by ID
-  Future<LocationUpdateModel?> getCachedLocationUpdate(String updateId);
+  Future<LocationUpdate?> getCachedLocationUpdate(String updateId);
 
   // ==================== Safety Alerts Operations ====================
 
   /// Cache safety alerts list
-  Future<void> cacheSafetyAlerts(List<SafetyAlertModel> alerts);
+  Future<void> cacheSafetyAlerts(List<SafetyAlert> alerts);
 
   /// Get cached safety alerts
-  Future<List<SafetyAlertModel>> getCachedSafetyAlerts();
+  Future<List<SafetyAlert>> getCachedSafetyAlerts();
 
   /// Get recent safety alerts from cache
-  Future<List<SafetyAlertModel>> getCachedRecentSafetyAlerts({int limit = 20});
+  Future<List<SafetyAlert>> getCachedRecentSafetyAlerts({int limit = 20});
 
   /// Cache a single safety alert
-  Future<void> cacheSafetyAlert(SafetyAlertModel alert);
+  Future<void> cacheSafetyAlert(SafetyAlert alert);
 
   /// Get cached safety alert by ID
-  Future<SafetyAlertModel?> getCachedSafetyAlert(String alertId);
+  Future<SafetyAlert?> getCachedSafetyAlert(String alertId);
 
   /// Get missed check-in alerts from cache
-  Future<List<SafetyAlertModel>> getCachedMissedCheckInAlerts();
+  Future<List<SafetyAlert>> getCachedMissedCheckInAlerts();
 
   // ==================== Safety Status Operations ====================
 
   /// Cache current safety status
-  Future<void> cacheSafetyStatus(SafetyStatusModel status);
+  Future<void> cacheSafetyStatus(SafetyStatus status);
 
   /// Get cached safety status
-  Future<SafetyStatusModel?> getCachedSafetyStatus();
+  Future<SafetyStatus?> getCachedSafetyStatus();
 
   // ==================== Battery & Settings Operations ====================
 

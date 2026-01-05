@@ -339,7 +339,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
     return (update(syncQueue)..where((sq) => sq.id.isIn(ids))).write(
       const SyncQueueCompanion(
         status: Value('pending'),
-        errorMessage: Value.null(),
+        errorMessage: Value(null),
       ),
     );
   }

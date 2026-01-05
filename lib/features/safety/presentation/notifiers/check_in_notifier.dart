@@ -15,7 +15,6 @@ class CheckInNotifier extends StateNotifier<CheckInState> {
   final ScheduleCheckInUseCase _scheduleCheckIn;
   final CancelCheckInUseCase _cancelCheckIn;
   final GetUpcomingCheckInsUseCase _getUpcomingCheckIns;
-  final StateNotifierProviderRef _ref;
 
   CheckInNotifier({
     required CreateCheckInUseCase createCheckIn,
@@ -23,13 +22,11 @@ class CheckInNotifier extends StateNotifier<CheckInState> {
     required ScheduleCheckInUseCase scheduleCheckIn,
     required CancelCheckInUseCase cancelCheckIn,
     required GetUpcomingCheckInsUseCase getUpcomingCheckIns,
-    required StateNotifierProviderRef ref,
   })  : _createCheckIn = createCheckIn,
         _completeCheckIn = completeCheckIn,
         _scheduleCheckIn = scheduleCheckIn,
         _cancelCheckIn = cancelCheckIn,
         _getUpcomingCheckIns = getUpcomingCheckIns,
-        _ref = ref,
         super(const CheckInState());
 
   /// Load all check-ins

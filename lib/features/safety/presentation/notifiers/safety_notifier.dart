@@ -14,19 +14,16 @@ class SafetyNotifier extends StateNotifier<SafetyState> {
   final UpdateSafetyStatusUseCase _updateStatus;
   final GetSafetyStatusUseCase _getStatus;
   final SafetyRepository _repository;
-  final StateNotifierProviderRef _ref;
 
   SafetyNotifier({
     required TriggerEmergencySOSUseCase triggerSOS,
     required UpdateSafetyStatusUseCase updateStatus,
     required GetSafetyStatusUseCase getStatus,
     required SafetyRepository repository,
-    required StateNotifierProviderRef ref,
   })  : _triggerSOS = triggerSOS,
         _updateStatus = updateStatus,
         _getStatus = getStatus,
         _repository = repository,
-        _ref = ref,
         super(const SafetyState());
 
   /// Initialize safety state by loading current status and alerts
@@ -38,7 +35,8 @@ class SafetyNotifier extends StateNotifier<SafetyState> {
       final currentStatus = await _getStatus();
       final recentAlerts = await _repository.getRecentSafetyAlerts(limit: 10);
       final activeAlerts = recentAlerts
-          .where((alert) => alert.status == SafetyAlertStatus.active)
+          .where((alert) => alert.status == SafetyAlertStatus.sent ||
+                         alert.status == SafetyAlertStatus.acknowledged)
           .toList();
       final contacts = await _repository.getTrustedContacts();
 
@@ -212,7 +210,8 @@ class SafetyNotifier extends StateNotifier<SafetyState> {
     try {
       final recentAlerts = await _repository.getRecentSafetyAlerts(limit: limit);
       final activeAlerts = recentAlerts
-          .where((alert) => alert.status == SafetyAlertStatus.active)
+          .where((alert) => alert.status == SafetyAlertStatus.sent ||
+                         alert.status == SafetyAlertStatus.acknowledged)
           .toList();
 
       state = state.copyWith(
@@ -239,16 +238,16 @@ class SafetyNotifier extends StateNotifier<SafetyState> {
 
       final updatedAlerts = state.recentAlerts.map((alert) {
         if (alert.id == alertId) {
-          final acknowledgedBy = [...alert.acknowledgedBy, contactId];
-          return alert.copyWith(acknowledgedBy: acknowledgedBy);
+          final acknowledgedByContactIds = [...alert.acknowledgedByContactIds, contactId];
+          return alert.copyWith(acknowledgedByContactIds: acknowledgedByContactIds);
         }
         return alert;
       }).toList();
 
       final updatedActiveAlerts = state.activeAlerts.map((alert) {
         if (alert.id == alertId) {
-          final acknowledgedBy = [...alert.acknowledgedBy, contactId];
-          return alert.copyWith(acknowledgedBy: acknowledgedBy);
+          final acknowledgedByContactIds = [...alert.acknowledgedByContactIds, contactId];
+          return alert.copyWith(acknowledgedByContactIds: acknowledgedByContactIds);
         }
         return alert;
       }).toList();

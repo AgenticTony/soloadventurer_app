@@ -2,15 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/core/error/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
-import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
+import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 
 /// Mock implementation of [SafetyRemoteDataSource] for testing
 ///
@@ -21,11 +17,11 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   final ApiClient _apiClient;
 
   // In-memory storage for mock data
-  final Map<String, TrustedContactModel> _trustedContacts = {};
-  final Map<String, CheckInModel> _checkIns = {};
-  final Map<String, LocationUpdateModel> _locationUpdates = {};
-  final Map<String, SafetyAlertModel> _safetyAlerts = {};
-  SafetyStatusModel? _currentSafetyStatus;
+  final Map<String, TrustedContact> _trustedContacts = {};
+  final Map<String, CheckIn> _checkIns = {};
+  final Map<String, LocationUpdate> _locationUpdates = {};
+  final Map<String, SafetyAlert> _safetyAlerts = {};
+  SafetyStatus? _currentSafetyStatus;
   int? _batteryLevel;
 
   /// Creates a new [MockSafetyRemoteDataSource]
@@ -53,8 +49,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   // ==================== Trusted Contacts Operations ====================
 
   @override
-  Future<TrustedContactModel> addTrustedContact(
-      TrustedContactModel contact) async {
+  Future<TrustedContact> addTrustedContact(
+      TrustedContact contact) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -80,22 +76,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     // Create new contact with generated ID
-    final newContact = TrustedContactModel(
+    final newContact = contact.copyWith(
       id: _generateId(),
-      userId: contact.userId,
-      name: contact.name,
-      email: contact.email,
-      phoneNumber: contact.phoneNumber,
-      source: contact.source,
-      communityUserId: contact.communityUserId,
-      permission: contact.permission,
-      locationSharingEnabled: contact.locationSharingEnabled,
-      receivesCheckIns: contact.receivesCheckIns,
-      receivesEmergencyAlerts: contact.receivesEmergencyAlerts,
       addedAt: DateTime.now(),
       updatedAt: DateTime.now(),
-      revokedAt: contact.revokedAt,
-      notes: contact.notes,
     );
 
     _trustedContacts[newContact.id] = newContact;
@@ -117,8 +101,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<TrustedContactModel> updateTrustedContact(
-      TrustedContactModel contact) async {
+  Future<TrustedContact> updateTrustedContact(
+      TrustedContact contact) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -126,16 +110,14 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const TrustedContactNotFoundException();
     }
 
-    final updatedContact = TrustedContactModel.fromEntity(
-      contact.copyWith(updatedAt: DateTime.now()),
-    );
+    final updatedContact = contact.copyWith(updatedAt: DateTime.now());
     _trustedContacts[contact.id] = updatedContact;
     debugPrint('Mock: Updated trusted contact ${contact.id}');
     return updatedContact;
   }
 
   @override
-  Future<List<TrustedContactModel>> getTrustedContacts() async {
+  Future<List<TrustedContact>> getTrustedContacts() async {
     await _simulateDelay();
     _checkOffline();
 
@@ -143,7 +125,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<TrustedContactModel> getTrustedContact(String contactId) async {
+  Future<TrustedContact> getTrustedContact(String contactId) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -158,22 +140,13 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   // ==================== Check-in Operations ====================
 
   @override
-  Future<CheckInModel> createCheckIn(CheckInModel checkIn) async {
+  Future<CheckIn> createCheckIn(CheckIn checkIn) async {
     await _simulateDelay();
     _checkOffline();
 
-    final newCheckIn = CheckInModel(
+    final newCheckIn = checkIn.copyWith(
       id: _generateId(),
-      userId: checkIn.userId,
-      scheduledTime: checkIn.scheduledTime,
-      deadline: checkIn.deadline,
-      location: checkIn.location,
       status: CheckInStatus.scheduled,
-      statusMessage: checkIn.statusMessage,
-      triggerType: checkIn.triggerType ?? CheckInTriggerType.manual,
-      notifyContactIds: checkIn.notifyContactIds,
-      tripId: checkIn.tripId,
-      completedAt: null,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -184,7 +157,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> completeCheckIn({
+  Future<CheckIn> completeCheckIn({
     required String checkInId,
     required CheckInLocation location,
     String? statusMessage,
@@ -201,15 +174,12 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const CheckInAlreadyCompletedException();
     }
 
-    final locationModel = CheckInLocationModel.fromEntity(location);
-    final completedCheckIn = CheckInModel.fromEntity(
-      checkIn.copyWith(
-        status: CheckInStatus.completed,
-        location: locationModel,
-        statusMessage: statusMessage ?? checkIn.statusMessage,
-        completedAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
+    final completedCheckIn = checkIn.copyWith(
+      status: CheckInStatus.completed,
+      location: location,
+      statusMessage: statusMessage ?? checkIn.statusMessage,
+      completedAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     _checkIns[checkInId] = completedCheckIn;
@@ -218,7 +188,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> scheduleCheckIn({
+  Future<CheckIn> scheduleCheckIn({
     required String userId,
     required DateTime scheduledTime,
     DateTime? deadline,
@@ -237,16 +207,12 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       );
     }
 
-    final locationModel = location != null
-        ? CheckInLocationModel.fromEntity(location)
-        : null;
-
-    final checkIn = CheckInModel(
+    final checkIn = CheckIn(
       id: _generateId(),
       userId: userId,
       scheduledTime: scheduledTime,
       deadline: deadline,
-      location: locationModel,
+      location: location,
       status: CheckInStatus.scheduled,
       statusMessage: statusMessage,
       triggerType: triggerType ?? CheckInTriggerType.scheduledTime,
@@ -281,7 +247,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getUpcomingCheckIns() async {
+  Future<List<CheckIn>> getUpcomingCheckIns() async {
     await _simulateDelay();
     _checkOffline();
 
@@ -295,7 +261,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getAllCheckIns() async {
+  Future<List<CheckIn>> getAllCheckIns() async {
     await _simulateDelay();
     _checkOffline();
 
@@ -304,7 +270,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> getCheckIn(String checkInId) async {
+  Future<CheckIn> getCheckIn(String checkInId) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -317,7 +283,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getCheckInsByTrip(String tripId) async {
+  Future<List<CheckIn>> getCheckInsByTrip(String tripId) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -328,7 +294,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<CheckInModel> updateCheckInStatus({
+  Future<CheckIn> updateCheckInStatus({
     required String checkInId,
     required CheckInStatus status,
   }) async {
@@ -340,11 +306,9 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const CheckInNotFoundException();
     }
 
-    final updatedCheckIn = CheckInModel.fromEntity(
-      checkIn.copyWith(
-        status: status,
-        updatedAt: DateTime.now(),
-      ),
+    final updatedCheckIn = checkIn.copyWith(
+      status: status,
+      updatedAt: DateTime.now(),
     );
 
     _checkIns[checkInId] = updatedCheckIn;
@@ -355,7 +319,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   // ==================== Location Sharing Operations ====================
 
   @override
-  Future<LocationUpdateModel> shareLocation({
+  Future<LocationUpdate> shareLocation({
     required double latitude,
     required double longitude,
     double? accuracy,
@@ -379,7 +343,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       );
     }
 
-    final locationUpdate = LocationUpdateModel(
+    final locationUpdate = LocationUpdate(
       id: _generateId(),
       userId: 'mock-user-id',
       latitude: latitude,
@@ -414,10 +378,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       if (update.sharingStatus == LocationSharingStatus.active &&
           update.sharedWithContactIds
               .any((contactId) => contactIds.contains(contactId))) {
-        _locationUpdates[id] = LocationUpdateModel.fromEntity(
-          update.copyWith(
-            sharingStatus: LocationSharingStatus.ended,
-          ),
+        _locationUpdates[id] = update.copyWith(
+          sharingStatus: LocationSharingStatus.ended,
         );
       }
     });
@@ -433,10 +395,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     // Stop all active location shares
     _locationUpdates.forEach((id, update) {
       if (update.sharingStatus == LocationSharingStatus.active) {
-        _locationUpdates[id] = LocationUpdateModel.fromEntity(
-          update.copyWith(
-            sharingStatus: LocationSharingStatus.ended,
-          ),
+        _locationUpdates[id] = update.copyWith(
+          sharingStatus: LocationSharingStatus.ended,
         );
       }
     });
@@ -445,7 +405,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<LocationUpdateModel>> getActiveLocationShares() async {
+  Future<List<LocationUpdate>> getActiveLocationShares() async {
     await _simulateDelay();
     _checkOffline();
 
@@ -456,7 +416,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<LocationUpdateModel>> getLocationUpdates({
+  Future<List<LocationUpdate>> getLocationUpdates({
     int limit = 20,
     DateTime? startDate,
     DateTime? endDate,
@@ -491,11 +451,9 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     final contact = _trustedContacts[contactId]!;
-    _trustedContacts[contactId] = TrustedContactModel.fromEntity(
-      contact.copyWith(
-        locationSharingEnabled: enabled,
-        updatedAt: DateTime.now(),
-      ),
+    _trustedContacts[contactId] = contact.copyWith(
+      locationSharingEnabled: enabled,
+      updatedAt: DateTime.now(),
     );
 
     debugPrint('Mock: Updated location sharing permission for $contactId');
@@ -504,7 +462,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   // ==================== Emergency SOS Operations ====================
 
   @override
-  Future<SafetyAlertModel> triggerEmergencySOS({
+  Future<SafetyAlert> triggerEmergencySOS({
     required String userId,
     String? message,
     required SafetyAlertLocation location,
@@ -531,7 +489,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const NoTrustedContactsConfiguredException();
     }
 
-    final alert = SafetyAlertModel(
+    final alert = SafetyAlert(
       id: _generateId(),
       userId: userId,
       type: SafetyAlertType.emergencySOS,
@@ -556,7 +514,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyStatusModel> updateSafetyStatus({
+  Future<SafetyStatus> updateSafetyStatus({
     required SafetyStatusType status,
     String? message,
     SafetyStatusLocation? location,
@@ -567,7 +525,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     await _simulateDelay();
     _checkOffline();
 
-    final safetyStatus = SafetyStatusModel(
+    final safetyStatus = SafetyStatus(
       id: _generateId(),
       userId: 'mock-user-id',
       status: status,
@@ -586,13 +544,13 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyStatusModel> getSafetyStatus() async {
+  Future<SafetyStatus> getSafetyStatus() async {
     await _simulateDelay();
     _checkOffline();
 
     if (_currentSafetyStatus == null) {
       // Return default safe status
-      _currentSafetyStatus = SafetyStatusModel(
+      _currentSafetyStatus = SafetyStatus(
         id: _generateId(),
         userId: 'mock-user-id',
         status: SafetyStatusType.safe,
@@ -605,7 +563,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyStatusModel> getSafetyStatusForUser(String userId) async {
+  Future<SafetyStatus> getSafetyStatusForUser(String userId) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -616,7 +574,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   // ==================== Safety Alerts Operations ====================
 
   @override
-  Future<List<SafetyAlertModel>> getSafetyAlerts() async {
+  Future<List<SafetyAlert>> getSafetyAlerts() async {
     await _simulateDelay();
     _checkOffline();
 
@@ -625,7 +583,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<SafetyAlertModel> getSafetyAlert(String alertId) async {
+  Future<SafetyAlert> getSafetyAlert(String alertId) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -638,7 +596,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<List<SafetyAlertModel>> getRecentSafetyAlerts({
+  Future<List<SafetyAlert>> getRecentSafetyAlerts({
     int limit = 20,
     SafetyAlertType? type,
   }) async {
@@ -676,12 +634,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     acknowledgedBy.add(contactId);
-    _safetyAlerts[alertId] = SafetyAlertModel.fromEntity(
-      alert.copyWith(
-        acknowledgedByContactIds: acknowledgedBy,
-        status: SafetyAlertStatus.acknowledged,
-        updatedAt: DateTime.now(),
-      ),
+    _safetyAlerts[alertId] = alert.copyWith(
+      acknowledgedByContactIds: acknowledgedBy,
+      status: SafetyAlertStatus.acknowledged,
+      updatedAt: DateTime.now(),
     );
 
     debugPrint('Mock: Acknowledged safety alert $alertId by contact $contactId');
@@ -701,12 +657,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const SafetyAlertAlreadyResolvedException();
     }
 
-    _safetyAlerts[alertId] = SafetyAlertModel.fromEntity(
-      alert.copyWith(
-        status: SafetyAlertStatus.resolved,
-        resolvedAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
+    _safetyAlerts[alertId] = alert.copyWith(
+      status: SafetyAlertStatus.resolved,
+      resolvedAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     debugPrint('Mock: Resolved safety alert $alertId');
@@ -727,19 +681,17 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const SafetyAlertAlreadyResolvedException();
     }
 
-    _safetyAlerts[alertId] = SafetyAlertModel.fromEntity(
-      alert.copyWith(
-        status: SafetyAlertStatus.cancelled,
-        cancelledAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
+    _safetyAlerts[alertId] = alert.copyWith(
+      status: SafetyAlertStatus.cancelled,
+      cancelledAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
 
     debugPrint('Mock: Canceled safety alert $alertId');
   }
 
   @override
-  Future<List<SafetyAlertModel>> getMissedCheckInAlerts() async {
+  Future<List<SafetyAlert>> getMissedCheckInAlerts() async {
     await _simulateDelay();
     _checkOffline();
 
@@ -790,12 +742,10 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       throw const TrustedContactNotFoundException();
     }
 
-    _trustedContacts[contactId] = TrustedContactModel.fromEntity(
-      contact.copyWith(
-        receivesCheckIns: receivesCheckIns,
-        receivesEmergencyAlerts: receivesEmergencyAlerts,
-        updatedAt: DateTime.now(),
-      ),
+    _trustedContacts[contactId] = contact.copyWith(
+      receivesCheckIns: receivesCheckIns,
+      receivesEmergencyAlerts: receivesEmergencyAlerts,
+      updatedAt: DateTime.now(),
     );
 
     debugPrint('Mock: Updated notification preferences for $contactId');

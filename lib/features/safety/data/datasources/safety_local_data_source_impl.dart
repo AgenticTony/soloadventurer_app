@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/core/error/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
-import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
+import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
+import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
+import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
+import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
+import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 
 /// Implementation of [SafetyLocalDataSource] using SharedPreferences
 class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
@@ -31,7 +31,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   // ==================== Trusted Contacts Operations ====================
 
   @override
-  Future<void> cacheTrustedContacts(List<TrustedContactModel> contacts) async {
+  Future<void> cacheTrustedContacts(List<TrustedContact> contacts) async {
     try {
       final List<Map<String, dynamic>> jsonList =
           contacts.map((contact) => contact.toJson()).toList();
@@ -46,7 +46,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<TrustedContactModel>> getCachedTrustedContacts() async {
+  Future<List<TrustedContact>> getCachedTrustedContacts() async {
     if (await isCacheExpired()) {
       return [];
     }
@@ -57,7 +57,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
 
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList
-          .map((json) => TrustedContactModel.fromJson(json as Map<String, dynamic>))
+          .map((json) => TrustedContact.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw const SafetyCacheRetrievalException(
@@ -66,7 +66,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<void> cacheTrustedContact(TrustedContactModel contact) async {
+  Future<void> cacheTrustedContact(TrustedContact contact) async {
     try {
       final contacts = await getCachedTrustedContacts();
       final index = contacts.indexWhere((c) => c.id == contact.id);
@@ -84,11 +84,11 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<TrustedContactModel?> getCachedTrustedContact(
+  Future<TrustedContact?> getCachedTrustedContact(
       String contactId) async {
     try {
       final contacts = await getCachedTrustedContacts();
-      return contacts.cast<TrustedContactModel?>().firstWhere(
+      return contacts.cast<TrustedContact?>().firstWhere(
             (contact) => contact?.id == contactId,
             orElse: () => null,
           );
@@ -113,7 +113,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   // ==================== Check-ins Operations ====================
 
   @override
-  Future<void> cacheCheckIns(List<CheckInModel> checkIns) async {
+  Future<void> cacheCheckIns(List<CheckIn> checkIns) async {
     try {
       final List<Map<String, dynamic>> jsonList =
           checkIns.map((checkIn) => checkIn.toJson()).toList();
@@ -128,7 +128,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getCachedCheckIns() async {
+  Future<List<CheckIn>> getCachedCheckIns() async {
     if (await isCacheExpired()) {
       return [];
     }
@@ -139,7 +139,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
 
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList
-          .map((json) => CheckInModel.fromJson(json as Map<String, dynamic>))
+          .map((json) => CheckIn.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw const SafetyCacheRetrievalException(
@@ -148,7 +148,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<CheckInModel>> getCachedUpcomingCheckIns() async {
+  Future<List<CheckIn>> getCachedUpcomingCheckIns() async {
     try {
       final allCheckIns = await getCachedCheckIns();
       final now = DateTime.now();
@@ -168,7 +168,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<void> cacheCheckIn(CheckInModel checkIn) async {
+  Future<void> cacheCheckIn(CheckIn checkIn) async {
     try {
       final checkIns = await getCachedCheckIns();
       final index = checkIns.indexWhere((c) => c.id == checkIn.id);
@@ -186,10 +186,10 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<CheckInModel?> getCachedCheckIn(String checkInId) async {
+  Future<CheckIn?> getCachedCheckIn(String checkInId) async {
     try {
       final checkIns = await getCachedCheckIns();
-      return checkIns.cast<CheckInModel?>().firstWhere(
+      return checkIns.cast<CheckIn?>().firstWhere(
             (checkIn) => checkIn?.id == checkInId,
             orElse: () => null,
           );
@@ -214,7 +214,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   // ==================== Location Updates Operations ====================
 
   @override
-  Future<void> cacheLocationUpdates(List<LocationUpdateModel> updates) async {
+  Future<void> cacheLocationUpdates(List<LocationUpdate> updates) async {
     try {
       final List<Map<String, dynamic>> jsonList =
           updates.map((update) => update.toJson()).toList();
@@ -229,7 +229,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<LocationUpdateModel>> getCachedLocationUpdates() async {
+  Future<List<LocationUpdate>> getCachedLocationUpdates() async {
     if (await isCacheExpired()) {
       return [];
     }
@@ -241,7 +241,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList
           .map((json) =>
-              LocationUpdateModel.fromJson(json as Map<String, dynamic>))
+              LocationUpdate.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw const SafetyCacheRetrievalException(
@@ -250,7 +250,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<LocationUpdateModel>> getCachedActiveLocationShares() async {
+  Future<List<LocationUpdate>> getCachedActiveLocationShares() async {
     try {
       final allUpdates = await getCachedLocationUpdates();
       return allUpdates
@@ -263,7 +263,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<void> cacheLocationUpdate(LocationUpdateModel update) async {
+  Future<void> cacheLocationUpdate(LocationUpdate update) async {
     try {
       final updates = await getCachedLocationUpdates();
       final index = updates.indexWhere((u) => u.id == update.id);
@@ -281,10 +281,10 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<LocationUpdateModel?> getCachedLocationUpdate(String updateId) async {
+  Future<LocationUpdate?> getCachedLocationUpdate(String updateId) async {
     try {
       final updates = await getCachedLocationUpdates();
-      return updates.cast<LocationUpdateModel?>().firstWhere(
+      return updates.cast<LocationUpdate?>().firstWhere(
             (update) => update?.id == updateId,
             orElse: () => null,
           );
@@ -297,7 +297,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   // ==================== Safety Alerts Operations ====================
 
   @override
-  Future<void> cacheSafetyAlerts(List<SafetyAlertModel> alerts) async {
+  Future<void> cacheSafetyAlerts(List<SafetyAlert> alerts) async {
     try {
       final List<Map<String, dynamic>> jsonList =
           alerts.map((alert) => alert.toJson()).toList();
@@ -312,7 +312,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<SafetyAlertModel>> getCachedSafetyAlerts() async {
+  Future<List<SafetyAlert>> getCachedSafetyAlerts() async {
     if (await isCacheExpired()) {
       return [];
     }
@@ -323,7 +323,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
 
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList
-          .map((json) => SafetyAlertModel.fromJson(json as Map<String, dynamic>))
+          .map((json) => SafetyAlert.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw const SafetyCacheRetrievalException(
@@ -332,7 +332,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<SafetyAlertModel>> getCachedRecentSafetyAlerts(
+  Future<List<SafetyAlert>> getCachedRecentSafetyAlerts(
       {int limit = 20}) async {
     try {
       final allAlerts = await getCachedSafetyAlerts();
@@ -347,7 +347,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<void> cacheSafetyAlert(SafetyAlertModel alert) async {
+  Future<void> cacheSafetyAlert(SafetyAlert alert) async {
     try {
       final alerts = await getCachedSafetyAlerts();
       final index = alerts.indexWhere((a) => a.id == alert.id);
@@ -365,10 +365,10 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<SafetyAlertModel?> getCachedSafetyAlert(String alertId) async {
+  Future<SafetyAlert?> getCachedSafetyAlert(String alertId) async {
     try {
       final alerts = await getCachedSafetyAlerts();
-      return alerts.cast<SafetyAlertModel?>().firstWhere(
+      return alerts.cast<SafetyAlert?>().firstWhere(
             (alert) => alert?.id == alertId,
             orElse: () => null,
           );
@@ -379,7 +379,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<List<SafetyAlertModel>> getCachedMissedCheckInAlerts() async {
+  Future<List<SafetyAlert>> getCachedMissedCheckInAlerts() async {
     try {
       final allAlerts = await getCachedSafetyAlerts();
       return allAlerts
@@ -394,7 +394,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   // ==================== Safety Status Operations ====================
 
   @override
-  Future<void> cacheSafetyStatus(SafetyStatusModel status) async {
+  Future<void> cacheSafetyStatus(SafetyStatus status) async {
     try {
       await _sharedPreferences.setString(
         _safetyStatusKey,
@@ -407,7 +407,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<SafetyStatusModel?> getCachedSafetyStatus() async {
+  Future<SafetyStatus?> getCachedSafetyStatus() async {
     if (await isCacheExpired()) {
       return null;
     }
@@ -416,7 +416,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
       final jsonString = _sharedPreferences.getString(_safetyStatusKey);
       if (jsonString == null) return null;
 
-      return SafetyStatusModel.fromJson(jsonDecode(jsonString));
+      return SafetyStatus.fromJson(jsonDecode(jsonString));
     } catch (e) {
       throw const SafetyCacheRetrievalException(
           'Failed to retrieve cached safety status');

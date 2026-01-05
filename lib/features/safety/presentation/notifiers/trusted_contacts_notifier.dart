@@ -13,19 +13,16 @@ class TrustedContactsNotifier extends StateNotifier<TrustedContactsState> {
   final RemoveTrustedContactUseCase _removeContact;
   final UpdateTrustedContactUseCase _updateContact;
   final GetTrustedContactsUseCase _getContacts;
-  final StateNotifierProviderRef _ref;
 
   TrustedContactsNotifier({
     required AddTrustedContactUseCase addContact,
     required RemoveTrustedContactUseCase removeContact,
     required UpdateTrustedContactUseCase updateContact,
     required GetTrustedContactsUseCase getContacts,
-    required StateNotifierProviderRef ref,
   })  : _addContact = addContact,
         _removeContact = removeContact,
         _updateContact = updateContact,
         _getContacts = getContacts,
-        _ref = ref,
         super(const TrustedContactsState());
 
   /// Load all trusted contacts

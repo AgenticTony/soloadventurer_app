@@ -11,17 +11,14 @@ class LocationSharingNotifier extends StateNotifier<LocationSharingState> {
   final ShareLocationUseCase _shareLocation;
   final StopLocationSharingUseCase _stopLocationSharing;
   final GetActiveLocationSharesUseCase _getActiveShares;
-  final StateNotifierProviderRef _ref;
 
   LocationSharingNotifier({
     required ShareLocationUseCase shareLocation,
     required StopLocationSharingUseCase stopLocationSharing,
     required GetActiveLocationSharesUseCase getActiveShares,
-    required StateNotifierProviderRef ref,
   })  : _shareLocation = shareLocation,
         _stopLocationSharing = stopLocationSharing,
         _getActiveShares = getActiveShares,
-        _ref = ref,
         super(const LocationSharingState());
 
   /// Load active location shares

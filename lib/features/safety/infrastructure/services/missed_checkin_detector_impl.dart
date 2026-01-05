@@ -173,7 +173,7 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
             altitude: lastKnownLocation.altitude,
             address: lastKnownLocation.address,
             placeName: lastKnownLocation.placeName,
-            timestamp: lastKnownLocation.timestamp,
+            timestamp: lastKnownLocation.createdAt,
             mapsUrl: _buildMapsUrl(
               lastKnownLocation.latitude,
               lastKnownLocation.longitude,
@@ -257,8 +257,8 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
             longitude: currentLocation.longitude,
             accuracy: currentLocation.accuracy,
             altitude: currentLocation.altitude,
-            timestamp: currentLocation.timestamp,
             sharingStatus: LocationSharingStatus.active,
+            sharedWithContactIds: [], // No contacts sharing yet
             createdAt: DateTime.now(),
           );
         } catch (e) {
@@ -271,7 +271,7 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
       final now = DateTime.now();
 
       for (final update in updates) {
-        final age = now.difference(update.timestamp);
+        final age = now.difference(update.createdAt);
         if (age <= maxAge) {
           return update;
         }
