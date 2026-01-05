@@ -1,4 +1,240 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
+
+/// Cache for storing aspect ratios to avoid recalculating them
+///
+/// This cache improves performance for photo galleries by storing
+/// aspect ratios that have already been calculated or retrieved.
+class AspectRatioCache {
+  final Map<String, double> _cache = {};
+
+  /// Gets the aspect ratio from cache, or computes it if not cached
+  double get(String key, double Function() compute) {
+    return _cache.putIfAbsent(key, compute);
+  }
+
+  /// Pre-populates the cache with multiple aspect ratios
+  void preload(Map<String, double> ratios) {
+    _cache.addAll(ratios);
+  }
+
+  /// Clears all cached aspect ratios
+  void clear() {
+    _cache.clear();
+  }
+
+  /// Returns the number of cached aspect ratios
+  int get length => _cache.length;
+
+  /// Checks if an aspect ratio is cached
+  bool containsKey(String key) => _cache.containsKey(key);
+}
+
+/// A custom grid delegate that supports variable aspect ratios per item
+///
+/// This delegate calculates the height of each grid item based on its
+/// individual aspect ratio, allowing photo galleries to display images
+/// at their correct proportions while maintaining a grid layout.
+class _VariableAspectRatioDelegate extends SliverGridDelegate {
+  /// The number of columns in the grid
+  final int crossAxisCount;
+
+  /// The spacing between columns
+  final double crossAxisSpacing;
+
+  /// The spacing between rows
+  final double mainAxisSpacing;
+
+  /// Function that returns the aspect ratio for each item
+  final double Function(int index) getAspectRatio;
+
+  /// Creates a variable aspect ratio grid delegate
+  const _VariableAspectRatioDelegate({
+    required this.crossAxisCount,
+    required this.getAspectRatio,
+    this.crossAxisSpacing = 0.0,
+    this.mainAxisSpacing = 0.0,
+  });
+
+  @override
+  SliverGridLayout getLayout(SliverConstraints constraints) {
+    // Calculate the available cross-axis width for all columns
+    final double crossAxisExtent = constraints.crossAxisExtent;
+    final double usableCrossAxisExtent =
+        crossAxisExtent - (crossAxisCount - 1) * crossAxisSpacing;
+    final double childCrossAxisExtent = usableCrossAxisExtent / crossAxisCount;
+
+    // Calculate the number of rows based on item count
+    // This will be recalculated based on actual child count in the delegate
+    final int crossAxisCount = this.crossAxisCount;
+
+    return _SliverGridGridLayoutWithVariableAspectRatio(
+      crossAxisCount: crossAxisCount,
+      childCrossAxisExtent: childCrossAxisExtent,
+      crossAxisSpacing: crossAxisSpacing,
+      mainAxisSpacing: mainAxisSpacing,
+      getAspectRatio: getAspectRatio,
+    );
+  }
+
+  @override
+  bool shouldRelayout(_VariableAspectRatioDelegate oldDelegate) {
+    return oldDelegate.crossAxisCount != crossAxisCount ||
+        oldDelegate.crossAxisSpacing != crossAxisSpacing ||
+        oldDelegate.mainAxisSpacing != mainAxisSpacing ||
+        oldDelegate.getAspectRatio != getAspectRatio;
+  }
+}
+
+/// Custom grid layout that supports variable aspect ratios per item
+class _SliverGridGridLayoutWithVariableAspectRatio extends SliverGridLayout {
+  final int crossAxisCount;
+  final double childCrossAxisExtent;
+  final double crossAxisSpacing;
+  final double mainAxisSpacing;
+  final double Function(int index) getAspectRatio;
+
+  _SliverGridGridLayoutWithVariableAspectRatio({
+    required this.crossAxisCount,
+    required this.childCrossAxisExtent,
+    required this.crossAxisSpacing,
+    required this.mainAxisSpacing,
+    required this.getAspectRatio,
+  });
+
+  @override
+  double getMinScrollOffset(int childCount) {
+    return 0.0;
+  }
+
+  @override
+  double getMaxScrollOffset(int childCount) {
+    if (childCount == 0) return 0.0;
+
+    final int rowCount = (childCount + crossAxisCount - 1) ~/ crossAxisCount;
+    double maxMainAxisExtent = 0.0;
+
+    // Calculate the total height by summing up each row's height
+    for (int row = 0; row < rowCount; row++) {
+      double maxRowHeight = 0.0;
+
+      // Find the tallest item in this row
+      for (int col = 0; col < crossAxisCount; col++) {
+        final int index = row * crossAxisCount + col;
+        if (index < childCount) {
+          final double aspectRatio = getAspectRatio(index);
+          final double childHeight = childCrossAxisExtent / aspectRatio;
+          maxRowHeight = math.max(maxRowHeight, childHeight);
+        }
+      }
+
+      // Add row height plus spacing (except for the last row)
+      maxMainAxisExtent += maxRowHeight;
+      if (row < rowCount - 1) {
+        maxMainAxisExtent += mainAxisSpacing;
+      }
+    }
+
+    return maxMainAxisExtent;
+  }
+
+  @override
+  SliverGridGeometry getGeometryForChildIndex(int index) {
+    final int row = index ~/ crossAxisCount;
+    final int col = index % crossAxisCount;
+
+    final double aspectRatio = getAspectRatio(index);
+    final double childHeight = childCrossAxisExtent / aspectRatio;
+
+    // Calculate the main-axis position (vertical position)
+    double mainAxisOffset = 0.0;
+    for (int r = 0; r < row; r++) {
+      double maxRowHeight = 0.0;
+      for (int c = 0; c < crossAxisCount; c++) {
+        final int i = r * crossAxisCount + c;
+        final double ar = getAspectRatio(i);
+        final double h = childCrossAxisExtent / ar;
+        maxRowHeight = math.max(maxRowHeight, h);
+      }
+      mainAxisOffset += maxRowHeight + mainAxisSpacing;
+    }
+
+    // Calculate cross-axis position (horizontal position)
+    final double crossAxisOffset = col * (childCrossAxisExtent + crossAxisSpacing);
+
+    return SliverGridGeometry(
+      scrollOffset: mainAxisOffset,
+      crossAxisOffset: crossAxisOffset,
+      mainAxisExtent: childHeight,
+      crossAxisExtent: childCrossAxisExtent,
+    );
+  }
+
+  @override
+  int getMinChildIndexForScrollOffset(double scrollOffset) {
+    if (scrollOffset <= 0.0) return 0;
+
+    double currentOffset = 0.0;
+    int row = 0;
+
+    // Iterate through rows until we find where the scroll offset falls
+    // Use a maximum row limit to prevent infinite loops
+    while (row < 10000) {
+      double maxRowHeight = 0.0;
+
+      // Calculate the height of this row
+      for (int col = 0; col < crossAxisCount; col++) {
+        final int i = row * crossAxisCount + col;
+        final double ar = getAspectRatio(i);
+        final double h = childCrossAxisExtent / ar;
+        maxRowHeight = math.max(maxRowHeight, h);
+      }
+
+      // Check if this row contains the scroll offset
+      if (currentOffset + maxRowHeight > scrollOffset) {
+        return row * crossAxisCount;
+      }
+
+      currentOffset += maxRowHeight + mainAxisSpacing;
+      row++;
+    }
+
+    // Fallback: if we've gone through many rows, return a reasonable estimate
+    return 0;
+  }
+
+  @override
+  int getMaxChildIndexForScrollOffset(double scrollOffset) {
+    if (scrollOffset <= 0.0) return 0;
+
+    double currentOffset = 0.0;
+    int row = 0;
+
+    // Iterate through rows until we find where the scroll offset falls
+    while (row < 10000) {
+      double maxRowHeight = 0.0;
+
+      // Calculate the height of this row
+      for (int col = 0; col < crossAxisCount; col++) {
+        final int i = row * crossAxisCount + col;
+        final double ar = getAspectRatio(i);
+        final double h = childCrossAxisExtent / ar;
+        maxRowHeight = math.max(maxRowHeight, h);
+      }
+
+      // Check if this row contains the scroll offset
+      if (currentOffset + maxRowHeight > scrollOffset) {
+        return (row + 1) * crossAxisCount - 1;
+      }
+
+      currentOffset += maxRowHeight + mainAxisSpacing;
+      row++;
+    }
+
+    // Fallback: return a reasonable upper estimate
+    return (row + 1) * crossAxisCount;
+  }
+}
 
 /// A generic virtual grid widget that optimizes rendering of large grids.
 ///
@@ -12,6 +248,7 @@ import 'package:flutter/material.dart';
 /// - Configurable cross-axis count (number of columns)
 /// - Prototype item support for improved performance
 /// - Configurable aspect ratio for grid items
+/// - Per-item aspect ratio support for photo galleries
 /// - Optional spacing between items
 /// - Support for headers and footers
 /// - Loading and error state handling
@@ -40,10 +277,24 @@ import 'package:flutter/material.dart';
 ///   prototypeItem: PhotoCard(item: items.first), // Measured once for all items
 ///   itemBuilder: (context, index) => PhotoCard(item: items[index]),
 /// )
+///
+/// // With per-item aspect ratio for photos
+/// VirtualGridView<Photo>(
+///   itemCount: photos.length,
+///   crossAxisCount: 3,
+///   itemAspectRatioBuilder: (context, index, photo) => photo.aspectRatio,
+///   itemBuilder: (context, index, photo) => PhotoGridItem(photo: photo),
+/// )
 /// ```
 class VirtualGridView<T> extends StatelessWidget {
   /// The total number of items in the grid
   final int itemCount;
+
+  /// Optional list of items (required for per-item aspect ratio support)
+  ///
+  /// This is only needed when using [itemAspectRatioBuilder] to provide
+  /// access to the actual item data for calculating aspect ratios.
+  final List<T>? items;
 
   /// Builds the widget for each item at the given index
   final NullableItemWidgetBuilder<T> itemBuilder;
@@ -96,10 +347,21 @@ class VirtualGridView<T> extends StatelessWidget {
   /// Optional key for the grid
   final Key? gridKey;
 
+  /// Optional builder for per-item aspect ratios
+  ///
+  /// If provided, each grid item can have its own aspect ratio.
+  /// This is useful for photo galleries where photos have different dimensions.
+  /// The builder should return the aspect ratio (width / height) for each item.
+  ///
+  /// For optimal performance, the aspect ratios should be cached or pre-calculated.
+  /// When this is null, [childAspectRatio] is used for all items.
+  final double Function(BuildContext context, int index, T item)? itemAspectRatioBuilder;
+
   /// Creates a generic virtual grid view with efficient rendering
   const VirtualGridView({
     super.key,
     required this.itemCount,
+    this.items,
     required this.itemBuilder,
     required this.crossAxisCount,
     this.header,
@@ -117,6 +379,7 @@ class VirtualGridView<T> extends StatelessWidget {
     this.physics,
     this.controller,
     this.gridKey,
+    this.itemAspectRatioBuilder,
   });
 
   @override
@@ -137,7 +400,7 @@ class VirtualGridView<T> extends StatelessWidget {
     }
 
     // Build the grid with optional header and footer
-    final grid = _buildGrid();
+    final grid = _buildGrid(context);
 
     if (header == null && footer == null) {
       return grid;
@@ -158,11 +421,11 @@ class VirtualGridView<T> extends StatelessWidget {
   }
 
   /// Builds the appropriate grid widget based on configuration
-  Widget _buildGrid() {
+  Widget _buildGrid(BuildContext context) {
     // If using CustomScrollView, we need a SliverGrid
     if (header != null || footer != null) {
       return SliverGrid(
-        gridDelegate: _buildGridDelegate(),
+        gridDelegate: _buildGridDelegate(context),
         delegate: _buildDelegate(),
       );
     }
@@ -173,7 +436,7 @@ class VirtualGridView<T> extends StatelessWidget {
       controller: controller,
       physics: physics,
       padding: padding,
-      gridDelegate: _buildGridDelegate(),
+      gridDelegate: _buildGridDelegate(context),
       prototypeItem: prototypeItem,
       itemCount: itemCount,
       itemBuilder: itemBuilder,
@@ -181,7 +444,26 @@ class VirtualGridView<T> extends StatelessWidget {
   }
 
   /// Builds the sliver grid delegate
-  SliverGridDelegate _buildGridDelegate() {
+  SliverGridDelegate _buildGridDelegate(BuildContext context) {
+    // If per-item aspect ratio builder is provided, use custom delegate
+    if (itemAspectRatioBuilder != null) {
+      if (items == null) {
+        throw ArgumentError(
+          'items must be provided when using itemAspectRatioBuilder',
+        );
+      }
+      return _VariableAspectRatioDelegate(
+        crossAxisCount: crossAxisCount,
+        getAspectRatio: (index) {
+          if (index >= items!.length) return childAspectRatio;
+          return itemAspectRatioBuilder!(context, index, items![index]);
+        },
+        crossAxisSpacing: crossAxisSpacing,
+        mainAxisSpacing: mainAxisSpacing,
+      );
+    }
+
+    // Otherwise use standard fixed cross axis count delegate
     return SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: crossAxisCount,
       childAspectRatio: childAspectRatio,

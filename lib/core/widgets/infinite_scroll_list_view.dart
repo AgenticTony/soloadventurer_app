@@ -576,6 +576,18 @@ class InfiniteScrollGridView<T> extends StatefulWidget {
   /// Spacing between rows
   final double mainAxisSpacing;
 
+  /// Optional builder for per-item aspect ratios
+  ///
+  /// If provided, each grid item can have its own aspect ratio based on its data.
+  /// This is useful for photo galleries where photos have different dimensions.
+  /// The builder receives the context, index, and the item at that index.
+  ///
+  /// For optimal performance, ensure the item's aspect ratio is pre-calculated
+  /// or cached in the model (e.g., Photo.aspectRatio getter).
+  ///
+  /// When this is null, [childAspectRatio] is used for all items.
+  final double Function(BuildContext context, int index, T item)? itemAspectRatioBuilder;
+
   /// Optional key for the widget
   final Key? key;
 
@@ -601,6 +613,7 @@ class InfiniteScrollGridView<T> extends StatefulWidget {
     this.childAspectRatio = 1.0,
     this.crossAxisSpacing = 4.0,
     this.mainAxisSpacing = 4.0,
+    this.itemAspectRatioBuilder,
   }) : super(key: key);
 
   @override
@@ -808,6 +821,7 @@ class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
     // Build the grid with pull-to-refresh wrapper
     final grid = VirtualGridView<T>(
       itemCount: _state.loadedItemCount,
+      items: _state.items,
       itemBuilder: (context, index) {
         return widget.itemBuilder(context, _state.items[index]);
       },
@@ -820,6 +834,7 @@ class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
       crossAxisSpacing: widget.crossAxisSpacing,
       mainAxisSpacing: widget.mainAxisSpacing,
       emptyWidget: widget.emptyWidget,
+      itemAspectRatioBuilder: widget.itemAspectRatioBuilder,
     );
 
     if (!widget.enablePullToRefresh) {

@@ -34,24 +34,47 @@ class PhotoGalleryScreen extends ConsumerWidget {
     final page = cursor == null ? 1 : int.parse(cursor);
     final itemsPerPage = 20;
 
-    // Generate mock photos
+    // Generate mock photos with varied aspect ratios
     final photos = List.generate(
       page == 5 ? 10 : itemsPerPage, // Last page has fewer items
-      (i) => Photo(
-        id: '${page}_$i',
-        imageUrl: 'https://picsum.photos/300/${page}_$i',
-        thumbnailUrl: 'https://picsum.photos/150/${page}_$i',
-        caption: i % 3 == 0 ? 'Photo caption ${(page - 1) * itemsPerPage + i + 1}' : null,
-        tripId: 'trip123',
-        location: i % 2 == 0 ? 'Location ${(page - 1) * itemsPerPage + i + 1}' : null,
-        latitude: i % 2 == 0 ? 40.7128 + (i * 0.01) : null,
-        longitude: i % 2 == 0 ? -74.0060 + (i * 0.01) : null,
-        takenAt: DateTime.now().subtract(Duration(days: i)),
-        width: 300,
-        height: 300,
-        sizeInBytes: 1024 * 100, // 100KB
-        createdAt: DateTime.now().subtract(Duration(days: i)),
-      ),
+      (i) {
+        // Create varied aspect ratios to demonstrate the feature
+        // 0: portrait (3:4), 1: landscape (16:9), 2: square (1:1)
+        final aspectRatioType = i % 3;
+        int width, height;
+
+        switch (aspectRatioType) {
+          case 0: // Portrait
+            width = 300;
+            height = 400;
+            break;
+          case 1: // Landscape
+            width = 400;
+            height = 225;
+            break;
+          case 2: // Square
+          default:
+            width = 300;
+            height = 300;
+            break;
+        }
+
+        return Photo(
+          id: '${page}_$i',
+          imageUrl: 'https://picsum.photos/$width/$height?random=${page}_$i',
+          thumbnailUrl: 'https://picsum.photos/150/${(height * 150 / width).toInt()}?random=${page}_$i',
+          caption: i % 3 == 0 ? 'Photo caption ${(page - 1) * itemsPerPage + i + 1}' : null,
+          tripId: 'trip123',
+          location: i % 2 == 0 ? 'Location ${(page - 1) * itemsPerPage + i + 1}' : null,
+          latitude: i % 2 == 0 ? 40.7128 + (i * 0.01) : null,
+          longitude: i % 2 == 0 ? -74.0060 + (i * 0.01) : null,
+          takenAt: DateTime.now().subtract(Duration(days: i)),
+          width: width,
+          height: height,
+          sizeInBytes: 1024 * 100, // 100KB
+          createdAt: DateTime.now().subtract(Duration(days: i)),
+        );
+      },
     );
 
     return PaginatedData(
@@ -120,7 +143,12 @@ class PhotoGalleryScreen extends ConsumerWidget {
           },
         ),
         crossAxisCount: _getCrossAxisCount(context),
-        childAspectRatio: 1.0,
+        // Use per-item aspect ratio for correct photo proportions
+        itemAspectRatioBuilder: (context, index, photo) {
+          // Return the cached aspect ratio from the photo metadata
+          // The Photo model has a pre-calculated aspectRatio getter
+          return photo.aspectRatio;
+        },
         crossAxisSpacing: 4.0,
         mainAxisSpacing: 4.0,
         padding: const EdgeInsets.all(4.0),

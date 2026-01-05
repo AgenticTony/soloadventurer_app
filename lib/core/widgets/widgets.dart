@@ -9,7 +9,8 @@
 /// - [VirtualListView]: A generic virtual scrolling list for efficient
 ///   rendering of large datasets (500+ items)
 /// - [VirtualGridView]: A generic virtual scrolling grid for efficient
-///   rendering of large photo galleries (500+ items)
+///   rendering of large photo galleries (500+ items) with per-item
+///   aspect ratio support
 /// - [InfiniteScrollListView]: A generic infinite scroll list with automatic
 ///   pagination for handling large datasets with efficient memory usage
 /// - [InfiniteScrollGridView]: A generic infinite scroll grid with automatic
@@ -30,6 +31,8 @@
 ///   isolate repaints and improve list performance
 /// - [MultiStageImageLoader]: A multi-stage progressive image loader that
 ///   loads thumbnail → medium → full resolution for optimal performance
+/// - [AspectRatioCache]: A cache for storing aspect ratios to avoid
+///   recalculating them and improve photo grid performance
 ///
 /// ## Usage
 ///
@@ -61,6 +64,15 @@
 ///   itemBuilder: (context, index) => ImageCard(photo: photos[index]),
 /// )
 ///
+/// // Photo grid with per-item aspect ratios (for correct photo proportions)
+/// VirtualGridView<Photo>(
+///   itemCount: photos.length,
+///   items: photos,
+///   crossAxisCount: 3,
+///   itemAspectRatioBuilder: (context, index, photo) => photo.aspectRatio,
+///   itemBuilder: (context, index) => PhotoGridItem(photo: photos[index]),
+/// )
+///
 /// // Infinite scroll grid with pagination
 /// InfiniteScrollGridView<Photo>(
 ///   crossAxisCount: 3,
@@ -71,6 +83,20 @@
 ///       pageSize: 20,
 ///     );
 ///   },
+///   itemBuilder: (context, photo) => PhotoGridItem(photo: photo),
+/// )
+///
+/// // Infinite scroll grid with per-item aspect ratios
+/// InfiniteScrollGridView<Photo>(
+///   crossAxisCount: 3,
+///   fetchData: (cursor) async {
+///     return await photoRepository.getPhotosCursor(
+///       tripId: 'trip123',
+///       cursor: cursor,
+///       pageSize: 20,
+///     );
+///   },
+///   itemAspectRatioBuilder: (context, index, photo) => photo.aspectRatio,
 ///   itemBuilder: (context, photo) => PhotoGridItem(photo: photo),
 /// )
 ///
