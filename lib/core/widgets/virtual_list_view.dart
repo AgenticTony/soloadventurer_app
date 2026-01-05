@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 /// Features:
 /// - Virtual scrolling for memory efficiency
 /// - Configurable item extent for fixed-height items
+/// - Prototype item support for variable-height lists (eliminates layout thrashing)
 /// - Optional separators between items
 /// - Support for headers and footers
 /// - Loading and error state handling
@@ -26,6 +27,13 @@ import 'package:flutter/material.dart';
 /// VirtualListView<Item>(
 ///   itemCount: items.length,
 ///   separatorBuilder: (context, index) => Divider(height: 1),
+///   itemBuilder: (context, index) => ItemCard(item: items[index]),
+/// )
+///
+/// // With prototype item for variable-height lists (improves scroll performance)
+/// VirtualListView<Item>(
+///   itemCount: items.length,
+///   prototypeItem: ItemCard(item: items.first), // Measured once for all items
 ///   itemBuilder: (context, index) => ItemCard(item: items[index]),
 /// )
 /// ```
@@ -69,6 +77,9 @@ class VirtualListView<T> extends StatelessWidget {
   /// Optional fixed extent for each item (improves performance)
   final double? itemExtent;
 
+  /// Optional prototype item to estimate item extents (improves performance for variable-height lists)
+  final Widget? prototypeItem;
+
   /// Optional fixed extent for separators (improves performance)
   final double? separatorExtent;
 
@@ -100,6 +111,7 @@ class VirtualListView<T> extends StatelessWidget {
     this.scrollDirection = Axis.vertical,
     this.reverse = false,
     this.itemExtent,
+    this.prototypeItem,
     this.separatorExtent,
     this.padding,
     this.physics,
@@ -151,6 +163,21 @@ class VirtualListView<T> extends StatelessWidget {
   Widget _buildList() {
     // If using CustomScrollView, we need a SliverList
     if (header != null || footer != null) {
+      // Use prototype extent list if prototypeItem is provided
+      if (prototypeItem != null) {
+        return SliverPrototypeExtentList(
+          prototypeItem: prototypeItem!,
+          delegate: _buildDelegate(),
+        );
+      }
+      // Use fixed extent list if itemExtent is provided
+      if (itemExtent != null) {
+        return SliverFixedExtentList(
+          itemExtent: itemExtent!,
+          delegate: _buildDelegate(),
+        );
+      }
+      // Fall back to regular SliverList
       return SliverList(
         delegate: _buildDelegate(),
       );
@@ -166,6 +193,7 @@ class VirtualListView<T> extends StatelessWidget {
       padding: padding,
       itemCount: _calculateItemCount(),
       itemExtent: itemExtent,
+      prototypeItem: prototypeItem,
       itemBuilder: _buildItem,
     );
   }
@@ -229,6 +257,7 @@ extension VirtualListViewExtensions on VirtualListView {
     bool isLoading = false,
     bool hasError = false,
     double? itemExtent,
+    Widget? prototypeItem,
     double? separatorExtent,
     EdgeInsets? padding,
     ScrollController? controller,
@@ -247,6 +276,7 @@ extension VirtualListViewExtensions on VirtualListView {
       hasError: hasError,
       scrollDirection: Axis.vertical,
       itemExtent: itemExtent,
+      prototypeItem: prototypeItem,
       separatorExtent: separatorExtent,
       padding: padding,
       controller: controller,
@@ -267,6 +297,7 @@ extension VirtualListViewExtensions on VirtualListView {
     bool isLoading = false,
     bool hasError = false,
     double? itemExtent,
+    Widget? prototypeItem,
     double? separatorExtent,
     EdgeInsets? padding,
     ScrollController? controller,
@@ -285,6 +316,7 @@ extension VirtualListViewExtensions on VirtualListView {
       hasError: hasError,
       scrollDirection: Axis.horizontal,
       itemExtent: itemExtent,
+      prototypeItem: prototypeItem,
       separatorExtent: separatorExtent,
       padding: padding,
       controller: controller,

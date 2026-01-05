@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 /// Features:
 /// - Virtual scrolling for memory efficiency
 /// - Configurable cross-axis count (number of columns)
+/// - Prototype item support for improved performance
 /// - Configurable aspect ratio for grid items
 /// - Optional spacing between items
 /// - Support for headers and footers
@@ -29,6 +30,14 @@ import 'package:flutter/material.dart';
 ///   itemCount: items.length,
 ///   crossAxisCount: 2,
 ///   childAspectRatio: 1.0,
+///   itemBuilder: (context, index) => PhotoCard(item: items[index]),
+/// )
+///
+/// // With prototype item for improved performance
+/// VirtualGridView<Item>(
+///   itemCount: items.length,
+///   crossAxisCount: 2,
+///   prototypeItem: PhotoCard(item: items.first), // Measured once for all items
 ///   itemBuilder: (context, index) => PhotoCard(item: items[index]),
 /// )
 /// ```
@@ -62,6 +71,9 @@ class VirtualGridView<T> extends StatelessWidget {
 
   /// The number of children in the cross axis
   final int crossAxisCount;
+
+  /// Optional prototype item to estimate child extents (improves performance)
+  final Widget? prototypeItem;
 
   /// The ratio of the cross-axis to the main-axis extent of each child
   final double childAspectRatio;
@@ -97,6 +109,7 @@ class VirtualGridView<T> extends StatelessWidget {
     this.errorWidget,
     this.isLoading = false,
     this.hasError = false,
+    this.prototypeItem,
     this.childAspectRatio = 1.0,
     this.crossAxisSpacing = 4.0,
     this.mainAxisSpacing = 4.0,
@@ -161,6 +174,7 @@ class VirtualGridView<T> extends StatelessWidget {
       physics: physics,
       padding: padding,
       gridDelegate: _buildGridDelegate(),
+      prototypeItem: prototypeItem,
       itemCount: itemCount,
       itemBuilder: itemBuilder,
     );
@@ -201,6 +215,7 @@ extension VirtualGridViewExtensions on VirtualGridView {
     Widget? errorWidget,
     bool isLoading = false,
     bool hasError = false,
+    Widget? prototypeItem,
     int crossAxisCount = 3,
     EdgeInsets? padding,
     ScrollController? controller,
@@ -210,6 +225,7 @@ extension VirtualGridViewExtensions on VirtualGridView {
       itemCount: itemCount,
       itemBuilder: itemBuilder,
       crossAxisCount: crossAxisCount,
+      prototypeItem: prototypeItem,
       childAspectRatio: 1.0, // Square photos
       crossAxisSpacing: 2.0,
       mainAxisSpacing: 2.0,
@@ -237,6 +253,7 @@ extension VirtualGridViewExtensions on VirtualGridView {
     Widget? errorWidget,
     bool isLoading = false,
     bool hasError = false,
+    Widget? prototypeItem,
     int crossAxisCount = 2,
     EdgeInsets? padding,
     ScrollController? controller,
@@ -246,6 +263,7 @@ extension VirtualGridViewExtensions on VirtualGridView {
       itemCount: itemCount,
       itemBuilder: itemBuilder,
       crossAxisCount: crossAxisCount,
+      prototypeItem: prototypeItem,
       childAspectRatio: 1.2, // Slightly wider cards
       crossAxisSpacing: 8.0,
       mainAxisSpacing: 8.0,
