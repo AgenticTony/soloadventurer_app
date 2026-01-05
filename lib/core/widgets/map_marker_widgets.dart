@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../models/map_marker.dart';
@@ -462,6 +463,220 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
       baseSize: baseSize,
       color: color,
       onTap: onTap,
+    );
+  }
+}
+
+/// Zoom-aware cluster widget that adjusts size and style based on map zoom level
+///
+/// This widget automatically adjusts cluster size, color, and text style
+/// based on the current zoom level to provide optimal visual feedback.
+class ZoomAwareClusterWidget extends StatelessWidget {
+  /// The cluster data to display
+  final MapCluster cluster;
+
+  /// Current map zoom level (typically 0-18 for most maps)
+  final double zoomLevel;
+
+  /// Optional callback when cluster is tapped
+  final VoidCallback? onTap;
+
+  /// Whether to show exact count or abbreviated (e.g., 99+, 1.2k)
+  final bool abbreviateCount;
+
+  /// Custom color scheme override
+  final ClusterColorScheme? colorScheme;
+
+  /// Whether to enable animation when count or zoom changes
+  final bool animate;
+
+  const ZoomAwareClusterWidget({
+    super.key,
+    required this.cluster,
+    required this.zoomLevel,
+    this.onTap,
+    this.abbreviateCount = true,
+    this.colorScheme,
+    this.animate = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final config = _getZoomConfig();
+    final clusterColor = colorScheme?.getColor(cluster.markerCount) ??
+        _getClusterColor(context, cluster.markerCount);
+
+    return MapClusterWidget(
+      cluster: cluster,
+      baseSize: config.baseSize,
+      onTap: onTap,
+      abbreviateCount: abbreviateCount,
+      color: clusterColor,
+      animate: animate,
+      borderWidth: config.borderWidth,
+      textStyle: config.textStyle,
+    );
+  }
+
+  /// Get configuration based on zoom level
+  _ZoomConfig _getZoomConfig() {
+    // Adjust cluster appearance based on zoom level
+    if (zoomLevel >= 15) {
+      // Very zoomed in - smaller clusters, less prominent
+      return _ZoomConfig(
+        baseSize: 40.0,
+        borderWidth: 2.0,
+        textStyle: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else if (zoomLevel >= 12) {
+      // Moderately zoomed in - balanced appearance
+      return _ZoomConfig(
+        baseSize: 50.0,
+        borderWidth: 2.5,
+        textStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else if (zoomLevel >= 9) {
+      // Zoomed out - larger clusters for visibility
+      return _ZoomConfig(
+        baseSize: 60.0,
+        borderWidth: 3.0,
+        textStyle: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    } else {
+      // Very zoomed out - largest, most prominent clusters
+      return _ZoomConfig(
+        baseSize: 70.0,
+        borderWidth: 4.0,
+        textStyle: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+      );
+    }
+  }
+
+  /// Get color based on cluster size
+  Color _getClusterColor(BuildContext context, int markerCount) {
+    if (markerCount < 10) {
+      return Colors.green; // Small clusters
+    } else if (markerCount < 50) {
+      return Colors.orange; // Medium clusters
+    } else if (markerCount < 100) {
+      return Colors.red; // Large clusters
+    } else {
+      return Colors.purple; // Very large clusters
+    }
+  }
+
+  /// Create small zoom-aware cluster
+  factory ZoomAwareClusterWidget.small({
+    Key? key,
+    required MapCluster cluster,
+    required double zoomLevel,
+    VoidCallback? onTap,
+  }) {
+    return ZoomAwareClusterWidget(
+      key: key,
+      cluster: cluster,
+      zoomLevel: zoomLevel,
+      onTap: onTap,
+    );
+  }
+}
+
+/// Configuration for cluster appearance at different zoom levels
+class _ZoomConfig {
+  final double baseSize;
+  final double borderWidth;
+  final TextStyle textStyle;
+
+  const _ZoomConfig({
+    required this.baseSize,
+    required this.borderWidth,
+    required this.textStyle,
+  });
+}
+
+/// Color scheme for cluster rendering
+///
+/// Defines custom color gradients or thresholds for clusters
+/// based on their marker count.
+class ClusterColorScheme {
+  /// Custom color thresholds
+  final Map<int, Color> thresholds;
+
+  /// Default color if no threshold matches
+  final Color defaultColor;
+
+  /// Whether to use gradient interpolation between thresholds
+  final bool useGradient;
+
+  const ClusterColorScheme({
+    this.thresholds = const {},
+    this.defaultColor = Colors.blue,
+    this.useGradient = false,
+  });
+
+  /// Get color for cluster with given marker count
+  Color getColor(int markerCount) {
+    // Find matching threshold
+    final matchingThresholds = thresholds.entries.toList()
+      ..sort((a, b) => b.key.compareTo(a.key));
+
+    for (final entry in matchingThresholds) {
+      if (markerCount >= entry.key) {
+        return entry.value;
+      }
+    }
+
+    return defaultColor;
+  }
+
+  /// Create preset color scheme for traffic light style
+  factory ClusterColorScheme.trafficLight() {
+    return const ClusterColorScheme(
+      thresholds: {
+        100: Colors.red,
+        50: Colors.orange,
+        10: Colors.yellow,
+      },
+      defaultColor: Colors.green,
+    );
+  }
+
+  /// Create preset color scheme for heatmap style
+  factory ClusterColorScheme.heatmap() {
+    return const ClusterColorScheme(
+      thresholds: {
+        200: Colors.purple,
+        100: Colors.red,
+        50: Colors.orange,
+        20: Colors.amber,
+        10: Colors.yellow,
+      },
+      defaultColor: Colors.green,
+    );
+  }
+
+  /// Create preset color scheme for monochrome style
+  factory ClusterColorScheme.monochrome({Color baseColor = Colors.blue}) {
+    return ClusterColorScheme(
+      thresholds: {
+        100: baseColor.withOpacity(0.9),
+        50: baseColor.withOpacity(0.7),
+        10: baseColor.withOpacity(0.5),
+      },
+      defaultColor: baseColor.withOpacity(0.3),
+      useGradient: true,
     );
   }
 }

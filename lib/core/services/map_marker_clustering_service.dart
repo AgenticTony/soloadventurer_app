@@ -548,4 +548,146 @@ class MapMarkerClusteringService {
       params: _params,
     );
   }
+
+  /// Limit visible items to maximum count for performance
+  ///
+  /// Ensures the total number of visible items (clusters + unclustered markers)
+  /// does not exceed [maxVisibleItems]. Uses priority-based selection to keep
+  /// the most important items visible.
+  ///
+  /// Priority is determined by:
+  /// 1. Larger clusters are prioritized (they represent more data)
+  /// 2. Clustered markers are prioritized over unclustered
+  /// 3. Marker type importance (trip > accommodation > activity > others)
+  ///
+  /// Returns a new [ClusteringResult] with limited visible items.
+  ClusteringResult limitVisibleItems(
+    ClusteringResult result, {
+    int maxVisibleItems = 50,
+  }) {
+    final totalItems = result.clusters.length + result.unclusteredMarkers.length;
+
+    // If already under limit, return as-is
+    if (totalItems <= maxVisibleItems) {
+      return result;
+    }
+
+    // Sort clusters by priority (larger first, then by marker type importance)
+    final sortedClusters = List<MapCluster>.from(result.clusters);
+    sortedClusters.sort((a, b) {
+      // Primary sort: by marker count (descending)
+      final countComparison = b.markerCount.compareTo(a.markerCount);
+      if (countComparison != 0) return countComparison;
+
+      // Secondary sort: by importance of marker types in cluster
+      final aImportance = _calculateClusterImportance(a);
+      final bImportance = _calculateClusterImportance(b);
+      return bImportance.compareTo(aImportance);
+    });
+
+    // Sort unclustered markers by priority
+    final sortedMarkers = List<MapMarker>.from(result.unclusteredMarkers);
+    sortedMarkers.sort((a, b) {
+      return _getMarkerImportance(b).compareTo(_getMarkerImportance(a));
+    });
+
+    // Select top items using a greedy approach
+    final selectedClusters = <MapCluster>[];
+    final selectedMarkers = <MapMarker>[];
+    int visibleCount = 0;
+
+    // First, add as many high-priority clusters as possible
+    for (final cluster in sortedClusters) {
+      if (visibleCount >= maxVisibleItems) break;
+
+      // Prefer clusters over single markers (they represent more data)
+      selectedClusters.add(cluster);
+      visibleCount++;
+    }
+
+    // Then add unclustered markers if we have space
+    if (visibleCount < maxVisibleItems) {
+      final remainingSlots = maxVisibleItems - visibleCount;
+      selectedMarkers.addAll(
+        sortedMarkers.take(remainingSlots),
+      );
+      visibleCount += remainingSlots;
+    }
+
+    return ClusteringResult(
+      clusters: selectedClusters,
+      unclusteredMarkers: selectedMarkers,
+      totalMarkers: result.totalMarkers,
+      algorithm: result.algorithm,
+      params: result.params,
+    );
+  }
+
+  /// Calculate cluster importance score for prioritization
+  ///
+  /// Higher score = more important to show
+  double _calculateClusterImportance(MapCluster cluster) {
+    double score = 0;
+
+    for (final type in cluster.markerTypes) {
+      score += _getMarkerTypeImportance(type);
+    }
+
+    // Bonus for larger clusters
+    score *= (1 + (cluster.markerCount / 100));
+
+    return score;
+  }
+
+  /// Get importance score for a single marker
+  double _getMarkerImportance(MapMarker marker) {
+    return _getMarkerTypeImportance(marker.type);
+  }
+
+  /// Get importance score for marker type
+  double _getMarkerTypeImportance(MarkerType type) {
+    switch (type) {
+      case MarkerType.trip:
+        return 10.0; // Highest importance
+      case MarkerType.accommodation:
+        return 8.0;
+      case MarkerType.activity:
+        return 6.0;
+      case MarkerType.restaurant:
+        return 5.0;
+      case MarkerType.transport:
+        return 4.0;
+      case MarkerType.poi:
+        return 3.0;
+      case MarkerType.photo:
+        return 2.0;
+      case MarkerType.defaultType:
+        return 1.0; // Lowest importance
+    }
+  }
+
+  /// Cluster markers with automatic visible item limiting
+  ///
+  /// Convenience method that performs clustering and then limits
+  /// the visible items to [maxVisibleItems] for optimal performance.
+  ClusteringResult clusterMarkersWithLimit(
+    List<MapMarker> markers, {
+    int maxVisibleItems = 50,
+  }) {
+    final result = clusterMarkers(markers);
+    return limitVisibleItems(result, maxVisibleItems: maxVisibleItems);
+  }
+
+  /// Cluster markers within bounds with automatic visible item limiting
+  ///
+  /// Convenience method that performs bounds-based clustering and then limits
+  /// the visible items to [maxVisibleItems] for optimal performance.
+  ClusteringResult clusterMarkersInBoundsWithLimit(
+    List<MapMarker> markers,
+    LatLngBounds bounds, {
+    int maxVisibleItems = 50,
+  }) {
+    final result = clusterMarkersInBounds(markers, bounds);
+    return limitVisibleItems(result, maxVisibleItems: maxVisibleItems);
+  }
 }
