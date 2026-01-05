@@ -1,0 +1,595 @@
+{
+  "spec_id": "006-performance-optimization-for-large-trips",
+  "title": "Performance Optimization for Large Trips",
+  "description": "Optimize app performance for handling large, complex trips with hundreds of locations, activities, and photos",
+  "phases": [
+    {
+      "phase_id": "1",
+      "name": "Foundation & Performance Baseline",
+      "description": "Set up performance monitoring infrastructure and establish performance benchmarks",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "1.1",
+          "title": "Set up performance monitoring infrastructure",
+          "description": "Extend existing VirtualListPerformanceTracker to monitor app-wide performance metrics including startup time, memory usage, frame rate, and network latency",
+          "status": "completed",
+          "files_to_create": [
+            "lib/core/monitoring/performance/performance_monitor.dart",
+            "lib/core/monitoring/performance/performance_metrics.dart",
+            "lib/core/monitoring/performance/memory_profiler.dart"
+          ],
+          "files_to_modify": [
+            "lib/core/monitoring/performance/app_start_tracker.dart"
+          ],
+          "acceptance_criteria": [
+            "Performance monitor tracks app startup time",
+            "Memory profiler monitors heap and RSS memory usage",
+            "Frame rate tracker captures FPS metrics",
+            "All metrics logged to Sentry for production monitoring"
+          ],
+          "notes": "Implemented app-wide performance monitoring infrastructure:\n- Created performance_metrics.dart with PerformanceMetrics data class for aggregating startup time, memory usage, FPS, and network latency\n- Created performance_monitor.dart singleton service that tracks metrics in real-time and provides alerts\n- Created memory_profiler.dart utility for capturing and analyzing memory snapshots with trend analysis\n- Enhanced app_start_tracker.dart to integrate with PerformanceMonitor and provide detailed startup metrics\n- All classes follow established patterns from VirtualListPerformanceTracker and NetworkMonitor\n- Debug-only logging with kDebugMode checks throughout\n- Comprehensive documentation with usage examples"
+        },
+        {
+          "subtask_id": "1.2",
+          "title": "Create performance benchmark suite",
+          "description": "Create integration tests that simulate large trips (500+ activities, 1000+ photos) to establish baseline performance metrics",
+          "status": "pending",
+          "files_to_create": [
+            "integration_test/performance/large_trip_performance_test.dart",
+            "integration_test/performance/test_data_generators.dart"
+          ],
+          "acceptance_criteria": [
+            "Test generates trip with 500+ activities",
+            "Test generates trip with 1000+ photos",
+            "Baseline metrics recorded for app startup, list scrolling, and image loading"
+          ]
+        },
+        {
+          "subtask_id": "1.3",
+          "title": "Add performance DevTools support",
+          "description": "Enhance performance tracking widgets to display metrics in development mode for real-time monitoring",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/core/widgets/virtual_list_performance_tracker.dart"
+          ],
+          "files_to_create": [
+            "lib/features/performance/presentation/screens/performance_dashboard_screen.dart"
+          ],
+          "acceptance_criteria": [
+            "Performance overlay displays FPS, memory usage",
+            "Development mode shows render times for virtual lists",
+            "Metrics exportable for analysis"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "2",
+      "name": "Data Layer Optimization",
+      "description": "Optimize database queries, add proper indexing, and implement efficient data pagination",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "2.1",
+          "title": "Create Supabase database schema optimizations",
+          "description": "Add database indexes for commonly queried fields (tripId, userId, startDateTime, category, isCompleted) to improve query performance with large datasets",
+          "status": "pending",
+          "files_to_create": [
+            "scripts/database/migrations/add_performance_indexes.sql",
+            "docs/database/performance_schema.md"
+          ],
+          "acceptance_criteria": [
+            "Index on activities(tripId, userId)",
+            "Index on activities(userId, startDateTime)",
+            "Index on activities(category, isCompleted)",
+            "Index on photos(tripId, takenAt)",
+            "Migration script documented and tested"
+          ]
+        },
+        {
+          "subtask_id": "2.2",
+          "title": "Implement cursor-based pagination for all repositories",
+          "description": "Ensure all trip, activity, and photo repositories use efficient cursor-based pagination instead of offset-based for better performance with large datasets",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/repositories/supabase_activity_repository.dart",
+            "lib/core/repositories/supabase_trip_repository.dart",
+            "lib/core/repositories/supabase_photo_repository.dart"
+          ],
+          "acceptance_criteria": [
+            "Activity repository uses cursor-based pagination",
+            "Trip repository uses cursor-based pagination",
+            "Photo repository uses cursor-based pagination",
+            "Page size validation implemented (max 100 items per page)"
+          ]
+        },
+        {
+          "subtask_id": "2.3",
+          "title": "Implement data caching layer",
+          "description": "Add a multi-layer caching strategy with memory cache, disk cache, and network requests to reduce redundant data fetching",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/cache/cache_manager.dart",
+            "lib/core/cache/memory_cache.dart",
+            "lib/core/cache/disk_cache.dart",
+            "lib/core/cache/cache_stats.dart"
+          ],
+          "acceptance_criteria": [
+            "Memory cache with LRU eviction policy",
+            "Disk cache for offline support",
+            "Cache invalidation strategy implemented",
+            "Cache hit rate metrics tracked"
+          ]
+        },
+        {
+          "subtask_id": "2.4",
+          "title": "Add query optimization helpers",
+          "description": "Create utility functions for query optimization, including selective field loading, batch queries, and query deduplication",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/data/query_optimizer.dart",
+            "lib/core/data/batch_query_builder.dart"
+          ],
+          "acceptance_criteria": [
+            "Selective field loading for large queries",
+            "Batch query support for multiple IDs",
+            "Query deduplication prevents duplicate network requests",
+            "Query result caching"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "3",
+      "name": "UI List Performance",
+      "description": "Implement and optimize virtual scrolling for all list views",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "3.1",
+          "title": "Replace all ListView.builder with VirtualListView",
+          "description": "Audit and replace all standard ListView implementations with VirtualListView across the app for consistent performance",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/features/travel/presentation/screens/activities_screen.dart",
+            "lib/features/travel/presentation/screens/trip_items_screen.dart"
+          ],
+          "acceptance_criteria": [
+            "Activities screen uses VirtualListView",
+            "Trip items screen uses VirtualListView",
+            "All custom ListView implementations migrated",
+            "Performance benchmarked with 500+ items"
+          ]
+        },
+        {
+          "subtask_id": "3.2",
+          "title": "Optimize list item rendering",
+          "description": "Implement const constructors, avoid unnecessary rebuilds, and use RepaintBoundary widgets for complex list items",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/widgets/optimized_list_item.dart"
+          ],
+          "files_to_modify": [
+            "lib/features/travel/presentation/screens/activities_screen.dart"
+          ],
+          "acceptance_criteria": [
+            "Activity card uses const constructors where possible",
+            "RepaintBoundary wraps complex widgets",
+            "Item builder optimized for minimal rebuilds",
+            "Render time measured and documented"
+          ]
+        },
+        {
+          "subtask_id": "3.3",
+          "title": "Implement infinite scroll for large datasets",
+          "description": "Add InfiniteScrollListView to activities and photos screens for seamless loading of large datasets",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/features/travel/presentation/screens/activities_screen.dart",
+            "lib/features/travel/presentation/screens/photo_gallery_screen.dart",
+            "lib/core/widgets/infinite_scroll_list_view.dart"
+          ],
+          "acceptance_criteria": [
+            "Activities screen supports infinite scroll",
+            "Photo gallery supports infinite scroll",
+            "Loading indicators show during data fetch",
+            "Error handling with retry functionality"
+          ]
+        },
+        {
+          "subtask_id": "3.4",
+          "title": "Add item extent hints for performance",
+          "description": "Implement item extent hints for all virtual lists to improve scroll performance by eliminating layout thrashing",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/core/widgets/virtual_list_view.dart",
+            "lib/core/widgets/virtual_grid_view.dart"
+          ],
+          "acceptance_criteria": [
+            "Item extent calculated and cached",
+            "Variable extent support for complex items",
+            "Performance improved by 20%+ with 500+ items"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "4",
+      "name": "Image & Media Optimization",
+      "description": "Implement lazy loading, caching, and compression for images",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "4.1",
+          "title": "Enhance LazyLoadImage widget",
+          "description": "Improve LazyLoadImage with better visibility detection, preloading, and error recovery",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/core/widgets/lazy_load_image.dart"
+          ],
+          "acceptance_criteria": [
+            "Visibility detection optimized with configurable threshold",
+            "Preloading for off-screen images",
+            "Progressive image loading support",
+            "Error retry with exponential backoff"
+          ]
+        },
+        {
+          "subtask_id": "4.2",
+          "title": "Implement multi-stage image loading",
+          "description": "Add thumbnail � medium � full resolution image loading pipeline for optimal performance",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/widgets/multi_stage_image_loader.dart"
+          ],
+          "acceptance_criteria": [
+            "Thumbnail loaded first for fast preview",
+            "Medium resolution loaded for grid view",
+            "Full resolution loaded on demand",
+            "Smooth transitions between stages"
+          ]
+        },
+        {
+          "subtask_id": "4.3",
+          "title": "Configure image cache settings",
+          "description": "Optimize cached_network_image settings for memory and disk cache limits",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/config/image_cache_config.dart"
+          ],
+          "files_to_modify": [
+            "lib/app/bootstrap.dart"
+          ],
+          "acceptance_criteria": [
+            "Memory cache limited to 300 MB",
+            "Disk cache limited to 1 GB",
+            "Cache eviction policy configured",
+            "Cache statistics tracked"
+          ]
+        },
+        {
+          "subtask_id": "4.4",
+          "title": "Implement image compression service",
+          "description": "Create service for compressing images before upload to reduce bandwidth and storage",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/services/image_compression_service.dart"
+          ],
+          "acceptance_criteria": [
+            "JPEG compression with configurable quality (80% default)",
+            "Thumbnail generation (150x150, 300x300)",
+            "Maximum image size limits enforced",
+            "EXIF data stripped for privacy"
+          ]
+        },
+        {
+          "subtask_id": "4.5",
+          "title": "Add photo gallery grid optimization",
+          "description": "Enhance VirtualGridView for photo grid with aspect ratio caching and efficient recycling",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/core/widgets/virtual_grid_view.dart",
+            "lib/features/travel/presentation/screens/photo_gallery_screen.dart"
+          ],
+          "acceptance_criteria": [
+            "Aspect ratio cached per photo",
+            "Grid items recycled efficiently",
+            "Placeholder while images load",
+            "Smooth scrolling with 1000+ photos"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "5",
+      "name": "Map Performance Optimization",
+      "description": "Optimize map rendering with intelligent marker clustering and viewport-based loading",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "5.1",
+          "title": "Implement advanced marker clustering",
+          "description": "Enhance MapMarkerClusteringService with zoom-level aware clustering and custom cluster rendering",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/core/services/map_marker_clustering_service.dart",
+            "lib/core/widgets/map_marker_widgets.dart"
+          ],
+          "acceptance_criteria": [
+            "Markers cluster based on zoom level",
+            "Custom cluster icons with count display",
+            "Max 50 markers visible at any time",
+            "Smooth clustering animations"
+          ]
+        },
+        {
+          "subtask_id": "5.2",
+          "title": "Add viewport-based marker loading",
+          "description": "Load only markers within current map viewport to improve performance with large numbers of locations",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/services/map_viewport_loader.dart"
+          ],
+          "files_to_modify": [
+            "lib/features/travel/presentation/screens/trip_map_screen.dart"
+          ],
+          "acceptance_criteria": [
+            "Only visible markers loaded",
+            "Markers preload for adjacent viewport areas",
+            "Markers added/removed smoothly on pan/zoom",
+            "Debouncing for rapid map movements"
+          ]
+        },
+        {
+          "subtask_id": "5.3",
+          "title": "Optimize map marker data fetching",
+          "description": "Implement efficient querying for markers within bounds using database spatial queries",
+          "status": "pending",
+          "files_to_create": [
+            "lib/features/travel/infrastructure/repositories/spatial_activity_repository.dart"
+          ],
+          "acceptance_criteria": [
+            "Spatial query for markers within bounds",
+            "Query result caching by viewport",
+            "Query debouncing for rapid pan/zoom",
+            "Maximum 1000 markers considered for clustering"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "6",
+      "name": "Memory Management",
+      "description": "Optimize memory usage and prevent memory leaks",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "6.1",
+          "title": "Implement memory-aware image caching",
+          "description": "Add memory pressure listeners to adjust cache sizes based on available memory",
+          "status": "pending",
+          "files_to_create": [
+            "lib/core/cache/memory_aware_cache_manager.dart"
+          ],
+          "acceptance_criteria": [
+            "Cache size reduced under memory pressure",
+            "Low-memory listener implemented",
+            "Old cache entries evicted first",
+            "Memory usage stays within 200 MB baseline"
+          ]
+        },
+        {
+          "subtask_id": "6.2",
+          "title": "Add widget lifecycle management",
+          "description": "Ensure proper disposal of controllers, listeners, and subscriptions to prevent memory leaks",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/features/travel/presentation/screens/activities_screen.dart",
+            "lib/features/travel/presentation/screens/photo_gallery_screen.dart",
+            "lib/features/travel/presentation/screens/trip_map_screen.dart"
+          ],
+          "acceptance_criteria": [
+            "All StatefulWidgets have proper dispose",
+            "Controllers disposed in screens",
+            "Stream subscriptions canceled",
+            "No memory leaks detected in DevTools"
+          ]
+        },
+        {
+          "subtask_id": "6.3",
+          "title": "Implement efficient data models",
+          "description": "Use Freezed models with immutability and efficient copyWith for better memory performance",
+          "status": "pending",
+          "files_to_audit": [
+            "lib/features/travel/domain/models/activity.dart",
+            "lib/features/travel/domain/models/photo.dart",
+            "lib/features/travel/domain/models/trip.dart"
+          ],
+          "acceptance_criteria": [
+            "All models use Freezed for immutability",
+            "Large fields (images) use lazy loading",
+            "Collections use efficient data structures",
+            "Memory profiler shows no unexpected growth"
+          ]
+        },
+        {
+          "subtask_id": "6.4",
+          "title": "Add memory leak detection tests",
+          "description": "Create integration tests that detect memory leaks during common user flows",
+          "status": "pending",
+          "files_to_create": [
+            "integration_test/performance/memory_leak_test.dart"
+          ],
+          "acceptance_criteria": [
+            "Test for memory leaks during scrolling",
+            "Test for memory leaks during image loading",
+            "Test for memory leaks during map navigation",
+            "All tests pass with no memory growth"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "7",
+      "name": "App Startup Optimization",
+      "description": "Optimize app startup time to meet 2-second target",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "7.1",
+          "title": "Implement lazy initialization",
+          "description": "Defer non-critical initialization until after first frame rendered",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/app/bootstrap.dart",
+            "lib/app/my_app.dart"
+          ],
+          "files_to_create": [
+            "lib/core/initialization/lazy_initializer.dart"
+          ],
+          "acceptance_criteria": [
+            "Critical path initialized synchronously",
+            "Non-critical services deferred",
+            "First frame renders in < 500ms",
+            "Full initialization completes in < 2s"
+          ]
+        },
+        {
+          "subtask_id": "7.2",
+          "title": "Optimize dependency injection",
+          "description": "Review and optimize GetIt service locator registration for faster startup",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/app/di/service_locator.dart",
+            "lib/app/di/modules/core_module.dart",
+            "lib/app/di/modules/auth_module.dart"
+          ],
+          "acceptance_criteria": [
+            "Services registered in optimal order",
+            "Singleton initialization time tracked",
+            "Dependency injection completes in < 200ms",
+            "No circular dependencies"
+          ]
+        },
+        {
+          "subtask_id": "7.3",
+          "title": "Add deferred loading for features",
+          "description": "Implement deferred loading for less frequently used features to reduce initial bundle size",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/app/router/app_router.dart"
+          ],
+          "acceptance_criteria": [
+            "Performance feature loaded on demand",
+            "Admin features loaded on demand",
+            "Initial bundle size reduced by 20%",
+            "Deferred loading tracked in metrics"
+          ]
+        },
+        {
+          "subtask_id": "7.4",
+          "title": "Optimize app launch",
+          "description": "Remove unnecessary work from app launch and optimize native plugins initialization",
+          "status": "pending",
+          "files_to_modify": [
+            "lib/main.dart",
+            "lib/app/bootstrap.dart"
+          ],
+          "acceptance_criteria": [
+            "App launch time measured and optimized",
+            "Native plugins initialized efficiently",
+            "Splash screen stays minimal time",
+            "Time to interactive < 2 seconds"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "8",
+      "name": "Testing & Validation",
+      "description": "Validate performance improvements with comprehensive testing",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "8.1",
+          "title": "Create performance regression tests",
+          "description": "Add automated tests that fail if performance degrades beyond acceptable thresholds",
+          "status": "pending",
+          "files_to_create": [
+            "integration_test/performance/performance_regression_test.dart",
+            "integration_test/performance/test_thresholds.dart"
+          ],
+          "acceptance_criteria": [
+            "App startup time < 2s",
+            "List scrolling maintains 60 FPS with 500+ items",
+            "Image loading time < 500ms",
+            "Memory usage < 200 MB baseline"
+          ]
+        },
+        {
+          "subtask_id": "8.2",
+          "title": "Perform load testing",
+          "description": "Test app performance with realistic large datasets (500+ activities, 1000+ photos, 200+ map markers)",
+          "status": "pending",
+          "files_to_create": [
+            "integration_test/performance/load_test_scenarios.dart"
+          ],
+          "acceptance_criteria": [
+            "App handles 500+ activities smoothly",
+            "App handles 1000+ photos in gallery",
+            "Map renders 200+ markers with clustering",
+            "No UI freezing or stuttering"
+          ]
+        },
+        {
+          "subtask_id": "8.3",
+          "title": "Document performance metrics",
+          "description": "Create comprehensive documentation of performance benchmarks and optimization techniques",
+          "status": "pending",
+          "files_to_create": [
+            "docs/performance/benchmarks.md",
+            "docs/performance/optimization_techniques.md",
+            "docs/performance/best_practices.md"
+          ],
+          "acceptance_criteria": [
+            "Benchmarks documented with before/after metrics",
+            "Optimization techniques explained",
+            "Best practices guide for developers",
+            "Performance troubleshooting guide"
+          ]
+        },
+        {
+          "subtask_id": "8.4",
+          "title": "Validate on target devices",
+          "description": "Test performance on low-end and mid-range devices to ensure optimizations work across hardware spectrum",
+          "status": "pending",
+          "files_to_create": [
+            "integration_test/performance/device_performance_test.dart",
+            "docs/performance/device_compatibility.md"
+          ],
+          "acceptance_criteria": [
+            "Tested on low-end Android device",
+            "Tested on mid-range iOS device",
+            "Performance acceptable on both platforms",
+            "Device-specific optimizations documented"
+          ]
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    "App loads and renders smoothly with trips containing 500+ items",
+    "List views use virtual scrolling for memory efficiency",
+    "Images are lazy-loaded and compressed for optimal performance",
+    "Database queries are optimized with proper indexing",
+    "Map markers cluster intelligently for high-density areas",
+    "App startup time remains under 2 seconds even with large datasets",
+    "Memory usage stays within reasonable limits for mobile devices"
+  ],
+  "test_plan": "Run performance integration tests with 500+ activities and 1000+ photos, validate 60 FPS scrolling, confirm < 2s startup time, and verify memory usage under 200 MB",
+  "notes": "Many performance widgets already exist (VirtualListView, LazyLoadImage, etc.). Focus on integrating them properly, adding database optimizations, and ensuring comprehensive testing.",
+  "status": "in_progress",
+  "planStatus": "in_progress",
+  "updated_at": "2026-01-05T11:48:37.139Z"
+}
