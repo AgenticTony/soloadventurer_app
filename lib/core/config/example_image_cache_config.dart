@@ -142,9 +142,9 @@ class _BasicInitializationExampleState
         _initialized = true;
         _status = 'Initialized successfully!\n\n'
             'Settings:\n'
-            '• Memory Cache: 150 MB\n'
-            '• Disk Cache: 500 MB\n'
-            '• Max Images: 200';
+            '• Memory Cache: 300 MB\n'
+            '• Disk Cache: 1 GB\n'
+            '• Max Images: 300';
       });
     } catch (e) {
       setState(() {
@@ -447,20 +447,20 @@ class _DeviceSpecificConfigExampleState
   final Map<String, Map<String, dynamic>> _deviceConfigs = {
     'low_end': {
       'name': 'Low-End Device',
-      'memory': 50 * 1024 * 1024, // 50 MB
-      'disk': 200 * 1024 * 1024, // 200 MB
-      'images': 50,
+      'memory': 100 * 1024 * 1024, // 100 MB
+      'disk': 512 * 1024 * 1024, // 512 MB
+      'images': 100,
     },
     'mid_range': {
       'name': 'Mid-Range Device',
-      'memory': 150 * 1024 * 1024, // 150 MB
-      'disk': 500 * 1024 * 1024, // 500 MB
-      'images': 200,
+      'memory': 300 * 1024 * 1024, // 300 MB
+      'disk': 1024 * 1024 * 1024, // 1 GB
+      'images': 300,
     },
     'high_end': {
       'name': 'High-End Device',
-      'memory': 300 * 1024 * 1024, // 300 MB
-      'disk': 1024 * 1024 * 1024, // 1 GB
+      'memory': 500 * 1024 * 1024, // 500 MB
+      'disk': 2 * 1024 * 1024 * 1024, // 2 GB
       'images': 500,
     },
   };

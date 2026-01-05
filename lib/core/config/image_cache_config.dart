@@ -20,9 +20,9 @@ import 'package:flutter/material.dart';
 /// about how LRU eviction works and how to verify the configuration.
 ///
 /// Performance Targets:
-/// - Memory Cache: 100-150 MB (for ~100-200 images in memory)
-/// - Disk Cache: 500 MB - 1 GB (for offline support)
-/// - Max Images: 200-300 cached images
+/// - Memory Cache: 300 MB (for ~200-300 images in memory)
+/// - Disk Cache: 1 GB (for offline support)
+/// - Max Images: 300 cached images
 /// - Memory per Image: 500KB - 1MB (using memCacheWidth/Height)
 ///
 /// Usage:
@@ -47,23 +47,23 @@ import 'package:flutter/material.dart';
 /// await ImageCacheConfig.clearDiskCache();
 /// ```
 class ImageCacheConfig {
-  /// Default maximum memory cache size in bytes (150 MB)
+  /// Default maximum memory cache size in bytes (300 MB)
   ///
-  /// This allows approximately 100-200 images in memory at once, assuming
+  /// This allows approximately 200-300 images in memory at once, assuming
   /// 500KB - 1MB per image after compression.
-  static const int defaultMaxMemoryCacheSize = 150 * 1024 * 1024;
+  static const int defaultMaxMemoryCacheSize = 300 * 1024 * 1024;
 
-  /// Default maximum disk cache size in bytes (500 MB)
+  /// Default maximum disk cache size in bytes (1 GB)
   ///
   /// Provides offline support for frequently accessed photos while
   /// limiting storage usage.
-  static const int defaultMaxDiskCacheSize = 500 * 1024 * 1024;
+  static const int defaultMaxDiskCacheSize = 1024 * 1024 * 1024;
 
-  /// Default maximum number of images to cache in memory (200)
+  /// Default maximum number of images to cache in memory (300)
   ///
   /// Combined with maxMemoryCacheBytes, this ensures the cache doesn't
   /// grow too large with many small images or too small with few large images.
-  static const int defaultMaxMemoryCacheImages = 200;
+  static const int defaultMaxMemoryCacheImages = 300;
 
   /// Default image quality for JPEG compression (85%)
   ///
