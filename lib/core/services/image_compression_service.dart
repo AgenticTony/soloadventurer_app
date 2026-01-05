@@ -18,13 +18,14 @@ import 'package:path/path.dart' as path;
 /// - Faster uploads (less data to transfer)
 /// - Reduced storage costs
 /// - Better app performance (less I/O)
+/// - EXIF data automatically stripped for privacy
 ///
 /// Usage:
 /// ```dart
 /// // Compress an image file
 /// final result = await ImageCompressionService.compressFile(
 ///   file: imageFile,
-///   quality: 85,
+///   quality: 80,
 ///   maxWidth: 1920,
 /// );
 ///
@@ -38,17 +39,17 @@ import 'package:path/path.dart' as path;
 /// - Use quality 60-70 for thumbnails/avatars (smaller files)
 /// - Set maxWidth to 1920-2048 for full photos
 /// - Set maxWidth to 1024-1200 for shared photos
-/// - Set maxWidth to 600-800 for thumbnails
+/// - Set maxWidth to 150-300 for thumbnails
 class ImageCompressionService {
   /// Private constructor to prevent instantiation
   ImageCompressionService._();
 
-  /// Default JPEG compression quality (85%)
+  /// Default JPEG compression quality (80%)
   ///
   /// This provides a good balance between image quality and file size.
   /// Higher quality (90-95) for professional photos
   /// Lower quality (70-80) for thumbnails/avatars
-  static const int defaultQuality = 85;
+  static const int defaultQuality = 80;
 
   /// Default maximum width for images (1920 pixels)
   ///
