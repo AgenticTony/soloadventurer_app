@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:soloadventurer/core/models/map_marker.dart';
 import 'package:soloadventurer/core/services/map_marker_clustering_service.dart';
 import 'package:soloadventurer/core/services/zoom_aware_clustering_manager.dart';
-import 'package:soloadventurer/core/widgets/map_marker_widgets.dart';
+import 'package:soloadventurer/core/widgets/widgets.dart';
 
 /// Provider for trip map markers
 ///
@@ -657,11 +657,10 @@ class _ClusterExpandSheet extends ConsumerWidget {
 
           // Markers list
           Flexible(
-            child: ListView.builder(
-              shrinkWrap: true,
+            child: VirtualListView<MapEntry<MarkerType, List<MapMarker>>>(
+              itemCount: groupedMarkers.length,
               physics: const ClampingScrollPhysics(),
               padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: groupedMarkers.length,
               itemBuilder: (context, index) {
                 final entry = groupedMarkers.entries.elementAt(index);
                 final type = entry.key;
