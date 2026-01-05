@@ -9,17 +9,17 @@
     "failed": 0
   },
   "phase": {
-    "current": "UI List Performance",
+    "current": "Image & Media Optimization",
     "id": null,
-    "total": 4
+    "total": 5
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 10,
+    "number": 15,
     "started_at": "2026-01-05T12:48:43.006712"
   },
-  "last_update": "2026-01-05T13:28:05.318485"
+  "last_update": "2026-01-05T13:43:14.095756"
 }
