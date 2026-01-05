@@ -28,6 +28,8 @@
 ///   and size-based color coding
 /// - [OptimizedListItem]: A wrapper widget that adds RepaintBoundary to
 ///   isolate repaints and improve list performance
+/// - [MultiStageImageLoader]: A multi-stage progressive image loader that
+///   loads thumbnail → medium → full resolution for optimal performance
 ///
 /// ## Usage
 ///
@@ -105,6 +107,16 @@
 ///     itemBuilder: (context, index) => TripCard(trip: trips[index]),
 ///   ),
 /// )
+///
+/// // Multi-stage image loading
+/// MultiStageImageLoader.photoGrid(
+///   thumbnailUrl: photo.thumbnailUrl,
+///   mediumUrl: photo.mediumUrl,
+///   fullUrl: photo.fullUrl,
+///   size: 150.0,
+///   loadFullOnTap: true,
+///   onStageChanged: (stage) => debugPrint('Stage: $stage'),
+/// )
 /// ```
 
 export 'virtual_list_view.dart';
@@ -116,3 +128,4 @@ export 'image_placeholder.dart';
 export 'image_error_widget.dart';
 export 'map_marker_widgets.dart';
 export 'optimized_list_item.dart';
+export 'multi_stage_image_loader.dart';
