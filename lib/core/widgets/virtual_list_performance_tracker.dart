@@ -308,7 +308,7 @@ class _VirtualListPerformanceTrackerState
     }
 
     // Wrap child with stack if overlay is enabled
-    if (widget.showOverlay && _currentMetrics != null) {
+    if (widget.showOverlay) {
       return Stack(
         children: [
           widget.child,
@@ -316,8 +316,10 @@ class _VirtualListPerformanceTrackerState
             top: 8,
             right: 8,
             child: _PerformanceOverlay(
-              metrics: _currentMetrics!,
+              metrics: _currentMetrics,
               itemName: widget.itemName,
+              totalFrames: _totalFrames,
+              jankyFrames: _jankyFrames,
             ),
           ),
         ],
@@ -329,69 +331,136 @@ class _VirtualListPerformanceTrackerState
 }
 
 /// A performance overlay widget that displays metrics in a compact card
-class _PerformanceOverlay extends StatelessWidget {
-  final VirtualListPerformanceMetrics metrics;
+class _PerformanceOverlay extends StatefulWidget {
+  final VirtualListPerformanceMetrics? metrics;
   final String? itemName;
+  final int totalFrames;
+  final int jankyFrames;
 
   const _PerformanceOverlay({
     required this.metrics,
     this.itemName,
+    required this.totalFrames,
+    required this.jankyFrames,
   });
+
+  @override
+  State<_PerformanceOverlay> createState() => _PerformanceOverlayState();
+}
+
+class _PerformanceOverlayState extends State<_PerformanceOverlay> {
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final meetsTargets = metrics.meetsTargets();
+    final metrics = widget.metrics;
+    final meetsTargets = metrics?.meetsTargets() ?? true;
 
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: meetsTargets
-                ? Colors.green.withOpacity(0.5)
-                : Colors.orange.withOpacity(0.5),
-            width: 2,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isExpanded = !_isExpanded;
+          });
+        },
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 180),
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withOpacity(0.95),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: meetsTargets
+                  ? Colors.green.withOpacity(0.5)
+                  : Colors.orange.withOpacity(0.5),
+              width: 2,
+            ),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (itemName != null)
-              Text(
-                itemName!,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with expand icon
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (widget.itemName != null)
+                    Flexible(
+                      child: Text(
+                        widget.itemName!,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  Icon(
+                    _isExpanded
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    size: 16,
+                  ),
+                ],
               ),
-            const SizedBox(height: 4),
-            _MetricRow(
-              label: 'FPS',
-              value: metrics.averageFPS.toStringAsFixed(1),
-              isGood: metrics.averageFPS >= 55,
-            ),
-            _MetricRow(
-              label: 'Janky',
-              value: '${metrics.jankyFramePercentage.toStringAsFixed(1)}%',
-              isGood: metrics.jankyFramePercentage < 10,
-            ),
-            _MetricRow(
-              label: 'Render',
-              value: '${metrics.initialRenderTimeMs}ms',
-              isGood: metrics.initialRenderTimeMs < 1000,
-            ),
-            _MetricRow(
-              label: 'Memory',
-              value:
-                  '${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(1)}MB',
-              isGood: metrics.currentMemoryUsageBytes < 150 * 1024 * 1024,
-            ),
-          ],
+              if (!_isExpanded && metrics != null) ...[
+                const SizedBox(height: 4),
+                _MetricRow(
+                  label: 'FPS',
+                  value: metrics.averageFPS.toStringAsFixed(1),
+                  isGood: metrics.averageFPS >= 55,
+                ),
+                _MetricRow(
+                  label: 'Janky',
+                  value: '${metrics.jankyFramePercentage.toStringAsFixed(1)}%',
+                  isGood: metrics.jankyFramePercentage < 10,
+                ),
+              ],
+              if (_isExpanded && metrics != null) ...[
+                const SizedBox(height: 4),
+                _MetricRow(
+                  label: 'FPS',
+                  value: metrics.averageFPS.toStringAsFixed(1),
+                  isGood: metrics.averageFPS >= 55,
+                ),
+                _MetricRow(
+                  label: 'Janky',
+                  value: '${metrics.jankyFramePercentage.toStringAsFixed(1)}%',
+                  isGood: metrics.jankyFramePercentage < 10,
+                ),
+                _MetricRow(
+                  label: 'Frames',
+                  value: '${widget.totalFrames}',
+                  isGood: true,
+                ),
+                _MetricRow(
+                  label: 'Janky Count',
+                  value: '${widget.jankyFrames}',
+                  isGood: widget.jankyFrames < 10,
+                ),
+                _MetricRow(
+                  label: 'Render',
+                  value: '${metrics.initialRenderTimeMs}ms',
+                  isGood: metrics.initialRenderTimeMs < 1000,
+                ),
+                _MetricRow(
+                  label: 'Memory',
+                  value:
+                      '${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(1)}MB',
+                  isGood: metrics.currentMemoryUsageBytes < 150 * 1024 * 1024,
+                ),
+              ],
+              if (metrics == null)
+                Text(
+                  'Waiting for data...',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
