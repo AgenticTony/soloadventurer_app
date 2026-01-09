@@ -13,8 +13,7 @@ import 'package:soloadventurer/features/profile/presentation/screens/edit_profil
 import 'package:soloadventurer/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/pages/cloudwatch_test_page.dart';
-import 'package:soloadventurer/features/performance/presentation/screens/performance_benchmark_screen.dart';
-import 'package:soloadventurer/features/performance/presentation/routes/performance_routes.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/routes/destination_discovery_routes.dart';
 
 /// App router for handling navigation
 class AppRouter {
@@ -36,9 +35,9 @@ class AppRouter {
       }
     }
 
-    // Check if it's an offline route
-    if (settings.name?.startsWith('/settings/sync') == true) {
-      final route = OfflineRoutes.onGenerateRoute(settings);
+    // Check if it's a destination discovery route
+    if (settings.name?.startsWith('/destinations') == true) {
+      final route = DestinationDiscoveryRouter.onGenerateRoute(settings);
       if (route != null) {
         return route;
       }

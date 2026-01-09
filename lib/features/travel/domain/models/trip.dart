@@ -21,6 +21,12 @@ class Trip with _$Trip {
     List<String>? travelCompanionIds,
     required DateTime createdAt,
     required DateTime updatedAt,
+    /// List of destination IDs from the destination discovery feature
+    @Default([]) List<String> destinationIds,
+    /// Optional notes for each destination (keyed by destination ID)
+    @Default({}) Map<String, String> destinationNotes,
+    /// Whether this trip was created from destination discovery
+    @Default(false) bool isFromDiscovery,
   }) = _Trip;
 
   factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
