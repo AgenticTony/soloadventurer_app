@@ -1,0 +1,624 @@
+{
+  "feature": "Travel Journal with Media",
+  "description": "# Travel Journal with Media\n\nRich travel journal with photo and video uploads, text notes, location tagging, mood tracking, and media organization. Users can document daily experiences, add memories, and organize content by trip or date with automatic backups.\n\n## Rationale\nAddresses user pain point: 'Difficulty documenting and sharing travel experiences in one place.' Addresses competitor issues with clunky journal apps (pain-4-2) and crashes when adding photos (pain-2-2). Solo travelers value being able to document and share their adventures.\n\n## User Stories\n- As a traveler, I want to document my daily experiences with photos and notes so that I can remember my trip\n- As a user, I want to organize my journal by trip so that I can easily find memories from specific adventures\n- As a traveler, I want to upload photos in the background so that I can continue using the app while they sync\n\n## Acceptance Criteria\n- [ ] Users can create journal entries with rich text formatting\n- [ ] Photos and videos upload in background with compression\n- [ ] Entries are automatically tagged with location and date\n- [ ] Users can organize entries by trip, date, or custom tags\n- [ ] Media gallery views all photos/videos from a trip\n- [ ] Offline editing with sync when connection available\n- [ ] Export or share entire trips or individual entries\n- [ ] Memory timeline shows chronological view of all travel experiences\n",
+  "created_at": "2026-01-04T18:29:59.629Z",
+  "updated_at": "2026-01-06T00:00:00.000Z",
+  "status": "in_progress",
+  "phases": [
+    {
+      "phase_id": "1",
+      "name": "Foundation & Database Schema",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "1.1",
+          "title": "Design database schema for journal entries and media",
+          "description": "Create Supabase tables for journal_entries, media_items, trips, and tags with proper relationships",
+          "status": "completed",
+          "files": [
+            "supabase/migrations/20250104000000_create_travel_journal_tables.sql"
+          ]
+        },
+        {
+          "subtask_id": "1.2",
+          "title": "Set up storage buckets for media",
+          "description": "Create Supabase storage buckets for photos and videos with proper RLS policies",
+          "status": "completed",
+          "files": [
+            "supabase/migrations/20250105000000_create_journal_storage_buckets.sql"
+          ]
+        },
+        {
+          "subtask_id": "1.3",
+          "title": "Create TypeScript types for journal entities",
+          "description": "Define TypeScript interfaces for JournalEntry, MediaItem, Trip, and Tag",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/entities/trip.dart",
+            "lib/features/journal/domain/entities/journal_entry.dart",
+            "lib/features/journal/domain/entities/media_item.dart",
+            "lib/features/journal/domain/entities/tag.dart",
+            "lib/features/journal/data/models/trip_model.dart",
+            "lib/features/journal/data/models/journal_entry_model.dart",
+            "lib/features/journal/data/models/media_item_model.dart",
+            "lib/features/journal/data/models/tag_model.dart"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "2",
+      "name": "Core Journal Entry Functionality",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "2.1",
+          "title": "Implement rich text editor component",
+          "description": "Create a rich text editor with formatting options (bold, italic, lists, headers)",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/rich_text_editor.dart",
+            "lib/features/journal/presentation/widgets/editor_toolbar.dart",
+            "lib/features/journal/presentation/widgets/rich_text_editor_example.dart",
+            "lib/features/journal/presentation/widgets/README.md"
+          ]
+        },
+        {
+          "subtask_id": "2.2",
+          "title": "Create journal entry creation flow",
+          "description": "Build UI and logic for creating new journal entries with title, content, and date",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/journal_entry_providers.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "2.3",
+          "title": "Implement journal entry API functions",
+          "description": "Create CRUD operations for journal entries using Supabase",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/repositories/journal_repository.dart",
+            "lib/features/journal/data/datasources/journal_remote_data_source.dart",
+            "lib/features/journal/data/datasources/journal_remote_data_source_impl.dart",
+            "lib/features/journal/data/repositories/journal_repository_impl.dart",
+            "lib/features/journal/data/repositories/README.md",
+            "lib/features/journal/presentation/providers/journal_entry_providers.dart",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "2.4",
+          "title": "Build journal entry detail view",
+          "description": "Create screen to view individual journal entries with all content",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/journal_entry_detail_provider.dart",
+            "lib/features/journal/presentation/widgets/rich_text_viewer.dart",
+            "lib/features/journal/presentation/screens/journal_entry_detail_screen.dart",
+            "lib/features/journal/presentation/screens/journal_entry_detail_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_ENTRY_DETAIL.md"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "3",
+      "name": "Media Upload & Management",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "3.1",
+          "title": "Implement image compression utility",
+          "description": "Create utility to compress images before upload while maintaining quality",
+          "status": "completed",
+          "files": [
+            "lib/utils/media_compression.dart",
+            "lib/utils/README_MEDIA_COMPRESSION.md",
+            "lib/utils/media_compression_example.dart",
+            "lib/core/errors/exceptions.dart",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "3.2",
+          "title": "Create video compression utility",
+          "description": "Implement video compression for reduced file sizes",
+          "status": "completed",
+          "files": [
+            "lib/utils/video_compression.dart",
+            "lib/utils/README_VIDEO_COMPRESSION.md",
+            "lib/utils/video_compression_example.dart",
+            "lib/core/errors/exceptions.dart"
+          ]
+        },
+        {
+          "subtask_id": "3.3",
+          "title": "Build media picker component",
+          "description": "Create component to select photos and videos from device library",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/media_picker.dart",
+            "lib/features/journal/presentation/widgets/media_picker_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_PICKER.md"
+          ]
+        },
+        {
+          "subtask_id": "3.4",
+          "title": "Implement background upload service",
+          "description": "Create service to upload media in background with queue management",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/data/models/upload_task.dart",
+            "lib/features/journal/domain/services/media_upload_service.dart",
+            "lib/features/journal/data/services/media_upload_service_impl.dart",
+            "lib/features/journal/presentation/providers/media_upload_providers.dart",
+            "lib/features/journal/data/services/README_MEDIA_UPLOAD.md",
+            "lib/features/journal/data/services/media_upload_service_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "3.5",
+          "title": "Add upload progress indicator",
+          "description": "Show progress bars for media uploads in journal entries",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/media_upload_progress_indicator.dart",
+            "lib/features/journal/presentation/widgets/media_upload_progress_indicator_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_UPLOAD_PROGRESS.md"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "4",
+      "name": "Location & Metadata",
+      "status": "completed",
+      "subtasks": [
+        {
+          "subtask_id": "4.1",
+          "title": "Implement automatic location tagging",
+          "description": "Capture and store location data when creating journal entries",
+          "status": "completed",
+          "files": [
+            "lib/utils/location_service.dart",
+            "lib/features/journal/presentation/providers/journal_entry_providers.dart",
+            "lib/features/journal/presentation/widgets/location_capture_widget.dart",
+            "lib/core/errors/exceptions.dart"
+          ]
+        },
+        {
+          "subtask_id": "4.2",
+          "title": "Create location picker component",
+          "description": "Allow users to manually select or edit location for entries",
+          "status": "completed",
+          "files": [
+            "lib/utils/geocoding_service.dart",
+            "lib/utils/geocoding_service_example.dart",
+            "lib/features/journal/presentation/widgets/location_picker_widget.dart",
+            "lib/features/journal/presentation/widgets/location_picker_widget_example.dart",
+            "lib/features/journal/presentation/widgets/README_LOCATION_PICKER.md",
+            "lib/core/errors/exceptions.dart"
+          ]
+        },
+        {
+          "subtask_id": "4.3",
+          "title": "Extract EXIF data from photos",
+          "description": "Pull location and date metadata from uploaded photos",
+          "status": "completed",
+          "files": [
+            "lib/utils/exif_utils.dart",
+            "lib/utils/exif_utils_example.dart",
+            "lib/utils/README_EXIF_UTILS.md",
+            "lib/core/errors/exceptions.dart",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "4.4",
+          "title": "Add mood tracking feature",
+          "description": "Allow users to tag entries with mood emojis",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/mood_picker.dart",
+            "lib/features/journal/presentation/widgets/mood_picker_example.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen.dart",
+            "lib/features/journal/presentation/widgets/README_MOOD_PICKER.md"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "5",
+      "name": "Organization & Tagging",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "5.1",
+          "title": "Create trip management system",
+          "description": "Allow users to create and manage trips to organize entries",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/data/datasources/trip_remote_data_source.dart",
+            "lib/features/journal/data/datasources/trip_remote_data_source_impl.dart",
+            "lib/features/journal/domain/repositories/trip_repository.dart",
+            "lib/features/journal/data/repositories/trip_repository_impl.dart",
+            "lib/features/journal/presentation/providers/trip_providers.dart",
+            "lib/features/journal/presentation/screens/trip_list_screen.dart",
+            "lib/features/journal/presentation/screens/create_trip_screen.dart",
+            "lib/features/journal/presentation/screens/trip_detail_screen.dart",
+            "lib/features/journal/data/repositories/README_TRIP.md",
+            "lib/features/journal/presentation/screens/trip_screens_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "5.2",
+          "title": "Implement custom tags feature",
+          "description": "Create tagging system for categorizing entries",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/data/datasources/tag_remote_data_source.dart",
+            "lib/features/journal/data/datasources/tag_remote_data_source_impl.dart",
+            "lib/features/journal/domain/repositories/tag_repository.dart",
+            "lib/features/journal/data/repositories/tag_repository_impl.dart",
+            "lib/features/journal/presentation/providers/tag_providers.dart",
+            "lib/features/journal/presentation/screens/tag_list_screen.dart",
+            "lib/features/journal/presentation/screens/create_tag_screen.dart",
+            "lib/features/journal/presentation/widgets/tag_picker.dart",
+            "lib/features/journal/presentation/screens/tag_screens_example.dart",
+            "lib/features/journal/data/repositories/README_TAG.md"
+          ]
+        },
+        {
+          "subtask_id": "5.3",
+          "title": "Build trip overview screen",
+          "description": "Show all entries and media for a specific trip",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/trip_overview_provider.dart",
+            "lib/features/journal/presentation/screens/trip_overview_screen.dart",
+            "lib/features/journal/presentation/screens/README_TRIP_OVERVIEW.md",
+            "lib/features/journal/presentation/screens/trip_overview_screen_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "5.4",
+          "title": "Add search and filter functionality",
+          "description": "Allow searching entries by text, location, date, or tags",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/journal_search_provider.dart",
+            "lib/features/journal/presentation/screens/journal_search_screen.dart",
+            "lib/features/journal/presentation/widgets/journal_search_filter_sheet.dart",
+            "lib/features/journal/presentation/screens/journal_search_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_SEARCH.md"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "6",
+      "name": "Media Gallery & Views",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "6.1",
+          "title": "Create media gallery grid view",
+          "description": "Build grid layout to display all photos and videos from a trip",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/media_gallery.dart",
+            "lib/features/journal/presentation/widgets/media_gallery_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_GALLERY.md"
+          ]
+        },
+        {
+          "subtask_id": "6.2",
+          "title": "Implement fullscreen media viewer",
+          "description": "Create modal to view photos and videos at full screen",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/media_viewer.dart",
+            "lib/features/journal/presentation/widgets/media_viewer_example.dart",
+            "lib/features/journal/presentation/widgets/README_MEDIA_VIEWER.md",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "6.3",
+          "title": "Build memory timeline view",
+          "description": "Create chronological timeline of all travel experiences",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/memory_timeline_provider.dart",
+            "lib/features/journal/presentation/widgets/timeline_item.dart",
+            "lib/features/journal/presentation/screens/memory_timeline_screen.dart",
+            "lib/features/journal/presentation/screens/memory_timeline_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_MEMORY_TIMELINE.md"
+          ]
+        },
+        {
+          "subtask_id": "6.4",
+          "title": "Add map view for trip locations",
+          "description": "Display all journal locations on an interactive map",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/journal_map_provider.dart",
+            "lib/features/journal/presentation/screens/journal_map_screen.dart",
+            "lib/features/journal/presentation/screens/journal_map_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_MAP.md"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "7",
+      "name": "Offline Support & Sync",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "7.1",
+          "title": "Implement offline storage with SQLite",
+          "description": "Set up local database for offline journal entry storage",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/data/datasources/database_helper.dart",
+            "lib/features/journal/data/datasources/journal_local_data_source.dart",
+            "lib/features/journal/data/datasources/journal_local_data_source_impl.dart",
+            "lib/features/journal/data/datasources/trip_local_data_source.dart",
+            "lib/features/journal/data/datasources/trip_local_data_source_impl.dart",
+            "lib/features/journal/data/datasources/tag_local_data_source.dart",
+            "lib/features/journal/data/datasources/tag_local_data_source_impl.dart",
+            "lib/features/journal/data/datasources/README_OFFLINE_STORAGE.md",
+            "lib/core/errors/app_exception.dart",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "7.2",
+          "title": "Create sync service",
+          "description": "Implement bidirectional sync between local and remote databases",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/services/sync_service.dart",
+            "lib/features/journal/data/services/sync_service_impl.dart",
+            "lib/features/journal/data/services/README_SYNC_SERVICE.md",
+            "lib/features/journal/data/services/sync_service_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "7.3",
+          "title": "Add conflict resolution logic",
+          "description": "Handle conflicts when same entry is edited offline and online",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/services/conflict_resolution_service.dart",
+            "lib/features/journal/data/services/conflict_resolution_service_impl.dart",
+            "lib/features/journal/data/services/README_CONFLICT_RESOLUTION.md",
+            "lib/features/journal/data/services/conflict_resolution_service_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "7.4",
+          "title": "Implement offline mode indicator",
+          "description": "Show visual indicator when app is in offline mode",
+          "status": "completed",
+          "files": [
+            "lib/features/core/presentation/widgets/offline_indicator.dart",
+            "lib/features/core/presentation/widgets/offline_indicator_example.dart",
+            "lib/features/core/presentation/widgets/README_OFFLINE_INDICATOR.md"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "8",
+      "name": "Export & Sharing",
+      "status": "completed",
+      "subtasks": [
+        {
+          "subtask_id": "8.1",
+          "title": "Implement trip export to PDF",
+          "description": "Generate PDF document with all entries and media from a trip",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/services/pdf_export_service.dart",
+            "lib/features/journal/data/services/pdf_export_service_impl.dart",
+            "lib/features/journal/presentation/providers/pdf_export_providers.dart",
+            "lib/features/journal/presentation/widgets/pdf_export_widget.dart",
+            "lib/features/journal/data/services/README_PDF_EXPORT.md",
+            "lib/features/journal/data/services/pdf_export_service_example.dart",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "8.2",
+          "title": "Add social media sharing",
+          "description": "Allow sharing individual entries or media to social platforms",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/services/social_sharing_service.dart",
+            "lib/features/journal/data/services/social_sharing_service_impl.dart",
+            "lib/features/journal/presentation/providers/social_sharing_providers.dart",
+            "lib/features/journal/presentation/widgets/social_share_sheet.dart",
+            "lib/features/journal/data/services/README_SOCIAL_SHARING.md",
+            "lib/features/journal/data/services/social_sharing_service_example.dart",
+            "pubspec.yaml"
+          ]
+        },
+        {
+          "subtask_id": "8.3",
+          "title": "Create public trip sharing links",
+          "description": "Generate shareable links for trips with optional password protection",
+          "status": "completed",
+          "files": [
+            "supabase/migrations/20250106000000_create_shared_links_table.sql",
+            "lib/features/journal/domain/entities/shared_link.dart",
+            "lib/features/journal/data/models/shared_link_model.dart",
+            "lib/features/journal/domain/services/shared_link_service.dart",
+            "lib/features/journal/data/datasources/shared_link_remote_data_source.dart",
+            "lib/features/journal/data/datasources/shared_link_remote_data_source_impl.dart",
+            "lib/features/journal/data/services/shared_link_service_impl.dart",
+            "lib/features/journal/presentation/providers/shared_link_providers.dart",
+            "lib/features/journal/presentation/widgets/shared_link_creator.dart",
+            "lib/features/journal/presentation/widgets/shared_link_manager.dart",
+            "lib/features/journal/presentation/widgets/public_trip_viewer.dart",
+            "lib/features/journal/data/services/README_SHARED_LINKS.md",
+            "lib/features/journal/data/services/shared_link_service_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "8.4",
+          "title": "Add backup and restore functionality",
+          "description": "Allow users to backup all journal data and restore it",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/domain/services/backup_service.dart",
+            "lib/features/journal/data/services/backup_service_impl.dart",
+            "lib/features/journal/presentation/providers/backup_providers.dart",
+            "lib/features/journal/presentation/widgets/backup_restore_widget.dart",
+            "lib/features/journal/data/services/README_BACKUP_RESTORE.md",
+            "lib/features/journal/data/services/backup_service_example.dart",
+            "pubspec.yaml"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "9",
+      "name": "Journal List Screen",
+      "status": "in_progress",
+      "subtasks": [
+        {
+          "subtask_id": "9.1",
+          "title": "Build main journal list screen",
+          "description": "Create screen showing all journal entries organized by trip or date",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/providers/journal_list_provider.dart",
+            "lib/features/journal/presentation/screens/journal_list_screen.dart",
+            "lib/features/journal/presentation/widgets/journal_entry_card.dart",
+            "lib/features/journal/presentation/screens/journal_list_screen_example.dart",
+            "lib/features/journal/presentation/screens/README_JOURNAL_LIST.md"
+          ]
+        },
+        {
+          "subtask_id": "9.2",
+          "title": "Add entry preview cards",
+          "description": "Create cards showing entry summary, date, location, and thumbnail",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/widgets/journal_entry_card.dart"
+          ]
+        },
+        {
+          "subtask_id": "9.3",
+          "title": "Implement pull-to-refresh",
+          "description": "Add pull-to-refresh gesture to update journal list",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/screens/journal_list_screen.dart"
+          ]
+        },
+        {
+          "subtask_id": "9.4",
+          "title": "Add empty state and onboarding",
+          "description": "Show helpful message when no journal entries exist yet",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/screens/journal_list_screen.dart"
+          ]
+        }
+      ]
+    },
+    {
+      "phase_id": "10",
+      "name": "Testing & Polish",
+      "status": "pending",
+      "subtasks": [
+        {
+          "subtask_id": "10.1",
+          "title": "Write unit tests for journal API functions",
+          "description": "Test all CRUD operations and edge cases",
+          "status": "completed",
+          "files": [
+            "test/features/journal/helpers/journal_test_helpers.dart",
+            "test/features/journal/data/datasources/journal_remote_data_source_test.dart",
+            "test/features/journal/data/repositories/journal_repository_impl_test.dart",
+            "test/features/journal/README_JOURNAL_TESTS.md"
+          ]
+        },
+        {
+          "subtask_id": "10.2",
+          "title": "Test media upload and compression",
+          "description": "Verify media compression and upload functionality",
+          "status": "completed",
+          "files": [
+            "test/utils/media_test_helpers.dart",
+            "test/utils/media_compression_test.dart",
+            "test/utils/video_compression_test.dart",
+            "test/features/journal/data/services/media_upload_service_test.dart",
+            "test/utils/README_MEDIA_TESTS.md"
+          ]
+        },
+        {
+          "subtask_id": "10.3",
+          "title": "Test offline sync functionality",
+          "description": "Verify offline editing and sync behavior",
+          "status": "completed",
+          "files": [
+            "test/features/journal/helpers/sync_test_helpers.dart",
+            "test/features/journal/data/services/sync_service_test.dart",
+            "test/features/journal/README_SYNC_TESTS.md"
+          ]
+        },
+        {
+          "subtask_id": "10.4",
+          "title": "Performance optimization",
+          "description": "Optimize image loading, list rendering, and database queries",
+          "status": "completed",
+          "files": [
+            "lib/utils/performance/image_cache_manager.dart",
+            "lib/utils/performance/paginated_list_notifier.dart",
+            "lib/utils/performance/query_optimizer.dart",
+            "lib/utils/performance/README_PERFORMANCE_OPTIMIZATION.md",
+            "lib/utils/performance/performance_optimization_example.dart",
+            "lib/features/journal/presentation/providers/journal_list_provider_optimized.dart",
+            "lib/features/journal/data/datasources/journal_remote_data_source_optimized.dart",
+            "lib/features/journal/presentation/widgets/media_gallery.dart"
+          ]
+        },
+        {
+          "subtask_id": "10.5",
+          "title": "Error handling improvements",
+          "description": "Add better error messages and recovery options",
+          "status": "completed",
+          "files": [
+            "lib/core/errors/app_error.dart",
+            "lib/core/errors/error_handler.dart",
+            "lib/core/presentation/widgets/error_display_widget.dart",
+            "lib/core/presentation/widgets/error_dialog.dart",
+            "lib/core/errors/README_ERROR_HANDLING.md",
+            "lib/core/errors/error_handling_example.dart"
+          ]
+        },
+        {
+          "subtask_id": "10.6",
+          "title": "Accessibility audit",
+          "description": "Ensure all screens are accessible with screen readers",
+          "status": "completed",
+          "files": [
+            "lib/features/journal/presentation/screens/journal_list_screen.dart",
+            "lib/features/journal/presentation/screens/create_journal_entry_screen.dart",
+            "lib/features/journal/presentation/widgets/journal_entry_card.dart",
+            "lib/features/journal/presentation/widgets/mood_picker.dart",
+            "lib/features/journal/presentation/ACCESSIBILITY.md"
+          ]
+        }
+      ]
+    }
+  ],
+  "planStatus": "planned"
+}

@@ -49,9 +49,4 @@ node_modules
 .amplify
 amplify_outputs*
 amplifyconfiguration*
-
-# Auto Claude data directory
-.auto-claude/
-
-# Git worktrees metadata directory
-.worktrees/
+._*

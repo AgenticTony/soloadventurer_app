@@ -147,24 +147,74 @@ class CacheException extends AppException {
   }) : super(code: code ?? 'cache_error');
 }
 
-/// Exception thrown when an operation cannot be performed while offline
-class OfflineException extends AppException {
-  /// Suggested recovery action for the user
-  final String? recoveryAction;
-
-  /// Creates a new [OfflineException] with the given [message], optional [recoveryAction], and optional [code]
-  const OfflineException({
+/// Exception thrown when media compression fails
+class MediaCompressionException extends AppException {
+  /// Creates a new [MediaCompressionException] with the given [message] and optional [code]
+  const MediaCompressionException({
     required super.message,
-    this.recoveryAction,
     String? code,
-  }) : super(code: code ?? 'offline_mode');
+  }) : super(code: code ?? 'media_compression_error');
+}
 
-  @override
-  String toString() {
-    final base = super.toString();
-    if (recoveryAction != null) {
-      return '$base - Recovery: $recoveryAction';
-    }
-    return base;
-  }
+/// Exception thrown when image format is not supported
+class UnsupportedImageFormatException extends AppException {
+  /// Creates a new [UnsupportedImageFormatException] with the given [message] and optional [code]
+  const UnsupportedImageFormatException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'unsupported_image_format');
+}
+
+/// Exception thrown when image file is too large or corrupted
+class InvalidImageException extends AppException {
+  /// Creates a new [InvalidImageException] with the given [message] and optional [code]
+  const InvalidImageException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'invalid_image');
+}
+
+/// Exception thrown when video format is not supported
+class UnsupportedVideoFormatException extends AppException {
+  /// Creates a new [UnsupportedVideoFormatException] with the given [message] and optional [code]
+  const UnsupportedVideoFormatException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'unsupported_video_format');
+}
+
+/// Exception thrown when video file is invalid, too large, or corrupted
+class InvalidVideoException extends AppException {
+  /// Creates a new [InvalidVideoException] with the given [message] and optional [code]
+  const InvalidVideoException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'invalid_video');
+}
+
+/// Exception thrown when location operations fail
+class LocationException extends AppException {
+  /// Creates a new [LocationException] with the given [message] and optional [code]
+  const LocationException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'location_error');
+}
+
+/// Exception thrown when geocoding operations fail
+class GeocodingException extends AppException {
+  /// Creates a new [GeocodingException] with the given [message] and optional [code]
+  const GeocodingException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'geocoding_error');
+}
+
+/// Exception thrown when EXIF data extraction fails
+class ExifException extends AppException {
+  /// Creates a new [ExifException] with the given [message] and optional [code]
+  const ExifException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'exif_error');
 }

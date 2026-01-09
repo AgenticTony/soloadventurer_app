@@ -47,20 +47,20 @@ dependencies:
   # Authentication
   amazon_cognito_identity_dart_2: ^3.6.0
   flutter_dotenv: ^5.1.0
+  supabase_flutter: ^2.0.0
 
   # Storage
   shared_preferences: ^2.2.2
   flutter_secure_storage: ^10.0.0-beta.4
   sqflite: ^2.3.0
-  drift: ^2.14.0
-  path_provider: ^2.1.0
-  path: ^1.8.0
+  path: ^1.8.3
 
   # UI Components
   google_maps_flutter: ^2.6.0
   flutter_map: ^8.1.0
   flutter_map_marker_cluster: ^1.0.0
   cached_network_image: ^3.3.1
+  video_player: ^2.8.0
 
   # Performance & Optimization
   flutter_sticky_headers: ^0.3.0
@@ -92,10 +92,27 @@ dependencies:
 
   # Image Picker & Processing
   image_picker: ^1.0.7
-  image: ^4.1.7
+  flutter_image_compress: ^2.3.0
   freezed_annotation: ^2.4.1
   json_annotation: ^4.9.0
   connectivity_plus: ^6.1.3
+
+  # EXIF Data Extraction
+  exif: ^0.3.0
+  image: ^4.1.7
+
+  # PDF Generation
+  pdf: ^3.10.7
+  printing: ^5.11.1
+
+  # Backup & Archive
+  archive: ^3.6.1
+
+  # Social Sharing
+  share_plus: ^10.1.2
+
+  # Rich Text Editor
+  flutter_quill: ^10.8.4
 
   # Workmanager
   workmanager: ^0.5.2
