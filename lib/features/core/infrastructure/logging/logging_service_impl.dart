@@ -3,7 +3,6 @@ import 'package:soloadventurer/features/core/domain/services/logging_service.dar
 
 /// Implementation of [LoggingService]
 class LoggingServiceImpl implements LoggingService {
-  @override
   void debug(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
       print('DEBUG: $message');
@@ -16,7 +15,6 @@ class LoggingServiceImpl implements LoggingService {
     }
   }
 
-  @override
   void info(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
       print('INFO: $message');
@@ -29,7 +27,6 @@ class LoggingServiceImpl implements LoggingService {
     }
   }
 
-  @override
   void warning(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
       print('WARNING: $message');
@@ -42,7 +39,6 @@ class LoggingServiceImpl implements LoggingService {
     }
   }
 
-  @override
   void error(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
       print('ERROR: $message');
@@ -55,7 +51,6 @@ class LoggingServiceImpl implements LoggingService {
     }
   }
 
-  @override
   void critical(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
       print('CRITICAL: $message');

@@ -30,19 +30,19 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
     super.initState();
     // Load all safety data when screen initializes
     Future.microtask(() {
-      ref.read(trustedContactsNotifierProvider.notifier).loadContacts();
+      ref.read(trustedContactsProvider.notifier).loadContacts();
       ref.read(checkInNotifierProvider.notifier).loadUpcomingCheckIns();
-      ref.read(locationSharingNotifierProvider.notifier).loadActiveShares();
-      ref.read(safetyNotifierProvider.notifier).getSafetyStatus();
+      ref.read(locationSharingNotifierProvider).loadActiveShares();
+      ref.read(safetyNotifierProvider).initialize();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final trustedContactsState = ref.watch(trustedContactsNotifierProvider);
+    final trustedContactsState = ref.watch(trustedContactsProvider);
     final checkInState = ref.watch(checkInNotifierProvider);
-    final locationSharingState = ref.watch(locationSharingNotifierProvider);
-    final safetyState = ref.watch(safetyNotifierProvider);
+    final locationSharingState = ref.watch(locationSharingStateProvider);
+    final safetyState = ref.watch(safetyStateProvider);
 
     final contactsCount = trustedContactsState.contacts.length;
     final upcomingCheckInsCount = checkInState.upcomingCheckIns.length;
@@ -83,17 +83,17 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
                   child: Center(
                     child: Chip(
                       avatar: Icon(
-                        _getStatusIcon(currentStatus.statusType),
+                        _getStatusIcon(currentStatus.status),
                         size: 16,
                       ),
                       label: Text(
-                        _getStatusLabel(currentStatus.statusType),
+                        _getStatusLabel(currentStatus.status),
                         style: const TextStyle(fontSize: 12),
                       ),
-                      backgroundColor: _getStatusColor(
-                                  context, currentStatus.statusType)
-                              .withOpacity(0.2) ??
-                          Colors.grey.withOpacity(0.2),
+                      backgroundColor:
+                          _getStatusColor(context, currentStatus.status)
+                                  ?.withValues(alpha: 0.2) ??
+                              Colors.grey.withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -170,9 +170,7 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
             icon: Icons.event_available,
             label: 'Check-ins',
             value: upcomingCheckInsCount.toString(),
-            color: upcomingCheckInsCount > 0
-                ? Colors.orange
-                : Colors.grey,
+            color: upcomingCheckInsCount > 0 ? Colors.orange : Colors.grey,
           ),
         ),
         const SizedBox(width: 12),
@@ -181,9 +179,7 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
             icon: Icons.location_on,
             label: 'Sharing',
             value: activeLocationSharesCount.toString(),
-            color: activeLocationSharesCount > 0
-                ? Colors.green
-                : Colors.grey,
+            color: activeLocationSharesCount > 0 ? Colors.green : Colors.grey,
           ),
         ),
       ],
@@ -194,13 +190,13 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
     BuildContext context,
     SafetyStatus currentStatus,
   ) {
-    final statusColor = _getStatusColor(context, currentStatus.statusType);
-    final statusIcon = _getStatusIcon(currentStatus.statusType);
-    final statusLabel = _getStatusLabel(currentStatus.statusType);
+    final statusColor = _getStatusColor(context, currentStatus.status);
+    final statusIcon = _getStatusIcon(currentStatus.status);
+    final statusLabel = _getStatusLabel(currentStatus.status);
 
     return Card(
       elevation: 2,
-      color: statusColor?.withOpacity(0.1),
+      color: statusColor?.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -264,7 +260,7 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
             ],
             const SizedBox(height: 8),
             Text(
-              'Updated ${_formatTimeAgo(currentStatus.updatedAt)}',
+              'Updated ${_formatTimeAgo(currentStatus.timestamp)}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.grey,
                   ),
@@ -417,6 +413,8 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
         return Colors.orange;
       case SafetyStatusType.emergency:
         return Colors.red;
+      case SafetyStatusType.unknown:
+        return Colors.grey;
     }
   }
 
@@ -428,6 +426,8 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
         return Icons.help;
       case SafetyStatusType.emergency:
         return Icons.warning;
+      case SafetyStatusType.unknown:
+        return Icons.help_outline;
     }
   }
 
@@ -439,6 +439,8 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
         return 'Need Help';
       case SafetyStatusType.emergency:
         return 'Emergency';
+      case SafetyStatusType.unknown:
+        return 'Unknown';
     }
   }
 
@@ -528,10 +530,10 @@ class _QuickActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -580,9 +582,8 @@ class _FeatureCard extends StatelessWidget {
       elevation: isEmergency ? 4 : 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: isEmergency
-            ? BorderSide(color: color, width: 2)
-            : BorderSide.none,
+        side:
+            isEmergency ? BorderSide(color: color, width: 2) : BorderSide.none,
       ),
       child: InkWell(
         onTap: onTap,
@@ -594,7 +595,7 @@ class _FeatureCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(

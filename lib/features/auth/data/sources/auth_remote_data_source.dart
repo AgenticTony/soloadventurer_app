@@ -88,15 +88,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
   }) async {
     try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
+      return await _apiClient.post(
         AuthEndpoints.login,
         data: {
           'email': email,
           'password': password,
         },
       );
-
-      return response.data ?? {};
     } catch (e) {
       throw _handleAuthException(e, 'Failed to sign in');
     }
@@ -109,7 +107,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String username,
   }) async {
     try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
+      return await _apiClient.post(
         AuthEndpoints.register,
         data: {
           'email': email,
@@ -117,8 +115,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'username': username,
         },
       );
-
-      return response.data ?? {};
     } catch (e) {
       throw _handleAuthException(e, 'Failed to sign up');
     }
@@ -163,14 +159,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String refreshToken,
   }) async {
     try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
+      return await _apiClient.post(
         AuthEndpoints.refreshToken,
         data: {
           'refreshToken': refreshToken,
         },
       );
-
-      return response.data ?? {};
     } catch (e) {
       throw _handleAuthException(e, 'Failed to refresh token');
     }
@@ -215,14 +209,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<User> getUserProfile() async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        AuthEndpoints.userProfile,
-      );
-
-      final data = response.data;
-      if (data == null) {
-        throw const ServerException(message: 'Failed to get user profile');
-      }
+      final data = await _apiClient.get(AuthEndpoints.userProfile);
 
       return _mapToUser(data);
     } catch (e) {
@@ -240,15 +227,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (username != null) data['username'] = username;
       if (email != null) data['email'] = email;
 
-      final response = await _apiClient.put<Map<String, dynamic>>(
+      final responseData = await _apiClient.put(
         AuthEndpoints.userProfile,
         data: data,
       );
-
-      final responseData = response.data;
-      if (responseData == null) {
-        throw const ServerException(message: 'Failed to update user profile');
-      }
 
       return _mapToUser(responseData);
     } catch (e) {

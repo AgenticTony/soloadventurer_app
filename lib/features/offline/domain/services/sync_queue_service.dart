@@ -306,7 +306,7 @@ class SyncQueueService {
 
       if (operations.isEmpty) {
         debugPrint('📭 No pending operations to process');
-        return SyncQueueResult.success(operationsCount: 0);
+        return const SyncQueueResult.success(operationsCount: 0);
       }
 
       debugPrint('🔄 Processing ${operations.length} pending operations...');
@@ -369,7 +369,7 @@ class SyncQueueService {
 
       if (readyForRetry.isEmpty) {
         debugPrint('📭 No failed operations ready for retry');
-        return SyncQueueResult.success(operationsCount: 0);
+        return const SyncQueueResult.success(operationsCount: 0);
       }
 
       // Take only up to the limit
@@ -404,10 +404,8 @@ class SyncQueueService {
   /// Returns a [SyncQueueResult] with the count of cleared operations.
   Future<SyncQueueResult> clearOldCompletedOperations() async {
     try {
-      final cutoffDate =
-          DateTime.now().subtract(completedOperationMaxAge);
-      final count =
-          await _repository.clearOldCompletedOperations(cutoffDate);
+      final cutoffDate = DateTime.now().subtract(completedOperationMaxAge);
+      final count = await _repository.clearOldCompletedOperations(cutoffDate);
 
       if (count > 0) {
         debugPrint('🧹 Cleared $count old completed operations');
@@ -556,8 +554,8 @@ class SyncQueueService {
   /// We reset these operations to pending so they can be retried.
   Future<void> _recoverStuckOperations() async {
     try {
-      final processingOps =
-          await _repository.getOperationsByStatus(SyncOperationStatus.processing);
+      final processingOps = await _repository
+          .getOperationsByStatus(SyncOperationStatus.processing);
 
       if (processingOps.isNotEmpty) {
         debugPrint('🔄 Recovering ${processingOps.length} stuck operations...');
@@ -595,6 +593,7 @@ class SyncQueueService {
       clearOldFailedOperations();
     });
 
-    debugPrint('⏰ Cleanup timer started (interval: ${cleanupInterval.inMinutes}min)');
+    debugPrint(
+        '⏰ Cleanup timer started (interval: ${cleanupInterval.inMinutes}min)');
   }
 }

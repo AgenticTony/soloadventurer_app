@@ -65,7 +65,8 @@ class ItineraryItemTile extends StatelessWidget {
                 item.name,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w500,
-                      decoration: item.isCompleted ? TextDecoration.lineThrough : null,
+                      decoration:
+                          item.isCompleted ? TextDecoration.lineThrough : null,
                     ),
               ),
             ),
@@ -84,7 +85,8 @@ class ItineraryItemTile extends StatelessWidget {
                     child: Text(
                       item.location!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ),
@@ -177,8 +179,11 @@ class ItineraryItemTile extends StatelessWidget {
                     Navigator.pop(context);
                     onToggleCompletion();
                   },
-                  icon: Icon(item.isCompleted ? Icons.check_box : Icons.check_box_outline_blank),
-                  label: Text(item.isCompleted ? 'Mark Incomplete' : 'Mark Complete'),
+                  icon: Icon(item.isCompleted
+                      ? Icons.check_box
+                      : Icons.check_box_outline_blank),
+                  label: Text(
+                      item.isCompleted ? 'Mark Incomplete' : 'Mark Complete'),
                 ),
               ],
             ),
@@ -193,7 +198,9 @@ class ItineraryItemTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
         children: [
-          Icon(icon, size: 20.0, color: Theme.of(context).colorScheme.onSurfaceVariant),
+          Icon(icon,
+              size: 20.0,
+              color: Theme.of(context).colorScheme.onSurfaceVariant),
           const SizedBox(width: 8.0),
           Text(
             text,

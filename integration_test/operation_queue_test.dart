@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +10,6 @@ import 'package:soloadventurer/features/core/services/operation_storage_service.
 import 'package:soloadventurer/features/core/services/operation_priority.dart';
 import 'package:soloadventurer/features/core/providers/connectivity_provider.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
-import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
 import 'test_config.dart';
 
 /// Mock operation that can simulate success or failure
@@ -128,19 +126,16 @@ class MockTokenManager implements TokenManager {
   @override
   bool get canPerformOnlineOperations => _canPerformOnlineOperations;
 
-  @override
   String? get accessToken => 'mock-access-token';
 
   @override
   String? get refreshToken => 'mock-refresh-token';
 
-  @override
   String? get idToken => 'mock-id-token';
 
-  @override
-  DateTime? get accessTokenExpiry => DateTime.now().add(const Duration(hours: 1));
+  DateTime? get accessTokenExpiry =>
+      DateTime.now().add(const Duration(hours: 1));
 
-  @override
   Future<void> setTokens({
     required String accessToken,
     required String refreshToken,
@@ -151,20 +146,17 @@ class MockTokenManager implements TokenManager {
     _canPerformOnlineOperations = true;
   }
 
-  @override
   Future<void> clearTokens() async {
     _hasValidTokens = false;
     _canPerformOnlineOperations = false;
   }
 
-  @override
   Future<bool> refreshTokens() async {
     _hasValidTokens = true;
     _canPerformOnlineOperations = true;
     return true;
   }
 
-  @override
   Future<bool> isTokenExpired() async => false;
 
   void setOfflineMode() {
@@ -215,14 +207,14 @@ void main() {
           controller.state = isOnline;
           return controller;
         }),
-        tokenManagerProvider.overrideWithValue(mockTokenManager),
-        operationStorageServiceProvider.overrideWithValue(storageService),
+        tokenManagerProvider.overrideWith((ref) => mockTokenManager),
+        operationStorageServiceProvider.overrideWith((ref) => storageService),
       ],
     );
   });
 
   tearDown(() async {
-    await container.dispose();
+    container.dispose();
     await resetServiceLocator();
   });
 
@@ -254,7 +246,8 @@ void main() {
       // Assert
       expect(executeCount, 1, reason: 'Operation should execute when online');
       final pendingOps = queue.getPendingOperations();
-      expect(pendingOps.length, 0, reason: 'Queue should be empty after successful execution');
+      expect(pendingOps.length, 0,
+          reason: 'Queue should be empty after successful execution');
     });
 
     testWidgets('Operations queue when offline', (tester) async {
@@ -286,9 +279,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(executeCount, 0, reason: 'Operation should not execute when offline');
+      expect(executeCount, 0,
+          reason: 'Operation should not execute when offline');
       final pendingOps = queue.getPendingOperations();
-      expect(pendingOps.length, 1, reason: 'Operation should remain in queue when offline');
+      expect(pendingOps.length, 1,
+          reason: 'Operation should remain in queue when offline');
     });
 
     testWidgets('Queue processes when connection restored', (tester) async {
@@ -330,8 +325,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(executeCount, 1, reason: 'Operation should execute when connection is restored');
-      expect(queue.getPendingOperations().length, 0, reason: 'Queue should be empty after processing');
+      expect(executeCount, 1,
+          reason: 'Operation should execute when connection is restored');
+      expect(queue.getPendingOperations().length, 0,
+          reason: 'Queue should be empty after processing');
     });
 
     testWidgets('Failed operations retry correctly', (tester) async {
@@ -366,11 +363,14 @@ void main() {
       expect(attemptCount, 3, reason: 'Should retry up to maxRetries times');
 
       final failedOps = queue.getFailedOperations();
-      expect(failedOps.length, 1, reason: 'Operation should be in failed queue after max retries');
+      expect(failedOps.length, 1,
+          reason: 'Operation should be in failed queue after max retries');
 
       final failedOp = failedOps.first;
-      expect(failedOp.attemptCount, 3, reason: 'Failed operation should show 3 attempts');
-      expect(failedOp.lastError, isNotNull, reason: 'Failed operation should have error message');
+      expect(failedOp.attemptCount, 3,
+          reason: 'Failed operation should show 3 attempts');
+      expect(failedOp.lastError, isNotNull,
+          reason: 'Failed operation should have error message');
     });
 
     testWidgets('Manual retry works from queue', (tester) async {
@@ -413,9 +413,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert
-      expect(executeCount, 2, reason: 'Operation should execute again after manual retry');
-      expect(queue.getFailedOperations().length, 0, reason: 'Failed queue should be empty after successful retry');
-      expect(queue.getPendingOperations().length, 0, reason: 'Pending queue should be empty after successful retry');
+      expect(executeCount, 2,
+          reason: 'Operation should execute again after manual retry');
+      expect(queue.getFailedOperations().length, 0,
+          reason: 'Failed queue should be empty after successful retry');
+      expect(queue.getPendingOperations().length, 0,
+          reason: 'Pending queue should be empty after successful retry');
     });
 
     testWidgets('App restart preserves queue', (tester) async {
@@ -447,8 +450,8 @@ void main() {
             controller.state = isOnline;
             return controller;
           }),
-          tokenManagerProvider.overrideWithValue(mockTokenManager),
-          operationStorageServiceProvider.overrideWithValue(storageService),
+          tokenManagerProvider.overrideWith((ref) => mockTokenManager),
+          operationStorageServiceProvider.overrideWith((ref) => storageService),
         ],
       );
 
@@ -457,13 +460,16 @@ void main() {
 
       // Assert: New queue should have loaded the persisted operation
       final pendingOps = queue2.getPendingOperations();
-      expect(pendingOps.length, 1, reason: 'Queue should be restored after app restart');
-      expect(pendingOps.first.id, operationId, reason: 'Restored operation should match original');
+      expect(pendingOps.length, 1,
+          reason: 'Queue should be restored after app restart');
+      expect(pendingOps.first.id, operationId,
+          reason: 'Restored operation should match original');
 
-      await newContainer.dispose();
+      newContainer.dispose();
     });
 
-    testWidgets('Priority queue processes critical operations first', (tester) async {
+    testWidgets('Priority queue processes critical operations first',
+        (tester) async {
       // Arrange
       final queue = container.read(operationQueueProvider.notifier);
       final executionOrder = <String>[];
@@ -511,12 +517,14 @@ void main() {
 
       // Assert: Critical operation should execute first
       expect(executionOrder.length, 3);
-      expect(executionOrder[0], 'critical', reason: 'Critical operation should execute first');
+      expect(executionOrder[0], 'critical',
+          reason: 'Critical operation should execute first');
       expect(executionOrder.contains('normal'), true);
       expect(executionOrder.contains('low'), true);
     });
 
-    testWidgets('Operations with deduplication key replace duplicates', (tester) async {
+    testWidgets('Operations with deduplication key replace duplicates',
+        (tester) async {
       // Arrange
       final queue = container.read(operationQueueProvider.notifier);
       var executionCount = 0;
@@ -554,7 +562,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert: Only the second operation should execute (replaces the first)
-      expect(executionCount, 1, reason: 'Duplicate operation should replace the original');
+      expect(executionCount, 1,
+          reason: 'Duplicate operation should replace the original');
       expect(queue.getPendingOperations().length, 0);
     });
 
@@ -570,7 +579,8 @@ void main() {
           type: 'high_priority',
           priority: OperationPriority.high,
           requiresNetwork: true,
-          createdAt: DateTime.now().subtract(const Duration(minutes: 6)), // Old enough for aging boost
+          createdAt: DateTime.now().subtract(
+              const Duration(minutes: 6)), // Old enough for aging boost
           onExecute: () async {
             executionOrder.add('high-$i');
           },
@@ -603,10 +613,12 @@ void main() {
 
       // Assert: Low priority operation should eventually execute (aging or round-robin)
       expect(executionOrder.contains('low'), true,
-          reason: 'Low-priority operation should eventually execute due to aging or round-robin');
+          reason:
+              'Low-priority operation should eventually execute due to aging or round-robin');
     });
 
-    testWidgets('Exponential backoff increases delay between retries', (tester) async {
+    testWidgets('Exponential backoff increases delay between retries',
+        (tester) async {
       // Arrange
       final queue = container.read(operationQueueProvider.notifier);
       final attemptTimes = <DateTime>[];
@@ -641,7 +653,8 @@ void main() {
       expect(failedOps.first.attemptCount, 3);
     });
 
-    testWidgets('Clear failed operations removes all failed items', (tester) async {
+    testWidgets('Clear failed operations removes all failed items',
+        (tester) async {
       // Arrange
       final queue = container.read(operationQueueProvider.notifier);
 
@@ -677,7 +690,8 @@ void main() {
           reason: 'All failed operations should be cleared');
     });
 
-    testWidgets('Retry all failed operations moves them back to pending', (tester) async {
+    testWidgets('Retry all failed operations moves them back to pending',
+        (tester) async {
       // Arrange
       final queue = container.read(operationQueueProvider.notifier);
       var executeCount = 0;
@@ -721,7 +735,8 @@ void main() {
           reason: 'Failed queue should be empty after successful retry');
       expect(queue.getPendingOperations().length, 0,
           reason: 'Pending queue should be empty after successful execution');
-      expect(executeCount, 6, reason: 'All operations should execute twice (fail then succeed)');
+      expect(executeCount, 6,
+          reason: 'All operations should execute twice (fail then succeed)');
     });
   });
 }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
+import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_settings_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
@@ -312,7 +313,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
                 title: const Text('Sync Now'),
                 subtitle: const Text('Force sync all changes'),
                 trailing: FilledButton(
-                  onPressed: isConnected && syncStatus.syncEnabled
+                  onPressed: isConnected && syncSettings.syncEnabled
                       ? _handleForceSync
                       : null,
                   child: const Text('SYNC'),
@@ -415,10 +416,10 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
             context,
             'About Sync',
             [
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: const Text('How Sync Works'),
-                subtitle: const Text(
+              const ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text('How Sync Works'),
+                subtitle: Text(
                   'Changes are saved locally first, then synced to the cloud '
                   'when you\'re online. You can view and edit all your data '
                   'even without internet.',
@@ -515,7 +516,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: color),
       ),

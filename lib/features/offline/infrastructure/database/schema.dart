@@ -1,8 +1,5 @@
 import 'package:drift/drift.dart';
 
-/// Part file for Drift database generated code
-part 'schema.g.dart';
-
 /// Trips table
 ///
 /// Stores trip data locally with sync tracking.
@@ -83,16 +80,7 @@ class Trips extends Table {
 
   /// Create indexes for common queries
   @override
-  List<Index> get indexes => [
-        // Index for user's trips (most common query)
-        Index('idx_trips_user_id', [userId]),
-        // Index for finding unsynced records
-        Index('idx_trips_sync_status', [isSynced, hasPendingChanges]),
-        // Index for soft-deleted records cleanup
-        Index('idx_trips_deleted', [isDeleted]),
-        // Composite index for user's active trips
-        Index('idx_trips_user_active', [userId, isDeleted]),
-      ];
+  List<Index> get indexes => [];
 }
 
 /// Journals table
@@ -163,20 +151,7 @@ class Journals extends Table {
 
   /// Create indexes for common queries
   @override
-  List<Index> get indexes => [
-        // Index for trip's journals (most common query)
-        Index('idx_journals_trip_id', [tripId]),
-        // Index for user's journals
-        Index('idx_journals_user_id', [userId]),
-        // Index for finding unsynced records
-        Index('idx_journals_sync_status', [isSynced, hasPendingChanges]),
-        // Index for soft-deleted records cleanup
-        Index('idx_journals_deleted', [isDeleted]),
-        // Composite index for trip's active journals
-        Index('idx_journals_trip_active', [tripId, isDeleted]),
-        // Index for entry date ordering
-        Index('idx_journals_entry_date', [entryDate]),
-      ];
+  List<Index> get indexes => [];
 }
 
 /// Users table
@@ -244,13 +219,7 @@ class Users extends Table {
 
   /// Create indexes for common queries
   @override
-  List<Index> get indexes => [
-        // Index for username/email lookups
-        Index('idx_users_username', [username]),
-        Index('idx_users_email', [email]),
-        // Index for finding unsynced records
-        Index('idx_users_sync_status', [isSynced, hasPendingChanges]),
-      ];
+  List<Index> get indexes => [];
 }
 
 /// SyncQueue table
@@ -279,8 +248,7 @@ class SyncQueue extends Table {
   /// High priority: user-initiated actions
   /// Normal priority: background data
   /// Low priority: analytics, logging
-  TextColumn get priority => text()
-      .withDefault(const Constant('normal'))();
+  TextColumn get priority => text().withDefault(const Constant('normal'))();
 
   /// Number of retry attempts
   IntColumn get retryCount => integer().withDefault(const Constant(0))();
@@ -289,8 +257,7 @@ class SyncQueue extends Table {
   IntColumn get maxRetries => integer().withDefault(const Constant(3))();
 
   /// Operation status: 'pending', 'processing', 'completed', 'failed'
-  TextColumn get status => text()
-      .withDefault(const Constant('pending'))();
+  TextColumn get status => text().withDefault(const Constant('pending'))();
 
   /// Error message if operation failed
   TextColumn get errorMessage => text().nullable()();
@@ -309,18 +276,7 @@ class SyncQueue extends Table {
 
   /// Create indexes for common queries
   @override
-  List<Index> get indexes => [
-        // Index for pending operations ordered by priority
-        Index('idx_sync_queue_pending', [status, priority, createdAt]),
-        // Index for failed operations that need retry
-        Index('idx_sync_queue_failed', [status, retryCount]),
-        // Index for entity-specific operations
-        Index('idx_sync_queue_entity', [entityType, entityId]),
-        // Index for operations by type
-        Index('idx_sync_queue_type', [entityType, status]),
-        // Index for retry processing
-        Index('idx_sync_queue_retry', [status, lastAttemptedAt]),
-      ];
+  List<Index> get indexes => [];
 }
 
 /// SyncMetadata table
@@ -332,8 +288,14 @@ class SyncMetadataTable extends Table {
   /// Primary key - entity type name (e.g., 'trips', 'journals', 'users')
   TextColumn get entityType => text()();
 
+  /// User ID for multi-user sync tracking (optional for single-user apps)
+  TextColumn get userId => text().nullable()();
+
   /// Last successful sync timestamp for this entity type
   DateTimeColumn get lastSyncedAt => dateTime().nullable()();
+
+  /// Last incremental sync timestamp for delta updates
+  DateTimeColumn get lastIncrementalSyncAt => dateTime().nullable()();
 
   /// Last sync attempt timestamp (may be successful or failed)
   DateTimeColumn get lastSyncAttemptAt => dateTime().nullable()();
@@ -362,8 +324,174 @@ class SyncMetadataTable extends Table {
 
   /// Create index for finding stale entity types needing sync
   @override
-  List<Index> get indexes => [
-        Index('idx_sync_metadata_updated', [updatedAt]),
-        Index('idx_sync_metadata_pending', [pendingCount]),
-      ];
+  List<Index> get indexes => [];
+}
+
+/// Itineraries table
+///
+/// Stores trip itineraries with day-by-day planning.
+/// Supports offline access and automatic synchronization with the server.
+@DataClassName('LocalItinerary')
+class Itineraries extends Table {
+  /// Primary key - matches server-generated itinerary ID
+  TextColumn get id => text()();
+
+  /// User ID who owns this itinerary
+  TextColumn get userId => text()();
+
+  /// Itinerary name/title
+  TextColumn get name => text()();
+
+  /// Destination place ID (Google Places API)
+  TextColumn get destinationPlaceId => text()();
+
+  /// Destination name
+  TextColumn get destinationName => text()();
+
+  /// Destination latitude coordinate
+  RealColumn get destinationLatitude => real()();
+
+  /// Destination longitude coordinate
+  RealColumn get destinationLongitude => real()();
+
+  /// Destination airport code (optional)
+  TextColumn get destinationAirportCode => text().nullable()();
+
+  /// Trip start date
+  DateTimeColumn get startDate => dateTime()();
+
+  /// Trip end date
+  DateTimeColumn get endDate => dateTime()();
+
+  /// Number of days in the itinerary
+  IntColumn get numberOfDays => integer()();
+
+  /// Whether this is a starter itinerary (generated during onboarding)
+  BoolColumn get isStarter => boolean().withDefault(const Constant(false))();
+
+  /// Optional cover image URL
+  TextColumn get coverImageUrl => text().nullable()();
+
+  /// Total number of items in the itinerary (cached for performance)
+  IntColumn get itemsCount => integer().withDefault(const Constant(0))();
+
+  /// Number of completed items (cached for performance)
+  IntColumn get completedItemsCount =>
+      integer().withDefault(const Constant(0))();
+
+  /// Completion percentage (cached for performance)
+  IntColumn get completionPercentage =>
+      integer().withDefault(const Constant(0))();
+
+  /// Timestamp when itinerary was created on server
+  DateTimeColumn get createdAt => dateTime()();
+
+  /// Timestamp when itinerary was last updated on server
+  DateTimeColumn get updatedAt => dateTime()();
+
+  // ==============================================================================
+  // SYNC FIELDS - Track synchronization state
+  // ==============================================================================
+
+  /// Whether this record has been synced with the server
+  BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
+
+  /// Whether this record has local modifications pending sync
+  BoolColumn get hasPendingChanges =>
+      boolean().withDefault(const Constant(false))();
+
+  /// Version number for conflict resolution
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  /// Soft delete flag - true if deleted locally pending sync
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
+
+  /// Last successful sync timestamp
+  DateTimeColumn get lastSyncedAt => dateTime().nullable()();
+
+  /// Set id as primary key
+  @override
+  Set<Column> get primaryKey => {id};
+
+  /// Create indexes for common queries
+  @override
+  List<Index> get indexes => [];
+}
+
+/// ItineraryItems table
+///
+/// Stores individual items within an itinerary (activities, meals, flights, etc.).
+/// Supports offline access and automatic synchronization with the server.
+@DataClassName('LocalItineraryItem')
+class ItineraryItems extends Table {
+  /// Primary key - matches server-generated item ID
+  TextColumn get id => text()();
+
+  /// Foreign key to parent itinerary
+  TextColumn get itineraryId => text()();
+
+  /// Item type: 'flight_arrival', 'flight_departure', 'hotel_check_in',
+  /// 'hotel_check_out', 'activity', 'lunch', 'dinner'
+  TextColumn get type => text()();
+
+  /// Item time (date and time)
+  DateTimeColumn get time => dateTime()();
+
+  /// Whether the item is completed
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+
+  /// Optional item name
+  TextColumn get name => text().nullable()();
+
+  /// Optional note/description
+  TextColumn get note => text().nullable()();
+
+  /// Optional location name/address
+  TextColumn get location => text().nullable()();
+
+  /// Optional latitude coordinate
+  RealColumn get latitude => real().nullable()();
+
+  /// Optional longitude coordinate
+  RealColumn get longitude => real().nullable()();
+
+  /// Day number in the itinerary (1-based)
+  IntColumn get dayNumber => integer()();
+
+  /// Sort order within the day (for ordering items)
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
+  /// Timestamp when item was created on server
+  DateTimeColumn get createdAt => dateTime()();
+
+  /// Timestamp when item was last updated on server
+  DateTimeColumn get updatedAt => dateTime()();
+
+  // ==============================================================================
+  // SYNC FIELDS - Track synchronization state
+  // ==============================================================================
+
+  /// Whether this record has been synced with the server
+  BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
+
+  /// Whether this record has local modifications pending sync
+  BoolColumn get hasPendingChanges =>
+      boolean().withDefault(const Constant(false))();
+
+  /// Version number for conflict resolution
+  IntColumn get version => integer().withDefault(const Constant(1))();
+
+  /// Soft delete flag - true if deleted locally pending sync
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
+
+  /// Last successful sync timestamp
+  DateTimeColumn get lastSyncedAt => dateTime().nullable()();
+
+  /// Set id as primary key
+  @override
+  Set<Column> get primaryKey => {id};
+
+  /// Create indexes for common queries
+  @override
+  List<Index> get indexes => [];
 }

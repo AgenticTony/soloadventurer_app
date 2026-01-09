@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/safety_alert.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
-import '../../../../core/services/location_service.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
+import '../../../../core/services/location_service.dart' as core;
 
 /// Emergency SOS screen with prominent SOS button
 ///
@@ -63,7 +63,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
     try {
       final locationService = ref.read(locationServiceProvider);
       final locationData = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       setState(() {
@@ -85,7 +85,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
   }
 
   Future<void> _triggerSOS() async {
-    final user = ref.read(currentUserProvider);
+    final user = ref.read(authNotifierProvider).valueOrNull?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -114,7 +114,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
     final confirmed = await _showCountdownDialog();
     if (!confirmed || !mounted) return;
 
-    final notifier = ref.read(safetyNotifierProvider.notifier);
+    final notifier = ref.read(safetyNotifierProvider);
 
     try {
       await notifier.triggerEmergencySOS(
@@ -123,8 +123,9 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
         message: _messageController.text.trim().isEmpty
             ? null
             : _messageController.text.trim(),
-        notifyContactIds: null, // Will notify all contacts with emergency alerts enabled
-        batteryLevel: await ref.read(safetyNotifierProvider.notifier).getBatteryLevel(),
+        notifyContactIds:
+            null, // Will notify all contacts with emergency alerts enabled
+        batteryLevel: await ref.read(safetyNotifierProvider).getBatteryLevel(),
       );
 
       if (mounted) {
@@ -245,7 +246,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
 
     if (!confirmed) return;
 
-    final notifier = ref.read(safetyNotifierProvider.notifier);
+    final notifier = ref.read(safetyNotifierProvider);
     await notifier.cancelAlert(alert.id);
 
     if (mounted) {
@@ -261,15 +262,14 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyState = ref.watch(safetyNotifierProvider);
-    final trustedContactsState = ref.watch(trustedContactsNotifierProvider);
-    final isProcessing = safetyState.isProcessing;
-    final hasActiveEmergency = safetyState.hasActiveEmergency;
+    final safetyState = ref.watch(safetyStateProvider);
+    final contactsState = ref.watch(trustedContactsProvider);
+    final isProcessing = ref.watch(safetyProcessingProvider);
+    final hasActiveEmergency = ref.watch(hasActiveEmergencyProvider);
 
     // Get contacts who will be notified
-    final emergencyContacts = trustedContactsState.contacts
-        .where((c) => c.receivesEmergencyAlerts)
-        .toList();
+    final emergencyContacts =
+        contactsState.contacts.where((c) => c.receivesEmergencyAlerts).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -280,7 +280,8 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
           if (hasActiveEmergency)
             IconButton(
               icon: const Icon(Icons.info_outline),
-              onPressed: () => _showActiveAlertInfo(safetyState.activeAlerts.first),
+              onPressed: () =>
+                  _showActiveAlertInfo(safetyState.activeAlerts.first),
             ),
         ],
       ),
@@ -291,7 +292,8 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
           children: [
             // Active emergency banner
             if (hasActiveEmergency) ...[
-              _buildActiveEmergencyBanner(theme, safetyState.activeAlerts.first),
+              _buildActiveEmergencyBanner(
+                  theme, safetyState.activeAlerts.first),
               const SizedBox(height: 24),
             ],
 
@@ -332,7 +334,8 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
     );
   }
 
-  Widget _buildSOSButton(ThemeData theme, bool isProcessing, bool hasActiveEmergency) {
+  Widget _buildSOSButton(
+      ThemeData theme, bool isProcessing, bool hasActiveEmergency) {
     return AnimatedBuilder(
       animation: _pulseController,
       builder: (context, child) {
@@ -351,19 +354,19 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    color.withOpacity(0.3),
+                    color.withValues(alpha: 0.3),
                     color,
                   ],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(0.5),
+                    color: color.withValues(alpha: 0.5),
                     blurRadius: hasActiveEmergency ? 20 : 30,
                     spreadRadius: hasActiveEmergency ? 5 : 10,
                   ),
                   if (!hasActiveEmergency)
                     BoxShadow(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       blurRadius: 60 * pulseValue,
                       spreadRadius: 20 * pulseValue,
                     ),
@@ -390,7 +393,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                           Text(
                             'Emergency',
                             style: theme.textTheme.titleMedium?.copyWith(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -491,7 +494,8 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Icon(Icons.location_off, color: theme.colorScheme.error, size: 32),
+              Icon(Icons.location_off,
+                  color: theme.colorScheme.error, size: 32),
               const SizedBox(height: 8),
               Text(
                 'Location Unavailable',
@@ -541,7 +545,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -633,7 +637,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -652,7 +656,8 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
-                    Icon(Icons.warning_amber, color: Colors.orange[700], size: 20),
+                    Icon(Icons.warning_amber,
+                        color: Colors.orange[700], size: 20),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -674,7 +679,8 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                             children: [
                               CircleAvatar(
                                 radius: 16,
-                                backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                                backgroundColor: theme.colorScheme.primary
+                                    .withValues(alpha: 0.1),
                                 child: Text(
                                   contact.name.isNotEmpty
                                       ? contact.name[0].toUpperCase()
@@ -692,8 +698,9 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
                                   style: theme.textTheme.bodyMedium,
                                 ),
                               ),
-                              if (contact.phone != null)
-                                Icon(Icons.phone, size: 16, color: Colors.grey[600]),
+                              if (contact.phoneNumber.isNotEmpty)
+                                Icon(Icons.phone,
+                                    size: 16, color: Colors.grey[600]),
                             ],
                           ),
                         ))
@@ -774,10 +781,10 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
             const SizedBox(height: 8),
             OutlinedButton.icon(
               onPressed: () {
-                ref.read(safetyNotifierProvider.notifier).markAsSafe(
+                ref.read(safetyNotifierProvider).markAsSafe(
                       message: 'I\'m safe now',
                     );
-                ref.read(safetyNotifierProvider.notifier).resolveAlert(alert.id);
+                ref.read(safetyNotifierProvider).resolveAlert(alert.id);
               },
               icon: const Icon(Icons.check_circle),
               label: const Text('Mark as Safe & Resolve'),
@@ -812,9 +819,11 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
               _detailRow('Triggered', _formatDateTime(alert.triggeredAt)),
               _detailRow('Status', alert.status.name),
               if (alert.message != null) _detailRow('Message', alert.message!),
-              _detailRow('Notified', '${alert.notifiedContactIds.length} contacts'),
+              _detailRow(
+                  'Notified', '${alert.notifiedContactIds.length} contacts'),
               if (alert.acknowledgedByContactIds.isNotEmpty)
-                _detailRow('Acknowledged by', '${alert.acknowledgedByContactIds.length} contacts'),
+                _detailRow('Acknowledged by',
+                    '${alert.acknowledgedByContactIds.length} contacts'),
               if (alert.batteryLevel != null)
                 _detailRow('Battery', '${alert.batteryLevel}%'),
               if (alert.location != null)

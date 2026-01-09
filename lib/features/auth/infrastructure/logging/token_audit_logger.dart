@@ -48,15 +48,20 @@ class _TokenAuditLoggerImpl implements LoggingService {
   }
 
   /// Log token rotation events
+  @override
   void logTokenRotation({
-    required AuthSession oldSession,
-    required AuthSession newSession,
+    required Object oldSession,
+    required Object newSession,
     String? reason,
   }) {
+    // Cast to AuthSession for access to properties
+    final old = oldSession as AuthSession;
+    final newS = newSession as AuthSession;
+
     final metadata = {
       'operation': 'token_rotation',
-      'old_token_expiry': oldSession.expiresAt.toIso8601String(),
-      'new_token_expiry': newSession.expiresAt.toIso8601String(),
+      'old_token_expiry': old.expiresAt.toIso8601String(),
+      'new_token_expiry': newS.expiresAt.toIso8601String(),
       if (reason != null) 'reason': reason,
     };
 
@@ -68,6 +73,7 @@ class _TokenAuditLoggerImpl implements LoggingService {
   }
 
   /// Log token blacklist events
+  @override
   void logTokenBlacklist({
     required String token,
     required String reason,
@@ -107,6 +113,7 @@ class _TokenAuditLoggerImpl implements LoggingService {
   }
 
   /// Log token refresh attempts
+  @override
   void logTokenRefresh({
     required bool success,
     String? error,

@@ -264,11 +264,7 @@ class OperationQueue extends _$OperationQueue {
   /// - Jitter: 10% (prevents thundering herd)
   ///
   /// Retry delays: 1s → 2s → 4s → 8s → 16s → ... → 5m max
-  final RetryStrategy retryStrategy = const ExponentialBackoffStrategy(
-    baseDelay: Duration(seconds: 1),
-    maxDelay: Duration(minutes: 5),
-    jitterFactor: 0.1,
-  );
+  late final RetryStrategy retryStrategy;
 
   /// Track consecutive operations processed per priority level for round-robin.
   ///
@@ -296,6 +292,13 @@ class OperationQueue extends _$OperationQueue {
 
   @override
   Future<void> build() async {
+    // Initialize retry strategy
+    retryStrategy = ExponentialBackoffStrategy(
+      baseDelay: const Duration(seconds: 1),
+      maxDelay: const Duration(minutes: 5),
+      jitterFactor: 0.1,
+    );
+
     // Watch connectivity and token state
     ref.watch(connectivityNotifierProvider);
     ref.watch(tokenManagerProvider);
@@ -353,7 +356,8 @@ class OperationQueue extends _$OperationQueue {
     // Check for duplicate operations if this operation has a deduplication key
     final duplicate = _findDuplicate(operation);
     if (duplicate != null) {
-      debugPrint('OperationQueue: Found duplicate operation ${duplicate.id}, replacing with ${operation.id}');
+      debugPrint(
+          'OperationQueue: Found duplicate operation ${duplicate.id}, replacing with ${operation.id}');
       _replaceOperation(duplicate, operation);
     } else {
       _pendingOperations.add(operation);
@@ -422,7 +426,8 @@ class OperationQueue extends _$OperationQueue {
 
         // Check if operation has exceeded max retries
         if (!_shouldRetry(operation)) {
-          debugPrint('Operation ${operation.id} exceeded max retries (${operation.maxRetries}), moving to failed queue');
+          debugPrint(
+              'Operation ${operation.id} exceeded max retries (${operation.maxRetries}), moving to failed queue');
           operationsToFail.add(operation);
           operationsToRemove.add(operation);
           continue;
@@ -441,11 +446,13 @@ class OperationQueue extends _$OperationQueue {
           debugPrint('Stack trace: $stackTrace');
 
           // Update operation with error information and increment attempt count
-          final failedOperation = _updateAttemptMetadata(operation, e.toString());
+          final failedOperation =
+              _updateAttemptMetadata(operation, e.toString());
 
           // Check if this was the last retry attempt
           if (failedOperation.attemptCount >= failedOperation.maxRetries) {
-            debugPrint('Operation ${operation.id} reached max retries, moving to failed queue');
+            debugPrint(
+                'Operation ${operation.id} reached max retries, moving to failed queue');
             operationsToFail.add(failedOperation);
             operationsToRemove.add(operation);
           } else {
@@ -558,10 +565,8 @@ class OperationQueue extends _$OperationQueue {
 
     if (inBackoff) {
       final timeUntilRetry = retryTime.difference(now);
-      debugPrint(
-        'Operation ${operation.id} is in backoff period. '
-        'Can retry in ${timeUntilRetry.inSeconds}s'
-      );
+      debugPrint('Operation ${operation.id} is in backoff period. '
+          'Can retry in ${timeUntilRetry.inSeconds}s');
     }
 
     return inBackoff;
@@ -595,9 +600,8 @@ class OperationQueue extends _$OperationQueue {
       if (boostedPriority > basePriority) {
         final ageMinutes = age.inMinutes;
         debugPrint(
-          'Operation ${operation.id} has been waiting ${ageMinutes}min, '
-          'boosting priority from $basePriority to $boostedPriority'
-        );
+            'Operation ${operation.id} has been waiting ${ageMinutes}min, '
+            'boosting priority from $basePriority to $boostedPriority');
       }
 
       return boostedPriority;
@@ -615,7 +619,8 @@ class OperationQueue extends _$OperationQueue {
   /// priority operations completely.
   bool _shouldSkipDueToRoundRobin(QueueableOperation operation) {
     final effectivePriority = _getEffectivePriority(operation);
-    final consecutiveCount = _consecutiveProcessedByPriority[effectivePriority] ?? 0;
+    final consecutiveCount =
+        _consecutiveProcessedByPriority[effectivePriority] ?? 0;
 
     // Always process critical operations immediately (no round-robin limit)
     if (effectivePriority >= 1000) {
@@ -625,9 +630,8 @@ class OperationQueue extends _$OperationQueue {
     // Skip if we've already processed too many operations of this priority level
     if (consecutiveCount >= _maxConsecutivePerPriority) {
       debugPrint(
-        'Skipping operation ${operation.id} (priority $effectivePriority) - '
-        'already processed $consecutiveCount consecutive operations of this priority'
-      );
+          'Skipping operation ${operation.id} (priority $effectivePriority) - '
+          'already processed $consecutiveCount consecutive operations of this priority');
       return true;
     }
 
@@ -655,9 +659,9 @@ class OperationQueue extends _$OperationQueue {
 
     try {
       return _pendingOperations.cast<QueueableOperation?>().firstWhere(
-        (op) => op?.deduplicationKey == dedupKey && op?.id != operation.id,
-        orElse: () => null,
-      );
+            (op) => op?.deduplicationKey == dedupKey && op?.id != operation.id,
+            orElse: () => null,
+          );
     } catch (e) {
       // If there's any error searching, just return null (no duplicate found)
       debugPrint('OperationQueue: Error searching for duplicate: $e');
@@ -677,15 +681,14 @@ class OperationQueue extends _$OperationQueue {
     _pendingOperations.add(newOperation);
 
     debugPrint(
-      'OperationQueue: Replaced operation ${oldOperation.id} with ${newOperation.id} '
-      '(deduplication key: ${newOperation.deduplicationKey})'
-    );
+        'OperationQueue: Replaced operation ${oldOperation.id} with ${newOperation.id} '
+        '(deduplication key: ${newOperation.deduplicationKey})');
   }
 
   /// Load saved queue from storage on initialization
   Future<void> _loadQueue() async {
     try {
-      final storageService = ref.read(operationStorageServiceProvider);
+      final storageService = ref.read(operationStorageServiceProvider.notifier);
       final result = await storageService.loadOperations();
 
       // Restore pending operations
@@ -715,10 +718,12 @@ class OperationQueue extends _$OperationQueue {
       }
 
       if (result.hadCorruptedData) {
-        debugPrint('OperationQueue: Warning - some operations were corrupted and skipped');
+        debugPrint(
+            'OperationQueue: Warning - some operations were corrupted and skipped');
       }
 
-      debugPrint('OperationQueue: Loaded ${_pendingOperations.length} pending and ${_failedOperations.length} failed operations');
+      debugPrint(
+          'OperationQueue: Loaded ${_pendingOperations.length} pending and ${_failedOperations.length} failed operations');
     } catch (e, stackTrace) {
       debugPrint('OperationQueue: Error loading queue from storage: $e');
       debugPrint('Stack trace: $stackTrace');
@@ -758,7 +763,7 @@ class OperationQueue extends _$OperationQueue {
   /// Persist current queue state to storage
   Future<void> _persistQueue() async {
     try {
-      final storageService = ref.read(operationStorageServiceProvider);
+      final storageService = ref.read(operationStorageServiceProvider.notifier);
 
       // Save pending operations
       final pendingSuccess = await storageService.savePendingOperations(
@@ -771,7 +776,8 @@ class OperationQueue extends _$OperationQueue {
       );
 
       if (!pendingSuccess || !failedSuccess) {
-        debugPrint('OperationQueue: Warning - some operations failed to persist');
+        debugPrint(
+            'OperationQueue: Warning - some operations failed to persist');
       }
     } catch (e, stackTrace) {
       debugPrint('OperationQueue: Error persisting queue: $e');
@@ -857,9 +863,9 @@ class OperationQueue extends _$OperationQueue {
   /// logs a debug message and returns without error.
   Future<void> retryOperation(String id) async {
     final operation = _failedOperations.cast<QueueableOperation?>().firstWhere(
-      (op) => op?.id == id,
-      orElse: () => null,
-    );
+          (op) => op?.id == id,
+          orElse: () => null,
+        );
 
     if (operation == null) {
       debugPrint('OperationQueue: Failed operation with id $id not found');
@@ -877,7 +883,8 @@ class OperationQueue extends _$OperationQueue {
     // Add back to pending queue
     await addOperation(resetOperation);
 
-    debugPrint('OperationQueue: Operation ${operation.id} moved back to pending queue');
+    debugPrint(
+        'OperationQueue: Operation ${operation.id} moved back to pending queue');
   }
 
   /// Retries all failed operations by moving them back to the pending queue.
@@ -904,7 +911,8 @@ class OperationQueue extends _$OperationQueue {
   /// - User wants to retry all failed operations after connectivity is restored
   /// - User believes the issue causing failures has been resolved
   Future<void> retryAllFailed() async {
-    debugPrint('OperationQueue: Retrying all ${_failedOperations.length} failed operations');
+    debugPrint(
+        'OperationQueue: Retrying all ${_failedOperations.length} failed operations');
 
     final operationsToRetry = List<QueueableOperation>.from(_failedOperations);
 
@@ -917,7 +925,8 @@ class OperationQueue extends _$OperationQueue {
       await addOperation(resetOperation);
     }
 
-    debugPrint('OperationQueue: Moved ${operationsToRetry.length} operations back to pending queue');
+    debugPrint(
+        'OperationQueue: Moved ${operationsToRetry.length} operations back to pending queue');
   }
 
   /// Clears all failed operations from the queue.
@@ -940,7 +949,8 @@ class OperationQueue extends _$OperationQueue {
   /// - Operations are no longer relevant
   /// - User has manually handled the operations elsewhere
   Future<void> clearFailedOperations() async {
-    debugPrint('OperationQueue: Clearing all ${_failedOperations.length} failed operations');
+    debugPrint(
+        'OperationQueue: Clearing all ${_failedOperations.length} failed operations');
 
     final count = _failedOperations.length;
     _failedOperations.clear();
@@ -972,9 +982,9 @@ class OperationQueue extends _$OperationQueue {
   /// and returns without error.
   Future<void> removeFailedOperation(String id) async {
     final operation = _failedOperations.cast<QueueableOperation?>().firstWhere(
-      (op) => op?.id == id,
-      orElse: () => null,
-    );
+          (op) => op?.id == id,
+          orElse: () => null,
+        );
 
     if (operation == null) {
       debugPrint('OperationQueue: Failed operation with id $id not found');

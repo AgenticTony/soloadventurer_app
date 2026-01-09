@@ -69,7 +69,7 @@ final backgroundCheckInServiceProvider =
 typedef BackgroundCheckInServiceRef
     = AutoDisposeProviderRef<BackgroundCheckInService>;
 String _$missedCheckInDetectorHash() =>
-    r'0172bc00001229223b9e8c0f748f4fb440139950';
+    r'2317f9972ed1c573ad5beed2a5d0ab2c71389bca';
 
 /// Provider for MissedCheckInDetector
 ///
@@ -417,49 +417,8 @@ final getSafetyStatusUseCaseProvider =
 // ignore: unused_element
 typedef GetSafetyStatusUseCaseRef
     = AutoDisposeProviderRef<GetSafetyStatusUseCase>;
-String _$trustedContactsNotifierHash() =>
-    r'1d1788b62bc835b30415344a0a18c76367232a00';
-
-/// Provider for TrustedContactsNotifier
-///
-/// Copied from [trustedContactsNotifier].
-@ProviderFor(trustedContactsNotifier)
-final trustedContactsNotifierProvider =
-    AutoDisposeProvider<TrustedContactsNotifier>.internal(
-  trustedContactsNotifier,
-  name: r'trustedContactsNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$trustedContactsNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TrustedContactsNotifierRef
-    = AutoDisposeProviderRef<TrustedContactsNotifier>;
-String _$checkInNotifierHash() => r'cbeca9fb782c07b775d9538367b7f3b39c8781b8';
-
-/// Provider for CheckInNotifier
-///
-/// Copied from [checkInNotifier].
-@ProviderFor(checkInNotifier)
-final checkInNotifierProvider = AutoDisposeProvider<CheckInNotifier>.internal(
-  checkInNotifier,
-  name: r'checkInNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$checkInNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CheckInNotifierRef = AutoDisposeProviderRef<CheckInNotifier>;
 String _$locationSharingNotifierHash() =>
-    r'6e2155d320503075e1e3c6d612b3944df64be574';
+    r'905d6d51100e0a188bc1bd556e50b9148760b3ed';
 
 /// Provider for LocationSharingNotifier
 ///
@@ -480,7 +439,7 @@ final locationSharingNotifierProvider =
 // ignore: unused_element
 typedef LocationSharingNotifierRef
     = AutoDisposeProviderRef<LocationSharingNotifier>;
-String _$safetyNotifierHash() => r'e7ed43d3dd74486995c8a325b911611a7721af2b';
+String _$safetyNotifierHash() => r'2b193c47b9bf6d10ad2b817131253c48c8f11a23';
 
 /// Provider for SafetyNotifier
 ///

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'notification_service.g.dart';
@@ -71,7 +72,8 @@ class SafetyNotificationConfig {
   static const String notificationIcon = '@mipmap/ic_launcher';
 
   /// Default vibration pattern
-  static const Int64List vibrationPattern = Int64List.fromList([0, 500, 200, 500]);
+  static final Int64List vibrationPattern =
+      Int64List.fromList([0, 500, 200, 500]);
 
   /// Default notification importance for emergency
   static const NotificationImportance emergencyImportance =
@@ -139,59 +141,6 @@ class NotificationResult {
       return 'NotificationResult(success: true, id: $notificationId)';
     }
     return 'NotificationResult(success: false, error: $errorMessage)';
-  }
-
-  /// Shows a regular notification
-  ///
-  /// [title] - Notification title
-  /// [body] - Notification body text
-  /// [notificationId] - Unique ID for this notification
-  /// [channel] - Notification channel ID (default: background channel)
-  /// [priority] - Notification priority (default: high)
-  Future<void> show({
-    required String title,
-    required String body,
-    required int notificationId,
-    String channel = _channelId,
-    Priority priority = Priority.high,
-  }) async {
-    final androidDetails = AndroidNotificationDetails(
-      channel,
-      'Sync Notifications',
-      channelDescription: 'Notifications for sync events',
-      importance: Importance.high,
-      priority: priority,
-      autoCancel: true,
-      category: AndroidNotificationCategory.status,
-    );
-
-    const iOSDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
-
-    const details = NotificationDetails(
-      android: androidDetails,
-      iOS: iOSDetails,
-    );
-
-    await _notifications.show(
-      notificationId,
-      title,
-      body,
-      details,
-    );
-  }
-
-  /// Cancels a specific notification
-  Future<void> cancel(int notificationId) async {
-    await _notifications.cancel(notificationId);
-  }
-
-  /// Cancels all notifications
-  Future<void> cancelAll() async {
-    await _notifications.cancelAll();
   }
 }
 

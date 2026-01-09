@@ -90,8 +90,7 @@ void main() {
       // Assert
       expect(result.source, equals(ContactSource.community));
       expect(result.communityUserId, equals('community-user-123'));
-      verify(() =>
-              testSetup.mockRepository.addTrustedContact(communityContact))
+      verify(() => testSetup.mockRepository.addTrustedContact(communityContact))
           .called(1);
     });
 
@@ -107,8 +106,7 @@ void main() {
 
       // Assert
       expect(result.permission, equals(ContactPermission.emergencyOnly));
-      verify(() =>
-              testSetup.mockRepository.addTrustedContact(emergencyContact))
+      verify(() => testSetup.mockRepository.addTrustedContact(emergencyContact))
           .called(1);
     });
 
@@ -124,8 +122,7 @@ void main() {
 
       // Assert
       expect(result.permission, equals(ContactPermission.checkIns));
-      verify(() =>
-              testSetup.mockRepository.addTrustedContact(checkInsContact))
+      verify(() => testSetup.mockRepository.addTrustedContact(checkInsContact))
           .called(1);
     });
 
@@ -158,9 +155,8 @@ void main() {
 
       // Assert
       expect(result.locationSharingEnabled, isTrue);
-      verify(() =>
-              testSetup.mockRepository.addTrustedContact(locationSharingContact))
-          .called(1);
+      verify(() => testSetup.mockRepository
+          .addTrustedContact(locationSharingContact)).called(1);
     });
 
     test('should add contact with all notification preferences', () async {
@@ -172,15 +168,13 @@ void main() {
       testSetup.setupSuccessfulContactOperations();
 
       // Act
-      final result =
-          await addTrustedContactUseCase(allNotificationsContact);
+      final result = await addTrustedContactUseCase(allNotificationsContact);
 
       // Assert
       expect(result.receivesCheckIns, isTrue);
       expect(result.receivesEmergencyAlerts, isTrue);
-      verify(() => testSetup.mockRepository.addTrustedContact(
-              allNotificationsContact))
-          .called(1);
+      verify(() => testSetup.mockRepository
+          .addTrustedContact(allNotificationsContact)).called(1);
     });
 
     test('should add contact with no check-in notifications', () async {
@@ -214,8 +208,7 @@ void main() {
 
       // Assert
       expect(result.email, equals(testContactEmail));
-      verify(() =>
-              testSetup.mockRepository.addTrustedContact(contactWithEmail))
+      verify(() => testSetup.mockRepository.addTrustedContact(contactWithEmail))
           .called(1);
     });
 
@@ -231,8 +224,7 @@ void main() {
 
       // Assert
       expect(result.notes, equals('Family member'));
-      verify(() =>
-              testSetup.mockRepository.addTrustedContact(contactWithNotes))
+      verify(() => testSetup.mockRepository.addTrustedContact(contactWithNotes))
           .called(1);
     });
   });

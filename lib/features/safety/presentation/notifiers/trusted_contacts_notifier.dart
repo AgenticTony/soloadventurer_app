@@ -98,9 +98,8 @@ class TrustedContactsNotifier extends StateNotifier<TrustedContactsState> {
     state = state.copyWith(isRemoving: true, error: null);
     try {
       await _removeContact(contactId);
-      final updatedContacts = state.contacts
-          .where((contact) => contact.id != contactId)
-          .toList();
+      final updatedContacts =
+          state.contacts.where((contact) => contact.id != contactId).toList();
       state = state.copyWith(
         isRemoving: false,
         contacts: updatedContacts,

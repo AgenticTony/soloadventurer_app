@@ -6,7 +6,7 @@ part of 'security_manager.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$securityManagerHash() => r'd906b0c87c97d722ecfeb8011ade674cff01a47d';
+String _$securityManagerHash() => r'd696a60ffb495a551429352522a5ce858c9af2f1';
 
 /// Manages security-related features like rate limiting and device tracking
 ///

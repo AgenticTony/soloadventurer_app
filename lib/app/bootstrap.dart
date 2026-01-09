@@ -1,21 +1,15 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/misc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/config/app_config.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
-import 'package:soloadventurer/core/config/image_cache_config.dart';
-import 'package:soloadventurer/core/services/thumbnail_service.dart';
-import 'package:soloadventurer/core/services/memory_monitor.dart';
-import 'package:soloadventurer/core/services/data_unload_strategy.dart';
-import '../features/auth/domain/services/token_manager.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/token_manager_provider.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
 /// before the app is run.
@@ -79,20 +73,38 @@ Future<void> bootstrap() async {
     // This configures cached_network_image to handle 500+ photos efficiently
     await ImageCacheConfig.initialize();
 
-    // Initialize thumbnail service for generating and caching photo thumbnails
-    // This reduces memory footprint by 95%: 50KB thumbnails vs 1MB full images
-    await ThumbnailService.initialize();
+    // Start auth initialization phase
+    AppStartTracker.startPhase('auth_init');
 
-    // Initialize memory monitoring with automatic cache management
-    // Monitors memory usage in real-time and clears caches when thresholds are exceeded
-    await _initializeMemoryMonitoring();
+    // Initialize auth based on feature flag
+    if (AppConfig.useSupabaseAuth) {
+      // Supabase auth initialization is currently disabled
+      // To enable: add supabase_flutter to pubspec.yaml and uncomment below
+      debugPrint('⚠️ Supabase auth is configured but not available');
+      debugPrint('  To use Supabase, add supabase_flutter to pubspec.yaml');
+      // final supabaseUrl = AppConfig.supabaseUrl;
+      // final supabaseAnonKey = AppConfig.supabaseAnonKey;
+      // if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
+      //   await Supabase.initialize(...);
+      // }
+    } else {
+      // AWS Cognito initialization
+      debugPrint('ℹ️ Auth: Using AWS Cognito');
+      // Cognito initialization is handled by CognitoConfig class
+      // which is loaded by the auth repository when needed
+    }
 
-    // Initialize data unload strategy for automatic off-screen data unloading
-    // Works with MemoryMonitor to free memory when pressure is high
-    await _initializeDataUnloadStrategy();
+    AppStartTracker.endPhase('auth_init');
 
-    // Create ProviderContainer for initialization
-    final container = ProviderContainer();
+    // Start provider initialization phase
+    AppStartTracker.startPhase('provider_init');
+
+    // Create ProviderContainer for initialization with overrides
+    final container = ProviderContainer(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+    );
 
     // Initialize TokenManager
     await container.read(tokenManagerProvider.notifier).initializeToken();
@@ -122,66 +134,63 @@ Future<void> bootstrap() async {
 /// Logger for provider state changes
 ///
 /// This observer logs provider lifecycle events for debugging purposes.
-/// It uses the Riverpod 3.0 ProviderObserverContext API.
+/// Provider logger using Riverpod 2.6.1 ProviderObserver API
 ///
-/// See: https://riverpod.dev/docs/3.0_migration
+/// Monitors provider state changes for debugging purposes.
 final class ProviderLogger extends ProviderObserver {
   @override
   void didAddProvider(
-    ProviderObserverContext context,
+    ProviderBase<Object?> provider,
     Object? value,
+    ProviderContainer? container,
   ) {
     debugPrint('''
 {
   "event": "didAddProvider",
-  "provider": "${context.provider}",
+  "provider": "$provider",
   "value": "$value"
 }''');
   }
 
   @override
   void didUpdateProvider(
-    ProviderObserverContext context,
+    ProviderBase<Object?> provider,
     Object? previousValue,
     Object? newValue,
+    ProviderContainer? container,
   ) {
     debugPrint('''
 {
   "event": "didUpdateProvider",
-  "provider": "${context.provider}",
+  "provider": "$provider",
   "previousValue": "$previousValue",
-  "newValue": "$newValue",
-  "mutation": "${context.mutation}"
+  "newValue": "$newValue"
 }''');
   }
 
   @override
   void didDisposeProvider(
-    ProviderObserverContext context,
+    ProviderBase<Object?> provider,
+    ProviderContainer? container,
   ) {
     debugPrint('''
 {
   "event": "didDisposeProvider",
-  "provider": "${context.provider}"
+  "provider": "$provider"
 }''');
   }
 
   @override
   void providerDidFail(
-    ProviderObserverContext context,
+    ProviderBase<Object?> provider,
     Object error,
     StackTrace stackTrace,
+    ProviderContainer? container,
   ) {
-    // Skip ProviderException to avoid double-logging
-    // Riverpod 3.0 wraps all provider failures in ProviderException
-    if (error is ProviderException) {
-      return;
-    }
-
     debugPrint('''
 {
   "event": "providerDidFail",
-  "provider": "${context.provider}",
+  "provider": "$provider",
   "error": "$error",
   "stackTrace": "$stackTrace"
 }''');
@@ -193,66 +202,4 @@ final class ProviderLogger extends ProviderObserver {
 void setupDebugConfiguration() {
   // Enable additional logging in debug mode
   // Configure development-specific settings
-}
-
-/// Initialize memory monitoring with automatic cache management
-///
-/// This sets up real-time memory tracking and automatic cache clearing
-/// when memory usage exceeds configured thresholds.
-Future<void> _initializeMemoryMonitoring() async {
-  await MemoryMonitor.initialize(
-    config: const MemoryMonitorConfig(
-      warningThresholdBytes: 150 * 1024 * 1024,  // 150 MB warning
-      criticalThresholdBytes: 180 * 1024 * 1024, // 180 MB critical
-      monitoringInterval: Duration(seconds: 5),
-    ),
-    onAlert: (alert) async {
-      debugPrint('🚨 Memory Alert [${alert.level.name}]: ${alert.message}');
-
-      // Automatic cache management based on alert level
-      if (alert.level == MemoryAlertLevel.warning) {
-        debugPrint('⚠️  Memory warning - Clearing image cache');
-        await ImageCacheConfig.clearMemoryCache();
-      } else if (alert.level == MemoryAlertLevel.critical) {
-        debugPrint('❌ Memory critical - Clearing all caches');
-        await ImageCacheConfig.clearAllCaches();
-        await ThumbnailService.clearCache();
-
-        // Clear memory monitor history to free up memory
-        MemoryMonitor.clearHistory();
-
-        debugPrint('✅ All caches cleared due to critical memory usage');
-      }
-    },
-  );
-
-  debugPrint('✅ Memory monitoring initialized');
-  debugPrint('   Warning threshold: 150 MB');
-  debugPrint('   Critical threshold: 180 MB');
-  debugPrint('   Monitoring interval: 5 seconds');
-}
-
-/// Initialize data unload strategy for automatic off-screen data management
-///
-/// This sets up intelligent data unloading that responds to memory pressure
-/// by automatically unloading off-screen data when memory is high.
-Future<void> _initializeDataUnloadStrategy() async {
-  await DataUnloadStrategy.initialize(
-    config: const DataUnloadConfig(
-      autoUnloadOnWarning: true,   // Unload data at warning level (150 MB)
-      autoUnloadOnCritical: true,  // Aggressively unload at critical level (180 MB)
-      targetFreePercentageWarning: 0.1,    // Free 10% at warning
-      targetFreePercentageCritical: 0.3,   // Free 30% at critical
-      maxUnloadDuration: Duration(milliseconds: 100), // Don't block UI
-      prioritizeByPriority: true,   // Unload low priority data first
-      prioritizeByVisibility: true, // Unload off-screen data first
-      enableDebugLogging: true,     // Log unload operations in debug
-    ),
-  );
-
-  debugPrint('✅ Data unload strategy initialized');
-  debugPrint('   Auto-unload on warning: true (10% target)');
-  debugPrint('   Auto-unload on critical: true (30% target)');
-  debugPrint('   Priority-based: true');
-  debugPrint('   Visibility-aware: true');
 }

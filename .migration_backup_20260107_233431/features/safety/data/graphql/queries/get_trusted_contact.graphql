@@ -1,0 +1,15 @@
+query GetTrustedContact($contactId: ID!) {
+  getTrustedContact(contactId: $contactId) {
+    id
+    userId
+    name
+    email
+    phoneNumber
+    contactSource
+    receivesCheckInNotifications
+    receivesEmergencyAlerts
+    receivesLocationUpdates
+    createdAt
+    updatedAt
+  }
+}

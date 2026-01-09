@@ -9,5 +9,9 @@ class CreateProfileUseCase {
   const CreateProfileUseCase(this._repository);
 
   /// Execute the use case with the given profile data
-  Future<Profile> call(Profile profile) => _repository.createProfile(profile);
+  /// Returns the created profile from the repository operation result
+  Future<Profile> call(Profile profile) async {
+    final result = await _repository.createProfile(profile);
+    return result.data;
+  }
 }

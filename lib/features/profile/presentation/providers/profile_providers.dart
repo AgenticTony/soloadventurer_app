@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
+import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import '../../domain/entities/profile.dart';
 import '../../domain/entities/profile_state.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../data/repositories/profile_repository_impl.dart';
-import '../../../../core/network/network_providers.dart';
-import '../../../../core/providers/core_providers.dart';
 import '../../../offline/domain/services/connectivity_service.dart';
 import '../../../offline/domain/services/sync_queue_service.dart';
 import '../../../offline/infrastructure/database/dao/user_dao.dart';

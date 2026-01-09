@@ -67,9 +67,9 @@ class AppConfig {
   /// - 'supabase': Use Supabase Auth (new, recommended)
   /// - 'cognito': Use AWS Cognito (legacy, being phased out)
   ///
-  /// Set via: `flutter run --dart-define=AUTH_PROVIDER=supabase`
+  /// Set via: `flutter run --dart-define=AUTH_PROVIDER=cognito`
   static String get authProvider =>
-      const String.fromEnvironment('AUTH_PROVIDER', defaultValue: 'supabase');
+      const String.fromEnvironment('AUTH_PROVIDER', defaultValue: 'cognito');
 
   /// Whether to use Supabase for authentication
   static bool get useSupabaseAuth => authProvider == 'supabase';
@@ -89,8 +89,9 @@ class AppConfig {
   ///
   /// Set via: `flutter run --dart-define=ENABLE_SSL_PINNING=true`
   static bool get enableSSLPinning =>
-      const String.fromEnvironment('ENABLE_SSL_PINNING', defaultValue: 'false') ==
-          'true';
+      const String.fromEnvironment('ENABLE_SSL_PINNING',
+          defaultValue: 'false') ==
+      'true';
 
   // ============================================================
   // SUPABASE CONFIGURATION
@@ -107,7 +108,9 @@ class AppConfig {
   /// Required when `useSupabaseAuth` is true.
   /// Set in `.env` file: `SUPABASE_ANON_KEY=your-anon-key`
   static String get supabaseAnonKey =>
-      dotenv.env['SUPABASE_ANON_KEY'] ?? dotenv.env['SUPABASE_SERVICE_KEY'] ?? '';
+      dotenv.env['SUPABASE_ANON_KEY'] ??
+      dotenv.env['SUPABASE_SERVICE_KEY'] ??
+      '';
 
   /// Whether Supabase debug mode is enabled
   ///
@@ -125,7 +128,7 @@ class AppConfig {
   /// Set via: `flutter run --dart-define=DEBUG=true`
   static bool get debugMode =>
       const String.fromEnvironment('DEBUG', defaultValue: 'false') == 'true' ||
-          kDebugMode;
+      kDebugMode;
 
   // ============================================================
   // VALIDATION

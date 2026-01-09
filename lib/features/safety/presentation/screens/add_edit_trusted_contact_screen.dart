@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 import '../widgets/contact_picker_widget.dart';
 
 /// Screen for adding or editing a trusted contact
@@ -91,7 +91,7 @@ class _AddEditTrustedContactScreenState
       return;
     }
 
-    final user = ref.read(currentUserProvider);
+    final user = ref.read(authNotifierProvider).valueOrNull?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -104,7 +104,7 @@ class _AddEditTrustedContactScreenState
       return;
     }
 
-    final notifier = ref.read(trustedContactsNotifierProvider.notifier);
+    final notifier = ref.read(trustedContactsProvider.notifier);
 
     try {
       if (_isEditMode) {
@@ -174,7 +174,8 @@ class _AddEditTrustedContactScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to ${_isEditMode ? 'update' : 'add'} contact: $e'),
+            content:
+                Text('Failed to ${_isEditMode ? 'update' : 'add'} contact: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -184,12 +185,14 @@ class _AddEditTrustedContactScreenState
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(trustedContactsNotifierProvider);
-    final isSaving = _isEditMode ? state.isUpdating : state.isAdding;
+    final contactsState = ref.watch(trustedContactsProvider);
+    final isSaving =
+        _isEditMode ? contactsState.isUpdating : contactsState.isAdding;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditMode ? 'Edit Trusted Contact' : 'Add Trusted Contact'),
+        title:
+            Text(_isEditMode ? 'Edit Trusted Contact' : 'Add Trusted Contact'),
         actions: [
           if (isSaving)
             const Center(
@@ -316,7 +319,7 @@ class _AddEditTrustedContactScreenState
 
               // Contact source dropdown
               DropdownButtonFormField<ContactSource>(
-                value: _selectedSource,
+                initialValue: _selectedSource,
                 decoration: const InputDecoration(
                   labelText: 'Contact Source *',
                   border: OutlineInputBorder(),
@@ -358,7 +361,7 @@ class _AddEditTrustedContactScreenState
 
               // Permission level dropdown
               DropdownButtonFormField<ContactPermission>(
-                value: _selectedPermission,
+                initialValue: _selectedPermission,
                 decoration: const InputDecoration(
                   labelText: 'Permission Level *',
                   border: OutlineInputBorder(),
@@ -565,8 +568,7 @@ class _AddEditTrustedContactScreenState
 
     switch (permission) {
       case ContactPermission.emergencyOnly:
-        description =
-            'This contact will only be notified during emergencies. '
+        description = 'This contact will only be notified during emergencies. '
             'They will not receive check-in updates or location sharing.';
         icon = Icons.warning;
         color = Colors.orange;
@@ -590,9 +592,9 @@ class _AddEditTrustedContactScreenState
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -604,7 +606,7 @@ class _AddEditTrustedContactScreenState
               description,
               style: TextStyle(
                 fontSize: 12,
-                color: color.shade900,
+                color: color.withValues(alpha: 0.87),
                 height: 1.4,
               ),
             ),

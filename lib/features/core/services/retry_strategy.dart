@@ -40,19 +40,20 @@ class ExponentialBackoffStrategy extends RetryStrategy {
   /// [maxDelay] The maximum allowed delay (default: 5 minutes)
   /// [jitterFactor] Random variation as percentage 0.0-1.0 (default: 0.1)
   /// [random] Optional custom random generator (for testing)
-  const ExponentialBackoffStrategy({
+  ExponentialBackoffStrategy({
     this.baseDelay = const Duration(seconds: 1),
     this.maxDelay = const Duration(minutes: 5),
     this.jitterFactor = 0.1,
     Random? random,
-  })  : _random = random ?? const Random._internal(0),
+  })  : _random = random ?? Random(),
         assert(jitterFactor >= 0.0 && jitterFactor <= 1.0,
             'jitterFactor must be between 0.0 and 1.0');
 
   @override
   Duration calculateDelay(int attemptCount) {
     if (attemptCount < 0) {
-      debugPrint('ExponentialBackoffStrategy: attemptCount cannot be negative, defaulting to 0');
+      debugPrint(
+          'ExponentialBackoffStrategy: attemptCount cannot be negative, defaulting to 0');
       attemptCount = 0;
     }
 
@@ -72,10 +73,9 @@ class ExponentialBackoffStrategy extends RetryStrategy {
     final result = Duration(milliseconds: cappedDelay);
 
     debugPrint(
-      'ExponentialBackoffStrategy: attempt #$attemptCount -> ${result.inSeconds}s '
-      '(base: ${baseDelay.inSeconds}s, exponential: ${(exponentialDelay / 1000).toStringAsFixed(2)}s, '
-      'jitter: ${(jitter / 1000).toStringAsFixed(2)}s)'
-    );
+        'ExponentialBackoffStrategy: attempt #$attemptCount -> ${result.inSeconds}s '
+        '(base: ${baseDelay.inSeconds}s, exponential: ${(exponentialDelay / 1000).toStringAsFixed(2)}s, '
+        'jitter: ${(jitter / 1000).toStringAsFixed(2)}s)');
 
     return result;
   }
@@ -98,7 +98,7 @@ class FixedDelayStrategy extends RetryStrategy {
   /// Creates a fixed delay strategy
   ///
   /// [delay] The constant delay between retries (default: 5 seconds)
-  const FixedDelayStrategy({
+  FixedDelayStrategy({
     this.delay = const Duration(seconds: 5),
   });
 
@@ -109,8 +109,7 @@ class FixedDelayStrategy extends RetryStrategy {
     }
 
     debugPrint(
-      'FixedDelayStrategy: attempt #$attemptCount -> ${delay.inSeconds}s'
-    );
+        'FixedDelayStrategy: attempt #$attemptCount -> ${delay.inSeconds}s');
 
     return delay;
   }
@@ -149,25 +148,27 @@ class LinearBackoffStrategy extends RetryStrategy {
   /// [maxDelay] The maximum allowed delay (default: 1 minute)
   /// [jitterFactor] Random variation as percentage 0.0-1.0 (default: 0.1)
   /// [random] Optional custom random generator (for testing)
-  const LinearBackoffStrategy({
+  LinearBackoffStrategy({
     this.baseDelay = const Duration(seconds: 1),
     this.increment = const Duration(seconds: 2),
     this.maxDelay = const Duration(minutes: 1),
     this.jitterFactor = 0.1,
     Random? random,
-  })  : _random = random ?? const Random._internal(0),
+  })  : _random = random ?? Random(),
         assert(jitterFactor >= 0.0 && jitterFactor <= 1.0,
             'jitterFactor must be between 0.0 and 1.0');
 
   @override
   Duration calculateDelay(int attemptCount) {
     if (attemptCount < 0) {
-      debugPrint('LinearBackoffStrategy: attemptCount cannot be negative, defaulting to 0');
+      debugPrint(
+          'LinearBackoffStrategy: attemptCount cannot be negative, defaulting to 0');
       attemptCount = 0;
     }
 
     // Calculate linear backoff: baseDelay + (increment * attemptCount)
-    final linearDelay = baseDelay.inMilliseconds + (increment.inMilliseconds * attemptCount);
+    final linearDelay =
+        baseDelay.inMilliseconds + (increment.inMilliseconds * attemptCount);
 
     // Calculate and apply jitter
     final jitterRange = linearDelay * jitterFactor;
@@ -181,17 +182,15 @@ class LinearBackoffStrategy extends RetryStrategy {
     final result = Duration(milliseconds: cappedDelay);
 
     debugPrint(
-      'LinearBackoffStrategy: attempt #$attemptCount -> ${result.inSeconds}s '
-      '(base: ${baseDelay.inSeconds}s, increment: ${increment.inSeconds}s, '
-      'jitter: ${(jitter / 1000).toStringAsFixed(2)}s)'
-    );
+        'LinearBackoffStrategy: attempt #$attemptCount -> ${result.inSeconds}s '
+        '(base: ${baseDelay.inSeconds}s, increment: ${increment.inSeconds}s, '
+        'jitter: ${(jitter / 1000).toStringAsFixed(2)}s)');
 
     return result;
   }
 
   @override
-  String get description =>
-      'LinearBackoff(baseDelay: ${baseDelay.inSeconds}s, '
+  String get description => 'LinearBackoff(baseDelay: ${baseDelay.inSeconds}s, '
       'increment: ${increment.inSeconds}s, maxDelay: ${maxDelay.inSeconds}s, '
       'jitter: ${(jitterFactor * 100).toInt()}%)';
 }

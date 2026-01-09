@@ -68,7 +68,9 @@ class _DayExpansionTileState extends State<DayExpansionTile> {
                       shape: BoxShape.circle,
                       color: completedCount == totalCount
                           ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.surfaceContainerHighest,
+                          : Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                     ),
                     child: Center(
                       child: Text(
@@ -90,18 +92,20 @@ class _DayExpansionTileState extends State<DayExpansionTile> {
                       children: [
                         Text(
                           'Day ${widget.dayNumber}',
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         if (totalCount > 0)
                           Text(
                             '$completedCount of $totalCount activities completed',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
                           ),
                       ],
                     ),
@@ -143,7 +147,8 @@ class _DayExpansionTileState extends State<DayExpansionTile> {
                     key: ValueKey(item.id),
                     item: item,
                     isReorderMode: widget.isReorderMode,
-                    onToggleCompletion: () => widget.onToggleCompletion(item.id),
+                    onToggleCompletion: () =>
+                        widget.onToggleCompletion(item.id),
                     onRemove: () => _showRemoveDialog(context, item),
                   );
                 },

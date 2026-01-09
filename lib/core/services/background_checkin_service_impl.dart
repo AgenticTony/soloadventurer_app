@@ -4,7 +4,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:workmanager/workmanager.dart';
 import 'background_checkin_service.dart';
-import 'notification_service.dart';
 
 part 'background_checkin_service_impl.g.dart';
 
@@ -13,7 +12,8 @@ class BackgroundCheckInServiceImpl implements BackgroundCheckInService {
   final StreamController<BackgroundCheckInServiceStatus> _statusController =
       StreamController<BackgroundCheckInServiceStatus>.broadcast();
 
-  BackgroundCheckInServiceStatus _status = BackgroundCheckInServiceStatus.stopped;
+  BackgroundCheckInServiceStatus _status =
+      BackgroundCheckInServiceStatus.stopped;
 
   @override
   BackgroundCheckInServiceStatus get status => _status;
@@ -36,14 +36,14 @@ class BackgroundCheckInServiceImpl implements BackgroundCheckInService {
         BackgroundCheckInConfig.monitoringTaskId,
         BackgroundCheckInConfig.monitoringTaskName,
         frequency: BackgroundCheckInConfig.monitoringInterval,
-        constraints: WorkManagerConstraints(
+        constraints: Constraints(
           networkType: NetworkType.connected,
           requiresBatteryNotLow: true,
           requiresCharging: false,
           requiresDeviceIdle: false,
           requiresStorageNotLow: false,
         ),
-        existingWorkPolicy: ExistingWorkPolicy.replace,
+        existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
         backoffPolicy: BackoffPolicy.exponential,
         backoffPolicyDelay: BackgroundCheckInConfig.monitoringInterval,
       );
@@ -78,7 +78,7 @@ class BackgroundCheckInServiceImpl implements BackgroundCheckInService {
         'reminder_$checkInId',
         'checkInReminderTask',
         initialDelay: initialDelay,
-        constraints: WorkManagerConstraints(
+        constraints: Constraints(
           networkType: NetworkType.connected,
           requiresBatteryNotLow: false,
           requiresCharging: false,

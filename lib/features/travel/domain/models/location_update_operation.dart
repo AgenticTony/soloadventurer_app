@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/services/operation_queue.dart';
 import '../../../core/services/operation_priority.dart';
 
@@ -14,7 +15,7 @@ class LocationUpdateOperation
     required double latitude,
     required double longitude,
     required DateTime timestamp,
-    @Default(OperationPriority.low) int priority,
+    required int priority,
     // Retry metadata
     DateTime? createdAt,
     DateTime? lastAttempt,
@@ -27,6 +28,22 @@ class LocationUpdateOperation
       _$LocationUpdateOperationFromJson(json);
 
   const LocationUpdateOperation._();
+
+  /// Create a new location update operation
+  factory LocationUpdateOperation.create({
+    required double latitude,
+    required double longitude,
+    DateTime? timestamp,
+  }) {
+    return LocationUpdateOperation(
+      id: const Uuid().v4(),
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: timestamp ?? DateTime.now(),
+      priority: OperationPriority.low.value,
+      createdAt: DateTime.now(),
+    );
+  }
 
   @override
   String get type => 'location_update';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/services/location_service.dart';
+import '../../../../core/services/location_service.dart' as core;
 import '../../domain/entities/location_update.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
@@ -15,27 +15,26 @@ class LocationSharingScreen extends ConsumerStatefulWidget {
       _LocationSharingScreenState();
 }
 
-class _LocationSharingScreenState
-    extends ConsumerState<LocationSharingScreen> {
+class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
   @override
   void initState() {
     super.initState();
     // Load active location shares when screen initializes
     Future.microtask(() {
-      ref.read(locationSharingNotifierProvider.notifier).loadActiveShares();
+      ref.read(locationSharingNotifierProvider).loadActiveShares();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final locationSharingState = ref.watch(locationSharingNotifierProvider);
+    final locationSharingState = ref.watch(locationSharingStateProvider);
     final activeShares = locationSharingState.activeShares;
     final latestLocation = locationSharingState.latestLocation;
     final isLoading = locationSharingState.isLoading;
     final isStopping = locationSharingState.isStopping;
     final error = locationSharingState.error;
 
-    final trustedContactsState = ref.watch(trustedContactsNotifierProvider);
+    final trustedContactsState = ref.watch(trustedContactsProvider);
     final trustedContacts = trustedContactsState.contacts;
 
     return Scaffold(
@@ -196,7 +195,7 @@ class _LocationSharingScreenState
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.location_on,
                 color: Colors.white,
                 size: 20,
@@ -219,7 +218,7 @@ class _LocationSharingScreenState
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.gps_fixed,
                   color: Colors.white70,
                   size: 16,
@@ -237,7 +236,7 @@ class _LocationSharingScreenState
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.people,
                 color: Colors.white,
                 size: 20,
@@ -298,7 +297,9 @@ class _LocationSharingScreenState
                 children: [
                   Icon(
                     share.isEmergency ? Icons.emergency : Icons.share_location,
-                    color: share.isEmergency ? Colors.red : theme.colorScheme.primary,
+                    color: share.isEmergency
+                        ? Colors.red
+                        : theme.colorScheme.primary,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -306,9 +307,7 @@ class _LocationSharingScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          share.placeName ??
-                              share.address ??
-                              'Shared Location',
+                          share.placeName ?? share.address ?? 'Shared Location',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -413,7 +412,7 @@ class _LocationSharingScreenState
         label,
         style: const TextStyle(fontSize: 12),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
     );
   }
@@ -427,7 +426,7 @@ class _LocationSharingScreenState
           Icon(
             Icons.location_off,
             size: 64,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -481,9 +480,7 @@ class _LocationSharingScreenState
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref
-                    .read(locationSharingNotifierProvider.notifier)
-                    .loadActiveShares();
+                ref.read(locationSharingNotifierProvider).loadActiveShares();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
@@ -495,7 +492,7 @@ class _LocationSharingScreenState
   }
 
   void _showShareOptions(BuildContext context) {
-    final trustedContactsState = ref.read(trustedContactsNotifierProvider);
+    final trustedContactsState = ref.read(trustedContactsProvider);
     final trustedContacts = trustedContactsState.contacts;
     final contactsWithSharing = trustedContacts
         .where((contact) => contact.locationSharingEnabled)
@@ -565,14 +562,12 @@ class _LocationSharingScreenState
     try {
       final locationService = ref.read(locationServiceProvider);
       final location = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       if (!mounted) return;
 
-      await ref
-          .read(locationSharingNotifierProvider.notifier)
-          .shareWithContact(
+      await ref.read(locationSharingNotifierProvider).shareWithContact(
             latitude: location.latitude,
             longitude: location.longitude,
             contactId: contact.id,
@@ -617,16 +612,14 @@ class _LocationSharingScreenState
     try {
       final locationService = ref.read(locationServiceProvider);
       final location = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       if (!mounted) return;
 
       final contactIds = contacts.map((c) => c.id).toList();
 
-      await ref
-          .read(locationSharingNotifierProvider.notifier)
-          .shareLocation(
+      await ref.read(locationSharingNotifierProvider).shareLocation(
             latitude: location.latitude,
             longitude: location.longitude,
             shareWithContactIds: contactIds,
@@ -640,7 +633,8 @@ class _LocationSharingScreenState
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Now sharing location with ${contacts.length} contact(s)'),
+          content:
+              Text('Now sharing location with ${contacts.length} contact(s)'),
           action: SnackBarAction(
             label: 'View',
             onPressed: () {
@@ -740,9 +734,7 @@ class _LocationSharingScreenState
     List<String> contactIds,
     List<String> contactNames,
   ) {
-    ref
-        .read(locationSharingNotifierProvider.notifier)
-        .stopSharing(contactIds);
+    ref.read(locationSharingNotifierProvider).stopSharing(contactIds);
 
     final namesText = contactNames.isEmpty
         ? '${contactIds.length} contact(s)'
@@ -762,7 +754,7 @@ class _LocationSharingScreenState
   }
 
   void _stopAllSharing(BuildContext context) {
-    ref.read(locationSharingNotifierProvider.notifier).stopAllSharing();
+    ref.read(locationSharingNotifierProvider).stopAllSharing();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -851,6 +843,9 @@ class _LocationSharingScreenState
                 userId: '',
                 name: 'Unknown Contact',
                 phoneNumber: '',
+                email: '',
+                source: ContactSource.phone,
+                permission: ContactPermission.fullAccess,
                 addedAt: DateTime.now(),
               ),
             ))
@@ -928,9 +923,8 @@ class _LocationDetailsSheet extends StatelessWidget {
             children: [
               Icon(
                 share.isEmergency ? Icons.emergency : Icons.share_location,
-                color: share.isEmergency
-                    ? Colors.red
-                    : theme.colorScheme.primary,
+                color:
+                    share.isEmergency ? Colors.red : theme.colorScheme.primary,
                 size: 32,
               ),
               const SizedBox(width: 12),
@@ -997,7 +991,7 @@ class _LocationDetailsSheet extends StatelessWidget {
           ],
           const SizedBox(height: 16),
           _DetailRow(
-            icon: Icons.status,
+            icon: Icons.info,
             label: 'Status',
             value: _getStatusLabel(share.sharingStatus),
           ),
@@ -1011,7 +1005,7 @@ class _LocationDetailsSheet extends StatelessWidget {
           ),
           if (share.isEmergency) ...[
             const SizedBox(height: 16),
-            _DetailRow(
+            const _DetailRow(
               icon: Icons.emergency,
               label: 'Type',
               value: 'Emergency Share',
@@ -1029,7 +1023,7 @@ class _LocationDetailsSheet extends StatelessWidget {
           if (share.emergencyAlertId != null) ...[
             const SizedBox(height: 16),
             _DetailRow(
-              icon: Icons.alert,
+              icon: Icons.warning,
               label: 'Emergency Alert ID',
               value: share.emergencyAlertId!,
             ),
@@ -1048,6 +1042,9 @@ class _LocationDetailsSheet extends StatelessWidget {
                 userId: '',
                 name: 'Unknown Contact',
                 phoneNumber: '',
+                email: '',
+                source: ContactSource.phone,
+                permission: ContactPermission.fullAccess,
                 addedAt: DateTime.now(),
               ),
             ))

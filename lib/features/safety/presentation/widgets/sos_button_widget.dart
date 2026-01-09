@@ -135,13 +135,15 @@ class _SOSButtonWidgetState extends State<SOSButtonWidget>
         !widget.hasActiveEmergency;
 
     final buttonColor = widget.color ?? Colors.red;
-    final activeColor = widget.color?.withOpacity(0.8) ?? Colors.orange;
+    final activeColor = widget.color?.withValues(alpha: 0.8) ?? Colors.orange;
 
     final dimensions = widget.size.dimensions;
 
     return Semantics(
       label: widget.semanticLabel ??
-          (widget.hasActiveEmergency ? 'Active emergency alert' : 'Emergency SOS button'),
+          (widget.hasActiveEmergency
+              ? 'Active emergency alert'
+              : 'Emergency SOS button'),
       button: true,
       enabled: isEnabled,
       excludeSemantics: true,
@@ -164,19 +166,19 @@ class _SOSButtonWidgetState extends State<SOSButtonWidget>
                   gradient: RadialGradient(
                     colors: widget.hasActiveEmergency
                         ? [
-                            activeColor.withOpacity(0.3),
+                            activeColor.withValues(alpha: 0.3),
                             activeColor,
                           ]
                         : [
-                            buttonColor.withOpacity(0.3),
+                            buttonColor.withValues(alpha: 0.3),
                             buttonColor,
                           ],
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: widget.hasActiveEmergency
-                          ? activeColor.withOpacity(0.5)
-                          : buttonColor.withOpacity(0.5),
+                          ? activeColor.withValues(alpha: 0.5)
+                          : buttonColor.withValues(alpha: 0.5),
                       blurRadius: widget.hasActiveEmergency
                           ? dimensions.blurRadius * 0.7
                           : dimensions.blurRadius,
@@ -188,13 +190,16 @@ class _SOSButtonWidgetState extends State<SOSButtonWidget>
                         !widget.isLoading &&
                         widget.showPulse)
                       BoxShadow(
-                        color: buttonColor.withOpacity(0.3),
-                        blurRadius: dimensions.blurRadius * 2 * _pulseAnimation.value,
-                        spreadRadius: dimensions.spreadRadius * 2 * _pulseAnimation.value,
+                        color: buttonColor.withValues(alpha: 0.3),
+                        blurRadius:
+                            dimensions.blurRadius * 2 * _pulseAnimation.value,
+                        spreadRadius:
+                            dimensions.spreadRadius * 2 * _pulseAnimation.value,
                       ),
                   ],
                 ),
-                child: _buildContent(theme, buttonColor, activeColor, dimensions),
+                child:
+                    _buildContent(theme, buttonColor, activeColor, dimensions),
               ),
             ),
           );
@@ -226,7 +231,7 @@ class _SOSButtonWidgetState extends State<SOSButtonWidget>
         ? (widget.activeLabel ?? 'ACTIVE')
         : (widget.label ?? 'SOS');
 
-    final textColor = Colors.white;
+    const textColor = Colors.white;
 
     if (widget.size == SOSButtonSize.small) {
       // Small size: just show icon or text
@@ -263,7 +268,7 @@ class _SOSButtonWidgetState extends State<SOSButtonWidget>
           Text(
             widget.subtitle!,
             style: theme.textTheme.titleMedium?.copyWith(
-              color: textColor.withOpacity(0.9),
+              color: textColor.withValues(alpha: 0.9),
               fontWeight: FontWeight.w600,
               fontSize: dimensions.subtitleFontSize,
             ),

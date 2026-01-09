@@ -56,7 +56,8 @@ void main() {
     test('should not compare equal when any property differs', () {
       // Arrange
       final alert1 = createTestSafetyAlert();
-      final alert2 = createTestSafetyAlert(status: SafetyAlertStatus.acknowledged);
+      final alert2 =
+          createTestSafetyAlert(status: SafetyAlertStatus.acknowledged);
 
       // Assert
       expect(alert1, isNot(equals(alert2)));
@@ -64,22 +65,28 @@ void main() {
 
     test('should handle SafetyAlertType enum values correctly', () {
       // Assert
-      expect(SafetyAlertType.emergencySOS, equals(SafetyAlertType.emergencySOS));
+      expect(
+          SafetyAlertType.emergencySOS, equals(SafetyAlertType.emergencySOS));
       expect(SafetyAlertType.needHelp, equals(SafetyAlertType.needHelp));
       expect(SafetyAlertType.emergency, equals(SafetyAlertType.emergency));
-      expect(SafetyAlertType.missedCheckIn, equals(SafetyAlertType.missedCheckIn));
-      expect(SafetyAlertType.locationUpdate, equals(SafetyAlertType.locationUpdate));
+      expect(
+          SafetyAlertType.missedCheckIn, equals(SafetyAlertType.missedCheckIn));
+      expect(SafetyAlertType.locationUpdate,
+          equals(SafetyAlertType.locationUpdate));
       expect(SafetyAlertType.safe, equals(SafetyAlertType.safe));
-      expect(SafetyAlertType.emergencySOS, isNot(equals(SafetyAlertType.needHelp)));
+      expect(SafetyAlertType.emergencySOS,
+          isNot(equals(SafetyAlertType.needHelp)));
     });
 
     test('should handle SafetyAlertStatus enum values correctly', () {
       // Assert
       expect(SafetyAlertStatus.sent, equals(SafetyAlertStatus.sent));
-      expect(SafetyAlertStatus.acknowledged, equals(SafetyAlertStatus.acknowledged));
+      expect(SafetyAlertStatus.acknowledged,
+          equals(SafetyAlertStatus.acknowledged));
       expect(SafetyAlertStatus.resolved, equals(SafetyAlertStatus.resolved));
       expect(SafetyAlertStatus.cancelled, equals(SafetyAlertStatus.cancelled));
-      expect(SafetyAlertStatus.sent, isNot(equals(SafetyAlertStatus.acknowledged)));
+      expect(SafetyAlertStatus.sent,
+          isNot(equals(SafetyAlertStatus.acknowledged)));
     });
 
     test('should handle multiple notified contact IDs', () {
@@ -136,7 +143,8 @@ void main() {
       expect(location.timestamp, equals(testDateTime));
     });
 
-    test('should create a SafetyAlertLocation with optional fields as null', () {
+    test('should create a SafetyAlertLocation with optional fields as null',
+        () {
       // Arrange & Act
       final location = SafetyAlertLocation(
         latitude: testLatitude,

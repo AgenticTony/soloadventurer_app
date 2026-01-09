@@ -27,7 +27,9 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => ref.read(authNavigationProvider.notifier).navigateToProfileEdit(),
+            onPressed: () => ref
+                .read(authNavigationProvider.notifier)
+                .navigateToProfileEdit(),
           ),
         ],
       ),

@@ -90,7 +90,8 @@ class LocationPrivacySettings {
       shareCoordinates: shareCoordinates ?? this.shareCoordinates,
       sharePlaceName: sharePlaceName ?? this.sharePlaceName,
       shareBatteryLevel: shareBatteryLevel ?? this.shareBatteryLevel,
-      shareSpeedAndAltitude: shareSpeedAndAltitude ?? this.shareSpeedAndAltitude,
+      shareSpeedAndAltitude:
+          shareSpeedAndAltitude ?? this.shareSpeedAndAltitude,
       locationAccuracy: locationAccuracy ?? this.locationAccuracy,
       batteryOptimization: batteryOptimization ?? this.batteryOptimization,
       autoExpireMinutes: autoExpireMinutes ?? this.autoExpireMinutes,
@@ -354,7 +355,9 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           icon: Icons.location_city,
           color: Colors.green,
           isSelected: _settings.privacyLevel == LocationPrivacyLevel.minimal,
-          onTap: widget.enabled ? () => _updatePrivacyLevel(LocationPrivacyLevel.minimal) : null,
+          onTap: widget.enabled
+              ? () => _updatePrivacyLevel(LocationPrivacyLevel.minimal)
+              : null,
         ),
         const SizedBox(height: 8),
         _PrivacyLevelCard(
@@ -364,7 +367,9 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           icon: Icons.balance,
           color: Colors.blue,
           isSelected: _settings.privacyLevel == LocationPrivacyLevel.balanced,
-          onTap: widget.enabled ? () => _updatePrivacyLevel(LocationPrivacyLevel.balanced) : null,
+          onTap: widget.enabled
+              ? () => _updatePrivacyLevel(LocationPrivacyLevel.balanced)
+              : null,
         ),
         const SizedBox(height: 8),
         _PrivacyLevelCard(
@@ -374,7 +379,9 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           icon: Icons.my_location,
           color: Colors.orange,
           isSelected: _settings.privacyLevel == LocationPrivacyLevel.detailed,
-          onTap: widget.enabled ? () => _updatePrivacyLevel(LocationPrivacyLevel.detailed) : null,
+          onTap: widget.enabled
+              ? () => _updatePrivacyLevel(LocationPrivacyLevel.detailed)
+              : null,
         ),
       ],
     );
@@ -422,7 +429,8 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           context: context,
           timing: LocationSharingTiming.checkInsAndEmergencies,
           title: 'Check-ins & Emergencies',
-          subtitle: 'Share location during check-ins and emergencies (recommended)',
+          subtitle:
+              'Share location during check-ins and emergencies (recommended)',
           icon: Icons.shield,
         ),
         const Divider(height: 1),
@@ -541,7 +549,8 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           value: _settings.shareSpeedAndAltitude,
           onChanged: widget.enabled
               ? (value) {
-                  _updateSettings(_settings.copyWith(shareSpeedAndAltitude: value));
+                  _updateSettings(
+                      _settings.copyWith(shareSpeedAndAltitude: value));
                 }
               : null,
           secondary: const Icon(Icons.speed),
@@ -605,7 +614,8 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           label: _getAccuracyLabel(accuracy),
           onChanged: widget.enabled
               ? (value) {
-                  _updateSettings(_settings.copyWith(locationAccuracy: value.toInt()));
+                  _updateSettings(
+                      _settings.copyWith(locationAccuracy: value.toInt()));
                 }
               : null,
         ),
@@ -686,7 +696,8 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
           label: expireMinutes == 0 ? 'Never' : _formatDuration(expireMinutes),
           onChanged: widget.enabled
               ? (value) {
-                  _updateSettings(_settings.copyWith(autoExpireMinutes: value.toInt()));
+                  _updateSettings(
+                      _settings.copyWith(autoExpireMinutes: value.toInt()));
                 }
               : null,
         ),
@@ -789,7 +800,7 @@ class _PrivacyLevelCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? color.withOpacity(0.15)
+              ? color.withValues(alpha: 0.15)
               : theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
@@ -802,7 +813,7 @@ class _PrivacyLevelCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -1152,7 +1163,7 @@ class LocationPrivacyDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color, width: 1),
       ),
@@ -1189,7 +1200,7 @@ class LocationPrivacyDisplay extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
       visualDensity: VisualDensity.compact,
     );

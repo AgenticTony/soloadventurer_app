@@ -7,8 +7,10 @@ part 'location_update.g.dart';
 enum LocationSharingStatus {
   /// Location sharing is active
   active,
+
   /// Location sharing is paused
   paused,
+
   /// Location sharing has ended
   ended,
 }

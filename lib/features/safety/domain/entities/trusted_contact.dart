@@ -13,8 +13,10 @@ enum ContactSource {
 enum ContactPermission {
   /// Can only receive alerts during emergencies
   emergencyOnly,
+
   /// Can receive check-ins and emergency alerts
   checkIns,
+
   /// Can receive check-ins, emergency alerts, and location updates
   fullAccess,
 }

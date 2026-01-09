@@ -6,7 +6,7 @@ part of 'sync_manager_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$syncManagerHash() => r'41b9f28455eb6223a49c513f5494f6420ac03355';
+String _$syncManagerHash() => r'aac841f16f44149030e0fbda1712ba01d592bf65';
 
 /// Provider for the SyncManager that properly provides the userId callback
 ///

@@ -7,9 +7,9 @@ void main() {
     group('ExponentialBackoffStrategy', () {
       test('should calculate correct exponential delays', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0, // No jitter for predictable testing
           random: FixedRandom(0.5), // Fixed random value
         );
@@ -33,9 +33,9 @@ void main() {
 
       test('should cap delay at maxDelay', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 10),
-          maxDelay: Duration(seconds: 30), // Low max for testing
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 10),
+          maxDelay: const Duration(seconds: 30), // Low max for testing
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -56,9 +56,9 @@ void main() {
 
       test('should add jitter to delay', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.5, // 50% jitter for testing
           random: FixedRandom(0.0), // Returns 0.0, so jitter = -50%
         );
@@ -73,9 +73,9 @@ void main() {
 
       test('should handle zero jitter factor', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 2),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 2),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0, // No jitter
           random: FixedRandom(0.5),
         );
@@ -89,8 +89,8 @@ void main() {
 
       test('should handle negative attempt count gracefully', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
           random: FixedRandom(0.5),
         );
 
@@ -103,9 +103,9 @@ void main() {
 
       test('should prevent delay from going negative with jitter', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(milliseconds: 100),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(milliseconds: 100),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 1.0, // 100% jitter
           random: FixedRandom(0.0), // Returns 0.0, so jitter = -100%
         );
@@ -119,9 +119,9 @@ void main() {
 
       test('should have correct description', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 2),
-          maxDelay: Duration(minutes: 10),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 2),
+          maxDelay: const Duration(minutes: 10),
           jitterFactor: 0.2,
         );
 
@@ -135,28 +135,28 @@ void main() {
       test('should validate jitter factor bounds', () {
         // Arrange & Act & Assert
         expect(
-          () => const ExponentialBackoffStrategy(jitterFactor: -0.1),
+          () => ExponentialBackoffStrategy(jitterFactor: -0.1),
           throwsAssertionError,
         );
 
         expect(
-          () => const ExponentialBackoffStrategy(jitterFactor: 1.1),
+          () => ExponentialBackoffStrategy(jitterFactor: 1.1),
           throwsAssertionError,
         );
 
         // Valid values should not throw
-        expect(() => const ExponentialBackoffStrategy(jitterFactor: 0.0),
+        expect(() => ExponentialBackoffStrategy(jitterFactor: 0.0),
             returnsNormally);
-        expect(() => const ExponentialBackoffStrategy(jitterFactor: 0.5),
+        expect(() => ExponentialBackoffStrategy(jitterFactor: 0.5),
             returnsNormally);
-        expect(() => const ExponentialBackoffStrategy(jitterFactor: 1.0),
+        expect(() => ExponentialBackoffStrategy(jitterFactor: 1.0),
             returnsNormally);
       });
 
       test('should distribute delays with randomness', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
           jitterFactor: 0.2,
         );
 
@@ -173,15 +173,16 @@ void main() {
 
         // Assert: Should see variation in delays due to jitter
         final uniqueDelays = delays.toSet();
-        expect(uniqueDelays.length, greaterThan(10), // Should have multiple unique values
+        expect(uniqueDelays.length,
+            greaterThan(10), // Should have multiple unique values
             reason: 'Jitter should create variation in delays');
       });
 
       test('should not exceed maxDelay even with high attempt count', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(seconds: 60),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(seconds: 60),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -201,8 +202,8 @@ void main() {
     group('FixedDelayStrategy', () {
       test('should return same delay for all attempts', () {
         // Arrange
-        const strategy = FixedDelayStrategy(
-          delay: Duration(seconds: 5),
+        final strategy = FixedDelayStrategy(
+          delay: const Duration(seconds: 5),
         );
 
         // Act & Assert
@@ -215,8 +216,8 @@ void main() {
 
       test('should handle negative attempt count', () {
         // Arrange
-        const strategy = FixedDelayStrategy(
-          delay: Duration(seconds: 3),
+        final strategy = FixedDelayStrategy(
+          delay: const Duration(seconds: 3),
         );
 
         // Act & Assert
@@ -227,8 +228,8 @@ void main() {
 
       test('should have correct description', () {
         // Arrange
-        const strategy = FixedDelayStrategy(
-          delay: Duration(seconds: 10),
+        final strategy = FixedDelayStrategy(
+          delay: const Duration(seconds: 10),
         );
 
         // Act & Assert
@@ -237,13 +238,14 @@ void main() {
 
       test('should support custom delay duration', () {
         // Arrange & Act & Assert
-        const strategy1 = FixedDelayStrategy(delay: Duration(milliseconds: 500));
+        final strategy1 =
+            FixedDelayStrategy(delay: const Duration(milliseconds: 500));
         expect(strategy1.calculateDelay(0), const Duration(milliseconds: 500));
 
-        const strategy2 = FixedDelayStrategy(delay: Duration(minutes: 1));
+        final strategy2 = FixedDelayStrategy(delay: const Duration(minutes: 1));
         expect(strategy2.calculateDelay(0), const Duration(minutes: 1));
 
-        const strategy3 = FixedDelayStrategy(delay: Duration(hours: 1));
+        final strategy3 = FixedDelayStrategy(delay: const Duration(hours: 1));
         expect(strategy3.calculateDelay(0), const Duration(hours: 1));
       });
     });
@@ -251,10 +253,10 @@ void main() {
     group('LinearBackoffStrategy', () {
       test('should calculate correct linear delays', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          increment: Duration(seconds: 2),
-          maxDelay: Duration(minutes: 1),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          increment: const Duration(seconds: 2),
+          maxDelay: const Duration(minutes: 1),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -275,10 +277,10 @@ void main() {
 
       test('should cap delay at maxDelay', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 10),
-          increment: Duration(seconds: 10),
-          maxDelay: Duration(seconds: 25),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 10),
+          increment: const Duration(seconds: 10),
+          maxDelay: const Duration(seconds: 25),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -299,10 +301,10 @@ void main() {
 
       test('should add jitter to delay', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 5),
-          increment: Duration(seconds: 2),
-          maxDelay: Duration(minutes: 1),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 5),
+          increment: const Duration(seconds: 2),
+          maxDelay: const Duration(minutes: 1),
           jitterFactor: 0.4, // 40% jitter
           random: FixedRandom(1.0), // Returns 1.0, so jitter = +40%
         );
@@ -317,9 +319,9 @@ void main() {
 
       test('should handle zero jitter factor', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 2),
-          increment: Duration(seconds: 3),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 2),
+          increment: const Duration(seconds: 3),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -333,9 +335,9 @@ void main() {
 
       test('should handle negative attempt count gracefully', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 5),
-          increment: Duration(seconds: 2),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 5),
+          increment: const Duration(seconds: 2),
           random: FixedRandom(0.5),
         );
 
@@ -348,10 +350,10 @@ void main() {
 
       test('should prevent delay from going negative with jitter', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(milliseconds: 100),
-          increment: Duration(milliseconds: 50),
-          maxDelay: Duration(minutes: 5),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(milliseconds: 100),
+          increment: const Duration(milliseconds: 50),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 1.0, // 100% jitter
           random: FixedRandom(0.0), // Returns 0.0, so jitter = -100%
         );
@@ -365,10 +367,10 @@ void main() {
 
       test('should have correct description', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 2),
-          increment: Duration(seconds: 3),
-          maxDelay: Duration(minutes: 2),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 2),
+          increment: const Duration(seconds: 3),
+          maxDelay: const Duration(minutes: 2),
           jitterFactor: 0.15,
         );
 
@@ -382,30 +384,27 @@ void main() {
       test('should validate jitter factor bounds', () {
         // Arrange & Act & Assert
         expect(
-          () => const LinearBackoffStrategy(jitterFactor: -0.1),
+          () => LinearBackoffStrategy(jitterFactor: -0.1),
           throwsAssertionError,
         );
 
         expect(
-          () => const LinearBackoffStrategy(jitterFactor: 1.1),
+          () => LinearBackoffStrategy(jitterFactor: 1.1),
           throwsAssertionError,
         );
 
         // Valid values should not throw
-        expect(() => const LinearBackoffStrategy(jitterFactor: 0.0),
-            returnsNormally);
-        expect(() => const LinearBackoffStrategy(jitterFactor: 0.5),
-            returnsNormally);
-        expect(() => const LinearBackoffStrategy(jitterFactor: 1.0),
-            returnsNormally);
+        expect(() => LinearBackoffStrategy(jitterFactor: 0.0), returnsNormally);
+        expect(() => LinearBackoffStrategy(jitterFactor: 0.5), returnsNormally);
+        expect(() => LinearBackoffStrategy(jitterFactor: 1.0), returnsNormally);
       });
 
       test('should not exceed maxDelay even with high attempt count', () {
         // Arrange
-        const strategy = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          increment: Duration(seconds: 10),
-          maxDelay: Duration(seconds: 30),
+        final strategy = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          increment: const Duration(seconds: 10),
+          maxDelay: const Duration(seconds: 30),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -425,14 +424,14 @@ void main() {
     group('Strategy Comparison', () {
       test('exponential should grow faster than linear', () {
         // Arrange
-        const exponential = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
+        final exponential = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
-        const linear = LinearBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          increment: Duration(seconds: 2),
+        final linear = LinearBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          increment: const Duration(seconds: 2),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -458,9 +457,9 @@ void main() {
 
       test('fixed should be consistent', () {
         // Arrange
-        const fixed = FixedDelayStrategy(delay: Duration(seconds: 5));
-        const exponential = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
+        final fixed = FixedDelayStrategy(delay: const Duration(seconds: 5));
+        final exponential = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -480,9 +479,9 @@ void main() {
     group('Edge Cases', () {
       test('should handle very large attempt counts', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(milliseconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(milliseconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -495,8 +494,8 @@ void main() {
 
       test('should handle millisecond precision', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(milliseconds: 100),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(milliseconds: 100),
           jitterFactor: 0.0,
           random: FixedRandom(0.5),
         );
@@ -509,8 +508,8 @@ void main() {
 
       test('should handle microsecond precision', () {
         // Arrange
-        const strategy = FixedDelayStrategy(
-          delay: Duration(microseconds: 1500),
+        final strategy = FixedDelayStrategy(
+          delay: const Duration(microseconds: 1500),
         );
 
         // Act & Assert
@@ -524,7 +523,7 @@ void main() {
 class FixedRandom extends Random {
   final double _value;
 
-  const FixedRandom(this._value);
+  FixedRandom(this._value);
 
   @override
   double nextDouble() => _value;

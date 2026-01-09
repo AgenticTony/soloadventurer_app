@@ -1,10 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/core/services/location_service.dart';
+import 'package:soloadventurer/core/services/location_service_impl.dart';
 import 'package:soloadventurer/core/services/notification_service.dart';
+import 'package:soloadventurer/core/services/notification_service_impl.dart';
 import 'package:soloadventurer/core/services/background_checkin_service.dart';
+import 'package:soloadventurer/core/services/background_checkin_service_impl.dart';
 import 'package:soloadventurer/features/safety/data/repositories/safety_providers.dart';
-import 'package:soloadventurer/features/safety/domain/repositories/safety_repository.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/add_trusted_contact.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/remove_trusted_contact.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/update_trusted_contact.dart';
@@ -21,12 +22,13 @@ import 'package:soloadventurer/features/safety/domain/usecases/trigger_emergency
 import 'package:soloadventurer/features/safety/domain/usecases/update_safety_status.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/get_safety_status.dart';
 import 'package:soloadventurer/features/safety/infrastructure/services/missed_checkin_detector.dart';
-import 'package:soloadventurer/features/safety/presentation/notifiers/trusted_contacts_notifier.dart';
-import 'package:soloadventurer/features/safety/presentation/notifiers/check_in_notifier.dart';
+import 'package:soloadventurer/features/safety/infrastructure/services/missed_checkin_detector_impl.dart';
 import 'package:soloadventurer/features/safety/presentation/notifiers/location_sharing_notifier.dart';
 import 'package:soloadventurer/features/safety/presentation/notifiers/safety_notifier.dart';
-import 'package:soloadventurer/features/safety/presentation/state/trusted_contacts_state.dart';
-import 'package:soloadventurer/features/safety/presentation/state/check_in_state.dart';
+
+// Export new Riverpod 2 Phase 1 providers
+export 'trusted_contacts_provider.dart';
+export 'check_in_provider.dart';
 import 'package:soloadventurer/features/safety/presentation/state/location_sharing_state.dart';
 import 'package:soloadventurer/features/safety/presentation/state/safety_state.dart';
 
@@ -72,9 +74,9 @@ BackgroundCheckInService backgroundCheckInService(
 @riverpod
 MissedCheckInDetector missedCheckInDetector(MissedCheckInDetectorRef ref) {
   final service = MissedCheckInDetectorImpl(
-    repository: ref.watch(safetyRepositoryOverrideProvider),
-    notificationService: ref.watch(notificationServiceProvider),
+    safetyRepository: ref.watch(safetyRepositoryOverrideProvider),
     locationService: ref.watch(locationServiceProvider),
+    notificationService: ref.watch(notificationServiceProvider),
   );
 
   ref.onDispose(() => service.dispose());
@@ -237,51 +239,13 @@ GetSafetyStatusUseCase getSafetyStatusUseCase(GetSafetyStatusUseCaseRef ref) {
 }
 
 // ============================================================================
-// Notifiers - Trusted Contacts
-// ============================================================================
-
-/// Provider for TrustedContactsNotifier
-@riverpod
-TrustedContactsNotifier trustedContactsNotifier(TrustedContactsNotifierRef ref) {
-  final notifier = TrustedContactsNotifier(
-    addContact: ref.watch(addTrustedContactUseCaseProvider),
-    removeContact: ref.watch(removeTrustedContactUseCaseProvider),
-    updateContact: ref.watch(updateTrustedContactUseCaseProvider),
-    getContacts: ref.watch(getTrustedContactsUseCaseProvider),
-  );
-
-  ref.onDispose(() => notifier.dispose());
-
-  return notifier;
-}
-
-// ============================================================================
-// Notifiers - Check-ins
-// ============================================================================
-
-/// Provider for CheckInNotifier
-@riverpod
-CheckInNotifier checkInNotifier(CheckInNotifierRef ref) {
-  final notifier = CheckInNotifier(
-    createCheckIn: ref.watch(createCheckInUseCaseProvider),
-    completeCheckIn: ref.watch(completeCheckInUseCaseProvider),
-    scheduleCheckIn: ref.watch(scheduleCheckInUseCaseProvider),
-    cancelCheckIn: ref.watch(cancelCheckInUseCaseProvider),
-    getUpcomingCheckIns: ref.watch(getUpcomingCheckInsUseCaseProvider),
-  );
-
-  ref.onDispose(() => notifier.dispose());
-
-  return notifier;
-}
-
-// ============================================================================
 // Notifiers - Location Sharing
 // ============================================================================
 
 /// Provider for LocationSharingNotifier
 @riverpod
-LocationSharingNotifier locationSharingNotifier(LocationSharingNotifierRef ref) {
+LocationSharingNotifier locationSharingNotifier(
+    LocationSharingNotifierRef ref) {
   final notifier = LocationSharingNotifier(
     shareLocation: ref.watch(shareLocationUseCaseProvider),
     stopLocationSharing: ref.watch(stopLocationSharingUseCaseProvider),
@@ -313,130 +277,60 @@ SafetyNotifier safetyNotifier(SafetyNotifierRef ref) {
 }
 
 // ============================================================================
-// State Providers - Trusted Contacts
-// ============================================================================
-
-/// Provider for trusted contacts state
-final trustedContactsStateProvider = Provider<TrustedContactsState>((ref) {
-  return ref.watch(trustedContactsNotifierProvider);
-});
-
-/// Provider for trusted contacts list
-final trustedContactsListProvider = Provider((ref) {
-  return ref.watch(trustedContactsStateProvider).contacts;
-});
-
-/// Provider for trusted contacts loading state
-final trustedContactsLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(trustedContactsStateProvider).isLoading;
-});
-
-/// Provider for trusted contacts error
-final trustedContactsErrorProvider = Provider<String?>((ref) {
-  return ref.watch(trustedContactsStateProvider).error;
-});
-
-/// Provider for selected trusted contact
-final selectedTrustedContactProvider = Provider((ref) {
-  return ref.watch(trustedContactsStateProvider).selectedContact;
-});
-
-// ============================================================================
-// State Providers - Check-ins
-// ============================================================================
-
-/// Provider for check-in state
-final checkInStateProvider = Provider<CheckInState>((ref) {
-  return ref.watch(checkInNotifierProvider);
-});
-
-/// Provider for all check-ins list
-final checkInsListProvider = Provider((ref) {
-  return ref.watch(checkInNotifierProvider).checkIns;
-});
-
-/// Provider for upcoming check-ins list
-final upcomingCheckInsProvider = Provider((ref) {
-  return ref.watch(checkInNotifierProvider).upcomingCheckIns;
-});
-
-/// Provider for check-in loading state
-final checkInLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(checkInNotifierProvider).isLoading;
-});
-
-/// Provider for check-in error
-final checkInErrorProvider = Provider<String?>((ref) {
-  return ref.watch(checkInNotifierProvider).error;
-});
-
-/// Provider for selected check-in
-final selectedCheckInProvider = Provider((ref) {
-  return ref.watch(checkInNotifierProvider).selectedCheckIn;
-});
-
-/// Provider for check-ins due soon count
-final checkInsDueSoonProvider = Provider<int>((ref) {
-  return ref.watch(checkInNotifierProvider).dueSoonCount;
-});
-
-/// Provider for missed check-ins count
-final missedCheckInsCountProvider = Provider<int>((ref) {
-  return ref.watch(checkInNotifierProvider).missedCount;
-});
-
-/// Provider for next check-in
-final nextCheckInProvider = Provider((ref) {
-  return ref.watch(checkInNotifierProvider).nextCheckIn;
-});
-
-// ============================================================================
 // State Providers - Location Sharing
 // ============================================================================
 
 /// Provider for location sharing state
 final locationSharingStateProvider = Provider<LocationSharingState>((ref) {
-  return ref.watch(locationSharingNotifierProvider);
+  return ref.watch(locationSharingNotifierProvider).state;
 });
 
 /// Provider for active location shares
 final activeLocationSharesProvider = Provider((ref) {
-  return ref.watch(locationSharingNotifierProvider).activeShares;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.activeShares;
 });
 
 /// Provider for location updates
 final locationUpdatesProvider = Provider((ref) {
-  return ref.watch(locationSharingNotifierProvider).locationUpdates;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.locationUpdates;
 });
 
 /// Provider for latest location
 final latestLocationProvider = Provider((ref) {
-  return ref.watch(locationSharingNotifierProvider).latestLocation;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.latestLocation;
 });
 
 /// Provider for location sharing loading state
 final locationSharingLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(locationSharingNotifierProvider).isLoading;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.isLoading;
 });
 
 /// Provider for location sharing error
 final locationSharingErrorProvider = Provider<String?>((ref) {
-  return ref.watch(locationSharingNotifierProvider).error;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.error;
 });
 
 /// Provider for active sharing count
 final activeSharingCountProvider = Provider<int>((ref) {
-  return ref.watch(locationSharingNotifierProvider).activeSharingCount;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.activeSharingCount;
 });
 
 /// Provider for has emergency sharing
 final hasEmergencySharingProvider = Provider<bool>((ref) {
-  return ref.watch(locationSharingNotifierProvider).hasEmergencySharing;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.hasEmergencySharing;
 });
 
 /// Provider for active contact IDs
 final activeContactIdsProvider = Provider((ref) {
-  return ref.watch(locationSharingNotifierProvider).activeContactIds;
+  final state = ref.watch(locationSharingNotifierProvider).state;
+  return state.activeContactIds;
 });
 
 // ============================================================================
@@ -445,55 +339,65 @@ final activeContactIdsProvider = Provider((ref) {
 
 /// Provider for safety state
 final safetyStateProvider = Provider<SafetyState>((ref) {
-  return ref.watch(safetyNotifierProvider);
+  return ref.watch(safetyNotifierProvider).state;
 });
 
 /// Provider for current safety status
 final currentSafetyStatusProvider = Provider((ref) {
-  return ref.watch(safetyNotifierProvider).currentStatus;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.currentStatus;
 });
 
 /// Provider for recent safety alerts
 final recentSafetyAlertsProvider = Provider((ref) {
-  return ref.watch(safetyNotifierProvider).recentAlerts;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.recentAlerts;
 });
 
 /// Provider for active safety alerts
 final activeSafetyAlertsProvider = Provider((ref) {
-  return ref.watch(safetyNotifierProvider).activeAlerts;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.activeAlerts;
 });
 
 /// Provider for safety loading state
 final safetyLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(safetyNotifierProvider).isLoading;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.isLoading;
 });
 
 /// Provider for safety processing state
 final safetyProcessingProvider = Provider<bool>((ref) {
-  return ref.watch(safetyNotifierProvider).isProcessing;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.isProcessing;
 });
 
 /// Provider for safety error
 final safetyErrorProvider = Provider<String?>((ref) {
-  return ref.watch(safetyNotifierProvider).error;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.error;
 });
 
 /// Provider for trusted contacts count
 final trustedContactsCountProvider = Provider<int>((ref) {
-  return ref.watch(safetyNotifierProvider).trustedContactsCount;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.trustedContactsCount;
 });
 
 /// Provider for has active emergency
 final hasActiveEmergencyProvider = Provider<bool>((ref) {
-  return ref.watch(safetyNotifierProvider).hasActiveEmergency;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.hasActiveEmergency;
 });
 
 /// Provider for is in danger
 final isInDangerProvider = Provider<bool>((ref) {
-  return ref.watch(safetyNotifierProvider).isInDanger;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.isInDanger;
 });
 
 /// Provider for safety initialized
 final safetyInitializedProvider = Provider<bool>((ref) {
-  return ref.watch(safetyNotifierProvider).isInitialized;
+  final state = ref.watch(safetyNotifierProvider).state;
+  return state.isInitialized;
 });

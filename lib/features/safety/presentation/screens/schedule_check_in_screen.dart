@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
 import '../../domain/entities/check_in.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
-import '../../../../core/services/location_service.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
+import '../../../../core/services/location_service.dart' as core;
 
 /// Screen for scheduling automatic check-ins
 ///
@@ -38,7 +37,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
   DateTime? _scheduledTime;
   DateTime? _deadline;
   CheckInLocation? _location;
-  List<String> _selectedContactIds = [];
+  final List<String> _selectedContactIds = [];
   bool _isLoadingLocation = false;
   bool _useCustomDeadline = false;
 
@@ -57,7 +56,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
     try {
       final locationService = ref.read(locationServiceProvider);
       final locationData = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       setState(() {
@@ -145,7 +144,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
 
     final selectedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(_deadline ?? _scheduledTime!.add(const Duration(hours: 1))),
+      initialTime: TimeOfDay.fromDateTime(
+          _deadline ?? _scheduledTime!.add(const Duration(hours: 1))),
     );
 
     if (selectedTime == null) return;
@@ -189,7 +189,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
       }
     }
 
-    final user = ref.read(currentUserProvider);
+    final user = ref.read(authNotifierProvider).valueOrNull?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -206,16 +206,14 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
 
     try {
       await notifier.scheduleCheckIn(
-        userId: user.id,
         scheduledTime: _scheduledTime!,
         deadline: _deadline,
         location: _location,
         statusMessage: _messageController.text.trim().isEmpty
-            ? null
+            ? 'Scheduled check-in'
             : _messageController.text.trim(),
-        notifyContactIds: _selectedContactIds.isEmpty ? null : _selectedContactIds,
+        notifyContactIds: _selectedContactIds,
         tripId: widget.tripId,
-        triggerType: _selectedTriggerType,
       );
 
       if (mounted) {
@@ -250,7 +248,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final contactsState = ref.watch(trustedContactsNotifierProvider);
+    final contactsState = ref.watch(trustedContactsProvider);
     final checkInState = ref.watch(checkInNotifierProvider);
     final isScheduling = checkInState.isCreating;
 
@@ -305,10 +303,11 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
 
               // Location section (for location-based triggers)
               if (_selectedTriggerType == CheckInTriggerType.locationArrival ||
-                  _selectedTriggerType == CheckInTriggerType.locationDeparture) ...[
+                  _selectedTriggerType ==
+                      CheckInTriggerType.locationDeparture) ...[
                 _buildSectionHeader('Location'),
                 const SizedBox(height: 16),
-                _buildLocationCard(theme),
+                _buildLocationCard(theme, isScheduling),
                 const SizedBox(height: 24),
               ],
 
@@ -351,7 +350,9 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: (_isLoadingLocation || isScheduling) ? null : _scheduleCheckIn,
+                  onPressed: (_isLoadingLocation || isScheduling)
+                      ? null
+                      : _scheduleCheckIn,
                   icon: isScheduling
                       ? const SizedBox(
                           width: 20,
@@ -414,7 +415,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                 });
               }
             },
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           ),
           const Divider(height: 1),
           RadioListTile<CheckInTriggerType>(
@@ -435,7 +437,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                 });
               }
             },
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           ),
           const Divider(height: 1),
           RadioListTile<CheckInTriggerType>(
@@ -456,7 +459,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                 });
               }
             },
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           ),
         ],
       ),
@@ -472,8 +476,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
               ? 'Select Date & Time'
               : _formatDateTime(_scheduledTime!),
           style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: _scheduledTime == null ? null : FontWeight.bold,
-              ),
+            fontWeight: _scheduledTime == null ? null : FontWeight.bold,
+          ),
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: () => _selectScheduledTime(),
@@ -502,14 +506,15 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
           if (_useCustomDeadline) ...[
             const Divider(height: 1),
             ListTile(
-              leading: Icon(Icons.timer_outlined, color: theme.colorScheme.primary),
+              leading:
+                  Icon(Icons.timer_outlined, color: theme.colorScheme.primary),
               title: Text(
                 _deadline == null
                     ? 'Select Deadline'
                     : 'Deadline: ${_formatDateTime(_deadline!)}',
                 style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: _deadline == null ? null : FontWeight.bold,
-                    ),
+                  fontWeight: _deadline == null ? null : FontWeight.bold,
+                ),
               ),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () => _selectDeadline(),
@@ -526,8 +531,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                     child: Text(
                       'Default deadline: ${_formatDateTime(_deadline!)}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
-                          ),
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ),
                 ],
@@ -539,7 +544,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
     );
   }
 
-  Widget _buildLocationCard(ThemeData theme) {
+  Widget _buildLocationCard(ThemeData theme, bool isScheduling) {
     if (_isLoadingLocation) {
       return Card(
         child: Padding(
@@ -579,8 +584,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                         ? 'No Location Set'
                         : 'Location: ${_location!.latitude.toStringAsFixed(4)}, ${_location!.longitude.toStringAsFixed(4)}',
                     style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: _location == null ? null : FontWeight.bold,
-                        ),
+                      fontWeight: _location == null ? null : FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -589,7 +594,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.check_circle,
                     size: 16,
                     color: Colors.green,
@@ -620,14 +625,15 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
     );
   }
 
-  Widget _buildContactsSelector(ThemeData theme, List<TrustedContact> contacts) {
+  Widget _buildContactsSelector(
+      ThemeData theme, List<TrustedContact> contacts) {
     if (contacts.isEmpty) {
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Icon(
+              const Icon(
                 Icons.people_outline,
                 size: 48,
                 color: Colors.grey,
@@ -642,8 +648,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                 'Add trusted contacts to notify them about check-ins',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                  color: Colors.grey[600],
+                ),
               ),
             ],
           ),
@@ -657,7 +663,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
           final isSelected = _selectedContactIds.contains(contact.id);
           return CheckboxListTile(
             title: Text(contact.name),
-            subtitle: Text(contact.phoneNumber),
+            subtitle: Text(contact.phoneNumber ?? ''),
             secondary: CircleAvatar(
               child: Text(
                 contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',

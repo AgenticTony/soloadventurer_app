@@ -7,14 +7,19 @@ part 'safety_alert.g.dart';
 enum SafetyAlertType {
   /// Emergency SOS button pressed
   emergencySOS,
+
   /// User updated status to need help
   needHelp,
+
   /// User updated status to emergency
   emergency,
+
   /// Check-in was missed
   missedCheckIn,
+
   /// Location sharing triggered
   locationUpdate,
+
   /// User manually checked in as safe
   safe,
 }
@@ -23,10 +28,13 @@ enum SafetyAlertType {
 enum SafetyAlertStatus {
   /// Alert was sent but not yet acknowledged
   sent,
+
   /// Alert has been acknowledged by at least one contact
   acknowledged,
+
   /// Alert has been resolved (user is safe)
   resolved,
+
   /// Alert was cancelled (false alarm)
   cancelled,
 }

@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/safety_status.dart';
 import '../../domain/entities/safety_alert.dart';
-import '../../domain/entities/trusted_contact.dart';
 
 /// Overall safety state for the application
 /// Manages current safety status, active alerts, and emergency information
@@ -47,6 +46,11 @@ class SafetyState extends Equatable {
     this.trustedContactsCount = 0,
     this.error,
   });
+
+  /// Creates initial safety state with default values
+  factory SafetyState.initial() {
+    return const SafetyState();
+  }
 
   /// Creates a copy of this state with the given fields replaced
   SafetyState copyWith({

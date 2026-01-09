@@ -83,10 +83,13 @@ void main() {
 
     test('should handle ContactPermission enum values correctly', () {
       // Assert
-      expect(ContactPermission.emergencyOnly, equals(ContactPermission.emergencyOnly));
+      expect(ContactPermission.emergencyOnly,
+          equals(ContactPermission.emergencyOnly));
       expect(ContactPermission.checkIns, equals(ContactPermission.checkIns));
-      expect(ContactPermission.fullAccess, equals(ContactPermission.fullAccess));
-      expect(ContactPermission.emergencyOnly, isNot(equals(ContactPermission.fullAccess)));
+      expect(
+          ContactPermission.fullAccess, equals(ContactPermission.fullAccess));
+      expect(ContactPermission.emergencyOnly,
+          isNot(equals(ContactPermission.fullAccess)));
     });
 
     test('should create TrustedContact with community source', () {
@@ -120,9 +123,11 @@ void main() {
       );
 
       // Assert
-      expect(emergencyOnlyContact.permission, equals(ContactPermission.emergencyOnly));
+      expect(emergencyOnlyContact.permission,
+          equals(ContactPermission.emergencyOnly));
       expect(checkInsContact.permission, equals(ContactPermission.checkIns));
-      expect(fullAccessContact.permission, equals(ContactPermission.fullAccess));
+      expect(
+          fullAccessContact.permission, equals(ContactPermission.fullAccess));
     });
 
     test('should handle boolean flags correctly', () {

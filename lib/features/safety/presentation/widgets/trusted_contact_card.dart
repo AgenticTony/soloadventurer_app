@@ -160,17 +160,17 @@ class TrustedContactCard extends StatelessWidget {
     switch (contact.permission) {
       case ContactPermission.emergencyOnly:
         label = 'Emergency Only';
-        backgroundColor = Colors.orange.withOpacity(0.1);
+        backgroundColor = Colors.orange.withValues(alpha: 0.1);
         foregroundColor = Colors.orange.shade700;
         break;
       case ContactPermission.checkIns:
         label = 'Check-ins';
-        backgroundColor = Colors.blue.withOpacity(0.1);
+        backgroundColor = Colors.blue.withValues(alpha: 0.1);
         foregroundColor = Colors.blue.shade700;
         break;
       case ContactPermission.fullAccess:
         label = 'Full Access';
-        backgroundColor = Colors.green.withOpacity(0.1);
+        backgroundColor = Colors.green.withValues(alpha: 0.1);
         foregroundColor = Colors.green.shade700;
         break;
     }
@@ -181,7 +181,7 @@ class TrustedContactCard extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: foregroundColor.withOpacity(0.2),
+          color: foregroundColor.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -211,9 +211,8 @@ class TrustedContactCard extends StatelessWidget {
   Widget _buildSourceChip(BuildContext context) {
     final theme = Theme.of(context);
 
-    final sourceLabel = contact.source == ContactSource.phone
-        ? 'Phone'
-        : 'Community';
+    final sourceLabel =
+        contact.source == ContactSource.phone ? 'Phone' : 'Community';
 
     final sourceIcon = contact.source == ContactSource.phone
         ? Icons.contact_phone
@@ -260,8 +259,7 @@ class TrustedContactCard extends StatelessWidget {
             tooltip: 'Location sharing enabled',
             size: isCompact ? 18 : 20,
           ),
-        if (contact.locationSharingEnabled &&
-            contact.receivesEmergencyAlerts)
+        if (contact.locationSharingEnabled && contact.receivesEmergencyAlerts)
           const SizedBox(height: 4),
         if (contact.receivesEmergencyAlerts)
           _StatusIndicator(

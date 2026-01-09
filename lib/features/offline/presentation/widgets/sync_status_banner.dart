@@ -121,8 +121,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
   /// Updates banner visibility based on sync state
   void _updateVisibility(SyncState currentState) {
     // Auto-dismiss on successful sync (transition from syncing to idle)
-    if (_previousState == SyncState.syncing &&
-        currentState == SyncState.idle) {
+    if (_previousState == SyncState.syncing && currentState == SyncState.idle) {
       // Show success briefly then dismiss
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) {
@@ -179,7 +178,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
         color: colorScheme.primaryContainer,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.primary.withOpacity(0.3),
+            color: colorScheme.primary.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -215,7 +214,8 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
                   Text(
                     status.currentOperation!,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onPrimaryContainer.withOpacity(0.8),
+                      color:
+                          colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
@@ -232,7 +232,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
               child: CircularProgressIndicator(
                 value: status.progress,
                 strokeWidth: 2,
-                backgroundColor: colorScheme.primary.withOpacity(0.2),
+                backgroundColor: colorScheme.primary.withValues(alpha: 0.2),
                 valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
               ),
             ),
@@ -266,7 +266,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
         color: colorScheme.errorContainer,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.error.withOpacity(0.3),
+            color: colorScheme.error.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -298,7 +298,8 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
                   Text(
                     status.errorMessage!,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onErrorContainer.withOpacity(0.8),
+                      color:
+                          colorScheme.onErrorContainer.withValues(alpha: 0.8),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -343,10 +344,10 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant,
+        color: colorScheme.surfaceContainerHighest,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outline.withOpacity(0.3),
+            color: colorScheme.outline.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -377,7 +378,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
                 Text(
                   'You are currently offline. Changes will sync when you reconnect.',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant.withOpacity(0.8),
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -411,7 +412,7 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
         color: colorScheme.secondaryContainer,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.secondary.withOpacity(0.3),
+            color: colorScheme.secondary.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -442,7 +443,8 @@ class _SyncStatusBannerState extends ConsumerState<SyncStatusBanner>
                 Text(
                   'Tap to sync now',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSecondaryContainer.withOpacity(0.8),
+                    color:
+                        colorScheme.onSecondaryContainer.withValues(alpha: 0.8),
                   ),
                 ),
               ],

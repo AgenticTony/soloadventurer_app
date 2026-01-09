@@ -135,10 +135,12 @@ void main() {
         );
 
         final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(SOSButtonWidget),
-            matching: find.byType(Container),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(SOSButtonWidget),
+                matching: find.byType(Container),
+              )
+              .first,
         );
 
         final decoration = container.decoration as BoxDecoration;
@@ -356,8 +358,7 @@ void main() {
         expect(find.byType(SOSButtonWidget), findsOneWidget);
       });
 
-      testWidgets('stops pulsing when isLoading becomes true',
-          (tester) async {
+      testWidgets('stops pulsing when isLoading becomes true', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -453,10 +454,12 @@ void main() {
         );
 
         final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(SOSButtonWidget),
-            matching: find.byType(Container),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(SOSButtonWidget),
+                matching: find.byType(Container),
+              )
+              .first,
         );
 
         final decoration = container.decoration as BoxDecoration;
@@ -475,10 +478,12 @@ void main() {
         );
 
         final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(SOSButtonWidget),
-            matching: find.byType(Container),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(SOSButtonWidget),
+                matching: find.byType(Container),
+              )
+              .first,
         );
 
         final decoration = container.decoration as BoxDecoration;

@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/features/core/services/operation_queue.dart';
 import 'package:soloadventurer/features/core/services/retry_strategy.dart';
 import 'package:soloadventurer/features/core/services/operation_priority.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
@@ -11,9 +10,9 @@ void main() {
     group('Retry Logic', () {
       test('should calculate correct exponential backoff delays', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0,
         );
 
@@ -32,9 +31,9 @@ void main() {
 
       test('should cap backoff delay at maxDelay', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(seconds: 10),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(seconds: 10),
           jitterFactor: 0.0,
         );
 
@@ -48,8 +47,8 @@ void main() {
 
       test('should handle zero attempt count', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 2),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 2),
           jitterFactor: 0.0,
         );
 
@@ -62,9 +61,9 @@ void main() {
 
       test('should add jitter to delay when configured', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.5,
         );
 
@@ -110,37 +109,42 @@ void main() {
 
       test('should not deduplicate delete operations', () {
         // Arrange & Act
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'op1',
           tripId: 'trip123',
           planningType: TripPlanningType.delete,
           changes: {},
+          priority: 10,
         );
 
         // Assert
         expect(operation.deduplicationKey, isNull);
       });
 
-      test('should generate deduplication key for addDestination operations', () {
+      test('should generate deduplication key for addDestination operations',
+          () {
         // Arrange & Act
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'op1',
           tripId: 'trip123',
           planningType: TripPlanningType.addDestination,
           changes: {},
+          priority: 10,
         );
 
         // Assert
         expect(operation.deduplicationKey, 'trip_trip123');
       });
 
-      test('should generate deduplication key for removeDestination operations', () {
+      test('should generate deduplication key for removeDestination operations',
+          () {
         // Arrange & Act
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'op1',
           tripId: 'trip123',
           planningType: TripPlanningType.removeDestination,
           changes: {},
+          priority: 10,
         );
 
         // Assert
@@ -149,11 +153,12 @@ void main() {
 
       test('should generate deduplication key for updateDates operations', () {
         // Arrange & Act
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'op1',
           tripId: 'trip123',
           planningType: TripPlanningType.updateDates,
           changes: {},
+          priority: 10,
         );
 
         // Assert
@@ -184,6 +189,7 @@ void main() {
           latitude: 48.8566,
           longitude: 2.3522,
           timestamp: DateTime.now(),
+          priority: 1,
         );
 
         // Act
@@ -193,10 +199,13 @@ void main() {
         expect(deduplicationKey, isNull);
       });
 
-      test('should have same deduplication key for operations on same trip', () {
+      test('should have same deduplication key for operations on same trip',
+          () {
         // Arrange
-        final op1 = TripPlanningOperation.update(tripId: 'trip123', name: 'Update 1');
-        final op2 = TripPlanningOperation.update(tripId: 'trip123', name: 'Update 2');
+        final op1 =
+            TripPlanningOperation.update(tripId: 'trip123', name: 'Update 1');
+        final op2 =
+            TripPlanningOperation.update(tripId: 'trip123', name: 'Update 2');
 
         // Act
         final key1 = op1.deduplicationKey;
@@ -243,6 +252,7 @@ void main() {
           latitude: 48.8566,
           longitude: 2.3522,
           timestamp: DateTime.now(),
+          priority: 1,
         );
 
         // Assert
@@ -462,7 +472,8 @@ void main() {
         );
 
         // Act & Assert
-        expect(operation.attemptCount, greaterThanOrEqualTo(operation.maxRetries));
+        expect(
+            operation.attemptCount, greaterThanOrEqualTo(operation.maxRetries));
         expect(operation.attemptCount, equals(3));
         expect(operation.maxRetries, equals(3));
       });
@@ -491,9 +502,9 @@ void main() {
           attemptCount: 1,
           lastAttempt: DateTime.now().subtract(const Duration(seconds: 5)),
         );
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0,
         );
 
@@ -516,9 +527,9 @@ void main() {
           attemptCount: 1,
           lastAttempt: DateTime.now().subtract(const Duration(seconds: 1)),
         );
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0,
         );
 
@@ -535,9 +546,9 @@ void main() {
 
       test('should calculate increasing backoff delays', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0,
         );
 
@@ -601,7 +612,8 @@ void main() {
         expect(counters.length, 0);
       });
 
-      test('should enforce max consecutive limit for non-critical priorities', () {
+      test('should enforce max consecutive limit for non-critical priorities',
+          () {
         // Arrange
         const maxConsecutive = 3;
         final counters = <int, int>{10: 3};
@@ -644,10 +656,11 @@ void main() {
         expect(operation.lastAttempt, isNull);
       });
 
-      test('should handle operation with negative attempt count gracefully', () {
+      test('should handle operation with negative attempt count gracefully',
+          () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(seconds: 1),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(seconds: 1),
         );
 
         // Act
@@ -659,9 +672,9 @@ void main() {
 
       test('should prevent delay from going negative with jitter', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(milliseconds: 100),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(milliseconds: 100),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 1.0,
         );
 
@@ -674,9 +687,9 @@ void main() {
 
       test('should handle very large attempt counts', () {
         // Arrange
-        const strategy = ExponentialBackoffStrategy(
-          baseDelay: Duration(milliseconds: 1),
-          maxDelay: Duration(minutes: 5),
+        final strategy = ExponentialBackoffStrategy(
+          baseDelay: const Duration(milliseconds: 1),
+          maxDelay: const Duration(minutes: 5),
           jitterFactor: 0.0,
         );
 
@@ -698,7 +711,8 @@ void main() {
 
         // Act & Assert
         expect(operation.maxRetries, 0);
-        expect(operation.attemptCount, greaterThanOrEqualTo(operation.maxRetries));
+        expect(
+            operation.attemptCount, greaterThanOrEqualTo(operation.maxRetries));
       });
     });
 
@@ -735,6 +749,7 @@ void main() {
           latitude: 48.8566,
           longitude: 2.3522,
           timestamp: DateTime.now(),
+          priority: 1,
         );
 
         // Act & Assert
@@ -759,6 +774,7 @@ void main() {
           latitude: 48.8566,
           longitude: 2.3522,
           timestamp: DateTime.now(),
+          priority: 1,
         );
 
         // Act & Assert

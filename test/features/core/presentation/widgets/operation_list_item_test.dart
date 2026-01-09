@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:soloadventurer/core/services/operation_queue.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/operation_list_item.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
 import 'package:soloadventurer/features/travel/domain/models/travel_note_operation.dart';
@@ -43,7 +44,8 @@ void main() {
     group('Pending Operations', () {
       testWidgets('displays operation type icon correctly for trip planning',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.byIcon(Icons.flight_takeoff), findsOneWidget);
       });
@@ -53,8 +55,9 @@ void main() {
         final noteOperation = TravelNoteOperation(
           id: 'note-id-123',
           tripId: 'trip-id-456',
-          noteId: 'note-id-789',
-          content: 'Test note content',
+          noteType: NoteType.text,
+          content: {'text': 'Test note content'},
+          priority: 10,
           createdAt: DateTime.now(),
         );
 
@@ -68,10 +71,10 @@ void main() {
           (WidgetTester tester) async {
         final locationOperation = LocationUpdateOperation(
           id: 'location-id-123',
-          tripId: 'trip-id-456',
           latitude: 40.7128,
           longitude: -74.0060,
           timestamp: DateTime.now(),
+          priority: 1,
           createdAt: DateTime.now(),
         );
 
@@ -82,20 +85,23 @@ void main() {
       });
 
       testWidgets('displays operation title', (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.text('Trip Planning'), findsOneWidget);
       });
 
       testWidgets('displays operation type', (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.text('trip_planning'), findsOneWidget);
       });
 
       testWidgets('displays Pending status chip for new operations',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.text('Pending'), findsOneWidget);
       });
@@ -114,7 +120,8 @@ void main() {
       });
 
       testWidgets('displays operation details', (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.textContaining('ID:'), findsOneWidget);
         expect(find.textContaining('Priority:'), findsOneWidget);
@@ -124,7 +131,8 @@ void main() {
 
       testWidgets('displays correct priority label for Normal priority',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.textContaining('Normal'), findsOneWidget);
       });
@@ -152,14 +160,16 @@ void main() {
           (WidgetTester tester) async {
         final lowPriorityOp = testOperation.copyWith(priority: 1);
 
-        await tester.pumpWidget(createWidgetUnderTest(operation: lowPriorityOp));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: lowPriorityOp));
 
         expect(find.textContaining('Low'), findsOneWidget);
       });
 
       testWidgets('does not display retry metadata for new operations',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.textContaining('Attempt'), findsNothing);
         expect(find.byIcon(Icons.history), findsNothing);
@@ -182,7 +192,8 @@ void main() {
 
       testWidgets('does not display action buttons for pending operations',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         expect(find.text('Retry'), findsNothing);
         expect(find.text('Remove'), findsNothing);
@@ -282,7 +293,8 @@ void main() {
         expect(removeCalled, isTrue);
       });
 
-      testWidgets('displays both Retry and Remove buttons for failed operations with both callbacks',
+      testWidgets(
+          'displays both Retry and Remove buttons for failed operations with both callbacks',
           (WidgetTester tester) async {
         final failedOperation = testOperation.copyWith(
           attemptCount: 3,
@@ -304,11 +316,14 @@ void main() {
     group('Trip Planning Specific Details', () {
       testWidgets('displays trip-specific fields for trip planning operations',
           (WidgetTester tester) async {
-        final tripOperation = TripPlanningOperation(
+        const tripOperation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.addDestination,
-          changes: {'destinations': ['Paris', 'London']},
+          changes: {
+            'destinations': ['Paris', 'London']
+          },
+          priority: 10,
         );
 
         await tester
@@ -376,15 +391,18 @@ void main() {
     group('Visual Styling', () {
       testWidgets('displays card with correct margins',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         final card = tester.widget<Card>(find.byType(Card));
-        expect(card.margin, const EdgeInsets.symmetric(horizontal: 16, vertical: 8));
+        expect(card.margin,
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 8));
       });
 
       testWidgets('displays operation type icon with background color',
           (WidgetTester tester) async {
-        await tester.pumpWidget(createWidgetUnderTest(operation: testOperation));
+        await tester
+            .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
         final container = tester.widget<Container>(
           find.descendant(

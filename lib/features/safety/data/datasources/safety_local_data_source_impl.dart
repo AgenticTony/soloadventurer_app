@@ -84,8 +84,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
   }
 
   @override
-  Future<TrustedContact?> getCachedTrustedContact(
-      String contactId) async {
+  Future<TrustedContact?> getCachedTrustedContact(String contactId) async {
     try {
       final contacts = await getCachedTrustedContacts();
       return contacts.cast<TrustedContact?>().firstWhere(
@@ -240,8 +239,7 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
 
       final List<dynamic> jsonList = jsonDecode(jsonString);
       return jsonList
-          .map((json) =>
-              LocationUpdate.fromJson(json as Map<String, dynamic>))
+          .map((json) => LocationUpdate.fromJson(json as Map<String, dynamic>))
           .toList();
     } catch (e) {
       throw const SafetyCacheRetrievalException(
@@ -254,7 +252,8 @@ class SafetyLocalDataSourceImpl implements SafetyLocalDataSource {
     try {
       final allUpdates = await getCachedLocationUpdates();
       return allUpdates
-          .where((update) => update.sharingStatus == LocationSharingStatus.active)
+          .where(
+              (update) => update.sharingStatus == LocationSharingStatus.active)
           .toList();
     } catch (e) {
       throw const SafetyCacheRetrievalException(

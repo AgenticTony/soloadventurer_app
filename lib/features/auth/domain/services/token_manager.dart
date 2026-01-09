@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/auth_session.dart';
 import '../../data/providers/auth_data_providers.dart';
 import '../../../core/domain/services/connectivity_service.dart';
+import '../../../core/domain/services/logging_service.dart';
 import '../../../core/data/services/connectivity_service_impl.dart';
 import '../../data/models/credentials.dart';
 import '../services/token_blacklist_manager.dart' as blacklist;
@@ -19,6 +20,20 @@ enum FeatureAvailability {
   offlineNoCache, // Offline with no cached data
   tokenExpired, // Needs reauthentication
   unauthorized // Never authenticated
+}
+
+/// Extension on FeatureAvailability to provide convenience getters
+extension FeatureAvailabilityX on FeatureAvailability {
+  /// Whether the app can perform online operations
+  bool get canPerformOnlineOperations {
+    return this == FeatureAvailability.fullyAvailable;
+  }
+
+  /// Whether the app has valid tokens
+  bool get hasValidTokens {
+    return this == FeatureAvailability.fullyAvailable ||
+        this == FeatureAvailability.offlineWithCache;
+  }
 }
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
@@ -43,12 +58,13 @@ class TokenManager extends _$TokenManager {
   static const double _longTokenRefreshPercentage = 0.7; // For tokens > 60 min
 
   late final blacklist.TokenBlacklistManager _blacklistManager;
-  late final TokenAuditLogger _auditLogger;
+  late final LoggingService _auditLogger;
 
   @override
   FeatureAvailability build() {
     _blacklistManager =
         ref.watch(blacklist.tokenBlacklistManagerProvider.notifier);
+    _auditLogger = ref.watch(tokenAuditLoggerProvider);
 
     // Initialize secure storage
     try {

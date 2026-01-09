@@ -73,44 +73,7 @@ final userProfileProvider =
   return userRepository.getUserProfile(userId);
 });
 
-/// Provider for current user profile
-///
-/// OPTIMIZED: Uses `select` to only watch the userId field,
-/// preventing unnecessary rebuilds when other auth state fields change.
-final currentUserProfileProvider = FutureProvider.autoDispose<User?>((ref) async {
-  // Use select to only rebuild when userId changes
-  final userId = ref.watch(
-    authStateProvider.select((state) => state.userId),
-  );
-
-  if (userId == null) {
-    return null;
-  }
-
-  final userRepository = ref.read(userRepositoryProvider);
-  return userRepository.getUserProfile(userId);
-});
-
-/// Auth state provider (simplified for this example)
-///
-/// In production, this would come from your auth provider.
-final authStateProvider = Provider<AuthState>((ref) {
-  return AuthState(userId: 'current-user-id');
-});
-
-/// Simple auth state class for this example
-class AuthState {
-  final String? userId;
-
-  AuthState({this.userId});
-}
-
-/// Notifier for updating user profile
-///
-/// OPTIMIZED:
-/// 1. No automatic loading in constructor (prevents unnecessary fetches)
-/// 2. Uses `mounted` checks to prevent state updates after disposal
-/// 3. Proper async/await error handling with mounted checks
+// Notifier for updating user profile
 class UserProfileNotifier extends StateNotifier<AsyncValue<User?>> {
   final UserRepository _userRepository;
   final String userId;

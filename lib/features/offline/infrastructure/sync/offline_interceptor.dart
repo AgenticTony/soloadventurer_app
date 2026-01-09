@@ -100,13 +100,13 @@ class InterceptorConfig {
 /// This callback is invoked when the interceptor decides to execute
 /// the operation immediately (when online). It should perform the actual
 /// operation (e.g., API call) and return the result.
-typedef OperationExecutor<T> = Future<T>;
+typedef OperationExecutor<T> = Future<T> Function();
 
 /// Callback function type for updating local database
 ///
 /// This callback is invoked immediately (whether online or offline) to
 /// update the local database. This ensures the UI reflects changes immediately.
-typedef LocalUpdateCallback = Future<void>;
+typedef LocalUpdateCallback = Future<void> Function();
 
 /// Interceptor for offline-first operations
 ///
@@ -234,9 +234,9 @@ class OfflineInterceptor {
         );
       } else {
         // Queueing disabled - fail the operation
-        final error = 'Offline and queueing disabled';
+        const error = 'Offline and queueing disabled';
         debugPrint('❌ $error');
-        return InterceptorResult.failure(error);
+        return const InterceptorResult.failure(error);
       }
     }
   }
@@ -259,7 +259,8 @@ class OfflineInterceptor {
     required LocalUpdateCallback Function(Map<String, dynamic> op) localUpdate,
   }) async {
     if (!_config.enabled) {
-      debugPrint('🔄 Offline interception disabled, executing batch immediately');
+      debugPrint(
+          '🔄 Offline interception disabled, executing batch immediately');
       final results = <InterceptorResult>[];
       for (final op in operations) {
         final result = await _executeOperation(
@@ -301,7 +302,8 @@ class OfflineInterceptor {
             operation: op['operation'] as SyncOperationType,
             data: op['data'] as Map<String, dynamic>,
             localUpdate: localUpdate(op),
-            priority: op['priority'] as SyncPriority? ?? _config.defaultPriority,
+            priority:
+                op['priority'] as SyncPriority? ?? _config.defaultPriority,
             maxRetries: op['maxRetries'] as int? ?? _config.maxRetries,
             version: op['version'] as int?,
           );
@@ -309,10 +311,10 @@ class OfflineInterceptor {
         }
       } else {
         // Queueing disabled - fail all operations
-        final error = 'Offline and queueing disabled';
+        const error = 'Offline and queueing disabled';
         debugPrint('❌ $error');
         for (int i = 0; i < operations.length; i++) {
-          results.add(InterceptorResult.failure(error));
+          results.add(const InterceptorResult.failure(error));
         }
       }
     }
@@ -338,8 +340,8 @@ class OfflineInterceptor {
   /// Calls the executor to perform the actual operation, then calls
   /// localUpdate to keep the local database in sync.
   Future<InterceptorResult> _executeOperation<T>(
-    OperationExecutor<T> executor,
-    LocalUpdateCallback localUpdate,
+    Future<T> Function() executor,
+    Future<void> Function() localUpdate,
   ) async {
     try {
       // Execute the operation
@@ -392,7 +394,8 @@ class OfflineInterceptor {
       );
 
       if (result.success) {
-        debugPrint('✅ Operation queued successfully (id: ${result.operationId})');
+        debugPrint(
+            '✅ Operation queued successfully (id: ${result.operationId})');
         return InterceptorResult.queued(result.operationId);
       } else {
         debugPrint('❌ Failed to queue operation: ${result.errorMessage}');

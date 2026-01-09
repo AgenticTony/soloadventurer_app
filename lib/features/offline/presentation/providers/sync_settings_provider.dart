@@ -66,7 +66,8 @@ class SyncSettingsNotifier extends StateNotifier<SyncSettings> {
         syncOnlyOnWifi: syncOnlyOnWifi,
       );
 
-      debugPrint('📱 SyncSettings loaded: enabled=$syncEnabled, wifiOnly=$syncOnlyOnWifi');
+      debugPrint(
+          '📱 SyncSettings loaded: enabled=$syncEnabled, wifiOnly=$syncOnlyOnWifi');
     } catch (e) {
       debugPrint('❌ Error loading sync settings: $e');
       // Keep default values

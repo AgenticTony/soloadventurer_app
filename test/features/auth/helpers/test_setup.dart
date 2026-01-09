@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'test_helpers.dart';
 
 /// Sets up a test environment for auth feature tests

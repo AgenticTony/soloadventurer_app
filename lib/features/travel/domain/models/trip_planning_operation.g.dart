@@ -14,7 +14,7 @@ _$TripPlanningOperationImpl _$$TripPlanningOperationImplFromJson(
       planningType:
           $enumDecode(_$TripPlanningTypeEnumMap, json['planningType']),
       changes: json['changes'] as Map<String, dynamic>,
-      priority: (json['priority'] as num?)?.toInt() ?? OperationPriority.normal,
+      priority: (json['priority'] as num).toInt(),
       plannedStartDate: json['plannedStartDate'] == null
           ? null
           : DateTime.parse(json['plannedStartDate'] as String),

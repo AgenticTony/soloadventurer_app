@@ -208,7 +208,8 @@ class SyncOperationEntity extends Equatable {
     if (!canRetry || !isFailed) return false;
 
     // Exponential backoff: 2^retryCount seconds, max 60 seconds
-    final backoffSeconds = [1 << retryCount, 60].reduce((a, b) => a < b ? a : b);
+    final backoffSeconds =
+        [1 << retryCount, 60].reduce((a, b) => a < b ? a : b);
     final timeSinceFailure = timeSinceLastAttempt ?? Duration.zero;
 
     return timeSinceFailure >= Duration(seconds: backoffSeconds);

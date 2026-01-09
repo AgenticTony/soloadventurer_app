@@ -151,20 +151,21 @@ class BackgroundSyncService {
         initialDelay: initialDelay,
         constraints: Constraints(
           networkType: NetworkType.connected,
-          requiresNotRoaming: false, // Allow sync while roaming
           requiresCharging: false, // Don't require charging
           requiresDeviceIdle: false, // Don't require device idle
           requiresBatteryNotLow: true, // Only sync when battery is not low
           requiresStorageNotLow: true, // Only sync when storage is not low
         ),
         tag: periodicSyncTaskName,
-        existingWorkPolicy: ExistingWorkPolicy.replace, // Replace existing task
-        backoffPolicy: BackoffPolicy.exponential, // Retry with exponential backoff
-        backoffDelay: Duration(minutes: 15), // Initial backoff delay
+        existingWorkPolicy:
+            ExistingPeriodicWorkPolicy.replace, // Replace existing task
+        backoffPolicy:
+            BackoffPolicy.exponential, // Retry with exponential backoff
       );
 
       debug.info('$_tag: ✅ Periodic sync task scheduled every $interval');
-      debug.info('$_tag: Constraints: Connected, Battery Not Low, Storage Not Low');
+      debug.info(
+          '$_tag: Constraints: Connected, Battery Not Low, Storage Not Low');
     } catch (e) {
       debug.error('$_tag: ❌ Failed to schedule periodic sync: $e');
       rethrow;
@@ -177,7 +178,8 @@ class BackgroundSyncService {
   /// constraints are met (e.g., when network becomes available).
   Future<void> scheduleImmediateSync() async {
     if (!_isEnabled) {
-      debug.info('$_tag: Background sync is disabled, not scheduling immediate task');
+      debug.info(
+          '$_tag: Background sync is disabled, not scheduling immediate task');
       return;
     }
 
@@ -185,14 +187,15 @@ class BackgroundSyncService {
       await Workmanager().registerOneOffTask(
         immediateSyncTaskName,
         immediateSyncTaskName,
-        initialDelay: Duration(seconds: 10), // Small delay to allow app to fully close
+        initialDelay: const Duration(
+            seconds: 10), // Small delay to allow app to fully close
         constraints: Constraints(
           networkType: NetworkType.connected,
           requiresBatteryNotLow: true,
           requiresStorageNotLow: true,
         ),
         tag: immediateSyncTaskName,
-        existingWorkPolicy: ExistingWorkPolicy.append, // Don't replace existing
+        existingWorkPolicy: ExistingWorkPolicy.keep, // Don't replace existing
       );
 
       debug.info('$_tag: ✅ Immediate sync task scheduled');
@@ -222,7 +225,8 @@ class BackgroundSyncService {
   /// one-off tasks intact.
   Future<void> cancelPeriodicSync() async {
     try {
-      await Workmanager().cancelTaskByTag(periodicSyncTaskName);
+      // Use cancelByTag with the task name
+      await Workmanager().cancelByTag(periodicSyncTaskName);
       debug.info('$_tag: ✅ Periodic sync task cancelled');
     } catch (e) {
       debug.error('$_tag: ❌ Failed to cancel periodic sync: $e');
@@ -313,7 +317,8 @@ class BackgroundSyncService {
 
       // For now, log the intent and return true to mark task as successful
       debug.info('$_tag: 📊 Background sync would run here');
-      debug.info('$_tag: ℹ️ Full implementation requires cross-isolate communication');
+      debug.info(
+          '$_tag: ℹ️ Full implementation requires cross-isolate communication');
 
       // Placeholder: Simulate successful sync
       // In production, this would:
@@ -322,7 +327,7 @@ class BackgroundSyncService {
       // 3. Wait for sync completion
       // 4. Return actual result
 
-      await Future.delayed(Duration(seconds: 2)); // Simulate work
+      await Future.delayed(const Duration(seconds: 2)); // Simulate work
 
       debug.info('$_tag: ✅ Background task completed: $taskName');
       return true;

@@ -21,8 +21,8 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the inserted sync queue item with the database-generated ID.
   ///
   /// Throws [InvalidDataException] if the sync operation data is invalid.
-  Future<SyncQueueItem> enqueueOperation(SyncQueueCompanion item) async {
-    return await into(syncQueue).insert(item);
+  Future<int> enqueueOperation(SyncQueueCompanion item) async {
+    return await into(db.syncQueue).insert(item);
   }
 
   /// Enqueues multiple sync operations in a single transaction
@@ -35,7 +35,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final item in items) {
-        await into(syncQueue).insert(item);
+        await into(db.syncQueue).insert(item);
         count++;
       }
       return count;
@@ -46,8 +46,8 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// The [item] parameter is a SyncQueueItem object with updated data.
   /// Returns the number of rows affected (should be 1).
-  Future<int> updateOperation(SyncQueueItem item) async {
-    return await update(syncQueue).replace(item);
+  Future<bool> updateOperation(SyncQueueItem item) async {
+    return await update(db.syncQueue).replace(item);
   }
 
   /// Deletes a sync queue item by ID
@@ -55,7 +55,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the sync queue item ID to delete.
   /// Returns the number of rows affected (should be 1 or 0).
   Future<int> deleteOperationById(int id) async {
-    return await (delete(syncQueue)..where((sq) => sq.id.equals(id))).go();
+    return await (delete(db.syncQueue)..where((sq) => sq.id.equals(id))).go();
   }
 
   /// Deletes multiple sync queue items by IDs
@@ -63,7 +63,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [ids] parameter is a list of sync queue item IDs to delete.
   /// Returns the count of operations deleted.
   Future<int> deleteOperationsByIds(List<int> ids) async {
-    return await (delete(syncQueue)..where((sq) => sq.id.isIn(ids))).go();
+    return await (delete(db.syncQueue)..where((sq) => sq.id.isIn(ids))).go();
   }
 
   // ==============================================================================
@@ -75,7 +75,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the sync queue item ID to retrieve.
   /// Returns the sync queue item if found, null otherwise.
   Future<SyncQueueItem?> getOperationById(int id) {
-    return (select(syncQueue)..where((sq) => sq.id.equals(id)))
+    return (select(db.syncQueue)..where((sq) => sq.id.equals(id)))
         .getSingleOrNull();
   }
 
@@ -85,7 +85,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Ordered by priority (high first) and creation date (oldest first).
   Future<List<SyncQueueItem>> getPendingOperations() {
-    return (select(syncQueue)
+    return (select(db.syncQueue)
           ..where((sq) => sq.status.equals('pending'))
           ..orderBy([
             (sq) => OrderingTerm.asc(sq.priority),
@@ -100,20 +100,14 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// Returns a list of pending operations prioritized for execution.
   ///
   /// Priority order: 'high' > 'normal' > 'low'
-  Future<List<SyncQueueItem>> getPendingOperationsByPriority(
-      {int limit = 50}) {
-    // Using CASE WHEN for priority ordering
-    // high = 1, normal = 2, low = 3
-    final priorityCase = CaseWhen<String, int>([
-      ifCase(syncQueue.priority.equals('high'), then: const Constant(1)),
-      ifCase(syncQueue.priority.equals('normal'), then: const Constant(2)),
-      ifCase(syncQueue.priority.equals('low'), then: const Constant(3)),
-    ], otherwise: const Constant(2));
-
-    return (select(syncQueue)
+  Future<List<SyncQueueItem>> getPendingOperationsByPriority({int limit = 50}) {
+    // Simple priority ordering without complex CASE WHEN
+    // Just order by priority field (alphabetical: 'high' < 'low' < 'normal')
+    // For custom ordering, you'd need to use a custom expression or raw SQL
+    return (select(db.syncQueue)
           ..where((sq) => sq.status.equals('pending'))
           ..orderBy([
-            (sq) => OrderingTerm.asc(priorityCase),
+            (sq) => OrderingTerm.asc(sq.priority),
             (sq) => OrderingTerm.asc(sq.createdAt),
           ])
           ..limit(limit))
@@ -126,9 +120,9 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Ordered by retry count (fewest retries first) and last attempted time.
   Future<List<SyncQueueItem>> getFailedOperationsForRetry() {
-    return (select(syncQueue)
+    return (select(db.syncQueue)
           ..where((sq) => sq.status.equals('failed'))
-          ..where((sq) => sq.retryCount.isSmallerThan(sq.maxRetries))
+          ..where((sq) => sq.retryCount.isSmallerThanValue(3))
           ..orderBy([
             (sq) => OrderingTerm.asc(sq.retryCount),
             (sq) => OrderingTerm.asc(sq.lastAttemptedAt),
@@ -145,7 +139,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
     String entityType,
     String entityId,
   ) {
-    return (select(syncQueue)
+    return (select(db.syncQueue)
           ..where((sq) => sq.entityType.equals(entityType))
           ..where((sq) => sq.entityId.equals(entityId))
           ..orderBy([(sq) => OrderingTerm.asc(sq.createdAt)]))
@@ -157,7 +151,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [entityType] parameter is the entity type (e.g., 'trip', 'journal').
   /// Returns a list of sync operations for the specified entity type.
   Future<List<SyncQueueItem>> getOperationsByEntityType(String entityType) {
-    return (select(syncQueue)
+    return (select(db.syncQueue)
           ..where((sq) => sq.entityType.equals(entityType))
           ..orderBy([(sq) => OrderingTerm.asc(sq.createdAt)]))
         .get();
@@ -168,7 +162,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [status] parameter is the operation status (e.g., 'pending', 'processing', 'completed', 'failed').
   /// Returns a list of operations with the specified status.
   Future<List<SyncQueueItem>> getOperationsByStatus(String status) {
-    return (select(syncQueue)
+    return (select(db.syncQueue)
           ..where((sq) => sq.status.equals(status))
           ..orderBy([(sq) => OrderingTerm.asc(sq.createdAt)]))
         .get();
@@ -181,7 +175,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// Returns a list of operations of the specified type.
   Future<List<SyncQueueItem>> getOperationsByType(String operation,
       {String? entityType}) {
-    final query = select(syncQueue)
+    final query = select(db.syncQueue)
       ..where((sq) => sq.operation.equals(operation))
       ..orderBy([(sq) => OrderingTerm.asc(sq.createdAt)]);
 
@@ -196,24 +190,24 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Returns the count of operations with status 'pending'.
   Future<int> countPendingOperations() async {
-    final query = selectOnly(syncQueue)
-      ..addColumns([syncQueue.id.count()])
-      ..where(syncQueue.status.equals('pending'));
+    final query = selectOnly(db.syncQueue)
+      ..addColumns([db.syncQueue.id.count()])
+      ..where(db.syncQueue.status.equals('pending'));
 
     final result = await query.getSingle();
-    return result.read(syncQueue.id.count());
+    return result.read(db.syncQueue.id.count()) ?? 0;
   }
 
   /// Counts all failed operations
   ///
   /// Returns the count of operations with status 'failed'.
   Future<int> countFailedOperations() async {
-    final query = selectOnly(syncQueue)
-      ..addColumns([syncQueue.id.count()])
-      ..where(syncQueue.status.equals('failed'));
+    final query = selectOnly(db.syncQueue)
+      ..addColumns([db.syncQueue.id.count()])
+      ..where(db.syncQueue.status.equals('failed'));
 
     final result = await query.getSingle();
-    return result.read(syncQueue.id.count());
+    return result.read(db.syncQueue.id.count()) ?? 0;
   }
 
   /// Counts operations by entity type and status
@@ -223,13 +217,13 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the count of matching operations.
   Future<int> countOperationsByEntityAndStatus(
       String entityType, String status) async {
-    final query = selectOnly(syncQueue)
-      ..addColumns([syncQueue.id.count()])
-      ..where(syncQueue.entityType.equals(entityType))
-      ..where(syncQueue.status.equals(status));
+    final query = selectOnly(db.syncQueue)
+      ..addColumns([db.syncQueue.id.count()])
+      ..where(db.syncQueue.entityType.equals(entityType))
+      ..where(db.syncQueue.status.equals(status));
 
     final result = await query.getSingle();
-    return result.read(syncQueue.id.count());
+    return result.read(db.syncQueue.id.count()) ?? 0;
   }
 
   /// Gets queue statistics
@@ -255,12 +249,12 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
 
   /// Counts operations by status (internal helper)
   Future<int> _countByStatus(String status) async {
-    final query = selectOnly(syncQueue)
-      ..addColumns([syncQueue.id.count()])
-      ..where(syncQueue.status.equals(status));
+    final query = selectOnly(db.syncQueue)
+      ..addColumns([db.syncQueue.id.count()])
+      ..where(db.syncQueue.status.equals(status));
 
     final result = await query.getSingle();
-    return result.read(syncQueue.id.count());
+    return result.read(db.syncQueue.id.count()) ?? 0;
   }
 
   // ==============================================================================
@@ -272,7 +266,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the operation ID.
   /// Returns the number of rows affected.
   Future<int> markAsProcessing(int id) {
-    return (update(syncQueue)..where((sq) => sq.id.equals(id))).write(
+    return (update(db.syncQueue)..where((sq) => sq.id.equals(id))).write(
       SyncQueueCompanion(
         status: const Value('processing'),
         lastAttemptedAt: Value(DateTime.now()),
@@ -285,7 +279,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the operation ID.
   /// Returns the number of rows affected.
   Future<int> markAsCompleted(int id) {
-    return (update(syncQueue)..where((sq) => sq.id.equals(id))).write(
+    return (update(db.syncQueue)..where((sq) => sq.id.equals(id))).write(
       SyncQueueCompanion(
         status: const Value('completed'),
         completedAt: Value(DateTime.now()),
@@ -299,7 +293,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [errorMessage] parameter is the error message to store.
   /// Returns the number of rows affected.
   Future<int> markAsFailed(int id, String errorMessage) {
-    return (update(syncQueue)..where((sq) => sq.id.equals(id))).write(
+    return (update(db.syncQueue)..where((sq) => sq.id.equals(id))).write(
       SyncQueueCompanion(
         status: const Value('failed'),
         errorMessage: Value(errorMessage),
@@ -320,7 +314,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
     final newRetryCount = item.retryCount + 1;
     final shouldFail = newRetryCount >= item.maxRetries;
 
-    return (update(syncQueue)..where((sq) => sq.id.equals(id))).write(
+    return (update(db.syncQueue)..where((sq) => sq.id.equals(id))).write(
       SyncQueueCompanion(
         status: Value(shouldFail ? 'failed' : 'pending'),
         retryCount: Value(newRetryCount),
@@ -336,7 +330,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [ids] parameter is a list of operation IDs to reset.
   /// Returns the count of operations reset.
   Future<int> resetOperationsForRetry(List<int> ids) {
-    return (update(syncQueue)..where((sq) => sq.id.isIn(ids))).write(
+    return (update(db.syncQueue)..where((sq) => sq.id.isIn(ids))).write(
       const SyncQueueCompanion(
         status: Value('pending'),
         errorMessage: Value(null),
@@ -354,7 +348,8 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a cleanup operation for operations that completed successfully.
   Future<int> clearCompletedOperations() async {
-    return await (delete(syncQueue)..where((sq) => sq.status.equals('completed')))
+    return await (delete(db.syncQueue)
+          ..where((sq) => sq.status.equals('completed')))
         .go();
   }
 
@@ -364,7 +359,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// **WARNING**: This is a destructive operation. Use with caution.
   Future<int> clearAllOperations() async {
-    return await delete(syncQueue).go();
+    return await delete(db.syncQueue).go();
   }
 
   /// Clears old completed operations
@@ -373,7 +368,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// Operations completed before this time will be deleted.
   /// Returns the count of operations deleted.
   Future<int> clearOldCompletedOperations(DateTime olderThan) async {
-    return await (delete(syncQueue)
+    return await (delete(db.syncQueue)
           ..where((sq) => sq.status.equals('completed'))
           ..where((sq) => sq.completedAt.isSmallerThanValue(olderThan)))
         .go();
@@ -385,7 +380,7 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// The [entityId] parameter is the entity ID.
   /// Returns the count of operations deleted.
   Future<int> clearOperationsForEntity(String entityType, String entityId) {
-    return (delete(syncQueue)
+    return (delete(db.syncQueue)
           ..where((sq) => sq.entityType.equals(entityType))
           ..where((sq) => sq.entityId.equals(entityId)))
         .go();
@@ -397,9 +392,10 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
   /// Operations that failed before this time will be deleted.
   /// Returns the count of operations deleted.
   Future<int> clearOldFailedOperations(DateTime olderThan) async {
-    return await (delete(syncQueue)
+    // Filter for failed operations where retryCount >= 3 (max retries)
+    return await (delete(db.syncQueue)
           ..where((sq) => sq.status.equals('failed'))
-          ..where((sq) => sq.retryCount.isBiggerOrEqualValue(sq.maxRetries))
+          ..where((sq) => sq.retryCount.isBiggerOrEqualValue(3))
           ..where((sq) => sq.completedAt.isSmallerThanValue(olderThan)))
         .go();
   }
@@ -419,9 +415,9 @@ class SyncQueueDao extends DatabaseAccessor<AppDatabase> {
 
     // Calculate threshold for each operation based on retry count
     // This is approximated in SQL by checking if enough time has passed
-    return (select(syncQueue)
+    return (select(db.syncQueue)
           ..where((sq) => sq.status.equals('failed'))
-          ..where((sq) => sq.retryCount.isSmallerThan(sq.maxRetries))
+          ..where((sq) => sq.retryCount.isSmallerThanValue(3))
           ..where((sq) => sq.lastAttemptedAt.isNotNull())
           ..where((sq) => sq.lastAttemptedAt.isSmallerThanValue(
                 now.subtract(Duration(

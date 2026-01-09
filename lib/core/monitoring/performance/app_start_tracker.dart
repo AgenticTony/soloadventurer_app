@@ -25,8 +25,7 @@ import 'package:solo_adventurer/core/monitoring/performance/memory_profiler.dart
 /// ```
 class AppStartTracker {
   static DateTime? _startTime;
-  static DateTime? _endTime;
-  static bool _isCompleted = false;
+  static final Map<String, DateTime> _phaseStartTimes = {};
 
   /// Start tracking app startup time
   ///
@@ -139,61 +138,26 @@ class AppStartTracker {
     }
   }
 
-  /// Check if startup tracking is in progress
-  static bool get isTracking => _startTime != null && !_isCompleted;
+  /// Start tracking a phase
+  static void startPhase(String phaseName) {
+    _phaseStartTimes[phaseName] = DateTime.now();
+  }
 
-  /// Check if startup tracking is completed
-  static bool get isCompleted => _isCompleted;
-
-  /// Check if startup tracking has been started
-  static bool get isStarted => _startTime != null;
-
-  /// Get the start time
-  static DateTime? get startTime => _startTime;
-
-  /// Get the end time (null if not completed)
-  static DateTime? get endTime => _endTime;
-
-  /// Reset tracking state
-  ///
-  /// Clears all tracking state. Useful for testing or if you want
-  /// to track startup multiple times (though not recommended).
-  static void reset() {
-    _startTime = null;
-    _endTime = null;
-    _isCompleted = false;
-
-    if (kDebugMode) {
-      debugPrint('AppStartTracker: Reset');
+  /// End tracking a phase and log duration
+  static void endPhase(String phaseName) {
+    final startTime = _phaseStartTimes[phaseName];
+    if (startTime != null && kDebugMode) {
+      final duration = DateTime.now().difference(startTime);
+      print('$phaseName took: ${duration.inMilliseconds}ms');
+      _phaseStartTimes.remove(phaseName);
     }
   }
 
-  /// Get startup performance summary
-  ///
-  /// Returns a formatted string with startup performance details.
-  /// Returns null if startup hasn't been completed.
-  static String? getPerformanceSummary() {
-    if (!isCompleted) {
-      return null;
+  /// Log complete startup report
+  static void logStartupReport() {
+    if (kDebugMode) {
+      logStartupDuration();
+      print('Startup phases completed');
     }
-
-    final duration = getStartupDuration()!;
-    final buffer = StringBuffer();
-
-    buffer.writeln('App Startup Summary:');
-    buffer.writeln('  Duration: ${duration.inMilliseconds}ms');
-
-    // Performance assessment
-    if (duration.inMilliseconds < 1000) {
-      buffer.writeln('  Status: ✅ Excellent (< 1s)');
-    } else if (duration.inMilliseconds < 2000) {
-      buffer.writeln('  Status: ✅ Good (< 2s)');
-    } else if (duration.inMilliseconds < 3000) {
-      buffer.writeln('  Status: ⚠️ Acceptable (< 3s)');
-    } else {
-      buffer.writeln('  Status: ❌ Slow (> 3s)');
-    }
-
-    return buffer.toString().trim();
   }
 }

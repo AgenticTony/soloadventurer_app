@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mockito/mockito.dart';
@@ -71,8 +72,7 @@ void main() {
     test('should update state when connectivity changes', () async {
       final controller = StreamController<ConnectivityStatus>();
 
-      when(mockService.connectivityStream)
-          .thenAnswer((_) => controller.stream);
+      when(mockService.connectivityStream).thenAnswer((_) => controller.stream);
 
       final notifier = ConnectivityNotifier(mockService);
 
@@ -89,8 +89,8 @@ void main() {
     });
 
     test('should check connectivity on demand', () async {
-      when(mockService.checkConnectivity())
-          .thenAnswer((_) async => ConnectivityStatus.connected(ConnectionType.cellular));
+      when(mockService.checkConnectivity()).thenAnswer(
+          (_) async => ConnectivityStatus.connected(ConnectionType.cellular));
 
       final notifier = ConnectivityNotifier(mockService);
       await notifier.checkConnectivity();

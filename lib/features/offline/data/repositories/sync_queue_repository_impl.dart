@@ -1,9 +1,12 @@
+import 'package:drift/drift.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/offline/data/models/sync_operation_model.dart';
+import 'package:soloadventurer/features/offline/data/models/sync_operation_model.dart'
+    as model;
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/sync_queue_dao.dart';
-import 'package:soloadventurer/features/offline/infrastructure/database/schema.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
+import 'dart:convert';
 
 /// Implementation of [SyncQueueRepository] that manages sync queue in local database
 ///
@@ -28,24 +31,33 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
   Future<SyncOperationEntity> enqueueOperation(
       SyncOperationEntity operation) async {
     try {
-      final item = await _syncQueueDao.enqueueOperation(
+      final id = await _syncQueueDao.enqueueOperation(
         _entityToCompanion(operation),
       );
-      return SyncOperationModel.fromDatabase(item).toDomainEntity();
+      // Get the inserted item to return full entity
+      final item = await _syncQueueDao.getOperationById(id);
+      if (item == null) {
+        throw const CacheException(
+          message: 'Failed to retrieve enqueued operation',
+        );
+      }
+      return model.SyncOperationModel.fromDatabase(item).toDomainEntity();
     } catch (e) {
-      throw RepositoryException('Failed to enqueue operation: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed enqueue operation: ${e.toString()}',
+      );
     }
   }
 
   @override
-  Future<int> enqueueOperations(
-      List<SyncOperationEntity> operations) async {
+  Future<int> enqueueOperations(List<SyncOperationEntity> operations) async {
     try {
       final companions = operations.map(_entityToCompanion).toList();
       return await _syncQueueDao.enqueueOperations(companions);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to enqueue operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed enqueue operations: ${e.toString()}',
+      );
     }
   }
 
@@ -56,7 +68,8 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
   @override
   Future<SyncOperationEntity?> dequeueOperation() async {
     try {
-      final items = await _syncQueueDao.getPendingOperationsByPriority(limit: 1);
+      final items =
+          await _syncQueueDao.getPendingOperationsByPriority(limit: 1);
       if (items.isEmpty) return null;
 
       // Mark as processing
@@ -67,9 +80,12 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
       final updatedItem = await _syncQueueDao.getOperationById(item.id);
       if (updatedItem == null) return null;
 
-      return SyncOperationModel.fromDatabase(updatedItem).toDomainEntity();
+      return model.SyncOperationModel.fromDatabase(updatedItem)
+          .toDomainEntity();
     } catch (e) {
-      throw RepositoryException('Failed to dequeue operation: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed dequeue operation: ${e.toString()}',
+      );
     }
   }
 
@@ -80,11 +96,13 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
       final items =
           await _syncQueueDao.getPendingOperationsByPriority(limit: limit);
       return items
-          .map((item) => SyncOperationModel.fromDatabase(item).toDomainEntity())
+          .map<SyncOperationEntity>((item) =>
+              model.SyncOperationModel.fromDatabase(item).toDomainEntity())
           .toList();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get pending operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get pending operations: ${e.toString()}',
+      );
     }
   }
 
@@ -101,11 +119,13 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
       final items =
           await _syncQueueDao.getOperationsByEntity(entityType, entityId);
       return items
-          .map((item) => SyncOperationModel.fromDatabase(item).toDomainEntity())
+          .map<SyncOperationEntity>((item) =>
+              model.SyncOperationModel.fromDatabase(item).toDomainEntity())
           .toList();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get operations by entity: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get operations by entity: ${e.toString()}',
+      );
     }
   }
 
@@ -116,11 +136,13 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       final items = await _syncQueueDao.getOperationsByEntityType(entityType);
       return items
-          .map((item) => SyncOperationModel.fromDatabase(item).toDomainEntity())
+          .map<SyncOperationEntity>((item) =>
+              model.SyncOperationModel.fromDatabase(item).toDomainEntity())
           .toList();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get operations by entity type: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get operations by entity type: ${e.toString()}',
+      );
     }
   }
 
@@ -131,11 +153,13 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       final items = await _syncQueueDao.getOperationsByStatus(status.value);
       return items
-          .map((item) => SyncOperationModel.fromDatabase(item).toDomainEntity())
+          .map<SyncOperationEntity>((item) =>
+              model.SyncOperationModel.fromDatabase(item).toDomainEntity())
           .toList();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get operations by status: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get operations by status: ${e.toString()}',
+      );
     }
   }
 
@@ -145,10 +169,11 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
       final item = await _syncQueueDao.getOperationById(id);
       if (item == null) return null;
 
-      return SyncOperationModel.fromDatabase(item).toDomainEntity();
+      return model.SyncOperationModel.fromDatabase(item).toDomainEntity();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get operation by ID: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get operation by ID: ${e.toString()}',
+      );
     }
   }
 
@@ -161,8 +186,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.markAsCompleted(id);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to mark operation as completed: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to mark operation as completed: ${e.toString()}',
+      );
     }
   }
 
@@ -171,8 +197,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.markAsFailedWithRetry(id, errorMessage);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to mark operation as failed: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to mark operation as failed: ${e.toString()}',
+      );
     }
   }
 
@@ -181,8 +208,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.markAsProcessing(id);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to mark operation as processing: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to mark operation as processing: ${e.toString()}',
+      );
     }
   }
 
@@ -191,8 +219,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.resetOperationsForRetry(ids);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to reset operations for retry: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to reset operations for retry: ${e.toString()}',
+      );
     }
   }
 
@@ -201,11 +230,13 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       final items = await _syncQueueDao.getOperationsReadyForRetry();
       return items
-          .map((item) => SyncOperationModel.fromDatabase(item).toDomainEntity())
+          .map<SyncOperationEntity>((item) =>
+              model.SyncOperationModel.fromDatabase(item).toDomainEntity())
           .toList();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get operations ready for retry: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get operations ready for retry: ${e.toString()}',
+      );
     }
   }
 
@@ -218,8 +249,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.clearCompletedOperations();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to clear completed operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to clear completed operations: ${e.toString()}',
+      );
     }
   }
 
@@ -228,8 +260,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.clearAllOperations();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to clear all operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to clear all operations: ${e.toString()}',
+      );
     }
   }
 
@@ -238,8 +271,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.clearOldCompletedOperations(olderThan);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to clear old completed operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to clear old completed operations: ${e.toString()}',
+      );
     }
   }
 
@@ -249,11 +283,11 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     String entityId,
   ) async {
     try {
-      return await _syncQueueDao.clearOperationsForEntity(
-          entityType, entityId);
+      return await _syncQueueDao.clearOperationsForEntity(entityType, entityId);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to clear operations for entity: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to clear operations for entity: ${e.toString()}',
+      );
     }
   }
 
@@ -262,8 +296,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.clearOldFailedOperations(olderThan);
     } catch (e) {
-      throw RepositoryException(
-          'Failed to clear old failed operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to clear old failed operations: ${e.toString()}',
+      );
     }
   }
 
@@ -276,8 +311,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.countPendingOperations();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to count pending operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to count pending operations: ${e.toString()}',
+      );
     }
   }
 
@@ -286,8 +322,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.countFailedOperations();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to count failed operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to count failed operations: ${e.toString()}',
+      );
     }
   }
 
@@ -296,8 +333,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.getQueueStatistics();
     } catch (e) {
-      throw RepositoryException(
-          'Failed to get queue statistics: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to get queue statistics: ${e.toString()}',
+      );
     }
   }
 
@@ -305,9 +343,11 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
   Future<int> getQueueSize() async {
     try {
       final stats = await _syncQueueDao.getQueueStatistics();
-      return stats.values.fold(0, (sum, count) => sum + count);
+      return stats.values.fold<int>(0, (sum, count) => sum + count);
     } catch (e) {
-      throw RepositoryException('Failed to get queue size: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed get queue size: ${e.toString()}',
+      );
     }
   }
 
@@ -320,26 +360,34 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       final item = await _syncQueueDao.getOperationById(operation.id);
       if (item == null) {
-        throw RepositoryException('Operation not found: ${operation.id}');
+        throw CacheException(
+          message: 'Operation not found: ${operation.id}',
+        );
       }
 
-      final updatedItem = _entityFromModel(
-        SyncOperationModel.fromDatabase(item).copyWith(
-          operation: operation.operation,
-          data: operation.data,
-          priority: operation.priority,
-          retryCount: operation.retryCount,
-          maxRetries: operation.maxRetries,
-          status: operation.status,
-          errorMessage: operation.errorMessage,
-          version: operation.version,
-        ),
+      final updatedItem = SyncQueueItem(
+        id: item.id,
+        entityType: operation.entityType,
+        entityId: operation.entityId,
+        operation: operation.operation.value,
+        data: _encodeData(operation.data),
+        priority: operation.priority.value,
+        retryCount: operation.retryCount,
+        maxRetries: operation.maxRetries,
+        status: operation.status.value,
+        errorMessage: operation.errorMessage,
+        createdAt: operation.createdAt,
+        lastAttemptedAt: operation.lastAttemptedAt,
+        completedAt: operation.completedAt,
+        version: operation.version,
       );
 
-      return await _syncQueueDao.updateOperation(updatedItem);
+      final success = await _syncQueueDao.updateOperation(updatedItem);
+      return success ? 1 : 0;
     } catch (e) {
-      throw RepositoryException(
-          'Failed to update operation: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed update operation: ${e.toString()}',
+      );
     }
   }
 
@@ -348,7 +396,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.deleteOperationById(id);
     } catch (e) {
-      throw RepositoryException('Failed to delete operation: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed delete operation: ${e.toString()}',
+      );
     }
   }
 
@@ -357,7 +407,9 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     try {
       return await _syncQueueDao.deleteOperationsByIds(ids);
     } catch (e) {
-      throw RepositoryException('Failed to delete operations: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed delete operations: ${e.toString()}',
+      );
     }
   }
 
@@ -384,32 +436,14 @@ class SyncQueueRepositoryImpl implements SyncQueueRepository {
     );
   }
 
-  /// Converts a [SyncOperationModel] to a [SyncQueueItem] for database operations
-  SyncQueueItem _entityFromModel(SyncOperationModel model) {
-    return SyncQueueItem(
-      id: model.id,
-      entityType: model.entityType,
-      entityId: model.entityId,
-      operation: model.operation.value,
-      data: model.dataAsJson,
-      priority: model.priority.value,
-      retryCount: model.retryCount,
-      maxRetries: model.maxRetries,
-      status: model.status.value,
-      errorMessage: model.errorMessage,
-      createdAt: model.createdAt,
-      lastAttemptedAt: model.lastAttemptedAt,
-      completedAt: model.completedAt,
-      version: model.version,
-    );
-  }
-
   /// Encodes data map to JSON string for database storage
   String _encodeData(Map<String, dynamic> data) {
     try {
-      return SyncOperationModel(data: data).dataAsJson;
+      return jsonEncode(data);
     } catch (e) {
-      throw RepositoryException('Failed to encode operation data: ${e.toString()}');
+      throw CacheException(
+        message: 'Failed to encode operation data: ${e.toString()}',
+      );
     }
   }
 }

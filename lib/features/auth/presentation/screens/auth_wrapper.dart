@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
-import 'package:soloadventurer/features/auth/domain/state/auth_state.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/navigation_error_handler.dart';
 import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
@@ -20,50 +20,41 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    final isLoading = ref.watch(isLoadingProvider);
+    final authAsync = ref.watch(authNotifierProvider);
 
-    debugPrint('AuthWrapper build - authState: $authState');
+    debugPrint('AuthWrapper build - authAsync: $authAsync');
 
     // Show loading indicator while initializing
     return NavigationErrorHandler(
-      child: isLoading
-          ? const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
-          : authState.isLoading
-              ? const Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : authState.error != null
-                  ? Scaffold(
-                      body: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Error: ${authState.error}'),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                ref
-                                    .read(authNotifierProvider.notifier)
-                                    .signOut();
-                              },
-                              child: const Text('Try Again'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : _buildAuthenticatedContent(authState),
+      child: authAsync.when(
+        loading: () => const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+        error: (error, stack) => Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: $error'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.invalidate(authNotifierProvider);
+                  },
+                  child: const Text('Try Again'),
+                ),
+              ],
+            ),
+          ),
+        ),
+        data: (authState) => _buildContent(authState),
+      ),
     );
   }
 
-  Widget _buildAuthenticatedContent(AuthState state) {
+  Widget _buildContent(AuthState state) {
     // Handle password reset flow
     if (state.requiresPasswordReset) {
       debugPrint('AuthWrapper: User requires password reset');

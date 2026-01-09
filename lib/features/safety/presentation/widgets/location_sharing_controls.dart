@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/trusted_contact.dart';
-import '../providers/safety_providers.dart';
 
 /// Callback type for when location sharing is toggled
 typedef LocationSharingToggleCallback = void Function(
@@ -237,7 +236,7 @@ class _LocationSharingControlsState
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: widget.enabled
                     ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withOpacity(0.38),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.38),
               ),
             ),
           ],
@@ -371,9 +370,9 @@ class _LocationSharingControlsState
       child: Column(
         children: [
           Icon(
-            Icons.contacts_outline,
+            Icons.contacts,
             size: 48,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 12),
           Text(
@@ -397,21 +396,21 @@ class _LocationSharingControlsState
   Widget _buildActionButtons(BuildContext context) {
     final theme = Theme.of(context);
     final hasSelected = _selectedContactIds.isNotEmpty;
-    final selectedWithSharing = _selectedContacts
-        .where((c) => c.locationSharingEnabled)
-        .toList();
+    final selectedWithSharing =
+        _selectedContacts.where((c) => c.locationSharingEnabled).toList();
 
     return Row(
       children: [
         // Share now button
         Expanded(
           child: FilledButton.icon(
-            onPressed: (widget.enabled && hasSelected && widget.onShareNow != null)
-                ? () {
-                    final contactIds = _selectedContactIds.toList();
-                    widget.onShareNow!(contactIds);
-                  }
-                : null,
+            onPressed:
+                (widget.enabled && hasSelected && widget.onShareNow != null)
+                    ? () {
+                        final contactIds = _selectedContactIds.toList();
+                        widget.onShareNow!(contactIds);
+                      }
+                    : null,
             icon: const Icon(Icons.share_location, size: 18),
             label: const Text('Share Now'),
             style: FilledButton.styleFrom(
@@ -424,8 +423,7 @@ class _LocationSharingControlsState
           // Stop sharing button
           Expanded(
             child: FilledButton.icon(
-              onPressed: (widget.enabled &&
-                      widget.onStopSharing != null)
+              onPressed: (widget.enabled && widget.onStopSharing != null)
                   ? () {
                       final contactIds =
                           selectedWithSharing.map((c) => c.id).toList();
@@ -693,7 +691,7 @@ class LocationSharingToggle extends StatelessWidget {
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: enabled
                     ? theme.colorScheme.onSurface
-                    : theme.colorScheme.onSurface.withOpacity(0.38),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.38),
               ),
             ),
           ),

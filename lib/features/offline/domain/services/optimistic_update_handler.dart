@@ -178,7 +178,8 @@ class OptimisticUpdateHandler {
   final Map<int, OptimisticUpdateState> _pendingUpdates = {};
 
   /// Stream controller for emitting updates to pending operations
-  final StreamController<Map<int, OptimisticUpdateState>> _pendingUpdatesController =
+  final StreamController<Map<int, OptimisticUpdateState>>
+      _pendingUpdatesController =
       StreamController<Map<int, OptimisticUpdateState>>.broadcast();
 
   /// Creates a new [OptimisticUpdateHandler]
@@ -285,8 +286,9 @@ class OptimisticUpdateHandler {
   }) async {
     final state = _pendingUpdates[syncOperationId];
     if (state == null) {
-      debugPrint('⚠️ No optimistic update found for operation #$syncOperationId');
-      return RollbackResult.failure(
+      debugPrint(
+          '⚠️ No optimistic update found for operation #$syncOperationId');
+      return const RollbackResult.failure(
         entityId: '',
         entityType: '',
         errorMessage: 'Optimistic update not found',
@@ -310,9 +312,11 @@ class OptimisticUpdateHandler {
       if (result.success) {
         _pendingUpdates.remove(syncOperationId);
         _emitPendingUpdates();
-        debugPrint('✅ Rollback successful for ${state.entityType}:${state.entityId}');
+        debugPrint(
+            '✅ Rollback successful for ${state.entityType}:${state.entityId}');
       } else {
-        debugPrint('❌ Rollback failed for ${state.entityType}:${state.entityId}: '
+        debugPrint(
+            '❌ Rollback failed for ${state.entityType}:${state.entityId}: '
             '${result.errorMessage}');
       }
 
@@ -349,7 +353,8 @@ class OptimisticUpdateHandler {
     }
 
     final successCount = results.where((r) => r.success).length;
-    debugPrint('✅ Rollback complete: $successCount/${results.length} successful');
+    debugPrint(
+        '✅ Rollback complete: $successCount/${results.length} successful');
 
     return results;
   }

@@ -6,7 +6,7 @@ part of 'operation_queue.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$operationQueueHash() => r'f643f478a785d38234e167d57e1611539fa0725e';
+String _$operationQueueHash() => r'025b05f9d17043aca094b7a380d252f8028977a8';
 
 /// A persistent priority queue for managing offline-capable operations.
 ///

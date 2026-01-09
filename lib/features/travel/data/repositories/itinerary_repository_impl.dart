@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:dartz/dartz.dart';
-import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:soloadventurer/core/error/failures.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/itinerary_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
@@ -49,14 +47,15 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(itinerary);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve itinerary from local database',
       ));
     }
   }
 
   @override
-  Future<Either<Failure, List<Itinerary>>> getItineraries({String? userId}) async {
+  Future<Either<Failure, List<Itinerary>>> getItineraries(
+      {String? userId}) async {
     try {
       final localItineraries = userId != null
           ? await _dao.getItinerariesByUserId(userId)
@@ -70,7 +69,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(itineraries);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve itineraries from local database',
       ));
     }
@@ -89,19 +88,21 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(itineraries);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve starter itineraries from local database',
       ));
     }
   }
 
   @override
-  Future<Either<Failure, Itinerary>> createItinerary(Itinerary itinerary) async {
+  Future<Either<Failure, Itinerary>> createItinerary(
+      Itinerary itinerary) async {
     try {
       // Validate itinerary
       if (!itinerary.isValid) {
-        return left(const Failure.validation(
-          message: 'Itinerary must have a name, valid destination, date range, and at least one item',
+        return left(Failure.validation(
+          message:
+              'Itinerary must have a name, valid destination, date range, and at least one item',
         ));
       }
 
@@ -186,7 +187,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(created);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to create itinerary in local database',
       ));
     }
@@ -219,7 +220,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(updated);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to update itinerary in local database',
       ));
     }
@@ -231,7 +232,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
       await _dao.softDeleteItineraryById(id);
       return right(null);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to delete itinerary from local database',
       ));
     }
@@ -256,8 +257,11 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
           // Get current max sort order for this day
           final dayItems = await _dao.getItemsByDay(itineraryId, dayNumber);
-          final maxSortOrder =
-              dayItems.isEmpty ? 0 : dayItems.map((i) => i.sortOrder).reduce((a, b) => a > b ? a : b);
+          final maxSortOrder = dayItems.isEmpty
+              ? 0
+              : dayItems
+                  .map((i) => i.sortOrder)
+                  .reduce((a, b) => a > b ? a : b);
 
           // Create the item
           final localItem = item.toDatabaseEntity(
@@ -298,7 +302,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
         },
       );
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to add item to itinerary',
       ));
     }
@@ -332,7 +336,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return await getItinerary(itineraryId);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to update item in itinerary',
       ));
     }
@@ -349,7 +353,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return await getItinerary(itineraryId);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to remove item from itinerary',
       ));
     }
@@ -380,7 +384,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
       // Return updated itinerary
       return await getItinerary(itineraryId);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to reorder items in itinerary',
       ));
     }
@@ -397,7 +401,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return await getItinerary(itineraryId);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to toggle item completion',
       ));
     }
@@ -416,7 +420,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
       final items = await _dao.getItemsByDay(itineraryId, dayNumber);
       return right(items.map((item) => item.toDomainEntity()).toList());
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve items for day',
       ));
     }
@@ -430,7 +434,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
       final items = await _dao.getUncompletedItems(itineraryId);
       return right(items.map((item) => item.toDomainEntity()).toList());
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve uncompleted items',
       ));
     }
@@ -444,7 +448,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
       final items = await _dao.getCompletedItems(itineraryId);
       return right(items.map((item) => item.toDomainEntity()).toList());
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve completed items',
       ));
     }
@@ -472,7 +476,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(itineraries);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve itineraries by status',
       ));
     }
@@ -505,7 +509,7 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
 
       return right(itineraries);
     } catch (e) {
-      return left(const Failure.cache(
+      return left(Failure.cache(
         message: 'Failed to retrieve itineraries by date range',
       ));
     }
@@ -522,7 +526,8 @@ class ItineraryRepositoryImpl implements ItineraryRepository {
   }
 
   /// Calculates the day number from itinerary and item time
-  Future<int> _calculateDayNumberFromTime(String itineraryId, DateTime time) async {
+  Future<int> _calculateDayNumberFromTime(
+      String itineraryId, DateTime time) async {
     final itinerary = await _dao.getItineraryById(itineraryId);
     if (itinerary == null) return 1;
 
@@ -539,7 +544,8 @@ extension AppDatabaseItineraryExtensions on AppDatabase {
   }) async {
     final query = select(itineraries)
       ..where((tbl) => tbl.isDeleted.equals(false))
-      ..where((tbl) => tbl.destinationName.equals(status)); // Using destinationName as status placeholder
+      ..where((tbl) => tbl.destinationName
+          .equals(status)); // Using destinationName as status placeholder
 
     if (userId != null) {
       query.where((tbl) => tbl.userId.equals(userId));

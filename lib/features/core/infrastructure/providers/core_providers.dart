@@ -18,7 +18,7 @@ final deviceInfoPluginProvider = Provider<DeviceInfoPlugin>((ref) {
 final deviceInfoServiceProvider = Provider<DeviceInfoService>((ref) {
   final deviceInfo = ref.watch(deviceInfoPluginProvider);
   final logger = ref.watch(loggingServiceProvider);
-  
+
   return DeviceInfoService(
     deviceInfo: deviceInfo,
     logger: logger,

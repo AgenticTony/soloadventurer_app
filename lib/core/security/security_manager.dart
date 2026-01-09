@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -60,7 +59,17 @@ class SecurityManager extends _$SecurityManager {
     final storedId = await _storage.read(_deviceIdKey);
     if (storedId != null) return storedId;
 
-    final deviceId = await PlatformDeviceId.getDeviceId ?? 'unknown';
+    String deviceId;
+    if (Platform.isAndroid) {
+      final androidInfo = await _deviceInfo.androidInfo;
+      deviceId = androidInfo.id;
+    } else if (Platform.isIOS) {
+      final iosInfo = await _deviceInfo.iosInfo;
+      deviceId = iosInfo.identifierForVendor ?? 'unknown';
+    } else {
+      deviceId = 'unknown';
+    }
+
     await _storage.write(_deviceIdKey, deviceId);
     return deviceId;
   }

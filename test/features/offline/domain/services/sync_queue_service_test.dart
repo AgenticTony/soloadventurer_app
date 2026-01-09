@@ -42,7 +42,8 @@ void main() {
     });
 
     test('should return 0 on error when getting queue size', () async {
-      when(() => mockRepository.getQueueSize()).thenThrow(Exception('Database error'));
+      when(() => mockRepository.getQueueSize())
+          .thenThrow(Exception('Database error'));
 
       final size = await syncQueueService.getQueueSize();
 
@@ -50,7 +51,8 @@ void main() {
     });
 
     test('should get pending count', () async {
-      when(() => mockRepository.countPendingOperations()).thenAnswer((_) async => 3);
+      when(() => mockRepository.countPendingOperations())
+          .thenAnswer((_) async => 3);
 
       final count = await syncQueueService.getPendingCount();
 
@@ -68,7 +70,8 @@ void main() {
     });
 
     test('should get failed count', () async {
-      when(() => mockRepository.countFailedOperations()).thenAnswer((_) async => 2);
+      when(() => mockRepository.countFailedOperations())
+          .thenAnswer((_) async => 2);
 
       final count = await syncQueueService.getFailedCount();
 
@@ -119,7 +122,8 @@ void main() {
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 5);
 
       final emissionList = <int>[];
-      final subscription = syncQueueService.queueSizeStream.listen(emissionList.add);
+      final subscription =
+          syncQueueService.queueSizeStream.listen(emissionList.add);
 
       await syncQueueService.getQueueSize();
 
@@ -135,7 +139,7 @@ void main() {
         entityType: 'trip',
         entityId: 'trip-123',
         operation: SyncOperationType.create,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
         priority: SyncPriority.normal,
         status: SyncOperationStatus.pending,
         createdAt: DateTime.now(),
@@ -163,7 +167,7 @@ void main() {
         entityType: 'journal',
         entityId: 'journal-456',
         operation: SyncOperationType.update,
-        data: {'content': 'Updated'},
+        data: const {'content': 'Updated'},
         priority: SyncPriority.high,
         status: SyncOperationStatus.pending,
         createdAt: DateTime.now(),
@@ -182,8 +186,9 @@ void main() {
 
       expect(result.success, isTrue);
       final captured =
-          verify(() => mockRepository.enqueueOperation(captureAny())).captured.single
-              as SyncOperationEntity;
+          verify(() => mockRepository.enqueueOperation(captureAny()))
+              .captured
+              .single as SyncOperationEntity;
       expect(captured.priority, equals(SyncPriority.high));
     });
 
@@ -193,7 +198,7 @@ void main() {
         entityType: 'trip',
         entityId: 'trip-789',
         operation: SyncOperationType.delete,
-        data: {},
+        data: const {},
         maxRetries: 5,
         status: SyncOperationStatus.pending,
         createdAt: DateTime.now(),
@@ -212,8 +217,9 @@ void main() {
 
       expect(result.success, isTrue);
       final captured =
-          verify(() => mockRepository.enqueueOperation(captureAny())).captured.single
-              as SyncOperationEntity;
+          verify(() => mockRepository.enqueueOperation(captureAny()))
+              .captured
+              .single as SyncOperationEntity;
       expect(captured.maxRetries, equals(5));
     });
 
@@ -223,7 +229,7 @@ void main() {
         entityType: 'trip',
         entityId: 'trip-version',
         operation: SyncOperationType.update,
-        data: {'title': 'Updated'},
+        data: const {'title': 'Updated'},
         version: 5,
         status: SyncOperationStatus.pending,
         createdAt: DateTime.now(),
@@ -242,8 +248,9 @@ void main() {
 
       expect(result.success, isTrue);
       final captured =
-          verify(() => mockRepository.enqueueOperation(captureAny())).captured.single
-              as SyncOperationEntity;
+          verify(() => mockRepository.enqueueOperation(captureAny()))
+              .captured
+              .single as SyncOperationEntity;
       expect(captured.version, equals(5));
     });
 
@@ -284,7 +291,8 @@ void main() {
         },
       ];
 
-      when(() => mockRepository.enqueueOperations(any())).thenAnswer((_) async => 3);
+      when(() => mockRepository.enqueueOperations(any()))
+          .thenAnswer((_) async => 3);
 
       final result = await syncQueueService.enqueueOperations(operations);
 
@@ -311,14 +319,17 @@ void main() {
         },
       ];
 
-      when(() => mockRepository.enqueueOperations(any())).thenAnswer((_) async => 2);
+      when(() => mockRepository.enqueueOperations(any()))
+          .thenAnswer((_) async => 2);
 
       final result = await syncQueueService.enqueueOperations(operations);
 
       expect(result.success, isTrue);
 
-      final captured = verify(() => mockRepository.enqueueOperations(captureAny()))
-          .captured.single as List<SyncOperationEntity>;
+      final captured =
+          verify(() => mockRepository.enqueueOperations(captureAny()))
+              .captured
+              .single as List<SyncOperationEntity>;
 
       expect(captured[0].priority, equals(SyncPriority.high));
       expect(captured[1].priority, equals(SyncPriority.low));
@@ -343,7 +354,8 @@ void main() {
     });
 
     test('should handle empty batch operations', () async {
-      when(() => mockRepository.enqueueOperations(any())).thenAnswer((_) async => 0);
+      when(() => mockRepository.enqueueOperations(any()))
+          .thenAnswer((_) async => 0);
 
       final result = await syncQueueService.enqueueOperations([]);
 
@@ -360,7 +372,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -369,13 +381,14 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {'content': 'Updated'},
+          data: const {'content': 'Updated'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => operations);
       when(() => mockRepository.markAsProcessing(1)).thenAnswer((_) async => 1);
       when(() => mockRepository.markAsProcessing(2)).thenAnswer((_) async => 1);
@@ -404,7 +417,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -413,18 +426,20 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {'content': 'Updated'},
+          data: const {'content': 'Updated'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => operations);
       when(() => mockRepository.markAsProcessing(1)).thenAnswer((_) async => 1);
       when(() => mockRepository.markAsProcessing(2)).thenAnswer((_) async => 1);
       when(() => mockRepository.markAsCompleted(1)).thenAnswer((_) async => 1);
-      when(() => mockRepository.markAsFailed(2, any())).thenAnswer((_) async => 1);
+      when(() => mockRepository.markAsFailed(2, any()))
+          .thenAnswer((_) async => 1);
 
       final result = await syncQueueService.processPendingOperations(
         onProcess: (operation) async {
@@ -446,16 +461,18 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => operations);
       when(() => mockRepository.markAsProcessing(1)).thenAnswer((_) async => 1);
-      when(() => mockRepository.markAsFailed(1, any())).thenAnswer((_) async => 1);
+      when(() => mockRepository.markAsFailed(1, any()))
+          .thenAnswer((_) async => 1);
 
       final result = await syncQueueService.processPendingOperations(
         onProcess: (operation) async {
@@ -470,7 +487,8 @@ void main() {
 
     test('should return success with zero operations when queue is empty',
         () async {
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => []);
 
       final result = await syncQueueService.processPendingOperations(
@@ -500,8 +518,10 @@ void main() {
           .thenAnswer((_) async => operations.take(5).toList());
 
       for (int i = 1; i <= 5; i++) {
-        when(() => mockRepository.markAsProcessing(i)).thenAnswer((_) async => 1);
-        when(() => mockRepository.markAsCompleted(i)).thenAnswer((_) async => 1);
+        when(() => mockRepository.markAsProcessing(i))
+            .thenAnswer((_) async => 1);
+        when(() => mockRepository.markAsCompleted(i))
+            .thenAnswer((_) async => 1);
       }
 
       final result = await syncQueueService.processPendingOperations(
@@ -523,7 +543,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.failed,
           retryCount: 1,
           maxRetries: 3,
@@ -535,7 +555,7 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {'content': 'Updated'},
+          data: const {'content': 'Updated'},
           status: SyncOperationStatus.failed,
           retryCount: 2,
           maxRetries: 3,
@@ -583,8 +603,10 @@ void main() {
       expect(result.success, isTrue);
       expect(result.operationsCount, equals(10));
 
-      final captured = verify(() => mockRepository.resetOperationsForRetry(captureAny()))
-          .captured.single as List<int>;
+      final captured =
+          verify(() => mockRepository.resetOperationsForRetry(captureAny()))
+              .captured
+              .single as List<int>;
       expect(captured, hasLength(10));
     });
 
@@ -646,7 +668,8 @@ void main() {
     });
 
     test('should clear all operations', () async {
-      when(() => mockRepository.clearAllOperations()).thenAnswer((_) async => 20);
+      when(() => mockRepository.clearAllOperations())
+          .thenAnswer((_) async => 20);
 
       final result = await syncQueueService.clearAllOperations();
 
@@ -671,7 +694,8 @@ void main() {
           .thenAnswer((_) async => 0);
 
       final emissionList = <int>[];
-      final subscription = syncQueueService.queueSizeStream.listen(emissionList.add);
+      final subscription =
+          syncQueueService.queueSizeStream.listen(emissionList.add);
 
       await syncQueueService.clearOldCompletedOperations();
 
@@ -682,15 +706,15 @@ void main() {
 
   group('SyncQueueService - Lifecycle Management', () {
     test('should initialize successfully', () async {
-      when(() => mockRepository.getOperationsByStatus(SyncOperationStatus.processing))
-          .thenAnswer((_) async => []);
+      when(() => mockRepository.getOperationsByStatus(
+          SyncOperationStatus.processing)).thenAnswer((_) async => []);
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 0);
 
       final initialized = await syncQueueService.initialize();
 
       expect(initialized, isTrue);
-      verify(() => mockRepository.getOperationsByStatus(SyncOperationStatus.processing))
-          .called(1);
+      verify(() => mockRepository
+          .getOperationsByStatus(SyncOperationStatus.processing)).called(1);
       verify(() => mockRepository.getQueueSize()).called(1);
     });
 
@@ -701,7 +725,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.processing,
           createdAt: DateTime.now(),
         ),
@@ -710,14 +734,14 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {'content': 'Updated'},
+          data: const {'content': 'Updated'},
           status: SyncOperationStatus.processing,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getOperationsByStatus(SyncOperationStatus.processing))
-          .thenAnswer((_) async => stuckOps);
+      when(() => mockRepository.getOperationsByStatus(
+          SyncOperationStatus.processing)).thenAnswer((_) async => stuckOps);
       when(() => mockRepository.resetOperationsForRetry(any()))
           .thenAnswer((_) async => 2);
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 2);
@@ -729,7 +753,8 @@ void main() {
     });
 
     test('should handle initialization errors gracefully', () async {
-      when(() => mockRepository.getOperationsByStatus(SyncOperationStatus.processing))
+      when(() => mockRepository
+              .getOperationsByStatus(SyncOperationStatus.processing))
           .thenThrow(Exception('Database error'));
 
       final initialized = await syncQueueService.initialize();
@@ -753,7 +778,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-normal',
           operation: SyncOperationType.create,
-          data: {'title': 'Normal Priority'},
+          data: const {'title': 'Normal Priority'},
           priority: SyncPriority.normal,
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
@@ -763,7 +788,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-high',
           operation: SyncOperationType.create,
-          data: {'title': 'High Priority'},
+          data: const {'title': 'High Priority'},
           priority: SyncPriority.high,
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
@@ -773,7 +798,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-low',
           operation: SyncOperationType.create,
-          data: {'title': 'Low Priority'},
+          data: const {'title': 'Low Priority'},
           priority: SyncPriority.low,
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
@@ -781,7 +806,8 @@ void main() {
       ];
 
       // Mock repository returns operations already sorted by priority
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => [
                 operations[1], // high priority
                 operations[0], // normal priority
@@ -789,8 +815,10 @@ void main() {
               ]);
 
       for (int i = 1; i <= 3; i++) {
-        when(() => mockRepository.markAsProcessing(i)).thenAnswer((_) async => 1);
-        when(() => mockRepository.markAsCompleted(i)).thenAnswer((_) async => 1);
+        when(() => mockRepository.markAsProcessing(i))
+            .thenAnswer((_) async => 1);
+        when(() => mockRepository.markAsCompleted(i))
+            .thenAnswer((_) async => 1);
       }
 
       final processedIds = <int>[];
@@ -813,7 +841,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Older'},
+          data: const {'title': 'Older'},
           priority: SyncPriority.normal,
           status: SyncOperationStatus.pending,
           createdAt: now.subtract(const Duration(minutes: 10)),
@@ -823,7 +851,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-2',
           operation: SyncOperationType.create,
-          data: {'title': 'Newer'},
+          data: const {'title': 'Newer'},
           priority: SyncPriority.normal,
           status: SyncOperationStatus.pending,
           createdAt: now.subtract(const Duration(minutes: 5)),
@@ -831,7 +859,8 @@ void main() {
       ];
 
       // Repository should return older operations first within same priority
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => [operations[0], operations[1]]);
 
       when(() => mockRepository.markAsProcessing(1)).thenAnswer((_) async => 1);
@@ -859,7 +888,7 @@ void main() {
         entityType: 'trip',
         entityId: 'trip-123',
         operation: SyncOperationType.create,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
         status: SyncOperationStatus.pending,
         createdAt: DateTime.now(),
       );
@@ -888,7 +917,8 @@ void main() {
       );
 
       // Verify operations are still in queue
-      when(() => mockRepository.getOperationsByStatus(SyncOperationStatus.pending))
+      when(() =>
+              mockRepository.getOperationsByStatus(SyncOperationStatus.pending))
           .thenAnswer((_) async => []);
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 1);
 
@@ -907,7 +937,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -916,19 +946,22 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {'content': 'Updated'},
+          data: const {'content': 'Updated'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getOperationsByStatus(SyncOperationStatus.processing))
-          .thenAnswer((_) async => []);
+      when(() => mockRepository.getOperationsByStatus(
+          SyncOperationStatus.processing)).thenAnswer((_) async => []);
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 2);
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => pendingOps);
-      when(() => mockRepository.markAsProcessing(any())).thenAnswer((_) async => 1);
-      when(() => mockRepository.markAsCompleted(any())).thenAnswer((_) async => 1);
+      when(() => mockRepository.markAsProcessing(any()))
+          .thenAnswer((_) async => 1);
+      when(() => mockRepository.markAsCompleted(any()))
+          .thenAnswer((_) async => 1);
 
       await syncQueueService.initialize();
 
@@ -947,14 +980,14 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.processing,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getOperationsByStatus(SyncOperationStatus.processing))
-          .thenAnswer((_) async => stuckOps);
+      when(() => mockRepository.getOperationsByStatus(
+          SyncOperationStatus.processing)).thenAnswer((_) async => stuckOps);
       when(() => mockRepository.resetOperationsForRetry(any()))
           .thenAnswer((_) async => 1);
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 1);
@@ -978,7 +1011,8 @@ void main() {
         },
       );
 
-      when(() => mockRepository.enqueueOperations(any())).thenAnswer((_) async => 100);
+      when(() => mockRepository.enqueueOperations(any()))
+          .thenAnswer((_) async => 100);
 
       final stopwatch = Stopwatch()..start();
 
@@ -1016,15 +1050,18 @@ void main() {
         },
       ];
 
-      when(() => mockRepository.enqueueOperations(any())).thenAnswer((_) async => 3);
+      when(() => mockRepository.enqueueOperations(any()))
+          .thenAnswer((_) async => 3);
 
       final result = await syncQueueService.enqueueOperations(operations);
 
       expect(result.success, isTrue);
       expect(result.operationsCount, equals(3));
 
-      final captured = verify(() => mockRepository.enqueueOperations(captureAny()))
-          .captured.single as List<SyncOperationEntity>;
+      final captured =
+          verify(() => mockRepository.enqueueOperations(captureAny()))
+              .captured
+              .single as List<SyncOperationEntity>;
 
       expect(captured[0].operation, equals(SyncOperationType.create));
       expect(captured[1].operation, equals(SyncOperationType.update));
@@ -1055,16 +1092,18 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockRepository.getPendingOperations(limit: any(named: 'limit')))
+      when(() =>
+              mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => operations);
       when(() => mockRepository.markAsProcessing(1)).thenAnswer((_) async => 1);
-      when(() => mockRepository.markAsFailed(1, any())).thenAnswer((_) async => 1);
+      when(() => mockRepository.markAsFailed(1, any()))
+          .thenAnswer((_) async => 1);
 
       final result = await syncQueueService.processPendingOperations(
         onProcess: (operation) async {
@@ -1083,7 +1122,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Trip'},
+          data: const {'title': 'Trip'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),

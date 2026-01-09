@@ -168,7 +168,7 @@ class StatusSelectorWidget extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: enabled ? color : color.withOpacity(0.5),
+            color: enabled ? color : color.withValues(alpha: 0.5),
             size: 20,
           ),
           const SizedBox(width: 8),
@@ -196,7 +196,7 @@ class StatusSelectorWidget extends StatelessWidget {
           return color;
         }
         if (states.contains(WidgetState.disabled)) {
-          return color.withOpacity(0.38);
+          return color.withValues(alpha: 0.38);
         }
         return null;
       }),
@@ -281,13 +281,11 @@ class StatusSelectorCompact extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? color.withOpacity(0.15)
-              : color.withOpacity(0.05),
+              ? color.withValues(alpha: 0.15)
+              : color.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? color
-                : color.withOpacity(0.3),
+            color: isSelected ? color : color.withValues(alpha: 0.3),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -296,7 +294,7 @@ class StatusSelectorCompact extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: enabled ? color : color.withOpacity(0.5),
+              color: enabled ? color : color.withValues(alpha: 0.5),
               size: 24,
             ),
             if (showLabels) ...[
@@ -304,7 +302,7 @@ class StatusSelectorCompact extends StatelessWidget {
               Text(
                 label,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: enabled ? color : color.withOpacity(0.5),
+                  color: enabled ? color : color.withValues(alpha: 0.5),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -358,9 +356,7 @@ class StatusSelectorDropdown extends StatelessWidget {
           icon: Icon(Icons.warning, size: 18),
         ),
       ],
-      selected: selectedStatus != null
-          ? {selectedStatus!}
-          : {},
+      selected: selectedStatus != null ? {selectedStatus!} : {},
       onSelectionChanged: enabled
           ? (Set<safety.SafetyStatusType> newSelection) {
               if (newSelection.isNotEmpty && onStatusChanged != null) {
@@ -374,11 +370,11 @@ class StatusSelectorDropdown extends StatelessWidget {
           if (states.contains(WidgetState.selected)) {
             final status = selectedStatus;
             if (status == safety.SafetyStatusType.safe) {
-              return Colors.green.withOpacity(0.15);
+              return Colors.green.withValues(alpha: 0.15);
             } else if (status == safety.SafetyStatusType.needHelp) {
-              return Colors.orange.withOpacity(0.15);
+              return Colors.orange.withValues(alpha: 0.15);
             } else if (status == safety.SafetyStatusType.emergency) {
-              return Colors.red.withOpacity(0.15);
+              return Colors.red.withValues(alpha: 0.15);
             }
           }
           return null;
@@ -458,7 +454,7 @@ class StatusDisplayWidget extends StatelessWidget {
           fontSize: 12,
         ),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
       visualDensity: VisualDensity.compact,
     );
@@ -566,10 +562,13 @@ class StatusDisplayWidget extends StatelessWidget {
 enum StatusDisplayStyle {
   /// Chip with icon and label
   chip,
+
   /// Icon only
   icon,
+
   /// Icon with label (horizontal row)
   iconWithLabel,
+
   /// Badge style with solid background
   badge,
 }

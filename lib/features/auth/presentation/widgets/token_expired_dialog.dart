@@ -19,7 +19,7 @@ class TokenExpiredDialog extends ConsumerWidget {
             Navigator.of(context).pop();
             // Clear the session and navigate to login
             ref.read(tokenManagerProvider.notifier).clearSession();
-            ref.read(authNavigationProvider.notifier).navigateToLogin();
+            ref.read(authNavigationProvider.notifier).navigateToLogin(context);
           },
           child: const Text('Sign In'),
         ),

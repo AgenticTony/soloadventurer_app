@@ -1,86 +1,53 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/trusted_contact.dart';
 
-/// State for trusted contacts management
-/// Manages the list of trusted contacts and CRUD operations
-class TrustedContactsState extends Equatable {
-  /// Whether contacts are currently loading
-  final bool isLoading;
+part 'trusted_contacts_state.freezed.dart';
 
-  /// Whether an add operation is in progress
-  final bool isAdding;
+/// Immutable state for Trusted Contacts.
+///
+/// Riverpod 2 Compliant:
+/// - All fields must be final (enforced by freezed)
+/// - NO getters - all derived values are fields
+/// - isLoading and error are ALWAYS fields on state
+/// - State is NEVER nullable
+@freezed
+class TrustedContactsState with _$TrustedContactsState {
+  const TrustedContactsState._();
 
-  /// Whether an update operation is in progress
-  final bool isUpdating;
+  const factory TrustedContactsState({
+    /// Loading indicator - always a field on State
+    @Default(false) bool isLoading,
 
-  /// Whether a remove operation is in progress
-  final bool isRemoving;
+    /// Whether an add operation is in progress
+    @Default(false) bool isAdding,
 
-  /// List of all trusted contacts
-  final List<TrustedContact> contacts;
+    /// Whether an update operation is in progress
+    @Default(false) bool isUpdating,
 
-  /// Currently selected contact (for editing/viewing)
-  final TrustedContact? selectedContact;
+    /// Whether a remove operation is in progress
+    @Default(false) bool isRemoving,
 
-  /// Error message if any operation failed
-  final String? error;
+    /// List of all trusted contacts
+    @Default([]) List<TrustedContact> contacts,
 
-  /// Whether there are any trusted contacts
-  bool get hasContacts => contacts.isNotEmpty;
-
-  /// Whether operations are in progress
-  bool get isProcessing => isAdding || isUpdating || isRemoving;
-
-  /// Count of contacts receiving emergency alerts
-  int get emergencyContactsCount => contacts
-      .where((contact) => contact.receivesEmergencyAlerts)
-      .length;
-
-  /// Count of contacts with location sharing enabled
-  int get locationSharingCount => contacts
-      .where((contact) => contact.locationSharingEnabled)
-      .length;
-
-  const TrustedContactsState({
-    this.isLoading = false,
-    this.isAdding = false,
-    this.isUpdating = false,
-    this.isRemoving = false,
-    this.contacts = const [],
-    this.selectedContact,
-    this.error,
-  });
-
-  /// Creates a copy of this state with the given fields replaced
-  TrustedContactsState copyWith({
-    bool? isLoading,
-    bool? isAdding,
-    bool? isUpdating,
-    bool? isRemoving,
-    List<TrustedContact>? contacts,
+    /// Currently selected contact (for editing/viewing)
     TrustedContact? selectedContact,
-    String? error,
-    bool clearSelected = false,
-  }) {
-    return TrustedContactsState(
-      isLoading: isLoading ?? this.isLoading,
-      isAdding: isAdding ?? this.isAdding,
-      isUpdating: isUpdating ?? this.isUpdating,
-      isRemoving: isRemoving ?? this.isRemoving,
-      contacts: contacts ?? this.contacts,
-      selectedContact: clearSelected ? null : (selectedContact ?? this.selectedContact),
-      error: error ?? this.error,
-    );
-  }
 
-  @override
-  List<Object?> get props => [
-        isLoading,
-        isAdding,
-        isUpdating,
-        isRemoving,
-        contacts,
-        selectedContact,
-        error,
-      ];
+    /// Error message - always a field on State
+    String? error,
+
+    /// Whether there are any trusted contacts (was a getter, now a field)
+    @Default(false) bool hasContacts,
+
+    /// Whether operations are in progress (was a getter, now a field)
+    @Default(false) bool isProcessing,
+
+    /// Count of contacts receiving emergency alerts (was a getter, now a field)
+    @Default(0) int emergencyContactsCount,
+
+    /// Count of contacts with location sharing enabled (was a getter, now a field)
+    @Default(0) int locationSharingCount,
+  }) = _TrustedContactsState;
+
+  factory TrustedContactsState.initial() => const TrustedContactsState();
 }

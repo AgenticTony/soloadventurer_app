@@ -1,0 +1,42 @@
+mutation TriggerEmergencySOS(
+  $userId: ID!
+  $message: String
+  $location: SafetyAlertLocationInput!
+  $notifyContactIds: [String!]!
+  $batteryLevel: Int
+  $tripId: String
+) {
+  triggerEmergencySOS(
+    userId: $userId
+    message: $message
+    location: $location
+    notifyContactIds: $notifyContactIds
+    batteryLevel: $batteryLevel
+    tripId: $tripId
+  ) {
+    id
+    userId
+    alertType
+    status
+    location {
+      latitude
+      longitude
+      accuracy
+      altitude
+      timestamp
+      address
+      placeName
+    }
+    message
+    notifiedContactIds
+    acknowledgedByContactIds
+    batteryLevel
+    triggeredAt
+    resolvedAt
+    canceledAt
+    tripId
+    checkInId
+    createdAt
+    updatedAt
+  }
+}

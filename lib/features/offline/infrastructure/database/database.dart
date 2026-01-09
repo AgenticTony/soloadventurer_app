@@ -5,6 +5,11 @@ import 'package:path/path.dart' as p;
 import 'dart:io';
 
 import 'schema.dart';
+import 'dao/trip_dao.dart';
+import 'dao/journal_dao.dart';
+import 'dao/user_dao.dart';
+import 'dao/sync_queue_dao.dart';
+import 'dao/itinerary_dao.dart';
 
 /// Part file for Drift database generated code
 part 'database.g.dart';
@@ -21,7 +26,7 @@ part 'database.g.dart';
 /// - **Conflict Resolution**: Version tracking enables conflict detection
 ///
 /// **Database Version**: 1
-/// **Tables**: Trips, Journals, Users, SyncQueue, SyncMetadata
+/// **Tables**: Trips, Journals, Users, SyncQueue, SyncMetadata, Itineraries, ItineraryItems
 ///
 /// Example usage:
 /// ```dart
@@ -35,13 +40,15 @@ part 'database.g.dart';
   Users,
   SyncQueue,
   SyncMetadataTable,
+  Itineraries,
+  ItineraryItems,
 ])
 class AppDatabase extends _$AppDatabase {
   /// Current database schema version
   ///
   /// Increment this value when making breaking changes to the schema.
   /// Migration logic will be required to upgrade from older versions.
-  static const int schemaVersion = 1;
+  static const int currentSchemaVersion = 1;
 
   /// Database filename
   static const String dbName = 'soloadventurer.db';
@@ -50,8 +57,7 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// The [executor] parameter is optional and primarily used for testing.
   /// In production, the database is stored in the app's documents directory.
-  AppDatabase({QueryExecutor? executor})
-      : super(executor ?? _openDatabase());
+  AppDatabase({QueryExecutor? executor}) : super(executor ?? _openDatabase());
 
   /// Opens the database in the app's documents directory
   ///
@@ -80,7 +86,7 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// This must match the @DriftDatabase annotation version.
   @override
-  int get schemaVersion => schemaVersion;
+  int get schemaVersion => currentSchemaVersion;
 
   /// Migration strategy for database schema changes
   ///
@@ -198,4 +204,23 @@ class AppDatabase extends _$AppDatabase {
       // File might not exist or permissions might prevent deletion
     }
   }
+
+  // ==============================================================================
+  // DAO ACCESSORS
+  // ==============================================================================
+
+  /// Data Access Object for Trips table
+  TripDao get tripDao => TripDao(this);
+
+  /// Data Access Object for Journals table
+  JournalDao get journalDao => JournalDao(this);
+
+  /// Data Access Object for Users table
+  UserDao get userDao => UserDao(this);
+
+  /// Data Access Object for SyncQueue table
+  SyncQueueDao get syncQueueDao => SyncQueueDao(this);
+
+  /// Data Access Object for Itineraries and ItineraryItems tables
+  ItineraryDao get itineraryDao => ItineraryDao(this);
 }

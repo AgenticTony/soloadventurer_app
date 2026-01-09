@@ -13,7 +13,7 @@ _$LocationUpdateOperationImpl _$$LocationUpdateOperationImplFromJson(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       timestamp: DateTime.parse(json['timestamp'] as String),
-      priority: (json['priority'] as num?)?.toInt() ?? OperationPriority.low,
+      priority: (json['priority'] as num).toInt(),
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),

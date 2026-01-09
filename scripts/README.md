@@ -123,12 +123,64 @@ dart scripts/db_migration.dart snapshot --output schema.sql
 dart scripts/db_migration.dart --help
 ```
 
+### 5. Auth Architecture Validator (`validate_auth_architecture.sh`)
+
+A shell script to validate the Auth feature's architecture and ensure it follows consistent patterns.
+
+**Features:**
+
+- Validates AuthState structure and required fields
+- Checks for proper AuthNotifier implementations
+- Ensures provider files exist and follow naming conventions
+- Detects forbidden patterns (pseudo-type checking with 'is' keyword)
+- Verifies state constructor patterns
+- Checks for proper field access patterns
+- Identifies duplicate AuthNotifier classes
+- Validates no problematic .state access
+
+**Usage:**
+
+```bash
+# Make sure the script is executable
+chmod +x scripts/validate_auth_architecture.sh
+
+# Run the validation
+./scripts/validate_auth_architecture.sh
+```
+
+**Exit Codes:**
+
+- `0`: All checks passed
+- `1`: Critical checks failed (state file missing, no providers, forbidden patterns)
+- Script will exit immediately on critical failures
+
+**What It Checks:**
+
+1. ✅ AuthState file exists with proper structure
+2. ✅ AuthNotifier files present
+3. ✅ Provider files exist
+4. ✅ No pseudo-type checking with 'is' keyword
+5. ✅ State constructors follow pattern
+6. ✅ Proper field access patterns used
+7. ✅ Provider naming consistent
+8. ✅ No problematic .state access
+
+**Integration with CI:**
+
+Add to your CI pipeline:
+
+```yaml
+- name: Validate Auth Architecture
+  run: ./scripts/validate_auth_architecture.sh
+```
+
 ## Dependencies
 
 - **measure_performance.dart**: No external dependencies
 - **run_tests.sh**: Requires bash shell
 - **analyze_feedback.py**: Requires Python 3 with pandas and matplotlib
 - **db_migration.dart**: Requires Dart with path and args packages
+- **validate_auth_architecture.sh**: Requires bash shell and grep
 
 ## Adding New Scripts
 

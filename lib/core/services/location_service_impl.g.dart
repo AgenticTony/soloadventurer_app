@@ -7,7 +7,7 @@ part of 'location_service_impl.dart';
 // **************************************************************************
 
 String _$locationServiceImplHash() =>
-    r'178106535539775e4d3d34c9ec96432feaf34838';
+    r'bde99dc9ade45e54e20ab03249926a28f189ad37';
 
 /// Provider for LocationServiceImpl
 ///
@@ -28,7 +28,7 @@ final locationServiceImplProvider =
 // ignore: unused_element
 typedef LocationServiceImplRef = AutoDisposeProviderRef<LocationService>;
 String _$locationServiceOverrideHash() =>
-    r'7b7fc688e47d5ee518b2c60fcb6f241645508f84';
+    r'7605a9afd45500a615e8ff39dd13bca14b32e9ea';
 
 /// Provider override for LocationService interface
 ///

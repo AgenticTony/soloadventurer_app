@@ -145,14 +145,14 @@ class PerformanceMonitoring {
 /// // Initialize in your app startup
 /// final monitoringService = AwsCloudWatchMonitoring(apiService);
 /// PerformanceMonitoring.initialize(monitoringService);
-/// 
+///
 /// // Measure network operations
 /// final userData = await PerformanceMonitoring.measureNetworkOperation(
 ///   operationName: 'fetch_user_profile',
 ///   operation: () => apiService.getUserProfile(userId),
 ///   threshold: PerformanceThresholds.apiCall,
 /// );
-/// 
+///
 /// // Measure UI operations
 /// await PerformanceMonitoring.measureUiOperation(
 ///   operationName: 'render_trip_list',
@@ -163,7 +163,7 @@ class PerformanceMonitoring {
 ///   },
 ///   threshold: PerformanceThresholds.listRendering,
 /// );
-/// 
+///
 /// // Generate a report
 /// final report = PerformanceMonitoring.generatePerformanceReport();
 /// print(report);

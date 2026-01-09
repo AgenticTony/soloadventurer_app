@@ -1,96 +1,98 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter/material.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
-import 'package:flutter/material.dart';
 import '../../domain/services/token_manager.dart';
 
+part 'auth_navigation_provider.g.dart';
+
 /// Provider for handling auth-related navigation state
-final authNavigationProvider =
-    StateNotifierProvider<AuthNavigationNotifier, AuthNavigationState>((ref) {
-  return AuthNavigationNotifier(ref);
-});
+///
+/// Uses Riverpod 3.0 @riverpod annotation with Notifier pattern.
+/// Monitors auth state changes and handles navigation accordingly.
+@riverpod
+class AuthNavigation extends _$AuthNavigation {
+  /// Get the current route
+  String getCurrentRoute() {
+    return state.currentRequest?.route ?? '/';
+  }
 
-/// Notifier for handling auth-related navigation
-class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
-  final Ref _ref;
-
-  /// Creates a new [AuthNavigationNotifier]
-  AuthNavigationNotifier(this._ref) : super(AuthNavigationState.initial()) {
+  @override
+  AuthNavigationState build() {
     // Listen to auth state changes
-    _ref.listen(authStateProvider, (previous, next) {
-      debugPrint('AuthNavigationNotifier: Auth state changed');
-      debugPrint('AuthNavigationNotifier: Previous state: $previous');
-      debugPrint('AuthNavigationNotifier: Next state: $next');
+    ref.listen(authNotifierProvider, (previous, next) {
+      final authState = next.value;
+      if (authState == null) return;
+
+      debugPrint('AuthNavigation: Auth state changed');
+      debugPrint('AuthNavigation: Previous state: $previous');
+      debugPrint('AuthNavigation: Next state: $authState');
 
       // Only navigate if we're not already on the target route
       final currentRoute = getCurrentRoute();
 
       // Email verification takes highest priority
-      if (next.requiresEmailVerification) {
-        debugPrint('AuthNavigationNotifier: User needs verification');
+      if (authState.requiresEmailVerification) {
+        debugPrint('AuthNavigation: User needs verification');
         if (currentRoute != AuthRoutes.verifyEmail) {
-          debugPrint('AuthNavigationNotifier: Navigating to verify email');
-          navigateToVerification(next.user?.email);
+          debugPrint('AuthNavigation: Navigating to verify email');
+          navigateToVerification(authState.user?.email);
         } else {
-          debugPrint('AuthNavigationNotifier: Already on verify email screen');
+          debugPrint('AuthNavigation: Already on verify email screen');
         }
         return; // Early return to prevent other navigation
       }
 
       // Password reset takes second priority
-      if (next.requiresPasswordReset) {
-        debugPrint('AuthNavigationNotifier: Password reset required');
+      if (authState.requiresPasswordReset) {
+        debugPrint('AuthNavigation: Password reset required');
         if (currentRoute != AuthRoutes.confirmPasswordReset) {
-          debugPrint(
-              'AuthNavigationNotifier: Navigating to confirm password reset');
-          navigateToConfirmPasswordReset(next.user?.email ?? '');
+          debugPrint('AuthNavigation: Navigating to confirm password reset');
+          navigateToConfirmPasswordReset(authState.user?.email ?? '');
         } else {
           debugPrint(
-              'AuthNavigationNotifier: Already on confirm password reset screen');
+              'AuthNavigation: Already on confirm password reset screen');
         }
         return; // Early return to prevent other navigation
       }
 
       // Only handle login/home navigation if no special states are active
-      if (!next.requiresEmailVerification && !next.requiresPasswordReset) {
-        if (next.isLoggedIn) {
-          debugPrint(
-              'AuthNavigationNotifier: User is logged in, navigating to home');
+      if (!authState.requiresEmailVerification &&
+          !authState.requiresPasswordReset) {
+        if (authState.isAuthenticated) {
+          debugPrint('AuthNavigation: User is logged in, navigating to home');
           navigateToHome();
         } else {
           debugPrint(
-              'AuthNavigationNotifier: User is not logged in, navigating to login');
+              'AuthNavigation: User is not logged in, navigating to login');
           navigateToLogin(null);
         }
       }
     });
 
     // Listen to token manager state changes
-    _ref.listen(tokenManagerProvider, (previous, next) {
+    ref.listen(tokenManagerProvider, (previous, next) {
       if (next == FeatureAvailability.unauthorized) {
         _handleUnauthorized();
       }
     });
-  }
 
-  /// Get the current route
-  String getCurrentRoute() {
-    return state.currentRequest?.route ?? '/';
+    return AuthNavigationState.initial();
   }
 
   /// Handle unauthorized state
   void _handleUnauthorized() {
-    debugPrint('AuthNavigationNotifier: Handling unauthorized state');
+    debugPrint('AuthNavigation: Handling unauthorized state');
     navigateToLogin(null);
   }
 
   /// Navigate to confirm password reset screen
   void navigateToConfirmPasswordReset(String email) {
     debugPrint(
-        'AuthNavigationNotifier: Navigating to confirm password reset with email: $email');
+        'AuthNavigation: Navigating to confirm password reset with email: $email');
     navigateTo(
       AuthRoutes.confirmPasswordReset,
       arguments: {'email': email},
@@ -99,11 +101,12 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Check if navigation to a route is allowed
   bool _canNavigate(String route) {
-    final authState = _ref.read(authStateProvider);
+    final authState = ref.read(authNotifierProvider).valueOrNull;
+    if (authState == null) return false;
 
     switch (route) {
       case AuthRoutes.home:
-        if (!authState.isLoggedIn) {
+        if (!authState.isAuthenticated) {
           _setNavigationError('Authentication required to access home');
           return false;
         }
@@ -122,11 +125,11 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         // Block navigation to auth screens if user needs verification
         if (authState.requiresEmailVerification) {
           debugPrint(
-              'AuthNavigationNotifier: Blocking navigation to $route - email verification required');
+              'AuthNavigation: Blocking navigation to $route - email verification required');
           return false;
         }
         // Allow navigation to auth screens if not logged in
-        if (!authState.isLoggedIn) return true;
+        if (!authState.isAuthenticated) return true;
         _setNavigationError('Already authenticated');
         return false;
 
@@ -137,7 +140,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
   /// Set navigation error
   void _setNavigationError(String message) {
-    debugPrint('AuthNavigationNotifier: Setting error: $message');
+    debugPrint('AuthNavigation: Setting error: $message');
     // Only set the error if it's different from the current error
     if (state.error != message) {
       state = state.copyWith(error: message);
@@ -205,19 +208,17 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
   /// Request navigation to a specific route (internal use)
   void navigateTo(String route, {Map<String, dynamic>? arguments}) {
     debugPrint(
-        'AuthNavigationNotifier: Requesting navigation to $route with arguments: $arguments');
+        'AuthNavigation: Requesting navigation to $route with arguments: $arguments');
 
     // Clear any previous errors
     clearError();
 
     // Special handling for confirm password reset
     if (route == AuthRoutes.confirmPasswordReset) {
-      debugPrint(
-          'AuthNavigationNotifier: Handling confirm password reset navigation');
+      debugPrint('AuthNavigation: Handling confirm password reset navigation');
       final email = arguments?['email'] as String?;
       if (email == null || email.isEmpty) {
-        debugPrint(
-            'AuthNavigationNotifier: No email provided for password reset');
+        debugPrint('AuthNavigation: No email provided for password reset');
         // Instead of setting an error, just return without navigation
         return;
       }
@@ -225,7 +226,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 
     // Check if navigation is allowed
     if (!_canNavigate(route)) {
-      debugPrint('AuthNavigationNotifier: Navigation not allowed to $route');
+      debugPrint('AuthNavigation: Navigation not allowed to $route');
       return;
     }
 
@@ -238,19 +239,18 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
         arguments: arguments,
       );
 
-      debugPrint(
-          'AuthNavigationNotifier: Creating navigation request: $request');
+      debugPrint('AuthNavigation: Creating navigation request: $request');
       state = state.copyWith(
         currentRequest: request,
         history: [...state.history, request],
         error: null, // Clear any previous errors
       );
-      debugPrint('AuthNavigationNotifier: New state after navigation: $state');
+      debugPrint('AuthNavigation: New state after navigation: $state');
 
       // Run post-navigation middleware
       _afterNavigation(route);
     } catch (e) {
-      debugPrint('AuthNavigationNotifier: Navigation failed: $e');
+      debugPrint('AuthNavigation: Navigation failed: $e');
       _setNavigationError('Failed to navigate: ${e.toString()}');
       // Run post-navigation middleware with failure status
       _afterNavigation(route, success: false);
@@ -352,6 +352,7 @@ class AuthNavigationNotifier extends StateNotifier<AuthNavigationState> {
 }
 
 /// Global navigator key for handling navigation from providers
-final navigatorKeyProvider = Provider<GlobalKey<NavigatorState>>((ref) {
+@riverpod
+GlobalKey<NavigatorState> navigatorKey(NavigatorKeyRef ref) {
   return GlobalKey<NavigatorState>();
-});
+}

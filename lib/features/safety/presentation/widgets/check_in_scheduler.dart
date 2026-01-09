@@ -88,7 +88,7 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
   DateTime? _scheduledTime;
   DateTime? _deadline;
   CheckInLocation? _location;
-  List<String> _selectedContactIds = [];
+  final List<String> _selectedContactIds = [];
   bool _isLoadingLocation = false;
   String? _locationError;
   bool _isCustomDeadline = false;
@@ -96,7 +96,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
   @override
   void initState() {
     super.initState();
-    _selectedTriggerType = widget.initialTriggerType ?? CheckInTriggerType.scheduledTime;
+    _selectedTriggerType =
+        widget.initialTriggerType ?? CheckInTriggerType.scheduledTime;
     _scheduledTime = widget.initialScheduledTime;
     _deadline = widget.initialDeadline;
     if (widget.initialTripId != null) {
@@ -141,7 +142,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
           // Location input for location-based triggers
           if (widget.showLocationInput &&
               (_selectedTriggerType == CheckInTriggerType.locationArrival ||
-                  _selectedTriggerType == CheckInTriggerType.locationDeparture)) ...[
+                  _selectedTriggerType ==
+                      CheckInTriggerType.locationDeparture)) ...[
             _buildLocationInput(context),
             const SizedBox(height: 16),
           ],
@@ -222,7 +224,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
               _selectedTriggerType = selected.first;
               // Auto-fetch location for location-based triggers
               if (_selectedTriggerType == CheckInTriggerType.locationArrival ||
-                  _selectedTriggerType == CheckInTriggerType.locationDeparture) {
+                  _selectedTriggerType ==
+                      CheckInTriggerType.locationDeparture) {
                 _getCurrentLocation();
               }
             });
@@ -389,7 +392,7 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
               ] else ...[
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_searching,
                       color: Colors.grey,
                     ),
@@ -431,7 +434,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
                 setState(() {
                   _isCustomDeadline = !_isCustomDeadline;
                   if (!_isCustomDeadline && _scheduledTime != null) {
-                    _deadline = _scheduledTime!.add(widget.defaultDeadlineOffset);
+                    _deadline =
+                        _scheduledTime!.add(widget.defaultDeadlineOffset);
                   }
                 });
               },
@@ -530,7 +534,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
   }
 
   /// Builds the contact selector
-  Widget _buildContactSelector(BuildContext context, TrustedContactsState state) {
+  Widget _buildContactSelector(
+      BuildContext context, TrustedContactsState state) {
     final theme = Theme.of(context);
     final contacts = state.contacts;
 
@@ -685,7 +690,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
 
     final picked = await showDatePicker(
       context: context,
-      initialDate: _deadline ?? _scheduledTime!.add(widget.defaultDeadlineOffset),
+      initialDate:
+          _deadline ?? _scheduledTime!.add(widget.defaultDeadlineOffset),
       firstDate: _scheduledTime!,
       lastDate: _scheduledTime!.add(const Duration(days: 30)),
     );
@@ -747,7 +753,8 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
       message: _messageController.text.trim().isEmpty
           ? null
           : _messageController.text.trim(),
-      notifyContactIds: _selectedContactIds.isEmpty ? null : _selectedContactIds,
+      notifyContactIds:
+          _selectedContactIds.isEmpty ? null : _selectedContactIds,
       tripId: _tripIdController.text.trim().isEmpty
           ? null
           : _tripIdController.text.trim(),

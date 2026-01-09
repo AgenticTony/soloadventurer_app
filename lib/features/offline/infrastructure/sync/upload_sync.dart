@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
-import 'package:soloadventurer/features/offline/data/models/sync_operation_model.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
 
 /// Result of an upload sync operation
@@ -121,7 +120,7 @@ class UploadSync {
 
       if (operations.isEmpty) {
         debugPrint('📭 UploadSync: No pending operations to process');
-        return UploadSyncResult(
+        return const UploadSyncResult(
           successCount: 0,
           failureCount: 0,
           failedOperations: {},
@@ -129,7 +128,8 @@ class UploadSync {
         );
       }
 
-      debugPrint('🔄 UploadSync: Processing ${operations.length} operations...');
+      debugPrint(
+          '🔄 UploadSync: Processing ${operations.length} operations...');
 
       // Process each operation
       for (int i = 0; i < operations.length; i++) {
@@ -203,7 +203,8 @@ class UploadSync {
   /// Returns [true] if the operation was successful, [false] otherwise.
   Future<bool> processOperation(SyncOperationEntity operation) async {
     try {
-      debugPrint('🔄 Processing operation immediately: ${operation.description}');
+      debugPrint(
+          '🔄 Processing operation immediately: ${operation.description}');
 
       // Mark as processing
       await _syncQueueRepository.markAsProcessing(operation.id);
@@ -274,7 +275,7 @@ class UploadSync {
         case SyncOperationType.delete:
           return await _deleteTrip(operation);
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error executing trip operation: $e');
       return false;
     }
@@ -291,7 +292,7 @@ class UploadSync {
         case SyncOperationType.delete:
           return await _deleteJournal(operation);
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error executing journal operation: $e');
       return false;
     }
@@ -312,7 +313,7 @@ class UploadSync {
           debugPrint('⚠️ User deletion through sync not supported');
           return false;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error executing user operation: $e');
       return false;
     }
@@ -332,7 +333,7 @@ class UploadSync {
           debugPrint('⚠️ Travel preference deletion not supported');
           return false;
       }
-    } catch (e) {
+    } on Object catch (e) {
       debugPrint('❌ Error executing travel preference operation: $e');
       return false;
     }
@@ -402,7 +403,7 @@ class UploadSync {
     try {
       // Note: Assuming there's a deleteTrip mutation, if not this would need
       // to be added to GraphQLQueries
-      final deleteMutation = '''
+      const deleteMutation = '''
         mutation DeleteTrip(\$id: ID!) {
           deleteTrip(id: \$id) {
             id
@@ -437,7 +438,7 @@ class UploadSync {
   Future<bool> _createJournal(SyncOperationEntity operation) async {
     try {
       // Note: Assuming there's a createJournal mutation
-      final createMutation = '''
+      const createMutation = '''
         mutation CreateJournal(
           \$tripId: ID!
           \$title: String!
@@ -500,7 +501,7 @@ class UploadSync {
   Future<bool> _updateJournal(SyncOperationEntity operation) async {
     try {
       // Note: Assuming there's an updateJournal mutation
-      final updateMutation = '''
+      const updateMutation = '''
         mutation UpdateJournal(
           \$id: ID!
           \$title: String
@@ -566,7 +567,7 @@ class UploadSync {
   Future<bool> _deleteJournal(SyncOperationEntity operation) async {
     try {
       // Note: Assuming there's a deleteJournal mutation
-      final deleteMutation = '''
+      const deleteMutation = '''
         mutation DeleteJournal(\$id: ID!) {
           deleteJournal(id: \$id) {
             id

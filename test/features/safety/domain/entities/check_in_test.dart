@@ -85,10 +85,14 @@ void main() {
     test('should handle CheckInTriggerType enum values correctly', () {
       // Assert
       expect(CheckInTriggerType.manual, equals(CheckInTriggerType.manual));
-      expect(CheckInTriggerType.scheduledTime, equals(CheckInTriggerType.scheduledTime));
-      expect(CheckInTriggerType.locationArrival, equals(CheckInTriggerType.locationArrival));
-      expect(CheckInTriggerType.locationDeparture, equals(CheckInTriggerType.locationDeparture));
-      expect(CheckInTriggerType.manual, isNot(equals(CheckInTriggerType.scheduledTime)));
+      expect(CheckInTriggerType.scheduledTime,
+          equals(CheckInTriggerType.scheduledTime));
+      expect(CheckInTriggerType.locationArrival,
+          equals(CheckInTriggerType.locationArrival));
+      expect(CheckInTriggerType.locationDeparture,
+          equals(CheckInTriggerType.locationDeparture));
+      expect(CheckInTriggerType.manual,
+          isNot(equals(CheckInTriggerType.scheduledTime)));
     });
 
     test('should handle multiple notify contact IDs', () {

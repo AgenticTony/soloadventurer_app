@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/connectivity_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
 
@@ -45,8 +46,7 @@ class ConnectivityIndicator extends ConsumerStatefulWidget {
       _ConnectivityIndicatorState();
 }
 
-class _ConnectivityIndicatorState
-    extends ConsumerState<ConnectivityIndicator>
+class _ConnectivityIndicatorState extends ConsumerState<ConnectivityIndicator>
     with SingleTickerProviderStateMixin {
   /// Animation controller for sync icon rotation
   late AnimationController _rotationController;
@@ -194,7 +194,7 @@ class _ConnectivityIndicatorState
   ) {
     // If offline, show gray
     if (!connectivityState.isConnected) {
-      return theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
+      return theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
     }
 
     // If syncing, show primary color
@@ -270,16 +270,14 @@ class _ConnectivityStatusDialog extends StatelessWidget {
             // Connection status
             _buildStatusRow(
               context,
-              icon: connectivityState.isConnected
-                  ? Icons.wifi
-                  : Icons.wifi_off,
+              icon: connectivityState.isConnected ? Icons.wifi : Icons.wifi_off,
               label: 'Connection',
               value: connectivityState.isConnected
                   ? _getConnectionTypeLabel(connectivityState.connectionType)
                   : 'Disconnected',
               color: connectivityState.isConnected
                   ? Colors.green
-                  : theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 12),
 
@@ -297,7 +295,7 @@ class _ConnectivityStatusDialog extends StatelessWidget {
             if (syncStatus.isSyncing) ...[
               _buildStatusRow(
                 context,
-                icon: Icons.progress_bar,
+                icon: Icons.linear_scale,
                 label: 'Progress',
                 value: '${(syncStatus.progress * 100).toInt()}%',
                 color: theme.colorScheme.primary,
@@ -313,7 +311,7 @@ class _ConnectivityStatusDialog extends StatelessWidget {
               value: syncStatus.pendingOperations.toString(),
               color: syncStatus.pendingOperations > 0
                   ? theme.colorScheme.secondary
-                  : theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
             const SizedBox(height: 12),
 
@@ -325,7 +323,7 @@ class _ConnectivityStatusDialog extends StatelessWidget {
               value: syncStatus.lastSyncTime != null
                   ? _formatTimestamp(syncStatus.lastSyncTime!)
                   : 'Never',
-              color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
             ),
 
             // Error message (if any)
@@ -404,7 +402,7 @@ class _ConnectivityStatusDialog extends StatelessWidget {
         Text(
           '$label:',
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
           ),
         ),
         const SizedBox(width: 4),
@@ -455,7 +453,7 @@ class _ConnectivityStatusDialog extends StatelessWidget {
       case SyncState.error:
         return theme.colorScheme.error;
       case SyncState.paused:
-        return theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
+        return theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
       case SyncState.idle:
         return Colors.green;
     }

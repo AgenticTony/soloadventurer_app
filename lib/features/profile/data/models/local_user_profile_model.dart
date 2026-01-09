@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
 
@@ -89,16 +91,17 @@ class LocalUserProfileModel {
   factory LocalUserProfileModel.fromDatabase(LocalUser user) {
     // Parse interests from JSON string
     final interestsJson = user.interests;
-    final List<String> interests = interestsJson != null && interestsJson.isNotEmpty
-        ? (const JsonDecoder().convert(interestsJson) as List<dynamic>)
-            .cast<String>()
-        : <String>[];
+    final List<String> interests =
+        interestsJson != null && interestsJson.isNotEmpty
+            ? (jsonDecode(interestsJson) as List<dynamic>).cast<String>()
+            : <String>[];
 
     // Parse preferences from JSON string
     final preferencesJson = user.preferences;
-    final Map<String, dynamic> preferences = preferencesJson != null && preferencesJson.isNotEmpty
-        ? (const JsonDecoder().convert(preferencesJson) as Map<String, dynamic>)
-        : <String, dynamic>{};
+    final Map<String, dynamic> preferences =
+        preferencesJson != null && preferencesJson.isNotEmpty
+            ? jsonDecode(preferencesJson) as Map<String, dynamic>
+            : <String, dynamic>{};
 
     return LocalUserProfileModel(
       id: user.id,
@@ -174,8 +177,8 @@ class LocalUserProfileModel {
       bio: bio,
       avatarUrl: avatarUrl,
       isPublic: isPublic,
-      interests: interests.isNotEmpty ? const JsonEncoder().convert(interests) : null,
-      preferences: preferences.isNotEmpty ? const JsonEncoder().convert(preferences) : null,
+      interests: interests.isNotEmpty ? jsonEncode(interests) : null,
+      preferences: preferences.isNotEmpty ? jsonEncode(preferences) : null,
       createdAt: createdAt,
       updatedAt: updatedAt,
       lastLoginAt: lastLoginAt,

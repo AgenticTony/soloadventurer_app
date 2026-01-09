@@ -1,13 +1,16 @@
+import 'dart:convert';
+
+import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
-import 'package:soloadventurer/features/offline/data/models/local_user_profile_model.dart';
 import 'package:soloadventurer/features/offline/data/repositories/offline_aware_repository.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
-import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
+import 'package:soloadventurer/features/profile/data/models/local_user_profile_model.dart';
 import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
 import 'package:soloadventurer/features/profile/domain/repositories/profile_repository.dart';
 import 'package:uuid/uuid.dart';
@@ -20,13 +23,28 @@ import 'package:uuid/uuid.dart';
 /// - Writing to local database immediately
 /// - Queueing mutations for sync when offline
 /// - Syncing with server when online
-class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
-    LocalUserProfileModel, Map<String, dynamic>, Map<String, dynamic>> implements ProfileRepository {
+///
+/// Type parameters:
+/// - Entity: Profile (domain entity)
+/// - Model: LocalUserProfileModel (local data model)
+/// - CreateModel: Map<String, dynamic> (for GraphQL create operations)
+/// - UpdateModel: Map<String, dynamic> (for GraphQL update operations)
+///
+/// Note: We use Map<String, dynamic> for CreateModel and UpdateModel since
+/// GraphQL mutations receive JSON-like maps, not model instances.
+class ProfileRepositoryImpl extends OfflineAwareRepository<
+    Profile,
+    LocalUserProfileModel,
+    LocalUserProfileModel,
+    LocalUserProfileModel> implements ProfileRepository {
   /// Data Access Object for local user profile database operations
   final UserDao _userDao;
 
   /// API service for remote GraphQL operations
   final DioApiService _apiService;
+
+  /// Sync queue service for queuing offline operations
+  final SyncQueueService _syncQueueService;
 
   /// UUID generator for temporary IDs
   final Uuid _uuid = const Uuid();
@@ -37,15 +55,12 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
   ProfileRepositoryImpl({
     required UserDao userDao,
     required DioApiService apiService,
-    required ConnectivityService connectivityService,
-    required SyncQueueService syncQueueService,
+    required super.syncQueueService,
+    required super.connectivityService,
     super.config,
   })  : _userDao = userDao,
         _apiService = apiService,
-        super(
-          connectivityService: connectivityService,
-          syncQueueService: syncQueueService,
-        );
+        _syncQueueService = syncQueueService;
 
   // ==============================================================================
   // OFFLINE-AWARE BASE REPOSITORY ABSTRACT METHODS
@@ -78,15 +93,19 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
   Future<LocalUserProfileModel?> readFromLocal(String id) async {
     try {
       final localUser = await _userDao.getUserById(id);
-      return localUser != null ? LocalUserProfileModel.fromDatabase(localUser) : null;
+      return localUser != null
+          ? LocalUserProfileModel.fromDatabase(localUser)
+          : null;
     } catch (e) {
       debugPrint('❌ userProfile: Error reading from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to read user profile from local cache');
+      throw const CacheException(
+          message: 'Failed to read user profile from local cache');
     }
   }
 
   @override
-  Future<LocalUserProfileModel> writeToLocal(LocalUserProfileModel model) async {
+  Future<LocalUserProfileModel> writeToLocal(
+      LocalUserProfileModel model) async {
     try {
       // Convert model to LocalUser database entity
       final localUser = model.toDatabaseEntity();
@@ -108,7 +127,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       return model;
     } catch (e) {
       debugPrint('❌ userProfile: Error writing to local: ${e.toString()}');
-      throw CacheException(message: 'Failed to write user profile to local cache');
+      throw const CacheException(
+          message: 'Failed to write user profile to local cache');
     }
   }
 
@@ -120,7 +140,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       debugPrint('📝 userProfile: Deleted in local database: $id');
     } catch (e) {
       debugPrint('❌ userProfile: Error deleting from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to delete user profile from local cache');
+      throw const CacheException(
+          message: 'Failed to delete user profile from local cache');
     }
   }
 
@@ -130,28 +151,28 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       // User profiles are singleton per user, so we return just the user's profile
       if (userId != null) {
         final user = await _userDao.getUserById(userId);
-        return user != null
-            ? [LocalUserProfileModel.fromDatabase(user)]
-            : [];
+        return user != null ? [LocalUserProfileModel.fromDatabase(user)] : [];
       } else {
         // Return all users (admin scenario)
         final users = await _userDao.getAllUsers();
         return users.map((u) => LocalUserProfileModel.fromDatabase(u)).toList();
       }
     } catch (e) {
-      debugPrint('❌ userProfile: Error reading all from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to read user profiles from local cache');
+      debugPrint(
+          '❌ userProfile: Error reading all from local: ${e.toString()}');
+      throw const CacheException(
+          message: 'Failed to read user profiles from local cache');
     }
   }
 
   @override
-  Future<Profile> executeRemoteCreate(Map<String, dynamic> model) async {
+  Future<Profile> executeRemoteCreate(LocalUserProfileModel model) async {
     try {
       final response = await _apiService.dio.post(
         '/graphql',
         data: {
           'query': GraphQLQueries.createUserProfile,
-          'variables': model,
+          'variables': model.toJson(),
         },
       );
 
@@ -168,14 +189,16 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to create user profile on server');
+      throw const ServerException(
+          message: 'Failed to create user profile on server');
     }
   }
 
   @override
-  Future<Profile> executeRemoteUpdate(String id, Map<String, dynamic> model) async {
+  Future<Profile> executeRemoteUpdate(
+      String id, LocalUserProfileModel model) async {
     try {
-      final variables = {...model, 'userId': id};
+      final variables = {...model.toJson(), 'userId': id};
 
       final response = await _apiService.dio.post(
         '/graphql',
@@ -198,7 +221,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to update user profile on server');
+      throw const ServerException(
+          message: 'Failed to update user profile on server');
     }
   }
 
@@ -221,7 +245,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
 
       final result = response.data['data']['deleteUserProfile'];
       if (result['success'] != true) {
-        throw ServerException(
+        throw const ServerException(
           message: 'Failed to delete user profile on server',
         );
       }
@@ -232,7 +256,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to delete user profile on server');
+      throw const ServerException(
+          message: 'Failed to delete user profile on server');
     }
   }
 
@@ -260,7 +285,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch user profile from server');
+      throw const ServerException(
+          message: 'Failed to fetch user profile from server');
     }
   }
 
@@ -269,7 +295,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
     // For user profiles, we only fetch single user profiles
     // This method is not commonly used for profiles
     if (userId == null) {
-      throw ServerException(
+      throw const ServerException(
         message: 'userId is required for fetching user profiles',
       );
     }
@@ -282,7 +308,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch user profile from server');
+      throw const ServerException(
+          message: 'Failed to fetch user profile from server');
     }
   }
 
@@ -327,30 +354,36 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
 
       return profile;
     } catch (e) {
-      debugPrint('❌ userProfile: Error fetching current profile: ${e.toString()}');
+      debugPrint(
+          '❌ userProfile: Error fetching current profile: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch current user profile');
+      throw const ServerException(
+          message: 'Failed to fetch current user profile');
     }
   }
 
   @override
   Future<RepositoryOperationResult<Profile>> createProfile(Profile profile) {
-    final profileData = _profileToJson(profile);
-    return create(profileData);
+    final model = entityToModel(profile);
+    return create(model);
   }
 
   @override
   Future<RepositoryOperationResult<Profile>> updateProfile(Profile profile) {
-    final profileData = _profileToJson(profile);
-    return update(profile.userId, profileData);
+    final model = entityToModel(profile);
+    return update(profile.userId, model);
   }
 
   @override
   Future<RepositoryOperationResult<Profile>> updateProfileFields(
-      String userId, Map<String, dynamic> fields) {
-    return update(userId, fields);
+      String userId, Map<String, dynamic> fields) async {
+    // Get the current profile, update it with the fields, then save
+    final currentProfile = await getProfile(userId);
+    final updatedProfile = _applyFieldsToProfile(currentProfile, fields);
+    final model = entityToModel(updatedProfile);
+    return update(userId, model);
   }
 
   @override
@@ -382,7 +415,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to upload avatar');
+      throw const ServerException(message: 'Failed to upload avatar');
     }
   }
 
@@ -416,7 +449,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
         // Update local cache
         await _userDao.updateAvatar(userId, null);
 
-        return RepositoryOperationResult.immediate(null);
+        return const RepositoryOperationResult.immediate(null);
       } else {
         // Offline: Queue for sync
         final localProfile = await readFromLocal(userId);
@@ -425,21 +458,24 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
           await writeToLocal(updated);
         }
 
-        await _queueOperation(
+        // Queue the operation for sync
+        await _syncQueueService.enqueueOperation(
           entityType: entityType,
           entityId: userId,
           operation: SyncOperationType.update,
           data: fields,
+          priority: config.defaultSyncPriority,
+          maxRetries: config.maxSyncRetries,
         );
 
-        return RepositoryOperationResult.queued(null);
+        return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
       debugPrint('❌ userProfile: Error removing avatar: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to remove avatar');
+      throw const ServerException(message: 'Failed to remove avatar');
     }
   }
 
@@ -471,10 +507,10 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
         }
 
         // Update local cache
-        final preferencesJson = const JsonEncoder().convert(preferences);
+        final preferencesJson = jsonEncode(preferences);
         await _userDao.updatePreferences(userId, preferencesJson);
 
-        return RepositoryOperationResult.immediate(null);
+        return const RepositoryOperationResult.immediate(null);
       } else {
         // Offline: Queue for sync
         final localProfile = await readFromLocal(userId);
@@ -483,21 +519,23 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
           await writeToLocal(updated);
         }
 
-        await _queueOperation(
+        await _syncQueueService.enqueueOperation(
           entityType: entityType,
           entityId: userId,
           operation: SyncOperationType.update,
           data: fields,
+          priority: config.defaultSyncPriority,
+          maxRetries: config.maxSyncRetries,
         );
 
-        return RepositoryOperationResult.queued(null);
+        return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
       debugPrint('❌ userProfile: Error updating preferences: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to update preferences');
+      throw const ServerException(message: 'Failed to update preferences');
     }
   }
 
@@ -529,10 +567,10 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
         }
 
         // Update local cache
-        final interestsJson = const JsonEncoder().convert(interests);
+        final interestsJson = jsonEncode(interests);
         await _userDao.updateInterests(userId, interestsJson);
 
-        return RepositoryOperationResult.immediate(null);
+        return const RepositoryOperationResult.immediate(null);
       } else {
         // Offline: Queue for sync
         final localProfile = await readFromLocal(userId);
@@ -541,21 +579,23 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
           await writeToLocal(updated);
         }
 
-        await _queueOperation(
+        await _syncQueueService.enqueueOperation(
           entityType: entityType,
           entityId: userId,
           operation: SyncOperationType.update,
           data: fields,
+          priority: config.defaultSyncPriority,
+          maxRetries: config.maxSyncRetries,
         );
 
-        return RepositoryOperationResult.queued(null);
+        return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
       debugPrint('❌ userProfile: Error updating interests: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to update interests');
+      throw const ServerException(message: 'Failed to update interests');
     }
   }
 
@@ -589,7 +629,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
         // Update local cache
         await _userDao.toggleProfileVisibility(userId, isPublic);
 
-        return RepositoryOperationResult.immediate(null);
+        return const RepositoryOperationResult.immediate(null);
       } else {
         // Offline: Queue for sync
         final localProfile = await readFromLocal(userId);
@@ -598,21 +638,24 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
           await writeToLocal(updated);
         }
 
-        await _queueOperation(
+        await _syncQueueService.enqueueOperation(
           entityType: entityType,
           entityId: userId,
           operation: SyncOperationType.update,
           data: fields,
+          priority: config.defaultSyncPriority,
+          maxRetries: config.maxSyncRetries,
         );
 
-        return RepositoryOperationResult.queued(null);
+        return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
       debugPrint('❌ userProfile: Error toggling visibility: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to toggle profile visibility');
+      throw const ServerException(
+          message: 'Failed to toggle profile visibility');
     }
   }
 
@@ -642,7 +685,8 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
         rethrow;
       }
     } catch (e) {
-      debugPrint('❌ userProfile: Error checking profile existence: ${e.toString()}');
+      debugPrint(
+          '❌ userProfile: Error checking profile existence: ${e.toString()}');
       return false;
     }
   }
@@ -712,7 +756,22 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<Profile,
   }
 
   @override
-  Map<String, dynamic> _modelToJson(LocalUserProfileModel model) {
+  Map<String, dynamic> modelToJson(LocalUserProfileModel model) {
     return model.toJson();
+  }
+
+  /// Apply field updates to a profile
+  Profile _applyFieldsToProfile(Profile profile, Map<String, dynamic> fields) {
+    return profile.copyWith(
+      username: fields['username'] as String? ?? profile.username,
+      email: fields['email'] as String? ?? profile.email,
+      displayName: fields['displayName'] as String? ?? profile.displayName,
+      bio: fields['bio'] as String?,
+      avatarUrl: fields['avatarUrl'] as String?,
+      isPublic: fields['isPublic'] as bool? ?? profile.isPublic,
+      interests: fields['interests'] as List<String>? ?? profile.interests,
+      preferences:
+          fields['preferences'] as Map<String, dynamic>? ?? profile.preferences,
+    );
   }
 }

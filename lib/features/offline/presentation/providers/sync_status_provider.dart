@@ -65,8 +65,7 @@ class SyncStatusNotifier extends StateNotifier<SyncStatus> {
   /// Creates a new [SyncStatusNotifier]
   ///
   /// [_syncManager] - The sync manager to monitor
-  SyncStatusNotifier(this._syncManager)
-      : super(_syncManager.currentStatus) {
+  SyncStatusNotifier(this._syncManager) : super(_syncManager.currentStatus) {
     // Start monitoring sync status
     _startMonitoring();
   }

@@ -9,15 +9,22 @@ import 'package:soloadventurer/features/offline/domain/services/conflict_resolve
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/entities/offline_entities.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
+import 'package:soloadventurer/features/offline/data/models/local_trip_model.dart';
 import 'package:drift/drift.dart';
 
 // Mock classes
 class MockConnectivityService extends Mock implements ConnectivityService {}
+
 class MockSyncQueueService extends Mock implements SyncQueueService {}
+
 class MockConflictResolver extends Mock implements ConflictResolver {}
+
 class MockAppDatabase extends Mock implements AppDatabase {}
+
 class MockTripDao extends Mock implements TripDao {}
+
 class MockJournalDao extends Mock implements JournalDao {}
+
 class MockUserDao extends Mock implements UserDao {}
 
 void main() {
@@ -49,17 +56,18 @@ void main() {
 
     test('Test creating trip while offline', () async {
       // Setup: Device is offline
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.offline);
+      final offlineStatus = ConnectivityStatus.disconnected();
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => offlineStatus);
       when(() => mockConnectivityService.connectivityStream)
-          .thenAnswer((_) => Stream.value(ConnectivityStatus.offline));
+          .thenAnswer((_) => Stream.value(offlineStatus));
 
       // Create a trip while offline
       final trip = TripsCompanion.insert(
         id: 'trip-1',
         userId: 'user-1',
         title: 'Offline Trip',
-        description: 'Created while offline',
+        description: const Value('Created while offline'),
         startDate: DateTime.now(),
         endDate: DateTime.now().add(const Duration(days: 7)),
         isSynced: const Value(false),
@@ -77,17 +85,17 @@ void main() {
 
       // Verify sync operation was queued
       verify(() => mockSyncQueueService.enqueueOperation(
-        entityType: 'trip',
-        entityId: 'trip-1',
-        operation: SyncOperationType.create,
-        data: any(named: 'data'),
-      )).called(1);
+            entityType: 'trip',
+            entityId: 'trip-1',
+            operation: SyncOperationType.create,
+            data: any(named: 'data'),
+          )).called(1);
     });
 
     test('Test editing journal while offline', () async {
       // Setup: Device is offline
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.offline);
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => ConnectivityStatus.disconnected());
 
       // Update an existing journal while offline
       final updatedJournal = JournalsCompanion(
@@ -99,7 +107,8 @@ void main() {
         version: const Value(2),
       );
 
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       // Update the journal
       await mockDatabase.journalDao.updateJournal(updatedJournal);
@@ -109,18 +118,18 @@ void main() {
 
       // Verify sync operation was queued
       verify(() => mockSyncQueueService.enqueueOperation(
-        entityType: 'journal',
-        entityId: 'journal-1',
-        operation: SyncOperationType.update,
-        data: any(named: 'data'),
-        version: 2,
-      )).called(1);
+            entityType: 'journal',
+            entityId: 'journal-1',
+            operation: SyncOperationType.update,
+            data: any(named: 'data'),
+            version: 2,
+          )).called(1);
     });
 
     test('Test deleting item while offline', () async {
       // Setup: Device is offline
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.offline);
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => ConnectivityStatus.disconnected());
 
       // Delete a trip while offline
       final deletedTrip = TripsCompanion(
@@ -141,24 +150,24 @@ void main() {
 
       // Verify sync operation was queued
       verify(() => mockSyncQueueService.enqueueOperation(
-        entityType: 'trip',
-        entityId: 'trip-2',
-        operation: SyncOperationType.delete,
-        data: any(named: 'data'),
-      )).called(1);
+            entityType: 'trip',
+            entityId: 'trip-2',
+            operation: SyncOperationType.delete,
+            data: any(named: 'data'),
+          )).called(1);
     });
 
     test('Test sync when connection restored', () async {
       // Setup: Start offline, then go online
       final connectivityStatusStream = Stream.fromIterable([
-        ConnectivityStatus.offline,
-        ConnectivityStatus.online,
+        ConnectivityStatus.disconnected(),
+        ConnectivityStatus.connected(ConnectionType.wifi),
       ]);
 
       when(() => mockConnectivityService.connectivityStream)
           .thenAnswer((_) => connectivityStatusStream);
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.online);
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => ConnectivityStatus.connected(ConnectionType.wifi));
 
       // Mock pending operations
       final pendingOperations = [
@@ -167,7 +176,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {'title': 'Offline Trip'},
+          data: const {'title': 'Offline Trip'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -176,7 +185,7 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {'content': 'Updated content'},
+          data: const {'content': 'Updated content'},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -184,14 +193,15 @@ void main() {
 
       when(() => mockSyncQueueService.getPendingCount())
           .thenAnswer((_) async => 2);
-      when(() => mockSyncQueueService.getPendingOperations(limit: any(named: 'limit')))
+      when(() => mockSyncQueueService.getPendingOperations(
+              limit: any(named: 'limit')))
           .thenAnswer((_) async => pendingOperations);
       when(() => mockSyncQueueService.processPendingOperations(
-        onProcess: any(named: 'onProcess'),
-      )).thenAnswer((_) async => SyncQueueResult(
-        success: true,
-        operationsCount: 2,
-      ));
+            onProcess: any(named: 'onProcess'),
+          )).thenAnswer((_) async => SyncQueueResult(
+            success: true,
+            operationsCount: 2,
+          ));
 
       // Simulate connection restored
       when(() => mockSyncQueueService.markAsProcessing(1))
@@ -232,12 +242,12 @@ void main() {
         entityId: 'trip-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {
+        clientData: const {
           'version': 2,
           'title': 'Client Title',
           'description': 'Updated on device',
         },
-        serverData: {
+        serverData: const {
           'version': 3,
           'title': 'Server Title',
           'description': 'Updated on server',
@@ -250,9 +260,9 @@ void main() {
       when(() => mockConflictResolver.recordConflict(any()))
           .thenAnswer((_) async {});
       when(() => mockConflictResolver.resolveConflict(
-        any(),
-        ConflictResolutionStrategy.lastWriteWins,
-      )).thenAnswer((_) async => true);
+            any(),
+            ConflictResolutionStrategy.lastWriteWins,
+          )).thenAnswer((_) async => true);
 
       // Record the conflict
       await mockConflictResolver.recordConflict(conflict);
@@ -267,9 +277,9 @@ void main() {
       expect(resolved, isTrue);
       verify(() => mockConflictResolver.recordConflict(conflict)).called(1);
       verify(() => mockConflictResolver.resolveConflict(
-        conflict.id,
-        ConflictResolutionStrategy.lastWriteWins,
-      )).called(1);
+            conflict.id,
+            ConflictResolutionStrategy.lastWriteWins,
+          )).called(1);
     });
 
     test('Test conflict scenarios - delete-modify', () async {
@@ -280,11 +290,11 @@ void main() {
         entityId: 'journal-1',
         type: ConflictType.deleteModify,
         severity: ConflictSeverity.high,
-        clientData: {
+        clientData: const {
           'version': 2,
           'isDeleted': true,
         },
-        serverData: {
+        serverData: const {
           'version': 3,
           'content': 'Modified on server',
           'isDeleted': false,
@@ -368,29 +378,30 @@ void main() {
       expect(statusUpdates[5].state, equals(SyncState.idle));
     });
 
-    test('Test complete offline-to-online cycle with multiple operations', () async {
+    test('Test complete offline-to-online cycle with multiple operations',
+        () async {
       // This test simulates a complete offline-to-online cycle
 
       // Phase 1: Offline - Create, update, delete operations
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.offline);
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => ConnectivityStatus.disconnected());
 
       // Create trip offline
       when(() => mockTripDao.insertTrip(any())).thenAnswer((_) async => 1);
       when(() => mockSyncQueueService.enqueueOperation(
-        entityType: any(named: 'entityType'),
-        entityId: any(named: 'entityId'),
-        operation: any(named: 'operation'),
-        data: any(named: 'data'),
-      )).thenAnswer((_) async => SyncOperationEntity(
-        id: 1,
-        entityType: 'trip',
-        entityId: 'trip-1',
-        operation: SyncOperationType.create,
-        data: {},
-        status: SyncOperationStatus.pending,
-        createdAt: DateTime.now(),
-      ));
+            entityType: any(named: 'entityType'),
+            entityId: any(named: 'entityId'),
+            operation: any(named: 'operation'),
+            data: any(named: 'data'),
+          )).thenAnswer((_) async => SyncOperationEntity(
+            id: 1,
+            entityType: 'trip',
+            entityId: 'trip-1',
+            operation: SyncOperationType.create,
+            data: const {},
+            status: SyncOperationStatus.pending,
+            createdAt: DateTime.now(),
+          ));
 
       await mockDatabase.tripDao.insertTrip(TripsCompanion.insert(
         id: 'trip-1',
@@ -404,7 +415,8 @@ void main() {
       ));
 
       // Update journal offline
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       await mockDatabase.journalDao.updateJournal(JournalsCompanion(
         id: const Value('journal-1'),
@@ -427,29 +439,29 @@ void main() {
 
       // Verify all operations were queued
       verify(() => mockSyncQueueService.enqueueOperation(
-        entityType: 'trip',
-        entityId: 'trip-1',
-        operation: SyncOperationType.create,
-        data: any(named: 'data'),
-      )).called(1);
+            entityType: 'trip',
+            entityId: 'trip-1',
+            operation: SyncOperationType.create,
+            data: any(named: 'data'),
+          )).called(1);
 
       verify(() => mockSyncQueueService.enqueueOperation(
-        entityType: 'journal',
-        entityId: 'journal-1',
-        operation: SyncOperationType.update,
-        data: any(named: 'data'),
-      )).called(1);
+            entityType: 'journal',
+            entityId: 'journal-1',
+            operation: SyncOperationType.update,
+            data: any(named: 'data'),
+          )).called(1);
 
       verify(() => mockSyncQueueService.enqueueOperation(
-        entityType: 'trip',
-        entityId: 'trip-2',
-        operation: SyncOperationType.delete,
-        data: any(named: 'data'),
-      )).called(1);
+            entityType: 'trip',
+            entityId: 'trip-2',
+            operation: SyncOperationType.delete,
+            data: any(named: 'data'),
+          )).called(1);
 
       // Phase 2: Connection restored
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.online);
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => ConnectivityStatus.connected(ConnectionType.wifi));
 
       when(() => mockSyncQueueService.getPendingCount())
           .thenAnswer((_) async => 3);
@@ -460,7 +472,7 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-1',
           operation: SyncOperationType.create,
-          data: {},
+          data: const {},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -469,7 +481,7 @@ void main() {
           entityType: 'journal',
           entityId: 'journal-1',
           operation: SyncOperationType.update,
-          data: {},
+          data: const {},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
@@ -478,14 +490,14 @@ void main() {
           entityType: 'trip',
           entityId: 'trip-2',
           operation: SyncOperationType.delete,
-          data: {},
+          data: const {},
           status: SyncOperationStatus.pending,
           createdAt: DateTime.now(),
         ),
       ];
 
-      when(() => mockSyncQueueService.getPendingOperations(limit: any(named: 'limit')))
-          .thenAnswer((_) async => pendingOps);
+      when(() => mockSyncQueueService.getPendingOperations(
+          limit: any(named: 'limit'))).thenAnswer((_) async => pendingOps);
 
       // Phase 3: Sync all operations
       when(() => mockSyncQueueService.markAsProcessing(any()))
@@ -512,22 +524,21 @@ void main() {
       verify(() => mockSyncQueueService.markAsCompleted(3)).called(1);
 
       // Phase 4: Verify local data is marked as synced
-      when(() => mockTripDao.getTripById('trip-1')).thenAnswer((_) async =>
-        Trip(
-          id: 'trip-1',
-          userId: 'user-1',
-          title: 'Offline Trip 1',
-          description: '',
-          startDate: DateTime.now(),
-          endDate: DateTime.now().add(const Duration(days: 5)),
-          isSynced: true,
-          hasPendingChanges: false,
-          isDeleted: false,
-          version: 1,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        )
-      );
+      when(() => mockTripDao.getTripById('trip-1'))
+          .thenAnswer((_) async => LocalTripModel(
+                id: 'trip-1',
+                userId: 'user-1',
+                title: 'Offline Trip 1',
+                description: '',
+                startDate: DateTime.now(),
+                endDate: DateTime.now().add(const Duration(days: 5)),
+                isSynced: true,
+                hasPendingChanges: false,
+                isDeleted: false,
+                version: 1,
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ));
 
       final syncedTrip = await mockDatabase.tripDao.getTripById('trip-1');
       expect(syncedTrip?.isSynced, isTrue);
@@ -536,22 +547,23 @@ void main() {
 
     test('Test error handling during sync', () async {
       // Setup: Connection is online but sync fails
-      when(() => mockConnectivityService.currentStatus)
-          .thenAnswer((_) => ConnectivityStatus.online);
+      when(() => mockConnectivityService.checkConnectivity())
+          .thenAnswer((_) => ConnectivityStatus.connected(ConnectionType.wifi));
 
       final pendingOperation = SyncOperationEntity(
         id: 1,
         entityType: 'trip',
         entityId: 'trip-fail',
         operation: SyncOperationType.create,
-        data: {'title': 'Failed Trip'},
+        data: const {'title': 'Failed Trip'},
         status: SyncOperationStatus.pending,
         createdAt: DateTime.now(),
       );
 
       when(() => mockSyncQueueService.getPendingCount())
           .thenAnswer((_) async => 1);
-      when(() => mockSyncQueueService.getPendingOperations(limit: any(named: 'limit')))
+      when(() => mockSyncQueueService.getPendingOperations(
+              limit: any(named: 'limit')))
           .thenAnswer((_) async => [pendingOperation]);
       when(() => mockSyncQueueService.markAsProcessing(1))
           .thenAnswer((_) async => 1);
@@ -581,7 +593,7 @@ void main() {
         entityType: 'trip',
         entityId: 'trip-retry',
         operation: SyncOperationType.create,
-        data: {'title': 'Retry Trip'},
+        data: const {'title': 'Retry Trip'},
         status: SyncOperationStatus.failed,
         retryCount: 1,
         maxRetries: 3,

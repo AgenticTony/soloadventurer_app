@@ -173,8 +173,7 @@ class LocationSharingNotifier extends StateNotifier<LocationSharingState> {
       // Filter out shares with the specified contacts
       final updatedShares = state.activeShares
           .where((share) =>
-              !share.sharedWithContactIds
-                  .any((id) => contactIds.contains(id)))
+              !share.sharedWithContactIds.any((id) => contactIds.contains(id)))
           .toList();
 
       state = state.copyWith(
@@ -235,7 +234,8 @@ class LocationSharingNotifier extends StateNotifier<LocationSharingState> {
       state = state.copyWith(
         isLoading: false,
         locationUpdates: updates,
-        latestLocation: updates.isNotEmpty ? updates.first : state.latestLocation,
+        latestLocation:
+            updates.isNotEmpty ? updates.first : state.latestLocation,
         error: null,
       );
     } catch (e) {

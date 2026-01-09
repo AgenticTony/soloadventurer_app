@@ -7,12 +7,16 @@ part 'check_in.g.dart';
 enum CheckInStatus {
   /// Check-in is scheduled for the future
   scheduled,
+
   /// Check-in is currently active (waiting for user to check in)
   active,
+
   /// Check-in was completed successfully
   completed,
+
   /// Check-in was missed (user didn't check in on time)
   missed,
+
   /// Check-in was cancelled
   cancelled,
 }
@@ -21,10 +25,13 @@ enum CheckInStatus {
 enum CheckInTriggerType {
   /// Manual check-in initiated by user
   manual,
+
   /// Scheduled check-in at a specific time
   scheduledTime,
+
   /// Location-based check-in when arriving at a location
   locationArrival,
+
   /// Location-based check-in when departing a location
   locationDeparture,
 }

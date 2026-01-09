@@ -18,7 +18,7 @@ export 'data/datasources/auth_local_data_source.dart';
 export 'data/datasources/auth_remote_data_source.dart';
 
 // Presentation Layer
-export 'presentation/providers/auth_provider.dart';
+export 'presentation/providers/auth_notifier_provider.dart';
 export 'presentation/screens/login_screen.dart';
 export 'presentation/screens/register_screen.dart';
 export 'presentation/screens/auth_test_screen.dart';

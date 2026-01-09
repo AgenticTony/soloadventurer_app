@@ -5,8 +5,6 @@ import 'package:soloadventurer/app/di/modules/auth_module.dart';
 import 'package:soloadventurer/app/di/modules/core_module.dart';
 import 'package:soloadventurer/app/di/modules/offline_module.dart';
 import 'package:soloadventurer/app/di/modules/travel_module.dart';
-import 'package:soloadventurer/features/core/infrastructure/api/api_service.dart';
-import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 
 /// Global GetIt instance for dependency injection
 final GetIt getIt = GetIt.instance;
@@ -25,9 +23,6 @@ Future<void> setupServiceLocator({bool isTest = false}) async {
   // Register singletons that don't depend on other services
   await _registerIndependentServices();
 
-  // Register API client first
-  await _registerApiClient();
-
   // Register services that depend on other services
   await _registerDependentServices();
 
@@ -44,14 +39,6 @@ Future<void> _registerIndependentServices() async {
 
   // Register app configuration
   getIt.registerLazySingleton(() => AppConfig());
-}
-
-/// Register API client and related services
-Future<void> _registerApiClient() async {
-  // Register API service
-  getIt.registerLazySingleton<ApiService>(
-    () => DioApiService(),
-  );
 }
 
 /// Register services that depend on other services

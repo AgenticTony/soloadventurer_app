@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/auth_error_display.dart';
@@ -105,34 +104,44 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    final isLoading = ref.watch(isLoadingProvider);
+    final authAsync = ref.watch(authNotifierProvider);
     // Watch the navigation provider to ensure it's instantiated and listening
     ref.watch(authNavigationProvider);
 
-    // Listen for auth state changes to capture errors
-    ref.listen(authStateProvider, (previous, next) {
-      if (next.error != null && next.error!.isNotEmpty && mounted) {
-        // Create an AuthException from the error message
-        setState(() {
-          _currentError = AuthException(
-            message: next.error!,
-            code: next.errorCode,
-          );
-        });
-      } else if (next.error == null && mounted) {
-        // Clear error when auth state is successful
-        _clearError();
-      }
-    });
-
-    if (isLoading) {
-      return const Scaffold(
+    return authAsync.when(
+      loading: () => const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
         ),
-      );
-    }
+      ),
+      error: (error, stack) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Sign Up'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(authNotifierProvider);
+                },
+                child: const Text('Try Again'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (authState) => _buildSignUpForm(context, authState),
+    );
+  }
+
+  Widget _buildSignUpForm(BuildContext context, authState) {
+    // Note: With AsyncValue pattern, loading state is handled by .when() in build()
+    // When _buildSignUpForm is called, we're already in data state
+    const isLoading = false;
 
     return Scaffold(
       appBar: AppBar(
@@ -189,7 +198,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   ),
                   textInputAction: TextInputAction.next,
                   validator: _validateName,
-                  enabled: !authState.isLoading,
+                  enabled: !isLoading,
                 ),
 
                 const SizedBox(height: 16),
@@ -205,7 +214,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: _validateEmail,
-                  enabled: !authState.isLoading,
+                  enabled: !isLoading,
                 ),
 
                 const SizedBox(height: 16),
@@ -229,7 +238,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   obscureText: !_isPasswordVisible,
                   textInputAction: TextInputAction.next,
                   validator: _validatePassword,
-                  enabled: !authState.isLoading,
+                  enabled: !isLoading,
                 ),
 
                 const SizedBox(height: 16),
@@ -253,18 +262,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   obscureText: !_isConfirmPasswordVisible,
                   textInputAction: TextInputAction.done,
                   validator: _validateConfirmPassword,
-                  enabled: !authState.isLoading,
+                  enabled: !isLoading,
                 ),
 
                 const SizedBox(height: 24),
 
                 // Sign up button
                 ElevatedButton(
-                  onPressed: authState.isLoading ? null : _signUp,
+                  onPressed: isLoading ? null : _signUp,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: authState.isLoading
+                  child: isLoading
                       ? const CircularProgressIndicator()
                       : const Text(
                           'Sign Up',
@@ -280,7 +289,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   children: [
                     const Text('Already have an account?'),
                     TextButton(
-                      onPressed: authState.isLoading ? null : _navigateToLogin,
+                      onPressed: isLoading ? null : _navigateToLogin,
                       child: const Text('Login'),
                     ),
                   ],
@@ -305,7 +314,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       _clearError();
 
       try {
-        await ref.read(authNotifierProvider.notifier).register(
+        await ref.read(authNotifierProvider.notifier).signUp(
               email: email,
               password: password,
               name: name,
@@ -313,12 +322,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
         // Only navigate if we're still mounted and the signup was successful
         if (mounted) {
-          final authState = ref.read(authStateProvider);
-          if (authState.requiresEmailVerification) {
-            ref
-                .read(authNavigationProvider.notifier)
-                .navigateTo(AuthRoutes.verifyEmail);
-          }
+          final authAsync = ref.read(authNotifierProvider);
+          authAsync.whenData((authState) {
+            if (authState.requiresEmailVerification) {
+              ref
+                  .read(authNavigationProvider.notifier)
+                  .navigateTo(AuthRoutes.verifyEmail);
+            }
+          });
         }
       } catch (e) {
         // Store the error for display

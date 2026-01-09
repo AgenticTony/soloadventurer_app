@@ -1,22 +1,17 @@
 import 'package:get_it/get_it.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:dio/dio.dart';
 
-import '../../features/offline/infrastructure/database/offline_database.dart';
-import '../../features/offline/infrastructure/database/dao/sync_queue_dao.dart';
-import '../../features/offline/infrastructure/database/dao/user_dao.dart';
-import '../../features/offline/infrastructure/database/dao/trip_dao.dart';
-import '../../features/offline/infrastructure/database/dao/journal_dao.dart';
-import '../../features/offline/domain/services/offline_services.dart';
-import '../../features/offline/domain/repositories/offline_repositories.dart';
-import '../../features/offline/data/repositories/offline_repositories.dart';
-import '../../features/offline/infrastructure/sync/offline_sync.dart';
-import '../../features/offline/infrastructure/sync/background_sync_service.dart';
-import '../../features/offline/infrastructure/sync/offline_interceptor.dart';
-import '../../features/offline/infrastructure/sync/mutation_interceptor.dart';
-import '../../core/network/network_reachability.dart';
-import '../../features/core/infrastructure/api/dio_api_service.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/sync_queue_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
+import 'package:soloadventurer/features/offline/domain/services/offline_services.dart';
+import 'package:soloadventurer/features/offline/domain/repositories/offline_repositories.dart';
+import 'package:soloadventurer/features/offline/data/repositories/offline_repositories.dart';
+import 'package:soloadventurer/features/offline/infrastructure/sync/offline_sync.dart';
+import 'package:soloadventurer/core/network/network_reachability.dart';
+import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 
 /// Register all offline/sync feature dependencies
 ///
@@ -154,7 +149,8 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
       uploadSync: getIt<UploadSync>(),
       downloadSync: getIt<DownloadSync>(),
       conflictResolver: getIt<ConflictResolver>(),
-      getCurrentUserId: () => '', // TODO: Override in provider with actual userId
+      getCurrentUserId: () =>
+          '', // TODO: Override in provider with actual userId
       autoSyncMinInterval: const Duration(seconds: 30),
       syncOnlyOnWifi: false,
     ),
@@ -224,7 +220,7 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   // UI feedback with safety nets for failed operations.
   getIt.registerLazySingleton<OptimisticUpdateHandler>(
     () => OptimisticUpdateHandler(
-      config: OptimisticUpdateConfig(
+      config: const OptimisticUpdateConfig(
         autoRollbackOnFailure: true,
         maxAgeMs: 7 * 24 * 60 * 60 * 1000, // 7 days
         enableTracking: true,

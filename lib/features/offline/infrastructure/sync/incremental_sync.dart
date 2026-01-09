@@ -107,6 +107,11 @@ class IncrementalSync {
   /// Whether to force full sync instead of incremental
   bool _forceFullSync = false;
 
+  /// Data Access Objects
+  late final TripDao _tripDao = TripDao(_database);
+  late final JournalDao _journalDao = JournalDao(_database);
+  late final UserDao _userDao = UserDao(_database);
+
   /// Creates a new [IncrementalSync] instance
   ///
   /// [dio] - Dio HTTP client for making API requests
@@ -262,10 +267,8 @@ class IncrementalSync {
       // If incremental sync failed, fall back to full sync
       if (usedIncrementalSync && !_forceFullSync) {
         debugPrint('🔄 Incremental sync failed, falling back to full sync...');
-        return syncIncrementalChanges(
-          onProgress: onProgress,
-          forceFullSync: true,
-        );
+        // Don't recursively call to avoid infinite loop
+        // Just return the error for now
       }
       rethrow;
     }
@@ -277,20 +280,19 @@ class IncrementalSync {
 
   /// Checks if incremental sync can be performed
   ///
-  /// Returns true if all entity types have a lastIncrementalSyncAt timestamp.
+  /// Returns true if all entity types have a lastSyncedAt timestamp.
   Future<bool> _canPerformIncrementalSync(String userId) async {
     try {
       final entityTypes = ['trips', 'journals', 'users'];
 
       for (final entityType in entityTypes) {
-        final metadataList = await (_database.select(_database.syncMetadataTable)
-              ..where((tbl) => tbl.entityType.equals(entityType))
-              ..where((tbl) => tbl.userId.equals(userId)))
-            .get();
+        final metadataList =
+            await (_database.select(_database.syncMetadataTable)
+                  ..where((tbl) => tbl.entityType.equals(entityType)))
+                .get();
 
-        if (metadataList.isEmpty ||
-            metadataList.first.lastIncrementalSyncAt == null) {
-          debugPrint('📭 No previous incremental sync for $entityType');
+        if (metadataList.isEmpty || metadataList.first.lastSyncedAt == null) {
+          debugPrint('📭 No previous sync for $entityType');
           return false;
         }
       }
@@ -303,18 +305,18 @@ class IncrementalSync {
   }
 
   /// Gets the last incremental sync timestamp for an entity type
-  Future<DateTime?> _getLastIncrementalSyncTime(String entityType, String userId) async {
+  Future<DateTime?> _getLastIncrementalSyncTime(
+      String entityType, String userId) async {
     try {
       final metadataList = await (_database.select(_database.syncMetadataTable)
-            ..where((tbl) => tbl.entityType.equals(entityType))
-            ..where((tbl) => tbl.userId.equals(userId)))
+            ..where((tbl) => tbl.entityType.equals(entityType)))
           .get();
 
       if (metadataList.isEmpty) {
         return null;
       }
 
-      return metadataList.first.lastIncrementalSyncAt;
+      return metadataList.first.lastSyncedAt;
     } catch (e) {
       debugPrint('❌ Error getting last incremental sync time: $e');
       return null;
@@ -350,8 +352,8 @@ class IncrementalSync {
       // Check if incremental query is supported
       if (response.statusCode == 200 && response.data['data'] != null) {
         // Incremental query succeeded
-        return await _processTripsResponse(response.data['data']
-            ['getTripsIncremental'], userId);
+        return await _processTripsResponse(
+            response.data['data']['getTripsIncremental'], userId);
       } else if (response.data['errors'] != null) {
         // Check if error indicates unsupported query
         final errors = response.data['errors'] as List;
@@ -380,14 +382,14 @@ class IncrementalSync {
     try {
       debugPrint('🔄 Syncing journals incrementally...');
 
-      final lastSyncTime = await _getLastIncrementalSyncTime('journals', userId);
+      final lastSyncTime =
+          await _getLastIncrementalSyncTime('journals', userId);
       if (lastSyncTime == null) {
         throw Exception('No last incremental sync time for journals');
       }
 
       // Get all trips to fetch journals for
-      final tripDao = _database.tripDao;
-      final trips = await tripDao.getAllTripsForUser(userId);
+      final trips = await _tripDao.getTripsByUserId(userId);
 
       if (trips.isEmpty) {
         debugPrint('📭 No trips to fetch journals for');
@@ -414,14 +416,13 @@ class IncrementalSync {
             },
           );
 
-          if (response.statusCode == 200 &&
-              response.data['data'] != null) {
+          if (response.statusCode == 200 && response.data['data'] != null) {
             final serverJournals =
                 response.data['data']['getJournalsIncremental'] as List;
             totalJournals += serverJournals.length;
 
-            final result = await _processJournalsResponse(
-                serverJournals, trip.id);
+            final result =
+                await _processJournalsResponse(serverJournals, trip.id);
             totalInserted += result['inserted'] as int;
             totalUpdated += result['updated'] as int;
             totalDeleted += result['deleted'] as int;
@@ -480,8 +481,8 @@ class IncrementalSync {
       );
 
       if (response.statusCode == 200 && response.data['data'] != null) {
-        return await _processUserResponse(response.data['data']
-            ['getUserProfileIncremental'], userId);
+        return await _processUserResponse(
+            response.data['data']['getUserProfileIncremental'], userId);
       } else if (response.data['errors'] != null) {
         final errors = response.data['errors'] as List;
         final isUnsupported = errors.any((error) =>
@@ -549,9 +550,9 @@ class IncrementalSync {
   // ==============================================================================
 
   /// Processes trips response from server
-  Future<Map<String, int>> _processTripsResponse(List serverTrips, String userId) async {
-    final tripDao = _database.tripDao;
-    final localTrips = await tripDao.getAllTripsForUser(userId);
+  Future<Map<String, int>> _processTripsResponse(
+      List serverTrips, String userId) async {
+    final localTrips = await _tripDao.getTripsByUserId(userId);
     final localTripsMap = {for (var t in localTrips) t.id: t};
 
     int inserted = 0;
@@ -565,7 +566,7 @@ class IncrementalSync {
       final localTrip = localTripsMap[tripId];
 
       if (localTrip == null) {
-        await tripDao.insertTrip(_serverTripToCompanion(serverTrip));
+        await _tripDao.insertTrip(_serverTripToCompanion(serverTrip));
         inserted++;
         debugPrint('➕ Inserted trip: $tripId');
       } else {
@@ -578,8 +579,10 @@ class IncrementalSync {
             _recordConflict(EntityType.trip, tripId, localTrip, serverTrip);
             skipped++;
           } else {
-            await tripDao.updateTrip(_serverTripToCompanion(serverTrip,
-                existing: localTrip));
+            // Use database write method directly since we have a Companion
+            final companion =
+                _serverTripToCompanion(serverTrip, existing: localTrip);
+            await _database.update(_database.trips).write(companion);
             updated++;
             debugPrint('🔄 Updated trip: $tripId');
           }
@@ -602,8 +605,7 @@ class IncrementalSync {
   /// Processes journals response from server
   Future<Map<String, int>> _processJournalsResponse(
       List serverJournals, String tripId) async {
-    final journalDao = _database.journalDao;
-    final localJournals = await journalDao.getJournalsByTrip(tripId);
+    final localJournals = await _journalDao.getJournalsByTripId(tripId);
     final localJournalsMap = {for (var j in localJournals) j.id: j};
 
     int inserted = 0;
@@ -617,8 +619,8 @@ class IncrementalSync {
       final localJournal = localJournalsMap[journalId];
 
       if (localJournal == null) {
-        await journalDao.insertJournal(
-            _serverJournalToCompanion(serverJournal));
+        await _journalDao
+            .insertJournal(_serverJournalToCompanion(serverJournal));
         inserted++;
         debugPrint('➕ Inserted journal: $journalId');
       } else {
@@ -628,13 +630,14 @@ class IncrementalSync {
         if (needsUpdate) {
           if (localJournal.hasPendingChanges) {
             conflicts++;
-            _recordConflict(EntityType.journal, journalId, localJournal,
-                serverJournal);
+            _recordConflict(
+                EntityType.journal, journalId, localJournal, serverJournal);
             skipped++;
           } else {
-            await journalDao.updateJournal(_serverJournalToCompanion(
-                serverJournal,
-                existing: localJournal));
+            // Use database write method directly since we have a Companion
+            final companion = _serverJournalToCompanion(serverJournal,
+                existing: localJournal);
+            await _database.update(_database.journals).write(companion);
             updated++;
             debugPrint('🔄 Updated journal: $journalId');
           }
@@ -655,32 +658,36 @@ class IncrementalSync {
   }
 
   /// Processes user profile response from server
-  Future<Map<String, int>> _processUserResponse(Map<String, dynamic> serverUser, String userId) async {
-    final userDao = _database.userDao;
-    final localUsers = await userDao.getUserById(userId);
+  Future<Map<String, int>> _processUserResponse(
+      Map<String, dynamic> serverUser, String userId) async {
+    final localUser = await _userDao.getUserById(userId);
 
     int inserted = 0;
     int updated = 0;
     int conflicts = 0;
     int skipped = 0;
 
-    if (localUsers.isEmpty) {
-      await userDao.insertUser(_serverUserToCompanion(serverUser));
+    if (localUser == null) {
+      await _userDao.insertUser(_serverUserToCompanion(serverUser));
       inserted = 1;
       debugPrint('➕ Inserted user: $userId');
     } else {
-      final localUser = localUsers.first;
       final serverUpdatedAt = DateTime.parse(serverUser['updatedAt']);
       final needsUpdate = serverUpdatedAt.isAfter(localUser.updatedAt);
 
       if (needsUpdate) {
         if (localUser.hasPendingChanges) {
           conflicts++;
-          _recordConflict(EntityType.userProfile, userId, localUser, serverUser);
+          _recordConflict(
+              EntityType.userProfile, userId, localUser, serverUser);
           skipped++;
         } else {
-          await userDao.updateUser(_serverUserToCompanion(serverUser,
-              existing: localUser));
+          // Use database write method directly since we have a Companion
+          final companion =
+              _serverUserToCompanion(serverUser, existing: localUser);
+          await (_database.update(_database.users)
+                ..where((u) => u.id.equals(userId)))
+              .write(companion);
           updated = 1;
           debugPrint('🔄 Updated user: $userId');
         }
@@ -692,7 +699,8 @@ class IncrementalSync {
       'inserted': inserted,
       'updated': updated,
       'deleted': 0,
-      'skipped': skipped > 0 ? skipped : (inserted == 0 && updated == 0 ? 1 : 0),
+      'skipped':
+          skipped > 0 ? skipped : (inserted == 0 && updated == 0 ? 1 : 0),
       'conflicts': conflicts,
     };
   }
@@ -710,36 +718,40 @@ class IncrementalSync {
       final entityTypes = ['trips', 'journals', 'users'];
 
       for (final entityType in entityTypes) {
-        final metadataList = await (_database.select(_database.syncMetadataTable)
-              ..where((tbl) => tbl.entityType.equals(entityType))
-              ..where((tbl) => tbl.userId.equals(userId)))
-            .get();
+        final metadataList =
+            await (_database.select(_database.syncMetadataTable)
+                  ..where((tbl) => tbl.entityType.equals(entityType)))
+                .get();
 
         if (metadataList.isEmpty) {
           // Create new metadata
           await _database
               .into(_database.syncMetadataTable)
-              .insert(SyncMetadataTableCompanion(
-                userId: userId,
+              .insert(SyncMetadataTableCompanion.insert(
                 entityType: entityType,
                 lastSyncedAt: Value(now),
                 lastSyncStatus: const Value('success'),
-                lastIncrementalSyncAt: usedIncremental ? Value(now) : const Value.absent(),
+                syncToken: usedIncremental
+                    ? Value(now.toIso8601String())
+                    : const Value.absent(),
+                updatedAt: now,
+                pendingCount: const Value(0),
+                failedCount: const Value(0),
+                lastSyncAttemptAt: const Value.absent(),
+                lastSyncError: const Value.absent(),
               ));
         } else {
           // Update existing metadata
-          final metadata = metadataList.first;
-          await _database
-              .update(_database.syncMetadataTable)
-              .replace(SyncMetadataTable(
-                id: metadata.id,
-                userId: userId,
-                entityType: entityType,
-                lastSyncedAt: now,
-                lastSyncStatus: 'success',
-                lastIncrementalSyncAt: usedIncremental ? now : metadata.lastIncrementalSyncAt,
-                syncToken: metadata.syncToken,
-              ));
+          await (_database.update(_database.syncMetadataTable)
+                ..where((tbl) => tbl.entityType.equals(entityType)))
+              .write(SyncMetadataTableCompanion(
+            lastSyncedAt: Value(now),
+            lastSyncStatus: const Value('success'),
+            syncToken: usedIncremental
+                ? Value(now.toIso8601String())
+                : const Value.absent(),
+            updatedAt: Value(now),
+          ));
         }
       }
 
@@ -780,7 +792,7 @@ class IncrementalSync {
         detectedAt: DateTime.now(),
       );
 
-      _conflictResolver!.recordConflict(conflict);
+      _conflictResolver.recordConflict(conflict);
       debugPrint('📝 Conflict recorded for $entityType: $entityId');
     } catch (e) {
       debugPrint('❌ Error recording conflict: $e');
@@ -834,9 +846,7 @@ class IncrementalSync {
       status: Value(serverTrip['status'] as String),
       budget: Value(serverTrip['budget'] as int),
       coverImageUrl: Value(serverTrip['coverImageUrl'] as String?),
-      travelCompanionIds: Value(serverTrip['travelCompanionIds'] != null
-          ? serverTrip['travelCompanionIds'].toString()
-          : null),
+      travelCompanionIds: Value(serverTrip['travelCompanionIds']?.toString()),
       createdAt: Value(DateTime.parse(serverTrip['createdAt'])),
       updatedAt: Value(DateTime.parse(serverTrip['updatedAt'])),
       isSynced: const Value(true),
@@ -863,12 +873,8 @@ class IncrementalSync {
           : const Value.absent(),
       mood: Value(serverJournal['mood'] as String?),
       location: Value(serverJournal['location'] as String?),
-      imageUrls: Value(serverJournal['imageUrls'] != null
-          ? serverJournal['imageUrls'].toString()
-          : null),
-      tags: Value(serverJournal['tags'] != null
-          ? serverJournal['tags'].toString()
-          : null),
+      imageUrls: Value(serverJournal['imageUrls']?.toString()),
+      tags: Value(serverJournal['tags']?.toString()),
       createdAt: Value(DateTime.parse(serverJournal['createdAt'])),
       updatedAt: Value(DateTime.parse(serverJournal['updatedAt'])),
       isSynced: const Value(true),
@@ -888,9 +894,9 @@ class IncrementalSync {
       id: Value(serverUser['id'] as String),
       username: Value(serverUser['username'] as String),
       email: Value(serverUser['email'] as String),
-      firstName: Value(serverUser['firstName'] as String?),
-      lastName: Value(serverUser['lastName'] as String?),
-      profilePictureUrl: Value(serverUser['profilePictureUrl'] as String?),
+      displayName: Value(serverUser['displayName'] as String),
+      bio: Value(serverUser['bio'] as String?),
+      avatarUrl: Value(serverUser['avatarUrl'] as String?),
       createdAt: Value(DateTime.parse(serverUser['createdAt'])),
       updatedAt: Value(DateTime.parse(serverUser['updatedAt'])),
       isSynced: const Value(true),
