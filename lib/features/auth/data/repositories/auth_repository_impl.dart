@@ -6,18 +6,25 @@ import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/refresh_queue_manager.dart';
 
 /// Implementation of [AuthRepository] that coordinates between local and remote data sources
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final AuthLocalDataSource localDataSource;
   final SecurityManager securityManager;
+  final RefreshQueueManager? refreshQueueManager;
 
   /// Creates a new [AuthRepositoryImpl] with the given data sources
+  ///
+  /// The [refreshQueueManager] is optional. When provided, it enables
+  /// robust token refresh with retry logic and queue management.
+  /// When not provided, falls back to simple refresh without retries.
   const AuthRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
     required this.securityManager,
+    this.refreshQueueManager,
   });
 
   @override
@@ -250,16 +257,53 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AuthSession> refreshToken() async {
+    // Use RefreshQueueManager if available for robust refresh with retry logic
+    if (refreshQueueManager != null) {
+      debugPrint('AuthRepositoryImpl: Using RefreshQueueManager for token refresh');
+      try {
+        final queuedResult = await refreshQueueManager!.enqueueRefresh();
+        if (queuedResult.success && queuedResult.session != null) {
+          // Update session storage after successful refresh
+          await _saveSessionToStorage(queuedResult.session!);
+          return queuedResult.session!;
+        } else {
+          throw queuedResult.error ??
+              const AuthException(
+                'Token refresh failed',
+                code: 'REFRESH_FAILED',
+              );
+        }
+      } on AuthException {
+        rethrow;
+      } catch (e) {
+        throw AuthException('Failed to refresh token: ${e.toString()}');
+      }
+    }
+
+    // Fallback to simple refresh without retry logic
+    debugPrint('AuthRepositoryImpl: Using basic token refresh (no queue manager)');
+    return performBasicTokenRefresh();
+  }
+
+  @override
+  Future<AuthSession> performBasicTokenRefresh() async {
     try {
       final session = await remoteDataSource.refreshToken();
-      await localDataSource.saveAuthData(
-        session.accessToken,
-        session.refreshToken,
-      );
+      await _saveSessionToStorage(session);
       return session;
     } catch (e) {
       throw AuthException('Failed to refresh token: ${e.toString()}');
     }
+  }
+
+  /// Saves the session tokens to local storage
+  Future<void> _saveSessionToStorage(AuthSession session) async {
+    await localDataSource.saveAuthData(
+      session.accessToken,
+      session.refreshToken,
+      expiresAt: session.expiresAt,
+      idToken: session.idToken,
+    );
   }
 
   /// Get list of known devices for the current user
@@ -314,5 +358,44 @@ class AuthRepositoryImpl implements AuthRepository {
       name: name,
     );
     return user;
+  }
+
+  @override
+  Future<AuthSession?> getSession() async {
+    try {
+      // Check if user is authenticated
+      if (!await securityManager.isKnownDevice()) {
+        return null;
+      }
+
+      // Check if session is valid
+      if (!await localDataSource.hasValidSession()) {
+        return null;
+      }
+
+      // Get all session components
+      final accessToken = await localDataSource.getAuthToken();
+      final idToken = await localDataSource.getIdToken();
+      final refreshToken = await localDataSource.getRefreshToken();
+      final expiresAt = await localDataSource.getTokenExpiration();
+
+      // Validate we have all required data
+      if (accessToken == null ||
+          refreshToken == null ||
+          expiresAt == null) {
+        return null;
+      }
+
+      // Construct and return AuthSession
+      return AuthSession(
+        accessToken: accessToken,
+        idToken: idToken ?? '',
+        refreshToken: refreshToken,
+        expiresAt: expiresAt,
+      );
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Error getting session: $e');
+      return null;
+    }
   }
 }

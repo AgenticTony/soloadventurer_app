@@ -127,8 +127,15 @@ class UnknownException extends AppException {
 
 /// Exception thrown when authentication operations fail
 class AuthException extends AppException {
-  /// Creates a new [AuthException] with the given [message] and optional [code]
-  const AuthException(String message, {super.code}) : super(message: message);
+  /// The original error that caused this exception
+  final Object? originalError;
+
+  /// Creates a new [AuthException] with the given [message], optional [originalError], and optional [code]
+  const AuthException(
+    String message, {
+    this.originalError,
+    String? code,
+  }) : super(message: message, code: code);
 }
 
 /// Exception thrown when there is a cache error
@@ -138,4 +145,26 @@ class CacheException extends AppException {
     required super.message,
     String? code,
   }) : super(code: code ?? 'cache_error');
+}
+
+/// Exception thrown when an operation cannot be performed while offline
+class OfflineException extends AppException {
+  /// Suggested recovery action for the user
+  final String? recoveryAction;
+
+  /// Creates a new [OfflineException] with the given [message], optional [recoveryAction], and optional [code]
+  const OfflineException({
+    required super.message,
+    this.recoveryAction,
+    String? code,
+  }) : super(code: code ?? 'offline_mode');
+
+  @override
+  String toString() {
+    final base = super.toString();
+    if (recoveryAction != null) {
+      return '$base - Recovery: $recoveryAction';
+    }
+    return base;
+  }
 }

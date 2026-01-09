@@ -14,6 +14,11 @@ import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dar
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// Provider for the auth repository
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -31,6 +36,24 @@ final loggingServiceProvider = Provider<LoggingService>((ref) {
   throw UnimplementedError('loggingServiceProvider must be overridden');
 });
 
+/// Provider for the token refresh scheduler
+final tokenRefreshSchedulerProvider =
+    Provider<TokenRefreshScheduler>((ref) {
+  throw UnimplementedError('tokenRefreshSchedulerProvider must be overridden');
+});
+
+/// Provider for the auth local data source
+final authLocalDataSourceProvider =
+    Provider<AuthLocalDataSource>((ref) {
+  throw UnimplementedError('authLocalDataSourceProvider must be overridden');
+});
+
+/// Provider for the persistent session manager
+final persistentSessionManagerProvider =
+    Provider<PersistentSessionManager>((ref) {
+  throw UnimplementedError('persistentSessionManagerProvider must be overridden');
+});
+
 /// Auth notifier that manages the authentication state
 class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final GetCurrentUser _getCurrentUser;
@@ -43,6 +66,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
   final ForgotPassword _forgotPassword;
   final ConfirmPasswordReset _confirmPasswordReset;
   final LoggingService _logger;
+  final TokenRefreshScheduler _refreshScheduler;
+  final AuthLocalDataSource _localDataSource;
+  final PersistentSessionManager _sessionManager;
+  final AuthRepository _authRepository;
 
   /// Creates a new [AuthNotifier]
   AuthNotifier({
@@ -56,6 +83,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     required ForgotPassword forgotPassword,
     required ConfirmPasswordReset confirmPasswordReset,
     required LoggingService logger,
+    required TokenRefreshScheduler refreshScheduler,
+    required AuthLocalDataSource localDataSource,
+    required PersistentSessionManager sessionManager,
+    required AuthRepository authRepository,
   })  : _getCurrentUser = getCurrentUser,
         _isSignedIn = isSignedIn,
         _login = login,
@@ -66,6 +97,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         _forgotPassword = forgotPassword,
         _confirmPasswordReset = confirmPasswordReset,
         _logger = logger,
+        _refreshScheduler = refreshScheduler,
+        _localDataSource = localDataSource,
+        _sessionManager = sessionManager,
+        _authRepository = authRepository,
         super(const AsyncValue.data(AuthState.initial()));
 
   /// Initialize the auth state
@@ -73,23 +108,101 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     state = const AsyncValue.loading();
 
     final newState = await AsyncValue.guard(() async {
-      final isAuthenticated = await _isSignedIn();
-      if (isAuthenticated) {
-        final user = await _getCurrentUser();
-        if (user != null) {
-          return AuthState.authenticated(
-            user: user,
-            accessToken: user.accessToken,
-            idToken: user.idToken,
-            refreshToken: user.refreshToken,
-            tokenExpiresAt: user.tokenExpiresAt,
-          );
-        }
+      debugPrint('AuthNotifier: Starting session restoration');
+
+      // Validate the stored session and determine the required action
+      final validationResult = await _sessionManager.validateSessionForRestoration();
+
+      switch (validationResult.action) {
+        case SessionValidationAction.valid:
+          // Session is valid, restore it
+          debugPrint('AuthNotifier: Session is valid, restoring user session');
+          final user = await _getCurrentUser();
+          if (user != null) {
+            // Start the refresh scheduler with the current session
+            if (validationResult.session != null) {
+              _refreshScheduler.start(validationResult.session!);
+            }
+            return AuthState.authenticated(user);
+          }
+          return const AuthState.initial();
+
+        case SessionValidationAction.canRefresh:
+          // Session is expired but can be refreshed (expired < 24 hours ago)
+          debugPrint('AuthNotifier: Session expired but can be refreshed, '
+              'expired ${validationResult.timeSinceExpiration?.inHours ?? 0}h ago');
+          try {
+            // Attempt to refresh the tokens
+            final newSession = await _authRepository.refreshToken();
+
+            // Save the refreshed session
+            await _sessionManager.saveSession(newSession);
+
+            // Get the current user
+            final user = await _getCurrentUser();
+            if (user != null) {
+              // Start the refresh scheduler with the new session
+              _refreshScheduler.start(newSession);
+              debugPrint('AuthNotifier: Session refreshed successfully');
+              return AuthState.authenticated(user);
+            }
+            return const AuthState.initial();
+          } catch (e) {
+            debugPrint('AuthNotifier: Failed to refresh session: $e');
+            // Refresh failed, user needs to re-authenticate
+            return const AuthState.initial();
+          }
+
+        case SessionValidationAction.reauthenticate:
+          // Session is expired and requires re-authentication (expired > 24 hours ago)
+          debugPrint('AuthNotifier: Session requires re-authentication, '
+              'expired ${validationResult.timeSinceExpiration?.inHours ?? 0}h ago');
+          // Clear the invalid session
+          await _sessionManager.clearSession();
+          return const AuthState.initial();
+
+        case SessionValidationAction.invalid:
+          // Session data is missing or corrupted
+          debugPrint('AuthNotifier: Session is invalid or missing');
+          return const AuthState.initial();
       }
-      return const AuthState.initial();
     });
 
     state = newState;
+  }
+
+  /// Starts the token refresh scheduler with the current session
+  Future<void> _startRefreshScheduler() async {
+    try {
+      final accessToken = await _localDataSource.getAuthToken();
+      final idToken = await _localDataSource.getIdToken();
+      final refreshToken = await _localDataSource.getRefreshToken();
+      final expiresAt = await _localDataSource.getTokenExpiration();
+
+      if (accessToken != null &&
+          idToken != null &&
+          refreshToken != null &&
+          expiresAt != null) {
+        final session = AuthSession(
+          accessToken: accessToken,
+          idToken: idToken,
+          refreshToken: refreshToken,
+          expiresAt: expiresAt,
+        );
+        _refreshScheduler.start(session);
+        debugPrint('AuthNotifier: Token refresh scheduler started');
+      } else {
+        debugPrint('AuthNotifier: Incomplete session data, scheduler not started');
+      }
+    } catch (e) {
+      debugPrint('AuthNotifier: Failed to start refresh scheduler: $e');
+    }
+  }
+
+  /// Stops the token refresh scheduler
+  void _stopRefreshScheduler() {
+    _refreshScheduler.stop();
+    debugPrint('AuthNotifier: Token refresh scheduler stopped');
   }
 
   /// Sign in with email and password
@@ -98,13 +211,16 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
     try {
       final user = await _login(LoginParams(email: email, password: password));
-      state = AsyncValue.data(AuthState.authenticated(
-        user: user,
-        accessToken: user.accessToken,
-        idToken: user.idToken,
-        refreshToken: user.refreshToken,
-        tokenExpiresAt: user.tokenExpiresAt,
-      ));
+
+      // Get the current session and save it
+      final session = await _authRepository.getSession();
+      if (session != null) {
+        await _sessionManager.saveSession(session);
+        // Start the refresh scheduler after successful login
+        _refreshScheduler.start(session);
+      }
+
+      state = AsyncValue.data(AuthState.authenticated(user));
     } catch (e, stack) {
       state = AsyncValue.error(e.toString(), stack);
     }
@@ -128,13 +244,14 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       if (needsVerification) {
         state = AsyncValue.data(AuthState.unverified(user: user));
       } else {
-        state = AsyncValue.data(AuthState.authenticated(
-          user: user,
-          accessToken: user.accessToken,
-          idToken: user.idToken,
-          refreshToken: user.refreshToken,
-          tokenExpiresAt: user.tokenExpiresAt,
-        ));
+        // Get the current session and save it (if logged in)
+        final session = await _authRepository.getSession();
+        if (session != null) {
+          await _sessionManager.saveSession(session);
+          // Start the refresh scheduler after successful registration
+          _refreshScheduler.start(session);
+        }
+        state = AsyncValue.data(AuthState.authenticated(user));
       }
     } catch (e, stack) {
       state = AsyncValue.error(e.toString(), stack);
@@ -146,6 +263,12 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     state = const AsyncValue.loading();
 
     try {
+      // Stop the refresh scheduler before signing out
+      _stopRefreshScheduler();
+
+      // Clear the persistent session
+      await _sessionManager.clearSession();
+
       await _signOut();
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {

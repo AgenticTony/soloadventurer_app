@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/widgets/auth_error_display.dart';
 
 /// Login screen for the application
 class LoginScreen extends ConsumerStatefulWidget {
@@ -21,12 +23,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  Object? _currentError;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _clearError() {
+    setState(() {
+      _currentError = null;
+    });
   }
 
   void _togglePasswordVisibility() {
@@ -65,16 +74,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authStateProvider);
     final isLoading = ref.watch(isLoadingProvider);
 
-    // Listen for auth state changes to show error messages
+    // Listen for auth state changes to capture errors
     ref.listen(authStateProvider, (previous, next) {
-      if (next.error?.isNotEmpty == true && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      if (next.error != null && next.error!.isNotEmpty && mounted) {
+        // Create an AuthException from the error message
+        setState(() {
+          _currentError = AuthException(
+            message: next.error!,
+            code: next.errorCode,
+          );
+        });
+      } else if (next.error == null && mounted) {
+        // Clear error when auth state is successful
+        _clearError();
       }
     });
 
@@ -90,15 +102,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      body: Column(
+        children: [
+          // Show error banner if there's an error
+          if (_currentError != null)
+            AuthErrorBanner(
+              error: _currentError!,
+              onDismiss: _clearError,
+            ),
+
+          // Form content
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                 // App logo or image
                 const Icon(
                   Icons.hiking,
@@ -203,10 +226,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                   ],
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -226,6 +251,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
 
+      // Clear any previous error before attempting login
+      _clearError();
+
       try {
         await ref.read(authNotifierProvider.notifier).signIn(
               email,
@@ -242,7 +270,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }
       } catch (e) {
-        // Error handling is done by the provider
+        // Store the error for display
+        if (mounted) {
+          setState(() {
+            _currentError = e;
+          });
+        }
       }
     }
   }

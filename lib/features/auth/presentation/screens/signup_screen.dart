@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/widgets/auth_error_display.dart';
 
 /// Sign up screen for the application
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -24,6 +26,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  Object? _currentError;
 
   @override
   void dispose() {
@@ -32,6 +35,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  void _clearError() {
+    setState(() {
+      _currentError = null;
+    });
   }
 
   void _togglePasswordVisibility() {
@@ -101,6 +110,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     // Watch the navigation provider to ensure it's instantiated and listening
     ref.watch(authNavigationProvider);
 
+    // Listen for auth state changes to capture errors
+    ref.listen(authStateProvider, (previous, next) {
+      if (next.error != null && next.error!.isNotEmpty && mounted) {
+        // Create an AuthException from the error message
+        setState(() {
+          _currentError = AuthException(
+            message: next.error!,
+            code: next.errorCode,
+          );
+        });
+      } else if (next.error == null && mounted) {
+        // Clear error when auth state is successful
+        _clearError();
+      }
+    });
+
     if (isLoading) {
       return const Scaffold(
         body: Center(
@@ -109,39 +134,30 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       );
     }
 
-    if (authState.error != null) {
-      return Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: ${authState.error}'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(authNotifierProvider.notifier).signOut();
-                },
-                child: const Text('Try Again'),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign Up'),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      body: Column(
+        children: [
+          // Show error banner if there's an error
+          if (_currentError != null)
+            AuthErrorBanner(
+              error: _currentError!,
+              onDismiss: _clearError,
+            ),
+
+          // Form content
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                 // App logo or image
                 const Icon(
                   Icons.hiking,
@@ -269,10 +285,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     ),
                   ],
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -282,6 +300,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       final name = _nameController.text.trim();
       final email = _emailController.text.trim();
       final password = _passwordController.text;
+
+      // Clear any previous error before attempting signup
+      _clearError();
 
       try {
         await ref.read(authNotifierProvider.notifier).register(
@@ -300,7 +321,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           }
         }
       } catch (e) {
-        // Error handling is done by the provider
+        // Store the error for display
+        if (mounted) {
+          setState(() {
+            _currentError = e;
+          });
+        }
       }
     }
   }

@@ -8,6 +8,7 @@ import 'package:soloadventurer/features/profile/presentation/providers/profile_p
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_overlay.dart';
+import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_notification_listener.dart';
 
 /// Provider for the profile route observer
 final profileRouteObserverProvider = Provider<ProfileRouteObserver>((ref) {
@@ -90,24 +91,26 @@ class App extends ConsumerWidget {
     final navigatorKey = ref.watch(navigatorKeyProvider);
 
     return AppLifecycleSyncManager(
-      child: TokenRefreshOverlay(
-        child: MaterialApp(
-          navigatorKey: navigatorKey,
-          title: 'SoloAdventurer',
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode.system,
-          debugShowCheckedModeBanner: false,
-          onGenerateRoute: AppRouter.onGenerateRoute,
-          initialRoute: '/',
-          navigatorObservers: [
-            NavigatorObserver(),
-            ref.watch(profileRouteObserverProvider),
-          ],
-          builder: (context, child) {
-            if (child == null) return const SizedBox();
-            return NavigationHandler(child: child);
-          },
+      child: TokenRefreshNotificationListener(
+        child: TokenRefreshOverlay(
+          child: MaterialApp(
+            navigatorKey: navigatorKey,
+            title: 'SoloAdventurer',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.system,
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: AppRouter.onGenerateRoute,
+            initialRoute: '/',
+            navigatorObservers: [
+              NavigatorObserver(),
+              ref.watch(profileRouteObserverProvider),
+            ],
+            builder: (context, child) {
+              if (child == null) return const SizedBox();
+              return NavigationHandler(child: child);
+            },
+          ),
         ),
       ),
     );

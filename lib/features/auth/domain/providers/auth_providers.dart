@@ -19,6 +19,7 @@ import 'package:soloadventurer/features/auth/domain/usecases/resend_verification
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/auth_error_handler.dart';
 
 /// Authentication configuration constants
 const _kMaxFailedAttempts = 5;
@@ -152,6 +153,11 @@ final confirmPasswordResetProvider = Provider<ConfirmPasswordReset>(
 /// Provider for the logging service
 final loggingServiceProvider =
     Provider<LoggingService>((ref) => getIt<LoggingService>());
+
+/// Provider for the auth error handler
+final authErrorHandlerProvider = Provider<AuthErrorHandler>((ref) {
+  return const AuthErrorHandler();
+});
 
 /// Provider for the auth notifier
 final authNotifierProvider =
