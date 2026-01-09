@@ -1,0 +1,46 @@
+// Production-grade fix for plugins without namespace (AGP 8.x requirement)
+// This configuration is applied to all subprojects to ensure they have a namespace
+//
+// Background: Android Gradle Plugin 8.x requires all modules to specify a namespace.
+// Older Flutter plugins like device_info 2.0.3 don't have this configured.
+// This script automatically adds a namespace for any plugin project missing one.
+
+// Use projectsEvaluated to ensure all projects are loaded first
+gradle.projectsEvaluated {
+    // Iterate through all subprojects
+    rootProject.subprojects.each { project ->
+        // Only apply to Android projects
+        if (project.hasProperty("android")) {
+            project.afterEvaluate {
+                // Check if namespace is already set
+                if (project.ext.has("namespace")) {
+                    return
+                }
+
+                // Check the android block for namespace
+                def hasNamespace = false
+                try {
+                    if (project.android.hasProperty("namespace")) {
+                        hasNamespace = true
+                    }
+                } catch (Exception e) {
+                    // Namespace not configured
+                }
+
+                if (!hasNamespace) {
+                    // Add namespace to the android block
+                    project.android {
+                        // For device_info plugin, use its package name
+                        if (project.name == "device_info") {
+                            namespace = "io.flutter.plugins.deviceinfo"
+                        }
+                        // For other plugins without namespace, use a default pattern
+                        else {
+                            namespace = "io.flutter.plugins.${project.name}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -9,11 +9,19 @@ class UpdateProfileUseCase {
   const UpdateProfileUseCase(this._repository);
 
   /// Execute the use case with the given profile data
-  Future<Profile> call(Profile profile) => _repository.updateProfile(profile);
+  /// Returns the updated profile from the repository operation result
+  Future<Profile> call(Profile profile) async {
+    final result = await _repository.updateProfile(profile);
+    return result.data;
+  }
 
   /// Update specific profile fields
-  Future<Profile> updateFields(String userId, Map<String, dynamic> fields) =>
-      _repository.updateProfileFields(userId, fields);
+  /// Returns the updated profile from the repository operation result
+  Future<Profile> updateFields(
+      String userId, Map<String, dynamic> fields) async {
+    final result = await _repository.updateProfileFields(userId, fields);
+    return result.data;
+  }
 
   /// Update profile preferences
   Future<void> updatePreferences(

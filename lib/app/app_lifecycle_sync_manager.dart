@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
@@ -35,8 +34,7 @@ class AppLifecycleSyncManager extends ConsumerStatefulWidget {
 }
 
 class _AppLifecycleSyncManagerState
-    extends ConsumerState<AppLifecycleSyncManager>
-    with WidgetsBindingObserver {
+    extends ConsumerState<AppLifecycleSyncManager> with WidgetsBindingObserver {
   /// Timestamp of last foreground sync trigger
   DateTime? _lastForegroundSyncTime;
 
@@ -78,8 +76,7 @@ class _AppLifecycleSyncManagerState
       final timeSinceLastSync =
           DateTime.now().difference(_lastForegroundSyncTime!);
       if (timeSinceLastSync < widget.minSyncInterval) {
-        final remainingTime =
-            widget.minSyncInterval - timeSinceLastSync;
+        final remainingTime = widget.minSyncInterval - timeSinceLastSync;
         debugPrint(
           '⏱️ Skipping foreground sync - not enough time elapsed. '
           'Remaining: ${remainingTime.inSeconds}s',

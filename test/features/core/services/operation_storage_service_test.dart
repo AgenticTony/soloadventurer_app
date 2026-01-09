@@ -1,9 +1,12 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:soloadventurer/features/core/services/operation_storage_service.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
+import 'package:soloadventurer/features/auth/infrastructure/providers/secure_storage_provider.dart';
+import 'package:soloadventurer/features/core/providers/operation_queue_provider.dart';
 import 'package:soloadventurer/features/core/services/operation_queue.dart';
 
 @GenerateMocks([SharedPreferences, FlutterSecureStorage])
@@ -13,11 +16,25 @@ void main() {
   group('OperationStorageService', () {
     late MockSharedPreferences mockPrefs;
     late MockFlutterSecureStorage mockSecureStorage;
-    late OperationStorageService service;
+    late ProviderContainer container;
 
     setUp(() {
       mockPrefs = MockSharedPreferences();
       mockSecureStorage = MockFlutterSecureStorage();
+
+      // Set up mocks for SharedPreferences.getInstance()
+      SharedPreferences.setMockInitialValues({});
+
+      container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(mockPrefs),
+          secureStorageProvider.overrideWithValue(mockSecureStorage),
+        ],
+      );
+    });
+
+    tearDown(() {
+      container.dispose();
     });
 
     group('Save Operations', () {
@@ -25,6 +42,8 @@ void main() {
         // Arrange
         when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
         when(mockPrefs.setInt(any, any)).thenAnswer((_) async => true);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.savePendingOperations([]);
@@ -37,8 +56,11 @@ void main() {
 
       test('should clear storage when saving empty operation list', () async {
         // Arrange
-        when(mockPrefs.remove('pending_operations')).thenAnswer((_) async => true);
+        when(mockPrefs.remove('pending_operations'))
+            .thenAnswer((_) async => true);
         when(mockPrefs.setInt(any, any)).thenAnswer((_) async => true);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.savePendingOperations([]);
@@ -51,6 +73,8 @@ void main() {
       test('should save failed operations successfully', () async {
         // Arrange
         when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.saveFailedOperations([]);
@@ -68,6 +92,8 @@ void main() {
         );
         when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
         when(mockPrefs.setInt(any, any)).thenAnswer((_) async => true);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.savePendingOperations(operations);
@@ -79,7 +105,10 @@ void main() {
 
       test('should handle save errors gracefully', () async {
         // Arrange
-        when(mockPrefs.setString(any, any)).thenThrow(Exception('Storage error'));
+        when(mockPrefs.setString(any, any))
+            .thenThrow(Exception('Storage error'));
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.savePendingOperations([]);
@@ -106,10 +135,12 @@ void main() {
             'requiresNetwork': true,
           },
         ];
-        when(mockPrefs.getString('pending_operations'))
-            .thenReturn('[${operationsJson.map((e) => _jsonEncode(e)).join(',')}]');
+        when(mockPrefs.getString('pending_operations')).thenReturn(
+            '[${operationsJson.map((e) => _jsonEncode(e)).join(',')}]');
         when(mockPrefs.getString('failed_operations')).thenReturn(null);
         when(mockPrefs.getInt('operation_queue_version')).thenReturn(1);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.loadOperations();
@@ -126,6 +157,8 @@ void main() {
         when(mockPrefs.getString('pending_operations')).thenReturn(null);
         when(mockPrefs.getString('failed_operations')).thenReturn(null);
         when(mockPrefs.getInt('operation_queue_version')).thenReturn(0);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.loadOperations();
@@ -142,6 +175,8 @@ void main() {
             .thenReturn('invalid json{{{');
         when(mockPrefs.getString('failed_operations')).thenReturn(null);
         when(mockPrefs.getInt('operation_queue_version')).thenReturn(1);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.loadOperations();
@@ -170,10 +205,12 @@ void main() {
             'type': 'location_update',
           },
         ];
-        when(mockPrefs.getString('pending_operations'))
-            .thenReturn('[${operationsJson.map((e) => _jsonEncode(e)).join(',')}]');
+        when(mockPrefs.getString('pending_operations')).thenReturn(
+            '[${operationsJson.map((e) => _jsonEncode(e)).join(',')}]');
         when(mockPrefs.getString('failed_operations')).thenReturn(null);
         when(mockPrefs.getInt('operation_queue_version')).thenReturn(1);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.loadOperations();
@@ -189,6 +226,8 @@ void main() {
         when(mockPrefs.getString('pending_operations')).thenReturn('[]');
         when(mockPrefs.getString('failed_operations')).thenReturn(null);
         when(mockPrefs.getInt('operation_queue_version')).thenReturn(999);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.loadOperations();
@@ -203,6 +242,8 @@ void main() {
       test('should clear all operations successfully', () async {
         // Arrange
         when(mockPrefs.remove(any)).thenAnswer((_) async => true);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.clearAllOperations();
@@ -217,6 +258,8 @@ void main() {
       test('should handle clear errors gracefully', () async {
         // Arrange
         when(mockPrefs.remove(any)).thenThrow(Exception('Clear error'));
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.clearAllOperations();
@@ -229,13 +272,15 @@ void main() {
     group('Storage Statistics', () {
       test('should return accurate storage statistics', () async {
         // Arrange
-        final pendingJson =
+        const pendingJson =
             '[{"id":"op1","type":"test"},{"id":"op2","type":"test"}]';
-        final failedJson = '[{"id":"op3","type":"test"}]';
+        const failedJson = '[{"id":"op3","type":"test"}]';
         when(mockPrefs.getString('pending_operations')).thenReturn(pendingJson);
         when(mockPrefs.getString('failed_operations')).thenReturn(failedJson);
         when(mockPrefs.getInt('operation_queue_last_save_time'))
             .thenReturn(1640000000000);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final stats = await service.getStorageStats();
@@ -251,7 +296,10 @@ void main() {
         // Arrange
         when(mockPrefs.getString('pending_operations')).thenReturn(null);
         when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_last_save_time')).thenReturn(null);
+        when(mockPrefs.getInt('operation_queue_last_save_time'))
+            .thenReturn(null);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final stats = await service.getStorageStats();
@@ -269,9 +317,12 @@ void main() {
         // Arrange
         when(mockSecureStorage.write(key: any, value: any))
             .thenAnswer((_) async => Future.value());
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
-        final result = await service.saveSensitiveData('test_key', 'test_value');
+        final result =
+            await service.saveSensitiveData('test_key', 'test_value');
 
         // Assert
         expect(result, isTrue);
@@ -282,6 +333,8 @@ void main() {
         // Arrange
         when(mockSecureStorage.read(key: any))
             .thenAnswer((_) async => 'test_value');
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.loadSensitiveData('test_key');
@@ -295,6 +348,8 @@ void main() {
         // Arrange
         when(mockSecureStorage.delete(key: any))
             .thenAnswer((_) async => Future.value());
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.deleteSensitiveData('test_key');
@@ -308,6 +363,8 @@ void main() {
         // Arrange
         when(mockSecureStorage.deleteAll())
             .thenAnswer((_) async => Future.value());
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = await service.clearAllSensitiveData();
@@ -321,9 +378,12 @@ void main() {
         // Arrange
         when(mockSecureStorage.write(key: any, value: any))
             .thenThrow(Exception('Secure storage error'));
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
-        final result = await service.saveSensitiveData('test_key', 'test_value');
+        final result =
+            await service.saveSensitiveData('test_key', 'test_value');
 
         // Assert
         expect(result, isFalse);
@@ -335,6 +395,8 @@ void main() {
         // Arrange
         when(mockPrefs.getInt('operation_queue_last_save_time'))
             .thenReturn(null);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = service.getLastSaveTime();
@@ -345,9 +407,11 @@ void main() {
 
       test('should return valid DateTime if save time exists', () async {
         // Arrange
-        final timestamp = 1640000000000;
+        const timestamp = 1640000000000;
         when(mockPrefs.getInt('operation_queue_last_save_time'))
             .thenReturn(timestamp);
+        final service =
+            container.read(operationStorageServiceProvider.notifier);
 
         // Act
         final result = service.getLastSaveTime();
@@ -383,6 +447,24 @@ class _MockQueueableOperation implements QueueableOperation {
 
   @override
   bool get requiresNetwork => true;
+
+  @override
+  int get attemptCount => 0;
+
+  @override
+  DateTime? get createdAt => DateTime.now();
+
+  @override
+  String? get deduplicationKey => 'test_$id';
+
+  @override
+  DateTime? get lastAttempt => null;
+
+  @override
+  String? get lastError => null;
+
+  @override
+  int get maxRetries => 3;
 
   _MockQueueableOperation(this.id, this.type);
 

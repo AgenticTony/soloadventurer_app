@@ -1,34 +1,25 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:platform_device_id/platform_device_id.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
 
 /// Service for retrieving device information
 class DeviceInfoService {
   final DeviceInfoPlugin _deviceInfo;
   final LoggingService _logger;
-  
+
   /// Creates a new [DeviceInfoService]
   DeviceInfoService({
     required DeviceInfoPlugin deviceInfo,
     required LoggingService logger,
-  }) : 
-    _deviceInfo = deviceInfo,
-    _logger = logger;
-  
+  })  : _deviceInfo = deviceInfo,
+        _logger = logger;
+
   /// Gets a unique device identifier
   /// This is used for device-specific encryption
   Future<String> getDeviceId() async {
     try {
-      // Try to get the platform device ID first
-      String? deviceId = await PlatformDeviceId.getDeviceId;
-      
-      if (deviceId != null && deviceId.isNotEmpty) {
-        return deviceId;
-      }
-      
-      // Fallback to device-specific identifiers
+      // Use device-specific identifiers
       if (Platform.isAndroid) {
         final androidInfo = await _deviceInfo.androidInfo;
         return androidInfo.id;
@@ -49,21 +40,21 @@ class DeviceInfoService {
         return 'unknown_device_${DateTime.now().millisecondsSinceEpoch}';
       }
     } catch (e, stackTrace) {
-      _logger.error(
-        'Failed to get device ID',
-        error: e,
+      _logger.logError(
+        feature: 'DeviceInfoService',
+        error: 'Failed to get device ID: $e',
         stackTrace: stackTrace,
       );
       // Fallback to a timestamp-based ID
       return 'fallback_device_${DateTime.now().millisecondsSinceEpoch}';
     }
   }
-  
+
   /// Gets detailed device information for logging/debugging
   Future<Map<String, dynamic>> getDeviceDetails() async {
     try {
       final Map<String, dynamic> deviceData = <String, dynamic>{};
-      
+
       if (kIsWeb) {
         deviceData['platform'] = 'web';
         final webInfo = await _deviceInfo.webBrowserInfo;
@@ -97,7 +88,8 @@ class DeviceInfoService {
         final windowsInfo = await _deviceInfo.windowsInfo;
         deviceData['computerName'] = windowsInfo.computerName;
         deviceData['numberOfCores'] = windowsInfo.numberOfCores;
-        deviceData['systemMemoryInMegabytes'] = windowsInfo.systemMemoryInMegabytes;
+        deviceData['systemMemoryInMegabytes'] =
+            windowsInfo.systemMemoryInMegabytes;
       } else if (Platform.isLinux) {
         deviceData['platform'] = 'linux';
         final linuxInfo = await _deviceInfo.linuxInfo;
@@ -107,12 +99,12 @@ class DeviceInfoService {
       } else {
         deviceData['platform'] = 'unknown';
       }
-      
+
       return deviceData;
     } catch (e, stackTrace) {
-      _logger.error(
-        'Failed to get device details',
-        error: e,
+      _logger.logError(
+        feature: 'DeviceInfoService',
+        error: 'Failed to get device details: $e',
         stackTrace: stackTrace,
       );
       return {'platform': 'unknown', 'error': e.toString()};

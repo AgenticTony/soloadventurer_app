@@ -17,7 +17,8 @@ class OperationQueueScreen extends ConsumerStatefulWidget {
   const OperationQueueScreen({super.key});
 
   @override
-  ConsumerState<OperationQueueScreen> createState() => _OperationQueueScreenState();
+  ConsumerState<OperationQueueScreen> createState() =>
+      _OperationQueueScreenState();
 }
 
 class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
@@ -53,7 +54,8 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
                     ),
                   ),
                   backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 ),
               ),
             ),
@@ -69,7 +71,8 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
                     ),
                   ),
                   backgroundColor: colorScheme.error,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 ),
               ),
             ),
@@ -91,7 +94,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
-                        color: Colors.blue.withOpacity(0.1),
+                        color: Colors.blue.withValues(alpha: 0.1),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -122,7 +125,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.pending,
                               color: Colors.blue,
                               size: 20,
@@ -137,10 +140,11 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
                           ],
                         ),
                       ),
-                      ...queueState.pendingOperations.map((operation) => OperationListItem(
-                            operation: operation,
-                            isFailed: false,
-                          )),
+                      ...queueState.pendingOperations
+                          .map((operation) => OperationListItem(
+                                operation: operation,
+                                isFailed: false,
+                              )),
                       const SizedBox(height: 16),
                     ],
 
@@ -175,12 +179,13 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
                           ],
                         ),
                       ),
-                      ...queueState.failedOperations.map((operation) => OperationListItem(
-                            operation: operation,
-                            isFailed: true,
-                            onRetry: () => _retryOperation(operation.id),
-                            onRemove: () => _removeOperation(operation.id),
-                          )),
+                      ...queueState.failedOperations
+                          .map((operation) => OperationListItem(
+                                operation: operation,
+                                isFailed: true,
+                                onRetry: () => _retryOperation(operation.id),
+                                onRemove: () => _removeOperation(operation.id),
+                              )),
                       const SizedBox(height: 16),
                     ],
 
@@ -194,7 +199,9 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
           ? null
           : FloatingActionButton.extended(
               onPressed: () async {
-                await ref.read(operationQueueNotifierProvider.notifier).processQueue();
+                await ref
+                    .read(operationQueueNotifierProvider.notifier)
+                    .processQueue();
               },
               icon: const Icon(Icons.play_arrow),
               label: const Text('Process Queue'),
@@ -218,7 +225,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withOpacity(0.1),
+                  color: colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -238,7 +245,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
               Text(
                 'No operations are currently pending or failed.',
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -246,7 +253,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
               Text(
                 'Your changes have been synced successfully.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -260,7 +267,9 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
   /// Retry a specific failed operation
   Future<void> _retryOperation(String operationId) async {
     try {
-      await ref.read(operationQueueNotifierProvider.notifier).retryOperation(operationId);
+      await ref
+          .read(operationQueueNotifierProvider.notifier)
+          .retryOperation(operationId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -286,14 +295,17 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
     final confirmed = await _showConfirmDialog(
       context,
       title: 'Remove Operation',
-      content: 'Are you sure you want to remove this operation? This action cannot be undone.',
+      content:
+          'Are you sure you want to remove this operation? This action cannot be undone.',
       confirmText: 'Remove',
       isDestructive: true,
     );
 
     if (confirmed == true) {
       try {
-        await ref.read(operationQueueNotifierProvider.notifier).removeFailedOperation(operationId);
+        await ref
+            .read(operationQueueNotifierProvider.notifier)
+            .removeFailedOperation(operationId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -320,14 +332,17 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
     final confirmed = await _showConfirmDialog(
       context,
       title: 'Clear All Failed Operations',
-      content: 'Are you sure you want to clear all ${ref.read(operationQueueNotifierProvider).failedCount} failed operations? This action cannot be undone.',
+      content:
+          'Are you sure you want to clear all ${ref.read(operationQueueNotifierProvider).failedCount} failed operations? This action cannot be undone.',
       confirmText: 'Clear All',
       isDestructive: true,
     );
 
     if (confirmed == true) {
       try {
-        await ref.read(operationQueueNotifierProvider.notifier).clearFailedOperations();
+        await ref
+            .read(operationQueueNotifierProvider.notifier)
+            .clearFailedOperations();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -373,7 +388,8 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: TextButton.styleFrom(
-              foregroundColor: isDestructive ? colorScheme.error : colorScheme.primary,
+              foregroundColor:
+                  isDestructive ? colorScheme.error : colorScheme.primary,
             ),
             child: Text(confirmText),
           ),

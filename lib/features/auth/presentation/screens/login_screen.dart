@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 
@@ -62,29 +62,86 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    final isLoading = ref.watch(isLoadingProvider);
+    final authAsync = ref.watch(authNotifierProvider);
 
     // Listen for auth state changes to show error messages
-    ref.listen(authStateProvider, (previous, next) {
-      if (next.error?.isNotEmpty == true && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error!),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
+    ref.listen(authNotifierProvider, (previous, next) {
+      next.when(
+        data: (authState) {
+          // Don't show snackbar - errors are handled by UI
+        },
+        loading: () {},
+        error: (error, stack) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(error.toString()),
+                backgroundColor: Theme.of(context).colorScheme.error,
+                behavior: SnackBarBehavior.floating,
+                action: SnackBarAction(
+                  label: 'Dismiss',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  },
+                ),
+              ),
+            );
+          }
+        },
+      );
     });
 
-    if (isLoading) {
-      return const Scaffold(
+    return authAsync.when(
+      loading: () => const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
         ),
-      );
-    }
+      ),
+      error: (error, stack) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Login'),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: Colors.red,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'An error occurred',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.invalidate(authNotifierProvider),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      data: (authState) => _buildLoginForm(context, authState),
+    );
+  }
+
+  Widget _buildLoginForm(BuildContext context, authState) {
+    // Note: With AsyncValue pattern, loading state is handled by .when() in build()
+    // When _buildLoginForm is called, we're already in data state
+    const isLoading = false;
 
     return Scaffold(
       appBar: AppBar(
@@ -131,7 +188,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                   validator: _validateEmail,
-                  enabled: !authState.isLoading,
+                  enabled: !isLoading,
                 ),
 
                 const SizedBox(height: 16),
@@ -155,7 +212,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   obscureText: !_isPasswordVisible,
                   textInputAction: TextInputAction.done,
                   validator: _validatePassword,
-                  enabled: !authState.isLoading,
+                  enabled: !isLoading,
                 ),
 
                 const SizedBox(height: 8),
@@ -164,8 +221,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed:
-                        authState.isLoading ? null : _navigateToForgotPassword,
+                    onPressed: isLoading ? null : _navigateToForgotPassword,
                     child: const Text('Forgot Password?'),
                   ),
                 ),
@@ -174,11 +230,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Login button
                 ElevatedButton(
-                  onPressed: authState.isLoading ? null : _login,
+                  onPressed: isLoading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: authState.isLoading
+                  child: isLoading
                       ? const SizedBox(
                           height: 20,
                           width: 20,
@@ -198,7 +254,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     const Text("Don't have an account?"),
                     TextButton(
-                      onPressed: authState.isLoading ? null : _navigateToSignUp,
+                      onPressed: isLoading ? null : _navigateToSignUp,
                       child: const Text('Sign Up'),
                     ),
                   ],
@@ -234,12 +290,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
         // Only navigate to home if we're still mounted and the login was successful
         if (mounted) {
-          final authState = ref.read(authStateProvider);
-          if (authState.isLoggedIn) {
-            ref
-                .read(authNavigationProvider.notifier)
-                .navigateTo(AuthRoutes.home);
-          }
+          final authAsync = ref.read(authNotifierProvider);
+          authAsync.whenData((authState) {
+            if (authState.isLoggedIn) {
+              ref
+                  .read(authNavigationProvider.notifier)
+                  .navigateTo(AuthRoutes.home);
+            }
+          });
         }
       } catch (e) {
         // Error handling is done by the provider

@@ -282,7 +282,7 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
       required this.tripId,
       required this.noteType,
       required final Map<String, dynamic> content,
-      this.priority = OperationPriority.normal,
+      required this.priority,
       this.locationName,
       this.latitude,
       this.longitude,
@@ -313,7 +313,6 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
   }
 
   @override
-  @JsonKey()
   final int priority;
   @override
   final String? locationName;
@@ -416,7 +415,7 @@ abstract class _TravelNoteOperation extends TravelNoteOperation {
       required final String tripId,
       required final NoteType noteType,
       required final Map<String, dynamic> content,
-      final int priority,
+      required final int priority,
       final String? locationName,
       final double? latitude,
       final double? longitude,

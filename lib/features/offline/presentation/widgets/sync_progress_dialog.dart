@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
+import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
 
 /// A dialog showing detailed sync progress with operations list
@@ -37,8 +38,7 @@ class SyncProgressDialog extends ConsumerStatefulWidget {
   const SyncProgressDialog({super.key});
 
   @override
-  ConsumerState<SyncProgressDialog> createState() =>
-      _SyncProgressDialogState();
+  ConsumerState<SyncProgressDialog> createState() => _SyncProgressDialogState();
 }
 
 class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
@@ -157,7 +157,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
               size: 24,
             )
           else
-            Icon(
+            const Icon(
               Icons.check_circle,
               color: Colors.green,
               size: 24,
@@ -180,7 +180,6 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
           ),
         ],
       ),
-
       content: SizedBox(
         width: double.maxFinite,
         child: Column(
@@ -200,7 +199,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
                 operations: _pendingOperations,
                 icon: Icons.pending_actions,
                 color: theme.colorScheme.secondary,
-                theme,
+                theme: theme,
               ),
               const SizedBox(height: 16),
             ],
@@ -213,7 +212,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
                 operations: _failedOperations,
                 icon: Icons.error_outline,
                 color: theme.colorScheme.error,
-                theme,
+                theme: theme,
               ),
               const SizedBox(height: 16),
             ],
@@ -227,7 +226,6 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
           ],
         ),
       ),
-
       actions: [
         // Cancel sync button (only when syncing)
         if (syncStatus.isSyncing)
@@ -274,8 +272,9 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
           // Progress bar
           LinearProgressIndicator(
             value: syncStatus.progress,
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
-            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
+            valueColor:
+                AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
           ),
           const SizedBox(height: 8),
 
@@ -305,7 +304,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
             Text(
               syncStatus.currentOperation!,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -404,7 +404,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
             child: Text(
               'And ${operations.length - 5} more...',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -444,7 +445,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
             : Text(
                 _getOperationTypeLabel(operation.operation),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                  color:
+                      theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                 ),
               ),
         trailing: operation.status == SyncOperationStatus.failed
@@ -465,7 +467,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Icons.check_circle_outline,
               color: Colors.green,
               size: 48,
@@ -481,7 +483,8 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
             Text(
               'No pending or failed operations',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                color:
+                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -534,7 +537,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
       case SyncOperationType.create:
         return Icons.add_circle_outline;
       case SyncOperationType.update:
-        return Icons.edit_outline;
+        return Icons.edit;
       case SyncOperationType.delete:
         return Icons.delete_outline;
     }

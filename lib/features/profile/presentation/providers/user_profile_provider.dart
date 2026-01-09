@@ -47,31 +47,6 @@ final userProfileProvider =
   return userRepository.getUserProfile(userId);
 });
 
-// Provider for current user profile
-final currentUserProfileProvider = FutureProvider<User?>((ref) async {
-  final authState = ref.watch(authStateProvider);
-
-  if (authState.userId == null) {
-    return null;
-  }
-
-  final userRepository = ref.watch(userRepositoryProvider);
-  return userRepository.getUserProfile(authState.userId!);
-});
-
-// Auth state provider (simplified for this example)
-final authStateProvider = Provider<AuthState>((ref) {
-  // This would normally come from your auth provider
-  return AuthState(userId: 'current-user-id');
-});
-
-// Simple auth state class for this example
-class AuthState {
-  final String? userId;
-
-  AuthState({this.userId});
-}
-
 // Notifier for updating user profile
 class UserProfileNotifier extends StateNotifier<AsyncValue<User?>> {
   final UserRepository _userRepository;

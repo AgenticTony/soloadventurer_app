@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/safety_status.dart' as safety;
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
-import '../../../../core/services/location_service.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
+import '../../../../core/services/location_service.dart' as core;
 
 /// Screen for updating safety status
 ///
@@ -33,8 +33,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
   void initState() {
     super.initState();
     // Initialize with current status
-    final safetyState = ref.read(safetyNotifierProvider);
-    _selectedStatus = safetyState.currentStatus?.status;
+    _selectedStatus = null; // Will be loaded when state is available
 
     // Get current location if location sharing is enabled
     if (_shareLocation) {
@@ -57,7 +56,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
     try {
       final locationService = ref.read(locationServiceProvider);
       final locationData = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       setState(() {
@@ -89,7 +88,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
       return;
     }
 
-    final user = ref.read(currentUserProvider);
+    final user = ref.read(authNotifierProvider).valueOrNull?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -102,7 +101,10 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
       return;
     }
 
-    if (_shareLocation && _currentLocation == null && !_locationError.isNullOrEmpty) {
+    if (_shareLocation &&
+        _currentLocation == null &&
+        _locationError != null &&
+        _locationError!.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Waiting for location...'),
@@ -112,7 +114,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
       return;
     }
 
-    final notifier = ref.read(safetyNotifierProvider.notifier);
+    final notifier = ref.read(safetyNotifierProvider);
 
     try {
       await notifier.updateSafetyStatus(
@@ -157,14 +159,14 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           color: statusColor,
           size: 64,
         ),
-        title: Text('Status Updated!'),
+        title: const Text('Status Updated!'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -239,12 +241,12 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyState = ref.watch(safetyNotifierProvider);
-    final trustedContactsState = ref.watch(trustedContactsNotifierProvider);
+    final safetyState = ref.watch(safetyStateProvider);
+    final contactsState = ref.watch(trustedContactsProvider);
     final isProcessing = safetyState.isProcessing;
 
     // Get contacts who will be notified (all contacts for status updates)
-    final contactsToNotify = trustedContactsState.contacts;
+    final contactsToNotify = contactsState.contacts;
 
     return Scaffold(
       appBar: AppBar(
@@ -293,7 +295,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildStatusSelector(theme),
+            _buildStatusSelector(theme, isProcessing),
             const SizedBox(height: 24),
 
             // Location section
@@ -338,7 +340,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
             ),
             if (_shareLocation) ...[
               const SizedBox(height: 16),
-              _buildLocationCard(theme),
+              _buildLocationCard(theme, isProcessing),
             ],
             const SizedBox(height: 24),
 
@@ -427,9 +429,9 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: statusColor.withOpacity(0.1),
+        color: statusColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: statusColor.withOpacity(0.3), width: 1),
+        border: Border.all(color: statusColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -455,32 +457,32 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           Text(
             statusText,
             style: theme.textTheme.headlineSmall?.copyWith(
-                  color: statusColor,
-                  fontWeight: FontWeight.bold,
-                ),
+              color: statusColor,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           if (status.message != null) ...[
             const SizedBox(height: 8),
             Text(
               status.message!,
               style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[700],
-                  ),
+                color: Colors.grey[700],
+              ),
             ),
           ],
           const SizedBox(height: 8),
           Text(
             'Updated ${_formatTimeAgo(status.timestamp)}',
             style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey[600],
-                ),
+              color: Colors.grey[600],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildStatusSelector(ThemeData theme) {
+  Widget _buildStatusSelector(ThemeData theme, bool isProcessing) {
     return Column(
       children: [
         // Safe status
@@ -491,6 +493,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           subtitle: 'Let your contacts know you\'re okay',
           icon: Icons.check_circle,
           color: Colors.green,
+          isProcessing: isProcessing,
         ),
         const Divider(height: 1),
 
@@ -502,6 +505,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           subtitle: 'You need assistance but it\'s not an emergency',
           icon: Icons.help,
           color: Colors.orange,
+          isProcessing: isProcessing,
         ),
         const Divider(height: 1),
 
@@ -513,6 +517,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           subtitle: 'You\'re in an emergency situation',
           icon: Icons.warning,
           color: Colors.red,
+          isProcessing: isProcessing,
         ),
       ],
     );
@@ -525,6 +530,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
     required String subtitle,
     required IconData icon,
     required Color color,
+    required bool isProcessing,
   }) {
     return RadioListTile<safety.SafetyStatusType>(
       title: Row(
@@ -537,7 +543,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
       subtitle: Text(subtitle),
       value: status,
       groupValue: _selectedStatus,
-      onChanged: (isProcessing)
+      onChanged: isProcessing
           ? null
           : (value) {
               setState(() {
@@ -552,7 +558,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
     );
   }
 
-  Widget _buildLocationCard(ThemeData theme) {
+  Widget _buildLocationCard(ThemeData theme, bool isProcessing) {
     if (_isLoadingLocation) {
       return Card(
         child: Padding(
@@ -587,7 +593,8 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              Icon(Icons.location_off, color: theme.colorScheme.error, size: 32),
+              Icon(Icons.location_off,
+                  color: theme.colorScheme.error, size: 32),
               const SizedBox(height: 8),
               Text(
                 'Location Unavailable',
@@ -637,7 +644,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -736,7 +743,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Text(
@@ -777,8 +784,8 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
                             children: [
                               CircleAvatar(
                                 radius: 16,
-                                backgroundColor:
-                                    theme.colorScheme.primary.withOpacity(0.1),
+                                backgroundColor: theme.colorScheme.primary
+                                    .withValues(alpha: 0.1),
                                 child: Text(
                                   contact.name.isNotEmpty
                                       ? contact.name[0].toUpperCase()
@@ -796,8 +803,9 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
                                   style: theme.textTheme.bodyMedium,
                                 ),
                               ),
-                              if (contact.phone != null)
-                                Icon(Icons.phone, size: 16, color: Colors.grey[600]),
+                              if (contact.phoneNumber.isNotEmpty)
+                                Icon(Icons.phone,
+                                    size: 16, color: Colors.grey[600]),
                             ],
                           ),
                         ))
@@ -812,8 +820,8 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
                           children: [
                             CircleAvatar(
                               radius: 16,
-                              backgroundColor:
-                                  theme.colorScheme.primary.withOpacity(0.1),
+                              backgroundColor: theme.colorScheme.primary
+                                  .withValues(alpha: 0.1),
                               child: Text(
                                 contact.name.isNotEmpty
                                     ? contact.name[0].toUpperCase()

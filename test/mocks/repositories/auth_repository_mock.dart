@@ -3,7 +3,7 @@ import 'package:soloadventurer/features/auth/infrastructure/services/auth_servic
 import 'package:soloadventurer/features/auth/infrastructure/services/session_manager.dart';
 
 /// A mock implementation of [AuthService] for testing.
-class MockAuthService extends Mock implements AuthService {
+class MockAuthService extends Mock {
   bool _isAuthenticated = false;
   String? _username;
 
@@ -12,6 +12,110 @@ class MockAuthService extends Mock implements AuthService {
 
   @override
   String? get username => _username;
+
+  @override
+  Future<bool> signIn({
+    required String username,
+    required String password,
+  }) async {
+    return super.noSuchMethod(
+          Invocation.method(
+            #signIn,
+            [],
+            {
+              #username: username,
+              #password: password,
+            },
+          ),
+        ) as bool? ??
+        false;
+  }
+
+  @override
+  Future<bool> signUp({
+    required String username,
+    required String password,
+    required String email,
+    String? firstName,
+    String? lastName,
+    String? displayName,
+  }) async {
+    return super.noSuchMethod(
+          Invocation.method(
+            #signUp,
+            [],
+            {
+              #username: username,
+              #password: password,
+              #email: email,
+              #firstName: firstName,
+              #lastName: lastName,
+              #displayName: displayName,
+            },
+          ),
+        ) as bool? ??
+        false;
+  }
+
+  @override
+  Future<bool> signOut() async {
+    return super.noSuchMethod(
+          Invocation.method(#signOut, []),
+        ) as bool? ??
+        false;
+  }
+
+  @override
+  Future<bool> refreshSession() async {
+    return super.noSuchMethod(
+          Invocation.method(#refreshSession, []),
+        ) as bool? ??
+        false;
+  }
+
+  @override
+  Future<bool> forgotPassword({required String username}) async {
+    return super.noSuchMethod(
+          Invocation.method(#forgotPassword, [], {#username: username}),
+        ) as bool? ??
+        false;
+  }
+
+  @override
+  Future<bool> confirmForgotPassword({
+    required String confirmationCode,
+    required String newPassword,
+  }) async {
+    return super.noSuchMethod(
+          Invocation.method(
+            #confirmForgotPassword,
+            [],
+            {
+              #confirmationCode: confirmationCode,
+              #newPassword: newPassword,
+            },
+          ),
+        ) as bool? ??
+        false;
+  }
+
+  @override
+  Future<bool> confirmSignUp({
+    required String username,
+    required String confirmationCode,
+  }) async {
+    return super.noSuchMethod(
+          Invocation.method(
+            #confirmSignUp,
+            [],
+            {
+              #username: username,
+              #confirmationCode: confirmationCode,
+            },
+          ),
+        ) as bool? ??
+        false;
+  }
 
   /// Sets up the mock for a successful sign-in.
   void setupSuccessfulSignIn(String username) {
@@ -113,17 +217,31 @@ class MockAuthService extends Mock implements AuthService {
 
 /// A mock implementation of [SessionManager] for testing.
 class MockSessionManager extends Mock implements SessionManager {
+  @override
+  Future<void> startSession() async {
+    return super.noSuchMethod(
+      Invocation.method(#startSession, []),
+    );
+  }
+
+  @override
+  Future<void> endSession() async {
+    return super.noSuchMethod(
+      Invocation.method(#endSession, []),
+    );
+  }
+
   /// Sets up the mock for a successful session start.
   void setupSuccessfulSessionStart() {
     when(() => startSession()).thenAnswer((_) async {
-      return null;
+      return;
     });
   }
 
   /// Sets up the mock for a successful session end.
   void setupSuccessfulSessionEnd() {
     when(() => endSession()).thenAnswer((_) async {
-      return null;
+      return;
     });
   }
 

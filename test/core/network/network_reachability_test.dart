@@ -2,7 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:solo_adventurer/core/network/network_reachability.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:soloadventurer/core/network/network_reachability.dart';
 
 // Generate mocks with: flutter pub run build_runner build --delete-conflicting-outputs
 @GenerateMocks([Dio])
@@ -11,6 +12,11 @@ import 'network_reachability_test.mocks.dart';
 void main() {
   late MockDio mockDio;
   late NetworkReachabilityService service;
+
+  setUpAll(() async {
+    // Initialize dotenv for tests
+    await dotenv.load(fileName: '.env.example');
+  });
 
   setUp(() {
     mockDio = MockDio();
@@ -45,7 +51,7 @@ void main() {
       // Assert
       expect(result.isReachable, isTrue);
       expect(result.statusCode, equals(200));
-      expect(result.responseTimeMs, isGreaterThanOrEqualTo(0));
+      expect(result.responseTimeMs, greaterThanOrEqualTo(0));
       expect(result.errorMessage, isNull);
       verify(mockDio.head(any, options: anyNamed('options'))).called(1);
     });

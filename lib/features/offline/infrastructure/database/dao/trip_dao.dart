@@ -21,8 +21,8 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the inserted trip with the database-generated ID (if applicable).
   ///
   /// Throws [InvalidDataException] if the trip data is invalid.
-  Future<LocalTrip> insertTrip(TripsCompanion trip) async {
-    return await into(trips).insert(trip);
+  Future<int> insertTrip(TripsCompanion trip) async {
+    return await into(db.trips).insert(trip);
   }
 
   /// Inserts multiple trips in a single transaction
@@ -35,7 +35,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final trip in trips) {
-        await into(trips).insert(trip);
+        await into(db.trips).insert(trip);
         count++;
       }
       return count;
@@ -48,8 +48,8 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the number of rows affected (should be 1).
   ///
   /// Uses the trip ID to identify which record to update.
-  Future<int> updateTrip(LocalTrip trip) async {
-    return await update(trips).replace(trip);
+  Future<bool> updateTrip(LocalTrip trip) async {
+    return await update(db.trips).replace(trip);
   }
 
   /// Updates multiple trips in a single transaction
@@ -62,7 +62,9 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final trip in trips) {
-        count += await update(trips).replace(trip);
+        if (await update(db.trips).replace(trip)) {
+          count++;
+        }
       }
       return count;
     });
@@ -75,7 +77,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteTrip].
   Future<int> deleteTripById(String id) async {
-    return await (delete(trips)..where((t) => t.id.equals(id))).go();
+    return await (delete(db.trips)..where((t) => t.id.equals(id))).go();
   }
 
   /// Soft deletes a trip by marking it as deleted
@@ -85,8 +87,8 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Soft delete sets isDeleted flag to true, allowing sync to server.
   Future<int> softDeleteTripById(String id) async {
-    return await (update(trips)..where((t) => t.id.equals(id)))
-        .write(TripsCompanion(isDeleted: const Value(true)));
+    return await (update(db.trips)..where((t) => t.id.equals(id)))
+        .write(const TripsCompanion(isDeleted: Value(true)));
   }
 
   /// Deletes multiple trips by IDs
@@ -96,7 +98,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteTripsByIds].
   Future<int> deleteTripsByIds(List<String> ids) async {
-    return await (delete(trips)..where((t) => t.id.isIn(ids))).go();
+    return await (delete(db.trips)..where((t) => t.id.isIn(ids))).go();
   }
 
   /// Soft deletes multiple trips by marking them as deleted
@@ -106,8 +108,8 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Soft delete sets isDeleted flag to true, allowing sync to server.
   Future<int> softDeleteTripsByIds(List<String> ids) async {
-    return await (update(trips)..where((t) => t.id.isIn(ids)))
-        .write(TripsCompanion(isDeleted: const Value(true)));
+    return await (update(db.trips)..where((t) => t.id.isIn(ids)))
+        .write(const TripsCompanion(isDeleted: Value(true)));
   }
 
   // ==============================================================================
@@ -119,7 +121,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the trip ID to retrieve.
   /// Returns the trip if found, null otherwise.
   Future<LocalTrip?> getTripById(String id) {
-    return (select(trips)..where((t) => t.id.equals(id))).getSingleOrNull();
+    return (select(db.trips)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
   /// Gets all trips for a specific user
@@ -129,7 +131,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted trips by default.
   Future<List<LocalTrip>> getTripsByUserId(String userId) {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.userId.equals(userId))
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
@@ -142,7 +144,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted trips by default.
   Future<List<LocalTrip>> getAllTrips() {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
@@ -156,7 +158,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted trips by default.
   Future<List<LocalTrip>> getTripsPaginated({int limit = 20, int offset = 0}) {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.isDeleted.equals(false))
           ..limit(limit, offset: offset)
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
@@ -169,7 +171,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [userId] parameter is optional. If provided, filters by user as well.
   /// Returns a list of trips with the specified status.
   Future<List<LocalTrip>> getTripsByStatus(String status, {String? userId}) {
-    final query = select(trips)
+    final query = select(db.trips)
       ..where((t) => t.status.equals(status))
       ..where((t) => t.isDeleted.equals(false))
       ..orderBy([(t) => OrderingTerm.asc(t.startDate)]);
@@ -192,7 +194,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
     DateTime endDate, {
     String? userId,
   }) {
-    final query = select(trips)
+    final query = select(db.trips)
       ..where((t) => t.startDate.isBiggerOrEqualValue(startDate))
       ..where((t) => t.endDate.isSmallerOrEqualValue(endDate))
       ..where((t) => t.isDeleted.equals(false))
@@ -211,9 +213,9 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [userId] parameter is optional. If provided, filters by user as well.
   /// Returns a list of trips matching the search term.
   Future<List<LocalTrip>> searchTrips(String searchTerm, {String? userId}) {
-    final query = select(trips)
-      ..where((t) => t.title.contains(searchTerm) |
-          t.destination.contains(searchTerm))
+    final query = select(db.trips)
+      ..where((t) =>
+          t.title.contains(searchTerm) | t.destination.contains(searchTerm))
       ..where((t) => t.isDeleted.equals(false))
       ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]);
 
@@ -231,13 +233,13 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted trips.
   Future<int> countTripsByUserId(String userId) async {
-    final query = selectOnly(trips)
-      ..addColumns([trips.id.count()])
-      ..where(trips.userId.equals(userId))
-      ..where(trips.isDeleted.equals(false));
+    final query = selectOnly(db.trips)
+      ..addColumns([db.trips.id.count()])
+      ..where(db.trips.userId.equals(userId))
+      ..where(db.trips.isDeleted.equals(false));
 
     final result = await query.getSingle();
-    return result.read(trips.id.count());
+    return result.read(db.trips.id.count()) ?? 0;
   }
 
   // ==============================================================================
@@ -250,7 +252,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These trips need to be synced to the server.
   Future<List<LocalTrip>> getUnsyncedTrips() {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.isSynced.equals(false))
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
@@ -263,7 +265,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These trips have local modifications that need to be synced.
   Future<List<LocalTrip>> getTripsWithPendingChanges() {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.hasPendingChanges.equals(true))
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
@@ -274,9 +276,9 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Returns a list of trips that need to be synced to the server.
   Future<List<LocalTrip>> getTripsNeedingSync() {
-    return (select(trips)
-          ..where((t) => t.isSynced.equals(false) |
-              t.hasPendingChanges.equals(true))
+    return (select(db.trips)
+          ..where((t) =>
+              t.isSynced.equals(false) | t.hasPendingChanges.equals(true))
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
         .get();
@@ -288,7 +290,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These trips need to be deleted from the server.
   Future<List<LocalTrip>> getSoftDeletedTrips() {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.isDeleted.equals(true))
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
         .get();
@@ -299,7 +301,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [synced] parameter indicates whether to get synced or unsynced trips.
   /// Returns a list of trips matching the sync status.
   Future<List<LocalTrip>> getTripsBySyncStatus(bool synced) {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.isSynced.equals(synced))
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
@@ -312,7 +314,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [isSynced] parameter indicates the new sync status.
   /// Returns the number of rows affected.
   Future<int> updateTripSyncStatus(String id, bool isSynced) {
-    return (update(trips)..where((t) => t.id.equals(id)))
+    return (update(db.trips)..where((t) => t.id.equals(id)))
         .write(TripsCompanion(isSynced: Value(isSynced)));
   }
 
@@ -322,7 +324,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [hasPendingChanges] parameter indicates whether there are pending changes.
   /// Returns the number of rows affected.
   Future<int> updateTripPendingChanges(String id, bool hasPendingChanges) {
-    return (update(trips)..where((t) => t.id.equals(id)))
+    return (update(db.trips)..where((t) => t.id.equals(id)))
         .write(TripsCompanion(hasPendingChanges: Value(hasPendingChanges)));
   }
 
@@ -332,7 +334,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastSyncedAt] parameter is the timestamp of the sync.
   /// Returns the number of rows affected.
   Future<int> markTripAsSynced(String id, DateTime lastSyncedAt) {
-    return (update(trips)..where((t) => t.id.equals(id))).write(
+    return (update(db.trips)..where((t) => t.id.equals(id))).write(
       TripsCompanion(
         isSynced: const Value(true),
         hasPendingChanges: const Value(false),
@@ -347,7 +349,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastSyncedAt] parameter is the timestamp of the sync.
   /// Returns the count of trips updated.
   Future<int> markTripsAsSynced(List<String> ids, DateTime lastSyncedAt) {
-    return (update(trips)..where((t) => t.id.isIn(ids))).write(
+    return (update(db.trips)..where((t) => t.id.isIn(ids))).write(
       TripsCompanion(
         isSynced: const Value(true),
         hasPendingChanges: const Value(false),
@@ -362,7 +364,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [version] parameter is the new version number.
   /// Returns the number of rows affected.
   Future<int> updateTripVersion(String id, int version) {
-    return (update(trips)..where((t) => t.id.equals(id)))
+    return (update(db.trips)..where((t) => t.id.equals(id)))
         .write(TripsCompanion(version: Value(version)));
   }
 
@@ -373,7 +375,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Useful for incremental sync operations.
   Future<List<LocalTrip>> getTripsUpdatedAfter(DateTime timestamp) {
-    return (select(trips)
+    return (select(db.trips)
           ..where((t) => t.updatedAt.isBiggerThanValue(timestamp))
           ..where((t) => t.isDeleted.equals(false))
           ..orderBy([(t) => OrderingTerm.asc(t.updatedAt)]))
@@ -391,7 +393,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// This is a cleanup operation for trips that were soft deleted
   /// and successfully synced to the server.
   Future<int> cleanupSyncedDeletedTrips() async {
-    return await (delete(trips)
+    return await (delete(db.trips)
           ..where((t) => t.isDeleted.equals(true))
           ..where((t) => t.isSynced.equals(true)))
         .go();
@@ -404,7 +406,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteAllTripsForUser].
   Future<int> deleteAllTripsForUser(String userId) async {
-    return await (delete(trips)..where((t) => t.userId.equals(userId))).go();
+    return await (delete(db.trips)..where((t) => t.userId.equals(userId))).go();
   }
 
   /// Soft deletes all trips for a user
@@ -412,7 +414,7 @@ class TripDao extends DatabaseAccessor<AppDatabase> {
   /// The [userId] parameter is the user ID.
   /// Returns the count of trips soft deleted.
   Future<int> softDeleteAllTripsForUser(String userId) async {
-    return await (update(trips)..where((t) => t.userId.equals(userId)))
-        .write(TripsCompanion(isDeleted: const Value(true)));
+    return await (update(db.trips)..where((t) => t.userId.equals(userId)))
+        .write(const TripsCompanion(isDeleted: Value(true)));
   }
 }

@@ -73,7 +73,7 @@ class NotificationServiceImpl implements NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTap,
     );
 
-    if (!success ?? false) {
+    if (success == null || !success) {
       throw NotificationServiceException(
         'Failed to initialize notification service',
       );
@@ -161,8 +161,9 @@ class NotificationServiceImpl implements NotificationService {
   @override
   Future<bool> arePermissionsGranted() async {
     if (Platform.isAndroid) {
-      final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin =
+          _notifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
       if (androidPlugin == null) return false;
 
       final granted = await androidPlugin.areNotificationsEnabled();
@@ -172,7 +173,9 @@ class NotificationServiceImpl implements NotificationService {
           IOSFlutterLocalNotificationsPlugin>();
       if (iOSPlugin == null) return false;
 
-      return await iOSPlugin.checkPermissions() ?? false;
+      final result = await iOSPlugin.checkPermissions();
+      // The return type is a map, not a bool
+      return result != null;
     }
     return false;
   }
@@ -180,8 +183,9 @@ class NotificationServiceImpl implements NotificationService {
   @override
   Future<bool> requestPermissions() async {
     if (Platform.isAndroid) {
-      final androidPlugin = _notifications.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin =
+          _notifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
       if (androidPlugin == null) return false;
 
       final result = await androidPlugin.requestNotificationsPermission();
@@ -263,8 +267,7 @@ class NotificationServiceImpl implements NotificationService {
         tz.TZDateTime.from(scheduledTime, tz.local),
         details,
         payload: payloadString,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents: DateTimeComponents.time,
       );
 
@@ -305,6 +308,7 @@ class NotificationServiceImpl implements NotificationService {
         _mapDurationToRepeatInterval(interval),
         details,
         payload: payloadString,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       );
 
       _notificationTypes[id] = type;
@@ -353,7 +357,7 @@ class NotificationServiceImpl implements NotificationService {
     required DateTime scheduledTime,
     required DateTime deadline,
   }) async {
-    final title = 'Check-in Reminder';
+    const title = 'Check-in Reminder';
     final body =
         'You have a check-in due at ${_formatTime(deadline)}. Please check in now.';
 
@@ -377,7 +381,7 @@ class NotificationServiceImpl implements NotificationService {
     required DateTime reminderTime,
     required DateTime deadline,
   }) async {
-    final title = 'Check-in Reminder';
+    const title = 'Check-in Reminder';
     final body =
         'You have a check-in due at ${_formatTime(deadline)}. Please check in now.';
 
@@ -401,7 +405,7 @@ class NotificationServiceImpl implements NotificationService {
     required String checkInId,
     String? lastKnownLocation,
   }) async {
-    final title = 'Missed Check-in Alert';
+    const title = 'Missed Check-in Alert';
     final body = lastKnownLocation != null
         ? 'You missed your check-in. Last known location: $lastKnownLocation'
         : 'You missed your check-in. Your trusted contacts have been notified.';
@@ -420,9 +424,10 @@ class NotificationServiceImpl implements NotificationService {
     String? location,
     String? message,
   }) async {
-    final title = '🆘 EMERGENCY SOS';
+    const title = '🆘 EMERGENCY SOS';
     final locationText = location ?? 'Unknown location';
-    final messageText = message.isNotEmpty ?? false ? '\nMessage: $message' : '';
+    final messageText =
+        (message != null && message.isNotEmpty) ? '\nMessage: $message' : '';
     final body = 'Emergency alert sent!\nLocation: $locationText$messageText';
 
     return showNotification(
@@ -438,7 +443,7 @@ class NotificationServiceImpl implements NotificationService {
     required String status,
     String? message,
   }) async {
-    final title = 'Safety Status Updated';
+    const title = 'Safety Status Updated';
     final messageText = message != null ? '\n$message' : '';
     final body = 'Your status is now: $status$messageText';
 
@@ -454,7 +459,7 @@ class NotificationServiceImpl implements NotificationService {
   Future<NotificationResult> showLocationSharingStarted({
     required List<String> contactNames,
   }) async {
-    final title = 'Location Sharing Started';
+    const title = 'Location Sharing Started';
     final contacts = contactNames.length <= 2
         ? contactNames.join(', ')
         : '${contactNames.take(2).join(', ')} and ${contactNames.length - 2} others';
@@ -470,8 +475,8 @@ class NotificationServiceImpl implements NotificationService {
 
   @override
   Future<NotificationResult> showLocationSharingStopped() async {
-    final title = 'Location Sharing Stopped';
-    final body = 'Your location is no longer being shared';
+    const title = 'Location Sharing Stopped';
+    const body = 'Your location is no longer being shared';
 
     return showNotification(
       title: title,
@@ -611,6 +616,8 @@ class NotificationServiceImpl implements NotificationService {
       case Importance.min:
       case Importance.none:
         return Priority.low;
+      case Importance.unspecified:
+        return Priority.defaultPriority;
     }
   }
 
@@ -644,6 +651,7 @@ NotificationService notificationServiceImpl(NotificationServiceImplRef ref) {
 
 /// Provider override for NotificationService interface
 @riverpod
-NotificationService notificationServiceOverride(NotificationServiceOverrideRef ref) {
+NotificationService notificationServiceOverride(
+    NotificationServiceOverrideRef ref) {
   return ref.watch(notificationServiceImplProvider);
 }

@@ -21,8 +21,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the inserted journal with the database-generated ID (if applicable).
   ///
   /// Throws [InvalidDataException] if the journal data is invalid.
-  Future<LocalJournal> insertJournal(JournalsCompanion journal) async {
-    return await into(journals).insert(journal);
+  Future<int> insertJournal(JournalsCompanion journal) async {
+    return await into(db.journals).insert(journal);
   }
 
   /// Inserts multiple journal entries in a single transaction
@@ -35,7 +35,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final journal in journals) {
-        await into(journals).insert(journal);
+        await into(db.journals).insert(journal);
         count++;
       }
       return count;
@@ -48,8 +48,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the number of rows affected (should be 1).
   ///
   /// Uses the journal ID to identify which record to update.
-  Future<int> updateJournal(LocalJournal journal) async {
-    return await update(journals).replace(journal);
+  Future<bool> updateJournal(LocalJournal journal) async {
+    return await update(db.journals).replace(journal);
   }
 
   /// Updates multiple journal entries in a single transaction
@@ -62,7 +62,9 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final journal in journals) {
-        count += await update(journals).replace(journal);
+        if (await update(db.journals).replace(journal)) {
+          count++;
+        }
       }
       return count;
     });
@@ -75,7 +77,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteJournal].
   Future<int> deleteJournalById(String id) async {
-    return await (delete(journals)..where((j) => j.id.equals(id))).go();
+    return await (delete(db.journals)..where((j) => j.id.equals(id))).go();
   }
 
   /// Soft deletes a journal entry by marking it as deleted
@@ -85,8 +87,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Soft delete sets isDeleted flag to true, allowing sync to server.
   Future<int> softDeleteJournalById(String id) async {
-    return await (update(journals)..where((j) => j.id.equals(id)))
-        .write(JournalsCompanion(isDeleted: const Value(true)));
+    return await (update(db.journals)..where((j) => j.id.equals(id)))
+        .write(const JournalsCompanion(isDeleted: Value(true)));
   }
 
   /// Deletes all journals for a trip
@@ -96,7 +98,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteJournalsByTripId].
   Future<int> deleteJournalsByTripId(String tripId) async {
-    return await (delete(journals)..where((j) => j.tripId.equals(tripId))).go();
+    return await (delete(db.journals)..where((j) => j.tripId.equals(tripId)))
+        .go();
   }
 
   /// Soft deletes all journals for a trip
@@ -104,8 +107,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [tripId] parameter is the trip ID.
   /// Returns the count of journals soft deleted.
   Future<int> softDeleteJournalsByTripId(String tripId) async {
-    return await (update(journals)..where((j) => j.tripId.equals(tripId)))
-        .write(JournalsCompanion(isDeleted: const Value(true)));
+    return await (update(db.journals)..where((j) => j.tripId.equals(tripId)))
+        .write(const JournalsCompanion(isDeleted: Value(true)));
   }
 
   /// Deletes multiple journal entries by IDs
@@ -115,7 +118,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteJournalsByIds].
   Future<int> deleteJournalsByIds(List<String> ids) async {
-    return await (delete(journals)..where((j) => j.id.isIn(ids))).go();
+    return await (delete(db.journals)..where((j) => j.id.isIn(ids))).go();
   }
 
   /// Soft deletes multiple journal entries by marking them as deleted
@@ -125,8 +128,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Soft delete sets isDeleted flag to true, allowing sync to server.
   Future<int> softDeleteJournalsByIds(List<String> ids) async {
-    return await (update(journals)..where((j) => j.id.isIn(ids)))
-        .write(JournalsCompanion(isDeleted: const Value(true)));
+    return await (update(db.journals)..where((j) => j.id.isIn(ids)))
+        .write(const JournalsCompanion(isDeleted: Value(true)));
   }
 
   // ==============================================================================
@@ -138,7 +141,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the journal ID to retrieve.
   /// Returns the journal if found, null otherwise.
   Future<LocalJournal?> getJournalById(String id) {
-    return (select(journals)..where((j) => j.id.equals(id))).getSingleOrNull();
+    return (select(db.journals)..where((j) => j.id.equals(id)))
+        .getSingleOrNull();
   }
 
   /// Gets all journals for a specific trip
@@ -149,7 +153,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// Excludes soft-deleted journals by default.
   /// Ordered by entry date (newest first).
   Future<List<LocalJournal>> getJournalsByTripId(String tripId) {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.tripId.equals(tripId))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.desc(j.entryDate)]))
@@ -164,7 +168,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// Excludes soft-deleted journals by default.
   /// Ordered by entry date (newest first).
   Future<List<LocalJournal>> getJournalsByUserId(String userId) {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.userId.equals(userId))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.desc(j.entryDate)]))
@@ -177,7 +181,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted journals by default.
   Future<List<LocalJournal>> getAllJournals() {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.desc(j.createdAt)]))
         .get();
@@ -196,7 +200,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
     int offset = 0,
     String? tripId,
   }) {
-    final query = select(journals)
+    final query = select(db.journals)
       ..where((j) => j.isDeleted.equals(false))
       ..limit(limit, offset: offset)
       ..orderBy([(j) => OrderingTerm.desc(j.entryDate)]);
@@ -214,7 +218,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [userId] parameter is optional. If provided, filters by user as well.
   /// Returns a list of journals with the specified mood.
   Future<List<LocalJournal>> getJournalsByMood(String mood, {String? userId}) {
-    final query = select(journals)
+    final query = select(db.journals)
       ..where((j) => j.mood.equals(mood))
       ..where((j) => j.isDeleted.equals(false))
       ..orderBy([(j) => OrderingTerm.desc(j.entryDate)]);
@@ -237,7 +241,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
     DateTime endDate, {
     String? tripId,
   }) {
-    final query = select(journals)
+    final query = select(db.journals)
       ..where((j) => j.entryDate.isBiggerOrEqualValue(startDate))
       ..where((j) => j.entryDate.isSmallerOrEqualValue(endDate))
       ..where((j) => j.isDeleted.equals(false))
@@ -257,7 +261,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// Returns a list of journals with the specified location.
   Future<List<LocalJournal>> getJournalsByLocation(String location,
       {String? userId}) {
-    final query = select(journals)
+    final query = select(db.journals)
       ..where((j) => j.location.equals(location))
       ..where((j) => j.isDeleted.equals(false))
       ..orderBy([(j) => OrderingTerm.desc(j.entryDate)]);
@@ -276,9 +280,9 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// Returns a list of journals matching the search term.
   Future<List<LocalJournal>> searchJournals(String searchTerm,
       {String? userId}) {
-    final query = select(journals)
-      ..where((j) => j.title.contains(searchTerm) |
-          j.content.contains(searchTerm))
+    final query = select(db.journals)
+      ..where(
+          (j) => j.title.contains(searchTerm) | j.content.contains(searchTerm))
       ..where((j) => j.isDeleted.equals(false))
       ..orderBy([(j) => OrderingTerm.desc(j.entryDate)]);
 
@@ -296,13 +300,13 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted journals.
   Future<int> countJournalsByTripId(String tripId) async {
-    final query = selectOnly(journals)
-      ..addColumns([journals.id.count()])
-      ..where(journals.tripId.equals(tripId))
-      ..where(journals.isDeleted.equals(false));
+    final query = selectOnly(db.journals)
+      ..addColumns([db.journals.id.count()])
+      ..where(db.journals.tripId.equals(tripId))
+      ..where(db.journals.isDeleted.equals(false));
 
     final result = await query.getSingle();
-    return result.read(journals.id.count());
+    return result.read(db.journals.id.count()) ?? 0;
   }
 
   /// Counts all journals for a user
@@ -312,13 +316,13 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Excludes soft-deleted journals.
   Future<int> countJournalsByUserId(String userId) async {
-    final query = selectOnly(journals)
-      ..addColumns([journals.id.count()])
-      ..where(journals.userId.equals(userId))
-      ..where(journals.isDeleted.equals(false));
+    final query = selectOnly(db.journals)
+      ..addColumns([db.journals.id.count()])
+      ..where(db.journals.userId.equals(userId))
+      ..where(db.journals.isDeleted.equals(false));
 
     final result = await query.getSingle();
-    return result.read(journals.id.count());
+    return result.read(db.journals.id.count()) ?? 0;
   }
 
   // ==============================================================================
@@ -331,7 +335,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These journals need to be synced to the server.
   Future<List<LocalJournal>> getUnsyncedJournals() {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.isSynced.equals(false))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.asc(j.createdAt)]))
@@ -344,7 +348,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These journals have local modifications that need to be synced.
   Future<List<LocalJournal>> getJournalsWithPendingChanges() {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.hasPendingChanges.equals(true))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.asc(j.updatedAt)]))
@@ -355,9 +359,9 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Returns a list of journals that need to be synced to the server.
   Future<List<LocalJournal>> getJournalsNeedingSync() {
-    return (select(journals)
-          ..where((j) => j.isSynced.equals(false) |
-              j.hasPendingChanges.equals(true))
+    return (select(db.journals)
+          ..where((j) =>
+              j.isSynced.equals(false) | j.hasPendingChanges.equals(true))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.asc(j.updatedAt)]))
         .get();
@@ -369,7 +373,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These journals need to be deleted from the server.
   Future<List<LocalJournal>> getSoftDeletedJournals() {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.isDeleted.equals(true))
           ..orderBy([(j) => OrderingTerm.asc(j.updatedAt)]))
         .get();
@@ -380,7 +384,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [synced] parameter indicates whether to get synced or unsynced journals.
   /// Returns a list of journals matching the sync status.
   Future<List<LocalJournal>> getJournalsBySyncStatus(bool synced) {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.isSynced.equals(synced))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.asc(j.createdAt)]))
@@ -393,7 +397,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [isSynced] parameter indicates the new sync status.
   /// Returns the number of rows affected.
   Future<int> updateJournalSyncStatus(String id, bool isSynced) {
-    return (update(journals)..where((j) => j.id.equals(id)))
+    return (update(db.journals)..where((j) => j.id.equals(id)))
         .write(JournalsCompanion(isSynced: Value(isSynced)));
   }
 
@@ -403,7 +407,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [hasPendingChanges] parameter indicates whether there are pending changes.
   /// Returns the number of rows affected.
   Future<int> updateJournalPendingChanges(String id, bool hasPendingChanges) {
-    return (update(journals)..where((j) => j.id.equals(id)))
+    return (update(db.journals)..where((j) => j.id.equals(id)))
         .write(JournalsCompanion(hasPendingChanges: Value(hasPendingChanges)));
   }
 
@@ -413,7 +417,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastSyncedAt] parameter is the timestamp of the sync.
   /// Returns the number of rows affected.
   Future<int> markJournalAsSynced(String id, DateTime lastSyncedAt) {
-    return (update(journals)..where((j) => j.id.equals(id))).write(
+    return (update(db.journals)..where((j) => j.id.equals(id))).write(
       JournalsCompanion(
         isSynced: const Value(true),
         hasPendingChanges: const Value(false),
@@ -428,7 +432,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastSyncedAt] parameter is the timestamp of the sync.
   /// Returns the count of journals updated.
   Future<int> markJournalsAsSynced(List<String> ids, DateTime lastSyncedAt) {
-    return (update(journals)..where((j) => j.id.isIn(ids))).write(
+    return (update(db.journals)..where((j) => j.id.isIn(ids))).write(
       JournalsCompanion(
         isSynced: const Value(true),
         hasPendingChanges: const Value(false),
@@ -443,7 +447,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [version] parameter is the new version number.
   /// Returns the number of rows affected.
   Future<int> updateJournalVersion(String id, int version) {
-    return (update(journals)..where((j) => j.id.equals(id)))
+    return (update(db.journals)..where((j) => j.id.equals(id)))
         .write(JournalsCompanion(version: Value(version)));
   }
 
@@ -454,7 +458,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Useful for incremental sync operations.
   Future<List<LocalJournal>> getJournalsUpdatedAfter(DateTime timestamp) {
-    return (select(journals)
+    return (select(db.journals)
           ..where((j) => j.updatedAt.isBiggerThanValue(timestamp))
           ..where((j) => j.isDeleted.equals(false))
           ..orderBy([(j) => OrderingTerm.asc(j.updatedAt)]))
@@ -472,7 +476,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// This is a cleanup operation for journals that were soft deleted
   /// and successfully synced to the server.
   Future<int> cleanupSyncedDeletedJournals() async {
-    return await (delete(journals)
+    return await (delete(db.journals)
           ..where((j) => j.isDeleted.equals(true))
           ..where((j) => j.isSynced.equals(true)))
         .go();
@@ -485,7 +489,8 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// This is a hard delete. For soft delete, use [softDeleteAllJournalsForUser].
   Future<int> deleteAllJournalsForUser(String userId) async {
-    return await (delete(journals)..where((j) => j.userId.equals(userId))).go();
+    return await (delete(db.journals)..where((j) => j.userId.equals(userId)))
+        .go();
   }
 
   /// Soft deletes all journals for a user
@@ -493,7 +498,7 @@ class JournalDao extends DatabaseAccessor<AppDatabase> {
   /// The [userId] parameter is the user ID.
   /// Returns the count of journals soft deleted.
   Future<int> softDeleteAllJournalsForUser(String userId) async {
-    return await (update(journals)..where((j) => j.userId.equals(userId)))
-        .write(JournalsCompanion(isDeleted: const Value(true)));
+    return await (update(db.journals)..where((j) => j.userId.equals(userId)))
+        .write(const JournalsCompanion(isDeleted: Value(true)));
   }
 }

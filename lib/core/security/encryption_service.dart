@@ -234,7 +234,6 @@ class EncryptionServiceImpl implements EncryptionService {
   /// Get the number of operations performed in the current minute
   int get operationsCount => _operationsCounter;
 
-  @override
   void dispose() {
     _memoryLockTimer?.cancel();
     secureDestroy();

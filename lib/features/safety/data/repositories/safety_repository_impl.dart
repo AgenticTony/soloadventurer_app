@@ -32,7 +32,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to add trusted contact: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to add trusted contact: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to add trusted contact: ${e.toString()}',
           code: 'add_trusted_contact_failed');
@@ -47,7 +48,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to remove trusted contact: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to remove trusted contact: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to remove trusted contact: ${e.toString()}',
           code: 'remove_trusted_contact_failed');
@@ -57,13 +59,15 @@ class SafetyRepositoryImpl implements SafetyRepository {
   @override
   Future<TrustedContact> updateTrustedContact(TrustedContact contact) async {
     try {
-      final updatedContact = await _remoteDataSource.updateTrustedContact(contact);
+      final updatedContact =
+          await _remoteDataSource.updateTrustedContact(contact);
       await _localDataSource.cacheTrustedContact(updatedContact);
       return updatedContact;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update trusted contact: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update trusted contact: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to update trusted contact: ${e.toString()}',
           code: 'update_trusted_contact_failed');
@@ -93,7 +97,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
       return contact;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedContact = await _localDataSource.getCachedTrustedContact(contactId);
+      final cachedContact =
+          await _localDataSource.getCachedTrustedContact(contactId);
       if (cachedContact == null) {
         throw const TrustedContactNotFoundException();
       }
@@ -252,9 +257,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on AppException catch (_) {
       // Fallback to cache when offline - filter by tripId
       final cachedCheckIns = await _localDataSource.getCachedCheckIns();
-      final filteredCheckIns = cachedCheckIns
-          .where((checkIn) => checkIn.tripId == tripId)
-          .toList();
+      final filteredCheckIns =
+          cachedCheckIns.where((checkIn) => checkIn.tripId == tripId).toList();
       return filteredCheckIns;
     } catch (e) {
       throw SafetyException('Failed to get check-ins by trip: ${e.toString()}',
@@ -277,7 +281,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update check-in status: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update check-in status: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to update check-in status: ${e.toString()}',
           code: 'update_check_in_status_failed');
@@ -338,7 +343,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to stop location sharing: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to stop location sharing: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to stop location sharing: ${e.toString()}',
           code: 'stop_location_sharing_failed');
@@ -353,9 +359,11 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to stop all location sharing: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to stop all location sharing: ${e.message}');
     } catch (e) {
-      throw SafetyException('Failed to stop all location sharing: ${e.toString()}',
+      throw SafetyException(
+          'Failed to stop all location sharing: ${e.toString()}',
           code: 'stop_all_location_sharing_failed');
     }
   }
@@ -370,7 +378,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
       // Fallback to cache when offline
       return await _localDataSource.getCachedActiveLocationShares();
     } catch (e) {
-      throw SafetyException('Failed to get active location shares: ${e.toString()}',
+      throw SafetyException(
+          'Failed to get active location shares: ${e.toString()}',
           code: 'get_active_location_shares_failed');
     }
   }
@@ -424,7 +433,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
         enabled: enabled,
       );
       // Update the cached contact with new permission
-      final cachedContact = await _localDataSource.getCachedTrustedContact(contactId);
+      final cachedContact =
+          await _localDataSource.getCachedTrustedContact(contactId);
       if (cachedContact != null) {
         final updatedContact = cachedContact.copyWith(
           locationSharingEnabled: enabled,
@@ -434,9 +444,11 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update location sharing permission: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update location sharing permission: ${e.message}');
     } catch (e) {
-      throw SafetyException('Failed to update location sharing permission: ${e.toString()}',
+      throw SafetyException(
+          'Failed to update location sharing permission: ${e.toString()}',
           code: 'update_location_sharing_permission_failed');
     }
   }
@@ -466,7 +478,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to trigger emergency SOS: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to trigger emergency SOS: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to trigger emergency SOS: ${e.toString()}',
           code: 'trigger_emergency_sos_failed');
@@ -496,7 +509,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update safety status: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update safety status: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to update safety status: ${e.toString()}',
           code: 'update_safety_status_failed');
@@ -526,15 +540,18 @@ class SafetyRepositoryImpl implements SafetyRepository {
   @override
   Future<SafetyStatus> getSafetyStatusForUser(String userId) async {
     try {
-      final safetyStatus = await _remoteDataSource.getSafetyStatusForUser(userId);
+      final safetyStatus =
+          await _remoteDataSource.getSafetyStatusForUser(userId);
       // Note: We don't cache other users' status
       return safetyStatus;
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to get safety status for user: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to get safety status for user: ${e.message}');
     } catch (e) {
-      throw SafetyException('Failed to get safety status for user: ${e.toString()}',
+      throw SafetyException(
+          'Failed to get safety status for user: ${e.toString()}',
           code: 'get_safety_status_for_user_failed');
     }
   }
@@ -588,14 +605,17 @@ class SafetyRepositoryImpl implements SafetyRepository {
       return alerts;
     } on AppException catch (_) {
       // Fallback to cache when offline
-      final cachedAlerts = await _localDataSource.getCachedRecentSafetyAlerts(limit: limit);
+      final cachedAlerts =
+          await _localDataSource.getCachedRecentSafetyAlerts(limit: limit);
       if (type != null) {
-        final filteredAlerts = cachedAlerts.where((alert) => alert.type == type).toList();
+        final filteredAlerts =
+            cachedAlerts.where((alert) => alert.type == type).toList();
         return filteredAlerts;
       }
       return cachedAlerts;
     } catch (e) {
-      throw SafetyException('Failed to get recent safety alerts: ${e.toString()}',
+      throw SafetyException(
+          'Failed to get recent safety alerts: ${e.toString()}',
           code: 'get_recent_safety_alerts_failed');
     }
   }
@@ -607,7 +627,10 @@ class SafetyRepositoryImpl implements SafetyRepository {
       // Update cached alert
       final cachedAlert = await _localDataSource.getCachedSafetyAlert(alertId);
       if (cachedAlert != null) {
-        final acknowledgedBy = [...cachedAlert.acknowledgedByContactIds, contactId];
+        final acknowledgedBy = [
+          ...cachedAlert.acknowledgedByContactIds,
+          contactId
+        ];
         final updatedAlert = cachedAlert.copyWith(
           acknowledgedByContactIds: acknowledgedBy,
           firstAcknowledgedAt: DateTime.now(),
@@ -617,9 +640,11 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to acknowledge safety alert: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to acknowledge safety alert: ${e.message}');
     } catch (e) {
-      throw SafetyException('Failed to acknowledge safety alert: ${e.toString()}',
+      throw SafetyException(
+          'Failed to acknowledge safety alert: ${e.toString()}',
           code: 'acknowledge_safety_alert_failed');
     }
   }
@@ -640,7 +665,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to resolve safety alert: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to resolve safety alert: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to resolve safety alert: ${e.toString()}',
           code: 'resolve_safety_alert_failed');
@@ -663,7 +689,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to cancel safety alert: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to cancel safety alert: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to cancel safety alert: ${e.toString()}',
           code: 'cancel_safety_alert_failed');
@@ -679,7 +706,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
       // Fallback to cache when offline
       return await _localDataSource.getCachedMissedCheckInAlerts();
     } catch (e) {
-      throw SafetyException('Failed to get missed check-in alerts: ${e.toString()}',
+      throw SafetyException(
+          'Failed to get missed check-in alerts: ${e.toString()}',
           code: 'get_missed_check_in_alerts_failed');
     }
   }
@@ -694,7 +722,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update battery level: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update battery level: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to update battery level: ${e.toString()}',
           code: 'update_battery_level_failed');
@@ -733,7 +762,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
         receivesEmergencyAlerts: receivesEmergencyAlerts,
       );
       // Update the cached contact with new preferences
-      final cachedContact = await _localDataSource.getCachedTrustedContact(contactId);
+      final cachedContact =
+          await _localDataSource.getCachedTrustedContact(contactId);
       if (cachedContact != null) {
         final updatedContact = cachedContact.copyWith(
           receivesCheckIns: receivesCheckIns,
@@ -744,9 +774,11 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update contact notification preferences: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update contact notification preferences: ${e.message}');
     } catch (e) {
-      throw SafetyException('Failed to update contact notification preferences: ${e.toString()}',
+      throw SafetyException(
+          'Failed to update contact notification preferences: ${e.toString()}',
           code: 'update_contact_notification_preferences_failed');
     }
   }
@@ -778,7 +810,8 @@ class SafetyRepositoryImpl implements SafetyRepository {
     } on SafetyException {
       rethrow;
     } on AppException catch (e) {
-      throw SafetyOfflineException('Failed to update safety settings: ${e.message}');
+      throw SafetyOfflineException(
+          'Failed to update safety settings: ${e.message}');
     } catch (e) {
       throw SafetyException('Failed to update safety settings: ${e.toString()}',
           code: 'update_safety_settings_failed');

@@ -1,13 +1,12 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
 import 'package:soloadventurer/features/offline/data/models/local_journal_model.dart';
-import 'package:soloadventurer/features/offline/data/models/sync_operation_model.dart';
 import 'package:soloadventurer/features/offline/data/repositories/offline_aware_repository.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
-import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/travel/domain/models/journal.dart';
 import 'package:soloadventurer/features/travel/domain/repositories/journal_repository.dart';
 
@@ -19,9 +18,17 @@ import 'package:soloadventurer/features/travel/domain/repositories/journal_repos
 /// - Writing to local database immediately
 /// - Queueing mutations for sync when offline
 /// - Syncing with server when online
-class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
-    LocalJournalModel, Map<String, dynamic>, Map<String, dynamic>>
-    implements JournalRepository {
+///
+/// Type parameters:
+/// - Entity: Journal (domain entity)
+/// - Model: LocalJournalModel (local database model)
+/// - CreateModel: LocalJournalModel (same as Model for create operations)
+/// - UpdateModel: LocalJournalModel (same as Model for update operations)
+class JournalRepositoryImpl extends OfflineAwareRepository<
+    Journal,
+    LocalJournalModel,
+    LocalJournalModel,
+    LocalJournalModel> implements JournalRepository {
   /// Data Access Object for local journal database operations
   final JournalDao _journalDao;
 
@@ -34,15 +41,11 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
   JournalRepositoryImpl({
     required JournalDao journalDao,
     required DioApiService apiService,
-    required ConnectivityService connectivityService,
-    required SyncQueueService syncQueueService,
+    required super.connectivityService,
+    required super.syncQueueService,
     super.config,
   })  : _journalDao = journalDao,
-        _apiService = apiService,
-        super(
-          connectivityService: connectivityService,
-          syncQueueService: syncQueueService,
-        );
+        _apiService = apiService;
 
   // ==============================================================================
   // OFFLINE-AWARE BASE REPOSITORY ABSTRACT METHODS
@@ -111,7 +114,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
           : null;
     } catch (e) {
       debugPrint('❌ journal: Error reading from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to read journal from local cache');
+      throw const CacheException(
+          message: 'Failed to read journal from local cache');
     }
   }
 
@@ -138,7 +142,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       return model;
     } catch (e) {
       debugPrint('❌ journal: Error writing to local: ${e.toString()}');
-      throw CacheException(message: 'Failed to write journal to local cache');
+      throw const CacheException(
+          message: 'Failed to write journal to local cache');
     }
   }
 
@@ -150,7 +155,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       debugPrint('📝 journal: Soft deleted in local database: $id');
     } catch (e) {
       debugPrint('❌ journal: Error deleting from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to delete journal from local cache');
+      throw const CacheException(
+          message: 'Failed to delete journal from local cache');
     }
   }
 
@@ -169,18 +175,20 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       }
     } catch (e) {
       debugPrint('❌ journal: Error reading all from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to read journals from local cache');
+      throw const CacheException(
+          message: 'Failed to read journals from local cache');
     }
   }
 
   @override
-  Future<Journal> executeRemoteCreate(Map<String, dynamic> model) async {
+  Future<Journal> executeRemoteCreate(LocalJournalModel model) async {
     try {
+      final journalData = _journalToJsonData(model);
       final response = await _apiService.dio.post(
         '/graphql',
         data: {
           'query': GraphQLQueries.createJournal,
-          'variables': model,
+          'variables': journalData,
         },
       );
 
@@ -190,24 +198,26 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
         );
       }
 
-      final journalData = response.data['data']['createJournal'];
-      return Journal.fromJson(journalData);
+      final journalDataResponse = response.data['data']['createJournal'];
+      return Journal.fromJson(journalDataResponse);
     } catch (e) {
       debugPrint('❌ journal: Error in remote create: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to create journal on server');
+      throw const ServerException(
+          message: 'Failed to create journal on server');
     }
   }
 
   @override
   Future<Journal> executeRemoteUpdate(
     String id,
-    Map<String, dynamic> model,
+    LocalJournalModel model,
   ) async {
     try {
-      final variables = {...model, 'id': id};
+      final journalData = _journalToJsonData(model);
+      final variables = {...journalData, 'id': id};
 
       final response = await _apiService.dio.post(
         '/graphql',
@@ -223,14 +233,15 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
         );
       }
 
-      final journalData = response.data['data']['updateJournal'];
-      return Journal.fromJson(journalData);
+      final journalDataResponse = response.data['data']['updateJournal'];
+      return Journal.fromJson(journalDataResponse);
     } catch (e) {
       debugPrint('❌ journal: Error in remote update: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to update journal on server');
+      throw const ServerException(
+          message: 'Failed to update journal on server');
     }
   }
 
@@ -253,7 +264,7 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
 
       final result = response.data['data']['deleteJournal'];
       if (result['success'] != true) {
-        throw ServerException(
+        throw const ServerException(
           message: 'Failed to delete journal on server',
         );
       }
@@ -264,7 +275,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to delete journal on server');
+      throw const ServerException(
+          message: 'Failed to delete journal on server');
     }
   }
 
@@ -292,7 +304,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch journal from server');
+      throw const ServerException(
+          message: 'Failed to fetch journal from server');
     }
   }
 
@@ -311,7 +324,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch journals from server');
+      throw const ServerException(
+          message: 'Failed to fetch journals from server');
     }
   }
 
@@ -341,15 +355,15 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       }
 
       // Local data not available, check connectivity
-      final isConnected = await _connectivityService.checkConnectivity();
+      final online = await isOnline;
 
-      if (!isConnected.isConnected) {
+      if (!online) {
         if (config.enableOfflineMode) {
-          throw CacheException(
+          throw const CacheException(
             message: 'journal data not available offline',
           );
         } else {
-          throw NetworkConnectivityException(
+          throw const NetworkConnectivityException(
             message: 'No network connection and offline mode disabled',
           );
         }
@@ -397,8 +411,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
 
   @override
   Future<RepositoryOperationResult<Journal>> createJournal(Journal journal) {
-    final journalData = _journalToJson(journal);
-    return create(journalData);
+    final journalModel = entityToModel(journal);
+    return create(journalModel);
   }
 
   @override
@@ -406,8 +420,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
     String id,
     Journal journal,
   ) {
-    final journalData = _journalToJson(journal);
-    return update(id, journalData);
+    final journalModel = entityToModel(journal);
+    return update(id, journalModel);
   }
 
   @override
@@ -420,14 +434,15 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
     try {
       // For now, we only support local queries
       // Remote sync will happen automatically when needed
-      final journals = await _journalDao.getJournalsByMood(mood, userId: userId);
+      final journals =
+          await _journalDao.getJournalsByMood(mood, userId: userId);
       return journals
           .map((j) => LocalJournalModel.fromDatabase(j))
           .map(modelToEntity)
           .toList();
     } catch (e) {
       debugPrint('❌ journal: Error getting journals by mood: ${e.toString()}');
-      throw CacheException(message: 'Failed to get journals by mood');
+      throw const CacheException(message: 'Failed to get journals by mood');
     }
   }
 
@@ -450,8 +465,10 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
           .map(modelToEntity)
           .toList();
     } catch (e) {
-      debugPrint('❌ journal: Error getting journals by date range: ${e.toString()}');
-      throw CacheException(message: 'Failed to get journals by date range');
+      debugPrint(
+          '❌ journal: Error getting journals by date range: ${e.toString()}');
+      throw const CacheException(
+          message: 'Failed to get journals by date range');
     }
   }
 
@@ -468,13 +485,15 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
           .map(modelToEntity)
           .toList();
     } catch (e) {
-      debugPrint('❌ journal: Error getting journals by location: ${e.toString()}');
-      throw CacheException(message: 'Failed to get journals by location');
+      debugPrint(
+          '❌ journal: Error getting journals by location: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get journals by location');
     }
   }
 
   @override
-  Future<List<Journal>> searchJournals(String searchTerm, {String? userId}) async {
+  Future<List<Journal>> searchJournals(String searchTerm,
+      {String? userId}) async {
     try {
       // For now, we only support local queries
       // Remote sync will happen automatically when needed
@@ -486,7 +505,7 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
           .toList();
     } catch (e) {
       debugPrint('❌ journal: Error searching journals: ${e.toString()}');
-      throw CacheException(message: 'Failed to search journals');
+      throw const CacheException(message: 'Failed to search journals');
     }
   }
 
@@ -509,8 +528,9 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
           .map(modelToEntity)
           .toList();
     } catch (e) {
-      debugPrint('❌ journal: Error getting paginated journals: ${e.toString()}');
-      throw CacheException(message: 'Failed to get paginated journals');
+      debugPrint(
+          '❌ journal: Error getting paginated journals: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get paginated journals');
     }
   }
 
@@ -529,8 +549,8 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       entryDate: model.entryDate,
       mood: model.mood,
       location: model.location,
-      imageUrls: model.imageUrls,
-      tags: model.tags,
+      imageUrls: model.imageUrlsToJson(),
+      tags: model.tagsToJson(),
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
       isSynced: model.isSynced,
@@ -552,8 +572,10 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
       entryDate: Value(journal.entryDate),
       mood: Value(journal.mood),
       location: Value(journal.location),
-      imageUrls: Value(journal.imageUrls),
-      tags: Value(journal.tags),
+      imageUrls: journal.imageUrls != null
+          ? Value(journal.imageUrls!)
+          : const Value.absent(),
+      tags: journal.tags != null ? Value(journal.tags!) : const Value.absent(),
       createdAt: Value(journal.createdAt),
       updatedAt: Value(journal.updatedAt),
       isSynced: Value(journal.isSynced),
@@ -564,19 +586,32 @@ class JournalRepositoryImpl extends OfflineAwareRepository<Journal,
     );
   }
 
-  /// Convert [Journal] domain entity to JSON for GraphQL mutations
-  Map<String, dynamic> _journalToJson(Journal journal) {
-    return {
-      'tripId': journal.tripId,
-      'userId': journal.userId,
-      'title': journal.title,
-      'content': journal.content,
-      'entryDate': journal.entryDate?.toIso8601String(),
-      'mood': journal.mood,
-      'location': journal.location,
-      'imageUrls': journal.imageUrls,
-      'tags': journal.tags,
-    };
+  /// Convert domain entity or model to JSON for GraphQL mutations
+  Map<String, dynamic> _journalToJsonData(dynamic journalOrModel) {
+    final data = journalOrModel is Journal
+        ? {
+            'tripId': journalOrModel.tripId,
+            'userId': journalOrModel.userId,
+            'title': journalOrModel.title,
+            'content': journalOrModel.content,
+            'entryDate': journalOrModel.entryDate?.toIso8601String(),
+            'mood': journalOrModel.mood,
+            'location': journalOrModel.location,
+            'imageUrls': journalOrModel.imageUrls,
+            'tags': journalOrModel.tags,
+          }
+        : {
+            'tripId': journalOrModel.tripId,
+            'userId': journalOrModel.userId,
+            'title': journalOrModel.title,
+            'content': journalOrModel.content,
+            'entryDate': journalOrModel.entryDate?.toIso8601String(),
+            'mood': journalOrModel.mood,
+            'location': journalOrModel.location,
+            'imageUrls': journalOrModel.imageUrls,
+            'tags': journalOrModel.tags,
+          };
+    return data;
   }
 
   @override

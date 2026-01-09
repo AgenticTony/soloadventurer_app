@@ -311,7 +311,8 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
                   icon: const Icon(Icons.visibility, size: 16),
                   label: const Text('View Details'),
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   ),
                 ),
               ),
@@ -354,7 +355,7 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
         label,
         style: const TextStyle(fontSize: 12),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
     );
   }
@@ -404,7 +405,7 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
             Icon(
               icon,
               size: 64,
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(

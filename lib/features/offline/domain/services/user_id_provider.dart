@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
-import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Service for providing the current user ID
@@ -26,22 +25,16 @@ class UserIdProvider {
   ///
   /// This method safely handles cases where:
   /// - No user is authenticated (returns empty string)
-  /// - Auth state is loading (returns empty string)
-  /// - Auth state has an error (returns empty string)
+  /// - User is not available (returns empty string)
   String getCurrentUserId() {
     try {
       final authState = _container.read(authNotifierProvider);
 
-      return authState.when(
-        data: (state) {
-          if (state is Authenticated) {
-            return state.user.id;
-          }
-          return '';
-        },
-        loading: () => '',
-        error: (_, __) => '',
-      );
+      // With new AuthState pattern, we directly access fields
+      if (authState.isAuthenticated && authState.user != null) {
+        return authState.user!.id;
+      }
+      return '';
     } catch (e) {
       debugPrint('⚠️ Error getting current user ID: $e');
       return '';

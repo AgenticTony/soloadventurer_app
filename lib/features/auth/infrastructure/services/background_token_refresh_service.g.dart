@@ -7,7 +7,7 @@ part of 'background_token_refresh_service.dart';
 // **************************************************************************
 
 String _$backgroundTokenRefreshServiceHash() =>
-    r'8fc70daf668509b088156916dea15d6abeb70ea6';
+    r'7c77d7f80b7a51f339ebdb802b6de16d258e5554';
 
 /// Service responsible for managing background token refresh operations
 ///

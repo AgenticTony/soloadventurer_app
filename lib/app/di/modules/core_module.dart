@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:soloadventurer/core/security/security_manager.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 
 /// Register core module dependencies
@@ -9,10 +8,6 @@ void registerCoreModule(GetIt getIt, {bool isTest = false}) {
     () => SecureStorage(),
   );
 
-  getIt.registerLazySingleton<SecurityManager>(
-    () => SecurityManagerImpl(
-      storage: getIt<SecureStorage>(),
-      isTest: isTest,
-    ),
-  );
+  // SecurityManager is now a Riverpod provider, not registered in GetIt
+  // Use ProviderContainer to access it instead
 }

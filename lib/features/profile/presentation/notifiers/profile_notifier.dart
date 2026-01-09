@@ -5,7 +5,7 @@ import '../../domain/usecases/manage_avatar_use_case.dart';
 import '../../domain/usecases/delete_profile_use_case.dart';
 import '../state/profile_state.dart';
 import '../../domain/entities/profile_state.dart';
-import '../../../auth/domain/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 
 class ProfileNotifier extends StateNotifier<ProfileState> {
   final GetCurrentProfileUseCase _getCurrentProfile;
@@ -46,9 +46,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> loadProfile() async {
     if (state.isLoading) return;
 
-    final authState = _ref.read(authStateProvider);
-    final isAuthenticated = authState.isLoggedIn;
-    final user = authState.user;
+    final authState = _ref.read(authNotifierProvider);
+    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
+    final user = authState.valueOrNull?.user;
 
     if (!isAuthenticated || user == null) {
       state = state.copyWith(
@@ -79,9 +79,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
-    final authState = _ref.read(authStateProvider);
-    final isAuthenticated = authState.isLoggedIn;
-    final user = authState.user;
+    final authState = _ref.read(authNotifierProvider);
+    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
+    final user = authState.valueOrNull?.user;
 
     if (!isAuthenticated || user == null) {
       state = state.copyWith(
@@ -119,9 +119,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> uploadAvatar(String filePath) async {
     if (state.isUploading || !state.isInitialized) return;
 
-    final authState = _ref.read(authStateProvider);
-    final isAuthenticated = authState.isLoggedIn;
-    final user = authState.user;
+    final authState = _ref.read(authNotifierProvider);
+    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
+    final user = authState.valueOrNull?.user;
 
     if (!isAuthenticated || user == null) {
       state = state.copyWith(
@@ -152,9 +152,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> removeAvatar() async {
     if (state.isUpdating || !state.isInitialized) return;
 
-    final authState = _ref.read(authStateProvider);
-    final isAuthenticated = authState.isLoggedIn;
-    final user = authState.user;
+    final authState = _ref.read(authNotifierProvider);
+    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
+    final user = authState.valueOrNull?.user;
 
     if (!isAuthenticated || user == null) {
       state = state.copyWith(
@@ -182,9 +182,9 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> deleteProfile() async {
     if (state.isUpdating || !state.isInitialized) return;
 
-    final authState = _ref.read(authStateProvider);
-    final isAuthenticated = authState.isLoggedIn;
-    final user = authState.user;
+    final authState = _ref.read(authNotifierProvider);
+    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
+    final user = authState.valueOrNull?.user;
 
     if (!isAuthenticated || user == null) {
       state = state.copyWith(

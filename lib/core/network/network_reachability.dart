@@ -218,20 +218,19 @@ class NetworkReachabilityService {
       stopwatch.stop();
 
       // Check if response indicates server is reachable
-      final isReachable = response != null &&
-          response.statusCode != null &&
+      final isReachable = response.statusCode != null &&
           response.statusCode! >= 200 &&
           response.statusCode! < 500;
 
       final result = isReachable
           ? NetworkReachabilityResult.reachable(
               endpoint: fullUrl,
-              statusCode: response!.statusCode,
+              statusCode: response.statusCode,
               responseTimeMs: stopwatch.elapsedMilliseconds,
             )
           : NetworkReachabilityResult.unreachable(
               endpoint: fullUrl,
-              errorMessage: 'Server returned status ${response?.statusCode}',
+              errorMessage: 'Server returned status ${response.statusCode}',
             );
 
       _updateCache(result);
@@ -249,7 +248,8 @@ class NetworkReachabilityService {
         case DioExceptionType.connectionTimeout:
         case DioExceptionType.sendTimeout:
         case DioExceptionType.receiveTimeout:
-          errorMessage = 'Connection timeout after ${stopwatch.elapsedMilliseconds}ms';
+          errorMessage =
+              'Connection timeout after ${stopwatch.elapsedMilliseconds}ms';
           break;
         case DioExceptionType.connectionError:
           errorMessage = 'Connection error: ${e.message}';

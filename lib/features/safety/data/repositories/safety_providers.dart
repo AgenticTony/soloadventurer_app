@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:soloadventurer/core/error/failures.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
 import 'package:soloadventurer/features/safety/data/repositories/safety_repository_impl.dart';
@@ -10,14 +9,20 @@ part 'safety_providers.g.dart';
 /// Provider for SafetyLocalDataSource
 @riverpod
 SafetyLocalDataSource safetyLocalDataSource(SafetyLocalDataSourceRef ref) {
-  return SafetyLocalDataSourceImpl();
+  // Get SharedPreferences from a provider or create it
+  // For now, we'll use a workaround - this should be properly injected
+  throw UnimplementedError(
+      'SafetyLocalDataSource requires SharedPreferences - should be provided via dependency injection');
 }
 
 /// Provider for SafetyRemoteDataSource
 /// Uses mock implementation for now, should be replaced with real implementation
 @riverpod
 SafetyRemoteDataSource safetyRemoteDataSource(SafetyRemoteDataSourceRef ref) {
-  return MockSafetyRemoteDataSource();
+  // Get ApiClient from a provider or create it
+  // For now, we'll use a workaround - this should be properly injected
+  throw UnimplementedError(
+      'SafetyRemoteDataSource requires ApiClient - should be provided via dependency injection');
 }
 
 /// Provider for SafetyRepository implementation

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:soloadventurer/features/offline/infrastructure/database/schema.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 
 /// Local data model for Journal that represents the database entity
 ///
@@ -80,10 +80,10 @@ class LocalJournalModel {
       mood: localJournal.mood,
       location: localJournal.location,
       imageUrls: localJournal.imageUrls != null
-          ? List<String>.from(localJournal.imageUrls!)
+          ? List<String>.from(jsonDecode(localJournal.imageUrls!))
           : null,
       tags: localJournal.tags != null
-          ? List<String>.from(localJournal.tags!)
+          ? List<String>.from(jsonDecode(localJournal.tags!))
           : null,
       createdAt: localJournal.createdAt,
       updatedAt: localJournal.updatedAt,
@@ -294,4 +294,20 @@ class LocalJournalModel {
 
   /// Checks if the journal has a mood
   bool get hasMood => mood != null && mood!.isNotEmpty;
+
+  // ==============================================================================
+  // DATABASE CONVERSION HELPERS
+  // ==============================================================================
+
+  /// Converts imageUrls list to a JSON string suitable for database storage
+  String? imageUrlsToJson() {
+    if (imageUrls == null) return null;
+    return jsonEncode(imageUrls);
+  }
+
+  /// Converts tags list to a JSON string suitable for database storage
+  String? tagsToJson() {
+    if (tags == null) return null;
+    return jsonEncode(tags);
+  }
 }

@@ -33,7 +33,8 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
         ? MockAuthRemoteDataSource(getIt<ApiClient>())
         : AuthRemoteDataSourceImpl(
             userPool: AppConfig.awsConfig.userPool,
-            clientSecret: AppConfig.awsConfig.clientId, // Using clientId as fallback
+            clientSecret:
+                AppConfig.awsConfig.clientId, // Using clientId as fallback
             client: getIt<http.Client>(),
             baseUrl: AppConfig.apiBaseUrl,
           ),

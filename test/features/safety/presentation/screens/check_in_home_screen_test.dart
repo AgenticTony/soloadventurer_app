@@ -9,7 +9,7 @@ import 'package:soloadventurer/features/safety/presentation/providers/safety_pro
 
 // Mock classes
 class MockCheckInNotifier extends ChangeNotifier implements CheckInNotifier {
-  CheckInState _state = CheckInState.initial();
+  CheckInState _state = const CheckInState();
   String? _error;
 
   @override
@@ -46,7 +46,6 @@ class MockCheckInNotifier extends ChangeNotifier implements CheckInNotifier {
       checkIns: _state.checkIns,
       upcomingCheckIns: _state.upcomingCheckIns,
       isLoading: false,
-      isProcessing: false,
       error: null,
     );
     notifyListeners();
@@ -64,7 +63,8 @@ class MockCheckInNotifier extends ChangeNotifier implements CheckInNotifier {
     SafetyStatusType? statusType,
     List<String>? notifyContactIds,
     String? tripId,
-  }) => Future.value();
+  }) =>
+      Future.value();
 
   @override
   Future<void> completeCheckIn({
@@ -72,7 +72,8 @@ class MockCheckInNotifier extends ChangeNotifier implements CheckInNotifier {
     CheckInLocation? location,
     String? statusMessage,
     SafetyStatusType? statusType,
-  }) => Future.value();
+  }) =>
+      Future.value();
 
   @override
   Future<void> scheduleCheckIn({
@@ -83,7 +84,8 @@ class MockCheckInNotifier extends ChangeNotifier implements CheckInNotifier {
     String? statusMessage,
     List<String>? notifyContactIds,
     String? tripId,
-  }) => Future.value();
+  }) =>
+      Future.value();
 
   @override
   Future<void> cancelCheckIn(String checkInId) => Future.value();
@@ -92,7 +94,8 @@ class MockCheckInNotifier extends ChangeNotifier implements CheckInNotifier {
   Future<void> updateCheckInStatus(
     String checkInId,
     CheckInStatus status,
-  ) => Future.value();
+  ) =>
+      Future.value();
 
   @override
   CheckIn? getCheckInById(String id) => null;
@@ -126,14 +129,12 @@ void main() {
 
   group('CheckInHomeScreen', () {
     group('Rendering', () {
-      testWidgets('shows loading indicator on initial load',
-          (tester) async {
+      testWidgets('shows loading indicator on initial load', (tester) async {
         mockCheckInNotifier.setState(
           const CheckInState(
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: true,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -150,7 +151,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -187,7 +187,6 @@ void main() {
             checkIns: checkIns,
             upcomingCheckIns: checkIns,
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -196,7 +195,8 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('Upcoming Check-ins'), findsOneWidget);
-        expect(find.byType(Card), findsWidgets); // Status cards + check-in cards
+        expect(
+            find.byType(Card), findsWidgets); // Status cards + check-in cards
       });
 
       testWidgets('shows status cards with due soon and missed counts',
@@ -227,7 +227,6 @@ void main() {
             checkIns: checkIns,
             upcomingCheckIns: checkIns,
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -237,7 +236,8 @@ void main() {
 
         expect(find.text('Due Soon'), findsOneWidget);
         expect(find.text('Missed'), findsOneWidget);
-        expect(find.text('1'), findsAtLeastNWidgets(2)); // Both cards show count
+        expect(
+            find.text('1'), findsAtLeastNWidgets(2)); // Both cards show count
       });
 
       testWidgets('shows next check-in card prominently', (tester) async {
@@ -258,7 +258,6 @@ void main() {
             checkIns: [nextCheckIn],
             upcomingCheckIns: [nextCheckIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -276,7 +275,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: 'Failed to load check-ins',
           ),
         );
@@ -296,7 +294,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -314,7 +311,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -333,7 +329,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -355,7 +350,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -374,7 +368,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: true,
             error: null,
           ),
         );
@@ -394,7 +387,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -430,7 +422,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -459,7 +450,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -488,7 +478,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -521,7 +510,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -540,7 +528,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -573,7 +560,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -602,7 +588,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -622,7 +607,6 @@ void main() {
             checkIns: [],
             upcomingCheckIns: [],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -652,7 +636,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );
@@ -681,7 +664,6 @@ void main() {
             checkIns: [checkIn],
             upcomingCheckIns: [checkIn],
             isLoading: false,
-            isProcessing: false,
             error: null,
           ),
         );

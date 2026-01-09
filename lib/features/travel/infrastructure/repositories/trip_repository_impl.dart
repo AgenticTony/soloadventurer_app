@@ -1,13 +1,12 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
 import 'package:soloadventurer/features/offline/data/models/local_trip_model.dart';
-import 'package:soloadventurer/features/offline/data/models/sync_operation_model.dart';
 import 'package:soloadventurer/features/offline/data/repositories/offline_aware_repository.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
-import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 import 'package:soloadventurer/features/travel/domain/repositories/trip_repository.dart';
 
@@ -19,8 +18,14 @@ import 'package:soloadventurer/features/travel/domain/repositories/trip_reposito
 /// - Writing to local database immediately
 /// - Queueing mutations for sync when offline
 /// - Syncing with server when online
+///
+/// Type parameters:
+/// - Entity: Trip (domain entity)
+/// - Model: LocalTripModel (local database model)
+/// - CreateModel: LocalTripModel (same as Model for create operations)
+/// - UpdateModel: LocalTripModel (same as Model for update operations)
 class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
-    Map<String, dynamic>, Map<String, dynamic>> implements TripRepository {
+    LocalTripModel, LocalTripModel> implements TripRepository {
   /// Data Access Object for local trip database operations
   final TripDao _tripDao;
 
@@ -33,15 +38,11 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
   TripRepositoryImpl({
     required TripDao tripDao,
     required DioApiService apiService,
-    required ConnectivityService connectivityService,
-    required SyncQueueService syncQueueService,
+    required super.connectivityService,
+    required super.syncQueueService,
     super.config,
   })  : _tripDao = tripDao,
-        _apiService = apiService,
-        super(
-          connectivityService: connectivityService,
-          syncQueueService: syncQueueService,
-        );
+        _apiService = apiService;
 
   // ==============================================================================
   // OFFLINE-AWARE BASE REPOSITORY ABSTRACT METHODS
@@ -77,7 +78,8 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       return localTrip != null ? LocalTripModel.fromDatabase(localTrip) : null;
     } catch (e) {
       debugPrint('❌ trip: Error reading from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to read trip from local cache');
+      throw const CacheException(
+          message: 'Failed to read trip from local cache');
     }
   }
 
@@ -104,7 +106,8 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       return model;
     } catch (e) {
       debugPrint('❌ trip: Error writing to local: ${e.toString()}');
-      throw CacheException(message: 'Failed to write trip to local cache');
+      throw const CacheException(
+          message: 'Failed to write trip to local cache');
     }
   }
 
@@ -116,7 +119,8 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       debugPrint('📝 trip: Soft deleted in local database: $id');
     } catch (e) {
       debugPrint('❌ trip: Error deleting from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to delete trip from local cache');
+      throw const CacheException(
+          message: 'Failed to delete trip from local cache');
     }
   }
 
@@ -132,18 +136,20 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       }
     } catch (e) {
       debugPrint('❌ trip: Error reading all from local: ${e.toString()}');
-      throw CacheException(message: 'Failed to read trips from local cache');
+      throw const CacheException(
+          message: 'Failed to read trips from local cache');
     }
   }
 
   @override
-  Future<Trip> executeRemoteCreate(Map<String, dynamic> model) async {
+  Future<Trip> executeRemoteCreate(LocalTripModel model) async {
     try {
+      final tripData = _tripToJsonData(model);
       final response = await _apiService.dio.post(
         '/graphql',
         data: {
           'query': GraphQLQueries.createTrip,
-          'variables': model,
+          'variables': tripData,
         },
       );
 
@@ -153,21 +159,22 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         );
       }
 
-      final tripData = response.data['data']['createTrip'];
-      return Trip.fromJson(tripData);
+      final tripDataResponse = response.data['data']['createTrip'];
+      return Trip.fromJson(tripDataResponse);
     } catch (e) {
       debugPrint('❌ trip: Error in remote create: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to create trip on server');
+      throw const ServerException(message: 'Failed to create trip on server');
     }
   }
 
   @override
-  Future<Trip> executeRemoteUpdate(String id, Map<String, dynamic> model) async {
+  Future<Trip> executeRemoteUpdate(String id, LocalTripModel model) async {
     try {
-      final variables = {...model, 'id': id};
+      final tripData = _tripToJsonData(model);
+      final variables = {...tripData, 'id': id};
 
       final response = await _apiService.dio.post(
         '/graphql',
@@ -183,14 +190,14 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         );
       }
 
-      final tripData = response.data['data']['updateTrip'];
-      return Trip.fromJson(tripData);
+      final tripDataResponse = response.data['data']['updateTrip'];
+      return Trip.fromJson(tripDataResponse);
     } catch (e) {
       debugPrint('❌ trip: Error in remote update: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to update trip on server');
+      throw const ServerException(message: 'Failed to update trip on server');
     }
   }
 
@@ -213,7 +220,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
 
       final result = response.data['data']['deleteTrip'];
       if (result['success'] != true) {
-        throw ServerException(
+        throw const ServerException(
           message: 'Failed to delete trip on server',
         );
       }
@@ -224,7 +231,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to delete trip on server');
+      throw const ServerException(message: 'Failed to delete trip on server');
     }
   }
 
@@ -252,7 +259,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch trip from server');
+      throw const ServerException(message: 'Failed to fetch trip from server');
     }
   }
 
@@ -260,7 +267,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
   Future<List<Trip>> executeRemoteFetchAll({String? userId}) async {
     try {
       if (userId == null) {
-        throw ServerException(
+        throw const ServerException(
           message: 'userId is required for fetching trips',
         );
       }
@@ -286,7 +293,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       if (e is AppException) {
         rethrow;
       }
-      throw ServerException(message: 'Failed to fetch trips from server');
+      throw const ServerException(message: 'Failed to fetch trips from server');
     }
   }
 
@@ -306,14 +313,14 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
 
   @override
   Future<RepositoryOperationResult<Trip>> createTrip(Trip trip) {
-    final tripData = _tripToJson(trip);
-    return create(tripData);
+    final tripModel = entityToModel(trip);
+    return create(tripModel);
   }
 
   @override
   Future<RepositoryOperationResult<Trip>> updateTrip(String id, Trip trip) {
-    final tripData = _tripToJson(trip);
-    return update(id, tripData);
+    final tripModel = entityToModel(trip);
+    return update(id, tripModel);
   }
 
   @override
@@ -327,10 +334,12 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       // For now, we only support local queries
       // Remote sync will happen automatically when needed
       final trips = await _tripDao.getTripsByStatus(status, userId: userId);
-      return trips.map((t) => LocalTripModel.fromDatabase(t).toDomainEntity()).toList();
+      return trips
+          .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
+          .toList();
     } catch (e) {
       debugPrint('❌ trip: Error getting trips by status: ${e.toString()}');
-      throw CacheException(message: 'Failed to get trips by status');
+      throw const CacheException(message: 'Failed to get trips by status');
     }
   }
 
@@ -348,10 +357,12 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         endDate,
         userId: userId,
       );
-      return trips.map((t) => LocalTripModel.fromDatabase(t).toDomainEntity()).toList();
+      return trips
+          .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
+          .toList();
     } catch (e) {
       debugPrint('❌ trip: Error getting trips by date range: ${e.toString()}');
-      throw CacheException(message: 'Failed to get trips by date range');
+      throw const CacheException(message: 'Failed to get trips by date range');
     }
   }
 
@@ -361,10 +372,12 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       // For now, we only support local queries
       // Remote sync will happen automatically when needed
       final trips = await _tripDao.searchTrips(searchTerm, userId: userId);
-      return trips.map((t) => LocalTripModel.fromDatabase(t).toDomainEntity()).toList();
+      return trips
+          .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
+          .toList();
     } catch (e) {
       debugPrint('❌ trip: Error searching trips: ${e.toString()}');
-      throw CacheException(message: 'Failed to search trips');
+      throw const CacheException(message: 'Failed to search trips');
     }
   }
 
@@ -387,7 +400,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       status: model.status,
       budget: model.budget,
       coverImageUrl: model.coverImageUrl,
-      travelCompanionIds: model.travelCompanionIds,
+      travelCompanionIds: model.travelCompanionIdsToJson(),
       createdAt: model.createdAt,
       updatedAt: model.updatedAt,
       isSynced: model.isSynced,
@@ -413,7 +426,9 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       status: Value(trip.status),
       budget: Value(trip.budget),
       coverImageUrl: Value(trip.coverImageUrl),
-      travelCompanionIds: Value(trip.travelCompanionIds),
+      travelCompanionIds: trip.travelCompanionIds != null
+          ? Value(trip.travelCompanionIds!)
+          : const Value.absent(),
       createdAt: Value(trip.createdAt),
       updatedAt: Value(trip.updatedAt),
       isSynced: Value(trip.isSynced),
@@ -424,22 +439,38 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
     );
   }
 
-  /// Convert [Trip] domain entity to JSON for GraphQL mutations
-  Map<String, dynamic> _tripToJson(Trip trip) {
-    return {
-      'userId': trip.userId,
-      'title': trip.title,
-      'description': trip.description,
-      'startDate': trip.startDate.toIso8601String(),
-      'endDate': trip.endDate.toIso8601String(),
-      'destination': trip.destination,
-      'latitude': trip.latitude,
-      'longitude': trip.longitude,
-      'status': trip.status,
-      'budget': trip.budget,
-      'coverImageUrl': trip.coverImageUrl,
-      'travelCompanionIds': trip.travelCompanionIds,
-    };
+  /// Convert domain entity or model to JSON for GraphQL mutations
+  Map<String, dynamic> _tripToJsonData(dynamic tripOrModel) {
+    final data = tripOrModel is Trip
+        ? {
+            'userId': tripOrModel.userId,
+            'title': tripOrModel.title,
+            'description': tripOrModel.description,
+            'startDate': tripOrModel.startDate.toIso8601String(),
+            'endDate': tripOrModel.endDate.toIso8601String(),
+            'destination': tripOrModel.destination,
+            'latitude': tripOrModel.latitude,
+            'longitude': tripOrModel.longitude,
+            'status': tripOrModel.status,
+            'budget': tripOrModel.budget,
+            'coverImageUrl': tripOrModel.coverImageUrl,
+            'travelCompanionIds': tripOrModel.travelCompanionIds,
+          }
+        : {
+            'userId': tripOrModel.userId,
+            'title': tripOrModel.title,
+            'description': tripOrModel.description,
+            'startDate': tripOrModel.startDate.toIso8601String(),
+            'endDate': tripOrModel.endDate.toIso8601String(),
+            'destination': tripOrModel.destination,
+            'latitude': tripOrModel.latitude,
+            'longitude': tripOrModel.longitude,
+            'status': tripOrModel.status,
+            'budget': tripOrModel.budget,
+            'coverImageUrl': tripOrModel.coverImageUrl,
+            'travelCompanionIds': tripOrModel.travelCompanionIds,
+          };
+    return data;
   }
 
   @override

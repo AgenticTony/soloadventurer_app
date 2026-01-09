@@ -1,10 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:soloadventurer/core/services/location_service.dart';
-import 'package:soloadventurer/core/services/notification_service.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
 import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
-import 'package:soloadventurer/features/safety/domain/repositories/safety_repository.dart';
 
 part 'missed_checkin_detector.g.dart';
 

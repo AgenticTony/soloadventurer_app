@@ -206,7 +206,8 @@ class AuthRepositoryImpl implements AuthRepository {
               'AuthRepositoryImpl: Using cached user data after verification');
           await localDataSource.cacheUser(cachedUser);
         } else {
-          throw const AuthException('No user data available after verification');
+          throw const AuthException(
+              'No user data available after verification');
         }
       } catch (e) {
         debugPrint('AuthRepositoryImpl: Failed to get fresh user data: $e');

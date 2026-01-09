@@ -100,6 +100,11 @@ class DownloadSync {
   /// Uuid generator for conflict IDs
   final Uuid _uuid = const Uuid();
 
+  /// Data Access Objects
+  late final TripDao _tripDao = TripDao(_database);
+  late final JournalDao _journalDao = JournalDao(_database);
+  late final UserDao _userDao = UserDao(_database);
+
   /// Creates a new [DownloadSync] instance
   ///
   /// [dio] - Dio HTTP client for making API requests
@@ -254,8 +259,7 @@ class DownloadSync {
       debugPrint('📊 Received ${serverTrips.length} trips from server');
 
       // Get all local trips
-      final tripDao = _database.tripDao;
-      final localTrips = await tripDao.getAllTripsForUser(userId);
+      final localTrips = await _tripDao.getTripsByUserId(userId);
       final localTripsMap = {for (var t in localTrips) t.id: t};
 
       int inserted = 0;
@@ -271,7 +275,7 @@ class DownloadSync {
 
         if (localTrip == null) {
           // Insert new trip
-          await tripDao.insertTrip(_serverTripToCompanion(serverTrip));
+          await _tripDao.insertTrip(_serverTripToCompanion(serverTrip));
           inserted++;
           debugPrint('➕ Inserted trip: $tripId');
         } else {
@@ -313,7 +317,7 @@ class DownloadSync {
                   detectedAt: DateTime.now(),
                 );
 
-                await _conflictResolver!.recordConflict(conflict);
+                await _conflictResolver.recordConflict(conflict);
                 debugPrint('📝 Conflict recorded for trip: $tripId');
               }
 
@@ -321,9 +325,12 @@ class DownloadSync {
               // Will be resolved by conflict resolution phase
               skipped++;
             } else {
-              // Update trip
-              await tripDao.updateTrip(_serverTripToCompanion(serverTrip,
-                  existing: localTrip));
+              // Update trip using database update method
+              final companion =
+                  _serverTripToCompanion(serverTrip, existing: localTrip);
+              await (_database.update(_database.trips)
+                    ..where((t) => t.id.equals(tripId)))
+                  .write(companion);
               updated++;
               debugPrint('🔄 Updated trip: $tripId');
             }
@@ -336,14 +343,13 @@ class DownloadSync {
       // Handle deletions (server trips that are not in local DB anymore)
       // Note: This is a simplified approach. In production, you'd need
       // a way to track deleted items from server (e.g., deletedAt timestamp)
-      final serverTripIds =
-          serverTrips.map((t) => t['id'] as String).toSet();
+      final serverTripIds = serverTrips.map((t) => t['id'] as String).toSet();
       for (final localTrip in localTrips) {
         if (!serverTripIds.contains(localTrip.id) &&
             localTrip.isSynced &&
             !localTrip.hasPendingChanges) {
           // Trip was deleted on server, delete locally
-          await tripDao.deleteTripById(localTrip.id);
+          await _tripDao.deleteTripById(localTrip.id);
           deleted++;
           debugPrint('🗑️ Deleted trip: ${localTrip.id}');
         }
@@ -373,8 +379,7 @@ class DownloadSync {
       debugPrint('📥 Syncing journals...');
 
       // Get all trips to fetch journals for
-      final tripDao = _database.tripDao;
-      final trips = await tripDao.getAllTripsForUser(userId);
+      final trips = await _tripDao.getTripsByUserId(userId);
 
       if (trips.isEmpty) {
         debugPrint('📭 No trips to fetch journals for');
@@ -393,7 +398,7 @@ class DownloadSync {
       // to be added to GraphQLQueries
       for (final trip in trips) {
         try {
-          final query = '''
+          const query = '''
             query GetJournals(\$tripId: ID!) {
               getJournals(tripId: \$tripId) {
                 id
@@ -427,11 +432,11 @@ class DownloadSync {
 
           final serverJournals = response.data['data']['getJournals'] as List;
           totalJournals += serverJournals.length;
-          debugPrint('📊 Received ${serverJournals.length} journals for trip ${trip.id}');
+          debugPrint(
+              '📊 Received ${serverJournals.length} journals for trip ${trip.id}');
 
           // Get all local journals for this trip
-          final journalDao = _database.journalDao;
-          final localJournals = await journalDao.getJournalsByTrip(trip.id);
+          final localJournals = await _journalDao.getJournalsByTripId(trip.id);
           final localJournalsMap = {for (var j in localJournals) j.id: j};
 
           // Process each server journal
@@ -441,14 +446,16 @@ class DownloadSync {
 
             if (localJournal == null) {
               // Insert new journal
-              await journalDao.insertJournal(
-                  _serverJournalToCompanion(serverJournal));
+              await _journalDao
+                  .insertJournal(_serverJournalToCompanion(serverJournal));
               totalInserted++;
               debugPrint('➕ Inserted journal: $journalId');
             } else {
               // Check if update is needed
-              final serverUpdatedAt = DateTime.parse(serverJournal['updatedAt']);
-              final needsUpdate = serverUpdatedAt.isAfter(localJournal.updatedAt);
+              final serverUpdatedAt =
+                  DateTime.parse(serverJournal['updatedAt']);
+              final needsUpdate =
+                  serverUpdatedAt.isAfter(localJournal.updatedAt);
 
               if (needsUpdate) {
                 // Check for conflicts
@@ -469,7 +476,7 @@ class DownloadSync {
                         'id': localJournal.id,
                         'title': localJournal.title,
                         'content': localJournal.content,
-                        'entryDate': localJournal.entryDate.toIso8601String(),
+                        'entryDate': localJournal.entryDate?.toIso8601String(),
                         'version': localJournal.version,
                         'updatedAt': localJournal.updatedAt.toIso8601String(),
                       },
@@ -486,17 +493,19 @@ class DownloadSync {
                       detectedAt: DateTime.now(),
                     );
 
-                    await _conflictResolver!.recordConflict(conflict);
+                    await _conflictResolver.recordConflict(conflict);
                     debugPrint('📝 Conflict recorded for journal: $journalId');
                   }
 
                   // Skip updating to avoid losing local changes
                   totalSkipped++;
                 } else {
-                  // Update journal
-                  await journalDao.updateJournal(_serverJournalToCompanion(
-                      serverJournal,
-                      existing: localJournal));
+                  // Update journal using database update method
+                  final companion = _serverJournalToCompanion(serverJournal,
+                      existing: localJournal);
+                  await (_database.update(_database.journals)
+                        ..where((j) => j.id.equals(journalId)))
+                      .write(companion);
                   totalUpdated++;
                   debugPrint('🔄 Updated journal: $journalId');
                 }
@@ -514,7 +523,7 @@ class DownloadSync {
                 localJournal.isSynced &&
                 !localJournal.hasPendingChanges) {
               // Journal was deleted on server, delete locally
-              await journalDao.deleteJournalById(localJournal.id);
+              await _journalDao.deleteJournalById(localJournal.id);
               totalDeleted++;
               debugPrint('🗑️ Deleted journal: ${localJournal.id}');
             }
@@ -566,21 +575,19 @@ class DownloadSync {
       debugPrint('📊 Received user profile from server');
 
       // Get local user
-      final userDao = _database.userDao;
-      final localUsers = await userDao.getUserById(userId);
+      final localUser = await _userDao.getUserById(userId);
 
       int inserted = 0;
       int updated = 0;
       int conflicts = 0;
       int skipped = 0;
 
-      if (localUsers.isEmpty) {
+      if (localUser == null) {
         // Insert new user
-        await userDao.insertUser(_serverUserToCompanion(serverUser));
+        await _userDao.insertUser(_serverUserToCompanion(serverUser));
         inserted = 1;
         debugPrint('➕ Inserted user: $userId');
       } else {
-        final localUser = localUsers.first;
         // Check if update is needed
         final serverUpdatedAt = DateTime.parse(serverUser['updatedAt']);
         final needsUpdate = serverUpdatedAt.isAfter(localUser.updatedAt);
@@ -617,16 +624,19 @@ class DownloadSync {
                 detectedAt: DateTime.now(),
               );
 
-              await _conflictResolver!.recordConflict(conflict);
+              await _conflictResolver.recordConflict(conflict);
               debugPrint('📝 Conflict recorded for user: $userId');
             }
 
             // Skip updating to avoid losing local changes
             skipped++;
           } else {
-            // Update user
-            await userDao.updateUser(_serverUserToCompanion(serverUser,
-                existing: localUser));
+            // Update user using database update method
+            final companion =
+                _serverUserToCompanion(serverUser, existing: localUser);
+            await (_database.update(_database.users)
+                  ..where((u) => u.id.equals(userId)))
+                .write(companion);
             updated = 1;
             debugPrint('🔄 Updated user: $userId');
           }
@@ -638,7 +648,8 @@ class DownloadSync {
         'inserted': inserted,
         'updated': updated,
         'deleted': 0,
-        'skipped': skipped > 0 ? skipped : (inserted == 0 && updated == 0 ? 1 : 0),
+        'skipped':
+            skipped > 0 ? skipped : (inserted == 0 && updated == 0 ? 1 : 0),
         'conflicts': conflicts,
       };
     } catch (e) {
@@ -663,34 +674,36 @@ class DownloadSync {
 
       for (final entityType in entityTypes) {
         // Check if metadata exists
-        final metadataList = await (_database.select(_database.syncMetadataTable)
-              ..where((tbl) => tbl.entityType.equals(entityType))
-              ..where((tbl) => tbl.userId.equals(userId)))
-            .get();
+        final metadataList =
+            await (_database.select(_database.syncMetadataTable)
+                  ..where((tbl) => tbl.entityType.equals(entityType)))
+                .get();
 
         if (metadataList.isEmpty) {
           // Create new metadata
           await _database
               .into(_database.syncMetadataTable)
               .insert(SyncMetadataTableCompanion.insert(
-                userId: userId,
                 entityType: entityType,
-                lastSyncedAt: now,
-                lastSyncStatus: 'success',
+                lastSyncedAt: Value(now),
+                lastSyncStatus: const Value('success'),
+                updatedAt: now,
+                pendingCount: const Value(0),
+                failedCount: const Value(0),
+                syncToken: const Value.absent(),
+                lastSyncAttemptAt: const Value.absent(),
+                lastSyncError: const Value.absent(),
               ));
         } else {
           // Update existing metadata
           final metadata = metadataList.first;
-          await _database
-              .update(_database.syncMetadataTable)
-              .replace(SyncMetadataTable(
-                id: metadata.id,
-                userId: userId,
-                entityType: entityType,
-                lastSyncedAt: now,
-                lastSyncStatus: 'success',
-                lastIncrementalSyncAt: now,
-              ));
+          await (_database.update(_database.syncMetadataTable)
+                ..where((tbl) => tbl.entityType.equals(entityType)))
+              .write(SyncMetadataTableCompanion(
+            lastSyncedAt: Value(now),
+            lastSyncStatus: const Value('success'),
+            updatedAt: Value(now),
+          ));
         }
       }
 
@@ -723,9 +736,7 @@ class DownloadSync {
       status: Value(serverTrip['status'] as String),
       budget: Value(serverTrip['budget'] as int),
       coverImageUrl: Value(serverTrip['coverImageUrl'] as String?),
-      travelCompanionIds: Value(serverTrip['travelCompanionIds'] != null
-          ? serverTrip['travelCompanionIds'].toString()
-          : null),
+      travelCompanionIds: Value(serverTrip['travelCompanionIds']?.toString()),
       createdAt: Value(DateTime.parse(serverTrip['createdAt'])),
       updatedAt: Value(DateTime.parse(serverTrip['updatedAt'])),
       isSynced: const Value(true),
@@ -752,12 +763,8 @@ class DownloadSync {
           : const Value.absent(),
       mood: Value(serverJournal['mood'] as String?),
       location: Value(serverJournal['location'] as String?),
-      imageUrls: Value(serverJournal['imageUrls'] != null
-          ? serverJournal['imageUrls'].toString()
-          : null),
-      tags: Value(serverJournal['tags'] != null
-          ? serverJournal['tags'].toString()
-          : null),
+      imageUrls: Value(serverJournal['imageUrls']?.toString()),
+      tags: Value(serverJournal['tags']?.toString()),
       createdAt: Value(DateTime.parse(serverJournal['createdAt'])),
       updatedAt: Value(DateTime.parse(serverJournal['updatedAt'])),
       isSynced: const Value(true),
@@ -777,9 +784,9 @@ class DownloadSync {
       id: Value(serverUser['id'] as String),
       username: Value(serverUser['username'] as String),
       email: Value(serverUser['email'] as String),
-      firstName: Value(serverUser['firstName'] as String?),
-      lastName: Value(serverUser['lastName'] as String?),
-      profilePictureUrl: Value(serverUser['profilePictureUrl'] as String?),
+      displayName: Value(serverUser['displayName'] as String),
+      bio: Value(serverUser['bio'] as String?),
+      avatarUrl: Value(serverUser['avatarUrl'] as String?),
       createdAt: Value(DateTime.parse(serverUser['createdAt'])),
       updatedAt: Value(DateTime.parse(serverUser['updatedAt'])),
       isSynced: const Value(true),

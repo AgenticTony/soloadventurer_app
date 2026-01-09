@@ -32,12 +32,12 @@ class LocationSharingState extends Equatable {
   bool get isProcessing => isStarting || isStopping;
 
   /// Count of contacts currently receiving location updates
-  int get activeSharingCount => activeShares
-      .fold(0, (sum, update) => sum + update.sharedWithContactIds.length);
+  int get activeSharingCount => activeShares.fold(
+      0, (sum, update) => sum + update.sharedWithContactIds.length);
 
   /// Whether there are any emergency location shares active
-  bool get hasEmergencySharing => activeShares
-      .any((update) => update.isEmergency);
+  bool get hasEmergencySharing =>
+      activeShares.any((update) => update.isEmergency);
 
   /// IDs of contacts currently receiving location updates
   List<String> get activeContactIds {

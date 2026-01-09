@@ -1,8 +1,19 @@
 import 'dart:async';
-import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart' as geo
+    show
+        Geolocator,
+        LocationAccuracy,
+        LocationPermission,
+        LocationSettings,
+        Position,
+        ServiceStatus;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:riverpod/riverpod.dart';
-import 'location_service.dart';
+import 'location_service.dart'
+    show
+        LocationAccuracy,
+        LocationData,
+        LocationPermissionStatus,
+        LocationService;
 
 part 'location_service_impl.g.dart';
 
@@ -12,7 +23,7 @@ class LocationServiceImpl implements LocationService {
       StreamController<LocationData>.broadcast();
 
   bool _isTracking = false;
-  StreamSubscription<Position>? _positionSubscription;
+  StreamSubscription<geo.Position>? _positionSubscription;
 
   @override
   Stream<LocationData> get onLocationChanged => _locationController.stream;
@@ -51,7 +62,7 @@ class LocationServiceImpl implements LocationService {
     final locationSettings = _getLocationSettings(accuracy);
 
     try {
-      final position = await Geolocator.getCurrentPosition(
+      final position = await geo.Geolocator.getCurrentPosition(
         locationSettings: locationSettings,
       );
 
@@ -66,7 +77,7 @@ class LocationServiceImpl implements LocationService {
   @override
   Future<LocationData?> getLastKnownLocation() async {
     try {
-      final position = await Geolocator.getLastKnownPosition();
+      final position = await geo.Geolocator.getLastKnownPosition();
       if (position == null) {
         return null;
       }
@@ -112,23 +123,24 @@ class LocationServiceImpl implements LocationService {
     }
 
     // Configure location settings for battery efficiency
-    final locationSettings = LocationSettings(
+    final locationSettings = geo.LocationSettings(
       accuracy: _mapAccuracy(accuracy),
       distanceFilter: distanceFilter,
       timeLimit: const Duration(seconds: 30), // Timeout for getting location
     );
 
     // Start listening to position updates
-    _positionSubscription = Geolocator.getPositionStream(
+    _positionSubscription = geo.Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen(
-      (Position position) {
+      (geo.Position position) {
         final locationData = _convertPositionToLocationData(position);
         _locationController.add(locationData);
       },
       onError: (error) {
         _locationController.addError(
-          LocationServiceException('Location update error: ${error.toString()}'),
+          LocationServiceException(
+              'Location update error: ${error.toString()}'),
         );
       },
     );
@@ -145,18 +157,18 @@ class LocationServiceImpl implements LocationService {
 
   @override
   Future<bool> isLocationServiceEnabled() async {
-    return await Geolocator.isLocationServiceEnabled();
+    return await geo.Geolocator.isLocationServiceEnabled();
   }
 
   @override
   Future<LocationPermissionStatus> checkPermission() async {
-    final permission = await Geolocator.checkPermission();
+    final permission = await geo.Geolocator.checkPermission();
     return _mapPermissionStatus(permission);
   }
 
   @override
   Future<LocationPermissionStatus> requestPermission() async {
-    final permission = await Geolocator.requestPermission();
+    final permission = await geo.Geolocator.requestPermission();
     return _mapPermissionStatus(permission);
   }
 
@@ -167,7 +179,7 @@ class LocationServiceImpl implements LocationService {
     double endLatitude,
     double endLongitude,
   ) {
-    return Geolocator.distanceBetween(
+    return geo.Geolocator.distanceBetween(
       startLatitude,
       startLongitude,
       endLatitude,
@@ -182,22 +194,22 @@ class LocationServiceImpl implements LocationService {
   }
 
   /// Maps our [LocationAccuracy] to geolocator's [LocationAccuracy]
-  geolocator.LocationAccuracy _mapAccuracy(LocationAccuracy accuracy) {
+  geo.LocationAccuracy _mapAccuracy(LocationAccuracy accuracy) {
     switch (accuracy) {
       case LocationAccuracy.low:
-        return geolocator.LocationAccuracy.low;
+        return geo.LocationAccuracy.low;
       case LocationAccuracy.balanced:
-        return geolocator.LocationAccuracy.medium;
+        return geo.LocationAccuracy.medium;
       case LocationAccuracy.high:
-        return geolocator.LocationAccuracy.high;
+        return geo.LocationAccuracy.high;
       case LocationAccuracy.best:
-        return geolocator.LocationAccuracy.best;
+        return geo.LocationAccuracy.bestForNavigation;
     }
   }
 
   /// Creates location settings based on desired accuracy
-  LocationSettings _getLocationSettings(LocationAccuracy accuracy) {
-    return LocationSettings(
+  geo.LocationSettings _getLocationSettings(LocationAccuracy accuracy) {
+    return geo.LocationSettings(
       accuracy: _mapAccuracy(accuracy),
       distanceFilter: 0, // Get exact location for single request
       timeLimit: const Duration(seconds: 30),
@@ -205,7 +217,7 @@ class LocationServiceImpl implements LocationService {
   }
 
   /// Converts geolocator Position to our LocationData
-  LocationData _convertPositionToLocationData(Position position) {
+  LocationData _convertPositionToLocationData(geo.Position position) {
     return LocationData(
       latitude: position.latitude,
       longitude: position.longitude,
@@ -219,17 +231,17 @@ class LocationServiceImpl implements LocationService {
 
   /// Maps geolocator permission status to our LocationPermissionStatus
   LocationPermissionStatus _mapPermissionStatus(
-    geolocator.LocationPermission permission,
+    geo.LocationPermission permission,
   ) {
     switch (permission) {
-      case geolocator.LocationPermission.always:
-      case geolocator.LocationPermission.whileInUse:
+      case geo.LocationPermission.always:
+      case geo.LocationPermission.whileInUse:
         return LocationPermissionStatus.granted;
-      case geolocator.LocationPermission.denied:
+      case geo.LocationPermission.denied:
         return LocationPermissionStatus.denied;
-      case geolocator.LocationPermission.deniedForever:
+      case geo.LocationPermission.deniedForever:
         return LocationPermissionStatus.permanentlyDenied;
-      case geolocator.LocationPermission.unableToDetermine:
+      case geo.LocationPermission.unableToDetermine:
         return LocationPermissionStatus.denied;
     }
   }
@@ -257,7 +269,7 @@ class LocationPermissionException implements Exception {
 
 /// Provider for LocationServiceImpl
 @riverpod
-LocationService locationServiceImpl(LocationServiceImplRef ref) {
+LocationService locationServiceImpl(Ref ref) {
   final service = LocationServiceImpl();
 
   // Dispose the service when the provider is disposed
@@ -268,6 +280,6 @@ LocationService locationServiceImpl(LocationServiceImplRef ref) {
 
 /// Provider override for LocationService interface
 @riverpod
-LocationService locationServiceOverride(LocationServiceOverrideRef ref) {
+LocationService locationServiceOverride(Ref ref) {
   return ref.watch(locationServiceImplProvider);
 }

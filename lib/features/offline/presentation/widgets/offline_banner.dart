@@ -127,10 +127,10 @@ class _OfflineBannerState extends ConsumerState<OfflineBanner>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           // Use distinctive orange/amber color for offline banner
-          color: colorScheme.errorContainer.withOpacity(0.3),
+          color: colorScheme.errorContainer.withValues(alpha: 0.3),
           border: Border(
             bottom: BorderSide(
-              color: colorScheme.error.withOpacity(0.5),
+              color: colorScheme.error.withValues(alpha: 0.5),
               width: 2,
             ),
           ),
@@ -162,7 +162,8 @@ class _OfflineBannerState extends ConsumerState<OfflineBanner>
                   Text(
                     _buildMessage(syncStatus.pendingOperations),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onErrorContainer.withOpacity(0.85),
+                      color:
+                          colorScheme.onErrorContainer.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -178,10 +179,10 @@ class _OfflineBannerState extends ConsumerState<OfflineBanner>
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: colorScheme.error.withOpacity(0.2),
+                  color: colorScheme.error.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: colorScheme.error.withOpacity(0.5),
+                    color: colorScheme.error.withValues(alpha: 0.5),
                     width: 1,
                   ),
                 ),

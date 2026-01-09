@@ -45,10 +45,11 @@ void main() {
       // Insert 1000 trips
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('perf-trip-$i'),
+          id: 'perf-trip-$i',
           userId: i % 10 == 0 ? 'user-2' : 'user-1',
           title: 'Performance Trip $i',
-          description: 'Description for trip $i' * 5, // Longer description
+          description:
+              Value('Description for trip $i' * 5), // Longer description
           startDate: DateTime(2024, 1, i % 28 + 1),
           endDate: DateTime(2024, 1, (i % 28 + 1) % 28 + 1),
           destination: 'Destination ${i % 50}',
@@ -65,11 +66,13 @@ void main() {
       final avgInsertTime = insertTime / tripCount;
 
       print('Inserted $tripCount trips in ${insertTime}ms');
-      print('Average insert time: ${avgInsertTime.toStringAsFixed(2)}ms per trip');
+      print(
+          'Average insert time: ${avgInsertTime.toStringAsFixed(2)}ms per trip');
 
       // Performance assertion
       expect(insertTime, lessThan(60000),
-          reason: 'Inserting 1000 trips should take less than 60 seconds, took ${insertTime}ms');
+          reason:
+              'Inserting 1000 trips should take less than 60 seconds, took ${insertTime}ms');
       expect(avgInsertTime, lessThan(60),
           reason: 'Average insert time should be less than 60ms per trip');
     });
@@ -79,7 +82,7 @@ void main() {
       const int tripCount = 1000;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('query-trip-$i'),
+          id: 'query-trip-$i',
           userId: 'user-${i % 5}',
           title: 'Query Trip $i',
           startDate: DateTime(2024, i % 12 + 1, 1),
@@ -98,17 +101,19 @@ void main() {
       final queryTime = stopwatch.elapsedMilliseconds;
 
       print('Queried ${allTrips.length} trips in ${queryTime}ms');
-      print('Average query time: ${(queryTime / allTrips.length).toStringAsFixed(3)}ms per trip');
+      print(
+          'Average query time: ${(queryTime / allTrips.length).toStringAsFixed(3)}ms per trip');
 
       expect(allTrips.length, equals(tripCount));
       expect(queryTime, lessThan(10000),
-          reason: 'Querying 1000 trips should take less than 10 seconds, took ${queryTime}ms');
+          reason:
+              'Querying 1000 trips should take less than 10 seconds, took ${queryTime}ms');
     });
 
     test('Test with 10000+ journal entries - Insert performance', () async {
       // Create a trip first
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('journal-trip'),
+        id: 'journal-trip',
         userId: 'user-1',
         title: 'Trip with many journals',
         startDate: DateTime(2024, 1, 1),
@@ -126,13 +131,13 @@ void main() {
       // Insert 10000 journal entries
       for (int i = 1; i <= journalCount; i++) {
         await journalDao.insertJournal(JournalsCompanion.insert(
-          id: Value('perf-journal-$i'),
+          id: 'perf-journal-$i',
           tripId: 'journal-trip',
           userId: 'user-1',
           title: 'Journal Entry $i',
           content: 'Content for journal entry $i. ' * 20, // Larger content
-          mood: ['happy', 'sad', 'excited', 'tired'][i % 4],
-          location: 'Location ${i % 100}',
+          mood: Value(['happy', 'sad', 'excited', 'tired'][i % 4]),
+          location: Value('Location ${i % 100}'),
           isSynced: const Value(i % 3 != 0),
           hasPendingChanges: const Value(i % 2 == 0),
           createdAt: DateTime(2024, 1, 1).add(Duration(days: i ~/ 30)),
@@ -144,11 +149,13 @@ void main() {
       final avgInsertTime = insertTime / journalCount;
 
       print('Inserted $journalCount journal entries in ${insertTime}ms');
-      print('Average insert time: ${avgInsertTime.toStringAsFixed(2)}ms per journal');
+      print(
+          'Average insert time: ${avgInsertTime.toStringAsFixed(2)}ms per journal');
 
       // Performance assertion
       expect(insertTime, lessThan(300000),
-          reason: 'Inserting 10000 journals should take less than 5 minutes, took ${insertTime}ms');
+          reason:
+              'Inserting 10000 journals should take less than 5 minutes, took ${insertTime}ms');
       expect(avgInsertTime, lessThan(50),
           reason: 'Average insert time should be less than 50ms per journal');
     });
@@ -156,7 +163,7 @@ void main() {
     test('Test with 10000+ journal entries - Query performance', () async {
       // Create trip and insert journals
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('query-journal-trip'),
+        id: 'query-journal-trip',
         userId: 'user-1',
         title: 'Query Trip',
         startDate: DateTime(2024, 1, 1),
@@ -171,7 +178,7 @@ void main() {
       const int journalCount = 10000;
       for (int i = 1; i <= journalCount; i++) {
         await journalDao.insertJournal(JournalsCompanion.insert(
-          id: Value('query-journal-$i'),
+          id: 'query-journal-$i',
           tripId: 'query-journal-trip',
           userId: 'user-1',
           title: 'Journal $i',
@@ -183,15 +190,18 @@ void main() {
 
       // Test query performance
       final stopwatch = Stopwatch()..start();
-      final journals = await journalDao.getJournalsByTripId('query-journal-trip');
+      final journals =
+          await journalDao.getJournalsByTripId('query-journal-trip');
       final queryTime = stopwatch.elapsedMilliseconds;
 
       print('Queried ${journals.length} journals in ${queryTime}ms');
-      print('Average query time: ${(queryTime / journals.length).toStringAsFixed(3)}ms per journal');
+      print(
+          'Average query time: ${(queryTime / journals.length).toStringAsFixed(3)}ms per journal');
 
       expect(journals.length, equals(journalCount));
       expect(queryTime, lessThan(15000),
-          reason: 'Querying 10000 journals should take less than 15 seconds, took ${queryTime}ms');
+          reason:
+              'Querying 10000 journals should take less than 15 seconds, took ${queryTime}ms');
     });
 
     test('Pagination performance with large dataset', () async {
@@ -199,7 +209,7 @@ void main() {
       const int tripCount = 1000;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('page-trip-$i'),
+          id: 'page-trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, i % 28 + 1),
@@ -232,9 +242,11 @@ void main() {
 
       print('Retrieved $pageCount pages in ${totalTime}ms');
       print('Average page retrieval time: ${avgPageTime.toStringAsFixed(2)}ms');
-      print('Total trips retrieved: ${pages.fold<int>(0, (sum, page) => sum + page.length)}');
+      print(
+          'Total trips retrieved: ${pages.fold<int>(0, (sum, page) => sum + page.length)}');
 
-      expect(pages.fold<int>(0, (sum, page) => sum + page.length), equals(tripCount));
+      expect(pages.fold<int>(0, (sum, page) => sum + page.length),
+          equals(tripCount));
       expect(avgPageTime, lessThan(100),
           reason: 'Average page retrieval should be less than 100ms');
     });
@@ -244,7 +256,7 @@ void main() {
       const int tripCount = 1000;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('filter-trip-$i'),
+          id: 'filter-trip-$i',
           userId: 'user-${i % 5}',
           title: 'Trip $i',
           startDate: DateTime(2024, i % 12 + 1, 1),
@@ -266,7 +278,8 @@ void main() {
 
       expect(planningTrips.isNotEmpty, isTrue);
       expect(filterTime, lessThan(5000),
-          reason: 'Filtered query should take less than 5 seconds, took ${filterTime}ms');
+          reason:
+              'Filtered query should take less than 5 seconds, took ${filterTime}ms');
     });
 
     test('Search performance with large dataset', () async {
@@ -275,7 +288,7 @@ void main() {
       final destinations = List.generate(100, (i) => 'City $i');
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('search-trip-$i'),
+          id: 'search-trip-$i',
           userId: 'user-1',
           title: 'Trip to ${destinations[i % 100]}',
           startDate: DateTime(2024, i % 12 + 1, 1),
@@ -297,7 +310,8 @@ void main() {
 
       expect(results.isNotEmpty, isTrue);
       expect(searchTime, lessThan(3000),
-          reason: 'Search query should take less than 3 seconds, took ${searchTime}ms');
+          reason:
+              'Search query should take less than 3 seconds, took ${searchTime}ms');
     });
 
     test('Sync queue performance with large operations', () async {
@@ -307,11 +321,10 @@ void main() {
       // Enqueue 1000 sync operations
       for (int i = 1; i <= operationCount; i++) {
         await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-          id: Value('sync-op-$i'),
           entityType: ['trip', 'journal', 'user'][i % 3],
           entityId: 'entity-$i',
           operationType: ['create', 'update', 'delete'][i % 3],
-          data: Value('{"data":"$i"}'),
+          data: '{"data":"$i"}',
           status: const Value('pending'),
           priority: const Value(0),
           retryCount: const Value(0),
@@ -324,10 +337,12 @@ void main() {
       final avgEnqueueTime = enqueueTime / operationCount;
 
       print('Enqueued $operationCount operations in ${enqueueTime}ms');
-      print('Average enqueue time: ${avgEnqueueTime.toStringAsFixed(2)}ms per operation');
+      print(
+          'Average enqueue time: ${avgEnqueueTime.toStringAsFixed(2)}ms per operation');
 
       expect(enqueueTime, lessThan(60000),
-          reason: 'Enqueueing 1000 operations should take less than 60 seconds');
+          reason:
+              'Enqueueing 1000 operations should take less than 60 seconds');
       expect(avgEnqueueTime, lessThan(60),
           reason: 'Average enqueue time should be less than 60ms');
     });
@@ -337,11 +352,10 @@ void main() {
       const int operationCount = 1000;
       for (int i = 1; i <= operationCount; i++) {
         await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-          id: Value('pending-op-$i'),
           entityType: 'trip',
           entityId: 'trip-$i',
           operationType: 'update',
-          data: Value('{"data":"$i"}'),
+          data: '{"data":"$i"}',
           status: Value(i % 3 == 0 ? 'completed' : 'pending'),
           createdAt: DateTime(2024, 1, 1),
           updatedAt: DateTime(2024, 1, 1),
@@ -357,7 +371,8 @@ void main() {
 
       expect(pendingOps.length, greaterThan(0));
       expect(queryTime, lessThan(5000),
-          reason: 'Querying pending operations should take less than 5 seconds');
+          reason:
+              'Querying pending operations should take less than 5 seconds');
     });
 
     test('Batch update performance', () async {
@@ -365,7 +380,7 @@ void main() {
       const int tripCount = 500;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('batch-trip-$i'),
+          id: 'batch-trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -394,7 +409,8 @@ void main() {
       final updateTime = stopwatch.elapsedMilliseconds;
 
       print('Updated $tripCount trips in ${updateTime}ms');
-      print('Average update time: ${(updateTime / tripCount).toStringAsFixed(2)}ms per trip');
+      print(
+          'Average update time: ${(updateTime / tripCount).toStringAsFixed(2)}ms per trip');
 
       expect(updateTime, lessThan(60000),
           reason: 'Batch updating 500 trips should take less than 60 seconds');
@@ -405,7 +421,7 @@ void main() {
       const int tripCount = 1000;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('concurrent-trip-$i'),
+          id: 'concurrent-trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, i % 28 + 1),
@@ -428,10 +444,13 @@ void main() {
       final results = await Future.wait(futures);
       final totalTime = stopwatch.elapsedMilliseconds;
 
-      final totalRetrieved = results.fold<int>(0, (sum, list) => sum + list.length);
+      final totalRetrieved =
+          results.fold<int>(0, (sum, list) => sum + list.length);
 
-      print('Retrieved $totalRetrieved trips across ${results.length} concurrent queries in ${totalTime}ms');
-      print('Average query time: ${(totalTime / results.length).toStringAsFixed(2)}ms per query');
+      print(
+          'Retrieved $totalRetrieved trips across ${results.length} concurrent queries in ${totalTime}ms');
+      print(
+          'Average query time: ${(totalTime / results.length).toStringAsFixed(2)}ms per query');
 
       expect(totalRetrieved, equals(tripCount));
       expect(totalTime, lessThan(10000),
@@ -442,7 +461,7 @@ void main() {
       // Insert 1000 trips
       for (int i = 1; i <= 1000; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('index-trip-$i'),
+          id: 'index-trip-$i',
           userId: 'user-${i % 10}',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -469,8 +488,10 @@ void main() {
       final unsyncedTrips = await tripDao.getUnsyncedTrips();
       final indexedTime2 = stopwatch.elapsedMilliseconds;
 
-      print('Query by user_id (indexed): ${indexedTime1}ms for ${userTrips.length} trips');
-      print('Query unsynced (indexed): ${indexedTime2}ms for ${unsyncedTrips.length} trips');
+      print(
+          'Query by user_id (indexed): ${indexedTime1}ms for ${userTrips.length} trips');
+      print(
+          'Query unsynced (indexed): ${indexedTime2}ms for ${unsyncedTrips.length} trips');
 
       expect(indexedTime1, lessThan(1000),
           reason: 'Indexed query should be very fast (< 1s)');
@@ -487,7 +508,7 @@ void main() {
       const int tripCount = 1000;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('memory-trip-$i'),
+          id: 'memory-trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -507,9 +528,12 @@ void main() {
       final memoryDelta = finalMemory - initialMemory;
       final memoryPerTrip = memoryDelta / tripCount;
 
-      print('Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)}MB');
-      print('Final memory: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)}MB');
-      print('Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)}MB');
+      print(
+          'Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)}MB');
+      print(
+          'Final memory: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)}MB');
+      print(
+          'Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)}MB');
       print('Memory per trip: ${(memoryPerTrip / 1024).toStringAsFixed(2)}KB');
 
       expect(allTrips, hasLength(tripCount));
@@ -523,7 +547,7 @@ void main() {
       // Perform repeated operations
       for (int i = 1; i <= 100; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('leak-trip-$i'),
+          id: 'leak-trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -546,7 +570,8 @@ void main() {
       final finalMemory = await _getMemoryUsage();
       final memoryDelta = finalMemory - initialMemory;
 
-      print('Memory delta after 100 operations: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)}MB');
+      print(
+          'Memory delta after 100 operations: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)}MB');
 
       expect(memoryDelta, lessThan(20 * 1024 * 1024),
           reason: 'Memory increase should be reasonable (< 20MB)');
@@ -559,7 +584,7 @@ void main() {
       const int tripCount = 500;
       for (int i = 1; i <= tripCount; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('sync-trip-$i'),
+          id: 'sync-trip-$i',
           userId: 'user-1',
           title: 'Sync Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -575,11 +600,10 @@ void main() {
 
         // Enqueue sync operation
         await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-          id: Value('sync-op-$i'),
           entityType: 'trip',
           entityId: 'sync-trip-$i',
           operationType: 'create',
-          data: Value('{"title":"Sync Trip $i"}'),
+          data: '{"title":"Sync Trip $i"}',
           status: const Value('pending'),
           createdAt: DateTime(2024, 1, 1),
           updatedAt: DateTime(2024, 1, 1),
@@ -606,10 +630,12 @@ void main() {
 
       final totalSyncTime = queryTime + processTime;
 
-      print('Queried ${pendingOps.length} pending operations in ${queryTime}ms');
+      print(
+          'Queried ${pendingOps.length} pending operations in ${queryTime}ms');
       print('Processed ${pendingOps.length} operations in ${processTime}ms');
       print('Total sync time: ${totalSyncTime}ms');
-      print('Average sync time per operation: ${(totalSyncTime / pendingOps.length).toStringAsFixed(2)}ms');
+      print(
+          'Average sync time per operation: ${(totalSyncTime / pendingOps.length).toStringAsFixed(2)}ms');
 
       expect(totalSyncTime, lessThan(60000),
           reason: 'Syncing 500 operations should take less than 60 seconds');
@@ -619,7 +645,7 @@ void main() {
       // Insert initial dataset
       for (int i = 1; i <= 500; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('incremental-trip-$i'),
+          id: 'incremental-trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -638,7 +664,7 @@ void main() {
 
       for (int i = 501; i <= 510; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('incremental-trip-$i'),
+          id: 'incremental-trip-$i',
           userId: 'user-1',
           title: 'New Trip $i',
           startDate: DateTime(2024, 1, 1),
@@ -656,7 +682,8 @@ void main() {
       final unsyncedTrips = await tripDao.getUnsyncedTrips();
       final incrementalSyncTime = stopwatch.elapsedMilliseconds;
 
-      print('Incremental sync found ${unsyncedTrips.length} unsynced trips in ${incrementalSyncTime}ms');
+      print(
+          'Incremental sync found ${unsyncedTrips.length} unsynced trips in ${incrementalSyncTime}ms');
 
       expect(unsyncedTrips.length, equals(10));
       expect(incrementalSyncTime, lessThan(5000),

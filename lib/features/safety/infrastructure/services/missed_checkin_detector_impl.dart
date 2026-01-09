@@ -21,7 +21,8 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
   final NotificationService _notificationService;
 
   MissedCheckInDetectorStatus _status = MissedCheckInDetectorStatus.stopped;
-  final _statusController = StreamController<MissedCheckInDetectorStatus>.broadcast();
+  final _statusController =
+      StreamController<MissedCheckInDetectorStatus>.broadcast();
 
   @override
   MissedCheckInDetectorStatus get status => _status;
@@ -147,7 +148,7 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
 
     final now = DateTime.now();
     final deadlineWithGrace = checkIn.deadline!.add(
-      Duration(minutes: MissedCheckInConfig.gracePeriodMinutes),
+      const Duration(minutes: MissedCheckInConfig.gracePeriodMinutes),
     );
 
     return now.isAfter(deadlineWithGrace);
@@ -197,11 +198,12 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
     final alert = await _safetyRepository.triggerEmergencySOS(
       userId: checkIn.userId,
       message: MissedCheckInConfig.defaultAlertMessage,
-      location: alertLocation ?? SafetyAlertLocation(
-        latitude: 0.0,
-        longitude: 0.0,
-        timestamp: DateTime.now(),
-      ),
+      location: alertLocation ??
+          SafetyAlertLocation(
+            latitude: 0.0,
+            longitude: 0.0,
+            timestamp: DateTime.now(),
+          ),
       notifyContactIds: trustedContacts.map((c) => c.id).toList(),
       batteryLevel: batteryLevel,
       tripId: checkIn.tripId,
@@ -267,7 +269,7 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
       }
 
       // Find the most recent location within the max age limit
-      final maxAge = Duration(hours: MissedCheckInConfig.maxLocationAgeHours);
+      const maxAge = Duration(hours: MissedCheckInConfig.maxLocationAgeHours);
       final now = DateTime.now();
 
       for (final update in updates) {
@@ -312,7 +314,7 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
         locationDescription = alert.location!.address ??
             alert.location!.placeName ??
             '${alert.location!.latitude.toStringAsFixed(4)}, '
-            '${alert.location!.longitude.toStringAsFixed(4)}';
+                '${alert.location!.longitude.toStringAsFixed(4)}';
       }
 
       await _notificationService.showMissedCheckInAlert(

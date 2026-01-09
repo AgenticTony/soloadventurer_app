@@ -18,7 +18,8 @@ import 'package:soloadventurer/features/safety/domain/entities/location_update.d
 
 import '../../../../helpers/safety_test_helpers.dart';
 
-class MockSafetyRemoteDataSource extends Mock implements SafetyRemoteDataSource {}
+class MockSafetyRemoteDataSource extends Mock
+    implements SafetyRemoteDataSource {}
 
 class MockSafetyLocalDataSource extends Mock implements SafetyLocalDataSource {}
 
@@ -60,7 +61,8 @@ void main() {
           .called(1);
     });
 
-    test('should throw SafetyOfflineException when add fails due to network', () async {
+    test('should throw SafetyOfflineException when add fails due to network',
+        () async {
       // Arrange
       when(() => mockRemoteDataSource.addTrustedContact(any()))
           .thenThrow(const NetworkException('No internet connection'));
@@ -97,14 +99,16 @@ void main() {
       // Assert
       verify(() => mockRemoteDataSource.removeTrustedContact(testContactId))
           .called(1);
-      verify(() => mockLocalDataSource.removeCachedTrustedContact(testContactId))
+      verify(() =>
+              mockLocalDataSource.removeCachedTrustedContact(testContactId))
           .called(1);
     });
 
     test('should update trusted contact successfully', () async {
       // Arrange
       final updatedContact = createTestTrustedContact(name: 'Updated Name');
-      final updatedContactModel = TrustedContactModel.fromEntity(updatedContact);
+      final updatedContactModel =
+          TrustedContactModel.fromEntity(updatedContact);
 
       when(() => mockRemoteDataSource.updateTrustedContact(any()))
           .thenAnswer((_) async => updatedContactModel);
@@ -116,7 +120,8 @@ void main() {
 
       // Assert
       expect(result.name, 'Updated Name');
-      verify(() => mockRemoteDataSource.updateTrustedContact(updatedContactModel))
+      verify(() =>
+              mockRemoteDataSource.updateTrustedContact(updatedContactModel))
           .called(1);
       verify(() => mockLocalDataSource.cacheTrustedContact(updatedContactModel))
           .called(1);
@@ -223,10 +228,10 @@ void main() {
       final testLocation = createTestCheckInLocation();
 
       when(() => mockRemoteDataSource.completeCheckIn(
-        checkInId: any(),
-        location: any(),
-        statusMessage: anyNamed('statusMessage'),
-      )).thenAnswer((_) async => testCheckInModel);
+            checkInId: any(),
+            location: any(),
+            statusMessage: any('statusMessage'),
+          )).thenAnswer((_) async => testCheckInModel);
       when(() => mockLocalDataSource.cacheCheckIn(any()))
           .thenAnswer((_) async {});
 
@@ -240,10 +245,10 @@ void main() {
       // Assert
       expect(result.id, testCheckInId);
       verify(() => mockRemoteDataSource.completeCheckIn(
-        checkInId: testCheckInId,
-        location: testLocation,
-        statusMessage: testStatusMessage,
-      )).called(1);
+            checkInId: testCheckInId,
+            location: testLocation,
+            statusMessage: testStatusMessage,
+          )).called(1);
       verify(() => mockLocalDataSource.cacheCheckIn(testCheckInModel))
           .called(1);
     });
@@ -251,19 +256,19 @@ void main() {
     test('should schedule check-in successfully', () async {
       // Arrange
       final scheduledTime = testFutureDateTime;
-      final deadline = scheduledTime.add(Duration(hours: 1));
+      final deadline = scheduledTime.add(const Duration(hours: 1));
       final testLocation = createTestCheckInLocation();
 
       when(() => mockRemoteDataSource.scheduleCheckIn(
-        userId: any(),
-        scheduledTime: any(),
-        deadline: anyNamed('deadline'),
-        location: anyNamed('location'),
-        statusMessage: anyNamed('statusMessage'),
-        notifyContactIds: anyNamed('notifyContactIds'),
-        tripId: anyNamed('tripId'),
-        triggerType: anyNamed('triggerType'),
-      )).thenAnswer((_) async => testCheckInModel);
+            userId: any(),
+            scheduledTime: any(),
+            deadline: any('deadline'),
+            location: any('location'),
+            statusMessage: any('statusMessage'),
+            notifyContactIds: any('notifyContactIds'),
+            tripId: any('tripId'),
+            triggerType: any('triggerType'),
+          )).thenAnswer((_) async => testCheckInModel);
       when(() => mockLocalDataSource.cacheCheckIn(any()))
           .thenAnswer((_) async {});
 
@@ -282,15 +287,15 @@ void main() {
       // Assert
       expect(result.id, testCheckInId);
       verify(() => mockRemoteDataSource.scheduleCheckIn(
-        userId: testUserId,
-        scheduledTime: scheduledTime,
-        deadline: deadline,
-        location: testLocation,
-        statusMessage: testStatusMessage,
-        notifyContactIds: [testContactId],
-        tripId: testTripId,
-        triggerType: CheckInTriggerType.scheduled,
-      )).called(1);
+            userId: testUserId,
+            scheduledTime: scheduledTime,
+            deadline: deadline,
+            location: testLocation,
+            statusMessage: testStatusMessage,
+            notifyContactIds: [testContactId],
+            tripId: testTripId,
+            triggerType: CheckInTriggerType.scheduled,
+          )).called(1);
       verify(() => mockLocalDataSource.cacheCheckIn(testCheckInModel))
           .called(1);
     });
@@ -306,8 +311,7 @@ void main() {
       await repository.cancelCheckIn(testCheckInId);
 
       // Assert
-      verify(() => mockRemoteDataSource.cancelCheckIn(testCheckInId))
-          .called(1);
+      verify(() => mockRemoteDataSource.cancelCheckIn(testCheckInId)).called(1);
       verify(() => mockLocalDataSource.removeCachedCheckIn(testCheckInId))
           .called(1);
     });
@@ -329,8 +333,7 @@ void main() {
       // Assert
       expect(result, hasLength(3));
       verify(() => mockRemoteDataSource.getUpcomingCheckIns()).called(1);
-      verify(() => mockLocalDataSource.cacheCheckIns(checkInModels))
-          .called(1);
+      verify(() => mockLocalDataSource.cacheCheckIns(checkInModels)).called(1);
     });
 
     test('should get all check-ins from remote', () async {
@@ -350,8 +353,7 @@ void main() {
       // Assert
       expect(result, hasLength(5));
       verify(() => mockRemoteDataSource.getAllCheckIns()).called(1);
-      verify(() => mockLocalDataSource.cacheCheckIns(checkInModels))
-          .called(1);
+      verify(() => mockLocalDataSource.cacheCheckIns(checkInModels)).called(1);
     });
 
     test('should fallback to cache when getting check-ins offline', () async {
@@ -386,13 +388,13 @@ void main() {
 
       // Assert
       expect(result.id, testCheckInId);
-      verify(() => mockRemoteDataSource.getCheckIn(testCheckInId))
-          .called(1);
+      verify(() => mockRemoteDataSource.getCheckIn(testCheckInId)).called(1);
       verify(() => mockLocalDataSource.cacheCheckIn(testCheckInModel))
           .called(1);
     });
 
-    test('should throw when getting non-existent check-in from cache', () async {
+    test('should throw when getting non-existent check-in from cache',
+        () async {
       // Arrange
       when(() => mockRemoteDataSource.getCheckIn(any()))
           .thenThrow(const NetworkException('No internet'));
@@ -412,9 +414,8 @@ void main() {
         createTestCheckIn(id: 'checkin-1', tripId: testTripId),
         createTestCheckIn(id: 'checkin-2', tripId: testTripId),
       ];
-      final checkInModels = tripCheckIns
-          .map((c) => CheckInModel.fromEntity(c))
-          .toList();
+      final checkInModels =
+          tripCheckIns.map((c) => CheckInModel.fromEntity(c)).toList();
 
       when(() => mockRemoteDataSource.getCheckInsByTrip(any()))
           .thenAnswer((_) async => checkInModels);
@@ -436,9 +437,9 @@ void main() {
       final updatedCheckInModel = CheckInModel.fromEntity(updatedCheckIn);
 
       when(() => mockRemoteDataSource.updateCheckInStatus(
-        checkInId: any(),
-        status: any(),
-      )).thenAnswer((_) async => updatedCheckInModel);
+            checkInId: any(),
+            status: any(),
+          )).thenAnswer((_) async => updatedCheckInModel);
       when(() => mockLocalDataSource.cacheCheckIn(any()))
           .thenAnswer((_) async {});
 
@@ -451,9 +452,9 @@ void main() {
       // Assert
       expect(result.status, CheckInStatus.completed);
       verify(() => mockRemoteDataSource.updateCheckInStatus(
-        checkInId: testCheckInId,
-        status: CheckInStatus.completed,
-      )).called(1);
+            checkInId: testCheckInId,
+            status: CheckInStatus.completed,
+          )).called(1);
       verify(() => mockLocalDataSource.cacheCheckIn(updatedCheckInModel))
           .called(1);
     });
@@ -473,20 +474,20 @@ void main() {
     test('should share location successfully', () async {
       // Arrange
       when(() => mockRemoteDataSource.shareLocation(
-        latitude: any(),
-        longitude: any(),
-        accuracy: anyNamed('accuracy'),
-        altitude: anyNamed('altitude'),
-        speed: anyNamed('speed'),
-        heading: anyNamed('heading'),
-        address: anyNamed('address'),
-        placeName: anyNamed('placeName'),
-        shareWithContactIds: anyNamed('shareWithContactIds'),
-        batteryLevel: anyNamed('batteryLevel'),
-        isEmergency: anyNamed('isEmergency'),
-        emergencyAlertId: anyNamed('emergencyAlertId'),
-        checkInId: anyNamed('checkInId'),
-      )).thenAnswer((_) async => testLocationUpdate);
+            latitude: any(),
+            longitude: any(),
+            accuracy: any('accuracy'),
+            altitude: any('altitude'),
+            speed: any('speed'),
+            heading: any('heading'),
+            address: any('address'),
+            placeName: any('placeName'),
+            shareWithContactIds: any('shareWithContactIds'),
+            batteryLevel: any('batteryLevel'),
+            isEmergency: any('isEmergency'),
+            emergencyAlertId: any('emergencyAlertId'),
+            checkInId: any('checkInId'),
+          )).thenAnswer((_) async => testLocationUpdate);
       when(() => mockLocalDataSource.cacheLocationUpdate(any()))
           .thenAnswer((_) async {});
 
@@ -504,12 +505,12 @@ void main() {
       expect(result.latitude, testLatitude);
       expect(result.longitude, testLongitude);
       verify(() => mockRemoteDataSource.shareLocation(
-        latitude: testLatitude,
-        longitude: testLongitude,
-        accuracy: testAccuracy,
-        shareWithContactIds: [testContactId],
-        batteryLevel: 85,
-      )).called(1);
+            latitude: testLatitude,
+            longitude: testLongitude,
+            accuracy: testAccuracy,
+            shareWithContactIds: [testContactId],
+            batteryLevel: 85,
+          )).called(1);
       verify(() => mockLocalDataSource.cacheLocationUpdate(testLocationUpdate))
           .called(1);
     });
@@ -517,12 +518,12 @@ void main() {
     test('should share location for emergency', () async {
       // Arrange
       when(() => mockRemoteDataSource.shareLocation(
-        latitude: any(),
-        longitude: any(),
-        shareWithContactIds: anyNamed('shareWithContactIds'),
-        isEmergency: anyNamed('isEmergency'),
-        emergencyAlertId: anyNamed('emergencyAlertId'),
-      )).thenAnswer((_) async => testLocationUpdate);
+            latitude: any(),
+            longitude: any(),
+            shareWithContactIds: any('shareWithContactIds'),
+            isEmergency: any('isEmergency'),
+            emergencyAlertId: any('emergencyAlertId'),
+          )).thenAnswer((_) async => testLocationUpdate);
       when(() => mockLocalDataSource.cacheLocationUpdate(any()))
           .thenAnswer((_) async {});
 
@@ -537,12 +538,12 @@ void main() {
 
       // Assert
       verify(() => mockRemoteDataSource.shareLocation(
-        latitude: testLatitude,
-        longitude: testLongitude,
-        shareWithContactIds: [testContactId],
-        isEmergency: true,
-        emergencyAlertId: testAlertId,
-      )).called(1);
+            latitude: testLatitude,
+            longitude: testLongitude,
+            shareWithContactIds: [testContactId],
+            isEmergency: true,
+            emergencyAlertId: testAlertId,
+          )).called(1);
     });
 
     test('should stop location sharing successfully', () async {
@@ -592,7 +593,8 @@ void main() {
           .called(1);
     });
 
-    test('should fallback to cache when getting active shares offline', () async {
+    test('should fallback to cache when getting active shares offline',
+        () async {
       // Arrange
       final cachedUpdates = [testLocationUpdate];
 
@@ -618,10 +620,10 @@ void main() {
       final locationUpdates = [testLocationUpdate];
 
       when(() => mockRemoteDataSource.getLocationUpdates(
-        limit: any(),
-        startDate: anyNamed('startDate'),
-        endDate: anyNamed('endDate'),
-      )).thenAnswer((_) async => locationUpdates);
+            limit: any(),
+            startDate: any('startDate'),
+            endDate: any('endDate'),
+          )).thenAnswer((_) async => locationUpdates);
 
       // Act
       final result = await repository.getLocationUpdates(
@@ -633,21 +635,22 @@ void main() {
       // Assert
       expect(result, hasLength(1));
       verify(() => mockRemoteDataSource.getLocationUpdates(
-        limit: 20,
-        startDate: startDate,
-        endDate: endDate,
-      )).called(1);
+            limit: 20,
+            startDate: startDate,
+            endDate: endDate,
+          )).called(1);
     });
 
-    test('should fallback to cache when getting location updates offline', () async {
+    test('should fallback to cache when getting location updates offline',
+        () async {
       // Arrange
       final cachedUpdates = [testLocationUpdate];
 
       when(() => mockRemoteDataSource.getLocationUpdates(
-        limit: any(),
-        startDate: anyNamed('startDate'),
-        endDate: anyNamed('endDate'),
-      )).thenThrow(const NetworkException('No internet'));
+            limit: any(),
+            startDate: any('startDate'),
+            endDate: any('endDate'),
+          )).thenThrow(const NetworkException('No internet'));
       when(() => mockLocalDataSource.getCachedLocationUpdates())
           .thenAnswer((_) async => cachedUpdates);
 
@@ -671,9 +674,9 @@ void main() {
       );
 
       when(() => mockRemoteDataSource.updateLocationSharingPermission(
-        contactId: any(),
-        enabled: any(),
-      )).thenAnswer((_) async {});
+            contactId: any(),
+            enabled: any(),
+          )).thenAnswer((_) async {});
       when(() => mockLocalDataSource.getCachedTrustedContact(any()))
           .thenAnswer((_) async => cachedContactModel);
       when(() => mockLocalDataSource.cacheTrustedContact(any()))
@@ -687,15 +690,17 @@ void main() {
 
       // Assert
       verify(() => mockRemoteDataSource.updateLocationSharingPermission(
-        contactId: testContactId,
-        enabled: true,
-      )).called(1);
+            contactId: testContactId,
+            enabled: true,
+          )).called(1);
       verify(() => mockLocalDataSource.getCachedTrustedContact(testContactId))
           .called(1);
       verify(() => mockLocalDataSource.cacheTrustedContact(
-        argThat(isA<TrustedContactModel>()
-            .having((c) => c.locationSharingEnabled, 'locationSharingEnabled', true)),
-      )).called(1);
+            argThat(isA<TrustedContactModel>().having(
+                (c) => c.locationSharingEnabled,
+                'locationSharingEnabled',
+                true)),
+          )).called(1);
     });
   });
 
@@ -708,13 +713,13 @@ void main() {
       final testLocation = createTestSafetyAlertLocation();
 
       when(() => mockRemoteDataSource.triggerEmergencySOS(
-        userId: any(),
-        message: anyNamed('message'),
-        location: any(),
-        notifyContactIds: anyNamed('notifyContactIds'),
-        batteryLevel: anyNamed('batteryLevel'),
-        tripId: anyNamed('tripId'),
-      )).thenAnswer((_) async => testAlertModel);
+            userId: any(),
+            message: any('message'),
+            location: any(),
+            notifyContactIds: any('notifyContactIds'),
+            batteryLevel: any('batteryLevel'),
+            tripId: any('tripId'),
+          )).thenAnswer((_) async => testAlertModel);
       when(() => mockLocalDataSource.cacheSafetyAlert(any()))
           .thenAnswer((_) async {});
 
@@ -732,13 +737,13 @@ void main() {
       expect(result.id, testAlertId);
       expect(result.type, SafetyAlertType.emergencySOS);
       verify(() => mockRemoteDataSource.triggerEmergencySOS(
-        userId: testUserId,
-        message: testEmergencyMessage,
-        location: testLocation,
-        notifyContactIds: [testContactId],
-        batteryLevel: 85,
-        tripId: testTripId,
-      )).called(1);
+            userId: testUserId,
+            message: testEmergencyMessage,
+            location: testLocation,
+            notifyContactIds: [testContactId],
+            batteryLevel: 85,
+            tripId: testTripId,
+          )).called(1);
       verify(() => mockLocalDataSource.cacheSafetyAlert(testAlertModel))
           .called(1);
     });
@@ -753,13 +758,13 @@ void main() {
       );
 
       when(() => mockRemoteDataSource.updateSafetyStatus(
-        status: any(),
-        message: anyNamed('message'),
-        location: anyNamed('location'),
-        batteryLevel: anyNamed('batteryLevel'),
-        safetyAlertId: anyNamed('safetyAlertId'),
-        checkInId: anyNamed('checkInId'),
-      )).thenAnswer((_) async => testStatus);
+            status: any(),
+            message: any('message'),
+            location: any('location'),
+            batteryLevel: any('batteryLevel'),
+            safetyAlertId: any('safetyAlertId'),
+            checkInId: any('checkInId'),
+          )).thenAnswer((_) async => testStatus);
       when(() => mockLocalDataSource.cacheSafetyStatus(any()))
           .thenAnswer((_) async {});
 
@@ -773,11 +778,10 @@ void main() {
       expect(result.status, SafetyStatusType.safe);
       expect(result.message, testStatusMessage);
       verify(() => mockRemoteDataSource.updateSafetyStatus(
-        status: SafetyStatusType.safe,
-        message: testStatusMessage,
-      )).called(1);
-      verify(() => mockLocalDataSource.cacheSafetyStatus(testStatus))
-          .called(1);
+            status: SafetyStatusType.safe,
+            message: testStatusMessage,
+          )).called(1);
+      verify(() => mockLocalDataSource.cacheSafetyStatus(testStatus)).called(1);
     });
 
     test('should get safety status from remote', () async {
@@ -799,11 +803,11 @@ void main() {
       // Assert
       expect(result.status, SafetyStatusType.safe);
       verify(() => mockRemoteDataSource.getSafetyStatus()).called(1);
-      verify(() => mockLocalDataSource.cacheSafetyStatus(testStatus))
-          .called(1);
+      verify(() => mockLocalDataSource.cacheSafetyStatus(testStatus)).called(1);
     });
 
-    test('should fallback to cache when getting safety status offline', () async {
+    test('should fallback to cache when getting safety status offline',
+        () async {
       // Arrange
       final cachedStatus = SafetyStatusModel(
         userId: testUserId,
@@ -845,7 +849,7 @@ void main() {
 
     test('should get safety status for another user', () async {
       // Arrange
-      final otherUserId = 'user-456';
+      const otherUserId = 'user-456';
       final testStatus = SafetyStatusModel(
         userId: otherUserId,
         status: SafetyStatusType.safe,
@@ -884,8 +888,7 @@ void main() {
       // Assert
       expect(result, hasLength(3));
       verify(() => mockRemoteDataSource.getSafetyAlerts()).called(1);
-      verify(() => mockLocalDataSource.cacheSafetyAlerts(testAlerts))
-          .called(1);
+      verify(() => mockLocalDataSource.cacheSafetyAlerts(testAlerts)).called(1);
     });
 
     test('should fallback to cache when getting alerts offline', () async {
@@ -919,8 +922,7 @@ void main() {
 
       // Assert
       expect(result.id, testAlertId);
-      verify(() => mockRemoteDataSource.getSafetyAlert(testAlertId))
-          .called(1);
+      verify(() => mockRemoteDataSource.getSafetyAlert(testAlertId)).called(1);
       verify(() => mockLocalDataSource.cacheSafetyAlert(testAlertModel))
           .called(1);
     });
@@ -942,9 +944,9 @@ void main() {
     test('should get recent safety alerts from remote', () async {
       // Arrange
       when(() => mockRemoteDataSource.getRecentSafetyAlerts(
-        limit: any(),
-        type: anyNamed('type'),
-      )).thenAnswer((_) async => testAlerts);
+            limit: any(),
+            type: any('type'),
+          )).thenAnswer((_) async => testAlerts);
 
       // Act
       final result = await repository.getRecentSafetyAlerts(limit: 10);
@@ -962,9 +964,9 @@ void main() {
           .toList();
 
       when(() => mockRemoteDataSource.getRecentSafetyAlerts(
-        limit: any(),
-        type: anyNamed('type'),
-      )).thenAnswer((_) async => emergencyAlerts);
+            limit: any(),
+            type: any('type'),
+          )).thenAnswer((_) async => emergencyAlerts);
 
       // Act
       final result = await repository.getRecentSafetyAlerts(
@@ -975,9 +977,9 @@ void main() {
       // Assert
       expect(result, hasLength(emergencyAlerts.length));
       verify(() => mockRemoteDataSource.getRecentSafetyAlerts(
-        limit: 10,
-        type: SafetyAlertType.emergencySOS,
-      )).called(1);
+            limit: 10,
+            type: SafetyAlertType.emergencySOS,
+          )).called(1);
     });
 
     test('should acknowledge safety alert successfully', () async {
@@ -986,7 +988,7 @@ void main() {
         acknowledgedBy: [],
       );
       final cachedAlertModel = SafetyAlertModel.fromEntity(testAlert);
-      final acknowledgedContactId = 'contact-ack';
+      const acknowledgedContactId = 'contact-ack';
 
       when(() => mockRemoteDataSource.acknowledgeSafetyAlert(any(), any()))
           .thenAnswer((_) async {});
@@ -996,20 +998,22 @@ void main() {
           .thenAnswer((_) async {});
 
       // Act
-      await repository.acknowledgeSafetyAlert(testAlertId, acknowledgedContactId);
+      await repository.acknowledgeSafetyAlert(
+          testAlertId, acknowledgedContactId);
 
       // Assert
       verify(() => mockRemoteDataSource.acknowledgeSafetyAlert(
-        testAlertId,
-        acknowledgedContactId,
-      )).called(1);
+            testAlertId,
+            acknowledgedContactId,
+          )).called(1);
       verify(() => mockLocalDataSource.getCachedSafetyAlert(testAlertId))
           .called(1);
       verify(() => mockLocalDataSource.cacheSafetyAlert(
-        argThat(isA<SafetyAlertModel>()
-            .having((a) => a.acknowledgedBy.contains(acknowledgedContactId),
-                   'acknowledgedBy', true)),
-      )).called(1);
+            argThat(isA<SafetyAlertModel>().having(
+                (a) => a.acknowledgedBy.contains(acknowledgedContactId),
+                'acknowledgedBy',
+                true)),
+          )).called(1);
     });
 
     test('should resolve safety alert successfully', () async {
@@ -1035,9 +1039,9 @@ void main() {
       verify(() => mockLocalDataSource.getCachedSafetyAlert(testAlertId))
           .called(1);
       verify(() => mockLocalDataSource.cacheSafetyAlert(
-        argThat(isA<SafetyAlertModel>()
-            .having((a) => a.status, 'status', SafetyAlertStatus.resolved)),
-      )).called(1);
+            argThat(isA<SafetyAlertModel>()
+                .having((a) => a.status, 'status', SafetyAlertStatus.resolved)),
+          )).called(1);
     });
 
     test('should cancel safety alert successfully', () async {
@@ -1063,9 +1067,9 @@ void main() {
       verify(() => mockLocalDataSource.getCachedSafetyAlert(testAlertId))
           .called(1);
       verify(() => mockLocalDataSource.cacheSafetyAlert(
-        argThat(isA<SafetyAlertModel>()
-            .having((a) => a.status, 'status', SafetyAlertStatus.canceled)),
-      )).called(1);
+            argThat(isA<SafetyAlertModel>()
+                .having((a) => a.status, 'status', SafetyAlertStatus.canceled)),
+          )).called(1);
     });
 
     test('should get missed check-in alerts', () async {
@@ -1156,7 +1160,8 @@ void main() {
       verify(() => mockLocalDataSource.cacheBatteryLevel(85)).called(1);
     });
 
-    test('should fallback to cache when getting battery level offline', () async {
+    test('should fallback to cache when getting battery level offline',
+        () async {
       // Arrange
       when(() => mockRemoteDataSource.getBatteryLevel())
           .thenThrow(const NetworkException('No internet'));
@@ -1208,7 +1213,8 @@ void main() {
           .called(1);
     });
 
-    test('should fallback to cache when getting safety settings offline', () async {
+    test('should fallback to cache when getting safety settings offline',
+        () async {
       // Arrange
       final cachedSettings = {'cached': 'value'};
 
@@ -1261,7 +1267,8 @@ void main() {
   });
 
   group('SafetyRepositoryImpl - Contact Notification Preferences', () {
-    test('should update contact notification preferences successfully', () async {
+    test('should update contact notification preferences successfully',
+        () async {
       // Arrange
       final testContact = createTestTrustedContact(
         id: testContactId,
@@ -1275,10 +1282,10 @@ void main() {
       );
 
       when(() => mockRemoteDataSource.updateContactNotificationPreferences(
-        contactId: any(),
-        receivesCheckIns: any(),
-        receivesEmergencyAlerts: any(),
-      )).thenAnswer((_) async {});
+            contactId: any(),
+            receivesCheckIns: any(),
+            receivesEmergencyAlerts: any(),
+          )).thenAnswer((_) async {});
       when(() => mockLocalDataSource.getCachedTrustedContact(any()))
           .thenAnswer((_) async => cachedContactModel);
       when(() => mockLocalDataSource.cacheTrustedContact(any()))
@@ -1293,17 +1300,18 @@ void main() {
 
       // Assert
       verify(() => mockRemoteDataSource.updateContactNotificationPreferences(
-        contactId: testContactId,
-        receivesCheckIns: true,
-        receivesEmergencyAlerts: true,
-      )).called(1);
+            contactId: testContactId,
+            receivesCheckIns: true,
+            receivesEmergencyAlerts: true,
+          )).called(1);
       verify(() => mockLocalDataSource.getCachedTrustedContact(testContactId))
           .called(1);
       verify(() => mockLocalDataSource.cacheTrustedContact(
-        argThat(isA<TrustedContactModel>()
-            .having((c) => c.receivesCheckIns, 'receivesCheckIns', true)
-            .having((c) => c.receivesEmergencyAlerts, 'receivesEmergencyAlerts', true)),
-      )).called(1);
+            argThat(isA<TrustedContactModel>()
+                .having((c) => c.receivesCheckIns, 'receivesCheckIns', true)
+                .having((c) => c.receivesEmergencyAlerts,
+                    'receivesEmergencyAlerts', true)),
+          )).called(1);
     });
   });
 }

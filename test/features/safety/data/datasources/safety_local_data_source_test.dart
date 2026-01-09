@@ -3,16 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/core/error/safety_exceptions.dart';
-import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source_impl.dart';
-import 'package:soloadventurer/features/safety/data/models/check_in_model.dart';
 import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
-import 'package:soloadventurer/features/safety/data/models/safety_alert_model.dart';
 import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
-import 'package:soloadventurer/features/safety/data/models/trusted_contact_model.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
-import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
 
@@ -44,13 +39,13 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_trusted_contacts',
-        any(that: isA<String>()),
-      )).called(1);
+            'cached_trusted_contacts',
+            any(that: isA<String>()),
+          )).called(1);
       verify(() => mockSharedPreferences.setInt(
-        'safety_last_cache_update',
-        any(that: isA<int>()),
-      )).called(1);
+            'safety_last_cache_update',
+            any(that: isA<int>()),
+          )).called(1);
     });
 
     test('should retrieve cached trusted contacts', () async {
@@ -73,7 +68,9 @@ void main() {
     test('should return empty list when cache is expired', () async {
       // Arrange
       when(() => mockSharedPreferences.getInt('safety_last_cache_update'))
-          .thenReturn(DateTime.now().subtract(Duration(hours: 2)).millisecondsSinceEpoch);
+          .thenReturn(DateTime.now()
+              .subtract(const Duration(hours: 2))
+              .millisecondsSinceEpoch);
 
       // Act
       final result = await dataSource.getCachedTrustedContacts();
@@ -115,15 +112,17 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_trusted_contacts',
-        any(that: contains('new-contact')),
-      )).called(1);
+            'cached_trusted_contacts',
+            any(that: contains('new-contact')),
+          )).called(1);
     });
 
     test('should update existing contact when caching', () async {
       // Arrange
-      final existingContact = createTestTrustedContact(id: 'contact-1', name: 'Old Name');
-      final updatedContact = createTestTrustedContact(id: 'contact-1', name: 'New Name');
+      final existingContact =
+          createTestTrustedContact(id: 'contact-1', name: 'Old Name');
+      final updatedContact =
+          createTestTrustedContact(id: 'contact-1', name: 'New Name');
       final jsonList = [existingContact.toJson()];
 
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
@@ -139,9 +138,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_trusted_contacts',
-        any(that: contains('New Name')),
-      )).called(1);
+            'cached_trusted_contacts',
+            any(that: contains('New Name')),
+          )).called(1);
     });
 
     test('should get cached trusted contact by ID', () async {
@@ -162,7 +161,8 @@ void main() {
       expect(result.name, 'Contact 1');
     });
 
-    test('should return null when getting non-existent cached contact', () async {
+    test('should return null when getting non-existent cached contact',
+        () async {
       // Arrange
       final contacts = createTestTrustedContactsList(count: 2);
       final jsonList = contacts.map((c) => c.toJson()).toList();
@@ -182,7 +182,8 @@ void main() {
       // Arrange
       final contacts = createTestTrustedContactsList(count: 3);
       final jsonList = contacts.map((c) => c.toJson()).toList();
-      final remainingJson = jsonList.where((json) => json['id'] != 'contact-1').toList();
+      final remainingJson =
+          jsonList.where((json) => json['id'] != 'contact-1').toList();
 
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
           .thenReturn(jsonEncode(jsonList))
@@ -197,9 +198,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_trusted_contacts',
-        any(that: isNot(contains('contact-1'))),
-      )).called(1);
+            'cached_trusted_contacts',
+            any(that: isNot(contains('contact-1'))),
+          )).called(1);
     });
 
     test('should throw SafetyCacheException when caching fails', () async {
@@ -214,7 +215,8 @@ void main() {
       );
     });
 
-    test('should throw SafetyCacheRetrievalException when retrieval fails', () async {
+    test('should throw SafetyCacheRetrievalException when retrieval fails',
+        () async {
       // Arrange
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
           .thenThrow(Exception('Read error'));
@@ -242,13 +244,13 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_check_ins',
-        any(that: isA<String>()),
-      )).called(1);
+            'cached_check_ins',
+            any(that: isA<String>()),
+          )).called(1);
       verify(() => mockSharedPreferences.setInt(
-        'safety_last_cache_update',
-        any(that: isA<int>()),
-      )).called(1);
+            'safety_last_cache_update',
+            any(that: isA<int>()),
+          )).called(1);
     });
 
     test('should retrieve cached check-ins', () async {
@@ -272,17 +274,17 @@ void main() {
       final now = DateTime.now();
       final pastCheckIn = createTestCheckIn(
         id: 'past',
-        scheduledTime: now.subtract(Duration(hours: 1)),
+        scheduledTime: now.subtract(const Duration(hours: 1)),
         status: CheckInStatus.completed,
       );
       final upcomingCheckIn1 = createTestCheckIn(
         id: 'upcoming-1',
-        scheduledTime: now.add(Duration(hours: 1)),
+        scheduledTime: now.add(const Duration(hours: 1)),
         status: CheckInStatus.scheduled,
       );
       final upcomingCheckIn2 = createTestCheckIn(
         id: 'upcoming-2',
-        scheduledTime: now.add(Duration(hours: 2)),
+        scheduledTime: now.add(const Duration(hours: 2)),
         status: CheckInStatus.active,
       );
       final allCheckIns = [pastCheckIn, upcomingCheckIn1, upcomingCheckIn2];
@@ -322,9 +324,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_check_ins',
-        any(that: contains('new-checkin')),
-      )).called(1);
+            'cached_check_ins',
+            any(that: contains('new-checkin')),
+          )).called(1);
     });
 
     test('should get cached check-in by ID', () async {
@@ -348,7 +350,8 @@ void main() {
       // Arrange
       final checkIns = createTestCheckInsList(count: 3);
       final jsonList = checkIns.map((c) => c.toJson()).toList();
-      final remainingJson = jsonList.where((json) => json['id'] != 'checkin-1').toList();
+      final remainingJson =
+          jsonList.where((json) => json['id'] != 'checkin-1').toList();
 
       when(() => mockSharedPreferences.getString('cached_check_ins'))
           .thenReturn(jsonEncode(jsonList))
@@ -363,9 +366,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_check_ins',
-        any(that: isNot(contains('checkin-1'))),
-      )).called(1);
+            'cached_check_ins',
+            any(that: isNot(contains('checkin-1'))),
+          )).called(1);
     });
   });
 
@@ -403,9 +406,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_location_updates',
-        any(that: isA<String>()),
-      )).called(1);
+            'cached_location_updates',
+            any(that: isA<String>()),
+          )).called(1);
     });
 
     test('should retrieve cached location updates', () async {
@@ -467,9 +470,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_location_updates',
-        any(that: contains('new-update')),
-      )).called(1);
+            'cached_location_updates',
+            any(that: contains('new-update')),
+          )).called(1);
     });
 
     test('should get cached location update by ID', () async {
@@ -504,9 +507,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_safety_alerts',
-        any(that: isA<String>()),
-      )).called(1);
+            'cached_safety_alerts',
+            any(that: isA<String>()),
+          )).called(1);
     });
 
     test('should retrieve cached safety alerts', () async {
@@ -558,9 +561,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_safety_alerts',
-        any(that: contains('new-alert')),
-      )).called(1);
+            'cached_safety_alerts',
+            any(that: contains('new-alert')),
+          )).called(1);
     });
 
     test('should get cached safety alert by ID', () async {
@@ -626,9 +629,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_safety_status',
-        any(that: isA<String>()),
-      )).called(1);
+            'cached_safety_status',
+            any(that: isA<String>()),
+          )).called(1);
     });
 
     test('should retrieve cached safety status', () async {
@@ -673,9 +676,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setInt(
-        'cached_battery_level',
-        85,
-      )).called(1);
+            'cached_battery_level',
+            85,
+          )).called(1);
     });
 
     test('should retrieve cached battery level', () async {
@@ -713,9 +716,9 @@ void main() {
 
       // Assert
       verify(() => mockSharedPreferences.setString(
-        'cached_safety_settings',
-        any(that: isA<String>()),
-      )).called(1);
+            'cached_safety_settings',
+            any(that: isA<String>()),
+          )).called(1);
     });
 
     test('should retrieve cached safety settings', () async {
@@ -774,7 +777,7 @@ void main() {
     test('should return true when cache is expired', () async {
       // Arrange
       final oldTimestamp = DateTime.now()
-          .subtract(Duration(hours: 2))
+          .subtract(const Duration(hours: 2))
           .millisecondsSinceEpoch;
       when(() => mockSharedPreferences.getInt('safety_last_cache_update'))
           .thenReturn(oldTimestamp);
@@ -789,7 +792,7 @@ void main() {
     test('should return false when cache is fresh', () async {
       // Arrange
       final freshTimestamp = DateTime.now()
-          .subtract(Duration(minutes: 30))
+          .subtract(const Duration(minutes: 30))
           .millisecondsSinceEpoch;
       when(() => mockSharedPreferences.getInt('safety_last_cache_update'))
           .thenReturn(freshTimestamp);
@@ -827,7 +830,8 @@ void main() {
       expect(result!.millisecondsSinceEpoch, testTimestamp);
     });
 
-    test('should return null when no last cache update timestamp exists', () async {
+    test('should return null when no last cache update timestamp exists',
+        () async {
       // Arrange
       when(() => mockSharedPreferences.getInt('safety_last_cache_update'))
           .thenReturn(null);

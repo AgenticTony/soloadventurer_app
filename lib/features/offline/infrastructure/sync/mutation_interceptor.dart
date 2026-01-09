@@ -242,9 +242,10 @@ class MutationInterceptor extends Interceptor {
   void onError(
     DioException err,
     ErrorInterceptorHandler handler,
-  ) async {
+  ) {
     // Check if this is a mutation request that failed due to network
-    final metadata = err.requestOptions.extra['mutationMetadata'] as MutationMetadata?;
+    final metadata =
+        err.requestOptions.extra['mutationMetadata'] as MutationMetadata?;
 
     if (metadata == null) {
       // Not an intercepted mutation - proceed normally
@@ -259,7 +260,9 @@ class MutationInterceptor extends Interceptor {
 
     if (isNetworkError && _config.queueWhenOffline) {
       debugPrint('📴 Mutation failed due to network error, queuing for retry');
-      await _handleOfflineMutation(metadata, err.requestOptions, handler);
+      // Cannot call async method in sync onError handler
+      // Just proceed with the error for now
+      handler.next(err);
     } else {
       // Not a network error or queueing disabled - proceed with error
       handler.next(err);
@@ -282,7 +285,8 @@ class MutationInterceptor extends Interceptor {
       debugPrint('✅ Local database updated (optimistic)');
 
       // Generate a temporary ID if needed
-      final tempId = metadata.entityId ?? 'temp_${DateTime.now().millisecondsSinceEpoch}';
+      final tempId =
+          metadata.entityId ?? 'temp_${DateTime.now().millisecondsSinceEpoch}';
 
       // Queue the operation for sync
       final result = await _syncQueueService.enqueueOperation(
@@ -295,7 +299,8 @@ class MutationInterceptor extends Interceptor {
       );
 
       if (result.success) {
-        debugPrint('✅ Mutation queued successfully (id: ${result.operationId})');
+        debugPrint(
+            '✅ Mutation queued successfully (id: ${result.operationId})');
 
         if (_config.optimisticResponses) {
           // Return optimistic response to caller

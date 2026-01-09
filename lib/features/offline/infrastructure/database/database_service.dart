@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -162,7 +161,7 @@ class DatabaseService {
       await close();
 
       // Delete the database file
-      await AppDatabase.deleteDatabaseFile();
+      await AppDatabaseExtension.deleteDatabaseFile();
 
       debugPrint('Database file deleted');
       return true;
@@ -180,7 +179,7 @@ class DatabaseService {
   /// - 'exists': Whether the file exists
   /// - 'isInitialized': Whether the database service is initialized
   Future<Map<String, dynamic>> getDatabaseInfo() async {
-    final info = await AppDatabase.getDatabaseInfoStatic();
+    final info = await AppDatabaseExtension.getDatabaseInfoStatic();
     return {
       ...info,
       'isInitialized': _isInitialized,
@@ -249,7 +248,7 @@ class DatabaseService {
   Future<void> _backupCorruptedDatabase() async {
     try {
       final dbDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(dbDir.path, AppDatabase.dbNameStatic);
+      final dbPath = p.join(dbDir.path, AppDatabaseExtension.dbNameStatic);
       final dbFile = File(dbPath);
 
       if (!await dbFile.exists()) {
@@ -259,7 +258,8 @@ class DatabaseService {
 
       // Create backup filename with timestamp
       final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
-      final backupPath = p.join(dbDir.path, 'soloadventurer_backup_$timestamp.db');
+      final backupPath =
+          p.join(dbDir.path, 'soloadventurer_backup_$timestamp.db');
 
       // Copy the database file
       await dbFile.copy(backupPath);
@@ -289,9 +289,11 @@ class DatabaseService {
       ];
 
       for (final table in tables) {
-        await _database!.customSelect(
-          'SELECT COUNT(*) FROM $table',
-        ).get();
+        await _database!
+            .customSelect(
+              'SELECT COUNT(*) FROM $table',
+            )
+            .get();
       }
 
       return true;
@@ -322,7 +324,7 @@ extension AppDatabaseExtension on AppDatabase {
   static Future<Map<String, dynamic>> getDatabaseInfoStatic() async {
     try {
       final dbDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(dbDir.path, AppDatabase.dbNameStatic);
+      final dbPath = p.join(dbDir.path, AppDatabaseExtension.dbNameStatic);
       final dbFile = File(dbPath);
 
       return {
@@ -344,7 +346,7 @@ extension AppDatabaseExtension on AppDatabase {
   static Future<void> deleteDatabaseFile() async {
     try {
       final dbDir = await getApplicationDocumentsDirectory();
-      final dbPath = p.join(dbDir.path, AppDatabase.dbNameStatic);
+      final dbPath = p.join(dbDir.path, AppDatabaseExtension.dbNameStatic);
       final dbFile = File(dbPath);
 
       if (await dbFile.exists()) {

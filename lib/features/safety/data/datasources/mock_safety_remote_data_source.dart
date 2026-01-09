@@ -49,8 +49,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   // ==================== Trusted Contacts Operations ====================
 
   @override
-  Future<TrustedContact> addTrustedContact(
-      TrustedContact contact) async {
+  Future<TrustedContact> addTrustedContact(TrustedContact contact) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -101,8 +100,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
   }
 
   @override
-  Future<TrustedContact> updateTrustedContact(
-      TrustedContact contact) async {
+  Future<TrustedContact> updateTrustedContact(TrustedContact contact) async {
     await _simulateDelay();
     _checkOffline();
 
@@ -312,7 +310,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _checkIns[checkInId] = updatedCheckIn;
-    debugPrint('Mock: Updated check-in status for $checkInId to ${status.name}');
+    debugPrint(
+        'Mock: Updated check-in status for $checkInId to ${status.name}');
     return updatedCheckIn;
   }
 
@@ -478,7 +477,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       (alert) =>
           alert.type == SafetyAlertType.emergencySOS &&
           (alert.status == SafetyAlertStatus.sent ||
-           alert.status == SafetyAlertStatus.acknowledged),
+              alert.status == SafetyAlertStatus.acknowledged),
     );
 
     if (hasActiveSOS) {
@@ -548,16 +547,13 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     await _simulateDelay();
     _checkOffline();
 
-    if (_currentSafetyStatus == null) {
-      // Return default safe status
-      _currentSafetyStatus = SafetyStatus(
-        id: _generateId(),
-        userId: 'mock-user-id',
-        status: SafetyStatusType.safe,
-        timestamp: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-    }
+    _currentSafetyStatus ??= SafetyStatus(
+      id: _generateId(),
+      userId: 'mock-user-id',
+      status: SafetyStatusType.safe,
+      timestamp: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
 
     return _currentSafetyStatus!;
   }
@@ -640,7 +636,8 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       updatedAt: DateTime.now(),
     );
 
-    debugPrint('Mock: Acknowledged safety alert $alertId by contact $contactId');
+    debugPrint(
+        'Mock: Acknowledged safety alert $alertId by contact $contactId');
   }
 
   @override

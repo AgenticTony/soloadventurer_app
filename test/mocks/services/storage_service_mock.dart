@@ -149,7 +149,7 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
   void setupStoreUsername() {
     when(() => storeUsername(any())).thenAnswer((invocation) async {
       _username = invocation.positionalArguments[0] as String;
-      return null;
+      return;
     });
   }
 
@@ -163,7 +163,7 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
   void setupStoreAuthToken() {
     when(() => storeAuthToken(any())).thenAnswer((invocation) async {
       _authToken = invocation.positionalArguments[0] as String;
-      return null;
+      return;
     });
   }
 
@@ -177,7 +177,7 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
   void setupStoreRefreshToken() {
     when(() => storeRefreshToken(any())).thenAnswer((invocation) async {
       _refreshToken = invocation.positionalArguments[0] as String;
-      return null;
+      return;
     });
   }
 
@@ -191,7 +191,7 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
   void setupStoreUserId() {
     when(() => storeUserId(any())).thenAnswer((invocation) async {
       _userId = invocation.positionalArguments[0] as String;
-      return null;
+      return;
     });
   }
 
@@ -202,7 +202,7 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
       _authToken = null;
       _refreshToken = null;
       _userId = null;
-      return null;
+      return;
     });
   }
 }

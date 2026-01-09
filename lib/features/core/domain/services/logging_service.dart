@@ -1,4 +1,3 @@
-
 /// Interface for logging service following clean architecture principles
 abstract class LoggingService {
   /// Log a state transition with relevant metadata
@@ -33,5 +32,27 @@ abstract class LoggingService {
     required String status,
     Map<String, dynamic>? metadata,
     StackTrace? stackTrace,
+  });
+
+  /// Log token rotation events
+  void logTokenRotation({
+    required Object oldSession,
+    required Object newSession,
+    String? reason,
+  });
+
+  /// Log token blacklist events
+  void logTokenBlacklist({
+    required String token,
+    required String reason,
+    DateTime? expiryTime,
+  });
+
+  /// Log token refresh attempts
+  void logTokenRefresh({
+    required bool success,
+    String? error,
+    int attemptNumber = 1,
+    Map<String, dynamic>? additionalInfo,
   });
 }

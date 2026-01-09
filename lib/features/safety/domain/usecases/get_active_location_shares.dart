@@ -58,9 +58,7 @@ class GetActiveLocationSharesUseCase {
   /// Returns active location updates associated with the specified [checkInId].
   Future<List<LocationUpdate>> getSharesForCheckIn(String checkInId) async {
     final allShares = await _repository.getActiveLocationShares();
-    return allShares
-        .where((update) => update.checkInId == checkInId)
-        .toList();
+    return allShares.where((update) => update.checkInId == checkInId).toList();
   }
 
   /// Get location updates for an emergency alert

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/check_in.dart';
 import '../providers/safety_providers.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
 import 'manual_check_in_screen.dart';
 import 'schedule_check_in_screen.dart';
 import 'check_in_history_screen.dart';
@@ -219,7 +218,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
             Text(
               nextCheckIn.statusMessage!,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ],
@@ -228,7 +227,8 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
             onPressed: () => _completeCheckIn(context, nextCheckIn),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
-              foregroundColor: isOverdue ? Colors.red : theme.colorScheme.primary,
+              foregroundColor:
+                  isOverdue ? Colors.red : theme.colorScheme.primary,
               minimumSize: const Size(double.infinity, 48),
             ),
             child: const Text('Complete Check-in'),
@@ -381,7 +381,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
         label,
         style: const TextStyle(fontSize: 12),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
     );
   }
@@ -395,7 +395,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
           Icon(
             Icons.event_available,
             size: 64,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(

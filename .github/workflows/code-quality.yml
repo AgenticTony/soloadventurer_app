@@ -33,3 +33,61 @@ jobs:
       - name: Run custom lint
         run: flutter pub run custom_lint
         continue-on-error: true
+
+      # Auth Migration Checks - Ensure Riverpod 3.0 AsyncNotifier pattern compliance
+      - name: Check for legacy StateNotifier in auth feature
+        run: |
+          echo "Checking for StateNotifier in auth feature..."
+          if grep -rn "StateNotifier" lib/features/auth/ 2>/dev/null; then
+            echo "❌ ERROR: StateNotifier found in auth feature!"
+            echo "The auth feature must use AsyncNotifier, not StateNotifier."
+            exit 1
+          else
+            echo "✅ No StateNotifier found in auth feature"
+          fi
+
+      - name: Check for manual isLoading in AuthState
+        run: |
+          echo "Checking for manual isLoading field in AuthState..."
+          if grep -E "bool\s+isLoading|@Default.*isLoading" lib/features/auth/presentation/state/auth_state.dart 2>/dev/null; then
+            echo "❌ ERROR: Manual isLoading field found in AuthState!"
+            echo "AuthState should use AsyncValue wrapper, not manual isLoading field."
+            exit 1
+          else
+            echo "✅ No manual isLoading field in AuthState"
+          fi
+
+      - name: Check for old auth_providers.dart files
+        run: |
+          echo "Checking for deleted auth_providers.dart files..."
+          if [ -f "lib/features/auth/presentation/providers/auth_providers.dart" ] || [ -f "lib/features/auth/domain/providers/auth_providers.dart" ]; then
+            echo "❌ ERROR: Old auth_providers.dart file found!"
+            echo "These files were deleted in favor of @riverpod annotations."
+            exit 1
+          else
+            echo "✅ No old auth_providers.dart files found"
+          fi
+
+      - name: Check for AutoDisposeNotifierProvider in generated auth code
+        run: |
+          echo "Checking generated auth notifier provider code..."
+          if grep -rn "AutoDisposeNotifierProvider.*Auth" lib/features/auth/presentation/providers/ 2>/dev/null; then
+            echo "❌ ERROR: AutoDisposeNotifierProvider found in auth!"
+            echo "Auth providers should use AsyncNotifierProvider with keepAlive: true"
+            exit 1
+          else
+            echo "✅ Auth providers use correct AsyncNotifierProvider pattern"
+          fi
+
+      - name: Verify auth screens use AsyncValue.when() pattern
+        run: |
+          echo "Checking auth screens for AsyncValue.when() pattern..."
+          # Check that auth screens use .when() pattern for state handling
+          missing_when=$(grep -L "\.when(" lib/features/auth/presentation/screens/*.dart 2>/dev/null || true)
+          if [ -n "$missing_when" ]; then
+            echo "❌ WARNING: Some auth screens may not use AsyncValue.when() pattern:"
+            echo "$missing_when"
+            echo "Note: This may be acceptable for screens without async state watching"
+          else
+            echo "✅ Auth screens use AsyncValue.when() pattern"
+          fi

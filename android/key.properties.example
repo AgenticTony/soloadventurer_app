@@ -1,0 +1,14 @@
+# This file contains sensitive signing information.
+# Copy this file to key.properties and fill in your actual values.
+# NEVER commit key.properties to version control!
+
+storeFile=/path/to/your/keystore.jks
+storePassword=your_keystore_password
+keyAlias=your_key_alias
+keyPassword=your_key_password
+
+# Instructions for creating a keystore:
+# 1. Run: keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+# 2. Store the keystore file in a secure location (not in the project directory)
+# 3. Update the paths and passwords in this file
+# 4. Keep this file secure and NEVER commit it to version control

@@ -77,7 +77,7 @@ class CheckInStatusIndicator extends StatelessWidget {
         label,
         style: const TextStyle(fontSize: 12),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
       visualDensity: VisualDensity.compact,
     );
@@ -124,7 +124,7 @@ class CheckInStatusIndicator extends StatelessWidget {
         shape: BoxShape.circle,
         color: color,
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -223,10 +223,13 @@ class CheckInStatusIndicator extends StatelessWidget {
 enum CheckInStatusIndicatorStyle {
   /// Chip style with border and background
   chip,
+
   /// Icon style with optional label
   icon,
+
   /// Circular indicator with icon inside
   circular,
+
   /// Badge style with solid background
   badge,
 }
@@ -309,10 +312,12 @@ class CheckInStatusDisplay extends StatelessWidget {
       timeText = 'Due in ${difference.inMinutes} min';
       textColor = difference.inMinutes < 15 ? Colors.red : Colors.orange;
     } else if (difference.inHours < 24) {
-      timeText = 'Due in ${difference.inHours} hour${difference.inHours > 1 ? "s" : ""}';
+      timeText =
+          'Due in ${difference.inHours} hour${difference.inHours > 1 ? "s" : ""}';
       textColor = Colors.orange;
     } else {
-      timeText = 'Due in ${difference.inDays} day${difference.inDays > 1 ? "s" : ""}';
+      timeText =
+          'Due in ${difference.inDays} day${difference.inDays > 1 ? "s" : ""}';
       textColor = theme.colorScheme.primary;
     }
 

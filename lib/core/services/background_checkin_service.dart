@@ -1,12 +1,12 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 
 part 'background_checkin_service.g.dart';
 
 /// Configuration for background check-in operations
 class BackgroundCheckInConfig {
   /// Unique identifier for the check-in monitoring task
-  static const String monitoringTaskId = 'com.soloadventurer.checkin.monitoring';
+  static const String monitoringTaskId =
+      'com.soloadventurer.checkin.monitoring';
 
   /// Task name for check-in monitoring
   static const String monitoringTaskName = 'checkInMonitoringTask';
@@ -150,7 +150,8 @@ abstract class BackgroundCheckInService {
 
 /// Provider for the background check-in service implementation
 @riverpod
-BackgroundCheckInService backgroundCheckInService(BackgroundCheckInServiceRef ref) {
+BackgroundCheckInService backgroundCheckInService(
+    BackgroundCheckInServiceRef ref) {
   throw UnimplementedError(
     'BackgroundCheckInService implementation not provided. '
     'Use backgroundCheckInServiceProvider from background_checkin_service_impl.dart',

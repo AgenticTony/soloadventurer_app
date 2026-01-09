@@ -184,7 +184,7 @@ class CheckInCard extends StatelessWidget {
         label,
         style: const TextStyle(fontSize: 12),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       side: BorderSide(color: color),
     );
   }

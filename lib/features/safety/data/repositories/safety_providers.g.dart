@@ -7,7 +7,7 @@ part of 'safety_providers.dart';
 // **************************************************************************
 
 String _$safetyLocalDataSourceHash() =>
-    r'2d1d822157a8de0c51c276d95820944233a3fa7c';
+    r'b2f4d063bf9b05e7a081ba1f0beab38a31f4b599';
 
 /// Provider for SafetyLocalDataSource
 ///
@@ -29,7 +29,7 @@ final safetyLocalDataSourceProvider =
 typedef SafetyLocalDataSourceRef
     = AutoDisposeProviderRef<SafetyLocalDataSource>;
 String _$safetyRemoteDataSourceHash() =>
-    r'77ad7c919df0a6895fccd3ef197b18593f81495c';
+    r'f4fd7b20bcf5aaedea42c60f5d85f2e93522d842';
 
 /// Provider for SafetyRemoteDataSource
 /// Uses mock implementation for now, should be replaced with real implementation

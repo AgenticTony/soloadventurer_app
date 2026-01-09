@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
+import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
 import 'package:soloadventurer/features/offline/presentation/widgets/connectivity_indicator.dart';
 import 'package:soloadventurer/features/offline/presentation/widgets/sync_status_banner.dart';
 import 'package:soloadventurer/features/offline/presentation/widgets/offline_banner.dart';
 import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
-import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
 import 'package:soloadventurer/features/safety/presentation/widgets/sos_button_widget.dart';
 import 'package:soloadventurer/features/home/presentation/widgets/quick_sos_button.dart';
 
@@ -22,6 +22,66 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authAsync = ref.watch(authNotifierProvider);
+
+    return authAsync.when(
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Colors.red,
+              ),
+              const SizedBox(height: 16),
+              Text('Error: $error'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  ref.invalidate(authNotifierProvider);
+                },
+                child: const Text('Retry'),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                onPressed: () {
+                  ref
+                      .read(authNavigationProvider.notifier)
+                      .navigateToLogin(null);
+                },
+                child: const Text('Back to Login'),
+              ),
+            ],
+          ),
+        ),
+      ),
+      data: (authState) {
+        // Redirect to login if not authenticated
+        if (!authState.isAuthenticated) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ref.read(authNavigationProvider.notifier).navigateToLogin(null);
+          });
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        return _buildHomeContent(context, ref, authState);
+      },
+    );
+  }
+
+  Widget _buildHomeContent(
+      BuildContext context, WidgetRef ref, AuthState authState) {
     return Scaffold(
       floatingActionButton: const QuickSOSButton(
         size: SOSButtonSize.medium,
@@ -77,10 +137,11 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Welcome to SoloAdventurer!',
-                    key: Key('home_screen_title'),
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Text(
+                    'Welcome, ${authState.user?.username ?? 'Adventurer'}!',
+                    key: const Key('home_screen_title'),
+                    style: const TextStyle(
+                        fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 24),
 
@@ -104,8 +165,9 @@ class HomeScreen extends ConsumerWidget {
                         'Trusted contacts, check-ins, and emergency features',
                       ),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () =>
-                          ref.read(authNavigationProvider.notifier).navigateToSafetyHub(),
+                      onTap: () => ref
+                          .read(authNavigationProvider.notifier)
+                          .navigateToSafetyHub(),
                     ),
                   ),
 
@@ -126,11 +188,13 @@ class HomeScreen extends ConsumerWidget {
                               child: Column(
                                 children: [
                                   Icon(Icons.check_circle,
-                                      size: 32, color: Theme.of(context).primaryColor),
+                                      size: 32,
+                                      color: Theme.of(context).primaryColor),
                                   const SizedBox(height: 8),
                                   const Text(
                                     'Check In',
-                                    style: TextStyle(fontWeight: FontWeight.w600),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               ),
@@ -155,7 +219,8 @@ class HomeScreen extends ConsumerWidget {
                                   const SizedBox(height: 8),
                                   const Text(
                                     'Emergency',
-                                    style: TextStyle(fontWeight: FontWeight.w600),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w600),
                                   ),
                                 ],
                               ),

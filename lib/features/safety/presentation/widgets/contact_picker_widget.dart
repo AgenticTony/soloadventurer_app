@@ -70,7 +70,8 @@ class _ContactPickerWidgetState extends ConsumerState<ContactPickerWidget>
         setState(() {
           _hasPermission = false;
           _isLoading = false;
-          _error = 'Contact permission is required to select from phone contacts';
+          _error =
+              'Contact permission is required to select from phone contacts';
         });
         return;
       }
@@ -88,8 +89,7 @@ class _ContactPickerWidgetState extends ConsumerState<ContactPickerWidget>
       // Filter contacts that have at least a phone number
       final validContacts = contacts
           .where((contact) =>
-              contact.phones.isNotEmpty &&
-              contact.displayName.isNotEmpty)
+              contact.phones.isNotEmpty && contact.displayName.isNotEmpty)
           .toList();
 
       // Sort by name
@@ -124,22 +124,19 @@ class _ContactPickerWidgetState extends ConsumerState<ContactPickerWidget>
         _filteredContacts.clear();
         _filteredContacts.addAll(_phoneContacts.where((contact) =>
             contact.displayName.toLowerCase().contains(lowerQuery) ||
-            contact.phones.any((phone) =>
-                phone.number.toLowerCase().contains(lowerQuery))));
+            contact.phones.any(
+                (phone) => phone.number.toLowerCase().contains(lowerQuery))));
       }
     });
   }
 
   void _selectPhoneContact(Contact contact) {
     // Get the first phone number (or primary if available)
-    final phone = contact.phones.isNotEmpty
-        ? contact.phones.first.number
-        : '';
+    final phone = contact.phones.isNotEmpty ? contact.phones.first.number : '';
 
     // Get the first email (or primary if available)
-    final email = contact.emails.isNotEmpty
-        ? contact.emails.first.address
-        : null;
+    final email =
+        contact.emails.isNotEmpty ? contact.emails.first.address : null;
 
     widget.onContactSelected(
       name: contact.displayName,
@@ -241,7 +238,8 @@ class _ContactPickerWidgetState extends ConsumerState<ContactPickerWidget>
                 )
               : ListView.separated(
                   itemCount: _filteredContacts.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final contact = _filteredContacts[index];
                     return _buildContactTile(context, contact);
@@ -321,7 +319,7 @@ class _ContactPickerWidgetState extends ConsumerState<ContactPickerWidget>
             Icon(
               Icons.contact_phone,
               size: 80,
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -404,7 +402,7 @@ class _ContactPickerWidgetState extends ConsumerState<ContactPickerWidget>
             Icon(
               icon,
               size: 80,
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(

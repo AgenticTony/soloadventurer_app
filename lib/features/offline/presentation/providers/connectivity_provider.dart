@@ -107,7 +107,7 @@ class ConnectivityNotifier extends StateNotifier<ConnectivityState> {
   ///
   /// [_connectivityService] - The connectivity service to monitor
   ConnectivityNotifier(this._connectivityService)
-      : super(const ConnectivityState.disconnected()) {
+      : super(ConnectivityState.disconnected()) {
     // Start monitoring connectivity
     _startMonitoring();
   }

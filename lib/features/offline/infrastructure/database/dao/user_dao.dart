@@ -21,8 +21,8 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the inserted user with the database-generated ID (if applicable).
   ///
   /// Throws [InvalidDataException] if the user data is invalid.
-  Future<LocalUser> insertUser(UsersCompanion user) async {
-    return await into(users).insert(user);
+  Future<int> insertUser(UsersCompanion user) async {
+    return await into(db.users).insert(user);
   }
 
   /// Inserts multiple users in a single transaction
@@ -35,7 +35,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final user in users) {
-        await into(users).insert(user);
+        await into(db.users).insert(user);
         count++;
       }
       return count;
@@ -48,8 +48,8 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// Returns the number of rows affected (should be 1).
   ///
   /// Uses the user ID to identify which record to update.
-  Future<int> updateUser(LocalUser user) async {
-    return await update(users).replace(user);
+  Future<bool> updateUser(LocalUser user) async {
+    return await update(db.users).replace(user);
   }
 
   /// Updates multiple users in a single transaction
@@ -62,7 +62,9 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
     return await transaction(() async {
       var count = 0;
       for (final user in users) {
-        count += await update(users).replace(user);
+        if (await update(db.users).replace(user)) {
+          count++;
+        }
       }
       return count;
     });
@@ -73,7 +75,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the user ID to delete.
   /// Returns the number of rows affected (should be 1 or 0).
   Future<int> deleteUserById(String id) async {
-    return await (delete(users)..where((u) => u.id.equals(id))).go();
+    return await (delete(db.users)..where((u) => u.id.equals(id))).go();
   }
 
   /// Deletes multiple users by IDs
@@ -81,7 +83,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [ids] parameter is a list of user IDs to delete.
   /// Returns the count of users deleted.
   Future<int> deleteUsersByIds(List<String> ids) async {
-    return await (delete(users)..where((u) => u.id.isIn(ids))).go();
+    return await (delete(db.users)..where((u) => u.id.isIn(ids))).go();
   }
 
   // ==============================================================================
@@ -93,7 +95,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the user ID to retrieve.
   /// Returns the user if found, null otherwise.
   Future<LocalUser?> getUserById(String id) {
-    return (select(users)..where((u) => u.id.equals(id))).getSingleOrNull();
+    return (select(db.users)..where((u) => u.id.equals(id))).getSingleOrNull();
   }
 
   /// Gets a user by username
@@ -101,7 +103,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [username] parameter is the username to search for.
   /// Returns the user if found, null otherwise.
   Future<LocalUser?> getUserByUsername(String username) {
-    return (select(users)..where((u) => u.username.equals(username)))
+    return (select(db.users)..where((u) => u.username.equals(username)))
         .getSingleOrNull();
   }
 
@@ -110,7 +112,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [email] parameter is the email to search for.
   /// Returns the user if found, null otherwise.
   Future<LocalUser?> getUserByEmail(String email) {
-    return (select(users)..where((u) => u.email.equals(email)))
+    return (select(db.users)..where((u) => u.email.equals(email)))
         .getSingleOrNull();
   }
 
@@ -118,7 +120,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Returns a list of all users.
   Future<List<LocalUser>> getAllUsers() {
-    return (select(users)..orderBy([(u) => OrderingTerm.asc(u.username)]))
+    return (select(db.users)..orderBy([(u) => OrderingTerm.asc(u.username)]))
         .get();
   }
 
@@ -128,7 +130,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [offset] parameter is the number of users to skip.
   /// Returns a list of users.
   Future<List<LocalUser>> getUsersPaginated({int limit = 20, int offset = 0}) {
-    return (select(users)
+    return (select(db.users)
           ..limit(limit, offset: offset)
           ..orderBy([(u) => OrderingTerm.asc(u.username)]))
         .get();
@@ -139,7 +141,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [searchTerm] parameter is the search query.
   /// Returns a list of users matching the search term.
   Future<List<LocalUser>> searchUsers(String searchTerm) {
-    return (select(users)
+    return (select(db.users)
           ..where((u) =>
               u.username.contains(searchTerm) |
               u.displayName.contains(searchTerm) |
@@ -153,7 +155,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [isPublic] parameter indicates whether to get public or private profiles.
   /// Returns a list of users matching the public status.
   Future<List<LocalUser>> getUsersByPublicStatus(bool isPublic) {
-    return (select(users)
+    return (select(db.users)
           ..where((u) => u.isPublic.equals(isPublic))
           ..orderBy([(u) => OrderingTerm.asc(u.username)]))
         .get();
@@ -163,10 +165,10 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Returns the count of users in the database.
   Future<int> countAllUsers() async {
-    final query = selectOnly(users)..addColumns([users.id.count()]);
+    final query = selectOnly(db.users)..addColumns([db.users.id.count()]);
 
     final result = await query.getSingle();
-    return result.read(users.id.count());
+    return result.read(db.users.id.count()) ?? 0;
   }
 
   /// Checks if a user exists by ID
@@ -174,12 +176,13 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the user ID to check.
   /// Returns true if the user exists, false otherwise.
   Future<bool> userExists(String id) async {
-    final query = selectOnly(users)
-      ..addColumns([users.id.count()])
-      ..where(users.id.equals(id));
+    final query = selectOnly(db.users)
+      ..addColumns([db.users.id.count()])
+      ..where(db.users.id.equals(id));
 
     final result = await query.getSingle();
-    return result.read(users.id.count()) > 0;
+    final count = result.read(db.users.id.count()) ?? 0;
+    return count > 0;
   }
 
   /// Checks if a username is already taken
@@ -187,12 +190,13 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [username] parameter is the username to check.
   /// Returns true if the username exists, false otherwise.
   Future<bool> usernameExists(String username) async {
-    final query = selectOnly(users)
-      ..addColumns([users.id.count()])
-      ..where(users.username.equals(username));
+    final query = selectOnly(db.users)
+      ..addColumns([db.users.id.count()])
+      ..where(db.users.username.equals(username));
 
     final result = await query.getSingle();
-    return result.read(users.id.count()) > 0;
+    final count = result.read(db.users.id.count()) ?? 0;
+    return count > 0;
   }
 
   /// Checks if an email is already taken
@@ -200,12 +204,13 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [email] parameter is the email to check.
   /// Returns true if the email exists, false otherwise.
   Future<bool> emailExists(String email) async {
-    final query = selectOnly(users)
-      ..addColumns([users.id.count()])
-      ..where(users.email.equals(email));
+    final query = selectOnly(db.users)
+      ..addColumns([db.users.id.count()])
+      ..where(db.users.email.equals(email));
 
     final result = await query.getSingle();
-    return result.read(users.id.count()) > 0;
+    final count = result.read(db.users.id.count()) ?? 0;
+    return count > 0;
   }
 
   // ==============================================================================
@@ -218,7 +223,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These users need to be synced to the server.
   Future<List<LocalUser>> getUnsyncedUsers() {
-    return (select(users)
+    return (select(db.users)
           ..where((u) => u.isSynced.equals(false))
           ..orderBy([(u) => OrderingTerm.asc(u.createdAt)]))
         .get();
@@ -230,7 +235,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// These users have local modifications that need to be synced.
   Future<List<LocalUser>> getUsersWithPendingChanges() {
-    return (select(users)
+    return (select(db.users)
           ..where((u) => u.hasPendingChanges.equals(true))
           ..orderBy([(u) => OrderingTerm.asc(u.updatedAt)]))
         .get();
@@ -240,9 +245,9 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Returns a list of users that need to be synced to the server.
   Future<List<LocalUser>> getUsersNeedingSync() {
-    return (select(users)
-          ..where((u) => u.isSynced.equals(false) |
-              u.hasPendingChanges.equals(true))
+    return (select(db.users)
+          ..where((u) =>
+              u.isSynced.equals(false) | u.hasPendingChanges.equals(true))
           ..orderBy([(u) => OrderingTerm.asc(u.updatedAt)]))
         .get();
   }
@@ -252,7 +257,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [synced] parameter indicates whether to get synced or unsynced users.
   /// Returns a list of users matching the sync status.
   Future<List<LocalUser>> getUsersBySyncStatus(bool synced) {
-    return (select(users)
+    return (select(db.users)
           ..where((u) => u.isSynced.equals(synced))
           ..orderBy([(u) => OrderingTerm.asc(u.createdAt)]))
         .get();
@@ -264,7 +269,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [isSynced] parameter indicates the new sync status.
   /// Returns the number of rows affected.
   Future<int> updateUserSyncStatus(String id, bool isSynced) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(isSynced: Value(isSynced)));
   }
 
@@ -274,7 +279,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [hasPendingChanges] parameter indicates whether there are pending changes.
   /// Returns the number of rows affected.
   Future<int> updateUserPendingChanges(String id, bool hasPendingChanges) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(hasPendingChanges: Value(hasPendingChanges)));
   }
 
@@ -284,7 +289,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastSyncedAt] parameter is the timestamp of the sync.
   /// Returns the number of rows affected.
   Future<int> markUserAsSynced(String id, DateTime lastSyncedAt) {
-    return (update(users)..where((u) => u.id.equals(id))).write(
+    return (update(db.users)..where((u) => u.id.equals(id))).write(
       UsersCompanion(
         isSynced: const Value(true),
         hasPendingChanges: const Value(false),
@@ -299,7 +304,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastSyncedAt] parameter is the timestamp of the sync.
   /// Returns the count of users updated.
   Future<int> markUsersAsSynced(List<String> ids, DateTime lastSyncedAt) {
-    return (update(users)..where((u) => u.id.isIn(ids))).write(
+    return (update(db.users)..where((u) => u.id.isIn(ids))).write(
       UsersCompanion(
         isSynced: const Value(true),
         hasPendingChanges: const Value(false),
@@ -314,7 +319,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [version] parameter is the new version number.
   /// Returns the number of rows affected.
   Future<int> updateUserVersion(String id, int version) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(version: Value(version)));
   }
 
@@ -325,7 +330,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// Useful for incremental sync operations.
   Future<List<LocalUser>> getUsersUpdatedAfter(DateTime timestamp) {
-    return (select(users)
+    return (select(db.users)
           ..where((u) => u.updatedAt.isBiggerThanValue(timestamp))
           ..orderBy([(u) => OrderingTerm.asc(u.updatedAt)]))
         .get();
@@ -341,7 +346,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [lastLoginAt] parameter is the last login timestamp.
   /// Returns the number of rows affected.
   Future<int> updateLastLogin(String id, DateTime lastLoginAt) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(lastLoginAt: Value(lastLoginAt)));
   }
 
@@ -350,8 +355,37 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [id] parameter is the user ID.
   /// The [fields] parameter is a map of field names to values.
   /// Returns the number of rows affected.
-  Future<int> updateProfileFields(String id, Map<String, dynamic> fields) {
-    final companion = UsersCompanion.custom(
+  Future<int> updateProfileFields(
+      String id, Map<String, dynamic> fields) async {
+    // Update each field individually if present
+    final updates = <String, dynamic>{};
+
+    if (fields['username'] != null) {
+      updates['username'] = fields['username'] as String;
+    }
+    if (fields['displayName'] != null) {
+      updates['displayName'] = fields['displayName'] as String;
+    }
+    if (fields['bio'] != null) {
+      updates['bio'] = fields['bio'] as String;
+    }
+    if (fields['avatarUrl'] != null) {
+      updates['avatarUrl'] = fields['avatarUrl'] as String?;
+    }
+    if (fields['isPublic'] != null) {
+      updates['isPublic'] = fields['isPublic'] as bool;
+    }
+    if (fields['interests'] != null) {
+      updates['interests'] = fields['interests'] as String;
+    }
+    if (fields['preferences'] != null) {
+      updates['preferences'] = fields['preferences'] as String;
+    }
+
+    if (updates.isEmpty) return 0;
+
+    // Build companion with only the fields that need updating
+    final companion = UsersCompanion(
       username: fields['username'] != null
           ? Value(fields['username'] as String)
           : const Value.absent(),
@@ -362,7 +396,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
           ? Value(fields['bio'] as String)
           : const Value.absent(),
       avatarUrl: fields['avatarUrl'] != null
-          ? Value(fields['avatarUrl'] as String)
+          ? Value(fields['avatarUrl'] as String?)
           : const Value.absent(),
       isPublic: fields['isPublic'] != null
           ? Value(fields['isPublic'] as bool)
@@ -375,7 +409,8 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
           : const Value.absent(),
     );
 
-    return (update(users)..where((u) => u.id.equals(id))).write(companion);
+    return await (update(db.users)..where((u) => u.id.equals(id)))
+        .write(companion);
   }
 
   /// Updates user avatar URL
@@ -384,7 +419,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [avatarUrl] parameter is the new avatar URL.
   /// Returns the number of rows affected.
   Future<int> updateAvatar(String id, String? avatarUrl) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(avatarUrl: Value(avatarUrl)));
   }
 
@@ -394,11 +429,11 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [preferences] parameter is the preferences map as JSON string.
   /// Returns the number of rows affected.
   Future<int> updatePreferences(String id, String preferences) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(
-              preferences: Value(preferences),
-              hasPendingChanges: const Value(true),
-            ));
+      preferences: Value(preferences),
+      hasPendingChanges: const Value(true),
+    ));
   }
 
   /// Updates user interests
@@ -407,11 +442,11 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [interests] parameter is the interests list as JSON string.
   /// Returns the number of rows affected.
   Future<int> updateInterests(String id, String interests) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(
-              interests: Value(interests),
-              hasPendingChanges: const Value(true),
-            ));
+      interests: Value(interests),
+      hasPendingChanges: const Value(true),
+    ));
   }
 
   /// Toggles user profile visibility
@@ -420,11 +455,11 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   /// The [isPublic] parameter indicates whether the profile should be public.
   /// Returns the number of rows affected.
   Future<int> toggleProfileVisibility(String id, bool isPublic) {
-    return (update(users)..where((u) => u.id.equals(id)))
+    return (update(db.users)..where((u) => u.id.equals(id)))
         .write(UsersCompanion(
-              isPublic: Value(isPublic),
-              hasPendingChanges: const Value(true),
-            ));
+      isPublic: Value(isPublic),
+      hasPendingChanges: const Value(true),
+    ));
   }
 
   // ==============================================================================
@@ -437,6 +472,6 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
   ///
   /// **WARNING**: This is a destructive operation. Use with caution.
   Future<int> deleteAllUsers() async {
-    return await delete(users).go();
+    return await delete(db.users).go();
   }
 }

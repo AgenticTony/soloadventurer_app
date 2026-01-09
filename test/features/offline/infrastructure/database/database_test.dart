@@ -36,9 +36,11 @@ void main() {
 
     test('should verify all tables exist', () async {
       // Try to query each table to verify existence
-      final result = await database.customSelect(
-        'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name',
-      ).get();
+      final result = await database
+          .customSelect(
+            'SELECT name FROM sqlite_master WHERE type="table" ORDER BY name',
+          )
+          .get();
 
       final tableNames = result.map((row) => row.read<String>('name')).toList();
 
@@ -50,12 +52,13 @@ void main() {
     });
 
     test('should have correct indexes on trips table', () async {
-      final result = await database.customSelect(
-        "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='trips'",
-      ).get();
+      final result = await database
+          .customSelect(
+            "SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='trips'",
+          )
+          .get();
 
-      final indexNames =
-          result.map((row) => row.read<String>('name')).toList();
+      final indexNames = result.map((row) => row.read<String>('name')).toList();
 
       expect(indexNames, contains('idx_trips_user_id'));
       expect(indexNames, contains('idx_trips_sync_status'));
@@ -73,7 +76,7 @@ void main() {
 
     test('should insert a trip successfully', () async {
       final trip = TripsCompanion.insert(
-        id: const Value('trip-1'),
+        id: 'trip-1',
         userId: 'user-1',
         title: 'Test Trip',
         startDate: DateTime(2024, 6, 1),
@@ -82,7 +85,6 @@ void main() {
         status: 'planning',
         budget: 5000,
         createdAt: DateTime(2024, 5, 1),
-        updatedAt: DateTime(2024, 5, 1),
       );
 
       final inserted = await tripDao.insertTrip(trip);
@@ -94,7 +96,7 @@ void main() {
 
     test('should get a trip by ID', () async {
       final trip = TripsCompanion.insert(
-        id: const Value('trip-2'),
+        id: 'trip-2',
         userId: 'user-1',
         title: 'Trip to Get',
         startDate: DateTime(2024, 7, 1),
@@ -103,7 +105,6 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 6, 1),
-        updatedAt: DateTime(2024, 6, 1),
       );
 
       await tripDao.insertTrip(trip);
@@ -122,7 +123,7 @@ void main() {
 
     test('should update a trip successfully', () async {
       final trip = TripsCompanion.insert(
-        id: const Value('trip-3'),
+        id: 'trip-3',
         userId: 'user-1',
         title: 'Original Title',
         startDate: DateTime(2024, 8, 1),
@@ -131,14 +132,12 @@ void main() {
         status: 'planning',
         budget: 4000,
         createdAt: DateTime(2024, 7, 1),
-        updatedAt: DateTime(2024, 7, 1),
       );
 
       final inserted = await tripDao.insertTrip(trip);
       final updated = inserted.copyWith.copyWith(
         title: 'Updated Title',
         budget: 4500,
-        updatedAt: DateTime(2024, 7, 15),
       );
 
       final affectedRows = await tripDao.updateTrip(updated);
@@ -151,7 +150,7 @@ void main() {
 
     test('should delete a trip by ID', () async {
       final trip = TripsCompanion.insert(
-        id: const Value('trip-4'),
+        id: 'trip-4',
         userId: 'user-1',
         title: 'To Delete',
         startDate: DateTime(2024, 9, 1),
@@ -160,7 +159,6 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 8, 1),
-        updatedAt: DateTime(2024, 8, 1),
       );
 
       await tripDao.insertTrip(trip);
@@ -174,7 +172,7 @@ void main() {
 
     test('should soft delete a trip', () async {
       final trip = TripsCompanion.insert(
-        id: const Value('trip-5'),
+        id: 'trip-5',
         userId: 'user-1',
         title: 'To Soft Delete',
         startDate: DateTime(2024, 10, 1),
@@ -183,7 +181,6 @@ void main() {
         status: 'planning',
         budget: 2500,
         createdAt: DateTime(2024, 9, 1),
-        updatedAt: DateTime(2024, 9, 1),
       );
 
       await tripDao.insertTrip(trip);
@@ -204,7 +201,7 @@ void main() {
     test('should get all trips for a user', () async {
       // Insert trips for user-1
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-user1-1'),
+        id: 'trip-user1-1',
         userId: 'user-1',
         title: 'User 1 Trip 1',
         startDate: DateTime(2024, 11, 1),
@@ -213,11 +210,10 @@ void main() {
         status: 'planning',
         budget: 5000,
         createdAt: DateTime(2024, 10, 1),
-        updatedAt: DateTime(2024, 10, 1),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-user1-2'),
+        id: 'trip-user1-2',
         userId: 'user-1',
         title: 'User 1 Trip 2',
         startDate: DateTime(2024, 12, 1),
@@ -226,12 +222,11 @@ void main() {
         status: 'planning',
         budget: 4500,
         createdAt: DateTime(2024, 11, 1),
-        updatedAt: DateTime(2024, 11, 1),
       ));
 
       // Insert trip for different user
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-user2-1'),
+        id: 'trip-user2-1',
         userId: 'user-2',
         title: 'User 2 Trip',
         startDate: DateTime(2024, 11, 15),
@@ -240,7 +235,6 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 10, 15),
-        updatedAt: DateTime(2024, 10, 15),
       ));
 
       final user1Trips = await tripDao.getTripsByUserId('user-1');
@@ -252,7 +246,7 @@ void main() {
       // Insert 25 trips
       for (int i = 1; i <= 25; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: const Value('trip-$i'),
+          id: 'trip-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, i),
@@ -261,7 +255,6 @@ void main() {
           status: 'planning',
           budget: 1000 * i,
           createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
         ));
       }
 
@@ -277,7 +270,7 @@ void main() {
 
     test('should get trips by status', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-status-1'),
+        id: 'trip-status-1',
         userId: 'user-1',
         title: 'Planning Trip',
         startDate: DateTime(2024, 1, 1),
@@ -286,11 +279,10 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-status-2'),
+        id: 'trip-status-2',
         userId: 'user-1',
         title: 'Ongoing Trip',
         startDate: DateTime(2024, 1, 15),
@@ -299,11 +291,10 @@ void main() {
         status: 'ongoing',
         budget: 3000,
         createdAt: DateTime(2024, 1, 10),
-        updatedAt: DateTime(2024, 1, 10),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-status-3'),
+        id: 'trip-status-3',
         userId: 'user-1',
         title: 'Another Planning Trip',
         startDate: DateTime(2024, 2, 1),
@@ -312,7 +303,6 @@ void main() {
         status: 'planning',
         budget: 2500,
         createdAt: DateTime(2024, 1, 20),
-        updatedAt: DateTime(2024, 1, 20),
       ));
 
       final planningTrips = await tripDao.getTripsByStatus('planning');
@@ -326,7 +316,7 @@ void main() {
 
     test('should search trips by title or destination', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-search-1'),
+        id: 'trip-search-1',
         userId: 'user-1',
         title: 'Paris Adventure',
         startDate: DateTime(2024, 1, 1),
@@ -335,11 +325,10 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-search-2'),
+        id: 'trip-search-2',
         userId: 'user-1',
         title: 'London Trip',
         startDate: DateTime(2024, 2, 1),
@@ -348,11 +337,10 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 1, 15),
-        updatedAt: DateTime(2024, 1, 15),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-search-3'),
+        id: 'trip-search-3',
         userId: 'user-1',
         title: 'Paris Explorer',
         startDate: DateTime(2024, 3, 1),
@@ -361,11 +349,11 @@ void main() {
         status: 'planning',
         budget: 2500,
         createdAt: DateTime(2024, 2, 15),
-        updatedAt: DateTime(2024, 2, 15),
       ));
 
       final parisResults = await tripDao.searchTrips('Paris');
-      expect(parisResults, hasLength(2)); // Two trips with "Paris" in title/destination
+      expect(parisResults,
+          hasLength(2)); // Two trips with "Paris" in title/destination
 
       final londonResults = await tripDao.searchTrips('London');
       expect(londonResults, hasLength(1));
@@ -373,7 +361,7 @@ void main() {
 
     test('should count trips for a user', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-count-1'),
+        id: 'trip-count-1',
         userId: 'user-1',
         title: 'Trip 1',
         startDate: DateTime(2024, 1, 1),
@@ -382,11 +370,10 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-count-2'),
+        id: 'trip-count-2',
         userId: 'user-1',
         title: 'Trip 2',
         startDate: DateTime(2024, 2, 1),
@@ -395,11 +382,10 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 1, 15),
-        updatedAt: DateTime(2024, 1, 15),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-count-3'),
+        id: 'trip-count-3',
         userId: 'user-1',
         title: 'Trip 3',
         startDate: DateTime(2024, 3, 1),
@@ -408,7 +394,6 @@ void main() {
         status: 'planning',
         budget: 2500,
         createdAt: DateTime(2024, 2, 15),
-        updatedAt: DateTime(2024, 2, 15),
       ));
 
       final count = await tripDao.countTripsByUserId('user-1');
@@ -425,7 +410,7 @@ void main() {
 
     test('should get unsynced trips', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-sync-1'),
+        id: 'trip-sync-1',
         userId: 'user-1',
         title: 'Synced Trip',
         startDate: DateTime(2024, 1, 1),
@@ -434,12 +419,11 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         isSynced: const Value(true),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-sync-2'),
+        id: 'trip-sync-2',
         userId: 'user-1',
         title: 'Unsynced Trip',
         startDate: DateTime(2024, 2, 1),
@@ -448,7 +432,6 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 1, 15),
-        updatedAt: DateTime(2024, 1, 15),
         isSynced: const Value(false),
       ));
 
@@ -460,7 +443,7 @@ void main() {
 
     test('should get trips with pending changes', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-pending-1'),
+        id: 'trip-pending-1',
         userId: 'user-1',
         title: 'Clean Trip',
         startDate: DateTime(2024, 1, 1),
@@ -469,12 +452,11 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         hasPendingChanges: const Value(false),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-pending-2'),
+        id: 'trip-pending-2',
         userId: 'user-1',
         title: 'Modified Trip',
         startDate: DateTime(2024, 2, 1),
@@ -483,7 +465,6 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 1, 15),
-        updatedAt: DateTime(2024, 1, 15),
         hasPendingChanges: const Value(true),
       ));
 
@@ -495,7 +476,7 @@ void main() {
 
     test('should update trip sync status', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-status-1'),
+        id: 'trip-status-1',
         userId: 'user-1',
         title: 'Trip to Sync',
         startDate: DateTime(2024, 1, 1),
@@ -504,7 +485,6 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         isSynced: const Value(false),
       ));
 
@@ -520,7 +500,7 @@ void main() {
       final syncTime = DateTime(2024, 1, 15, 10, 30);
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-mark-1'),
+        id: 'trip-mark-1',
         userId: 'user-1',
         title: 'Trip to Mark',
         startDate: DateTime(2024, 1, 1),
@@ -529,7 +509,6 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         isSynced: const Value(false),
         hasPendingChanges: const Value(true),
       ));
@@ -546,7 +525,7 @@ void main() {
       final timestamp = DateTime(2024, 6, 15);
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-timestamp-1'),
+        id: 'trip-timestamp-1',
         userId: 'user-1',
         title: 'Old Trip',
         startDate: DateTime(2024, 1, 1),
@@ -555,11 +534,10 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 6, 10),
       ));
 
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-timestamp-2'),
+        id: 'trip-timestamp-2',
         userId: 'user-1',
         title: 'New Trip',
         startDate: DateTime(2024, 7, 1),
@@ -568,7 +546,6 @@ void main() {
         status: 'planning',
         budget: 3000,
         createdAt: DateTime(2024, 6, 20),
-        updatedAt: DateTime(2024, 6, 20),
       ));
 
       final recentTrips = await tripDao.getTripsUpdatedAfter(timestamp);
@@ -589,7 +566,7 @@ void main() {
     test('should insert a journal successfully', () async {
       // First create a trip
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-journal-1'),
+        id: 'trip-journal-1',
         userId: 'user-1',
         title: 'Test Trip',
         startDate: DateTime(2024, 6, 1),
@@ -598,17 +575,15 @@ void main() {
         status: 'ongoing',
         budget: 5000,
         createdAt: DateTime(2024, 5, 1),
-        updatedAt: DateTime(2024, 5, 1),
       ));
 
       final journal = JournalsCompanion.insert(
-        id: const Value('journal-1'),
+        id: 'journal-1',
         tripId: 'trip-journal-1',
         userId: 'user-1',
         title: 'Day 1 in Paris',
         content: 'Arrived safely and visited the Eiffel Tower',
         createdAt: DateTime(2024, 6, 1),
-        updatedAt: DateTime(2024, 6, 1),
       );
 
       final inserted = await journalDao.insertJournal(journal);
@@ -621,7 +596,7 @@ void main() {
     test('should get journals by trip ID', () async {
       // Create trip
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-journal-2'),
+        id: 'trip-journal-2',
         userId: 'user-1',
         title: 'Paris Trip',
         startDate: DateTime(2024, 6, 1),
@@ -630,28 +605,25 @@ void main() {
         status: 'ongoing',
         budget: 5000,
         createdAt: DateTime(2024, 5, 1),
-        updatedAt: DateTime(2024, 5, 1),
       ));
 
       // Insert journals
       await journalDao.insertJournal(JournalsCompanion.insert(
-        id: const Value('journal-2-1'),
+        id: 'journal-2-1',
         tripId: 'trip-journal-2',
         userId: 'user-1',
         title: 'Day 1',
         content: 'First day',
         createdAt: DateTime(2024, 6, 1),
-        updatedAt: DateTime(2024, 6, 1),
       ));
 
       await journalDao.insertJournal(JournalsCompanion.insert(
-        id: const Value('journal-2-2'),
+        id: 'journal-2-2',
         tripId: 'trip-journal-2',
         userId: 'user-1',
         title: 'Day 2',
         content: 'Second day',
         createdAt: DateTime(2024, 6, 2),
-        updatedAt: DateTime(2024, 6, 2),
       ));
 
       final journals = await journalDao.getJournalsByTripId('trip-journal-2');
@@ -661,7 +633,7 @@ void main() {
 
     test('should update a journal', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-journal-3'),
+        id: 'trip-journal-3',
         userId: 'user-1',
         title: 'Test Trip',
         startDate: DateTime(2024, 6, 1),
@@ -670,23 +642,20 @@ void main() {
         status: 'ongoing',
         budget: 5000,
         createdAt: DateTime(2024, 5, 1),
-        updatedAt: DateTime(2024, 5, 1),
       ));
 
       final journal = await journalDao.insertJournal(JournalsCompanion.insert(
-        id: const Value('journal-3'),
+        id: 'journal-3',
         tripId: 'trip-journal-3',
         userId: 'user-1',
         title: 'Original Title',
         content: 'Original content',
         createdAt: DateTime(2024, 6, 1),
-        updatedAt: DateTime(2024, 6, 1),
       ));
 
       final updated = journal.copyWith.copyWith(
         title: 'Updated Title',
         content: 'Updated content',
-        updatedAt: DateTime(2024, 6, 2),
       );
 
       final affectedRows = await journalDao.updateJournal(updated);
@@ -699,7 +668,7 @@ void main() {
 
     test('should delete a journal', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-journal-4'),
+        id: 'trip-journal-4',
         userId: 'user-1',
         title: 'Test Trip',
         startDate: DateTime(2024, 6, 1),
@@ -708,17 +677,15 @@ void main() {
         status: 'ongoing',
         budget: 5000,
         createdAt: DateTime(2024, 5, 1),
-        updatedAt: DateTime(2024, 5, 1),
       ));
 
       await journalDao.insertJournal(JournalsCompanion.insert(
-        id: const Value('journal-4'),
+        id: 'journal-4',
         tripId: 'trip-journal-4',
         userId: 'user-1',
         title: 'To Delete',
         content: 'Will be deleted',
         createdAt: DateTime(2024, 6, 1),
-        updatedAt: DateTime(2024, 6, 1),
       ));
 
       final affectedRows = await journalDao.deleteJournalById('journal-4');
@@ -738,11 +705,10 @@ void main() {
 
     test('should insert a user successfully', () async {
       final user = UsersCompanion.insert(
-        id: const Value('user-1'),
+        id: 'user-1',
         email: 'test@example.com',
         username: 'testuser',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       );
 
       final inserted = await userDao.insertUser(user);
@@ -754,11 +720,10 @@ void main() {
 
     test('should get a user by ID', () async {
       await userDao.insertUser(UsersCompanion.insert(
-        id: const Value('user-2'),
+        id: 'user-2',
         email: 'user2@example.com',
         username: 'user2',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       final retrieved = await userDao.getUserById('user-2');
@@ -770,11 +735,10 @@ void main() {
 
     test('should get a user by email', () async {
       await userDao.insertUser(UsersCompanion.insert(
-        id: const Value('user-3'),
+        id: 'user-3',
         email: 'user3@example.com',
         username: 'user3',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       final retrieved = await userDao.getUserByEmail('user3@example.com');
@@ -786,16 +750,14 @@ void main() {
 
     test('should update a user', () async {
       final inserted = await userDao.insertUser(UsersCompanion.insert(
-        id: const Value('user-4'),
+        id: 'user-4',
         email: 'user4@example.com',
         username: 'user4',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       final updated = inserted.copyWith.copyWith(
         username: 'user4updated',
-        updatedAt: DateTime(2024, 1, 2),
       );
 
       final affectedRows = await userDao.updateUser(updated);
@@ -807,11 +769,10 @@ void main() {
 
     test('should delete a user', () async {
       await userDao.insertUser(UsersCompanion.insert(
-        id: const Value('user-5'),
+        id: 'user-5',
         email: 'user5@example.com',
         username: 'user5',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       final affectedRows = await userDao.deleteUserById('user-5');
@@ -831,13 +792,11 @@ void main() {
 
     test('should enqueue a sync operation', () async {
       final operation = SyncQueueCompanion.insert(
-        id: const Value('sync-1'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'create',
-        data: const Value('{"title":"Test Trip"}'),
+        operation: 'create',
+        data: '{"title":"Test Trip"}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       );
 
       final inserted = await syncQueueDao.enqueueOperation(operation);
@@ -849,24 +808,20 @@ void main() {
 
     test('should get pending operations', () async {
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-2'),
         entityType: 'trip',
         entityId: 'trip-2',
-        operationType: 'update',
-        data: const Value('{"title":"Updated"}'),
+        operation: 'update',
+        data: '{"title":"Updated"}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         status: const Value('pending'),
       ));
 
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-3'),
         entityType: 'journal',
         entityId: 'journal-1',
-        operationType: 'create',
-        data: const Value('{"content":"New journal"}'),
+        operation: 'create',
+        data: '{"content":"New journal"}',
         createdAt: DateTime(2024, 1, 2),
-        updatedAt: DateTime(2024, 1, 2),
         status: const Value('completed'),
       ));
 
@@ -878,33 +833,27 @@ void main() {
 
     test('should get operations by entity', () async {
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-4'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'update',
-        data: const Value('{"title":"Update 1"}'),
+        operation: 'update',
+        data: '{"title":"Update 1"}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-5'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'update',
-        data: const Value('{"title":"Update 2"}'),
+        operation: 'update',
+        data: '{"title":"Update 2"}',
         createdAt: DateTime(2024, 1, 2),
-        updatedAt: DateTime(2024, 1, 2),
       ));
 
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-6'),
         entityType: 'journal',
         entityId: 'journal-1',
-        operationType: 'create',
-        data: const Value('{"content":"New"}'),
+        operation: 'create',
+        data: '{"content":"New"}',
         createdAt: DateTime(2024, 1, 3),
-        updatedAt: DateTime(2024, 1, 3),
       ));
 
       final tripOperations = await syncQueueDao.getOperationsByEntity(
@@ -918,13 +867,11 @@ void main() {
 
     test('should update operation status', () async {
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-7'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'create',
-        data: const Value('{"title":"New"}'),
+        operation: 'create',
+        data: '{"title":"New"}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         status: const Value('pending'),
       ));
 
@@ -941,13 +888,11 @@ void main() {
 
     test('should increment retry count', () async {
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-8'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'create',
-        data: const Value('{"title":"New"}'),
+        operation: 'create',
+        data: '{"title":"New"}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         retryCount: const Value(0),
       ));
 
@@ -961,24 +906,20 @@ void main() {
 
     test('should delete completed operations', () async {
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-9'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'create',
-        data: const Value('{"title":"New"}'),
+        operation: 'create',
+        data: '{"title":"New"}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
         status: const Value('completed'),
       ));
 
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-10'),
         entityType: 'trip',
         entityId: 'trip-2',
-        operationType: 'create',
-        data: const Value('{"title":"New 2"}'),
+        operation: 'create',
+        data: '{"title":"New 2"}',
         createdAt: DateTime(2024, 1, 2),
-        updatedAt: DateTime(2024, 1, 2),
         status: const Value('pending'),
       ));
 
@@ -1001,7 +942,7 @@ void main() {
     test('should rollback transaction on error', () async {
       // Insert initial trip
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-rollback-1'),
+        id: 'trip-rollback-1',
         userId: 'user-1',
         title: 'Original Title',
         startDate: DateTime(2024, 1, 1),
@@ -1010,7 +951,6 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       // Get original trip
@@ -1023,7 +963,6 @@ void main() {
           // Update trip
           await tripDao.updateTrip(original!.copyWith.copyWith(
             title: 'Updated Title',
-            updatedAt: DateTime(2024, 1, 2),
           ));
 
           // Force an error to trigger rollback
@@ -1040,7 +979,7 @@ void main() {
 
     test('should commit transaction when no error occurs', () async {
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-rollback-2'),
+        id: 'trip-rollback-2',
         userId: 'user-1',
         title: 'Before Transaction',
         startDate: DateTime(2024, 1, 1),
@@ -1049,7 +988,6 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       // Successful transaction
@@ -1057,7 +995,6 @@ void main() {
         final trip = await tripDao.getTripById('trip-rollback-2');
         await tripDao.updateTrip(trip!.copyWith.copyWith(
           title: 'After Transaction',
-          updatedAt: DateTime(2024, 1, 2),
         ));
       });
 
@@ -1070,7 +1007,7 @@ void main() {
       // Insert multiple trips
       for (int i = 1; i <= 5; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('trip-batch-$i'),
+          id: 'trip-batch-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, i, 1),
@@ -1079,7 +1016,6 @@ void main() {
           status: 'planning',
           budget: 1000 * i,
           createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
         ));
       }
 
@@ -1093,7 +1029,6 @@ void main() {
             final trip = await tripDao.getTripById('trip-batch-$i');
             await tripDao.updateTrip(trip!.copyWith.copyWith(
               title: 'Updated Trip $i',
-              updatedAt: DateTime(2024, 1, i + 1),
             ));
           }
 
@@ -1123,7 +1058,7 @@ void main() {
       // Insert 1000 trips
       for (int i = 1; i <= 1000; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('trip-perf-$i'),
+          id: 'trip-perf-$i',
           userId: i % 10 == 0 ? 'user-2' : 'user-1',
           title: 'Performance Trip $i',
           startDate: DateTime(2024, 1, i % 28 + 1),
@@ -1132,7 +1067,6 @@ void main() {
           status: ['planning', 'ongoing', 'completed'][i % 3],
           budget: 1000 + (i * 100),
           createdAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
-          updatedAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
         ));
       }
 
@@ -1156,7 +1090,7 @@ void main() {
       // Insert 500 trips
       for (int i = 1; i <= 500; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('trip-page-$i'),
+          id: 'trip-page-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, i % 28 + 1),
@@ -1165,7 +1099,6 @@ void main() {
           status: 'planning',
           budget: 1000 * i,
           createdAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
-          updatedAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
         ));
       }
 
@@ -1184,7 +1117,7 @@ void main() {
       // Insert mix of trips for different users and statuses
       for (int i = 1; i <= 300; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('trip-filter-$i'),
+          id: 'trip-filter-$i',
           userId: 'user-${i % 5}',
           title: 'Trip $i',
           startDate: DateTime(2024, i % 12 + 1, 1),
@@ -1193,14 +1126,14 @@ void main() {
           status: ['planning', 'ongoing', 'completed'][i % 3],
           budget: 1000 + (i * 100),
           createdAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
-          updatedAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
         ));
       }
 
       final stopwatch = Stopwatch()..start();
 
       // Query with filters
-      final filtered = await tripDao.getTripsByStatus('ongoing', userId: 'user-1');
+      final filtered =
+          await tripDao.getTripsByStatus('ongoing', userId: 'user-1');
       final filterTime = stopwatch.elapsedMilliseconds;
 
       expect(filterTime, lessThan(1000),
@@ -1212,7 +1145,7 @@ void main() {
       final destinations = List.generate(50, (i) => 'City $i');
       for (int i = 1; i <= 200; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('trip-search-perf-$i'),
+          id: 'trip-search-perf-$i',
           userId: 'user-1',
           title: 'Trip to ${destinations[i % 50]}',
           startDate: DateTime(2024, i % 12 + 1, 1),
@@ -1221,7 +1154,6 @@ void main() {
           status: 'planning',
           budget: 1000 * i,
           createdAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
-          updatedAt: DateTime(2024, 1, 1).add(Duration(milliseconds: i)),
         ));
       }
 
@@ -1239,7 +1171,7 @@ void main() {
       // Insert 100 trips
       for (int i = 1; i <= 100; i++) {
         await tripDao.insertTrip(TripsCompanion.insert(
-          id: Value('trip-concurrent-$i'),
+          id: 'trip-concurrent-$i',
           userId: 'user-1',
           title: 'Trip $i',
           startDate: DateTime(2024, 1, i % 28 + 1),
@@ -1248,7 +1180,6 @@ void main() {
           status: 'planning',
           budget: 1000 * i,
           createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
         ));
       }
 
@@ -1262,7 +1193,8 @@ void main() {
 
       // Verify all queries succeeded
       expect(results, hasLength(10));
-      expect(results.fold<int>(0, (sum, list) => sum + list.length), equals(100));
+      expect(
+          results.fold<int>(0, (sum, list) => sum + list.length), equals(100));
 
       // Verify no duplicate trips across pages
       final allIds = results.expand((list) => list.map((t) => t.id)).toSet();
@@ -1279,7 +1211,7 @@ void main() {
 
       // Insert data in all tables
       await tripDao.insertTrip(TripsCompanion.insert(
-        id: const Value('trip-clear-1'),
+        id: 'trip-clear-1',
         userId: 'user-1',
         title: 'Trip',
         startDate: DateTime(2024, 1, 1),
@@ -1288,25 +1220,21 @@ void main() {
         status: 'planning',
         budget: 2000,
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       await userDao.insertUser(UsersCompanion.insert(
-        id: const Value('user-clear-1'),
+        id: 'user-clear-1',
         email: 'user@example.com',
         username: 'user',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       await syncQueueDao.enqueueOperation(SyncQueueCompanion.insert(
-        id: const Value('sync-clear-1'),
         entityType: 'trip',
         entityId: 'trip-1',
-        operationType: 'create',
-        data: const Value('{}'),
+        operation: 'create',
+        data: '{}',
         createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
       ));
 
       // Verify data exists

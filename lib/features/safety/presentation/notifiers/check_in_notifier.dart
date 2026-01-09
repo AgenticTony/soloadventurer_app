@@ -93,7 +93,7 @@ class CheckInNotifier extends StateNotifier<CheckInState> {
         completedAt: DateTime.now(),
         location: location,
         statusMessage: statusMessage,
-        notifyContactIds: notifyContactIds,
+        notifyContactIds: notifyContactIds ?? [],
         tripId: tripId,
         triggerType: CheckInTriggerType.manual,
         createdAt: DateTime.now(),
@@ -186,9 +186,8 @@ class CheckInNotifier extends StateNotifier<CheckInState> {
         return c.id == checkInId ? completedCheckIn : c;
       }).toList();
 
-      final updatedUpcoming = state.upcomingCheckIns
-          .where((c) => c.id != checkInId)
-          .toList();
+      final updatedUpcoming =
+          state.upcomingCheckIns.where((c) => c.id != checkInId).toList();
 
       state = state.copyWith(
         isCompleting: false,
@@ -214,20 +213,18 @@ class CheckInNotifier extends StateNotifier<CheckInState> {
       await _cancelCheckIn(checkInId);
 
       // Create a cancelled version of the check-in
-      final cancelledCheckIn = state.checkIns
-          .firstWhere((c) => c.id == checkInId)
-          .copyWith(
-            status: CheckInStatus.cancelled,
-            updatedAt: DateTime.now(),
-          );
+      final cancelledCheckIn =
+          state.checkIns.firstWhere((c) => c.id == checkInId).copyWith(
+                status: CheckInStatus.cancelled,
+                updatedAt: DateTime.now(),
+              );
 
       final updatedCheckIns = state.checkIns.map((c) {
         return c.id == checkInId ? cancelledCheckIn : c;
       }).toList();
 
-      final updatedUpcoming = state.upcomingCheckIns
-          .where((c) => c.id != checkInId)
-          .toList();
+      final updatedUpcoming =
+          state.upcomingCheckIns.where((c) => c.id != checkInId).toList();
 
       state = state.copyWith(
         isCancelling: false,

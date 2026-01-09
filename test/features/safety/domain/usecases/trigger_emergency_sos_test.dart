@@ -107,7 +107,7 @@ void main() {
     test('should call repository with trip ID parameter', () async {
       // Arrange
       final location = createTestSafetyAlertLocation();
-      final tripId = testTripId;
+      const tripId = testTripId;
       testSetup.setupSuccessfulEmergencySOSOperations();
 
       // Act
@@ -132,7 +132,7 @@ void main() {
       final location = createTestSafetyAlertLocation();
       const message = testEmergencyMessage;
       const batteryLevel = 60;
-      final tripId = testTripId;
+      const tripId = testTripId;
       testSetup.setupSuccessfulEmergencySOSOperations();
 
       // Act
@@ -260,7 +260,7 @@ void main() {
 
     test('should include trip ID in returned alert', () async {
       // Arrange
-      final tripId = testTripId;
+      const tripId = testTripId;
       testSetup.setupSuccessfulEmergencySOSOperations();
 
       // Act

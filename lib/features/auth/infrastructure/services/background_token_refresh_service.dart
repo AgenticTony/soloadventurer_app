@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../../../core/services/notification_service.dart';
@@ -64,14 +65,14 @@ class BackgroundTokenRefreshService extends _$BackgroundTokenRefreshService {
         BackgroundRefreshConfig.taskId,
         BackgroundRefreshConfig.taskName,
         frequency: BackgroundRefreshConfig.minRefreshInterval,
-        constraints: WorkManagerConstraints(
+        constraints: Constraints(
           networkType: NetworkType.connected,
           requiresBatteryNotLow: true,
           requiresCharging: false,
           requiresDeviceIdle: false,
           requiresStorageNotLow: false,
         ),
-        existingWorkPolicy: ExistingWorkPolicy.replace,
+        existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
         backoffPolicy: BackoffPolicy.exponential,
         backoffPolicyDelay: BackgroundRefreshConfig.minRefreshInterval,
       );

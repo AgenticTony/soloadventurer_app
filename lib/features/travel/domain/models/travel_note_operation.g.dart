@@ -13,7 +13,7 @@ _$TravelNoteOperationImpl _$$TravelNoteOperationImplFromJson(
       tripId: json['tripId'] as String,
       noteType: $enumDecode(_$NoteTypeEnumMap, json['noteType']),
       content: json['content'] as Map<String, dynamic>,
-      priority: (json['priority'] as num?)?.toInt() ?? OperationPriority.normal,
+      priority: (json['priority'] as num).toInt(),
       locationName: json['locationName'] as String?,
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),

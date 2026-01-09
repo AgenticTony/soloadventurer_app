@@ -1,4 +1,3 @@
-
 /// Interface for monitoring services
 abstract class MonitoringService {
   /// Log an error with optional stack trace and context

@@ -1,4 +1,3 @@
-
 /// Interface for making HTTP requests
 abstract class ApiService {
   /// Performs a GET request to the specified path

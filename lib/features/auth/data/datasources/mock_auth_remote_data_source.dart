@@ -4,6 +4,8 @@ import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
+import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 
 /// Mock implementation of [AuthRemoteDataSource] for testing
 class MockAuthRemoteDataSource implements AuthRemoteDataSource {
@@ -202,5 +204,53 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
     }
     // In a real implementation, this would send an email
     debugPrint('Password reset email sent to: $email');
+  }
+
+  @override
+  Future<AuthTokens> refreshTokenWithString(String refreshToken) async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    if (!_isAuthenticated) {
+      throw const AuthException('Not authenticated');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return new mock tokens
+    return AuthTokens(
+      accessToken:
+          'refreshed_access_token_${DateTime.now().millisecondsSinceEpoch}',
+      idToken: 'refreshed_id_token_${DateTime.now().millisecondsSinceEpoch}',
+      refreshToken:
+          'refreshed_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+      expiration: DateTime.now().add(const Duration(hours: 1)),
+    );
+  }
+
+  @override
+  Future<AuthTokens> reauthenticate(Credentials credentials) async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Validate credentials
+    // Note: Credentials is a typedef, we can't access email/password directly
+    // In production, this would validate against the actual credentials
+
+    // Return new mock tokens
+    return AuthTokens(
+      accessToken:
+          'reauth_access_token_${DateTime.now().millisecondsSinceEpoch}',
+      idToken: 'reauth_id_token_${DateTime.now().millisecondsSinceEpoch}',
+      refreshToken:
+          'reauth_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+      expiration: DateTime.now().add(const Duration(hours: 1)),
+    );
   }
 }

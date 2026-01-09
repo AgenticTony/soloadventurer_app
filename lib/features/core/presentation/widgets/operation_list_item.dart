@@ -55,7 +55,7 @@ class OperationListItem extends StatelessWidget {
                       Text(
                         operation.type,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -81,16 +81,16 @@ class OperationListItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.errorColor.withOpacity(0.1),
+                  color: AppTheme.errorColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppTheme.errorColor.withOpacity(0.3),
+                    color: AppTheme.errorColor.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.error_outline,
                       color: AppTheme.errorColor,
                       size: 20,
@@ -170,7 +170,7 @@ class OperationListItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.1),
+        color: iconColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
@@ -192,15 +192,15 @@ class OperationListItem extends StatelessWidget {
 
     if (isFailed) {
       label = 'Failed';
-      backgroundColor = AppTheme.errorColor.withOpacity(0.1);
+      backgroundColor = AppTheme.errorColor.withValues(alpha: 0.1);
       textColor = AppTheme.errorColor;
     } else if (operation.attemptCount > 0) {
       label = 'Retrying';
-      backgroundColor = Colors.orange.withOpacity(0.1);
+      backgroundColor = Colors.orange.withValues(alpha: 0.1);
       textColor = Colors.orange;
     } else {
       label = 'Pending';
-      backgroundColor = Colors.blue.withOpacity(0.1);
+      backgroundColor = Colors.blue.withValues(alpha: 0.1);
       textColor = Colors.blue;
     }
 
@@ -240,7 +240,7 @@ class OperationListItem extends StatelessWidget {
                 child: Text(
                   '${entry.key}:',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),
@@ -265,7 +265,7 @@ class OperationListItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -273,13 +273,13 @@ class OperationListItem extends StatelessWidget {
           Icon(
             Icons.history,
             size: 16,
-            color: colorScheme.onSurface.withOpacity(0.6),
+            color: colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           const SizedBox(width: 8),
           Text(
             'Attempt ${operation.attemptCount} of ${operation.maxRetries}',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withOpacity(0.8),
+              color: colorScheme.onSurface.withValues(alpha: 0.8),
             ),
           ),
           if (operation.lastAttempt != null) ...[
@@ -287,14 +287,14 @@ class OperationListItem extends StatelessWidget {
             Icon(
               Icons.access_time,
               size: 16,
-              color: colorScheme.onSurface.withOpacity(0.6),
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 _formatDateTime(operation.lastAttempt!),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onSurface.withOpacity(0.6),
+                  color: colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 overflow: TextOverflow.ellipsis,
               ),

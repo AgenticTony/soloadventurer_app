@@ -182,7 +182,7 @@ class SyncManagerImpl implements SyncManager {
     // Prevent concurrent sync cycles
     if (_isSyncing) {
       debugPrint('⚠️ Sync already in progress, ignoring request');
-      return SyncResult.failure(
+      return const SyncResult.failure(
         'Sync already in progress',
         duration: Duration.zero,
       );
@@ -193,18 +193,17 @@ class SyncManagerImpl implements SyncManager {
       final pendingCount = await _syncQueueService.getPendingCount();
       if (pendingCount == 0) {
         debugPrint('📭 No pending operations, skipping sync');
-        return SyncResult.success(duration: Duration.zero);
+        return const SyncResult.success(duration: Duration.zero);
       }
 
       // Check if enough time has passed since last sync
       if (_lastSyncTime != null) {
         final timeSinceLastSync = DateTime.now().difference(_lastSyncTime!);
         if (timeSinceLastSync < autoSyncMinInterval) {
-          final remainingTime =
-              autoSyncMinInterval - timeSinceLastSync;
+          final remainingTime = autoSyncMinInterval - timeSinceLastSync;
           debugPrint('⏱️ Auto-sync too soon, waiting '
               '${remainingTime.inSeconds}s');
-          return SyncResult.failure(
+          return const SyncResult.failure(
             'Sync cooldown active',
             duration: Duration.zero,
           );
@@ -223,7 +222,7 @@ class SyncManagerImpl implements SyncManager {
       if (userId.isEmpty) {
         debugPrint('⚠️ No user authenticated, skipping sync');
         _isSyncing = false;
-        return SyncResult.failure(
+        return const SyncResult.failure(
           'No authenticated user',
           duration: Duration.zero,
         );
@@ -477,8 +476,7 @@ class SyncManagerImpl implements SyncManager {
         if (count > 0) {
           // Check cooldown
           if (_lastSyncTime != null) {
-            final timeSinceLastSync =
-                DateTime.now().difference(_lastSyncTime!);
+            final timeSinceLastSync = DateTime.now().difference(_lastSyncTime!);
             if (timeSinceLastSync < autoSyncMinInterval) {
               debugPrint('⏱️ Auto-sync cooldown active');
               return;

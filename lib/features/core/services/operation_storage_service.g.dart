@@ -7,7 +7,7 @@ part of 'operation_storage_service.dart';
 // **************************************************************************
 
 String _$operationStorageServiceHash() =>
-    r'27641b634df34d6630ac2ad464bb28ae1991978f';
+    r'a06ca5e2590975586217238c9affb143241cdd4b';
 
 /// Service for persisting and retrieving queued operations.
 ///

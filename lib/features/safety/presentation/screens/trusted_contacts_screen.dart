@@ -20,13 +20,13 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
     super.initState();
     // Load contacts when screen initializes
     Future.microtask(() {
-      ref.read(trustedContactsNotifierProvider.notifier).loadContacts();
+      ref.read(trustedContactsProvider.notifier).loadContacts();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final contactsState = ref.watch(trustedContactsNotifierProvider);
+    final contactsState = ref.watch(trustedContactsProvider);
     final contacts = contactsState.contacts;
     final isLoading = contactsState.isLoading;
     final isRemoving = contactsState.isRemoving;
@@ -75,9 +75,7 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref
-            .read(trustedContactsNotifierProvider.notifier)
-            .loadContacts();
+        await ref.read(trustedContactsProvider.notifier).loadContacts();
       },
       child: ListView.separated(
         itemCount: contacts.length,
@@ -192,7 +190,8 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
     );
   }
 
-  Widget _buildPermissionChip(BuildContext context, ContactPermission permission) {
+  Widget _buildPermissionChip(
+      BuildContext context, ContactPermission permission) {
     String label;
     Color color;
 
@@ -216,7 +215,7 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
         label,
         style: const TextStyle(fontSize: 10),
       ),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       padding: EdgeInsets.zero,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
@@ -228,7 +227,7 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
         source,
         style: const TextStyle(fontSize: 10),
       ),
-      backgroundColor: Colors.grey.withOpacity(0.1),
+      backgroundColor: Colors.grey.withValues(alpha: 0.1),
       padding: EdgeInsets.zero,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
@@ -244,7 +243,8 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
             Icon(
               Icons.people_outline,
               size: 80,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -299,9 +299,7 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref
-                    .read(trustedContactsNotifierProvider.notifier)
-                    .loadContacts();
+                ref.read(trustedContactsProvider.notifier).loadContacts();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
@@ -360,13 +358,13 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
 
   void _toggleLocationSharing(TrustedContact contact) {
     ref
-        .read(trustedContactsNotifierProvider.notifier)
+        .read(trustedContactsProvider.notifier)
         .updateLocationSharing(contact.id, !contact.locationSharingEnabled);
   }
 
   void _toggleEmergencyAlerts(TrustedContact contact) {
     ref
-        .read(trustedContactsNotifierProvider.notifier)
+        .read(trustedContactsProvider.notifier)
         .updateEmergencyAlerts(contact.id, !contact.receivesEmergencyAlerts);
   }
 
@@ -399,9 +397,7 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
   }
 
   void _removeContact(TrustedContact contact) {
-    ref
-        .read(trustedContactsNotifierProvider.notifier)
-        .removeContact(contact.id);
+    ref.read(trustedContactsProvider.notifier).removeContact(contact.id);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -488,9 +484,7 @@ class _ContactDetailsSheet extends StatelessWidget {
               CircleAvatar(
                 radius: 30,
                 child: Text(
-                  contact.name.isNotEmpty
-                      ? contact.name[0].toUpperCase()
-                      : '?',
+                  contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
                   style: theme.textTheme.headlineMedium,
                 ),
               ),
@@ -548,7 +542,8 @@ class _ContactDetailsSheet extends StatelessWidget {
             icon: Icons.location_on,
             label: 'Location Sharing',
             value: contact.locationSharingEnabled ? 'Enabled' : 'Disabled',
-            valueColor: contact.locationSharingEnabled ? Colors.green : Colors.grey,
+            valueColor:
+                contact.locationSharingEnabled ? Colors.green : Colors.grey,
           ),
           const SizedBox(height: 16),
           _DetailRow(
@@ -556,7 +551,7 @@ class _ContactDetailsSheet extends StatelessWidget {
             label: 'Emergency Alerts',
             value: contact.receivesEmergencyAlerts ? 'Enabled' : 'Disabled',
             valueColor:
-            contact.receivesEmergencyAlerts ? Colors.green : Colors.grey,
+                contact.receivesEmergencyAlerts ? Colors.green : Colors.grey,
           ),
           const SizedBox(height: 16),
           _DetailRow(

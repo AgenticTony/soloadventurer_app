@@ -7,8 +7,7 @@ import 'package:soloadventurer/features/core/providers/operation_queue_provider.
 import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
 import 'package:soloadventurer/features/travel/domain/models/travel_note_operation.dart';
 
-class MockOperationQueueNotifier extends OperationQueueNotifier
-    with Mock {
+class MockOperationQueueNotifier extends OperationQueueNotifier with Mock {
   MockOperationQueueNotifier() : super();
 
   @override
@@ -69,8 +68,7 @@ void main() {
     Widget createWidgetUnderTest() {
       return ProviderScope(
         overrides: [
-          operationQueueNotifierProvider
-              .overrideWith((ref) => mockNotifier),
+          operationQueueNotifierProvider.overrideWith((_) => mockNotifier),
         ],
         child: const MaterialApp(
           home: OperationQueueScreen(),
@@ -143,15 +141,16 @@ void main() {
     group('Pending Operations Section', () {
       testWidgets('displays pending operations section title',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -168,15 +167,16 @@ void main() {
 
       testWidgets('displays pending operation count in app bar',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -199,6 +199,7 @@ void main() {
             tripId: 'trip-$i',
             planningType: TripPlanningType.update,
             changes: {'name': 'Test $i'},
+            priority: 10,
           ),
         );
 
@@ -222,7 +223,7 @@ void main() {
     group('Failed Operations Section', () {
       testWidgets('displays failed operations section title',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -232,7 +233,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -249,7 +250,7 @@ void main() {
 
       testWidgets('displays failed operation count in app bar',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -259,7 +260,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -273,7 +274,8 @@ void main() {
         expect(find.text('2 failed'), findsOneWidget);
       });
 
-      testWidgets('displays Clear All button when there are multiple failed operations',
+      testWidgets(
+          'displays Clear All button when there are multiple failed operations',
           (WidgetTester tester) async {
         final operations = List.generate(
           2,
@@ -302,9 +304,10 @@ void main() {
         expect(find.text('Clear All'), findsOneWidget);
       });
 
-      testWidgets('does not display Clear All button when there is only one failed operation',
+      testWidgets(
+          'does not display Clear All button when there is only one failed operation',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -314,7 +317,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -330,7 +333,7 @@ void main() {
 
       testWidgets('displays list of failed operations with retry buttons',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -340,7 +343,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -360,7 +363,7 @@ void main() {
       testWidgets('displays processing banner when isProcessing is true',
           (WidgetTester tester) async {
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [],
             isProcessing: true,
@@ -378,7 +381,7 @@ void main() {
       testWidgets('does not show floating action button when processing',
           (WidgetTester tester) async {
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [],
             isProcessing: true,
@@ -392,17 +395,19 @@ void main() {
         expect(find.byType(FloatingActionButton), findsNothing);
       });
 
-      testWidgets('shows floating action button when not processing and has operations',
+      testWidgets(
+          'shows floating action button when not processing and has operations',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -446,15 +451,16 @@ void main() {
     group('Floating Action Button', () {
       testWidgets('calls processQueue when FAB is tapped',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -473,15 +479,16 @@ void main() {
 
       testWidgets('displays play_arrow icon on FAB',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -497,9 +504,10 @@ void main() {
     });
 
     group('Retry Operation', () {
-      testWidgets('shows confirmation dialog and calls retryOperation when retry is tapped',
+      testWidgets(
+          'shows confirmation dialog and calls retryOperation when retry is tapped',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -509,7 +517,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -528,7 +536,7 @@ void main() {
 
       testWidgets('shows success SnackBar when retry succeeds',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -538,7 +546,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -557,7 +565,7 @@ void main() {
 
       testWidgets('shows error SnackBar when retry fails',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -567,7 +575,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -585,14 +593,15 @@ void main() {
         await tester.tap(find.text('Retry'));
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('Failed to retry operation'), findsOneWidget);
+        expect(
+            find.textContaining('Failed to retry operation'), findsOneWidget);
       });
     });
 
     group('Remove Operation', () {
       testWidgets('shows confirmation dialog when remove is tapped',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -602,7 +611,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -625,7 +634,7 @@ void main() {
 
       testWidgets('calls removeFailedOperation when dialog is confirmed',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -635,7 +644,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -655,9 +664,10 @@ void main() {
         verify(() => mockNotifier.removeFailedOperation('test-id')).called(1);
       });
 
-      testWidgets('does not call removeFailedOperation when dialog is cancelled',
+      testWidgets(
+          'does not call removeFailedOperation when dialog is cancelled',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -667,7 +677,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -689,7 +699,7 @@ void main() {
 
       testWidgets('shows success SnackBar when remove succeeds',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
@@ -699,7 +709,7 @@ void main() {
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [],
             failedOperations: [operation],
             isProcessing: false,
@@ -751,7 +761,8 @@ void main() {
 
         expect(find.text('Clear All Failed Operations'), findsOneWidget);
         expect(
-          find.textContaining('Are you sure you want to clear all 2 failed operations?'),
+          find.textContaining(
+              'Are you sure you want to clear all 2 failed operations?'),
           findsOneWidget,
         );
       });
@@ -791,7 +802,8 @@ void main() {
         verify(() => mockNotifier.clearFailedOperations()).called(1);
       });
 
-      testWidgets('does not call clearFailedOperations when dialog is cancelled',
+      testWidgets(
+          'does not call clearFailedOperations when dialog is cancelled',
           (WidgetTester tester) async {
         final operations = List.generate(
           2,
@@ -862,8 +874,7 @@ void main() {
     });
 
     group('State Refresh', () {
-      testWidgets('calls refreshState on init',
-          (WidgetTester tester) async {
+      testWidgets('calls refreshState on init', (WidgetTester tester) async {
         when(() => mockNotifier.state).thenReturn(
           const OperationQueueState(
             pendingOperations: [],
@@ -884,24 +895,26 @@ void main() {
     group('Mixed Operations', () {
       testWidgets('displays both pending and failed operations',
           (WidgetTester tester) async {
-        final pendingOp = TripPlanningOperation(
+        const pendingOp = TripPlanningOperation(
           id: 'pending-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Pending Test'},
+          priority: 10,
         );
 
-        final failedOp = TravelNoteOperation(
+        const failedOp = TravelNoteOperation(
           id: 'failed-id',
           tripId: 'trip-456',
-          noteId: 'note-789',
-          content: 'Failed note',
+          noteType: NoteType.text,
+          content: {'text': 'Failed note'},
+          priority: 10,
           attemptCount: 3,
           lastError: 'Network error',
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [pendingOp],
             failedOperations: [failedOp],
             isProcessing: false,

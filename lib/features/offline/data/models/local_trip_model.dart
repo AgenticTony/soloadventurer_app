@@ -1,4 +1,5 @@
-import 'package:soloadventurer/features/offline/infrastructure/database/schema.dart';
+import 'dart:convert';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 
 /// Local data model for Trip that represents the database entity
@@ -84,7 +85,7 @@ class LocalTripModel {
       budget: localTrip.budget,
       coverImageUrl: localTrip.coverImageUrl,
       travelCompanionIds: localTrip.travelCompanionIds != null
-          ? List<String>.from(localTrip.travelCompanionIds!)
+          ? List<String>.from(jsonDecode(localTrip.travelCompanionIds!))
           : null,
       createdAt: localTrip.createdAt,
       updatedAt: localTrip.updatedAt,
@@ -174,8 +175,8 @@ class LocalTripModel {
       status: json['status'] as String,
       budget: json['budget'] as int,
       coverImageUrl: json['coverImageUrl'] as String?,
-      travelCompanionIds: (json['travelCompanionIds'] as List<dynamic>?)
-          ?.cast<String>(),
+      travelCompanionIds:
+          (json['travelCompanionIds'] as List<dynamic>?)?.cast<String>(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       isSynced: json['isSynced'] as bool? ?? false,
@@ -303,4 +304,17 @@ class LocalTripModel {
 
   /// Returns true if this trip is currently being synced
   bool get isSyncing => hasPendingChanges && !isSynced;
+
+  // ==============================================================================
+  // DATABASE CONVERSION HELPERS
+  // ==============================================================================
+
+  /// Converts this model to a JSON string suitable for database storage
+  ///
+  /// List fields are encoded as JSON strings since the database stores them
+  /// in TextColumn fields.
+  String? travelCompanionIdsToJson() {
+    if (travelCompanionIds == null) return null;
+    return jsonEncode(travelCompanionIds);
+  }
 }

@@ -1,6 +1,6 @@
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
-import 'package:soloadventurer/features/travel/domain/entities/trip.dart';
-import 'package:soloadventurer/features/profile/domain/entities/travel_preference.dart';
+import 'package:soloadventurer/features/travel/domain/models/trip.dart';
+import 'package:soloadventurer/features/travel/domain/models/travel_preference.dart';
 
 /// Factory functions for creating test data.
 class TestData {
@@ -9,21 +9,23 @@ class TestData {
     String id = 'test-user-id',
     String username = 'testuser',
     String email = 'test@example.com',
-    String? firstName = 'Test',
-    String? lastName = 'User',
-    String? profilePictureUrl,
     DateTime? createdAt,
-    DateTime? updatedAt,
+    DateTime? lastLoginAt,
+    String? accessToken,
+    String? idToken,
+    String? refreshToken,
+    DateTime? tokenExpiresAt,
   }) {
     return User(
       id: id,
       username: username,
       email: email,
-      firstName: firstName,
-      lastName: lastName,
-      profilePictureUrl: profilePictureUrl,
       createdAt: createdAt ?? DateTime.now(),
-      updatedAt: updatedAt ?? DateTime.now(),
+      lastLoginAt: lastLoginAt,
+      accessToken: accessToken,
+      idToken: idToken,
+      refreshToken: refreshToken,
+      tokenExpiresAt: tokenExpiresAt,
     );
   }
 
@@ -36,7 +38,7 @@ class TestData {
     DateTime? startDate,
     DateTime? endDate,
     String destination = 'Test Destination',
-    TripStatus status = TripStatus.planning,
+    String status = 'planning',
     int budget = 1000,
     String? coverImageUrl,
     List<String>? travelCompanionIds,
@@ -64,18 +66,9 @@ class TestData {
   static TravelPreference createTravelPreference({
     String id = 'test-preference-id',
     String userId = 'test-user-id',
-    List<TravelStyle> travelStyles = const [
-      TravelStyle.adventure,
-      TravelStyle.cultural
-    ],
-    List<AccommodationType> accommodationTypes = const [
-      AccommodationType.hotel,
-      AccommodationType.airbnb
-    ],
-    List<TransportationType> transportationTypes = const [
-      TransportationType.airplane,
-      TransportationType.car
-    ],
+    List<String> travelStyles = const ['adventure', 'cultural'],
+    List<String> accommodationTypes = const ['hotel', 'airbnb'],
+    List<String> transportationTypes = const ['airplane', 'car'],
     int minBudget = 50,
     int maxBudget = 200,
     int minTripDuration = 3,

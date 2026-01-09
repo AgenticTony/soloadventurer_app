@@ -109,10 +109,14 @@ class ValidationException extends AppException {
 
 /// Exception thrown when there is a server error (500, 501, 502, 503)
 class ServerException extends AppException {
-  /// Creates a new [ServerException] with the given [message] and optional [code]
+  /// HTTP status code
+  final int? statusCode;
+
+  /// Creates a new [ServerException] with the given [message], optional [code], and optional [statusCode]
   const ServerException({
     required super.message,
     String? code,
+    this.statusCode,
   }) : super(code: code ?? 'server_error');
 }
 

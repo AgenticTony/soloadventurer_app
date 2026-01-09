@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
-import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:uuid/uuid.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
+import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
 
 /// In-memory conflict log for tracking conflicts
 ///
@@ -17,7 +20,8 @@ class ConflictLog {
   /// Adds a conflict to the log
   void add(Conflict conflict) {
     _conflicts.add(conflict);
-    debugPrint('⚔️ Conflict recorded: ${conflict.entityType}/${conflict.entityId} '
+    debugPrint(
+        '⚔️ Conflict recorded: ${conflict.entityType}/${conflict.entityId} '
         '(${conflict.type})');
   }
 
@@ -36,11 +40,13 @@ class ConflictLog {
     var conflicts = _conflicts.toList();
 
     if (startDate != null) {
-      conflicts = conflicts.where((c) => c.detectedAt.isAfter(startDate)).toList();
+      conflicts =
+          conflicts.where((c) => c.detectedAt.isAfter(startDate)).toList();
     }
 
     if (endDate != null) {
-      conflicts = conflicts.where((c) => c.detectedAt.isBefore(endDate)).toList();
+      conflicts =
+          conflicts.where((c) => c.detectedAt.isBefore(endDate)).toList();
     }
 
     return conflicts;
@@ -94,6 +100,11 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Default resolution strategy for each entity type
   final Map<EntityType, ConflictResolutionStrategy> _defaultStrategies;
 
+  /// Data Access Objects
+  late final TripDao _tripDao = TripDao(_database);
+  late final JournalDao _journalDao = JournalDao(_database);
+  late final UserDao _userDao = UserDao(_database);
+
   /// Creates a new [ConflictResolverImpl] instance
   ///
   /// [database] - AppDatabase instance for data operations
@@ -115,7 +126,8 @@ class ConflictResolverImpl implements ConflictResolver {
               EntityType.userProfile: ConflictResolutionStrategy.lastWriteWins,
 
               // For preferences, always prefer client
-              EntityType.travelPreference: ConflictResolutionStrategy.clientWins,
+              EntityType.travelPreference:
+                  ConflictResolutionStrategy.clientWins,
             };
 
   // ==============================================================================
@@ -272,7 +284,8 @@ class ConflictResolverImpl implements ConflictResolver {
   /// and server versions, and chooses the most recent one.
   Future<bool> _resolveWithLastWriteWins(Conflict conflict) async {
     try {
-      final clientIsNewer = conflict.clientUpdatedAt.isAfter(conflict.serverUpdatedAt);
+      final clientIsNewer =
+          conflict.clientUpdatedAt.isAfter(conflict.serverUpdatedAt);
 
       if (clientIsNewer) {
         debugPrint('📝 Client version is newer for ${conflict.entityId}');
@@ -330,7 +343,8 @@ class ConflictResolverImpl implements ConflictResolver {
           return await _applyClientUserVersion(conflict);
         case EntityType.travelPreference:
           // For now, skip preferences as they're not fully implemented
-          debugPrint('⚠️ Preferences not yet supported for conflict resolution');
+          debugPrint(
+              '⚠️ Preferences not yet supported for conflict resolution');
           return true;
         case EntityType.other:
           debugPrint('⚠️ Unknown entity type, cannot resolve');
@@ -356,7 +370,8 @@ class ConflictResolverImpl implements ConflictResolver {
           return await _applyServerUserVersion(conflict);
         case EntityType.travelPreference:
           // For now, skip preferences
-          debugPrint('⚠️ Preferences not yet supported for conflict resolution');
+          debugPrint(
+              '⚠️ Preferences not yet supported for conflict resolution');
           return true;
         case EntityType.other:
           debugPrint('⚠️ Unknown entity type, cannot resolve');
@@ -375,20 +390,14 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Applies client version for a trip conflict
   Future<bool> _applyClientTripVersion(Conflict conflict) async {
     try {
-      final tripDao = _database.tripDao;
-
-      // Update the trip with client data
-      await tripDao.updateTrip(
-        TripsCompanion(
-          id: Value(conflict.entityId),
-          // Merge client data into trip fields
-          // This is a simplified approach - in production, you'd merge
-          // the specific fields that changed
-          hasPendingChanges: const Value(true),
-          version: Value(conflict.clientData['version'] as int? ?? 0),
-          updatedAt: Value(conflict.clientUpdatedAt),
-        ),
-      );
+      // Update the trip with client data using database write method
+      await (_database.update(_database.trips)
+            ..where((t) => t.id.equals(conflict.entityId)))
+          .write(TripsCompanion(
+        hasPendingChanges: const Value(true),
+        version: Value(conflict.clientData['version'] as int? ?? 0),
+        updatedAt: Value(conflict.clientUpdatedAt),
+      ));
 
       debugPrint('✅ Applied client version for trip ${conflict.entityId}');
       return true;
@@ -401,20 +410,16 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Applies server version for a trip conflict
   Future<bool> _applyServerTripVersion(Conflict conflict) async {
     try {
-      final tripDao = _database.tripDao;
-
-      // Update the trip with server data
-      await tripDao.updateTrip(
-        TripsCompanion(
-          id: Value(conflict.entityId),
-          // Update fields from server data
-          hasPendingChanges: const Value(false),
-          isSynced: const Value(true),
-          version: Value(conflict.serverData['version'] as int? ?? 0),
-          updatedAt: Value(conflict.serverUpdatedAt),
-          lastSyncedAt: Value(DateTime.now()),
-        ),
-      );
+      // Update the trip with server data using database write method
+      await (_database.update(_database.trips)
+            ..where((t) => t.id.equals(conflict.entityId)))
+          .write(TripsCompanion(
+        hasPendingChanges: const Value(false),
+        isSynced: const Value(true),
+        version: Value(conflict.serverData['version'] as int? ?? 0),
+        updatedAt: Value(conflict.serverUpdatedAt),
+        lastSyncedAt: Value(DateTime.now()),
+      ));
 
       debugPrint('✅ Applied server version for trip ${conflict.entityId}');
       return true;
@@ -427,17 +432,14 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Applies client version for a journal conflict
   Future<bool> _applyClientJournalVersion(Conflict conflict) async {
     try {
-      final journalDao = _database.journalDao;
-
-      // Update the journal with client data
-      await journalDao.updateJournal(
-        JournalsCompanion(
-          id: Value(conflict.entityId),
-          hasPendingChanges: const Value(true),
-          version: Value(conflict.clientData['version'] as int? ?? 0),
-          updatedAt: Value(conflict.clientUpdatedAt),
-        ),
-      );
+      // Update the journal with client data using database write method
+      await (_database.update(_database.journals)
+            ..where((j) => j.id.equals(conflict.entityId)))
+          .write(JournalsCompanion(
+        hasPendingChanges: const Value(true),
+        version: Value(conflict.clientData['version'] as int? ?? 0),
+        updatedAt: Value(conflict.clientUpdatedAt),
+      ));
 
       debugPrint('✅ Applied client version for journal ${conflict.entityId}');
       return true;
@@ -450,19 +452,16 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Applies server version for a journal conflict
   Future<bool> _applyServerJournalVersion(Conflict conflict) async {
     try {
-      final journalDao = _database.journalDao;
-
-      // Update the journal with server data
-      await journalDao.updateJournal(
-        JournalsCompanion(
-          id: Value(conflict.entityId),
-          hasPendingChanges: const Value(false),
-          isSynced: const Value(true),
-          version: Value(conflict.serverData['version'] as int? ?? 0),
-          updatedAt: Value(conflict.serverUpdatedAt),
-          lastSyncedAt: Value(DateTime.now()),
-        ),
-      );
+      // Update the journal with server data using database write method
+      await (_database.update(_database.journals)
+            ..where((j) => j.id.equals(conflict.entityId)))
+          .write(JournalsCompanion(
+        hasPendingChanges: const Value(false),
+        isSynced: const Value(true),
+        version: Value(conflict.serverData['version'] as int? ?? 0),
+        updatedAt: Value(conflict.serverUpdatedAt),
+        lastSyncedAt: Value(DateTime.now()),
+      ));
 
       debugPrint('✅ Applied server version for journal ${conflict.entityId}');
       return true;
@@ -475,17 +474,14 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Applies client version for a user profile conflict
   Future<bool> _applyClientUserVersion(Conflict conflict) async {
     try {
-      final userDao = _database.userDao;
-
-      // Update the user with client data
-      await userDao.updateUser(
-        UsersCompanion(
-          id: Value(conflict.entityId),
-          hasPendingChanges: const Value(true),
-          version: Value(conflict.clientData['version'] as int? ?? 0),
-          updatedAt: Value(conflict.clientUpdatedAt),
-        ),
-      );
+      // Update the user with client data using database write method
+      await (_database.update(_database.users)
+            ..where((u) => u.id.equals(conflict.entityId)))
+          .write(UsersCompanion(
+        hasPendingChanges: const Value(true),
+        version: Value(conflict.clientData['version'] as int? ?? 0),
+        updatedAt: Value(conflict.clientUpdatedAt),
+      ));
 
       debugPrint('✅ Applied client version for user ${conflict.entityId}');
       return true;
@@ -498,19 +494,16 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Applies server version for a user profile conflict
   Future<bool> _applyServerUserVersion(Conflict conflict) async {
     try {
-      final userDao = _database.userDao;
-
-      // Update the user with server data
-      await userDao.updateUser(
-        UsersCompanion(
-          id: Value(conflict.entityId),
-          hasPendingChanges: const Value(false),
-          isSynced: const Value(true),
-          version: Value(conflict.serverData['version'] as int? ?? 0),
-          updatedAt: Value(conflict.serverUpdatedAt),
-          lastSyncedAt: Value(DateTime.now()),
-        ),
-      );
+      // Update the user with server data using database write method
+      await (_database.update(_database.users)
+            ..where((u) => u.id.equals(conflict.entityId)))
+          .write(UsersCompanion(
+        hasPendingChanges: const Value(false),
+        isSynced: const Value(true),
+        version: Value(conflict.serverData['version'] as int? ?? 0),
+        updatedAt: Value(conflict.serverUpdatedAt),
+        lastSyncedAt: Value(DateTime.now()),
+      ));
 
       debugPrint('✅ Applied server version for user ${conflict.entityId}');
       return true;
@@ -546,7 +539,8 @@ class ConflictResolverImpl implements ConflictResolver {
   }
 
   /// Determines the severity of a conflict
-  ConflictSeverity _determineSeverity(ConflictType type, EntityType entityType) {
+  ConflictSeverity _determineSeverity(
+      ConflictType type, EntityType entityType) {
     switch (type) {
       case ConflictType.deleteModify:
         return ConflictSeverity.high;

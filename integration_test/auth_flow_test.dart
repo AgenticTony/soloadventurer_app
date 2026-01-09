@@ -6,7 +6,6 @@ import 'package:flutter/material.dart' as material
         Text,
         Icons,
         Key,
-        TextField,
         TextFormField;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -14,25 +13,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
+import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
+import 'package:soloadventurer/core/api/interceptors/error_interceptor.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/profile/data/datasources/profile_local_data_source.dart';
 import 'package:soloadventurer/features/profile/data/datasources/profile_remote_data_source.dart';
 import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
-import 'package:soloadventurer/features/profile/data/repositories/profile_repository_impl.dart';
-import 'package:soloadventurer/features/profile/domain/repositories/profile_repository.dart';
-import 'package:soloadventurer/features/profile/domain/usecases/get_current_profile_use_case.dart';
-import 'package:soloadventurer/features/profile/domain/usecases/update_profile_use_case.dart';
-import 'package:soloadventurer/features/profile/domain/usecases/manage_avatar_use_case.dart';
-import 'package:soloadventurer/features/profile/domain/usecases/delete_profile_use_case.dart';
-import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
+import 'package:soloadventurer/core/security/security_manager.dart';
 import 'test_config.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart'
+    as auth_providers;
 
 class MockProfileRemoteDataSource implements ProfileRemoteDataSource {
   ProfileModel? _mockProfile;
@@ -220,13 +219,161 @@ class MockProfileLocalDataSource implements ProfileLocalDataSource {
   }
 }
 
+/// Mock AuthLocalDataSource for integration testing
+class MockAuthLocalDataSource implements AuthLocalDataSource {
+  final SecureStorage _storage;
+  User? _cachedUser;
+  String? _authToken;
+  String? _refreshToken;
+  DateTime? _tokenExpiration;
+
+  MockAuthLocalDataSource(this._storage);
+
+  @override
+  Future<void> cacheUser(User user) async {
+    _cachedUser = user;
+  }
+
+  @override
+  Future<User?> getCachedUser() async => _cachedUser;
+
+  @override
+  Future<void> clearCache() async {
+    _cachedUser = null;
+    await _storage.deleteAll();
+  }
+
+  @override
+  Future<void> saveAuthData(
+    String token,
+    String refreshToken, {
+    DateTime? expiresAt,
+    String? idToken,
+  }) async {
+    _authToken = token;
+    _refreshToken = refreshToken;
+    _tokenExpiration = expiresAt;
+  }
+
+  @override
+  Future<String?> getAuthToken() async => _authToken;
+
+  @override
+  Future<String?> getIdToken() async => null;
+
+  @override
+  Future<String?> getRefreshToken() async => _refreshToken;
+
+  @override
+  Future<bool> isTokenExpired() async {
+    if (_tokenExpiration == null) return false;
+    return DateTime.now().isAfter(_tokenExpiration!);
+  }
+
+  @override
+  Future<DateTime?> getTokenExpiration() async => _tokenExpiration;
+
+  @override
+  Future<void> clearAuthData() async {
+    _authToken = null;
+    _refreshToken = null;
+    _tokenExpiration = null;
+  }
+
+  @override
+  Future<bool> hasValidSession() async {
+    return _authToken != null &&
+        _refreshToken != null &&
+        !(await isTokenExpired());
+  }
+
+  @override
+  Future<void> cacheAuthToken(String token) async {
+    _authToken = token;
+  }
+
+  @override
+  Future<void> cacheIdToken(String token) async {}
+
+  @override
+  Future<void> cacheRefreshToken(String token) async {
+    _refreshToken = token;
+  }
+
+  @override
+  Future<void> cacheUserData(Map<String, dynamic> userData) async {}
+
+  @override
+  Future<String?> getCachedAuthToken() async => _authToken;
+
+  @override
+  Future<String?> getCachedRefreshToken() async => _refreshToken;
+
+  @override
+  Future<User?> getCachedUserData() async => _cachedUser;
+
+  @override
+  Future<void> deleteAuthToken() async {
+    _authToken = null;
+  }
+
+  @override
+  Future<void> deleteRefreshToken() async {
+    _refreshToken = null;
+  }
+
+  @override
+  Future<void> setTokenExpiration(DateTime expiration) async {
+    _tokenExpiration = expiration;
+  }
+
+  @override
+  Future<void> clearSession() async {
+    _authToken = null;
+    _refreshToken = null;
+    _tokenExpiration = null;
+    _cachedUser = null;
+  }
+
+  @override
+  Future<bool> hasAuthToken() async => _authToken != null;
+
+  @override
+  Future<bool> hasRefreshToken() async => _refreshToken != null;
+
+  @override
+  Future<void> setAuthToken(String token) async {
+    _authToken = token;
+  }
+
+  @override
+  Future<void> setIdToken(String idToken) async {
+    // Store for later use
+  }
+
+  @override
+  Future<void> setRefreshToken(String refreshToken) async {
+    _refreshToken = refreshToken;
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getUserData() async {
+    if (_cachedUser == null) return null;
+    return {
+      'id': _cachedUser!.id,
+      'email': _cachedUser!.email,
+      'username': _cachedUser!.username,
+      'createdAt': _cachedUser!.createdAt.toIso8601String(),
+    };
+  }
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   late ProviderContainer container;
+  late ApiClient apiClient;
   late MockProfileRemoteDataSource mockProfileRemoteDataSource;
-  late MockProfileLocalDataSource mockProfileLocalDataSource;
-  late ProfileRepository profileRepository;
   late MockAuthRemoteDataSource mockAuthRemoteDataSource;
   late AuthRepository authRepository;
 
@@ -243,41 +390,35 @@ void main() {
     await getIt<SecureStorage>().delete(TestConfig.refreshTokenKey);
     await getIt<SecureStorage>().delete(TestConfig.userDataKey);
 
+    // Create ApiClient instance for testing
+    apiClient = ApiClient(
+      baseUrl: TestConfig.apiBaseUrl,
+      authInterceptor: AuthInterceptor(),
+      errorInterceptor: ErrorInterceptor(),
+      networkMonitor: NetworkMonitor(),
+    );
+
     // Initialize mock data sources
     mockProfileRemoteDataSource = MockProfileRemoteDataSource();
-    mockProfileLocalDataSource = MockProfileLocalDataSource();
-    mockAuthRemoteDataSource = MockAuthRemoteDataSource(getIt<ApiClient>());
+    mockAuthRemoteDataSource = MockAuthRemoteDataSource(apiClient);
 
-    // Initialize repositories with mock data sources
-    profileRepository = ProfileRepositoryImpl(
-      remoteDataSource: mockProfileRemoteDataSource,
-      localDataSource: mockProfileLocalDataSource,
-    );
+    // Create AuthLocalDataSource and SecurityManager for testing
+    final authLocalDataSource = MockAuthLocalDataSource(getIt<SecureStorage>());
+
+    // Get SecurityManager from service locator (it's registered in core_module)
+    final securityManager = getIt<SecurityManager>();
 
     authRepository = AuthRepositoryImpl(
       remoteDataSource: mockAuthRemoteDataSource,
-      localDataSource: getIt(),
-      securityManager: getIt(),
+      localDataSource: authLocalDataSource,
+      securityManager: securityManager,
     );
-
-    // Create use cases with mock repository
-    final getCurrentProfileUseCase =
-        GetCurrentProfileUseCase(profileRepository);
-    final updateProfileUseCase = UpdateProfileUseCase(profileRepository);
-    final manageAvatarUseCase = ManageAvatarUseCase(profileRepository);
-    final deleteProfileUseCase = DeleteProfileUseCase(profileRepository);
 
     // Override providers with mock implementations
     container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
-        profileRepositoryProvider.overrideWithValue(profileRepository),
-        getCurrentProfileUseCaseProvider
-            .overrideWithValue(getCurrentProfileUseCase),
-        updateProfileUseCaseProvider.overrideWithValue(updateProfileUseCase),
-        manageAvatarUseCaseProvider.overrideWithValue(manageAvatarUseCase),
-        deleteProfileUseCaseProvider.overrideWithValue(deleteProfileUseCase),
-        authRepositoryProvider.overrideWithValue(authRepository),
+        auth_providers.authRepositoryProvider.overrideWithValue(authRepository),
       ],
     );
   });
@@ -414,7 +555,7 @@ void main() {
         find.widgetWithText(material.TextFormField, 'Password'), 'password123');
 
     // Simulate offline mode by setting API client to offline mode
-    getIt<ApiClient>().setOfflineMode(true);
+    apiClient.setOfflineMode(true);
 
     await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
     await tester.pumpAndSettle();
@@ -423,7 +564,7 @@ void main() {
     expect(find.text('No internet connection'), findsOneWidget);
 
     // Test: Error handling
-    getIt<ApiClient>().setOfflineMode(false);
+    apiClient.setOfflineMode(false);
     await tester.enterText(find.widgetWithText(material.TextFormField, 'Email'),
         'test@example.com');
     await tester.enterText(

@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/auth_service.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
-import 'package:soloadventurer/features/auth/domain/entities/auth_session.dart';
 
 /// Mock classes for testing
 class MockAuthService extends Mock implements AuthService {
@@ -54,17 +52,17 @@ class AuthTestHelper {
 
   /// Get common provider overrides for auth tests
   List<Override> get authOverrides =>
-      [authServiceProvider.overrideWithValue(authService)];
+      []; // TODO: Implement proper auth service provider overrides
 
   /// Setup common mock behaviors
   void setupCommonMocks() {
     // Setup common mock behaviors for auth service
     when(() => authService.initialize()).thenAnswer((_) async {
-      return null;
+      return;
     });
     when(() => authService.refreshSession()).thenAnswer((_) async => true);
     when(() => authService.signOut()).thenAnswer((_) async {
-      return null;
+      return;
     });
   }
 

@@ -234,7 +234,7 @@ class _$LocationUpdateOperationImpl extends _LocationUpdateOperation {
       required this.latitude,
       required this.longitude,
       required this.timestamp,
-      this.priority = OperationPriority.low,
+      required this.priority,
       this.createdAt,
       this.lastAttempt,
       this.attemptCount = 0,
@@ -254,7 +254,6 @@ class _$LocationUpdateOperationImpl extends _LocationUpdateOperation {
   @override
   final DateTime timestamp;
   @override
-  @JsonKey()
   final int priority;
 // Retry metadata
   @override
@@ -339,7 +338,7 @@ abstract class _LocationUpdateOperation extends LocationUpdateOperation {
       required final double latitude,
       required final double longitude,
       required final DateTime timestamp,
-      final int priority,
+      required final int priority,
       final DateTime? createdAt,
       final DateTime? lastAttempt,
       final int attemptCount,

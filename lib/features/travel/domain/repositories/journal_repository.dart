@@ -66,7 +66,8 @@ abstract class JournalRepository {
   /// Get journals by location
   ///
   /// Filters journals by location. Only works with local data.
-  Future<List<Journal>> getJournalsByLocation(String location, {String? userId});
+  Future<List<Journal>> getJournalsByLocation(String location,
+      {String? userId});
 
   /// Search journals by title or content
   ///

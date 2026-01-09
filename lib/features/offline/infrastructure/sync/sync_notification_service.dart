@@ -204,8 +204,7 @@ class SyncNotificationService {
     }
 
     // 2. Check for sync failure
-    if (status.state == SyncState.error &&
-        _preferences.notifyOnFailure) {
+    if (status.state == SyncState.error && _preferences.notifyOnFailure) {
       _showSyncFailureNotification(status.errorMessage);
     }
 
@@ -221,8 +220,8 @@ class SyncNotificationService {
   /// Shows a notification when sync completes successfully
   Future<void> _showSyncSuccessNotification() async {
     try {
-      final title = 'Sync Complete';
-      final body = 'Your data has been synchronized successfully';
+      const title = 'Sync Complete';
+      const body = 'Your data has been synchronized successfully';
 
       debugPrint('$_tag: Showing success notification');
 
@@ -240,7 +239,7 @@ class SyncNotificationService {
   /// Shows a notification when sync fails
   Future<void> _showSyncFailureNotification(String? errorMessage) async {
     try {
-      final title = 'Sync Failed';
+      const title = 'Sync Failed';
       final body = errorMessage ?? 'An error occurred during synchronization';
       final truncatedBody =
           body.length > 100 ? '${body.substring(0, 97)}...' : body;
@@ -261,7 +260,7 @@ class SyncNotificationService {
   /// Shows a notification when pending operations exceed threshold
   Future<void> _showPendingOperationsNotification(int count) async {
     try {
-      final title = 'Pending Sync Operations';
+      const title = 'Pending Sync Operations';
       final body =
           'You have $count changes waiting to sync. Connect to the internet to sync.';
 
@@ -285,7 +284,7 @@ class SyncNotificationService {
     }
 
     try {
-      final title = 'Sync Conflicts Detected';
+      const title = 'Sync Conflicts Detected';
       final body =
           '$conflictCount conflict(s) need your attention. Please review and resolve.';
 
@@ -322,7 +321,8 @@ class SyncNotificationService {
       await _prefs.setBool(_keyNotifyOnFailure, newPreferences.notifyOnFailure);
       await _prefs.setBool(
           _keyNotifyOnPending, newPreferences.notifyOnPendingThreshold);
-      await _prefs.setInt(_keyPendingThreshold, newPreferences.pendingThreshold);
+      await _prefs.setInt(
+          _keyPendingThreshold, newPreferences.pendingThreshold);
       await _prefs.setBool(
           _keyNotifyOnConflicts, newPreferences.notifyOnConflicts);
 
@@ -341,8 +341,7 @@ class SyncNotificationService {
     try {
       final notifyOnSuccess = _prefs.getBool(_keyNotifyOnSuccess) ?? true;
       final notifyOnFailure = _prefs.getBool(_keyNotifyOnFailure) ?? true;
-      final notifyOnPending =
-          _prefs.getBool(_keyNotifyOnPending) ?? true;
+      final notifyOnPending = _prefs.getBool(_keyNotifyOnPending) ?? true;
       final pendingThreshold = _prefs.getInt(_keyPendingThreshold) ?? 10;
       final notifyOnConflicts = _prefs.getBool(_keyNotifyOnConflicts) ?? true;
 
@@ -402,7 +401,8 @@ class SyncNotificationService {
 /// This provider creates and manages the SyncNotificationService instance.
 /// It auto-disposes when no longer being listened to.
 @riverpod
-SyncNotificationService syncNotificationService(SyncNotificationServiceRef ref) {
+SyncNotificationService syncNotificationService(
+    SyncNotificationServiceRef ref) {
   throw UnimplementedError(
     'SyncNotificationService provider must be overridden in main app initialization. '
     'Use ProviderScope with overrides or GetIt DI to provide the service.',

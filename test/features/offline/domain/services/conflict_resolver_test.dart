@@ -2,13 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/conflict_resolver_impl.dart';
+import 'package:soloadventurer/test/mocks/dao_mocks.dart';
 
 // Mock classes
 class MockAppDatabase extends Mock implements AppDatabase {}
-class MockTripDao extends Mock implements TripDao {}
-class MockJournalDao extends Mock implements JournalDao {}
-class MockUserDao extends Mock implements UserDao {}
 
 void main() {
   late MockAppDatabase mockDatabase;
@@ -43,8 +44,8 @@ void main() {
         entityId: 'trip-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 2, 'title': 'Client Title'},
-        serverData: {'version': 1, 'title': 'Server Title'},
+        clientData: const {'version': 2, 'title': 'Client Title'},
+        serverData: const {'version': 1, 'title': 'Server Title'},
         clientUpdatedAt: clientTime,
         serverUpdatedAt: serverTime,
         detectedAt: DateTime.now(),
@@ -65,9 +66,9 @@ void main() {
       expect(result, isTrue);
       verify(() => mockTripDao.updateTrip(any())).called(1);
 
-      final captured =
-          verify(() => mockTripDao.updateTrip(captureAny())).captured.single
-              as TripsCompanion;
+      final captured = verify(() => mockTripDao.updateTrip(captureAny()))
+          .captured
+          .single as TripsCompanion;
       expect(captured.hasPendingChanges.value, isTrue);
       expect(captured.updatedAt.value, equals(clientTime));
     });
@@ -83,8 +84,8 @@ void main() {
         entityId: 'trip-2',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1, 'title': 'Client Title'},
-        serverData: {'version': 2, 'title': 'Server Title'},
+        clientData: const {'version': 1, 'title': 'Client Title'},
+        serverData: const {'version': 2, 'title': 'Server Title'},
         clientUpdatedAt: clientTime,
         serverUpdatedAt: serverTime,
         detectedAt: DateTime.now(),
@@ -102,9 +103,9 @@ void main() {
       expect(result, isTrue);
       verify(() => mockTripDao.updateTrip(any())).called(1);
 
-      final captured =
-          verify(() => mockTripDao.updateTrip(captureAny())).captured.single
-              as TripsCompanion;
+      final captured = verify(() => mockTripDao.updateTrip(captureAny()))
+          .captured
+          .single as TripsCompanion;
       expect(captured.isSynced.value, isTrue);
       expect(captured.hasPendingChanges.value, isFalse);
       expect(captured.updatedAt.value, equals(serverTime));
@@ -120,15 +121,16 @@ void main() {
         entityId: 'journal-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 2, 'content': 'Client content'},
-        serverData: {'version': 1, 'content': 'Server content'},
+        clientData: const {'version': 2, 'content': 'Client content'},
+        serverData: const {'version': 1, 'content': 'Server content'},
         clientUpdatedAt: clientTime,
         serverUpdatedAt: serverTime,
         detectedAt: DateTime.now(),
       );
 
       await conflictResolver.recordConflict(conflict);
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       final result = await conflictResolver.resolveConflict(
         conflict.id,
@@ -149,8 +151,8 @@ void main() {
         entityId: 'user-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 2, 'username': 'newUsername'},
-        serverData: {'version': 1, 'username': 'oldUsername'},
+        clientData: const {'version': 2, 'username': 'newUsername'},
+        serverData: const {'version': 1, 'username': 'oldUsername'},
         clientUpdatedAt: clientTime,
         serverUpdatedAt: serverTime,
         detectedAt: DateTime.now(),
@@ -168,16 +170,15 @@ void main() {
       verify(() => mockUserDao.updateUser(any())).called(1);
     });
 
-    test('should return false when last-write-wins resolution fails',
-        () async {
+    test('should return false when last-write-wins resolution fails', () async {
       final conflict = Conflict(
         id: 'conflict-5',
         entityType: EntityType.trip,
         entityId: 'trip-fail',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 2},
-        serverData: {'version': 1},
+        clientData: const {'version': 2},
+        serverData: const {'version': 1},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now().subtract(const Duration(days: 1)),
         detectedAt: DateTime.now(),
@@ -208,8 +209,8 @@ void main() {
         entityId: 'trip-3',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 2, 'title': 'Client Title'},
-        serverData: {'version': 1, 'title': 'Server Title'},
+        clientData: const {'version': 2, 'title': 'Client Title'},
+        serverData: const {'version': 1, 'title': 'Server Title'},
         clientUpdatedAt: clientTime,
         serverUpdatedAt: serverTime,
         detectedAt: DateTime.now(),
@@ -225,9 +226,9 @@ void main() {
 
       expect(result, isTrue);
 
-      final captured =
-          verify(() => mockTripDao.updateTrip(captureAny())).captured.single
-              as TripsCompanion;
+      final captured = verify(() => mockTripDao.updateTrip(captureAny()))
+          .captured
+          .single as TripsCompanion;
       // Should apply server version
       expect(captured.isSynced.value, isTrue);
       expect(captured.hasPendingChanges.value, isFalse);
@@ -241,15 +242,16 @@ void main() {
         entityId: 'journal-2',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 2, 'content': 'Client content'},
-        serverData: {'version': 1, 'content': 'Server content'},
+        clientData: const {'version': 2, 'content': 'Client content'},
+        serverData: const {'version': 1, 'content': 'Server content'},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now().subtract(const Duration(days: 1)),
         detectedAt: DateTime.now(),
       );
 
       await conflictResolver.recordConflict(conflict);
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       final result = await conflictResolver.resolveConflict(
         conflict.id,
@@ -273,8 +275,8 @@ void main() {
         entityId: 'user-2',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 2, 'username': 'clientUser'},
-        serverData: {'version': 1, 'username': 'serverUser'},
+        clientData: const {'version': 2, 'username': 'clientUser'},
+        serverData: const {'version': 1, 'username': 'serverUser'},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now().subtract(const Duration(hours: 1)),
         detectedAt: DateTime.now(),
@@ -291,9 +293,9 @@ void main() {
       expect(result, isTrue);
       verify(() => mockUserDao.updateUser(any())).called(1);
 
-      final captured =
-          verify(() => mockUserDao.updateUser(captureAny())).captured.single
-              as UsersCompanion;
+      final captured = verify(() => mockUserDao.updateUser(captureAny()))
+          .captured
+          .single as UsersCompanion;
       expect(captured.isSynced.value, isTrue);
       expect(captured.hasPendingChanges.value, isFalse);
     });
@@ -305,8 +307,8 @@ void main() {
         entityId: 'trip-server-fail',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 2},
-        serverData: {'version': 1},
+        clientData: const {'version': 2},
+        serverData: const {'version': 1},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now().subtract(const Duration(days: 1)),
         detectedAt: DateTime.now(),
@@ -337,15 +339,16 @@ void main() {
         entityId: 'journal-3',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1, 'content': 'Client content'},
-        serverData: {'version': 2, 'content': 'Server content'},
+        clientData: const {'version': 1, 'content': 'Client content'},
+        serverData: const {'version': 2, 'content': 'Server content'},
         clientUpdatedAt: clientTime,
         serverUpdatedAt: serverTime,
         detectedAt: DateTime.now(),
       );
 
       await conflictResolver.recordConflict(conflict);
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       final result = await conflictResolver.resolveConflict(
         conflict.id,
@@ -369,8 +372,8 @@ void main() {
         entityId: 'trip-4',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1, 'title': 'Client Title'},
-        serverData: {'version': 2, 'title': 'Server Title'},
+        clientData: const {'version': 1, 'title': 'Client Title'},
+        serverData: const {'version': 2, 'title': 'Server Title'},
         clientUpdatedAt: DateTime.now().subtract(const Duration(days: 1)),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -387,9 +390,9 @@ void main() {
       expect(result, isTrue);
       verify(() => mockTripDao.updateTrip(any())).called(1);
 
-      final captured =
-          verify(() => mockTripDao.updateTrip(captureAny())).captured.single
-              as TripsCompanion;
+      final captured = verify(() => mockTripDao.updateTrip(captureAny()))
+          .captured
+          .single as TripsCompanion;
       expect(captured.hasPendingChanges.value, isTrue);
       expect(captured.version.value, equals(1));
     });
@@ -401,8 +404,8 @@ void main() {
         entityId: 'user-3',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1, 'username': 'clientUsername'},
-        serverData: {'version': 2, 'username': 'serverUsername'},
+        clientData: const {'version': 1, 'username': 'clientUsername'},
+        serverData: const {'version': 2, 'username': 'serverUsername'},
         clientUpdatedAt: DateTime.now().subtract(const Duration(hours: 2)),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -419,9 +422,9 @@ void main() {
       expect(result, isTrue);
       verify(() => mockUserDao.updateUser(any())).called(1);
 
-      final captured =
-          verify(() => mockUserDao.updateUser(captureAny())).captured.single
-              as UsersCompanion;
+      final captured = verify(() => mockUserDao.updateUser(captureAny()))
+          .captured
+          .single as UsersCompanion;
       expect(captured.hasPendingChanges.value, isTrue);
     });
 
@@ -432,8 +435,8 @@ void main() {
         entityId: 'journal-client-fail',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now().subtract(const Duration(days: 1)),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -460,8 +463,8 @@ void main() {
         entityId: 'trip-manual',
         type: ConflictType.deleteModify,
         severity: ConflictSeverity.high,
-        clientData: {'version': 1, 'title': 'Client Title'},
-        serverData: {'version': 2, 'isDeleted': true},
+        clientData: const {'version': 1, 'title': 'Client Title'},
+        serverData: const {'version': 2, 'isDeleted': true},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -486,8 +489,8 @@ void main() {
         entityId: 'trip-manual-2',
         type: ConflictType.duplicateCreate,
         severity: ConflictSeverity.high,
-        clientData: {'version': 1, 'title': 'Client Trip'},
-        serverData: {'version': 1, 'title': 'Server Trip'},
+        clientData: const {'version': 1, 'title': 'Client Trip'},
+        serverData: const {'version': 1, 'title': 'Server Trip'},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -518,8 +521,8 @@ void main() {
         entityId: 'trip-manual-retry',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -556,8 +559,8 @@ void main() {
         entityId: 'trip-5',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -577,8 +580,8 @@ void main() {
         entityId: 'trip-6',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -590,8 +593,8 @@ void main() {
         entityId: 'journal-4',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -618,8 +621,8 @@ void main() {
         entityId: 'trip-7',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -655,8 +658,8 @@ void main() {
         entityId: 'trip-8',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: twoDaysAgo,
         serverUpdatedAt: twoDaysAgo,
         detectedAt: twoDaysAgo,
@@ -668,8 +671,8 @@ void main() {
         entityId: 'journal-5',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: now,
         serverUpdatedAt: now,
         detectedAt: now,
@@ -696,8 +699,8 @@ void main() {
         entityId: 'trip-9',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: oldDate,
         serverUpdatedAt: oldDate,
         detectedAt: oldDate,
@@ -712,8 +715,8 @@ void main() {
         entityId: 'journal-6',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: now,
         serverUpdatedAt: now,
         detectedAt: now,
@@ -770,8 +773,8 @@ void main() {
         entityId: 'trip-batch-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -783,8 +786,8 @@ void main() {
         entityId: 'journal-batch-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -794,7 +797,8 @@ void main() {
       await conflictResolver.recordConflict(journalConflict);
 
       when(() => mockTripDao.updateTrip(any())).thenAnswer((_) async => 1);
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       final result = await conflictResolver.resolveAllConflicts();
 
@@ -811,8 +815,8 @@ void main() {
         entityId: 'trip-fail-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -824,8 +828,8 @@ void main() {
         entityId: 'journal-fail-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -862,8 +866,8 @@ void main() {
         entityId: 'trip-custom',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -875,8 +879,8 @@ void main() {
         entityId: 'journal-custom',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -886,14 +890,15 @@ void main() {
       await customResolver.recordConflict(journalConflict);
 
       when(() => mockTripDao.updateTrip(any())).thenAnswer((_) async => 1);
-      when(() => mockJournalDao.updateJournal(any())).thenAnswer((_) async => 1);
+      when(() => mockJournalDao.updateJournal(any()))
+          .thenAnswer((_) async => 1);
 
       await customResolver.resolveAllConflicts();
 
       // Verify trip used client-wins (hasPendingChanges = true)
-      final tripUpdate =
-          verify(() => mockTripDao.updateTrip(captureAny())).captured.single
-              as TripsCompanion;
+      final tripUpdate = verify(() => mockTripDao.updateTrip(captureAny()))
+          .captured
+          .single as TripsCompanion;
       expect(tripUpdate.hasPendingChanges.value, isTrue);
 
       // Verify journal used server-wins (isSynced = true, hasPendingChanges = false)
@@ -922,8 +927,8 @@ void main() {
         entityId: 'unknown-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -956,8 +961,8 @@ void main() {
         entityId: 'pref-1',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.low,
-        clientData: {'version': 1},
-        serverData: {'version': 2},
+        clientData: const {'version': 1},
+        serverData: const {'version': 2},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -981,8 +986,8 @@ void main() {
         entityId: 'trip-same',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 2, 'title': 'First Update'},
-        serverData: {'version': 3, 'title': 'Second Update'},
+        clientData: const {'version': 2, 'title': 'First Update'},
+        serverData: const {'version': 3, 'title': 'Second Update'},
         clientUpdatedAt: DateTime(2024, 1, 10, 10, 0),
         serverUpdatedAt: DateTime(2024, 1, 10, 11, 0),
         detectedAt: DateTime.now(),
@@ -994,8 +999,8 @@ void main() {
         entityId: 'trip-same',
         type: ConflictType.concurrentUpdate,
         severity: ConflictSeverity.medium,
-        clientData: {'version': 3, 'title': 'Third Update'},
-        serverData: {'version': 4, 'title': 'Fourth Update'},
+        clientData: const {'version': 3, 'title': 'Third Update'},
+        serverData: const {'version': 4, 'title': 'Fourth Update'},
         clientUpdatedAt: DateTime(2024, 1, 10, 12, 0),
         serverUpdatedAt: DateTime(2024, 1, 10, 13, 0),
         detectedAt: DateTime.now(),
@@ -1021,8 +1026,8 @@ void main() {
         entityId: 'trip-deleted',
         type: ConflictType.deleteModify,
         severity: ConflictSeverity.high,
-        clientData: {'version': 1, 'isDeleted': false},
-        serverData: {'version': 2, 'isDeleted': true},
+        clientData: const {'version': 1, 'isDeleted': false},
+        serverData: const {'version': 2, 'isDeleted': true},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -1042,8 +1047,8 @@ void main() {
         entityId: 'trip-duplicate',
         type: ConflictType.duplicateCreate,
         severity: ConflictSeverity.high,
-        clientData: {'version': 1, 'title': 'Client Trip'},
-        serverData: {'version': 1, 'title': 'Server Trip'},
+        clientData: const {'version': 1, 'title': 'Client Trip'},
+        serverData: const {'version': 1, 'title': 'Server Trip'},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),
@@ -1062,8 +1067,8 @@ void main() {
         entityId: 'journal-version',
         type: ConflictType.versionMismatch,
         severity: ConflictSeverity.low,
-        clientData: {'version': 5},
-        serverData: {'version': 10},
+        clientData: const {'version': 5},
+        serverData: const {'version': 10},
         clientUpdatedAt: DateTime.now(),
         serverUpdatedAt: DateTime.now(),
         detectedAt: DateTime.now(),

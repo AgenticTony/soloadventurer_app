@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/token_state.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../data/providers/auth_data_providers.dart';
 
 part 'token_manager_provider.g.dart';
 
@@ -24,20 +24,10 @@ class TokenManager extends _$TokenManager {
   Future<void> initializeToken() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final session = await _authRepository.getCurrentSession();
-      if (session == null) return const TokenState.empty();
-
-      final expiresAt = DateTime.now().add(
-        Duration(seconds: session.accessToken.expiresIn),
-      );
-
-      _scheduleTokenRefresh(expiresAt);
-
-      return TokenState.valid(
-        accessToken: session.accessToken.jwtToken,
-        refreshToken: session.refreshToken.token,
-        expiresAt: expiresAt,
-      );
+      // TODO: Implement proper token initialization
+      // The current AuthRepository doesn't expose sessions directly
+      // For now, return empty state
+      return const TokenState.empty();
     });
   }
 
@@ -56,32 +46,13 @@ class TokenManager extends _$TokenManager {
     state = AsyncValue.data(TokenState.refreshing(refreshToken: refreshToken));
 
     state = await AsyncValue.guard(() async {
-      try {
-        final session = await _authRepository.refreshSession(refreshToken);
-        if (session == null) {
-          return const TokenState.error(
-            message: 'Failed to refresh token',
-            requiresReauthentication: true,
-          );
-        }
-
-        final expiresAt = DateTime.now().add(
-          Duration(seconds: session.accessToken.expiresIn),
-        );
-
-        _scheduleTokenRefresh(expiresAt);
-
-        return TokenState.valid(
-          accessToken: session.accessToken.jwtToken,
-          refreshToken: session.refreshToken.token,
-          expiresAt: expiresAt,
-        );
-      } on CognitoClientException catch (e) {
-        return TokenState.error(
-          message: e.message ?? 'Unknown error occurred',
-          requiresReauthentication: e.name == 'NotAuthorizedException',
-        );
-      }
+      // TODO: Implement proper token refresh
+      // The current AuthRepository doesn't expose refreshSession
+      // For now, return error state requiring reauthentication
+      return const TokenState.error(
+        message: 'Token refresh not yet implemented',
+        requiresReauthentication: true,
+      );
     });
   }
 

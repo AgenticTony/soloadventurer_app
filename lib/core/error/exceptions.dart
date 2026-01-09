@@ -52,3 +52,8 @@ class AuthException extends AppException {
     required this.type,
   }) : super(message);
 }
+
+/// Exception thrown when there is a repository/data layer error
+class RepositoryException extends AppException {
+  RepositoryException(super.message);
+}

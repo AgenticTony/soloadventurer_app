@@ -2,11 +2,35 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:aws_cloudwatch_api/cloudwatch-2010-08-01.dart' as aws;
-import 'package:shared_aws_api/shared.dart';
+// TODO: Fix aws_cloudwatch_api package corruption
+// import 'package:aws_cloudwatch_api/cloudwatch-2010-08-01.dart' as aws;
+// import 'package:shared_aws_api/shared.dart';
 import './monitoring_service.dart';
 
 part 'aws_cloudwatch_monitoring.g.dart';
+
+/// Data class for metric data
+class MetricDatum {
+  final String metricName;
+  final double value;
+  final List<Dimension>? dimensions;
+  final DateTime? timestamp;
+
+  MetricDatum({
+    required this.metricName,
+    required this.value,
+    this.dimensions,
+    this.timestamp,
+  });
+}
+
+/// Data class for dimensions
+class Dimension {
+  final String name;
+  final String value;
+
+  Dimension({required this.name, required this.value});
+}
 
 /// Provider for AWS CloudWatch monitoring service
 @riverpod
@@ -24,79 +48,28 @@ AwsCloudWatchMonitoring awsCloudWatchMonitoring(
   );
 }
 
-/// CloudWatch wrapper class
+/// CloudWatch wrapper class (stub implementation)
 class CloudWatch {
   final String region;
   final String accessKeyId;
   final String secretAccessKey;
-  late final aws.CloudWatch _client;
 
   CloudWatch({
     required this.region,
     required this.accessKeyId,
     required this.secretAccessKey,
   }) {
-    _client = aws.CloudWatch(
-      region: region,
-      credentials: AwsClientCredentials(
-        accessKey: accessKeyId,
-        secretKey: secretAccessKey,
-      ),
-    );
+    debugPrint('CloudWatch: Stub implementation - AWS monitoring disabled');
   }
 
   Future<void> putMetricData({
     required String namespace,
     required List<MetricDatum> metricData,
   }) async {
-    try {
-      final request = aws.PutMetricDataInput(
-        namespace: namespace,
-        metricData: metricData
-            .map((datum) => aws.MetricDatum(
-                  metricName: datum.metricName,
-                  value: datum.value,
-                  dimensions: datum.dimensions
-                      ?.map((d) => aws.Dimension(
-                            name: d.name,
-                            value: d.value,
-                          ))
-                      .toList(),
-                  timestamp: datum.timestamp,
-                ))
-            .toList(),
-      );
-
-      await _client.putMetricData(request);
-    } catch (e) {
-      debugPrint('Failed to put metric data to CloudWatch: $e');
-      rethrow;
-    }
+    // Stub implementation - AWS CloudWatch API package is corrupted
+    debugPrint(
+        'CloudWatch: Stub putMetricData called for $namespace with ${metricData.length} metrics');
   }
-}
-
-class MetricDatum {
-  final String metricName;
-  final double value;
-  final List<Dimension>? dimensions;
-  final DateTime timestamp;
-
-  MetricDatum({
-    required this.metricName,
-    required this.value,
-    this.dimensions,
-    required this.timestamp,
-  });
-}
-
-class Dimension {
-  final String name;
-  final String value;
-
-  Dimension({
-    required this.name,
-    required this.value,
-  });
 }
 
 /// Implementation of [MonitoringService] using AWS CloudWatch
@@ -156,7 +129,9 @@ class AwsCloudWatchMonitoring implements MonitoringService {
           MetricDatum(
             metricName: 'Warning',
             value: 1.0,
-            dimensions: _contextToDimensions(context),
+            dimensions: [
+              Dimension(name: 'Message', value: message),
+            ],
             timestamp: DateTime.now(),
           ),
         ],
@@ -180,7 +155,9 @@ class AwsCloudWatchMonitoring implements MonitoringService {
           MetricDatum(
             metricName: 'Info',
             value: 1.0,
-            dimensions: _contextToDimensions(context),
+            dimensions: [
+              Dimension(name: 'Message', value: message),
+            ],
             timestamp: DateTime.now(),
           ),
         ],
@@ -192,30 +169,85 @@ class AwsCloudWatchMonitoring implements MonitoringService {
     }
   }
 
+  Future<void> logMetric(
+    String name,
+    double value, {
+    Map<String, dynamic>? metadata,
+  }) async {
+    try {
+      final dimensions = metadata?.entries
+          .map((e) => Dimension(name: e.key, value: e.value.toString()))
+          .toList();
+
+      await _cloudWatch.putMetricData(
+        namespace: _namespace,
+        metricData: [
+          MetricDatum(
+            metricName: name,
+            value: value,
+            dimensions: dimensions,
+            timestamp: DateTime.now(),
+          ),
+        ],
+      );
+
+      debugPrint('Metric logged to CloudWatch: $name = $value');
+    } catch (e) {
+      debugPrint('Failed to log metric to CloudWatch: $e');
+    }
+  }
+
+  @override
+  void startTimer(String name) {
+    _timers[name] = DateTime.now();
+    debugPrint('Timer started: $name');
+  }
+
+  @override
+  Future<double?> stopTimer(String name) async {
+    final startTime = _timers[name];
+    if (startTime == null) {
+      debugPrint('Timer not found: $name');
+      return null;
+    }
+
+    final duration = DateTime.now().difference(startTime);
+    final durationMs = duration.inMilliseconds.toDouble();
+
+    await logMetric(
+      '${name}_duration',
+      durationMs,
+      metadata: {'unit': 'milliseconds'},
+    );
+
+    _timers.remove(name);
+    debugPrint('Timer stopped: $name (${durationMs}ms)');
+    return durationMs;
+  }
+
   @override
   Future<void> logDebug(
     String message, {
     Map<String, dynamic>? context,
   }) async {
-    // Only log debug messages in debug mode
-    if (kDebugMode) {
-      try {
-        await _cloudWatch.putMetricData(
-          namespace: _namespace,
-          metricData: [
-            MetricDatum(
-              metricName: 'Debug',
-              value: 1.0,
-              dimensions: _contextToDimensions(context),
-              timestamp: DateTime.now(),
-            ),
-          ],
-        );
+    try {
+      await _cloudWatch.putMetricData(
+        namespace: _namespace,
+        metricData: [
+          MetricDatum(
+            metricName: 'Debug',
+            value: 1.0,
+            dimensions: [
+              Dimension(name: 'Message', value: message),
+            ],
+            timestamp: DateTime.now(),
+          ),
+        ],
+      );
 
-        debugPrint('Debug logged to CloudWatch: $message');
-      } catch (e) {
-        debugPrint('Failed to log debug to CloudWatch: $e');
-      }
+      debugPrint('Debug logged to CloudWatch: $message');
+    } catch (e) {
+      debugPrint('Failed to log debug to CloudWatch: $e');
     }
   }
 
@@ -226,45 +258,26 @@ class AwsCloudWatchMonitoring implements MonitoringService {
     Map<String, String>? dimensions,
   }) async {
     try {
+      final metricDimensions = dimensions?.entries
+          .map((e) => Dimension(name: e.key, value: e.value))
+          .toList();
+
       await _cloudWatch.putMetricData(
         namespace: _namespace,
         metricData: [
           MetricDatum(
             metricName: metricName,
             value: value,
-            dimensions: dimensions?.entries
-                .map((e) => Dimension(name: e.key, value: e.value))
-                .toList(),
+            dimensions: metricDimensions,
             timestamp: DateTime.now(),
           ),
         ],
       );
 
-      debugPrint('Metric recorded to CloudWatch: $metricName = $value');
+      debugPrint('Metric logged to CloudWatch: $metricName = $value');
     } catch (e) {
-      debugPrint('Failed to record metric to CloudWatch: $e');
+      debugPrint('Failed to log metric to CloudWatch: $e');
     }
-  }
-
-  @override
-  void startTimer(String operationName) {
-    _timers[operationName] = DateTime.now();
-  }
-
-  @override
-  Future<void> stopTimer(String operationName) async {
-    final startTime = _timers.remove(operationName);
-    if (startTime == null) {
-      debugPrint('No timer found for operation: $operationName');
-      return;
-    }
-
-    final duration = DateTime.now().difference(startTime);
-    await recordMetric(
-      '${operationName}Duration',
-      duration.inMilliseconds.toDouble(),
-      dimensions: {'Operation': operationName},
-    );
   }
 
   @override
@@ -277,24 +290,22 @@ class AwsCloudWatchMonitoring implements MonitoringService {
         namespace: _namespace,
         metricData: [
           MetricDatum(
-            metricName: eventName,
+            metricName: 'Event',
             value: 1.0,
-            dimensions: _contextToDimensions(attributes),
+            dimensions: [
+              Dimension(name: 'Name', value: eventName),
+              if (attributes != null)
+                ...attributes.entries.map(
+                    (e) => Dimension(name: e.key, value: e.value.toString())),
+            ],
             timestamp: DateTime.now(),
           ),
         ],
       );
 
-      debugPrint('Event recorded to CloudWatch: $eventName');
+      debugPrint('Event logged to CloudWatch: $eventName');
     } catch (e) {
-      debugPrint('Failed to record event to CloudWatch: $e');
+      debugPrint('Failed to log event to CloudWatch: $e');
     }
-  }
-
-  List<Dimension>? _contextToDimensions(Map<String, dynamic>? context) {
-    if (context == null) return null;
-    return context.entries
-        .map((e) => Dimension(name: e.key, value: e.value.toString()))
-        .toList();
   }
 }

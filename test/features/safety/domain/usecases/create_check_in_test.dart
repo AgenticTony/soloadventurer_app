@@ -134,8 +134,7 @@ void main() {
       final result = await createCheckInUseCase(locationDepartureCheckIn);
 
       // Assert
-      expect(result.triggerType,
-          equals(CheckInTriggerType.locationDeparture));
+      expect(result.triggerType, equals(CheckInTriggerType.locationDeparture));
       verify(() =>
               testSetup.mockRepository.createCheckIn(locationDepartureCheckIn))
           .called(1);
@@ -196,7 +195,7 @@ void main() {
 
     test('should create check-in with trip ID', () async {
       // Arrange
-      final tripId = testTripId;
+      const tripId = testTripId;
       final checkInWithTrip = createTestCheckIn(tripId: tripId);
       testSetup.setupSuccessfulCheckInOperations();
 
@@ -224,8 +223,7 @@ void main() {
 
     test('should create check-in with empty notify contact IDs', () async {
       // Arrange
-      final checkInWithNoContacts =
-          createTestCheckIn(notifyContactIds: []);
+      final checkInWithNoContacts = createTestCheckIn(notifyContactIds: []);
       testSetup.setupSuccessfulCheckInOperations();
 
       // Act

@@ -345,9 +345,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
 
       final response = await _query(query);
       final data = response['getTrustedContacts'] as List;
-      return data
-          .map((json) => TrustedContact.fromJson(json))
-          .toList();
+      return data.map((json) => TrustedContact.fromJson(json)).toList();
     } on SafetyException {
       rethrow;
     } catch (e) {
@@ -447,7 +445,7 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
         'statusMessage': checkIn.statusMessage,
         'notifyContactIds': checkIn.notifyContactIds,
         'tripId': checkIn.tripId,
-        'triggerType': checkIn.triggerType?.name,
+        'triggerType': checkIn.triggerType.name,
       });
 
       final data = response['createCheckIn'] as Map<String, dynamic>;

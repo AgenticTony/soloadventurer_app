@@ -260,7 +260,7 @@ class _$TripPlanningOperationImpl extends _TripPlanningOperation {
       required this.tripId,
       required this.planningType,
       required final Map<String, dynamic> changes,
-      this.priority = OperationPriority.normal,
+      required this.priority,
       this.plannedStartDate,
       this.plannedEndDate,
       this.createdAt,
@@ -289,7 +289,6 @@ class _$TripPlanningOperationImpl extends _TripPlanningOperation {
   }
 
   @override
-  @JsonKey()
   final int priority;
   @override
   final DateTime? plannedStartDate;
@@ -382,7 +381,7 @@ abstract class _TripPlanningOperation extends TripPlanningOperation {
       required final String tripId,
       required final TripPlanningType planningType,
       required final Map<String, dynamic> changes,
-      final int priority,
+      required final int priority,
       final DateTime? plannedStartDate,
       final DateTime? plannedEndDate,
       final DateTime? createdAt,

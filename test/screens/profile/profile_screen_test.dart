@@ -3,8 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/profile/presentation/screens/profile_screen.dart';
-import 'package:soloadventurer/features/profile/presentation/providers/user_profile_provider.dart' as user_profile;
-import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/profile/presentation/providers/user_profile_provider.dart'
+    as user_profile;
+import 'package:soloadventurer/features/auth/domain/models/user.dart';
 
 // Mock classes
 class MockUserRepository extends Mock implements user_profile.UserRepository {}
@@ -13,11 +14,8 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 class MockRoute extends Mock implements Route {}
 
-class MockUserProfileNotifier extends StateNotifier<AsyncValue<User?>>
-    with Mock
-    implements user_profile.UserProfileNotifier {
-  MockUserProfileNotifier() : super(const AsyncValue.loading());
-}
+class MockUserProfileNotifier extends Mock
+    implements user_profile.UserProfileNotifier {}
 
 void main() {
   late MockNavigatorObserver mockNavigatorObserver;
@@ -116,8 +114,8 @@ void main() {
           .thenReturn(AsyncValue.data(testUser));
       when(() => mockUserProfileNotifier.updateProfile(any()))
           .thenAnswer((_) async {
-            return null;
-          });
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createTestableWidget());
@@ -155,8 +153,8 @@ void main() {
           const AsyncValue.error('Failed to load profile', StackTrace.empty));
       when(() => mockUserProfileNotifier.updateProfile(any()))
           .thenAnswer((_) async {
-            return null;
-          });
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createTestableWidget());

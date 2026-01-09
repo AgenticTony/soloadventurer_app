@@ -4,11 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
 import 'package:soloadventurer/features/core/providers/operation_queue_provider.dart';
-import 'package:soloadventurer/features/core/services/operation_queue.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
 
-class MockOperationQueueNotifier extends OperationQueueNotifier
-    with Mock {
+class MockOperationQueueNotifier extends OperationQueueNotifier with Mock {
   MockOperationQueueNotifier() : super();
 
   @override
@@ -34,13 +32,12 @@ void main() {
     Widget createWidgetUnderTest() {
       return ProviderScope(
         overrides: [
-          operationQueueNotifierProvider
-              .overrideWith((ref) => mockNotifier),
+          operationQueueNotifierProvider.overrideWith((_) => mockNotifier),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
           home: Scaffold(
             appBar: AppBar(
-              actions: [
+              actions: const [
                 QueueStatusIndicator(),
               ],
             ),
@@ -70,15 +67,16 @@ void main() {
 
       testWidgets('shows indicator when pendingCount is greater than 0',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -95,15 +93,16 @@ void main() {
 
       testWidgets('shows indicator when pendingCount is 1',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -126,6 +125,7 @@ void main() {
             tripId: 'trip-$i',
             planningType: TripPlanningType.update,
             changes: {'name': 'Test $i'},
+            priority: 10,
           ),
         );
 
@@ -153,6 +153,7 @@ void main() {
             tripId: 'trip-$i',
             planningType: TripPlanningType.update,
             changes: {'name': 'Test $i'},
+            priority: 10,
           ),
         );
 
@@ -175,15 +176,16 @@ void main() {
     group('Badge Display', () {
       testWidgets('displays correct count for 1 pending operation',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -206,6 +208,7 @@ void main() {
             tripId: 'trip-$i',
             planningType: TripPlanningType.update,
             changes: {'name': 'Test $i'},
+            priority: 10,
           ),
         );
 
@@ -233,6 +236,7 @@ void main() {
             tripId: 'trip-$i',
             planningType: TripPlanningType.update,
             changes: {'name': 'Test $i'},
+            priority: 10,
           ),
         );
 
@@ -260,6 +264,7 @@ void main() {
             tripId: 'trip-$i',
             planningType: TripPlanningType.update,
             changes: {'name': 'Test $i'},
+            priority: 10,
           ),
         );
 
@@ -281,15 +286,16 @@ void main() {
 
       testWidgets('uses normal font size for counts under 99',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -307,15 +313,16 @@ void main() {
 
     group('Icon Display', () {
       testWidgets('displays cloud_sync icon', (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -333,15 +340,16 @@ void main() {
     group('Tooltip', () {
       testWidgets('displays tooltip with count information',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -358,15 +366,16 @@ void main() {
 
       testWidgets('updates tooltip when count changes',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -381,7 +390,7 @@ void main() {
 
         // Update state
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -400,15 +409,16 @@ void main() {
     group('Navigation', () {
       testWidgets('navigates to operation queue screen when tapped',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -426,9 +436,9 @@ void main() {
                   .overrideWith((ref) => mockNotifier),
             ],
             child: MaterialApp(
-              home: const Scaffold(
+              home: Scaffold(
                 appBar: AppBar(
-                  actions: [
+                  actions: const [
                     QueueStatusIndicator(),
                   ],
                 ),
@@ -462,15 +472,16 @@ void main() {
 
         expect(find.byType(IconButton), findsNothing);
 
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -487,15 +498,16 @@ void main() {
 
       testWidgets('hides when pendingCount changes from 1 to 0',
           (WidgetTester tester) async {
-        final operation = TripPlanningOperation(
+        const operation = TripPlanningOperation(
           id: 'test-id',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
             isProcessing: false,
@@ -525,15 +537,16 @@ void main() {
 
       testWidgets('updates badge when count changes',
           (WidgetTester tester) async {
-        final operation1 = TripPlanningOperation(
+        const operation1 = TripPlanningOperation(
           id: 'test-id-1',
           tripId: 'trip-123',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation1],
             failedOperations: [],
             isProcessing: false,
@@ -546,15 +559,16 @@ void main() {
 
         expect(find.text('1'), findsOneWidget);
 
-        final operation2 = TripPlanningOperation(
+        const operation2 = TripPlanningOperation(
           id: 'test-id-2',
           tripId: 'trip-456',
           planningType: TripPlanningType.update,
           changes: {'name': 'Test 2'},
+          priority: 10,
         );
 
         when(() => mockNotifier.state).thenReturn(
-          OperationQueueState(
+          const OperationQueueState(
             pendingOperations: [operation1, operation2],
             failedOperations: [],
             isProcessing: false,

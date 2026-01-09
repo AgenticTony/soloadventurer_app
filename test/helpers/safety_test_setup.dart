@@ -4,7 +4,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart';
 import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
-import 'package:soloadventurer/features/safety/domain/repositories/safety_repository.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/add_trusted_contact.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/create_check_in.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/trigger_emergency_sos.dart';

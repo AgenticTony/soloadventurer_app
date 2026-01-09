@@ -4,7 +4,8 @@ import 'package:uuid/uuid.dart';
 import '../../domain/entities/check_in.dart';
 import '../../domain/entities/safety_status.dart' as safety;
 import '../providers/safety_providers.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
+import '../../../../core/services/location_service.dart' as core;
 
 /// Screen for manual check-in with current location and status
 ///
@@ -23,7 +24,8 @@ class ManualCheckInScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ManualCheckInScreen> createState() => _ManualCheckInScreenState();
+  ConsumerState<ManualCheckInScreen> createState() =>
+      _ManualCheckInScreenState();
 }
 
 class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
@@ -57,7 +59,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
     try {
       final locationService = ref.read(locationServiceProvider);
       final locationData = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       setState(() {
@@ -93,7 +95,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
       return;
     }
 
-    final user = ref.read(currentUserProvider);
+    final user = ref.read(authNotifierProvider).valueOrNull?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -111,16 +113,17 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
     try {
       if (widget.existingCheckIn != null) {
         // Complete existing check-in
-        final completedCheckIn = await notifier.completeCheckIn(
+        await notifier.completeCheckIn(
           checkInId: widget.existingCheckIn!.id,
-          location: _currentLocation!,
+          latitude: _currentLocation!.latitude,
+          longitude: _currentLocation!.longitude,
           statusMessage: _messageController.text.trim().isEmpty
               ? null
               : _messageController.text.trim(),
         );
 
         if (mounted) {
-          Navigator.of(context).pop(completedCheckIn);
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Check-in completed successfully'),
@@ -144,12 +147,18 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
           createdAt: DateTime.now(),
         );
 
-        final createdCheckIn = await notifier.createCheckIn(newCheckIn);
+        await notifier.createManualCheckIn(
+          statusMessage: _messageController.text.trim().isEmpty
+              ? 'Checked in'
+              : _messageController.text.trim(),
+          latitude: _currentLocation!.latitude,
+          longitude: _currentLocation!.longitude,
+        );
 
         // Optionally update safety status if selected
         if (_selectedStatus != null) {
-          final safetyNotifier = ref.read(safetyNotifierProvider.notifier);
-          await safetyNotifier.updateStatus(
+          final safetyNotifier = ref.read(safetyNotifierProvider);
+          await safetyNotifier.updateSafetyStatus(
             status: _selectedStatus!,
             message: _messageController.text.trim().isEmpty
                 ? null
@@ -161,12 +170,11 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
               altitude: _currentLocation!.altitude,
               timestamp: _currentLocation!.timestamp,
             ),
-            checkInId: createdCheckIn.id,
           );
         }
 
         if (mounted) {
-          Navigator.of(context).pop(createdCheckIn);
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -194,12 +202,14 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyState = ref.watch(safetyNotifierProvider);
-    final isSubmitting = safetyState.isProcessing;
+    final safetyNotifier = ref.watch(safetyNotifierProvider);
+    final isSubmitting = safetyNotifier.state.isProcessing;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.existingCheckIn != null ? 'Complete Check-in' : 'Manual Check-in'),
+        title: Text(widget.existingCheckIn != null
+            ? 'Complete Check-in'
+            : 'Manual Check-in'),
         actions: [
           if (isSubmitting)
             const Center(
@@ -249,7 +259,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
               TextFormField(
                 controller: _messageController,
                 decoration: const InputDecoration(
-                  hintText: 'Enter a message (e.g., "Arrived safely at the hotel")',
+                  hintText:
+                      'Enter a message (e.g., "Arrived safely at the hotel")',
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.message),
                 ),
@@ -275,7 +286,9 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: (_isLoadingLocation || isSubmitting) ? null : _submitCheckIn,
+                  onPressed: (_isLoadingLocation || isSubmitting)
+                      ? null
+                      : _submitCheckIn,
                   icon: isSubmitting
                       ? const SizedBox(
                           width: 20,
@@ -289,7 +302,9 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
                   label: Text(
                     isSubmitting
                         ? 'Checking In...'
-                        : (widget.existingCheckIn != null ? 'Complete Check-in' : 'Check In Now'),
+                        : (widget.existingCheckIn != null
+                            ? 'Complete Check-in'
+                            : 'Check In Now'),
                     style: const TextStyle(fontSize: 16),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -316,6 +331,11 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
             ),
       ),
     );
+  }
+
+  bool get _isSubmitting {
+    final safetyNotifier = ref.watch(safetyNotifierProvider);
+    return safetyNotifier.state.isProcessing;
   }
 
   Widget _buildLocationCard(ThemeData theme) {
@@ -368,7 +388,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: isSubmitting ? null : _getCurrentLocation,
+                onPressed: _isSubmitting ? null : _getCurrentLocation,
                 icon: const Icon(Icons.refresh),
                 label: const Text('Try Again'),
               ),
@@ -406,7 +426,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -461,7 +481,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
                 ),
                 const Spacer(),
                 TextButton.icon(
-                  onPressed: isSubmitting ? null : _getCurrentLocation,
+                  onPressed: _isSubmitting ? null : _getCurrentLocation,
                   icon: const Icon(Icons.refresh, size: 16),
                   label: const Text('Refresh'),
                   style: TextButton.styleFrom(
@@ -505,14 +525,16 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
         RadioListTile<safety.SafetyStatusType>(
           title: const Text('Just Check In'),
           subtitle: const Text('Complete check-in without updating status'),
-          value: null,
+          value: safety.SafetyStatusType.safe, // Default to safe
           groupValue: _selectedStatus,
-          onChanged: isSubmitting
+          onChanged: _isSubmitting
               ? null
               : (value) {
-                  setState(() {
-                    _selectedStatus = value;
-                  });
+                  if (value != null) {
+                    setState(() {
+                      _selectedStatus = value;
+                    });
+                  }
                 },
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
@@ -523,26 +545,28 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
 
         // Safe status
         RadioListTile<safety.SafetyStatusType>(
-          title: Row(
+          title: const Row(
             children: [
               Icon(
                 Icons.check_circle,
                 color: Colors.green,
                 size: 20,
               ),
-              const SizedBox(width: 8),
-              const Text('I\'m Safe'),
+              SizedBox(width: 8),
+              Text('I\'m Safe'),
             ],
           ),
           subtitle: const Text('Let your contacts know you\'re okay'),
           value: safety.SafetyStatusType.safe,
           groupValue: _selectedStatus,
-          onChanged: isSubmitting
+          onChanged: _isSubmitting
               ? null
               : (value) {
-                  setState(() {
-                    _selectedStatus = value;
-                  });
+                  if (value != null) {
+                    setState(() {
+                      _selectedStatus = value;
+                    });
+                  }
                 },
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
@@ -553,26 +577,29 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
 
         // Need help status
         RadioListTile<safety.SafetyStatusType>(
-          title: Row(
+          title: const Row(
             children: [
               Icon(
                 Icons.help,
                 color: Colors.orange,
                 size: 20,
               ),
-              const SizedBox(width: 8),
-              const Text('Need Help'),
+              SizedBox(width: 8),
+              Text('Need Help'),
             ],
           ),
-          subtitle: const Text('You need assistance but it\'s not an emergency'),
+          subtitle:
+              const Text('You need assistance but it\'s not an emergency'),
           value: safety.SafetyStatusType.needHelp,
           groupValue: _selectedStatus,
-          onChanged: isSubmitting
+          onChanged: _isSubmitting
               ? null
               : (value) {
-                  setState(() {
-                    _selectedStatus = value;
-                  });
+                  if (value != null) {
+                    setState(() {
+                      _selectedStatus = value;
+                    });
+                  }
                 },
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,
@@ -583,26 +610,28 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
 
         // Emergency status
         RadioListTile<safety.SafetyStatusType>(
-          title: Row(
+          title: const Row(
             children: [
               Icon(
                 Icons.warning,
                 color: Colors.red,
                 size: 20,
               ),
-              const SizedBox(width: 8),
-              const Text('Emergency'),
+              SizedBox(width: 8),
+              Text('Emergency'),
             ],
           ),
           subtitle: const Text('You\'re in an emergency situation'),
           value: safety.SafetyStatusType.emergency,
           groupValue: _selectedStatus,
-          onChanged: isSubmitting
+          onChanged: _isSubmitting
               ? null
               : (value) {
-                  setState(() {
-                    _selectedStatus = value;
-                  });
+                  if (value != null) {
+                    setState(() {
+                      _selectedStatus = value;
+                    });
+                  }
                 },
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 12,

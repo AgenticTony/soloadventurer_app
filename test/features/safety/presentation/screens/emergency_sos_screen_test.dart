@@ -11,7 +11,7 @@ import 'package:soloadventurer/features/safety/presentation/state/check_in_state
 import 'package:soloadventurer/features/safety/presentation/state/location_sharing_state.dart';
 import 'package:soloadventurer/features/safety/presentation/screens/emergency_sos_screen.dart';
 import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/core/services/location_service.dart';
 
@@ -99,9 +99,8 @@ class MockSafetyNotifier extends ChangeNotifier implements SafetyNotifier {
 
   @override
   Future<void> cancelAlert(String alertId) {
-    final updatedAlerts = _state.activeAlerts
-        .where((alert) => alert.id != alertId)
-        .toList();
+    final updatedAlerts =
+        _state.activeAlerts.where((alert) => alert.id != alertId).toList();
     _state = SafetyState(
       currentStatus: _state.currentStatus,
       recentAlerts: _state.recentAlerts,
@@ -192,8 +191,8 @@ void main() {
 
   setUpAll(() {
     // Register fallback values
-    registerFallbackValue(const SafetyState.initial());
-    registerFallbackValue(const TrustedContactsState.initial());
+    registerFallbackValue(SafetyState.initial());
+    registerFallbackValue(TrustedContactsState.initial());
   });
 
   setUp(() {
@@ -205,14 +204,14 @@ void main() {
     // Setup default mock behavior
     when(() => mockUser.id).thenReturn('user-123');
     when(() => mockLocationService.getCurrentLocation(
-      accuracy: any(named: 'accuracy'),
-    )).thenAnswer((_) async => LocationData(
-      latitude: 37.7749,
-      longitude: -122.4194,
-      accuracy: 10.0,
-      altitude: 0.0,
-      timestamp: DateTime.now(),
-    ));
+          accuracy: any(named: 'accuracy'),
+        )).thenAnswer((_) async => LocationData(
+          latitude: 37.7749,
+          longitude: -122.4194,
+          accuracy: 10.0,
+          altitude: 0.0,
+          timestamp: DateTime.now(),
+        ));
   });
 
   Widget createWidgetUnderTest() {
@@ -233,11 +232,10 @@ void main() {
 
   group('EmergencySOSScreen', () {
     group('Rendering', () {
-      testWidgets('shows SOS button when no active emergency',
-          (tester) async {
+      testWidgets('shows SOS button when no active emergency', (tester) async {
         mockSafetyNotifier.setState(SafetyState.initial());
         mockTrustedContactsNotifier.setState(
-          TrustedContactsState(
+          const TrustedContactsState(
             contacts: [],
             isLoading: false,
             isAdding: false,
@@ -272,7 +270,7 @@ void main() {
         mockSafetyNotifier.setState(
           SafetyState(
             currentStatus: null,
-            recentAlerts: [],
+            recentAlerts: const [],
             activeAlerts: [activeAlert],
             isLoading: false,
             isProcessing: false,
@@ -281,7 +279,7 @@ void main() {
         );
 
         mockTrustedContactsNotifier.setState(
-          TrustedContactsState(
+          const TrustedContactsState(
             contacts: [],
             isLoading: false,
             isAdding: false,
@@ -321,13 +319,13 @@ void main() {
 
       testWidgets('shows emergency contacts when available', (tester) async {
         final contacts = [
-          TrustedContact(
+          const TrustedContact(
             id: 'contact-1',
             name: 'John Doe',
             phone: '+1234567890',
             receivesEmergencyAlerts: true,
           ),
-          TrustedContact(
+          const TrustedContact(
             id: 'contact-2',
             name: 'Jane Smith',
             phone: '+0987654321',
@@ -537,7 +535,7 @@ void main() {
         mockSafetyNotifier.setState(
           SafetyState(
             currentStatus: null,
-            recentAlerts: [],
+            recentAlerts: const [],
             activeAlerts: [activeAlert],
             isLoading: false,
             isProcessing: false,
@@ -579,7 +577,7 @@ void main() {
         mockSafetyNotifier.setState(
           SafetyState(
             currentStatus: null,
-            recentAlerts: [],
+            recentAlerts: const [],
             activeAlerts: [activeAlert],
             isLoading: false,
             isProcessing: false,
@@ -618,17 +616,17 @@ void main() {
       testWidgets('shows loading indicator while fetching location',
           (tester) async {
         when(() => mockLocationService.getCurrentLocation(
-          accuracy: any(named: 'accuracy'),
-        )).thenAnswer((_) => Future.delayed(
-          const Duration(seconds: 1),
-          () => LocationData(
-            latitude: 37.7749,
-            longitude: -122.4194,
-            accuracy: 10.0,
-            altitude: 0.0,
-            timestamp: DateTime.now(),
-          ),
-        ));
+              accuracy: any(named: 'accuracy'),
+            )).thenAnswer((_) => Future.delayed(
+              const Duration(seconds: 1),
+              () => LocationData(
+                latitude: 37.7749,
+                longitude: -122.4194,
+                accuracy: 10.0,
+                altitude: 0.0,
+                timestamp: DateTime.now(),
+              ),
+            ));
 
         mockSafetyNotifier.setState(SafetyState.initial());
         mockTrustedContactsNotifier.setState(
@@ -651,8 +649,8 @@ void main() {
 
       testWidgets('shows error when location fetch fails', (tester) async {
         when(() => mockLocationService.getCurrentLocation(
-          accuracy: any(named: 'accuracy'),
-        )).thenThrow(Exception('Location permission denied'));
+              accuracy: any(named: 'accuracy'),
+            )).thenThrow(Exception('Location permission denied'));
 
         mockSafetyNotifier.setState(SafetyState.initial());
         mockTrustedContactsNotifier.setState(
@@ -675,8 +673,8 @@ void main() {
 
       testWidgets('refreshes location when retry is tapped', (tester) async {
         when(() => mockLocationService.getCurrentLocation(
-          accuracy: any(named: 'accuracy'),
-        )).thenThrow(Exception('Location permission denied'));
+              accuracy: any(named: 'accuracy'),
+            )).thenThrow(Exception('Location permission denied'));
 
         mockSafetyNotifier.setState(SafetyState.initial());
         mockTrustedContactsNotifier.setState(
@@ -699,8 +697,8 @@ void main() {
 
         // Verify location service was called again
         verify(() => mockLocationService.getCurrentLocation(
-          accuracy: any(named: 'accuracy'),
-        )).called(2);
+              accuracy: any(named: 'accuracy'),
+            )).called(2);
       });
     });
 
@@ -731,8 +729,7 @@ void main() {
     });
 
     group('App Bar', () {
-      testWidgets('shows info button when emergency is active',
-          (tester) async {
+      testWidgets('shows info button when emergency is active', (tester) async {
         final activeAlert = SafetyAlert(
           id: 'alert-1',
           type: SafetyAlertType.emergency,
@@ -749,7 +746,7 @@ void main() {
         mockSafetyNotifier.setState(
           SafetyState(
             currentStatus: null,
-            recentAlerts: [],
+            recentAlerts: const [],
             activeAlerts: [activeAlert],
             isLoading: false,
             isProcessing: false,
@@ -794,7 +791,7 @@ void main() {
         mockSafetyNotifier.setState(
           SafetyState(
             currentStatus: null,
-            recentAlerts: [],
+            recentAlerts: const [],
             activeAlerts: [activeAlert],
             isLoading: false,
             isProcessing: false,

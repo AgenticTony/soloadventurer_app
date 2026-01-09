@@ -24,7 +24,6 @@ class ForgotPassword {
   ForgotPassword(this._repository);
 
   /// Execute the use case with the given parameters
-  @override
   Future<void> call(ForgotPasswordParams params) async {
     if (params.identifier.isEmpty) {
       throw const AuthException(

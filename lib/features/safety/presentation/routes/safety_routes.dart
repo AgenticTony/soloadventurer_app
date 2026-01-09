@@ -73,7 +73,7 @@ class SafetyRoutes {
       case manualCheckIn:
         final args = settings.arguments as Map<String, dynamic>?;
         screen = ManualCheckInScreen(
-          checkIn: args?['checkIn'],
+          existingCheckIn: args?['checkIn'],
         );
         break;
 
@@ -94,10 +94,7 @@ class SafetyRoutes {
         break;
 
       case statusUpdate:
-        final args = settings.arguments as Map<String, dynamic>?;
-        screen = StatusUpdateScreen(
-          initialStatus: args?['initialStatus'],
-        );
+        screen = const StatusUpdateScreen();
         break;
 
       // Location Sharing

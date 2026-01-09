@@ -7,8 +7,7 @@ import 'package:soloadventurer/features/offline/domain/services/sync_queue_servi
 import 'package:soloadventurer/features/offline/infrastructure/sync/upload_sync.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/download_sync.dart';
 import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_provider.dart';
-import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 
 part 'sync_manager_provider.g.dart';
 
@@ -32,16 +31,11 @@ SyncManager syncManager(SyncManagerRef ref) {
   String getCurrentUserId() {
     final authState = ref.watch(authNotifierProvider);
 
-    return authState.when(
-      data: (state) {
-        if (state is Authenticated) {
-          return state.user.id;
-        }
-        return '';
-      },
-      loading: () => '',
-      error: (_, __) => '',
-    );
+    // With new AuthState pattern, we directly access fields
+    if (authState.isAuthenticated && authState.user != null) {
+      return authState.user!.id;
+    }
+    return '';
   }
 
   // Create and return SyncManagerImpl with the userId callback

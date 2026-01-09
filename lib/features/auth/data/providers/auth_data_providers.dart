@@ -7,19 +7,17 @@ import 'package:soloadventurer/core/security/security_manager.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_blacklist_manager.dart';
+import 'package:soloadventurer/app/di/service_locator.dart';
 
 /// Provider for SecureStorage
 final secureStorageProvider = Provider<SecureStorage>((ref) {
   return SecureStorage();
 });
 
-/// Provider for SecurityManager
-final securityManagerProvider = Provider<SecurityManager>((ref) {
-  final storage = ref.watch(secureStorageProvider);
-  return SecurityManagerImpl(storage: storage);
-});
+// SecurityManager is provided by @riverpod annotation in security_manager.dart
+// The generated provider is: securityManagerProvider
 
 /// Provider for SharedPreferences
 final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
@@ -62,4 +60,11 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
 /// Provider for TokenBlacklistManager
 final tokenBlacklistManagerProvider = Provider<TokenBlacklistManager>((ref) {
   return TokenBlacklistManager();
+});
+
+/// Provider for AuthRepository
+/// Bridges GetIt service locator with Riverpod for integration tests
+/// The actual AuthRepository instance is registered in GetIt via auth_module.dart
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  return getIt<AuthRepository>();
 });

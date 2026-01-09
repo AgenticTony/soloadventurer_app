@@ -1,57 +1,6 @@
 import 'dart:convert';
-import 'package:soloadventurer/features/offline/infrastructure/database/schema.dart';
-
-/// Sync operation types
-enum SyncOperationType {
-  create('create'),
-  update('update'),
-  delete('delete');
-
-  final String value;
-  const SyncOperationType(this.value);
-
-  static SyncOperationType fromString(String value) {
-    return SyncOperationType.values.firstWhere(
-      (type) => type.value == value,
-      orElse: () => throw ArgumentError('Invalid sync operation type: $value'),
-    );
-  }
-}
-
-/// Sync priority levels
-enum SyncPriority {
-  high('high'),
-  normal('normal'),
-  low('low');
-
-  final String value;
-  const SyncPriority(this.value);
-
-  static SyncPriority fromString(String value) {
-    return SyncPriority.values.firstWhere(
-      (priority) => priority.value == value,
-      orElse: () => throw ArgumentError('Invalid sync priority: $value'),
-    );
-  }
-}
-
-/// Sync operation status
-enum SyncOperationStatus {
-  pending('pending'),
-  processing('processing'),
-  completed('completed'),
-  failed('failed');
-
-  final String value;
-  const SyncOperationStatus(this.value);
-
-  static SyncOperationStatus fromString(String value) {
-    return SyncOperationStatus.values.firstWhere(
-      (status) => status.value == value,
-      orElse: () => throw ArgumentError('Invalid sync status: $value'),
-    );
-  }
-}
+import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 
 /// Local data model for SyncOperation that represents a queued sync operation
 ///
@@ -201,7 +150,8 @@ class SyncOperationModel {
   bool get canRetry => retryCount < maxRetries;
 
   /// Returns true if this operation has failed permanently
-  bool get permanentlyFailed => retryCount >= maxRetries && status == SyncOperationStatus.failed;
+  bool get permanentlyFailed =>
+      retryCount >= maxRetries && status == SyncOperationStatus.failed;
 
   /// Returns true if this operation is currently being processed
   bool get isProcessing => status == SyncOperationStatus.processing;
@@ -210,7 +160,8 @@ class SyncOperationModel {
   bool get isPending => status == SyncOperationStatus.pending;
 
   /// Returns true if this operation has completed (successfully or permanently failed)
-  bool get isCompleted => status == SyncOperationStatus.completed || permanentlyFailed;
+  bool get isCompleted =>
+      status == SyncOperationStatus.completed || permanentlyFailed;
 
   /// Returns true if this operation has completed successfully
   bool get isSuccessful => status == SyncOperationStatus.completed;
@@ -282,7 +233,8 @@ class SyncOperationModel {
     if (!canRetry || !isFailed) return false;
 
     // Exponential backoff: 2^retryCount seconds, max 60 seconds
-    final backoffSeconds = [1 << retryCount, 60].reduce((a, b) => a < b ? a : b);
+    final backoffSeconds =
+        [1 << retryCount, 60].reduce((a, b) => a < b ? a : b);
     final timeSinceFailure = timeSinceLastAttempt ?? Duration.zero;
 
     return timeSinceFailure >= Duration(seconds: backoffSeconds);

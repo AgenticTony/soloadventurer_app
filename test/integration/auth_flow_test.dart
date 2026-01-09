@@ -15,6 +15,7 @@ import 'package:soloadventurer/features/auth/domain/usecases/get_current_user_us
 import 'package:soloadventurer/features/auth/domain/usecases/login_use_case.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/logout_use_case.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/register_use_case.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_config.dart';
 
@@ -37,16 +38,20 @@ void main() {
     final authInterceptor = AuthInterceptor();
     final errorInterceptor = ErrorInterceptor();
     final networkMonitor = NetworkMonitor();
-    
+
     apiClient = ApiClient(
       baseUrl: TestConfig.apiBaseUrl,
       authInterceptor: authInterceptor,
       errorInterceptor: errorInterceptor,
       networkMonitor: networkMonitor,
     );
-    
+
     secureStorage = SecureStorage();
-    securityManager = SecurityManagerImpl(storage: secureStorage);
+    securityManager = SecurityManager();
+
+    // Initialize SharedPreferences for testing
+    SharedPreferences.setMockInitialValues({});
+    final sharedPreferences = await SharedPreferences.getInstance();
 
     // Clear any existing auth data
     await secureStorage.delete(TestConfig.authTokenKey);
@@ -54,7 +59,8 @@ void main() {
     await secureStorage.delete(TestConfig.userDataKey);
 
     // Set up data sources
-    authLocalDataSource = AuthLocalDataSourceImpl(securityManager);
+    authLocalDataSource =
+        AuthLocalDataSourceImpl(securityManager, sharedPreferences);
     authRemoteDataSource = MockAuthRemoteDataSource(apiClient);
 
     // Set up repository

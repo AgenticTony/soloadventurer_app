@@ -7,10 +7,13 @@ part 'safety_status.g.dart';
 enum SafetyStatusType {
   /// User is safe
   safe,
+
   /// User needs help but it's not an emergency
   needHelp,
+
   /// User is in an emergency situation
   emergency,
+
   /// Unknown status
   unknown,
 }

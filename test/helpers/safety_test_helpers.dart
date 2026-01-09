@@ -11,7 +11,8 @@ import 'package:soloadventurer/features/safety/domain/repositories/safety_reposi
 // Mock classes
 class MockSafetyRepository extends Mock implements SafetyRepository {}
 
-class MockSafetyRemoteDataSource extends Mock implements SafetyRemoteDataSource {}
+class MockSafetyRemoteDataSource extends Mock
+    implements SafetyRemoteDataSource {}
 
 class MockSafetyLocalDataSource extends Mock implements SafetyLocalDataSource {}
 
@@ -232,31 +233,34 @@ List<SafetyAlert> createTestSafetyAlertsList({int count = 3}) {
 SafetyStatus createTestSafetyStatus({
   String id = 'status-123',
   String userId = testUserId,
-  SafetyStatusType statusType = SafetyStatusType.safe,
+  SafetyStatusType status = SafetyStatusType.safe,
   String? message,
   SafetyStatusLocation? location,
   int? batteryLevel,
-  String? alertId,
+  String? safetyAlertId,
   String? checkInId,
-  DateTime? createdAt,
+  DateTime? timestamp,
   DateTime? updatedAt,
+  Map<String, dynamic>? metadata,
 }) {
   return SafetyStatus(
     id: id,
     userId: userId,
-    statusType: statusType,
+    status: status,
     message: message,
-    location: location ?? SafetyStatusLocation(
-      latitude: testLatitude,
-      longitude: testLongitude,
-      accuracy: testAccuracy,
-      timestamp: testDateTime,
-    ),
+    location: location ??
+        SafetyStatusLocation(
+          latitude: testLatitude,
+          longitude: testLongitude,
+          accuracy: testAccuracy,
+          timestamp: testDateTime,
+        ),
     batteryLevel: batteryLevel ?? 85,
-    alertId: alertId,
+    safetyAlertId: safetyAlertId,
     checkInId: checkInId,
-    createdAt: createdAt ?? testDateTime,
+    timestamp: timestamp ?? testDateTime,
     updatedAt: updatedAt,
+    metadata: metadata,
   );
 }
 
@@ -273,13 +277,11 @@ LocationUpdate createTestLocationUpdate({
   int? batteryLevel,
   LocationSharingStatus sharingStatus = LocationSharingStatus.active,
   List<String>? sharedWithContactIds,
-  bool emergency = false,
+  @Default(false) bool isEmergency,
   String? checkInId,
-  String? alertId,
-  String? tripId,
-  DateTime? expiresAt,
+  String? emergencyAlertId,
+  Map<String, dynamic>? metadata,
   DateTime? createdAt,
-  DateTime? updatedAt,
 }) {
   return LocationUpdate(
     id: id,
@@ -293,13 +295,11 @@ LocationUpdate createTestLocationUpdate({
     batteryLevel: batteryLevel ?? 85,
     sharingStatus: sharingStatus,
     sharedWithContactIds: sharedWithContactIds ?? [testContactId],
-    emergency: emergency,
+    isEmergency: isEmergency,
     checkInId: checkInId,
-    alertId: alertId,
-    tripId: tripId,
-    expiresAt: expiresAt,
+    emergencyAlertId: emergencyAlertId,
+    metadata: metadata,
     createdAt: createdAt ?? testDateTime,
-    updatedAt: updatedAt,
   );
 }
 

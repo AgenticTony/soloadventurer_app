@@ -21,9 +21,9 @@ class AuthTokens {
   }
 
   Map<String, dynamic> toJson() => {
-    'accessToken': accessToken,
-    'idToken': idToken,
-    'refreshToken': refreshToken,
-    'expiration': expiration.toIso8601String(),
-  };
+        'accessToken': accessToken,
+        'idToken': idToken,
+        'refreshToken': refreshToken,
+        'expiration': expiration.toIso8601String(),
+      };
 }

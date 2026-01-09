@@ -101,9 +101,7 @@ class OperationStorageService extends _$OperationStorageService {
   /// On iOS, secure storage is always encrypted by the platform.
   static const FlutterSecureStorage _secureStorageOptions =
       FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
+    aOptions: AndroidOptions(),
   );
 
   @override
@@ -152,8 +150,8 @@ class OperationStorageService extends _$OperationStorageService {
       if (operations.isEmpty) {
         // Clear storage if no operations
         await _prefs.remove(_StorageKeys.pendingOperations);
-        await _prefs.setInt(_StorageKeys.lastSaveTime,
-            DateTime.now().millisecondsSinceEpoch);
+        await _prefs.setInt(
+            _StorageKeys.lastSaveTime, DateTime.now().millisecondsSinceEpoch);
         debugPrint(
             'OperationStorageService: Cleared pending operations (empty list)');
         return true;
@@ -169,11 +167,12 @@ class OperationStorageService extends _$OperationStorageService {
         // Consider implementing storage limits or pagination in future
       }
 
-      final success = await _prefs.setString(
-          _StorageKeys.pendingOperations, jsonString);
+      final success =
+          await _prefs.setString(_StorageKeys.pendingOperations, jsonString);
       await _prefs.setInt(
           _StorageKeys.lastSaveTime, DateTime.now().millisecondsSinceEpoch);
-      await _prefs.setInt(_StorageKeys.queueVersion, _StorageKeys.currentVersion);
+      await _prefs.setInt(
+          _StorageKeys.queueVersion, _StorageKeys.currentVersion);
 
       if (success) {
         debugPrint(
@@ -185,7 +184,8 @@ class OperationStorageService extends _$OperationStorageService {
 
       return success;
     } catch (e, stackTrace) {
-      debugPrint('OperationStorageService: Error saving pending operations: $e');
+      debugPrint(
+          'OperationStorageService: Error saving pending operations: $e');
       debugPrint('Stack trace: $stackTrace');
       return false;
     }
@@ -210,8 +210,7 @@ class OperationStorageService extends _$OperationStorageService {
   /// ## Error Handling
   /// - Returns false on failure, doesn't throw
   /// - Logs errors for debugging
-  Future<bool> saveFailedOperations(
-      List<QueueableOperation> operations) async {
+  Future<bool> saveFailedOperations(List<QueueableOperation> operations) async {
     try {
       if (operations.isEmpty) {
         await _prefs.remove(_StorageKeys.failedOperations);
@@ -230,8 +229,7 @@ class OperationStorageService extends _$OperationStorageService {
         debugPrint(
             'OperationStorageService: Saved ${operations.length} failed operations');
       } else {
-        debugPrint(
-            'OperationStorageService: Failed to save failed operations');
+        debugPrint('OperationStorageService: Failed to save failed operations');
       }
 
       return success;
@@ -281,10 +279,10 @@ class OperationStorageService extends _$OperationStorageService {
             'OperationStorageService: Warning - storage version $version is newer than current ${_StorageKeys.currentVersion}');
       }
 
-      final pendingResult = await _loadOperationsList(
-          _StorageKeys.pendingOperations, 'pending');
-      final failedResult = await _loadOperationsList(
-          _StorageKeys.failedOperations, 'failed');
+      final pendingResult =
+          await _loadOperationsList(_StorageKeys.pendingOperations, 'pending');
+      final failedResult =
+          await _loadOperationsList(_StorageKeys.failedOperations, 'failed');
 
       final hadCorruptedData =
           pendingResult['hadCorruptedData'] || failedResult['hadCorruptedData'];
@@ -293,8 +291,10 @@ class OperationStorageService extends _$OperationStorageService {
           'OperationStorageService: Loaded ${pendingResult['operations'].length} pending, ${failedResult['operations'].length} failed operations');
 
       return OperationLoadResult(
-        pendingOperations: pendingResult['operations'] as List<Map<String, dynamic>>,
-        failedOperations: failedResult['operations'] as List<Map<String, dynamic>>,
+        pendingOperations:
+            pendingResult['operations'] as List<Map<String, dynamic>>,
+        failedOperations:
+            failedResult['operations'] as List<Map<String, dynamic>>,
         hadCorruptedData: hadCorruptedData,
         errorMessage: pendingResult['errorMessage'] as String? ??
             failedResult['errorMessage'] as String?,
@@ -373,8 +373,7 @@ class OperationStorageService extends _$OperationStorageService {
         'hadCorruptedData': hasCorruptedData,
       };
     } catch (e, stackTrace) {
-      debugPrint(
-          'OperationStorageService: Error loading $type operations: $e');
+      debugPrint('OperationStorageService: Error loading $type operations: $e');
       debugPrint('Stack trace: $stackTrace');
       return {
         'operations': <Map<String, dynamic>>[],
@@ -505,9 +504,8 @@ class OperationStorageService extends _$OperationStorageService {
       final failedJson = _prefs.getString(_StorageKeys.failedOperations);
       final lastSave = getLastSaveTime();
 
-      final pendingCount = pendingJson != null
-          ? (jsonDecode(pendingJson) as List).length
-          : 0;
+      final pendingCount =
+          pendingJson != null ? (jsonDecode(pendingJson) as List).length : 0;
       final failedCount =
           failedJson != null ? (jsonDecode(failedJson) as List).length : 0;
 
@@ -560,12 +558,10 @@ class OperationStorageService extends _$OperationStorageService {
   Future<bool> saveSensitiveData(String key, String value) async {
     try {
       await _secureStorage.write(key: key, value: value);
-      debugPrint(
-          'OperationStorageService: Saved sensitive data for key: $key');
+      debugPrint('OperationStorageService: Saved sensitive data for key: $key');
       return true;
     } catch (e, stackTrace) {
-      debugPrint(
-          'OperationStorageService: Error saving sensitive data: $e');
+      debugPrint('OperationStorageService: Error saving sensitive data: $e');
       debugPrint('Stack trace: $stackTrace');
       return false;
     }
@@ -598,8 +594,7 @@ class OperationStorageService extends _$OperationStorageService {
           'OperationStorageService: Loaded sensitive data for key: $key');
       return value;
     } catch (e, stackTrace) {
-      debugPrint(
-          'OperationStorageService: Error loading sensitive data: $e');
+      debugPrint('OperationStorageService: Error loading sensitive data: $e');
       debugPrint('Stack trace: $stackTrace');
       return null;
     }
@@ -626,8 +621,7 @@ class OperationStorageService extends _$OperationStorageService {
           'OperationStorageService: Deleted sensitive data for key: $key');
       return true;
     } catch (e, stackTrace) {
-      debugPrint(
-          'OperationStorageService: Error deleting sensitive data: $e');
+      debugPrint('OperationStorageService: Error deleting sensitive data: $e');
       debugPrint('Stack trace: $stackTrace');
       return false;
     }
@@ -656,8 +650,7 @@ class OperationStorageService extends _$OperationStorageService {
       debugPrint('OperationStorageService: Cleared all sensitive data');
       return true;
     } catch (e, stackTrace) {
-      debugPrint(
-          'OperationStorageService: Error clearing sensitive data: $e');
+      debugPrint('OperationStorageService: Error clearing sensitive data: $e');
       debugPrint('Stack trace: $stackTrace');
       return false;
     }
