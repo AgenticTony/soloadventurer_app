@@ -11,6 +11,17 @@
       "Edit(./**)",
       "Glob(./**)",
       "Grep(./**)",
+<<<<<<< HEAD
+=======
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/**)",
+      "Glob(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/**)",
+      "Grep(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/**)",
+      "Read(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/.auto-claude/specs/005-sync-conflict-resolution-system/**)",
+      "Write(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/.auto-claude/specs/005-sync-conflict-resolution-system/**)",
+      "Edit(/Volumes/ExternalSSD/SoloAdventurer/SoloAdventurer_app/.worktrees/005-sync-conflict-resolution-system/.auto-claude/specs/005-sync-conflict-resolution-system/**)",
+>>>>>>> auto-claude/005-sync-conflict-resolution-system
       "Bash(*)",
       "WebFetch(*)",
       "WebSearch(*)",
@@ -23,4 +34,8 @@
       "mcp__graphiti-memory__get_entity_edge(*)"
     ]
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> auto-claude/005-sync-conflict-resolution-system
