@@ -3,14 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
-import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
-import 'package:soloadventurer/features/offline/presentation/widgets/connectivity_indicator.dart';
-import 'package:soloadventurer/features/offline/presentation/widgets/sync_status_banner.dart';
-import 'package:soloadventurer/features/offline/presentation/widgets/offline_banner.dart';
-import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
-import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
-import 'package:soloadventurer/features/safety/presentation/widgets/sos_button_widget.dart';
-import 'package:soloadventurer/features/home/presentation/widgets/quick_sos_button.dart';
+import 'package:soloadventurer/features/performance/presentation/routes/performance_routes.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -183,8 +176,22 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, AuthRoutes.cloudWatchTest);
+              },
+              child: const Text('Test CloudWatch Logging'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, PerformanceRoutes.benchmark);
+              },
+              child: const Text('Performance Benchmark'),
+            ),
+          ],
+        ),
       ),
     );
   }

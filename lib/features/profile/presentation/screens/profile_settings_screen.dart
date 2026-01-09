@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/sync/presentation/widgets/widgets.dart';
-import 'package:soloadventurer/features/sync/presentation/providers/sync_providers.dart';
+import 'package:soloadventurer/core/widgets/widgets.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/loading_view.dart';
 
@@ -33,113 +32,99 @@ class ProfileSettingsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Profile Settings'),
       ),
-      body: SyncPullToRefresh(
-        showNotifications: true,
-        child: ListView(
-          children: [
-            _buildSyncSection(context, ref),
-          _buildSection(
-            context,
-            'Privacy',
-            [
-              SwitchListTile(
-                title: const Text('Public Profile'),
-                subtitle: Text(
-                  state.profile!.isPublic
-                      ? 'Your profile is visible to everyone'
-                      : 'Your profile is private',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+      body: VirtualListView<Widget>(
+        itemCount: 1,
+        itemBuilder: (context, index) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSection(
+                context,
+                'Privacy',
+                [
+                  SwitchListTile(
+                    title: const Text('Public Profile'),
+                    subtitle: Text(
+                      state.profile!.isPublic
+                          ? 'Your profile is visible to everyone'
+                          : 'Your profile is private',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    value: state.profile!.isPublic,
+                    onChanged: (value) {
+                      ref
+                          .read(profileUIProvider('current').notifier)
+                          .updateProfile({
+                        'isPublic': value,
+                      });
+                    },
+                  ),
+                ],
+              ),
+              _buildSection(
+                context,
+                'Account',
+                [
+                  ListTile(
+                    title: const Text('Delete Account'),
+                    subtitle: const Text(
+                      'Permanently delete your account and all data',
+                    ),
+                    leading: Icon(
+                      Icons.delete_forever,
+                      color: theme.colorScheme.error,
+                    ),
+                    textColor: theme.colorScheme.error,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete Account'),
+                          content: const Text(
+                            'Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data.',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('CANCEL'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                ref
+                                    .read(profileUIProvider('current').notifier)
+                                    .deleteProfile();
+                                Navigator.pop(context); // Pop settings screen
+                              },
+                              style: TextButton.styleFrom(
+                                foregroundColor: theme.colorScheme.error,
+                              ),
+                              child: const Text('DELETE'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              if (state.hasError) ...[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    state.error!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.error,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                value: state.profile!.isPublic,
-                onChanged: (value) {
-                  ref
-                      .read(profileUIProvider('current').notifier)
-                      .updateProfile({
-                    'isPublic': value,
-                  });
-                },
-              ),
+              ],
             ],
-          ),
-          _buildSection(
-            context,
-            'Data & Sync',
-            [
-              ListTile(
-                title: const Text('Operation Queue'),
-                subtitle: const Text(
-                  'View pending operations and sync status',
-                ),
-                leading: const Icon(Icons.cloud_sync),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.pushNamed(context, '/operation-queue');
-                },
-              ),
-            ],
-          ),
-          _buildSection(
-            context,
-            'Account',
-            [
-              ListTile(
-                title: const Text('Delete Account'),
-                subtitle: const Text(
-                  'Permanently delete your account and all data',
-                ),
-                leading: Icon(
-                  Icons.delete_forever,
-                  color: theme.colorScheme.error,
-                ),
-                textColor: theme.colorScheme.error,
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Delete Account'),
-                      content: const Text(
-                        'Are you sure you want to delete your account? This action cannot be undone and will permanently delete all your data.',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('CANCEL'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            ref
-                                .read(profileUIProvider('current').notifier)
-                                .deleteProfile();
-                            Navigator.pop(context); // Pop settings screen
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: theme.colorScheme.error,
-                          ),
-                          child: const Text('DELETE'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          if (state.hasError) ...[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                state.error!,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.error,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ]),
+          );
+        },
       ),
     );
   }

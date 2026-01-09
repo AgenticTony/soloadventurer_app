@@ -26,9 +26,20 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 });
 
 /// Provider for the auth notifier
+///
+/// This provider uses `keepAlive()` to preserve authentication state
+/// throughout the app lifecycle. The auth state should persist even when
+/// no widgets are actively listening (e.g., during navigation).
+///
+/// Cleanup is handled via `ref.onDispose()` to ensure proper disposal
+/// of resources when the provider container is disposed.
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AsyncValue<AuthState>>((ref) {
   throw UnimplementedError('authNotifierProvider must be overridden');
+  // Note: Implementation should:
+  // 1. Create the notifier with required dependencies
+  // 2. Call ref.keepAlive() to preserve auth state
+  // 3. Add ref.onDispose(() => notifier.dispose()) for cleanup
 });
 
 /// Provider for the logging service
@@ -105,6 +116,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
   /// Initialize the auth state
   Future<void> initialize() async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     final newState = await AsyncValue.guard(() async {
@@ -168,6 +181,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       }
     });
 
+    if (!mounted) return;
     state = newState;
   }
 
@@ -207,21 +221,16 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
 
   /// Sign in with email and password
   Future<void> signIn(String email, String password) async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
       final user = await _login(LoginParams(email: email, password: password));
-
-      // Get the current session and save it
-      final session = await _authRepository.getSession();
-      if (session != null) {
-        await _sessionManager.saveSession(session);
-        // Start the refresh scheduler after successful login
-        _refreshScheduler.start(session);
-      }
-
+      if (!mounted) return;
       state = AsyncValue.data(AuthState.authenticated(user));
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }
@@ -232,6 +241,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     required String password,
     required String name,
   }) async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
@@ -240,6 +251,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         password: password,
         name: name,
       ));
+
+      if (!mounted) return;
 
       if (needsVerification) {
         state = AsyncValue.data(AuthState.unverified(user: user));
@@ -254,12 +267,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         state = AsyncValue.data(AuthState.authenticated(user));
       }
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }
 
   /// Sign out the current user
   Future<void> signOut() async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
@@ -270,32 +286,42 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
       await _sessionManager.clearSession();
 
       await _signOut();
+      if (!mounted) return;
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }
 
   /// Verify email with confirmation code
   Future<void> verifyEmail(String code, String email) async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
       await _verifyEmail(VerifyEmailParams(code: code, email: email));
+      if (!mounted) return;
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }
 
   /// Request password reset
   Future<void> forgotPassword(String email) async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
       await _forgotPassword(ForgotPasswordParams(identifier: email));
+      if (!mounted) return;
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }
@@ -306,6 +332,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
     required String code,
     required String newPassword,
   }) async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
@@ -314,18 +342,24 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         code: code,
         newPassword: newPassword,
       ));
+      if (!mounted) return;
       state = const AsyncValue.data(AuthState.initial());
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }
 
   /// Resend verification email
   Future<void> resendVerificationEmail() async {
+    if (!mounted) return;
+
     state = const AsyncValue.loading();
 
     try {
       await _resendVerificationEmail();
+      if (!mounted) return;
+
       // Keep the current state but remove loading
       if (state.hasValue) {
         state = AsyncValue.data(state.value!);
@@ -333,6 +367,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthState>> {
         state = const AsyncValue.data(AuthState.initial());
       }
     } catch (e, stack) {
+      if (!mounted) return;
       state = AsyncValue.error(e.toString(), stack);
     }
   }

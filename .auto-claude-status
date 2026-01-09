@@ -1,25 +1,25 @@
 {
-  "active": false,
-  "spec": "005-sync-conflict-resolution-system",
-  "state": "completed",
+  "active": true,
+  "spec": "006-performance-optimization-for-large-trips",
+  "state": "building",
   "subtasks": {
-    "completed": 12,
-    "total": 12,
-    "in_progress": 0,
+    "completed": 0,
+    "total": 31,
+    "in_progress": 1,
     "failed": 0
   },
   "phase": {
-    "current": "Completed",
-    "id": 0,
-    "total": 0
+    "current": "Memory Management",
+    "id": null,
+    "total": 4
   },
   "workers": {
     "active": 0,
     "max": 1
   },
   "session": {
-    "number": 1,
-    "started_at": "2026-01-09T00:00:00.000000"
+    "number": 21,
+    "started_at": "2026-01-05T12:48:43.006712"
   },
-  "last_update": "2026-01-09T00:00:00.000000"
+  "last_update": "2026-01-05T14:10:02.141154"
 }
