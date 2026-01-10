@@ -106,3 +106,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [Flutter](https://flutter.dev/) - UI toolkit
 - [Riverpod](https://riverpod.dev/) - State management
 - [Dio](https://github.com/flutterchina/dio) - HTTP client
+# soloadventurer_app
