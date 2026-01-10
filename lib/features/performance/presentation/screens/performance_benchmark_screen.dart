@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
-import 'package:soloadventurer_test/utils/performance/performance_test_utils.dart';
 
 /// Performance benchmark dashboard screen
 ///
@@ -92,7 +91,8 @@ class _PerformanceBenchmarkScreenState
             _testResult = '✅ All performance targets met!';
           } else {
             final failures = metrics.getFailedTargets();
-            _testResult = '❌ ${failures.length} target(s) not met:\n${failures.join('\n')}';
+            _testResult =
+                '❌ ${failures.length} target(s) not met:\n${failures.join('\n')}';
           }
         });
 
@@ -151,7 +151,8 @@ class _PerformanceBenchmarkScreenState
     final initialMemory = await PerformanceReporter.captureMemoryUsage();
 
     // Generate and load 500 trips
-    final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);
+    final trips =
+        PerformanceTestDataGenerator.generateLargeTripList(count: 500);
     final loadedTrips = <Trip>[];
     for (final trip in trips) {
       loadedTrips.add(trip);
@@ -195,7 +196,8 @@ class _PerformanceBenchmarkScreenState
   /// List rendering performance test
   Future<PerformanceMetrics> _runListRenderingTest() async {
     // Generate test data
-    final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);
+    final trips =
+        PerformanceTestDataGenerator.generateLargeTripList(count: 500);
 
     // Measure rendering time
     final renderTime = await PerformanceReporter.measureTime(
@@ -233,7 +235,7 @@ class _PerformanceBenchmarkScreenState
 
   /// Data generation performance test
   Future<PerformanceMetrics> _runDataGenerationTest() async {
-    final iterations = 10;
+    const iterations = 10;
     final timings = <int>[];
 
     // Measure data generation performance
@@ -265,7 +267,8 @@ class _PerformanceBenchmarkScreenState
   /// Comprehensive performance baseline test
   Future<PerformanceMetrics> _runComprehensiveTest() async {
     // Generate test data
-    final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);
+    final trips =
+        PerformanceTestDataGenerator.generateLargeTripList(count: 500);
     final photos = PhotoDataGenerator.generatePhotoMetadata(count: 500);
 
     // Measure 1: Memory with trips
@@ -380,7 +383,7 @@ class _PerformanceBenchmarkScreenState
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: _selectedTest,
+                      initialValue: _selectedTest,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Test Type',
@@ -613,7 +616,8 @@ class _PerformanceBenchmarkScreenState
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: theme.colorScheme.primary),
+                        Icon(Icons.info_outline,
+                            color: theme.colorScheme.primary),
                         const SizedBox(width: 8),
                         Text(
                           'About Performance Tests',
@@ -663,9 +667,8 @@ class _MetricRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final meetsTarget = isLowerBetter
-        ? currentValue <= target
-        : currentValue >= target;
+    final meetsTarget =
+        isLowerBetter ? currentValue <= target : currentValue >= target;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),

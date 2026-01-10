@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 import '../models/map_marker.dart';
 import 'map_marker_clustering_service.dart';
 
@@ -113,9 +113,13 @@ class ZoomAwareClusteringManager {
     if (!useBoundsBasedClustering) return;
 
     if (_currentBounds != null &&
-        _currentBounds!.southwest == bounds.southwest &&
-        _currentBounds!.northeast == bounds.northeast &&
-        !force) return;
+        _currentBounds!.south == bounds.south &&
+        _currentBounds!.north == bounds.north &&
+        _currentBounds!.west == bounds.west &&
+        _currentBounds!.east == bounds.east &&
+        !force) {
+      return;
+    }
 
     _currentBounds = bounds;
 
@@ -129,7 +133,8 @@ class ZoomAwareClusteringManager {
   /// Update markers and re-cluster
   ///
   /// Uses incremental clustering if possible for better performance.
-  void updateMarkers(List<MapMarker> newMarkers, {bool forceRecluster = false}) {
+  void updateMarkers(List<MapMarker> newMarkers,
+      {bool forceRecluster = false}) {
     _allMarkers.clear();
     _allMarkers.addAll(newMarkers);
 
@@ -164,7 +169,7 @@ class ZoomAwareClusteringManager {
   Future<ClusteringResult> waitForClusterUpdate() async {
     // If there's a pending debounce, wait for it
     if (_debounceTimer != null && _debounceTimer!.isActive) {
-      await _debounceTimer!;
+      _debounceTimer!;
     }
 
     // Return current result
@@ -310,7 +315,7 @@ class ClusteringManagerFactories {
       initialZoom: initialZoom,
       debounceDelayMs: debounceDelayMs,
       useBoundsBasedClustering: useBoundsBasedClustering,
-      params: ClusteringParams.highDensity(),
+      params: const ClusteringParams.highDensity(),
     );
   }
 
@@ -326,7 +331,7 @@ class ClusteringManagerFactories {
       initialZoom: initialZoom,
       debounceDelayMs: debounceDelayMs,
       useBoundsBasedClustering: useBoundsBasedClustering,
-      params: ClusteringParams.lowDensity(),
+      params: const ClusteringParams.lowDensity(),
     );
   }
 
@@ -342,7 +347,7 @@ class ClusteringManagerFactories {
       initialZoom: initialZoom,
       debounceDelayMs: debounceDelayMs,
       useBoundsBasedClustering: useBoundsBasedClustering,
-      params: ClusteringParams(
+      params: const ClusteringParams(
         algorithm: ClusteringAlgorithm.grid, // Fastest algorithm
         gridCellSize: 100,
       ),

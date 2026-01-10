@@ -21,14 +21,14 @@ class _LocationCaptureWidgetExampleState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Location Capture Widget Examples'),
-        actions: [
+        actions: const [
           // Simple button in app bar
           LocationCaptureButton(
             label: 'Location',
             capturedIcon: Icons.location_on,
             uncapturedIcon: Icons.location_on_outlined,
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8),
         ],
       ),
       body: ListView(
@@ -66,19 +66,19 @@ class _LocationCaptureWidgetExampleState
           const SizedBox(height: 24),
 
           // Example 4: Button only
-          Row(
+          const Row(
             children: [
-              const Text(
+              Text(
                 'Inline Buttons:',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const Spacer(),
+              Spacer(),
               LocationCaptureButton(
                 label: 'Add Location',
                 capturedIcon: Icons.my_location,
                 uncapturedIcon: Icons.location_searching,
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               LocationCaptureButton(
                 capturedIcon: Icons.place,
                 uncapturedIcon: Icons.place_outlined,
@@ -138,7 +138,7 @@ class JournalEntryWithLocationExample extends ConsumerWidget {
         title: const Text('New Journal Entry'),
         actions: [
           // Quick location button in app bar
-          LocationCaptureButton(),
+          const LocationCaptureButton(),
           IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () {
@@ -382,8 +382,8 @@ class MinimalLocationExample extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: Theme.of(context).colorScheme.primaryContainer,
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+              child: const Padding(
+                padding: EdgeInsets.all(16),
                 child: LocationCaptureButton(
                   label: 'Add Location',
                   capturedIcon: Icons.location_on,

@@ -62,7 +62,8 @@ class SoloSuitabilityBadge extends StatelessWidget {
     final suitabilityLevel = _getSuitabilityLevelLabel(score);
 
     return Semantics(
-      label: '$displayLabel suitability score: ${score.toStringAsFixed(1)} out of 10, $suitabilityLevel',
+      label:
+          '$displayLabel suitability score: ${score.toStringAsFixed(1)} out of 10, $suitabilityLevel',
       value: score.toStringAsFixed(1),
       hint: 'Solo travel suitability rating from 1 to 10',
       child: Container(

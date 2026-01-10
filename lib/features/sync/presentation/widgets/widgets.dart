@@ -8,7 +8,7 @@ export 'conflict_banner.dart';
 export 'sync_error_banner.dart';
 export 'sync_error_card.dart';
 export 'sync_error_dialog.dart';
-export 'sync_error_list_view.dart';
+export 'sync_error_list_view.dart' hide StringExtension;
 export 'sync_error_toast.dart';
 
 // Manual Sync UI Widgets

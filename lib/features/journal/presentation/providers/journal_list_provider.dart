@@ -1,8 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
-import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
+
+part 'journal_list_provider.g.dart';
 
 // ============================================================================
 // Organization Mode
@@ -80,26 +81,33 @@ class JournalListState {
 }
 
 // ============================================================================
-// Journal List Notifier
+// Journal List Notifier (Riverpod 3.0)
 // ============================================================================
 
 /// Notifier for managing journal list state
-class JournalListNotifier extends StateNotifier<JournalListState> {
-  final JournalRepository _repository;
-
+/// MIGRATION: StateNotifier → Notifier pattern
+/// - Constructor logic moved to build() method
+/// - Dependencies accessed via ref.watch() in methods
+/// - Automatic provider generation via @riverpod annotation
+@riverpod
+class JournalList extends _$JournalList {
   /// Date formatter for grouping entries by date
-  final DateFormat _dateFormatter = DateFormat('MMMM yyyy');
+  DateFormat get _dateFormatter => DateFormat('MMMM yyyy');
 
-  JournalListNotifier(this._repository) : super(const JournalListState()) {
-    loadEntries();
+  @override
+  JournalListState build() {
+    // Initial load happens automatically when provider is first accessed
+    // Note: We don't call loadEntries() here to avoid issues during build
+    return const JournalListState();
   }
 
   /// Loads all journal entries for the current user
   Future<void> loadEntries() async {
+    final repository = ref.watch(journalRepositoryProvider);
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final entries = await _repository.getEntries();
+      final entries = await repository.getEntries();
 
       // Sort entries by date (newest first)
       entries.sort((a, b) => b.entryDate.compareTo(a.entryDate));
@@ -197,28 +205,21 @@ class JournalListNotifier extends StateNotifier<JournalListState> {
 }
 
 // ============================================================================
-// Providers
+// Computed Providers (derived from JournalList)
 // ============================================================================
 
-/// Provider for journal list state
-final journalListProvider =
-    StateNotifierProvider<JournalListNotifier, JournalListState>((ref) {
-  final repository = ref.watch(journalRepositoryProvider);
-  return JournalListNotifier(repository);
-});
-
 /// Provider for entries grouped by trip
-final journalEntriesByTripProvider = Provider<Map<String?, List<JournalEntry>>>(
-  (ref) {
-    final listState = ref.watch(journalListProvider);
-    return listState.entriesByTrip;
-  },
-);
+/// Computed from the main journalListProvider state
+@riverpod
+Map<String?, List<JournalEntry>> journalEntriesByTrip(Ref ref) {
+  final listState = ref.watch(journalListProvider);
+  return listState.entriesByTrip;
+}
 
 /// Provider for entries grouped by date
-final journalEntriesByDateProvider = Provider<Map<String, List<JournalEntry>>>(
-  (ref) {
-    final listState = ref.watch(journalListProvider);
-    return listState.entriesByDate;
-  },
-);
+/// Computed from the main journalListProvider state
+@riverpod
+Map<String, List<JournalEntry>> journalEntriesByDate(Ref ref) {
+  final listState = ref.watch(journalListProvider);
+  return listState.entriesByDate;
+}

@@ -18,7 +18,6 @@ part 'activity_suggestion.freezed.dart';
 ///
 @freezed
 class ActivitySuggestion with _$ActivitySuggestion {
-  const ActivitySuggestion._();
 
   /// Creates an activity suggestion
   ///
@@ -31,6 +30,12 @@ class ActivitySuggestion with _$ActivitySuggestion {
     required double score,
   }) = _ActivitySuggestion;
 
+  // Private constructor for freezed
+  const ActivitySuggestion._();
+}
+
+/// Extension on [ActivitySuggestion] for computed properties
+extension ActivitySuggestionExtension on ActivitySuggestion {
   /// Returns true if this is a highly relevant suggestion
   bool get isHighlyRelevant => score >= 0.7;
 

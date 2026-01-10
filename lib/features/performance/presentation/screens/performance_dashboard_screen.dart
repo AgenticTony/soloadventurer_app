@@ -11,7 +11,8 @@ final performanceMetricsProvider =
     StateProvider<List<VirtualListPerformanceMetrics>>((ref) => []);
 
 /// Provider for global metrics state
-final globalMetricsProvider = StateProvider<GlobalPerformanceMetrics?>((ref) => null);
+final globalMetricsProvider =
+    StateProvider<GlobalPerformanceMetrics?>((ref) => null);
 
 /// Global performance metrics aggregated from all tracked lists
 class GlobalPerformanceMetrics {
@@ -53,12 +54,13 @@ class GlobalPerformanceMetrics {
 
     final avgFPS = metrics.map((m) => m.averageFPS).reduce((a, b) => a + b) /
         metrics.length;
-    final avgJanky = metrics.map((m) => m.jankyFramePercentage).reduce((a, b) => a + b) /
-        metrics.length;
+    final avgJanky =
+        metrics.map((m) => m.jankyFramePercentage).reduce((a, b) => a + b) /
+            metrics.length;
     final totalMemory = metrics.map((m) => m.currentMemoryUsageBytes).fold(
-        0,
-        (sum, bytes) => sum + bytes,
-    );
+          0,
+          (sum, bytes) => sum + bytes,
+        );
 
     return GlobalPerformanceMetrics(
       averageFPS: avgFPS,
@@ -266,7 +268,8 @@ class _PerformanceDashboardScreenState
                       ),
                       _GlobalMetricRow(
                         label: 'Avg Janky Frames',
-                        value: '${globalMetrics.averageJankyPercentage.toStringAsFixed(1)}%',
+                        value:
+                            '${globalMetrics.averageJankyPercentage.toStringAsFixed(1)}%',
                         target: '< 10%',
                         meetsTarget: globalMetrics.averageJankyPercentage < 10,
                         isLowerBetter: true,
@@ -276,8 +279,8 @@ class _PerformanceDashboardScreenState
                         value:
                             '${(globalMetrics.totalMemoryUsage / 1024 / 1024).toStringAsFixed(2)} MB',
                         target: '< 200 MB',
-                        meetsTarget: globalMetrics.totalMemoryUsage <
-                            200 * 1024 * 1024,
+                        meetsTarget:
+                            globalMetrics.totalMemoryUsage < 200 * 1024 * 1024,
                         isLowerBetter: true,
                       ),
                       const SizedBox(height: 8),
@@ -343,7 +346,8 @@ class _PerformanceDashboardScreenState
                         ),
                         _CompactMetricRow(
                           label: 'Janky',
-                          value: '${metric.jankyFramePercentage.toStringAsFixed(1)}%',
+                          value:
+                              '${metric.jankyFramePercentage.toStringAsFixed(1)}%',
                           isGood: metric.jankyFramePercentage < 10,
                         ),
                         _CompactMetricRow(

@@ -6,24 +6,57 @@ part of 'token_blacklist_manager.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tokenBlacklistManagerHash() =>
-    r'c1dd1e7da6aa541b5ad5ff583d2afbb427e001b2';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Manages token blacklisting and rotation according to AWS Cognito best practices
+
+@ProviderFor(TokenBlacklistManager)
+final tokenBlacklistManagerProvider = TokenBlacklistManagerProvider._();
 
 /// Manages token blacklisting and rotation according to AWS Cognito best practices
-///
-/// Copied from [TokenBlacklistManager].
-@ProviderFor(TokenBlacklistManager)
-final tokenBlacklistManagerProvider =
-    AutoDisposeNotifierProvider<TokenBlacklistManager, void>.internal(
-  TokenBlacklistManager.new,
-  name: r'tokenBlacklistManagerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$tokenBlacklistManagerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class TokenBlacklistManagerProvider
+    extends $NotifierProvider<TokenBlacklistManager, void> {
+  /// Manages token blacklisting and rotation according to AWS Cognito best practices
+  TokenBlacklistManagerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tokenBlacklistManagerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-typedef _$TokenBlacklistManager = AutoDisposeNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$tokenBlacklistManagerHash();
+
+  @$internal
+  @override
+  TokenBlacklistManager create() => TokenBlacklistManager();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(void value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<void>(value),
+    );
+  }
+}
+
+String _$tokenBlacklistManagerHash() =>
+    r'7c139ca9d5fbf309d300b68e2156cad10b81c6b0';
+
+/// Manages token blacklisting and rotation according to AWS Cognito best practices
+
+abstract class _$TokenBlacklistManager extends $Notifier<void> {
+  void build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<void, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<void, void>, void, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

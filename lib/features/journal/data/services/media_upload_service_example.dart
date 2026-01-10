@@ -2,7 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../presentation/providers/media_upload_providers.dart';
-import '../../../utils/media_compression.dart';
+import 'package:soloadventurer/utils/media_compression.dart';
+import 'package:soloadventurer/features/journal/domain/entities/media_item.dart'; // For UploadStatus and MediaType
 
 /// Example screen demonstrating media upload service usage
 class MediaUploadExampleScreen extends ConsumerStatefulWidget {
@@ -70,8 +71,10 @@ class _MediaUploadExampleScreenState
               Text('Successful: ${stats.successfulUploads}'),
               Text('Failed: ${stats.failedUploads}'),
               Text('Active: ${stats.activeUploads}'),
-              Text('Success Rate: ${(stats.successRate * 100).toStringAsFixed(1)}%'),
-              Text('Overall Progress: ${(stats.overallProgress * 100).toStringAsFixed(1)}%'),
+              Text(
+                  'Success Rate: ${(stats.successRate * 100).toStringAsFixed(1)}%'),
+              Text(
+                  'Overall Progress: ${(stats.overallProgress * 100).toStringAsFixed(1)}%'),
               if (stats.totalBytesUploaded > 0)
                 Text('Uploaded: ${_formatBytes(stats.totalBytesUploaded)}'),
             ],
@@ -134,12 +137,12 @@ class _MediaUploadExampleScreenState
             if (task.retryCount > 0)
               Text(
                 'Retries: ${task.retryCount}/${task.maxRetries}',
-                style: TextStyle(color: Colors.orange),
+                style: const TextStyle(color: Colors.orange),
               ),
             if (task.errorMessage != null)
               Text(
                 task.errorMessage!,
-                style: TextStyle(color: Colors.red),
+                style: const TextStyle(color: Colors.red),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -179,6 +182,7 @@ class _MediaUploadExampleScreenState
       case UploadStatus.queued:
         return const Icon(Icons.schedule, color: Colors.blue);
     }
+    return null;
   }
 
   Widget? _buildTaskActions(UploadTask task) {
@@ -283,7 +287,8 @@ class _MediaUploadExampleScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Example file not found. Use MediaPicker to select real files.'),
+            content: Text(
+                'Example file not found. Use MediaPicker to select real files.'),
             duration: Duration(seconds: 3),
           ),
         );
@@ -423,8 +428,10 @@ class _SingleUploadMonitorExampleState
                 if (task.status == UploadStatus.uploading ||
                     task.status == UploadStatus.queued)
                   LinearProgressIndicator(value: task.progress / 100),
-                if (task.errorMessage != null) Text('Error: ${task.errorMessage}'),
-                if (task.storagePath != null) Text('Storage: ${task.storagePath}'),
+                if (task.errorMessage != null)
+                  Text('Error: ${task.errorMessage}'),
+                if (task.storagePath != null)
+                  Text('Storage: ${task.storagePath}'),
                 const SizedBox(height: 20),
                 _buildTaskActions(task),
               ],
@@ -469,7 +476,7 @@ class JournalEntryUploadFlowExample extends ConsumerWidget {
         final notifier = ref.read(mediaUploadNotifierProvider.notifier);
 
         // Assume user just created a journal entry and selected photos
-        final entryId = 'new-entry-id';
+        const entryId = 'new-entry-id';
         final selectedPhotos = [
           File('/path/to/photo1.jpg'),
           File('/path/to/photo2.jpg'),
@@ -493,7 +500,8 @@ class JournalEntryUploadFlowExample extends ConsumerWidget {
             // Show success message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('${selectedPhotos.length} photos uploading in background'),
+                content: Text(
+                    '${selectedPhotos.length} photos uploading in background'),
                 action: SnackBarAction(
                   label: 'View',
                   onPressed: () {

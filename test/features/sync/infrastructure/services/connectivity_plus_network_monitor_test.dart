@@ -21,7 +21,7 @@ void main() {
   });
 
   tearDown(() async {
-    await networkMonitor.dispose();
+    networkMonitor.dispose();
   });
 
   group('ConnectivityPlusNetworkMonitor - Initialization', () {
@@ -39,7 +39,8 @@ void main() {
       verify(mockConnectivity.checkConnectivity()).called(1);
     });
 
-    test('should initialize with online status when WiFi is connected', () async {
+    test('should initialize with online status when WiFi is connected',
+        () async {
       // Arrange
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.wifi]);
@@ -171,7 +172,8 @@ void main() {
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.none]);
 
-      final connectivityController = StreamController<List<ConnectivityResult>>();
+      final connectivityController =
+          StreamController<List<ConnectivityResult>>();
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityController.stream);
 
@@ -202,7 +204,8 @@ void main() {
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.none]);
 
-      final connectivityController = StreamController<List<ConnectivityResult>>();
+      final connectivityController =
+          StreamController<List<ConnectivityResult>>();
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityController.stream);
 
@@ -227,13 +230,15 @@ void main() {
       await connectivityController.close();
     });
 
-    test('should emit onOffline event when transitioning from online to offline',
+    test(
+        'should emit onOffline event when transitioning from online to offline',
         () async {
       // Arrange
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.wifi]);
 
-      final connectivityController = StreamController<List<ConnectivityResult>>();
+      final connectivityController =
+          StreamController<List<ConnectivityResult>>();
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityController.stream);
 
@@ -263,7 +268,8 @@ void main() {
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.none]);
 
-      final connectivityController = StreamController<List<ConnectivityResult>>();
+      final connectivityController =
+          StreamController<List<ConnectivityResult>>();
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityController.stream);
 
@@ -287,9 +293,9 @@ void main() {
       expect(statuses.length, greaterThan(2));
 
       // Find the WiFi status
-      final wifiStatus =
-          statuses.firstWhere((s) => s.connectionType == NetworkConnectionType.wifi,
-              orElse: () => NetworkStatus.offline());
+      final wifiStatus = statuses.firstWhere(
+          (s) => s.connectionType == NetworkConnectionType.wifi,
+          orElse: () => NetworkStatus.offline());
       expect(wifiStatus.isOnline, true);
 
       // Find the mobile status
@@ -299,8 +305,8 @@ void main() {
       expect(mobileStatus.isOnline, true);
 
       // Find the offline status
-      final offlineStatus =
-          statuses.lastWhere((s) => !s.isOnline, orElse: () => NetworkStatus.online(NetworkConnectionType.wifi));
+      final offlineStatus = statuses.lastWhere((s) => !s.isOnline,
+          orElse: () => NetworkStatus.online(NetworkConnectionType.wifi));
       expect(offlineStatus.isOnline, false);
 
       await subscription.cancel();
@@ -369,7 +375,8 @@ void main() {
       expect(networkMonitor.connectionType, NetworkConnectionType.vpn);
     });
 
-    test('should prioritize WiFi over mobile in multiple connections', () async {
+    test('should prioritize WiFi over mobile in multiple connections',
+        () async {
       // Arrange
       when(mockConnectivity.checkConnectivity()).thenAnswer(
           (_) async => [ConnectivityResult.mobile, ConnectivityResult.wifi]);
@@ -409,7 +416,7 @@ void main() {
       await networkMonitor.startMonitoring();
 
       // Act
-      await networkMonitor.dispose();
+      networkMonitor.dispose();
 
       // Assert - Should complete without throwing
       expect(() => networkMonitor.dispose(), returnsNormally);

@@ -1,0 +1,161 @@
+{
+  "code_quality": [
+    {
+      "id": "cq-001",
+      "type": "code_quality",
+      "title": "Split AuthRemoteDataSource interface and implementation into separate files",
+      "description": "The file lib/features/auth/data/datasources/auth_remote_data_source.dart contains both the abstract AuthRemoteDataSource interface and AuthRemoteDataSourceImpl class, totaling 905 lines. This violates separation of concerns and makes the code harder to navigate.",
+      "rationale": "Keeping interfaces and implementations in separate files is a Dart/Flutter best practice that improves code organization, makes it easier to locate the contract vs. implementation, reduces file size, and aligns with the project's clean architecture principles. Large files (>500 lines) increase cognitive load.",
+      "category": "large_files",
+      "severity": "major",
+      "affectedFiles": [
+        "lib/features/auth/data/datasources/auth_remote_data_source.dart"
+      ],
+      "currentState": "Single 905-line file containing both abstract interface (65 lines) and concrete implementation (840 lines) with 20+ methods handling authentication, password reset, token refresh, and admin operations.",
+      "proposedChange": "Split into two files:\n1. auth_remote_data_source.dart - Contains only the abstract AuthRemoteDataSource interface with method signatures\n2. auth_remote_data_source_impl.dart - Contains AuthRemoteDataSourceImpl implementation\n\nThis follows the pattern established in other parts of the codebase (e.g., api_client.dart and mock_api_client.dart are separate).",
+      "codeExample": "// Current: auth_remote_data_source.dart (905 lines)\nabstract class AuthRemoteDataSource {\n  Future<(UserModel, bool)> register({...});\n  Future<(UserModel, String)> signIn(...);\n  // 18 more methods...\n}\n\nclass AuthRemoteDataSourceImpl implements AuthRemoteDataSource {\n  // 840 lines of implementation\n}\n\n// Proposed:\n// auth_remote_data_source.dart (~70 lines)\nabstract class AuthRemoteDataSource {\n  Future<(UserModel, bool)> register({...});\n  // interface methods only\n}\n\n// auth_remote_data_source_impl.dart (~840 lines)\nclass AuthRemoteDataSourceImpl implements AuthRemoteDataSource {\n  // implementation only\n}",
+      "bestPractice": "Single Responsibility Principle - each file should have one reason to change. Interfaces define contracts; implementations provide functionality.",
+      "metrics": {
+        "lineCount": 905,
+        "complexity": null,
+        "duplicateLines": null,
+        "testCoverage": null
+      },
+      "estimatedEffort": "small",
+      "breakingChange": false,
+      "prerequisites": [
+        "Update imports in files that reference AuthRemoteDataSource",
+        "Run tests to ensure no regression"
+      ]
+    },
+    {
+      "id": "cq-002",
+      "type": "code_quality",
+      "title": "Extract duplicated Cognito exception mapping logic into a shared utility",
+      "description": "Cognito exception handling code is duplicated across multiple files with nearly identical error message parsing and mapping logic. The _mapCognitoException method contains 180+ lines of error mapping that's repeated with variations in auth_notifier.dart and other auth-related files.",
+      "rationale": "Code duplication leads to maintenance burden when error handling needs to be updated - fixes must be applied in multiple places, increasing the risk of inconsistencies. A centralized exception mapper ensures consistent error messages and reduces edge cases.",
+      "category": "duplication",
+      "severity": "major",
+      "affectedFiles": [
+        "lib/features/auth/data/datasources/auth_remote_data_source_impl.dart",
+        "lib/features/auth/presentation/notifiers/auth_notifier.dart"
+      ],
+      "currentState": "Multiple files contain similar error handling logic with 15+ error code checks each, parsing Cognito exception messages and mapping to domain-specific AuthException types with error codes like USER_NOT_FOUND, INVALID_CREDENTIALS, etc.",
+      "proposedChange": "Create a centralized CognitoExceptionMapper utility class:\n1. lib/core/error/cognito_exception_mapper.dart - Maps Cognito exceptions to domain exceptions\n2. Use Map-based lookup for O(1) error code resolution\n3. Include comprehensive unit tests for all error code mappings",
+      "codeExample": "// Current (repeated in 3+ files with variations):\nAuthException _mapCognitoException(Exception e) {\n  final errorMessage = e.toString().toLowerCase();\n  if (errorMessage.contains('usernotfoundexception')) {\n    return const AuthException('No account found...', code: 'USER_NOT_FOUND');\n  }\n  if (errorMessage.contains('notauthorizedexception')) {\n    return const AuthException('Incorrect email or password...', code: 'INVALID_CREDENTIALS');\n  }\n  // 15+ more similar checks...\n}\n\n// Proposed:\n// lib/core/error/cognito_exception_mapper.dart\nclass CognitoExceptionMapper {\n  static const Map<String, AuthException> _errorMap = {\n    'UserNotFoundException': AuthException('No account found...', code: 'USER_NOT_FOUND'),\n    'NotAuthorizedException': AuthException('Incorrect email...', code: 'INVALID_CREDENTIALS'),\n  };\n  \n  static AuthException fromException(Exception e) {\n    final code = _extractErrorCode(e);\n    return _errorMap[code] ?? AuthException('Authentication failed', code: 'UNKNOWN');\n  }\n}",
+      "bestPractice": "DRY (Don't Repeat Yourself) - Extract common error handling logic into reusable utilities. Centralized exception mapping ensures consistency.",
+      "metrics": {
+        "lineCount": null,
+        "complexity": null,
+        "duplicateLines": 200,
+        "testCoverage": null
+      },
+      "estimatedEffort": "medium",
+      "breakingChange": false,
+      "prerequisites": [
+        "Audit all files that handle Cognito exceptions",
+        "Ensure error codes are standardized"
+      ]
+    },
+    {
+      "id": "cq-003",
+      "type": "code_quality",
+      "title": "Replace debugPrint statements with structured logging framework",
+      "description": "The codebase contains 345 debugPrint() calls scattered across 32 files. This makes debugging difficult, provides no log levels or filtering, and clutters production code with print statements.",
+      "rationale": "A proper logging framework provides log levels (debug, info, warning, error), structured logging with metadata, the ability to filter logs in production, and better privacy controls. The project already has LoggingService infrastructure but it's inconsistently used.",
+      "category": "code_smells",
+      "severity": "minor",
+      "affectedFiles": [
+        "lib/features/auth/data/datasources/auth_remote_data_source.dart",
+        "lib/features/auth/data/datasources/auth_remote_data_source_impl.dart",
+        "lib/features/auth/domain/services/token_manager.dart",
+        "lib/features/auth/presentation/notifiers/auth_notifier.dart"
+      ],
+      "currentState": "345 debugPrint() calls across 32 files, mixing with existing LoggingService calls. No consistent logging strategy, making it hard to trace issues and control log output in production.",
+      "proposedChange": "1. Audit and categorize all debugPrint calls by severity (debug, info, warning, error)\n2. Replace with appropriate LoggingService methods\n3. Add log levels to LoggingService if not already present\n4. Enable log level filtering in production builds\n5. Consider removing sensitive data from logs (emails, tokens)",
+      "codeExample": "// Current (scattered across 32 files):\ndebugPrint('TokenManager: Starting initialization');\ndebugPrint('TokenManager: Loaded session data');\ndebugPrint('TokenManager: Has access token: ${accessToken != null}'); // Privacy issue\n\n// Proposed:\n_logger.logDebug('TokenManager: Starting initialization');\n_logger.logInfo('TokenManager: Loaded session data', {\n  'hasAccessToken': accessToken != null, // Boolean instead of actual token\n  'hasIdToken': idToken != null,\n});",
+      "bestPractice": "Use a proper logging framework instead of print statements. Structured logging with levels provides better debugging, performance monitoring, and privacy controls.",
+      "metrics": {
+        "lineCount": null,
+        "complexity": null,
+        "duplicateLines": null,
+        "testCoverage": null
+      },
+      "estimatedEffort": "medium",
+      "breakingChange": false,
+      "prerequisites": [
+        "Ensure LoggingService supports all needed log levels",
+        "Define logging guidelines for the team"
+      ]
+    },
+    {
+      "id": "cq-004",
+      "type": "code_quality",
+      "title": "Implement and enforce stricter linting rules in analysis_options.yaml",
+      "description": "The project uses a minimal analysis_options.yaml with only default flutter_lints. With 183 linter suppressions across the codebase, developers are likely working around rules rather than addressing underlying issues.",
+      "rationale": "Stricter linting catches potential bugs at compile time, enforces consistent code style, documents architectural decisions, and reduces code review friction. Many modern Flutter projects use recommended rules from very_good_analysis or similar packages.",
+      "category": "linting",
+      "severity": "minor",
+      "affectedFiles": [
+        "analysis_options.yaml"
+      ],
+      "currentState": "Basic analysis_options.yaml with only package:flutter_lints/flutter.yaml. 183 linter suppressions suggest developers are disabling rules frequently. Missing rules for prefer_const_constructors, avoid_print, unnecessary_imports, and type safety.",
+      "proposedChange": "Enhance analysis_options.yaml with additional rules:\n1. Consider adopting very_good_analysis package\n2. Add rules: prefer_const_constructors, avoid_print, unnecessary_imports, prefer_single_quotes\n3. Add complexity rules: cyclomatic_complexity, parameter_count\n4. Add type safety rules\n5. Audit and reduce // ignore: comments",
+      "codeExample": "// Current: analysis_options.yaml\ninclude: package:flutter_lints/flutter.yaml\nlinter:\n  rules:\n    # No additional rules\n\n// Proposed:\ninclude: package:flutter_lints/flutter.yaml\n\nlinter:\n  rules:\n    prefer_const_constructors: true\n    avoid_print: true\n    unnecessary_imports: true\n    prefer_single_quotes: true\n    cyclomatic_complexity: true\n    always_declare_return_types: true",
+      "bestPractice": "Enable stricter linting rules to catch issues early and maintain code consistency. Linting is a free automated code review that runs on every save.",
+      "metrics": {
+        "lineCount": null,
+        "complexity": null,
+        "duplicateLines": null,
+        "testCoverage": null
+      },
+      "estimatedEffort": "small",
+      "breakingChange": true,
+      "prerequisites": [
+        "Run flutter analyze to see all current issues",
+        "Plan to address existing violations incrementally"
+      ]
+    },
+    {
+      "id": "cq-005",
+      "type": "code_quality",
+      "title": "Resolve UnimplementedError placeholders and improve test coverage",
+      "description": "The codebase contains 15 UnimplementedError occurrences across 10 files, indicating incomplete functionality. Combined with only 70 test files for 440 source files (~16% coverage), there's significant risk of runtime failures.",
+      "rationale": "UnimplementedError throws at runtime when called, causing crashes in production. Low test coverage means these gaps aren't caught during development. Raising test coverage to industry standards (70-80%) would catch these issues early.",
+      "category": "testing",
+      "severity": "major",
+      "affectedFiles": [
+        "lib/features/auth/presentation/widgets/token_loading_state.dart",
+        "lib/features/travel/domain/models/*_operation.dart",
+        "lib/core/errors/error_handler.dart",
+        "lib/features/core/services/operation_queue.dart"
+      ],
+      "currentState": "15 UnimplementedError placeholders in critical paths like token loading states, travel operations, error handlers, and operation queues. Test coverage is approximately 16% (70 tests / 440 source files).",
+      "proposedChange": "1. Audit all UnimplementedError occurrences and either implement, remove, or document\n2. Improve test coverage:\n   - Add unit tests for all business logic (target 80% coverage)\n   - Add integration tests for critical flows\n   - Use test coverage reporting: flutter test --coverage\n   - Set up CI to fail when coverage drops below threshold",
+      "codeExample": "// Current:\nString someMethod() {\n  throw UnimplementedError();\n}\n\n// Proposed Option 1 - Implement:\nString someMethod() {\n  return _calculateValue();\n}\n\n// Proposed Option 2 - Document intent:\nString someMethod() {\n  throw UnimplementedError(\n    'Feature XYZ not implemented. Track with issue #123.'\n  );\n}",
+      "bestPractice": "Never ship code with UnimplementedError in reachable paths. Maintain high test coverage (70%+) to catch issues early and ensure confidence in refactoring.",
+      "metrics": {
+        "lineCount": null,
+        "complexity": null,
+        "duplicateLines": null,
+        "testCoverage": 16
+      },
+      "estimatedEffort": "large",
+      "breakingChange": false,
+      "prerequisites": [
+        "Generate baseline coverage report: flutter test --coverage",
+        "Identify critical paths that need testing first",
+        "Set up coverage reporting in CI/CD pipeline"
+      ]
+    }
+  ],
+  "metadata": {
+    "filesAnalyzed": 440,
+    "largeFilesFound": 5,
+    "duplicateBlocksFound": 12,
+    "lintingConfigured": true,
+    "testsPresent": true,
+    "generatedAt": "2025-01-04T19:30:00Z",
+    "analysisSummary": "Found significant code quality issues including large files with mixed concerns (900+ lines), duplicated exception handling logic across 3+ files, over 300 debugPrint statements suggesting inconsistent logging, minimal linting configuration with 183 suppressions, and low test coverage (~16%) with 15 UnimplementedError placeholders."
+  }
+}

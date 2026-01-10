@@ -1,15 +1,18 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/destination.dart';
 import '../../../travel/domain/models/trip_planning_operation.dart';
+import '../../../travel/domain/models/base_travel_operation.dart';
 import '../../../travel/domain/repositories/travel_operation_repository.dart';
 import '../state/add_to_trip_state.dart';
 
+part 'add_to_trip_provider.g.dart';
+
 /// Provider for the travel operation repository from the travel feature
-final travelOperationRepositoryProvider =
-    Provider<TravelOperationRepository>((ref) {
+@riverpod
+TravelOperationRepository travelOperationRepository(ref) {
   throw UnimplementedError(
       'travelOperationRepositoryProvider must be overridden in main app');
-});
+}
 
 /// Provider for managing add to trip operations
 ///
@@ -59,25 +62,12 @@ final travelOperationRepositoryProvider =
 ///   // Show error message
 /// }
 /// ```
-final addToTripProvider =
-    StateNotifierProvider<AddToTripNotifier, AddToTripState>((ref) {
-  final repository = ref.watch(travelOperationRepositoryProvider);
-  return AddToTripNotifier(repository);
-});
-
-/// Notifier for managing add to trip operations
-///
-/// This notifier handles adding destinations from the discovery feature
-/// to trips in the travel feature. It integrates with the existing
-/// travel operation system using TripPlanningOperation.
-class AddToTripNotifier extends StateNotifier<AddToTripState> {
-  final TravelOperationRepository _repository;
-
-  /// Creates a new [AddToTripNotifier]
-  ///
-  /// The [repository] parameter is required for performing trip planning operations.
-  AddToTripNotifier(this._repository)
-      : super(const AddToTripState.initial());
+@riverpod
+class AddToTripNotifier extends _$AddToTripNotifier {
+  @override
+  AddToTripState build() {
+    return const AddToTripState.initial();
+  }
 
   /// Add a destination to an existing trip
   ///
@@ -110,11 +100,13 @@ class AddToTripNotifier extends StateNotifier<AddToTripState> {
     String? notes,
   }) async {
     // Set loading state
-    state = state.copyWith(
-      destination: destination,
-      tripId: tripId,
-      tripName: tripName,
-    ).asLoading();
+    state = state
+        .copyWith(
+          destination: destination,
+          tripId: tripId,
+          tripName: tripName,
+        )
+        .asLoading();
 
     try {
       // Create a trip planning operation to add destination to existing trip
@@ -127,7 +119,14 @@ class AddToTripNotifier extends StateNotifier<AddToTripState> {
       );
 
       // Save the operation to the repository
-      await _repository.saveOperation(operation);
+      // Convert TripPlanningOperation to BaseTravelOperation
+      final baseOperation = BaseTravelOperation(
+        id: operation.id,
+        type: 'trip_planning',
+        timestamp: DateTime.now(),
+        priority: operation.priority,
+      );
+      await ref.read(travelOperationRepositoryProvider).saveOperation(baseOperation);
 
       // Update state to success
       state = state.asSuccess(tripId, tripName);
@@ -173,10 +172,12 @@ class AddToTripNotifier extends StateNotifier<AddToTripState> {
     String? notes,
   }) async {
     // Set loading state
-    state = state.copyWith(
-      destination: destination,
-      tripName: tripTitle,
-    ).asLoading();
+    state = state
+        .copyWith(
+          destination: destination,
+          tripName: tripTitle,
+        )
+        .asLoading();
 
     try {
       // Create a trip planning operation to create a new trip
@@ -189,7 +190,14 @@ class AddToTripNotifier extends StateNotifier<AddToTripState> {
       );
 
       // Save the operation to the repository
-      await _repository.saveOperation(operation);
+      // Convert TripPlanningOperation to BaseTravelOperation
+      final baseOperation = BaseTravelOperation(
+        id: operation.id,
+        type: 'trip_planning',
+        timestamp: DateTime.now(),
+        priority: operation.priority,
+      );
+      await ref.read(travelOperationRepositoryProvider).saveOperation(baseOperation);
 
       // Get the new trip ID from the operation
       final newTripId = operation.tripId;

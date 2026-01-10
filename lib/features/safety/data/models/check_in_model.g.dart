@@ -6,8 +6,8 @@ part of 'check_in_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CheckInModelImpl _$$CheckInModelImplFromJson(Map<String, dynamic> json) =>
-    _$CheckInModelImpl(
+_CheckInModel _$CheckInModelFromJson(Map<String, dynamic> json) =>
+    _CheckInModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
       triggerType:
@@ -40,7 +40,7 @@ _$CheckInModelImpl _$$CheckInModelImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$CheckInModelImplToJson(_$CheckInModelImpl instance) =>
+Map<String, dynamic> _$CheckInModelToJson(_CheckInModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

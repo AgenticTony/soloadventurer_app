@@ -69,7 +69,7 @@ enum ShareFormat {
 }
 
 /// Result of a share operation
-class ShareResult {
+class JournalShareResult {
   /// Whether the share was successful
   final bool success;
 
@@ -94,7 +94,7 @@ class ShareResult {
   /// Whether content was copied to clipboard
   final bool wasCopiedToClipboard;
 
-  const ShareResult({
+  const JournalShareResult({
     required this.success,
     required this.platform,
     required this.contentType,
@@ -106,14 +106,14 @@ class ShareResult {
   });
 
   /// Creates a successful share result
-  factory ShareResult.success({
+  factory JournalShareResult.success({
     required SharePlatform platform,
     required ShareableType contentType,
     required ShareFormat format,
     int itemCount = 1,
     bool wasCopiedToClipboard = false,
   }) {
-    return ShareResult(
+    return JournalShareResult(
       success: true,
       platform: platform,
       contentType: contentType,
@@ -125,12 +125,12 @@ class ShareResult {
   }
 
   /// Creates a failed share result
-  factory ShareResult.failure({
+  factory JournalShareResult.failure({
     required SharePlatform platform,
     required ShareableType contentType,
     required String errorMessage,
   }) {
-    return ShareResult(
+    return JournalShareResult(
       success: false,
       platform: platform,
       contentType: contentType,
@@ -142,7 +142,7 @@ class ShareResult {
 
   @override
   String toString() {
-    return 'ShareResult('
+    return 'JournalShareResult('
         'success: $success, '
         'platform: $platform, '
         'type: $contentType, '
@@ -293,7 +293,7 @@ abstract class SocialSharingService {
   /// [platform] - The platform to share to (use generic for native share sheet)
   /// [config] - Optional custom configuration (auto-generated if not provided)
   /// [includeMedia] - Whether to include attached media
-  Future<ShareResult> shareEntry(
+  Future<JournalShareResult> shareEntry(
     JournalEntry entry, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
@@ -306,7 +306,7 @@ abstract class SocialSharingService {
   /// [media] - The media item to share
   /// [platform] - The platform to share to
   /// [config] - Optional custom configuration
-  Future<ShareResult> shareMedia(
+  Future<JournalShareResult> shareMedia(
     MediaItem media, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
@@ -319,7 +319,7 @@ abstract class SocialSharingService {
   /// [platform] - The platform to share to
   /// [config] - Optional custom configuration
   /// [entryCount] - Number of entries to include in share
-  Future<ShareResult> shareTrip(
+  Future<JournalShareResult> shareTrip(
     Trip trip, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
@@ -331,7 +331,7 @@ abstract class SocialSharingService {
   /// [entries] - The entries to share
   /// [platform] - The platform to share to
   /// [config] - Optional custom configuration
-  Future<ShareResult> shareMultipleEntries(
+  Future<JournalShareResult> shareMultipleEntries(
     List<JournalEntry> entries, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,

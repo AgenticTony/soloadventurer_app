@@ -67,7 +67,8 @@ class ManualSyncButton extends ConsumerWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: _getBackgroundColor(theme, state),
             foregroundColor: _getForegroundColor(theme, state),
-            disabledBackgroundColor: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+            disabledBackgroundColor:
+                theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
           ),
         );
 

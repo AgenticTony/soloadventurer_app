@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
@@ -9,8 +9,10 @@ import 'package:soloadventurer/features/journal/data/repositories/journal_reposi
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/features/journal/helpers/journal_test_helpers.dart';
+import '../../../../test_constants.dart';
 
-class MockJournalRemoteDataSource extends Mock implements JournalRemoteDataSource {}
+class MockJournalRemoteDataSource extends Mock
+    implements JournalRemoteDataSource {}
 
 void main() {
   late MockJournalRemoteDataSource mockRemoteDataSource;
@@ -47,21 +49,24 @@ void main() {
         verify(() => mockRemoteDataSource.createEntry(any())).called(1);
       });
 
-      test('should throw AppException when data source throws ServerException', () async {
+      test('should throw AppException when data source throws ServerException',
+          () async {
         // Arrange
         final testEntity = createTestJournalEntry();
-        when(() => mockRemoteDataSource.createEntry(any()))
-            .thenThrow(const ServerException(message: 'Database error', statusCode: 500));
+        when(() => mockRemoteDataSource.createEntry(any())).thenThrow(
+            const ServerException(message: 'Database error', statusCode: 500));
 
         // Act & Assert
         expect(
           () => repository.createEntry(testEntity),
-          throwsA(isA<AppException>()
-              .having((e) => e.message, 'message', contains('Failed to create journal entry'))),
+          throwsA(isA<AppException>().having((e) => e.message, 'message',
+              contains('Failed to create journal entry'))),
         );
       });
 
-      test('should throw AppException when data source throws generic exception', () async {
+      test(
+          'should throw AppException when data source throws generic exception',
+          () async {
         // Arrange
         final testEntity = createTestJournalEntry();
         when(() => mockRemoteDataSource.createEntry(any()))
@@ -74,7 +79,8 @@ void main() {
         );
       });
 
-      test('should convert entity to model before calling data source', () async {
+      test('should convert entity to model before calling data source',
+          () async {
         // Arrange
         final testEntity = createTestJournalEntry(title: 'Original Title');
         final testModel = createTestJournalEntryModel(title: 'Original Title');
@@ -85,8 +91,10 @@ void main() {
         await repository.createEntry(testEntity);
 
         // Assert
-        final captured = verify(() => mockRemoteDataSource.createEntry(captureAny()))
-            .captured.single as JournalEntryModel;
+        final captured =
+            verify(() => mockRemoteDataSource.createEntry(captureAny()))
+                .captured
+                .single as JournalEntryModel;
         expect(captured.title, equals('Original Title'));
       });
     });
@@ -109,14 +117,14 @@ void main() {
 
       test('should throw AppException when entry not found', () async {
         // Arrange
-        when(() => mockRemoteDataSource.getEntry(any()))
-            .thenThrow(const ServerException(message: 'Not found', statusCode: 404));
+        when(() => mockRemoteDataSource.getEntry(any())).thenThrow(
+            const ServerException(message: 'Not found', statusCode: 404));
 
         // Act & Assert
         expect(
           () => repository.getEntry('non-existent-id'),
-          throwsA(isA<AppException>()
-              .having((e) => e.message, 'message', contains('Failed to get journal entry'))),
+          throwsA(isA<AppException>().having((e) => e.message, 'message',
+              contains('Failed to get journal entry'))),
         );
       });
 
@@ -128,7 +136,8 @@ void main() {
         // Act & Assert
         expect(
           () => repository.getEntry(testEntryId),
-          throwsA(isA<AppException>().having((e) => e.message, 'message', 'Custom error')),
+          throwsA(isA<AppException>()
+              .having((e) => e.message, 'message', 'Custom error')),
         );
       });
     });
@@ -164,8 +173,8 @@ void main() {
 
       test('should throw AppException on data source error', () async {
         // Arrange
-        when(() => mockRemoteDataSource.getEntries())
-            .thenThrow(const ServerException(message: 'Database error', statusCode: 500));
+        when(() => mockRemoteDataSource.getEntries()).thenThrow(
+            const ServerException(message: 'Database error', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -203,13 +212,14 @@ void main() {
 
         // Assert
         expect(result.length, equals(2));
-        verify(() => mockRemoteDataSource.getEntriesByTrip(testTripId)).called(1);
+        verify(() => mockRemoteDataSource.getEntriesByTrip(testTripId))
+            .called(1);
       });
 
       test('should throw AppException on error', () async {
         // Arrange
-        when(() => mockRemoteDataSource.getEntriesByTrip(any()))
-            .thenThrow(const ServerException(message: 'Trip not found', statusCode: 404));
+        when(() => mockRemoteDataSource.getEntriesByTrip(any())).thenThrow(
+            const ServerException(message: 'Trip not found', statusCode: 404));
 
         // Act & Assert
         expect(
@@ -229,11 +239,14 @@ void main() {
             .thenAnswer((_) async => testModels);
 
         // Act
-        final result = await repository.getEntriesByDateRange(startDate, endDate);
+        final result =
+            await repository.getEntriesByDateRange(startDate, endDate);
 
         // Assert
         expect(result.length, equals(2));
-        verify(() => mockRemoteDataSource.getEntriesByDateRange(startDate, endDate)).called(1);
+        verify(() =>
+                mockRemoteDataSource.getEntriesByDateRange(startDate, endDate))
+            .called(1);
       });
 
       test('should handle invalid date ranges', () async {
@@ -244,7 +257,8 @@ void main() {
             .thenAnswer((_) async => <JournalEntryModel>[]);
 
         // Act
-        final result = await repository.getEntriesByDateRange(startDate, endDate);
+        final result =
+            await repository.getEntriesByDateRange(startDate, endDate);
 
         // Assert
         expect(result, isEmpty);
@@ -344,8 +358,8 @@ void main() {
       test('should throw AppException on update failure', () async {
         // Arrange
         final testEntity = createTestJournalEntry();
-        when(() => mockRemoteDataSource.updateEntry(any()))
-            .thenThrow(const ServerException(message: 'Update failed', statusCode: 500));
+        when(() => mockRemoteDataSource.updateEntry(any())).thenThrow(
+            const ServerException(message: 'Update failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -362,14 +376,15 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(() => repository.deleteEntry(testEntryId), returnsNormally);
+        await expectLater(
+            () => repository.deleteEntry(testEntryId), returnsNormally);
         verify(() => mockRemoteDataSource.deleteEntry(testEntryId)).called(1);
       });
 
       test('should throw AppException on deletion failure', () async {
         // Arrange
-        when(() => mockRemoteDataSource.deleteEntry(any()))
-            .thenThrow(const ServerException(message: 'Delete failed', statusCode: 500));
+        when(() => mockRemoteDataSource.deleteEntry(any())).thenThrow(
+            const ServerException(message: 'Delete failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -392,7 +407,8 @@ void main() {
 
         // Assert
         expect(result.isFavorite, isTrue);
-        verify(() => mockRemoteDataSource.toggleFavorite(testEntryId)).called(1);
+        verify(() => mockRemoteDataSource.toggleFavorite(testEntryId))
+            .called(1);
       });
 
       test('should toggle isFavorite from true to false', () async {
@@ -411,8 +427,8 @@ void main() {
 
       test('should throw AppException when entry not found', () async {
         // Arrange
-        when(() => mockRemoteDataSource.toggleFavorite(any()))
-            .thenThrow(const ServerException(message: 'Not found', statusCode: 404));
+        when(() => mockRemoteDataSource.toggleFavorite(any())).thenThrow(
+            const ServerException(message: 'Not found', statusCode: 404));
 
         // Act & Assert
         expect(
@@ -464,8 +480,8 @@ void main() {
         const longitude = 2.3522;
         const radiusKm = 10.0;
         final testModels = createTestJournalEntryList(count: 2);
-        when(() => mockRemoteDataSource.getEntriesNearLocation(any(), any(), any()))
-            .thenAnswer((_) async => testModels);
+        when(() => mockRemoteDataSource.getEntriesNearLocation(
+            any(), any(), any())).thenAnswer((_) async => testModels);
 
         // Act
         final result = await repository.getEntriesNearLocation(
@@ -477,19 +493,21 @@ void main() {
         // Assert
         expect(result.length, equals(2));
         verify(() => mockRemoteDataSource.getEntriesNearLocation(
-          latitude,
-          longitude,
-          radiusKm,
-        )).called(1);
+              latitude,
+              longitude,
+              radiusKm,
+            )).called(1);
       });
 
       test('should handle zero radius', () async {
         // Arrange
-        when(() => mockRemoteDataSource.getEntriesNearLocation(any(), any(), any()))
+        when(() => mockRemoteDataSource.getEntriesNearLocation(
+                any(), any(), any()))
             .thenAnswer((_) async => <JournalEntryModel>[]);
 
         // Act
-        final result = await repository.getEntriesNearLocation(48.8566, 2.3522, 0.0);
+        final result =
+            await repository.getEntriesNearLocation(48.8566, 2.3522, 0.0);
 
         // Assert
         expect(result, isEmpty);
@@ -498,7 +516,8 @@ void main() {
       test('should handle very large radius', () async {
         // Arrange
         const largeRadius = 100000.0; // 100,000 km
-        when(() => mockRemoteDataSource.getEntriesNearLocation(any(), any(), any()))
+        when(() => mockRemoteDataSource.getEntriesNearLocation(
+                any(), any(), any()))
             .thenAnswer((_) async => <JournalEntryModel>[]);
 
         // Act
@@ -535,8 +554,8 @@ void main() {
       test('should throw AppException on addition failure', () async {
         // Arrange
         final testEntity = createTestMediaItem();
-        when(() => mockRemoteDataSource.addMedia(any()))
-            .thenThrow(const ServerException(message: 'Add failed', statusCode: 500));
+        when(() => mockRemoteDataSource.addMedia(any())).thenThrow(
+            const ServerException(message: 'Add failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -564,8 +583,8 @@ void main() {
       test('should throw AppException on update failure', () async {
         // Arrange
         final testEntity = createTestMediaItem();
-        when(() => mockRemoteDataSource.updateMedia(any()))
-            .thenThrow(const ServerException(message: 'Update failed', statusCode: 500));
+        when(() => mockRemoteDataSource.updateMedia(any())).thenThrow(
+            const ServerException(message: 'Update failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -582,14 +601,15 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(() => repository.deleteMedia(testMediaId), returnsNormally);
+        await expectLater(
+            () => repository.deleteMedia(testMediaId), returnsNormally);
         verify(() => mockRemoteDataSource.deleteMedia(testMediaId)).called(1);
       });
 
       test('should throw AppException on deletion failure', () async {
         // Arrange
-        when(() => mockRemoteDataSource.deleteMedia(any()))
-            .thenThrow(const ServerException(message: 'Delete failed', statusCode: 500));
+        when(() => mockRemoteDataSource.deleteMedia(any())).thenThrow(
+            const ServerException(message: 'Delete failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -612,7 +632,8 @@ void main() {
         // Assert
         expect(result.length, equals(3));
         expect(result, everyElement(isA<MediaItem>()));
-        verify(() => mockRemoteDataSource.getMediaForEntry(testEntryId)).called(1);
+        verify(() => mockRemoteDataSource.getMediaForEntry(testEntryId))
+            .called(1);
       });
 
       test('should return empty list when entry has no media', () async {
@@ -640,7 +661,8 @@ void main() {
 
         // Assert
         expect(result.length, equals(5));
-        verify(() => mockRemoteDataSource.getMediaForTrip(testTripId)).called(1);
+        verify(() => mockRemoteDataSource.getMediaForTrip(testTripId))
+            .called(1);
       });
 
       test('should return empty list when trip has no media', () async {
@@ -665,12 +687,13 @@ void main() {
             .thenAnswer((_) async => testModel);
 
         // Act
-        final result = await repository.updateMediaUploadProgress(testMediaId, progress);
+        final result =
+            await repository.updateMediaUploadProgress(testMediaId, progress);
 
         // Assert
         expect(result.uploadProgress, equals(progress));
-        verify(() => mockRemoteDataSource.updateMediaUploadProgress(testMediaId, progress))
-            .called(1);
+        verify(() => mockRemoteDataSource.updateMediaUploadProgress(
+            testMediaId, progress)).called(1);
       });
 
       test('should handle progress = 0', () async {
@@ -681,7 +704,8 @@ void main() {
             .thenAnswer((_) async => testModel);
 
         // Act
-        final result = await repository.updateMediaUploadProgress(testMediaId, progress);
+        final result =
+            await repository.updateMediaUploadProgress(testMediaId, progress);
 
         // Assert
         expect(result.uploadProgress, equals(0));
@@ -695,7 +719,8 @@ void main() {
             .thenAnswer((_) async => testModel);
 
         // Act
-        final result = await repository.updateMediaUploadProgress(testMediaId, progress);
+        final result =
+            await repository.updateMediaUploadProgress(testMediaId, progress);
 
         // Assert
         expect(result.uploadProgress, equals(100));
@@ -714,19 +739,21 @@ void main() {
             .thenAnswer((_) async => testModel);
 
         // Act
-        final result = await repository.completeMediaUpload(testMediaId, storagePath);
+        final result =
+            await repository.completeMediaUpload(testMediaId, storagePath);
 
         // Assert
         expect(result.storagePath, equals(storagePath));
         expect(result.uploadStatus, equals(UploadStatus.completed));
-        verify(() => mockRemoteDataSource.completeMediaUpload(testMediaId, storagePath))
-            .called(1);
+        verify(() => mockRemoteDataSource.completeMediaUpload(
+            testMediaId, storagePath)).called(1);
       });
 
       test('should throw AppException on completion failure', () async {
         // Arrange
         when(() => mockRemoteDataSource.completeMediaUpload(any(), any()))
-            .thenThrow(const ServerException(message: 'Completion failed', statusCode: 500));
+            .thenThrow(const ServerException(
+                message: 'Completion failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -740,16 +767,20 @@ void main() {
       test('should return MediaItem with failed status', () async {
         // Arrange
         const errorMessage = 'Network error';
-        final testModel = createTestMediaItemModel(uploadStatus: UploadStatus.failed);
+        final testModel =
+            createTestMediaItemModel(uploadStatus: UploadStatus.failed);
         when(() => mockRemoteDataSource.failMediaUpload(any(), any()))
             .thenAnswer((_) async => testModel);
 
         // Act
-        final result = await repository.failMediaUpload(testMediaId, errorMessage);
+        final result =
+            await repository.failMediaUpload(testMediaId, errorMessage);
 
         // Assert
         expect(result.uploadStatus, equals(UploadStatus.failed));
-        verify(() => mockRemoteDataSource.failMediaUpload(testMediaId, errorMessage)).called(1);
+        verify(() =>
+                mockRemoteDataSource.failMediaUpload(testMediaId, errorMessage))
+            .called(1);
       });
     });
   });
@@ -768,7 +799,8 @@ void main() {
         // Assert
         expect(result.length, equals(3));
         expect(result, equals(tagIds));
-        verify(() => mockRemoteDataSource.getTagsForEntry(testEntryId)).called(1);
+        verify(() => mockRemoteDataSource.getTagsForEntry(testEntryId))
+            .called(1);
       });
 
       test('should return empty list when entry has no tags', () async {
@@ -795,13 +827,14 @@ void main() {
           () => repository.addTagToEntry(testEntryId, testTagId),
           returnsNormally,
         );
-        verify(() => mockRemoteDataSource.addTagToEntry(testEntryId, testTagId)).called(1);
+        verify(() => mockRemoteDataSource.addTagToEntry(testEntryId, testTagId))
+            .called(1);
       });
 
       test('should throw AppException on failure', () async {
         // Arrange
-        when(() => mockRemoteDataSource.addTagToEntry(any(), any()))
-            .thenThrow(const ServerException(message: 'Add failed', statusCode: 500));
+        when(() => mockRemoteDataSource.addTagToEntry(any(), any())).thenThrow(
+            const ServerException(message: 'Add failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -822,14 +855,16 @@ void main() {
           () => repository.removeTagFromEntry(testEntryId, testTagId),
           returnsNormally,
         );
-        verify(() => mockRemoteDataSource.removeTagFromEntry(testEntryId, testTagId))
+        verify(() =>
+                mockRemoteDataSource.removeTagFromEntry(testEntryId, testTagId))
             .called(1);
       });
 
       test('should throw AppException on failure', () async {
         // Arrange
         when(() => mockRemoteDataSource.removeTagFromEntry(any(), any()))
-            .thenThrow(const ServerException(message: 'Remove failed', statusCode: 500));
+            .thenThrow(const ServerException(
+                message: 'Remove failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -851,7 +886,8 @@ void main() {
           () => repository.updateTagsForEntry(testEntryId, tagIds),
           returnsNormally,
         );
-        verify(() => mockRemoteDataSource.updateTagsForEntry(testEntryId, tagIds))
+        verify(() =>
+                mockRemoteDataSource.updateTagsForEntry(testEntryId, tagIds))
             .called(1);
       });
 
@@ -871,7 +907,8 @@ void main() {
       test('should throw AppException on failure', () async {
         // Arrange
         when(() => mockRemoteDataSource.updateTagsForEntry(any(), any()))
-            .thenThrow(const ServerException(message: 'Update failed', statusCode: 500));
+            .thenThrow(const ServerException(
+                message: 'Update failed', statusCode: 500));
 
         // Act & Assert
         expect(
@@ -917,7 +954,8 @@ void main() {
     test('should handle large content in entry', () async {
       // Arrange
       final largeContent = 'x' * 100000; // 100KB
-      final entryWithLargeContent = createTestJournalEntry(content: largeContent);
+      final entryWithLargeContent =
+          createTestJournalEntry(content: largeContent);
       final testModel = createTestJournalEntryModel(content: largeContent);
       when(() => mockRemoteDataSource.createEntry(any()))
           .thenAnswer((_) async => testModel);
@@ -931,7 +969,8 @@ void main() {
 
     test('should handle special characters in content', () async {
       // Arrange
-      final specialContent = 'Test with emoji 🎉 and special chars: <>&"\'\\n\\t';
+      const specialContent =
+          'Test with emoji 🎉 and special chars: <>&"\'\\n\\t';
       final entryWithSpecial = createTestJournalEntry(content: specialContent);
       final testModel = createTestJournalEntryModel(content: specialContent);
       when(() => mockRemoteDataSource.createEntry(any()))

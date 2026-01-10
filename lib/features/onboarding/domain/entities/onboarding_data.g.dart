@@ -6,8 +6,8 @@ part of 'onboarding_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OnboardingDataImpl _$$OnboardingDataImplFromJson(Map<String, dynamic> json) =>
-    _$OnboardingDataImpl(
+_OnboardingData _$OnboardingDataFromJson(Map<String, dynamic> json) =>
+    _OnboardingData(
       name: json['name'] as String,
       destination:
           Destination.fromJson(json['destination'] as Map<String, dynamic>),
@@ -18,8 +18,7 @@ _$OnboardingDataImpl _$$OnboardingDataImplFromJson(Map<String, dynamic> json) =>
       budget: $enumDecodeNullable(_$BudgetRangeEnumMap, json['budget']),
     );
 
-Map<String, dynamic> _$$OnboardingDataImplToJson(
-        _$OnboardingDataImpl instance) =>
+Map<String, dynamic> _$OnboardingDataToJson(_OnboardingData instance) =>
     <String, dynamic>{
       'name': instance.name,
       'destination': instance.destination,

@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
 
@@ -12,11 +12,8 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<TripModel> createTrip(TripModel trip) async {
     try {
-      final response = await _client
-          .from('trips')
-          .insert(trip.toJson())
-          .select()
-          .single();
+      final response =
+          await _client.from('trips').insert(trip.toJson()).select().single();
 
       return TripModel.fromJson(response);
     } on PostgrestException catch (e) {
@@ -35,11 +32,8 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<TripModel> getTrip(String tripId) async {
     try {
-      final response = await _client
-          .from('trips')
-          .select()
-          .eq('id', tripId)
-          .single();
+      final response =
+          await _client.from('trips').select().eq('id', tripId).single();
 
       return TripModel.fromJson(response);
     } on PostgrestException catch (e) {

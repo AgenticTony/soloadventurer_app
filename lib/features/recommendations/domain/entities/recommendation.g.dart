@@ -6,9 +6,9 @@ part of 'recommendation.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$RecommendationMetadataImpl _$$RecommendationMetadataImplFromJson(
+_RecommendationMetadata _$RecommendationMetadataFromJson(
         Map<String, dynamic> json) =>
-    _$RecommendationMetadataImpl(
+    _RecommendationMetadata(
       matchedInterests: (json['matchedInterests'] as List<dynamic>)
           .map((e) => $enumDecode(_$TravelInterestEnumMap, e))
           .toSet(),
@@ -29,8 +29,8 @@ _$RecommendationMetadataImpl _$$RecommendationMetadataImplFromJson(
       isIndoor: json['isIndoor'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$RecommendationMetadataImplToJson(
-        _$RecommendationMetadataImpl instance) =>
+Map<String, dynamic> _$RecommendationMetadataToJson(
+        _RecommendationMetadata instance) =>
     <String, dynamic>{
       'matchedInterests': instance.matchedInterests
           .map((e) => _$TravelInterestEnumMap[e]!)
@@ -81,25 +81,23 @@ const _$CrowdLevelEnumMap = {
   CrowdLevel.peak: 'peak',
 };
 
-_$TimeOfDayImpl _$$TimeOfDayImplFromJson(Map<String, dynamic> json) =>
-    _$TimeOfDayImpl(
+_TimeOfDay _$TimeOfDayFromJson(Map<String, dynamic> json) => _TimeOfDay(
       hour: (json['hour'] as num).toInt(),
       minute: (json['minute'] as num?)?.toInt() ?? 0,
     );
 
-Map<String, dynamic> _$$TimeOfDayImplToJson(_$TimeOfDayImpl instance) =>
+Map<String, dynamic> _$TimeOfDayToJson(_TimeOfDay instance) =>
     <String, dynamic>{
       'hour': instance.hour,
       'minute': instance.minute,
     };
 
-_$MoneyImpl _$$MoneyImplFromJson(Map<String, dynamic> json) => _$MoneyImpl(
+_Money _$MoneyFromJson(Map<String, dynamic> json) => _Money(
       amount: (json['amount'] as num).toDouble(),
       currency: json['currency'] as String? ?? 'USD',
     );
 
-Map<String, dynamic> _$$MoneyImplToJson(_$MoneyImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$MoneyToJson(_Money instance) => <String, dynamic>{
       'amount': instance.amount,
       'currency': instance.currency,
     };

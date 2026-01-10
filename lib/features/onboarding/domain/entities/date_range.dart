@@ -9,7 +9,6 @@ part 'date_range.g.dart';
 /// Includes validation logic to ensure the end date is after the start date.
 @freezed
 abstract class DateRange with _$DateRange {
-  const DateRange._();
 
   /// Creates a DateRange with start and end dates
   ///
@@ -58,4 +57,7 @@ abstract class DateRange with _$DateRange {
     final formatterEnd = '${end.month}/${end.day}/${end.year}';
     return '$formatter - $formatterEnd';
   }
+
+  // Private constructor for freezed getters
+  const DateRange._();
 }

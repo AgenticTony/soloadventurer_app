@@ -62,7 +62,8 @@ class SafetyScoreBadge extends StatelessWidget {
     final safetyLevel = _getSafetyLevelLabel(score);
 
     return Semantics(
-      label: '$displayLabel score: ${score.toStringAsFixed(1)} out of 10, $safetyLevel',
+      label:
+          '$displayLabel score: ${score.toStringAsFixed(1)} out of 10, $safetyLevel',
       value: score.toStringAsFixed(1),
       hint: 'Safety rating from 1 to 10',
       child: Container(

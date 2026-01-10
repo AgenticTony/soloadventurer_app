@@ -28,8 +28,7 @@ class BatchOperationResult {
   int get totalCount => successCount + failureCount;
 
   /// Success rate (0.0 to 1.0)
-  double get successRate =>
-      totalCount > 0 ? successCount / totalCount : 0.0;
+  double get successRate => totalCount > 0 ? successCount / totalCount : 0.0;
 
   /// Errors from failed operations
   final List<BatchError> errors;
@@ -174,8 +173,7 @@ class BatchQueryStats {
 
   /// Average time per item
   Duration get averageItemTime => totalItems > 0
-      ? Duration(
-          microseconds: (totalTime.inMicroseconds / totalItems).round())
+      ? Duration(microseconds: (totalTime.inMicroseconds / totalItems).round())
       : Duration.zero;
 
   /// Items processed per second
@@ -579,7 +577,8 @@ class BatchQueryBuilder<T> {
         } else {
           // All retries exhausted
           if (debug) {
-            debugPrint('[BatchQueryBuilder] Failed at item ${item.index}: $error');
+            debugPrint(
+                '[BatchQueryBuilder] Failed at item ${item.index}: $error');
             if (kDebugMode) {
               debugPrint(stackTrace.toString());
             }

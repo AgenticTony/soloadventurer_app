@@ -415,15 +415,15 @@ class _SyncHistoryEntryTile extends StatelessWidget {
     Color color;
 
     switch (entry.status) {
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         icon = Icons.check_circle;
         color = Colors.green;
         break;
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         icon = Icons.error;
         color = Colors.red;
         break;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         icon = Icons.sync;
         color = Colors.blue;
         break;
@@ -446,12 +446,12 @@ class _SyncHistoryEntryTile extends StatelessWidget {
   String _getEntrySubtitle() {
     final buffer = StringBuffer();
 
-    if (entry.status == SyncStatus.success) {
+    if (entry.status == SyncOperationStatus.success) {
       buffer.write('${entry.successCount} succeeded');
       if (entry.failureCount > 0) {
         buffer.write(', ${entry.failureCount} failed');
       }
-    } else if (entry.status == SyncStatus.failed) {
+    } else if (entry.status == SyncOperationStatus.failed) {
       buffer.write('${entry.failureCount} failed');
       if (entry.error != null) {
         buffer.write(' - ${entry.error!.userMessage}');
@@ -585,13 +585,13 @@ class _SyncHistoryEntryDialog extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(SyncStatus status) {
+  Color _getStatusColor(SyncOperationStatus status) {
     switch (status) {
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return Colors.green;
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return Colors.red;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return Colors.blue;
       default:
         return Colors.grey;

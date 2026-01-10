@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/auth_error_handler.dart';
 
 /// A reusable widget for displaying authentication errors with recovery options
@@ -53,7 +52,7 @@ class AuthErrorDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorHandler = const AuthErrorHandler();
+    const errorHandler = AuthErrorHandler();
     final errorInfo = errorHandler.handleError(error);
     final theme = Theme.of(context);
 
@@ -126,7 +125,8 @@ class AuthErrorDisplay extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onRetry,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _getErrorColor(context, errorInfo.category),
+                        backgroundColor:
+                            _getErrorColor(context, errorInfo.category),
                       ),
                       child: Text(retryButtonText ?? 'Try Again'),
                     ),
@@ -280,7 +280,7 @@ class AuthErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorHandler = const AuthErrorHandler();
+    const errorHandler = AuthErrorHandler();
     final errorInfo = errorHandler.handleError(error);
     final theme = Theme.of(context);
 
@@ -295,7 +295,8 @@ class AuthErrorBanner extends StatelessWidget {
             color: _getErrorColor(context, errorInfo.category).withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: _getErrorColor(context, errorInfo.category).withOpacity(0.5),
+              color:
+                  _getErrorColor(context, errorInfo.category).withOpacity(0.5),
             ),
           ),
           child: Row(

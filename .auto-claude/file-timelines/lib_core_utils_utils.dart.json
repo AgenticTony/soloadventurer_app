@@ -1,0 +1,28 @@
+{
+  "file_path": "lib/core/utils/utils.dart",
+  "main_branch_history": [],
+  "task_views": {
+    "006-performance-optimization-for-large-trips": {
+      "task_id": "006-performance-optimization-for-large-trips",
+      "branch_point": {
+        "commit_hash": "20dd5b9cdb7f9994913f6179576f194a9e9883e1",
+        "content": "",
+        "timestamp": "2026-01-05T12:48:39.346326"
+      },
+      "worktree_state": {
+        "content": "/// Core utilities for SoloAdventurer\n///\n/// This directory contains reusable utilities used across the application.\n/// These utilities are designed to be feature-agnostic and can be used\n/// in any part of the app.\n///\n/// ## Available Utilities\n///\n/// - [ScrollPerformanceTracker]: Tracks scroll performance metrics (velocity, FPS)\n/// - [Debouncer]: Debounces operations to reduce redundant calls\n/// - [QueryBatcher]: Batches multiple queries together for efficiency\n/// - [PreloadingManager]: Manages intelligent preloading strategies\n///\n/// ## Usage\n///\n/// ```dart\n/// import 'package:soloadventurer/core/utils/utils.dart';\n///\n/// // Debounce search queries\n/// final debouncer = Debouncer<PaginatedData<Trip>>(\n///   duration: const Duration(milliseconds: 500),\n/// );\n///\n/// debouncer.debounce(\n///   input: searchQuery,\n///   action: () => repository.search(query),\n///   onComplete: (result) {\n///     if (result.executed) showResults(result.value);\n///   },\n/// );\n///\n/// // Batch multiple queries\n/// final batcher = QueryBatcher(\n///   config: BatchConfig.aggressive,\n/// );\n///\n/// final trips = batcher.add(\n///   key: 'trips',\n///   query: () => repository.getTrips(),\n/// );\n///\n/// final activities = batcher.add(\n///   key: 'activities',\n///   query: () => repository.getActivities(),\n/// );\n///\n/// final results = await batcher.execute();\n///\n/// // Intelligent preloading\n/// InfiniteScrollListView<Trip>.withIntelligentPreloading(\n///   fetchData: (cursor) => repository.getTripsCursor(cursor: cursor),\n///   itemBuilder: (context, trip) => TripCard(trip: trip),\n///   preloadConfig: PreloadConfig.defaultConfig,\n/// )\n/// ```\n\nexport 'scroll_performance_tracker.dart';\nexport 'debounce.dart';\nexport 'query_batcher.dart';\nexport 'preloading_strategy.dart';\n",
+        "last_modified": "2026-01-05T12:48:42.704738"
+      },
+      "task_intent": {
+        "title": "Performance Optimization for Large Trips",
+        "description": "Optimize app performance for handling large, complex trips with hundreds of locations, activities, and photos",
+        "from_plan": true
+      },
+      "commits_behind_main": 203,
+      "status": "active",
+      "merged_at": null
+    }
+  },
+  "created_at": "2026-01-05T12:48:40.899719",
+  "last_updated": "2026-01-05T12:48:40.913357"
+}

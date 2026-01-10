@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/models/shared_link_model.dart';
 
 /// Remote data source interface for shared links

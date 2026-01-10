@@ -80,7 +80,7 @@ abstract class SyncHistoryService {
   SyncHistoryEntry? get latestEntry;
 
   /// Get entries filtered by status
-  List<SyncHistoryEntry> getEntriesByStatus(SyncStatus status);
+  List<SyncHistoryEntry> getEntriesByStatus(SyncOperationStatus status);
 
   /// Get entries filtered by manual sync flag
   List<SyncHistoryEntry> getManualSyncs();
@@ -114,7 +114,7 @@ abstract class SyncHistoryService {
   /// Delete entries by status
   ///
   /// Returns the number of entries deleted.
-  Future<int> deleteEntriesByStatus(SyncStatus status);
+  Future<int> deleteEntriesByStatus(SyncOperationStatus status);
 
   /// Export history to JSON string
   String exportToJson();

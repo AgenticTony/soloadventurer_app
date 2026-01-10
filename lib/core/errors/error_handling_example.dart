@@ -12,7 +12,7 @@ class Example1_BasicErrorHandling extends StatelessWidget {
   Future<void> _performOperation(BuildContext context) async {
     try {
       // Simulate an operation that might fail
-      throw NetworkTimeoutException(
+      throw const NetworkTimeoutException(
         message: 'Connection timed out after 30 seconds',
       );
     } catch (e, stackTrace) {

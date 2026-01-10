@@ -10,7 +10,6 @@ part 'destination.g.dart';
 /// place details, and metadata needed for itinerary generation.
 @freezed
 abstract class Destination with _$Destination {
-  const Destination._();
 
   /// Creates a Destination with all required fields
   ///
@@ -77,4 +76,7 @@ abstract class Destination with _$Destination {
         longitude >= -180 &&
         longitude <= 180;
   }
+
+  // Private constructor for freezed getters
+  const Destination._();
 }

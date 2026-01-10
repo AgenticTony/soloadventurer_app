@@ -2,19 +2,28 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase/src/supabase_realtime_client.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
 import 'package:soloadventurer/features/journal/helpers/journal_test_helpers.dart';
+import '../../../../test_constants.dart';
 
 // Mock classes
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockPostgrestClient extends Mock implements PostgrestClient {}
-class MockPostgrestFilterBuilder extends Mock implements PostgrestFilterBuilder {}
-class MockPostgrestTransformBuilder extends Mock implements PostgrestTransformBuilder {}
+
+class MockPostgrestFilterBuilder extends Mock
+    implements PostgrestFilterBuilder {}
+
+class MockPostgrestTransformBuilder extends Mock
+    implements PostgrestTransformBuilder {}
+
 class MockAuthResponse extends Mock implements AuthResponse {}
+
 class MockUser extends Mock implements User {}
 
 void main() {
@@ -40,7 +49,8 @@ void main() {
 
   group('JournalRemoteDataSourceImpl - Entry CRUD Operations', () {
     group('createEntry', () {
-      test('should return JournalEntryModel when creation is successful', () async {
+      test('should return JournalEntryModel when creation is successful',
+          () async {
         // Arrange
         final testEntry = createTestJournalEntryModel();
         final testJson = createTestJournalEntryJson();
@@ -60,10 +70,13 @@ void main() {
         expect(result.title, equals(testEntry.title));
       });
 
-      test('should throw ServerException when Supabase throws PostgrestException', () async {
+      test(
+          'should throw ServerException when Supabase throws PostgrestException',
+          () async {
         // Arrange
         final testEntry = createTestJournalEntryModel();
-        final postgrestException = PostgrestException(message: 'Database error');
+        const postgrestException =
+            PostgrestException(message: 'Database error');
 
         when(() => mockClient.from('journal_entries'))
             .thenThrow(postgrestException);
@@ -72,7 +85,8 @@ void main() {
         expect(
           () => dataSource.createEntry(testEntry),
           throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to create journal entry'))
+              .having((e) => e.message, 'message',
+                  contains('Failed to create journal entry'))
               .having((e) => e.statusCode, 'statusCode', 500)),
         );
       });
@@ -80,7 +94,7 @@ void main() {
       test('should throw ServerException with custom error code', () async {
         // Arrange
         final testEntry = createTestJournalEntryModel();
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Duplicate entry',
           code: '23505',
         );
@@ -104,15 +118,17 @@ void main() {
 
         when(() => mockClient.from('journal_entries'))
             .thenReturn(MockPostgrestFilterBuilder(null));
-        when(() => mockClient.from(any())).thenReturn(MockPostgrestFilterBuilder(null));
+        when(() => mockClient.from(any()))
+            .thenReturn(MockPostgrestFilterBuilder(null));
 
         // Act & Assert - Simulate successful retrieval
         // Note: Full mocking would require more complex PostgrestClient setup
       });
 
-      test('should throw ServerException with 404 when entry not found', () async {
+      test('should throw ServerException with 404 when entry not found',
+          () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Not found',
           code: '404',
         );
@@ -131,7 +147,7 @@ void main() {
 
       test('should throw ServerException with 404 for PGRST116 code', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'No rows found',
           code: 'PGRST116',
         );
@@ -149,14 +165,16 @@ void main() {
     });
 
     group('getEntries', () {
-      test('should return list of JournalEntryModel when user is authenticated', () async {
+      test('should return list of JournalEntryModel when user is authenticated',
+          () async {
         // Arrange
         when(() => mockUser.id).thenReturn(testUserId);
 
         // Act & Assert - Simulate successful list retrieval
       });
 
-      test('should throw ServerException when user is not authenticated', () async {
+      test('should throw ServerException when user is not authenticated',
+          () async {
         // Arrange
         when(() => mockAuth.currentUser).thenReturn(null);
 
@@ -173,14 +191,14 @@ void main() {
     group('getEntriesByTrip', () {
       test('should return entries for specified trip', () async {
         // Arrange
-        final tripId = 'trip-123';
+        const tripId = 'trip-123';
 
         // Act & Assert - Simulate successful retrieval
       });
 
       test('should throw ServerException on database error', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Database connection failed',
         );
 
@@ -190,8 +208,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.getEntriesByTrip('trip-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to get entries for trip'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to get entries for trip'))),
         );
       });
     });
@@ -205,7 +223,8 @@ void main() {
         // Act & Assert
       });
 
-      test('should throw ServerException when user is not authenticated', () async {
+      test('should throw ServerException when user is not authenticated',
+          () async {
         // Arrange
         when(() => mockAuth.currentUser).thenReturn(null);
         final startDate = DateTime(2024, 1, 1);
@@ -228,7 +247,8 @@ void main() {
         // Act & Assert
       });
 
-      test('should throw ServerException when user is not authenticated', () async {
+      test('should throw ServerException when user is not authenticated',
+          () async {
         // Arrange
         when(() => mockAuth.currentUser).thenReturn(null);
 
@@ -249,7 +269,8 @@ void main() {
         // Act & Assert
       });
 
-      test('should throw ServerException when user is not authenticated', () async {
+      test('should throw ServerException when user is not authenticated',
+          () async {
         // Arrange
         when(() => mockAuth.currentUser).thenReturn(null);
 
@@ -273,7 +294,7 @@ void main() {
       test('should throw ServerException on update failure', () async {
         // Arrange
         final testEntry = createTestJournalEntryModel();
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Update failed',
         );
 
@@ -283,24 +304,26 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.updateEntry(testEntry),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to update journal entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to update journal entry'))),
         );
       });
     });
 
     group('deleteEntry', () {
-      test('should complete without error when deletion is successful', () async {
+      test('should complete without error when deletion is successful',
+          () async {
         // Arrange
-        final entryId = 'entry-123';
+        const entryId = 'entry-123';
 
         // Act & Assert - Should not throw
-        await expectLater(() => dataSource.deleteEntry(entryId), returnsNormally);
+        await expectLater(
+            () => dataSource.deleteEntry(entryId), returnsNormally);
       });
 
       test('should throw ServerException on deletion failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Delete failed',
         );
 
@@ -310,8 +333,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.deleteEntry('entry-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to delete journal entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to delete journal entry'))),
         );
       });
     });
@@ -326,7 +349,7 @@ void main() {
 
       test('should throw ServerException when entry not found', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Entry not found',
           code: '404',
         );
@@ -350,7 +373,8 @@ void main() {
         // Act & Assert
       });
 
-      test('should throw ServerException when user is not authenticated', () async {
+      test('should throw ServerException when user is not authenticated',
+          () async {
         // Arrange
         when(() => mockAuth.currentUser).thenReturn(null);
 
@@ -374,7 +398,8 @@ void main() {
         // Act & Assert
       });
 
-      test('should throw ServerException when user is not authenticated', () async {
+      test('should throw ServerException when user is not authenticated',
+          () async {
         // Arrange
         when(() => mockAuth.currentUser).thenReturn(null);
 
@@ -390,7 +415,8 @@ void main() {
 
   group('JournalRemoteDataSourceImpl - Media CRUD Operations', () {
     group('addMedia', () {
-      test('should return MediaItemModel when addition is successful', () async {
+      test('should return MediaItemModel when addition is successful',
+          () async {
         // Arrange
         final testMedia = createTestMediaItemModel();
 
@@ -400,7 +426,7 @@ void main() {
       test('should throw ServerException on addition failure', () async {
         // Arrange
         final testMedia = createTestMediaItemModel();
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Failed to add media',
         );
 
@@ -410,8 +436,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.addMedia(testMedia),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to add media'))),
+          throwsA(isA<ServerException>().having(
+              (e) => e.message, 'message', contains('Failed to add media'))),
         );
       });
     });
@@ -427,7 +453,7 @@ void main() {
       test('should throw ServerException on update failure', () async {
         // Arrange
         final testMedia = createTestMediaItemModel();
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Update failed',
         );
 
@@ -437,24 +463,26 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.updateMedia(testMedia),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to update media'))),
+          throwsA(isA<ServerException>().having(
+              (e) => e.message, 'message', contains('Failed to update media'))),
         );
       });
     });
 
     group('deleteMedia', () {
-      test('should complete without error when deletion is successful', () async {
+      test('should complete without error when deletion is successful',
+          () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
 
         // Act & Assert
-        await expectLater(() => dataSource.deleteMedia(mediaId), returnsNormally);
+        await expectLater(
+            () => dataSource.deleteMedia(mediaId), returnsNormally);
       });
 
       test('should throw ServerException on deletion failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Delete failed',
         );
 
@@ -464,8 +492,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.deleteMedia('media-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to delete media'))),
+          throwsA(isA<ServerException>().having(
+              (e) => e.message, 'message', contains('Failed to delete media'))),
         );
       });
     });
@@ -473,14 +501,14 @@ void main() {
     group('getMediaForEntry', () {
       test('should return list of MediaItemModel for entry', () async {
         // Arrange
-        final entryId = 'entry-123';
+        const entryId = 'entry-123';
 
         // Act & Assert
       });
 
       test('should throw ServerException on retrieval failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Retrieval failed',
         );
 
@@ -490,8 +518,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.getMediaForEntry('entry-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to get media for entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to get media for entry'))),
         );
       });
     });
@@ -499,14 +527,14 @@ void main() {
     group('getMediaForTrip', () {
       test('should return all media items for trip entries', () async {
         // Arrange
-        final tripId = 'trip-123';
+        const tripId = 'trip-123';
 
         // Act & Assert
       });
 
       test('should return empty list when trip has no entries', () async {
         // Arrange
-        final tripId = 'empty-trip';
+        const tripId = 'empty-trip';
 
         // Act & Assert
         final result = await dataSource.getMediaForTrip(tripId);
@@ -515,7 +543,7 @@ void main() {
 
       test('should throw ServerException on retrieval failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Database error',
         );
 
@@ -525,8 +553,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.getMediaForTrip('trip-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to get media for trip'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to get media for trip'))),
         );
       });
     });
@@ -534,15 +562,16 @@ void main() {
     group('updateMediaUploadProgress', () {
       test('should return MediaItemModel with updated progress', () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
         const progress = 50;
 
         // Act & Assert
       });
 
-      test('should set upload_status to completed when progress is 100', () async {
+      test('should set upload_status to completed when progress is 100',
+          () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
         const progress = 100;
 
         // Act & Assert - Should set status to 'completed'
@@ -550,7 +579,7 @@ void main() {
 
       test('should throw ServerException on update failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Update failed',
         );
 
@@ -560,8 +589,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.updateMediaUploadProgress('media-123', 50),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to update upload progress'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to update upload progress'))),
         );
       });
     });
@@ -569,7 +598,7 @@ void main() {
     group('completeMediaUpload', () {
       test('should return MediaItemModel with completed status', () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
         const storagePath = '/uploads/photo.jpg';
 
         // Act & Assert
@@ -577,7 +606,7 @@ void main() {
 
       test('should set all completion fields correctly', () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
         const storagePath = '/uploads/photo.jpg';
 
         // Act & Assert - Should set:
@@ -589,7 +618,7 @@ void main() {
 
       test('should throw ServerException on completion failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Completion failed',
         );
 
@@ -599,8 +628,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.completeMediaUpload('media-123', '/path'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to complete upload'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to complete upload'))),
         );
       });
     });
@@ -608,7 +637,7 @@ void main() {
     group('failMediaUpload', () {
       test('should return MediaItemModel with failed status', () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
         const errorMessage = 'Upload failed';
 
         // Act & Assert
@@ -616,7 +645,7 @@ void main() {
 
       test('should set status fields to failed/pending', () async {
         // Arrange
-        final mediaId = 'media-123';
+        const mediaId = 'media-123';
         const errorMessage = 'Network error';
 
         // Act & Assert - Should set:
@@ -626,7 +655,7 @@ void main() {
 
       test('should throw ServerException on failure marking', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Update failed',
         );
 
@@ -636,8 +665,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.failMediaUpload('media-123', 'error'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to mark upload as failed'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to mark upload as failed'))),
         );
       });
     });
@@ -647,14 +676,14 @@ void main() {
     group('getTagsForEntry', () {
       test('should return list of tag IDs for entry', () async {
         // Arrange
-        final entryId = 'entry-123';
+        const entryId = 'entry-123';
 
         // Act & Assert
       });
 
       test('should throw ServerException on retrieval failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Database error',
         );
 
@@ -664,8 +693,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.getTagsForEntry('entry-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to get tags for entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to get tags for entry'))),
         );
       });
     });
@@ -673,16 +702,17 @@ void main() {
     group('addTagToEntry', () {
       test('should complete successfully when tag is added', () async {
         // Arrange
-        final entryId = 'entry-123';
-        final tagId = 'tag-123';
+        const entryId = 'entry-123';
+        const tagId = 'tag-123';
 
         // Act & Assert
-        await expectLater(() => dataSource.addTagToEntry(entryId, tagId), returnsNormally);
+        await expectLater(
+            () => dataSource.addTagToEntry(entryId, tagId), returnsNormally);
       });
 
       test('should throw ServerException on addition failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Insert failed',
         );
 
@@ -692,8 +722,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.addTagToEntry('entry-123', 'tag-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to add tag to entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to add tag to entry'))),
         );
       });
     });
@@ -701,16 +731,17 @@ void main() {
     group('removeTagFromEntry', () {
       test('should complete successfully when tag is removed', () async {
         // Arrange
-        final entryId = 'entry-123';
-        final tagId = 'tag-123';
+        const entryId = 'entry-123';
+        const tagId = 'tag-123';
 
         // Act & Assert
-        await expectLater(() => dataSource.removeTagFromEntry(entryId, tagId), returnsNormally);
+        await expectLater(() => dataSource.removeTagFromEntry(entryId, tagId),
+            returnsNormally);
       });
 
       test('should throw ServerException on removal failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Delete failed',
         );
 
@@ -720,8 +751,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.removeTagFromEntry('entry-123', 'tag-123'),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to remove tag from entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to remove tag from entry'))),
         );
       });
     });
@@ -729,25 +760,27 @@ void main() {
     group('updateTagsForEntry', () {
       test('should replace all tags for entry', () async {
         // Arrange
-        final entryId = 'entry-123';
+        const entryId = 'entry-123';
         final tagIds = ['tag-1', 'tag-2', 'tag-3'];
 
         // Act & Assert
-        await expectLater(() => dataSource.updateTagsForEntry(entryId, tagIds), returnsNormally);
+        await expectLater(() => dataSource.updateTagsForEntry(entryId, tagIds),
+            returnsNormally);
       });
 
       test('should handle empty tag list', () async {
         // Arrange
-        final entryId = 'entry-123';
+        const entryId = 'entry-123';
         final tagIds = <String>[];
 
         // Act & Assert - Should delete all existing tags
-        await expectLater(() => dataSource.updateTagsForEntry(entryId, tagIds), returnsNormally);
+        await expectLater(() => dataSource.updateTagsForEntry(entryId, tagIds),
+            returnsNormally);
       });
 
       test('should throw ServerException on update failure', () async {
         // Arrange
-        final postgrestException = PostgrestException(
+        const postgrestException = PostgrestException(
           message: 'Update failed',
         );
 
@@ -757,8 +790,8 @@ void main() {
         // Act & Assert
         expect(
           () => dataSource.updateTagsForEntry('entry-123', ['tag-1']),
-          throwsA(isA<ServerException>()
-              .having((e) => e.message, 'message', contains('Failed to update tags for entry'))),
+          throwsA(isA<ServerException>().having((e) => e.message, 'message',
+              contains('Failed to update tags for entry'))),
         );
       });
     });
@@ -801,15 +834,17 @@ void main() {
     test('should handle large content strings', () async {
       // Arrange
       final largeContent = 'x' * 100000; // 100KB of text
-      final entryWithLargeContent = createTestJournalEntryModel(content: largeContent);
+      final entryWithLargeContent =
+          createTestJournalEntryModel(content: largeContent);
 
       // Act & Assert - Should handle large content
     });
 
     test('should handle special characters in content', () async {
       // Arrange
-      final specialContent = 'Test with emoji 🎉, special chars: <>&"\'\\n\\t';
-      final entryWithSpecialChars = createTestJournalEntryModel(content: specialContent);
+      const specialContent = 'Test with emoji 🎉, special chars: <>&"\'\\n\\t';
+      final entryWithSpecialChars =
+          createTestJournalEntryModel(content: specialContent);
 
       // Act & Assert - Should escape/encode special characters
     });

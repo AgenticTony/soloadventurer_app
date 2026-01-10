@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/core/utils/query_batcher.dart';
+import 'package:soloadventurer/core/utils/query_batcher.dart';
 
 void main() {
   group('QueryBatcher', () {
@@ -94,7 +94,7 @@ void main() {
     });
 
     test('should deduplicate queries with same key', () async {
-      final config = BatchConfig(
+      const config = BatchConfig(
         maxBatchSize: 10,
         maxWaitTime: const Duration(milliseconds: 100),
         deduplicate: true,
@@ -132,7 +132,8 @@ void main() {
       batcher.dispose();
     });
 
-    test('should execute queries in priority order when priorities differ', () async {
+    test('should execute queries in priority order when priorities differ',
+        () async {
       final executionOrder = <String>[];
 
       batcher.add<String>(

@@ -89,10 +89,10 @@ class PerformanceTestDataGenerator {
     return List.generate(
       count,
       (index) {
-        final latitude = centerLatitude +
-            (random.nextDouble() * 2 - 1) * radius;
-        final longitude = centerLongitude +
-            (random.nextDouble() * 2 - 1) * radius;
+        final latitude =
+            centerLatitude + (random.nextDouble() * 2 - 1) * radius;
+        final longitude =
+            centerLongitude + (random.nextDouble() * 2 - 1) * radius;
 
         return Trip(
           id: 'clustered-trip-$index',
@@ -109,9 +109,8 @@ class PerformanceTestDataGenerator {
           coverImageUrl: index % 5 == 0
               ? 'https://example.com/covers/clustered-$index.jpg'
               : null,
-          travelCompanionIds: random.nextBool()
-              ? ['companion-${random.nextInt(10)}']
-              : null,
+          travelCompanionIds:
+              random.nextBool() ? ['companion-${random.nextInt(10)}'] : null,
           createdAt: DateTime.now().subtract(Duration(days: 30 - index)),
           updatedAt: DateTime.now().subtract(Duration(days: 29 - index)),
         );
@@ -203,8 +202,9 @@ class PerformanceTestDataGenerator {
       'activityCount': activityCount,
       'photoCount': photoCount,
       'noteCount': noteCount,
-      'estimatedMemoryUsage':
-          (activityCount * 1024) + (photoCount * 512 * 1024) + (noteCount * 512),
+      'estimatedMemoryUsage': (activityCount * 1024) +
+          (photoCount * 512 * 1024) +
+          (noteCount * 512),
       'createdAt': DateTime.now().toIso8601String(),
     };
   }

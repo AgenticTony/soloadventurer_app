@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:solo_adventurer/features/destination_discovery/application/providers/curated_lists_provider.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/curated_list.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/curated_lists_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/curated_list.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
 
 // Mock classes
 class MockDestinationRepository extends Mock implements DestinationRepository {}
@@ -21,7 +21,7 @@ void main() {
       location: (lat: 35.6762, lng: 139.6503),
       safetyScore: 8.5,
       soloSuitabilityScore: 8.0,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -46,7 +46,7 @@ void main() {
       location: (lat: 35.0116, lng: 135.7681),
       safetyScore: 9.0,
       soloSuitabilityScore: 8.5,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 9.0,
         nightlife: 6.0,
         walkability: 8.5,
@@ -234,7 +234,8 @@ void main() {
 
         await notifier.loadCuratedList('list99');
 
-        expect(notifier.state.value!.curatedLists.any((l) => l.id == 'list99'), isTrue);
+        expect(notifier.state.value!.curatedLists.any((l) => l.id == 'list99'),
+            isTrue);
         expect(notifier.state.value!.selectedList?.id, 'list99');
       });
 
@@ -245,7 +246,8 @@ void main() {
         when(() => mockRepository.getCuratedListById(any()))
             .thenThrow(Exception('Not found'));
 
-        expect(() async => await notifier.loadCuratedList('list1'), throwsException);
+        expect(() async => await notifier.loadCuratedList('list1'),
+            throwsException);
       });
     });
 
@@ -365,7 +367,8 @@ void main() {
         when(() => mockRepository.getCuratedListById('list1'))
             .thenThrow(Exception('Network error'));
 
-        expect(() async => await notifier.refreshSelectedList(), throwsException);
+        expect(
+            () async => await notifier.refreshSelectedList(), throwsException);
       });
     });
 
@@ -484,7 +487,8 @@ void main() {
         expect(notifier.hasCuratedLists, isFalse);
       });
 
-      test('hasSelectedList should return true when list is selected', () async {
+      test('hasSelectedList should return true when list is selected',
+          () async {
         notifier.clear();
         await notifier.loadCuratedLists();
 
@@ -495,7 +499,8 @@ void main() {
         expect(notifier.hasSelectedList, isTrue);
       });
 
-      test('hasSelectedList should return false when no list selected', () async {
+      test('hasSelectedList should return false when no list selected',
+          () async {
         notifier.clear();
 
         expect(notifier.hasSelectedList, isFalse);
@@ -512,12 +517,14 @@ void main() {
         expect(notifier.selectedList?.id, 'list1');
       });
 
-      test('getters should return empty/null when state has no value', () async {
+      test('getters should return empty/null when state has no value',
+          () async {
         notifier.clear();
 
         expect(notifier.featuredLists.isEmpty, isTrue);
         expect(notifier.popularLists.isEmpty, isTrue);
-        expect(notifier.getListsByType(CuratedListType.hiddenGems).isEmpty, isTrue);
+        expect(notifier.getListsByType(CuratedListType.hiddenGems).isEmpty,
+            isTrue);
         expect(notifier.hiddenGemsLists.isEmpty, isTrue);
         expect(notifier.budgetFriendlyLists.isEmpty, isTrue);
         expect(notifier.popularSoloLists.isEmpty, isTrue);

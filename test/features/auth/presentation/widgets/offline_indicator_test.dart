@@ -44,7 +44,8 @@ void main() {
       when(() => mockCachedDataProvider.getCachedDataInfo())
           .thenAnswer((_) async => CachedDataInfo(
                 userProfile: {'username': 'test_user'},
-                lastCachedAt: DateTime.now().subtract(const Duration(minutes: 5)),
+                lastCachedAt:
+                    DateTime.now().subtract(const Duration(minutes: 5)),
                 isFresh: true,
               ));
     });
@@ -354,7 +355,8 @@ void main() {
       when(() => mockCachedDataProvider.getCachedDataInfo())
           .thenAnswer((_) async => CachedDataInfo(
                 userProfile: {'username': 'test_user'},
-                lastCachedAt: DateTime.now().subtract(const Duration(minutes: 5)),
+                lastCachedAt:
+                    DateTime.now().subtract(const Duration(minutes: 5)),
                 isFresh: true,
               ));
     });
@@ -704,7 +706,7 @@ void main() {
       when(() => mockCachedDataProvider.isOffline())
           .thenAnswer((_) async => true);
       when(() => mockCachedDataProvider.getCachedDataInfo())
-          .thenAnswer((_) async => CachedDataInfo(
+          .thenAnswer((_) async => const CachedDataInfo(
                 userProfile: null,
                 lastCachedAt: null,
                 isFresh: false,

@@ -6,22 +6,59 @@ part of 'token_manager.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
+
+@ProviderFor(TokenManager)
+final tokenManagerProvider = TokenManagerProvider._();
+
+/// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
+final class TokenManagerProvider
+    extends $NotifierProvider<TokenManager, FeatureAvailability> {
+  /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
+  TokenManagerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tokenManagerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tokenManagerHash();
+
+  @$internal
+  @override
+  TokenManager create() => TokenManager();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FeatureAvailability value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FeatureAvailability>(value),
+    );
+  }
+}
+
 String _$tokenManagerHash() => r'bb2d64986f9ad8aef188a4999e6d7b94b1f85424';
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
-///
-/// Copied from [TokenManager].
-@ProviderFor(TokenManager)
-final tokenManagerProvider =
-    AutoDisposeNotifierProvider<TokenManager, FeatureAvailability>.internal(
-  TokenManager.new,
-  name: r'tokenManagerProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$tokenManagerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$TokenManager = AutoDisposeNotifier<FeatureAvailability>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$TokenManager extends $Notifier<FeatureAvailability> {
+  FeatureAvailability build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<FeatureAvailability, FeatureAvailability>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<FeatureAvailability, FeatureAvailability>,
+        FeatureAvailability,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

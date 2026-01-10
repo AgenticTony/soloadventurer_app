@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,163 +9,100 @@ part of 'travel_preference.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-TravelPreference _$TravelPreferenceFromJson(Map<String, dynamic> json) {
-  return _TravelPreference.fromJson(json);
-}
 
 /// @nodoc
 mixin _$TravelPreference {
-  String get id => throw _privateConstructorUsedError;
-  String get userId => throw _privateConstructorUsedError;
-  List<String> get travelStyles => throw _privateConstructorUsedError;
-  List<String> get accommodationTypes => throw _privateConstructorUsedError;
-  List<String> get transportationTypes => throw _privateConstructorUsedError;
-  int get minBudget => throw _privateConstructorUsedError;
-  int get maxBudget => throw _privateConstructorUsedError;
-  int get minTripDuration => throw _privateConstructorUsedError;
-  int get maxTripDuration => throw _privateConstructorUsedError;
-  List<String> get preferredDestinations => throw _privateConstructorUsedError;
-  List<String> get avoidDestinations => throw _privateConstructorUsedError;
-  bool get isFlexibleDates => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this TravelPreference to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get userId;
+  List<String> get travelStyles;
+  List<String> get accommodationTypes;
+  List<String> get transportationTypes;
+  int get minBudget;
+  int get maxBudget;
+  int get minTripDuration;
+  int get maxTripDuration;
+  List<String> get preferredDestinations;
+  List<String> get avoidDestinations;
+  bool get isFlexibleDates;
+  DateTime get createdAt;
+  DateTime get updatedAt;
 
   /// Create a copy of TravelPreference
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $TravelPreferenceCopyWith<TravelPreference> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $TravelPreferenceCopyWith<$Res> {
-  factory $TravelPreferenceCopyWith(
-          TravelPreference value, $Res Function(TravelPreference) then) =
-      _$TravelPreferenceCopyWithImpl<$Res, TravelPreference>;
-  @useResult
-  $Res call(
-      {String id,
-      String userId,
-      List<String> travelStyles,
-      List<String> accommodationTypes,
-      List<String> transportationTypes,
-      int minBudget,
-      int maxBudget,
-      int minTripDuration,
-      int maxTripDuration,
-      List<String> preferredDestinations,
-      List<String> avoidDestinations,
-      bool isFlexibleDates,
-      DateTime createdAt,
-      DateTime updatedAt});
-}
-
-/// @nodoc
-class _$TravelPreferenceCopyWithImpl<$Res, $Val extends TravelPreference>
-    implements $TravelPreferenceCopyWith<$Res> {
-  _$TravelPreferenceCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of TravelPreference
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $TravelPreferenceCopyWith<TravelPreference> get copyWith =>
+      _$TravelPreferenceCopyWithImpl<TravelPreference>(
+          this as TravelPreference, _$identity);
+
+  /// Serializes this TravelPreference to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? travelStyles = null,
-    Object? accommodationTypes = null,
-    Object? transportationTypes = null,
-    Object? minBudget = null,
-    Object? maxBudget = null,
-    Object? minTripDuration = null,
-    Object? maxTripDuration = null,
-    Object? preferredDestinations = null,
-    Object? avoidDestinations = null,
-    Object? isFlexibleDates = null,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      travelStyles: null == travelStyles
-          ? _value.travelStyles
-          : travelStyles // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      accommodationTypes: null == accommodationTypes
-          ? _value.accommodationTypes
-          : accommodationTypes // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      transportationTypes: null == transportationTypes
-          ? _value.transportationTypes
-          : transportationTypes // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      minBudget: null == minBudget
-          ? _value.minBudget
-          : minBudget // ignore: cast_nullable_to_non_nullable
-              as int,
-      maxBudget: null == maxBudget
-          ? _value.maxBudget
-          : maxBudget // ignore: cast_nullable_to_non_nullable
-              as int,
-      minTripDuration: null == minTripDuration
-          ? _value.minTripDuration
-          : minTripDuration // ignore: cast_nullable_to_non_nullable
-              as int,
-      maxTripDuration: null == maxTripDuration
-          ? _value.maxTripDuration
-          : maxTripDuration // ignore: cast_nullable_to_non_nullable
-              as int,
-      preferredDestinations: null == preferredDestinations
-          ? _value.preferredDestinations
-          : preferredDestinations // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      avoidDestinations: null == avoidDestinations
-          ? _value.avoidDestinations
-          : avoidDestinations // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      isFlexibleDates: null == isFlexibleDates
-          ? _value.isFlexibleDates
-          : isFlexibleDates // ignore: cast_nullable_to_non_nullable
-              as bool,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is TravelPreference &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            const DeepCollectionEquality()
+                .equals(other.travelStyles, travelStyles) &&
+            const DeepCollectionEquality()
+                .equals(other.accommodationTypes, accommodationTypes) &&
+            const DeepCollectionEquality()
+                .equals(other.transportationTypes, transportationTypes) &&
+            (identical(other.minBudget, minBudget) ||
+                other.minBudget == minBudget) &&
+            (identical(other.maxBudget, maxBudget) ||
+                other.maxBudget == maxBudget) &&
+            (identical(other.minTripDuration, minTripDuration) ||
+                other.minTripDuration == minTripDuration) &&
+            (identical(other.maxTripDuration, maxTripDuration) ||
+                other.maxTripDuration == maxTripDuration) &&
+            const DeepCollectionEquality()
+                .equals(other.preferredDestinations, preferredDestinations) &&
+            const DeepCollectionEquality()
+                .equals(other.avoidDestinations, avoidDestinations) &&
+            (identical(other.isFlexibleDates, isFlexibleDates) ||
+                other.isFlexibleDates == isFlexibleDates) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      const DeepCollectionEquality().hash(travelStyles),
+      const DeepCollectionEquality().hash(accommodationTypes),
+      const DeepCollectionEquality().hash(transportationTypes),
+      minBudget,
+      maxBudget,
+      minTripDuration,
+      maxTripDuration,
+      const DeepCollectionEquality().hash(preferredDestinations),
+      const DeepCollectionEquality().hash(avoidDestinations),
+      isFlexibleDates,
+      createdAt,
+      updatedAt);
+
+  @override
+  String toString() {
+    return 'TravelPreference(id: $id, userId: $userId, travelStyles: $travelStyles, accommodationTypes: $accommodationTypes, transportationTypes: $transportationTypes, minBudget: $minBudget, maxBudget: $maxBudget, minTripDuration: $minTripDuration, maxTripDuration: $maxTripDuration, preferredDestinations: $preferredDestinations, avoidDestinations: $avoidDestinations, isFlexibleDates: $isFlexibleDates, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
 /// @nodoc
-abstract class _$$TravelPreferenceImplCopyWith<$Res>
-    implements $TravelPreferenceCopyWith<$Res> {
-  factory _$$TravelPreferenceImplCopyWith(_$TravelPreferenceImpl value,
-          $Res Function(_$TravelPreferenceImpl) then) =
-      __$$TravelPreferenceImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $TravelPreferenceCopyWith<$Res> {
+  factory $TravelPreferenceCopyWith(
+          TravelPreference value, $Res Function(TravelPreference) _then) =
+      _$TravelPreferenceCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -185,12 +122,12 @@ abstract class _$$TravelPreferenceImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$TravelPreferenceImplCopyWithImpl<$Res>
-    extends _$TravelPreferenceCopyWithImpl<$Res, _$TravelPreferenceImpl>
-    implements _$$TravelPreferenceImplCopyWith<$Res> {
-  __$$TravelPreferenceImplCopyWithImpl(_$TravelPreferenceImpl _value,
-      $Res Function(_$TravelPreferenceImpl) _then)
-      : super(_value, _then);
+class _$TravelPreferenceCopyWithImpl<$Res>
+    implements $TravelPreferenceCopyWith<$Res> {
+  _$TravelPreferenceCopyWithImpl(this._self, this._then);
+
+  final TravelPreference _self;
+  final $Res Function(TravelPreference) _then;
 
   /// Create a copy of TravelPreference
   /// with the given fields replaced by the non-null parameter values.
@@ -212,71 +149,315 @@ class __$$TravelPreferenceImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
-    return _then(_$TravelPreferenceImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       userId: null == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
       travelStyles: null == travelStyles
-          ? _value._travelStyles
+          ? _self.travelStyles
           : travelStyles // ignore: cast_nullable_to_non_nullable
               as List<String>,
       accommodationTypes: null == accommodationTypes
-          ? _value._accommodationTypes
+          ? _self.accommodationTypes
           : accommodationTypes // ignore: cast_nullable_to_non_nullable
               as List<String>,
       transportationTypes: null == transportationTypes
-          ? _value._transportationTypes
+          ? _self.transportationTypes
           : transportationTypes // ignore: cast_nullable_to_non_nullable
               as List<String>,
       minBudget: null == minBudget
-          ? _value.minBudget
+          ? _self.minBudget
           : minBudget // ignore: cast_nullable_to_non_nullable
               as int,
       maxBudget: null == maxBudget
-          ? _value.maxBudget
+          ? _self.maxBudget
           : maxBudget // ignore: cast_nullable_to_non_nullable
               as int,
       minTripDuration: null == minTripDuration
-          ? _value.minTripDuration
+          ? _self.minTripDuration
           : minTripDuration // ignore: cast_nullable_to_non_nullable
               as int,
       maxTripDuration: null == maxTripDuration
-          ? _value.maxTripDuration
+          ? _self.maxTripDuration
           : maxTripDuration // ignore: cast_nullable_to_non_nullable
               as int,
       preferredDestinations: null == preferredDestinations
-          ? _value._preferredDestinations
+          ? _self.preferredDestinations
           : preferredDestinations // ignore: cast_nullable_to_non_nullable
               as List<String>,
       avoidDestinations: null == avoidDestinations
-          ? _value._avoidDestinations
+          ? _self.avoidDestinations
           : avoidDestinations // ignore: cast_nullable_to_non_nullable
               as List<String>,
       isFlexibleDates: null == isFlexibleDates
-          ? _value.isFlexibleDates
+          ? _self.isFlexibleDates
           : isFlexibleDates // ignore: cast_nullable_to_non_nullable
               as bool,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updatedAt: null == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [TravelPreference].
+extension TravelPreferencePatterns on TravelPreference {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_TravelPreference value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TravelPreference() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_TravelPreference value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelPreference():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_TravelPreference value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelPreference() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            List<String> travelStyles,
+            List<String> accommodationTypes,
+            List<String> transportationTypes,
+            int minBudget,
+            int maxBudget,
+            int minTripDuration,
+            int maxTripDuration,
+            List<String> preferredDestinations,
+            List<String> avoidDestinations,
+            bool isFlexibleDates,
+            DateTime createdAt,
+            DateTime updatedAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TravelPreference() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.travelStyles,
+            _that.accommodationTypes,
+            _that.transportationTypes,
+            _that.minBudget,
+            _that.maxBudget,
+            _that.minTripDuration,
+            _that.maxTripDuration,
+            _that.preferredDestinations,
+            _that.avoidDestinations,
+            _that.isFlexibleDates,
+            _that.createdAt,
+            _that.updatedAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            List<String> travelStyles,
+            List<String> accommodationTypes,
+            List<String> transportationTypes,
+            int minBudget,
+            int maxBudget,
+            int minTripDuration,
+            int maxTripDuration,
+            List<String> preferredDestinations,
+            List<String> avoidDestinations,
+            bool isFlexibleDates,
+            DateTime createdAt,
+            DateTime updatedAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelPreference():
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.travelStyles,
+            _that.accommodationTypes,
+            _that.transportationTypes,
+            _that.minBudget,
+            _that.maxBudget,
+            _that.minTripDuration,
+            _that.maxTripDuration,
+            _that.preferredDestinations,
+            _that.avoidDestinations,
+            _that.isFlexibleDates,
+            _that.createdAt,
+            _that.updatedAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String userId,
+            List<String> travelStyles,
+            List<String> accommodationTypes,
+            List<String> transportationTypes,
+            int minBudget,
+            int maxBudget,
+            int minTripDuration,
+            int maxTripDuration,
+            List<String> preferredDestinations,
+            List<String> avoidDestinations,
+            bool isFlexibleDates,
+            DateTime createdAt,
+            DateTime updatedAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelPreference() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.travelStyles,
+            _that.accommodationTypes,
+            _that.transportationTypes,
+            _that.minBudget,
+            _that.maxBudget,
+            _that.minTripDuration,
+            _that.maxTripDuration,
+            _that.preferredDestinations,
+            _that.avoidDestinations,
+            _that.isFlexibleDates,
+            _that.createdAt,
+            _that.updatedAt);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$TravelPreferenceImpl implements _TravelPreference {
-  const _$TravelPreferenceImpl(
+class _TravelPreference implements TravelPreference {
+  const _TravelPreference(
       {required this.id,
       required this.userId,
       required final List<String> travelStyles,
@@ -296,9 +477,8 @@ class _$TravelPreferenceImpl implements _TravelPreference {
         _transportationTypes = transportationTypes,
         _preferredDestinations = preferredDestinations,
         _avoidDestinations = avoidDestinations;
-
-  factory _$TravelPreferenceImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TravelPreferenceImplFromJson(json);
+  factory _TravelPreference.fromJson(Map<String, dynamic> json) =>
+      _$TravelPreferenceFromJson(json);
 
   @override
   final String id;
@@ -363,16 +543,26 @@ class _$TravelPreferenceImpl implements _TravelPreference {
   @override
   final DateTime updatedAt;
 
+  /// Create a copy of TravelPreference
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'TravelPreference(id: $id, userId: $userId, travelStyles: $travelStyles, accommodationTypes: $accommodationTypes, transportationTypes: $transportationTypes, minBudget: $minBudget, maxBudget: $maxBudget, minTripDuration: $minTripDuration, maxTripDuration: $maxTripDuration, preferredDestinations: $preferredDestinations, avoidDestinations: $avoidDestinations, isFlexibleDates: $isFlexibleDates, createdAt: $createdAt, updatedAt: $updatedAt)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$TravelPreferenceCopyWith<_TravelPreference> get copyWith =>
+      __$TravelPreferenceCopyWithImpl<_TravelPreference>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$TravelPreferenceToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TravelPreferenceImpl &&
+            other is _TravelPreference &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             const DeepCollectionEquality()
@@ -420,76 +610,124 @@ class _$TravelPreferenceImpl implements _TravelPreference {
       createdAt,
       updatedAt);
 
-  /// Create a copy of TravelPreference
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$TravelPreferenceImplCopyWith<_$TravelPreferenceImpl> get copyWith =>
-      __$$TravelPreferenceImplCopyWithImpl<_$TravelPreferenceImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$TravelPreferenceImplToJson(
-      this,
-    );
+  String toString() {
+    return 'TravelPreference(id: $id, userId: $userId, travelStyles: $travelStyles, accommodationTypes: $accommodationTypes, transportationTypes: $transportationTypes, minBudget: $minBudget, maxBudget: $maxBudget, minTripDuration: $minTripDuration, maxTripDuration: $maxTripDuration, preferredDestinations: $preferredDestinations, avoidDestinations: $avoidDestinations, isFlexibleDates: $isFlexibleDates, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
-abstract class _TravelPreference implements TravelPreference {
-  const factory _TravelPreference(
-      {required final String id,
-      required final String userId,
-      required final List<String> travelStyles,
-      required final List<String> accommodationTypes,
-      required final List<String> transportationTypes,
-      required final int minBudget,
-      required final int maxBudget,
-      required final int minTripDuration,
-      required final int maxTripDuration,
-      required final List<String> preferredDestinations,
-      required final List<String> avoidDestinations,
-      required final bool isFlexibleDates,
-      required final DateTime createdAt,
-      required final DateTime updatedAt}) = _$TravelPreferenceImpl;
+/// @nodoc
+abstract mixin class _$TravelPreferenceCopyWith<$Res>
+    implements $TravelPreferenceCopyWith<$Res> {
+  factory _$TravelPreferenceCopyWith(
+          _TravelPreference value, $Res Function(_TravelPreference) _then) =
+      __$TravelPreferenceCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String userId,
+      List<String> travelStyles,
+      List<String> accommodationTypes,
+      List<String> transportationTypes,
+      int minBudget,
+      int maxBudget,
+      int minTripDuration,
+      int maxTripDuration,
+      List<String> preferredDestinations,
+      List<String> avoidDestinations,
+      bool isFlexibleDates,
+      DateTime createdAt,
+      DateTime updatedAt});
+}
 
-  factory _TravelPreference.fromJson(Map<String, dynamic> json) =
-      _$TravelPreferenceImpl.fromJson;
+/// @nodoc
+class __$TravelPreferenceCopyWithImpl<$Res>
+    implements _$TravelPreferenceCopyWith<$Res> {
+  __$TravelPreferenceCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get userId;
-  @override
-  List<String> get travelStyles;
-  @override
-  List<String> get accommodationTypes;
-  @override
-  List<String> get transportationTypes;
-  @override
-  int get minBudget;
-  @override
-  int get maxBudget;
-  @override
-  int get minTripDuration;
-  @override
-  int get maxTripDuration;
-  @override
-  List<String> get preferredDestinations;
-  @override
-  List<String> get avoidDestinations;
-  @override
-  bool get isFlexibleDates;
-  @override
-  DateTime get createdAt;
-  @override
-  DateTime get updatedAt;
+  final _TravelPreference _self;
+  final $Res Function(_TravelPreference) _then;
 
   /// Create a copy of TravelPreference
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TravelPreferenceImplCopyWith<_$TravelPreferenceImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? userId = null,
+    Object? travelStyles = null,
+    Object? accommodationTypes = null,
+    Object? transportationTypes = null,
+    Object? minBudget = null,
+    Object? maxBudget = null,
+    Object? minTripDuration = null,
+    Object? maxTripDuration = null,
+    Object? preferredDestinations = null,
+    Object? avoidDestinations = null,
+    Object? isFlexibleDates = null,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+  }) {
+    return _then(_TravelPreference(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      travelStyles: null == travelStyles
+          ? _self._travelStyles
+          : travelStyles // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      accommodationTypes: null == accommodationTypes
+          ? _self._accommodationTypes
+          : accommodationTypes // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      transportationTypes: null == transportationTypes
+          ? _self._transportationTypes
+          : transportationTypes // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      minBudget: null == minBudget
+          ? _self.minBudget
+          : minBudget // ignore: cast_nullable_to_non_nullable
+              as int,
+      maxBudget: null == maxBudget
+          ? _self.maxBudget
+          : maxBudget // ignore: cast_nullable_to_non_nullable
+              as int,
+      minTripDuration: null == minTripDuration
+          ? _self.minTripDuration
+          : minTripDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      maxTripDuration: null == maxTripDuration
+          ? _self.maxTripDuration
+          : maxTripDuration // ignore: cast_nullable_to_non_nullable
+              as int,
+      preferredDestinations: null == preferredDestinations
+          ? _self._preferredDestinations
+          : preferredDestinations // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      avoidDestinations: null == avoidDestinations
+          ? _self._avoidDestinations
+          : avoidDestinations // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      isFlexibleDates: null == isFlexibleDates
+          ? _self.isFlexibleDates
+          : isFlexibleDates // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
 }
+
+// dart format on

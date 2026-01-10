@@ -1,11 +1,12 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
-import 'package:soloadventurer/utils/performance/paginated_list_notifier.dart';
 import 'package:soloadventurer/utils/performance/query_optimizer.dart';
+
+// Generated file
+part 'journal_list_provider_optimized.g.dart';
 
 // ============================================================================
 // Organization Mode
@@ -128,12 +129,29 @@ class OptimizedJournalListState {
 // Optimized Journal List Notifier
 // ============================================================================
 
-/// Optimized notifier for managing journal list with pagination and caching
-class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListState> {
-  final JournalRepository _repository;
-  final QueryOptimizer _queryOptimizer;
-  final PaginationConfig _paginationConfig;
+/// Pagination configuration
+class PaginationConfig {
+  final int pageSize;
+  final int threshold;
 
+  const PaginationConfig({
+    required this.pageSize,
+    required this.threshold,
+  });
+
+  /// Config for medium-sized lists
+  static const forMediumLists = PaginationConfig(
+    pageSize: 20,
+    threshold: 5,
+  );
+}
+
+/// Optimized notifier for managing journal list with pagination and caching
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class OptimizedJournalList extends _$OptimizedJournalList {
   /// Date formatter for grouping entries by date
   final DateFormat _dateFormatter = DateFormat('MMMM yyyy');
 
@@ -141,25 +159,28 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
   Map<String?, List<JournalEntry>> _cachedEntriesByTrip = {};
   Map<String, List<JournalEntry>> _cachedEntriesByDate = {};
 
-  OptimizedJournalListNotifier(
-    this._repository, {
-    QueryOptimizer? queryOptimizer,
-    PaginationConfig? paginationConfig,
-  })  : _queryOptimizer = queryOptimizer ?? QueryOptimizer(),
-        _paginationConfig = paginationConfig ?? PaginationConfig.forMediumLists,
-        super(const OptimizedJournalListState()) {
+  /// Default pagination config
+  PaginationConfig get _paginationConfig => PaginationConfig.forMediumLists;
+
+  @override
+  OptimizedJournalListState build() {
+    // Load initial data automatically on build
     loadInitial();
+
+    return const OptimizedJournalListState();
   }
 
   /// Loads initial page of journal entries with optimization
   Future<void> loadInitial() async {
     state = state.copyWith(isLoading: true, error: null);
-    notifyListeners();
 
     try {
-      final result = await _queryOptimizer.execute<List<JournalEntry>>(
+      final repository = ref.read(journalRepositoryProvider);
+      final queryOptimizer = ref.read(journalQueryOptimizerProvider);
+
+      final result = await queryOptimizer.execute<List<JournalEntry>>(
         'journal_entries_page_1',
-        () => _fetchEntriesPage(1, _paginationConfig.pageSize),
+        () => _fetchEntriesPage(repository, 1, _paginationConfig.pageSize),
         ttl: const Duration(minutes: 2),
       );
 
@@ -190,14 +211,11 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
       // Update cache
       _cachedEntriesByTrip = entriesByTrip;
       _cachedEntriesByDate = entriesByDate;
-
-      notifyListeners();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: e.toString(),
       );
-      notifyListeners();
     }
   }
 
@@ -208,14 +226,15 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
     }
 
     state = state.copyWith(isLoadingMore: true);
-    notifyListeners();
 
     try {
+      final repository = ref.read(journalRepositoryProvider);
+      final queryOptimizer = ref.read(journalQueryOptimizerProvider);
       final nextPage = state.currentPage + 1;
 
-      final result = await _queryOptimizer.execute<List<JournalEntry>>(
+      final result = await queryOptimizer.execute<List<JournalEntry>>(
         'journal_entries_page_$nextPage',
-        () => _fetchEntriesPage(nextPage, _paginationConfig.pageSize),
+        () => _fetchEntriesPage(repository, nextPage, _paginationConfig.pageSize),
         ttl: const Duration(minutes: 2),
       );
 
@@ -247,18 +266,19 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
       // Update cache
       _cachedEntriesByTrip = entriesByTrip;
       _cachedEntriesByDate = entriesByDate;
-
-      notifyListeners();
     } catch (e) {
       state = state.copyWith(isLoadingMore: false, error: e.toString());
-      notifyListeners();
     }
   }
 
   /// Fetch entries with field selection for optimization
-  Future<List<JournalEntry>> _fetchEntriesPage(int page, int pageSize) async {
+  Future<List<JournalEntry>> _fetchEntriesPage(
+    JournalRepository repository,
+    int page,
+    int pageSize,
+  ) async {
     // Use optimized query with field selection
-    final entries = await _repository.getEntries();
+    final entries = await repository.getEntries();
 
     // Apply pagination
     final startIndex = (page - 1) * pageSize;
@@ -326,13 +346,11 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
         : JournalListOrganization.byTrip;
 
     state = state.copyWith(organizationMode: newMode);
-    notifyListeners();
   }
 
   /// Set organization mode
   void setOrganizationMode(JournalListOrganization mode) {
     state = state.copyWith(organizationMode: mode);
-    notifyListeners();
   }
 
   /// Check if should load more based on index
@@ -344,8 +362,10 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
 
   /// Refreshes the journal list
   Future<void> refresh() async {
+    final queryOptimizer = ref.read(journalQueryOptimizerProvider);
+
     // Invalidate cache
-    _queryOptimizer.invalidateMultiple([
+    queryOptimizer.invalidateMultiple([
       'journal_entries_page_1',
       for (int i = 2; i <= state.currentPage; i++) 'journal_entries_page_$i',
     ]);
@@ -357,14 +377,14 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
   void clearError() {
     if (state.error != null) {
       state = state.copyWith(error: null);
-      notifyListeners();
     }
   }
 
   /// Get cache statistics
   Map<String, dynamic> getCacheStats() {
+    final queryOptimizer = ref.read(journalQueryOptimizerProvider);
     return {
-      'queryOptimizer': _queryOptimizer.getQueryStats(),
+      'queryOptimizer': queryOptimizer.getQueryStats(),
       'entriesByTripCount': _cachedEntriesByTrip.length,
       'entriesByDateCount': _cachedEntriesByDate.length,
     };
@@ -372,38 +392,35 @@ class OptimizedJournalListNotifier extends StateNotifier<OptimizedJournalListSta
 }
 
 // ============================================================================
-// Providers
+// Supporting Providers
 // ============================================================================
 
 /// Provider for query optimizer
-final journalQueryOptimizerProvider = Provider<QueryOptimizer>((ref) {
-  return QueryOptimizer(cacheConfig: CacheConfig.forLists);
-});
+@riverpod
+QueryOptimizer journalQueryOptimizer(Ref ref) {
+  return QueryOptimizer(cacheConfig: null);
+}
 
-/// Provider for optimized journal list state
-final optimizedJournalListProvider =
-    StateNotifierProvider<OptimizedJournalListNotifier, OptimizedJournalListState>((ref) {
-  final repository = ref.watch(journalRepositoryProvider);
-  final queryOptimizer = ref.watch(journalQueryOptimizerProvider);
+/// Cache configuration
+class CacheConfig {
+  final Duration ttl;
 
-  return OptimizedJournalListNotifier(
-    repository,
-    queryOptimizer: queryOptimizer,
-  );
-});
+  const CacheConfig({required this.ttl});
+
+  /// Config for lists
+  static const forLists = CacheConfig(ttl: Duration(minutes: 5));
+}
 
 /// Provider for entries grouped by trip (optimized)
-final optimizedJournalEntriesByTripProvider = Provider<Map<String?, List<JournalEntry>>>(
-  (ref) {
-    final listState = ref.watch(optimizedJournalListProvider);
-    return listState.entriesByTrip;
-  },
-);
+@riverpod
+Map<String?, List<JournalEntry>> optimizedJournalEntriesByTrip(Ref ref) {
+  final listState = ref.watch(optimizedJournalListProvider);
+  return listState.entriesByTrip;
+}
 
 /// Provider for entries grouped by date (optimized)
-final optimizedJournalEntriesByDateProvider = Provider<Map<String, List<JournalEntry>>>(
-  (ref) {
-    final listState = ref.watch(optimizedJournalListProvider);
-    return listState.entriesByDate;
-  },
-);
+@riverpod
+Map<String, List<JournalEntry>> optimizedJournalEntriesByDate(Ref ref) {
+  final listState = ref.watch(optimizedJournalListProvider);
+  return listState.entriesByDate;
+}

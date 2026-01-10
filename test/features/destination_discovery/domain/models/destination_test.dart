@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
 
 void main() {
   group('SoloSuitabilityFactors', () {
     test('should create with all required fields', () {
-      final factors = SoloSuitabilityFactors(
+      const factors = SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -25,7 +25,7 @@ void main() {
     });
 
     test('should serialize to JSON correctly', () {
-      final factors = SoloSuitabilityFactors(
+      const factors = SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -69,7 +69,7 @@ void main() {
     });
 
     test('should implement equality correctly', () {
-      final factors1 = SoloSuitabilityFactors(
+      const factors1 = SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -79,7 +79,7 @@ void main() {
         overall: 7.8,
       );
 
-      final factors2 = SoloSuitabilityFactors(
+      const factors2 = SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -89,7 +89,7 @@ void main() {
         overall: 7.8,
       );
 
-      final factors3 = SoloSuitabilityFactors(
+      const factors3 = SoloSuitabilityFactors(
         safety: 7.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -105,7 +105,7 @@ void main() {
     });
 
     test('should support copyWith', () {
-      final factors = SoloSuitabilityFactors(
+      const factors = SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -125,7 +125,7 @@ void main() {
 
   group('SafetyInsight', () {
     test('should create with all required fields', () {
-      final insight = SafetyInsight(
+      const insight = SafetyInsight(
         category: 'theft',
         description: 'Pickpocketing is common in tourist areas',
         severity: 'medium',
@@ -143,7 +143,7 @@ void main() {
     });
 
     test('should serialize to JSON correctly', () {
-      final insight = SafetyInsight(
+      const insight = SafetyInsight(
         category: 'theft',
         description: 'Pickpocketing is common',
         severity: 'medium',
@@ -175,21 +175,21 @@ void main() {
     });
 
     test('should implement equality correctly', () {
-      final insight1 = SafetyInsight(
+      const insight1 = SafetyInsight(
         category: 'theft',
         description: 'Pickpocketing is common',
         severity: 'medium',
         tips: ['Tip 1'],
       );
 
-      final insight2 = SafetyInsight(
+      const insight2 = SafetyInsight(
         category: 'theft',
         description: 'Pickpocketing is common',
         severity: 'medium',
         tips: ['Tip 1'],
       );
 
-      final insight3 = SafetyInsight(
+      const insight3 = SafetyInsight(
         category: 'theft',
         description: 'Different description',
         severity: 'medium',
@@ -203,7 +203,7 @@ void main() {
 
   group('Activity', () {
     test('should create with all required fields', () {
-      final activity = Activity(
+      const activity = Activity(
         id: 'act_1',
         name: 'Temple Visit',
         description: 'Visit ancient temples',
@@ -222,7 +222,7 @@ void main() {
     });
 
     test('should create with only required fields', () {
-      final activity = Activity(
+      const activity = Activity(
         id: 'act_1',
         name: 'Temple Visit',
         category: 'cultural',
@@ -237,7 +237,7 @@ void main() {
     });
 
     test('should serialize to JSON correctly', () {
-      final activity = Activity(
+      const activity = Activity(
         id: 'act_1',
         name: 'Temple Visit',
         description: 'Visit ancient temples',
@@ -277,21 +277,21 @@ void main() {
     });
 
     test('should implement equality correctly', () {
-      final activity1 = Activity(
+      const activity1 = Activity(
         id: 'act_1',
         name: 'Temple Visit',
         category: 'cultural',
         soloFriendly: true,
       );
 
-      final activity2 = Activity(
+      const activity2 = Activity(
         id: 'act_1',
         name: 'Temple Visit',
         category: 'cultural',
         soloFriendly: true,
       );
 
-      final activity3 = Activity(
+      const activity3 = Activity(
         id: 'act_2',
         name: 'Different Activity',
         category: 'cultural',
@@ -319,7 +319,7 @@ void main() {
         region: 'Kanto',
         safetyScore: 9.2,
         safetyInsights: [
-          SafetyInsight(
+          const SafetyInsight(
             category: 'general',
             description: 'Very safe city',
             severity: 'low',
@@ -327,7 +327,7 @@ void main() {
           ),
         ],
         soloSuitabilityScore: 8.8,
-        soloSuitabilityFactors: SoloSuitabilityFactors(
+        soloSuitabilityFactors: const SoloSuitabilityFactors(
           safety: 9.5,
           nightlife: 8.0,
           walkability: 9.0,
@@ -349,7 +349,7 @@ void main() {
         ],
         coverImageUrl: 'https://example.com/tokyo_cover.jpg',
         popularActivities: [
-          Activity(
+          const Activity(
             id: 'act_1',
             name: 'Visit temples',
             category: 'cultural',
@@ -400,12 +400,15 @@ void main() {
       expect(deserialized.id, destination.id);
       expect(deserialized.name, destination.name);
       expect(deserialized.safetyScore, destination.safetyScore);
-      expect(deserialized.soloSuitabilityScore, destination.soloSuitabilityScore);
+      expect(
+          deserialized.soloSuitabilityScore, destination.soloSuitabilityScore);
       expect(deserialized.budgetLevel, destination.budgetLevel);
       expect(deserialized.tags, destination.tags);
       expect(deserialized.images.length, destination.images.length);
-      expect(deserialized.safetyInsights.length, destination.safetyInsights.length);
-      expect(deserialized.popularActivities.length, destination.popularActivities.length);
+      expect(deserialized.safetyInsights.length,
+          destination.safetyInsights.length);
+      expect(deserialized.popularActivities.length,
+          destination.popularActivities.length);
     });
 
     test('should implement equality correctly', () {

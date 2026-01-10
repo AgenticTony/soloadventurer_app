@@ -1,0 +1,238 @@
+{
+  "project_root": "/Users/anthonyforan/SoloAdventurer_app",
+  "project_type": "monorepo",
+  "services": {
+    "docs": {
+      "name": "docs",
+      "path": "/Users/anthonyforan/SoloAdventurer_app/docs",
+      "language": "Python",
+      "framework": null,
+      "type": "unknown",
+      "package_manager": "pip",
+      "dependencies": [
+        "aiohttp",
+        "beautifulsoup4",
+        "html2text",
+        "openai",
+        "python-dotenv",
+        "requests",
+        "supabase",
+        "httpx"
+      ],
+      "environment": {
+        "variables": {
+          "AWS_REGION": {
+            "value": "us-east-1",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "AWS_ACCESS_KEY_ID": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "AWS_SECRET_ACCESS_KEY": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "AWS_USER_POOL_ID": {
+            "value": "us-east-1_mBzCWbAF7",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "AWS_CLIENT_ID": {
+            "value": "bcnr0d4dbcc5lc3dh05ih6540",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "AWS_IDENTITY_POOL_ID": {
+            "value": "us-east-1:XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "API_BASE_URL_DEV": {
+            "value": "https://api.soloadventurer.com/dev",
+            "source": "../.env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "API_BASE_URL_STAGING": {
+            "value": "https://api.soloadventurer.com/staging",
+            "source": "../.env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "API_BASE_URL_PROD": {
+            "value": "https://api.soloadventurer.com/prod",
+            "source": "../.env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "OAUTH_CALLBACK_URL": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "path",
+            "sensitive": true,
+            "required": false
+          },
+          "OAUTH_SIGN_OUT_URL": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "path",
+            "sensitive": true,
+            "required": false
+          },
+          "AWS_CLOUDWATCH_LOG_GROUP": {
+            "value": "/aws/cognito/userpools",
+            "source": "../.env",
+            "type": "path",
+            "sensitive": false,
+            "required": false
+          },
+          "AWS_CLOUDWATCH_LOG_STREAM": {
+            "value": "default",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "ENABLE_DETAILED_LOGS": {
+            "value": "true",
+            "source": "../.env",
+            "type": "boolean",
+            "sensitive": false,
+            "required": false
+          },
+          "ENABLE_PERFORMANCE_MONITORING": {
+            "value": "true",
+            "source": "../.env",
+            "type": "boolean",
+            "sensitive": false,
+            "required": false
+          },
+          "ENABLE_CRASH_REPORTING": {
+            "value": "true",
+            "source": "../.env",
+            "type": "boolean",
+            "sensitive": false,
+            "required": false
+          },
+          "ENABLE_ANALYTICS": {
+            "value": "false",
+            "source": "../.env",
+            "type": "boolean",
+            "sensitive": false,
+            "required": false
+          },
+          "CACHE_MAX_SIZE_MB": {
+            "value": "100",
+            "source": "../.env",
+            "type": "number",
+            "sensitive": false,
+            "required": false
+          },
+          "CACHE_EXPIRATION_DAYS": {
+            "value": "7",
+            "source": "../.env",
+            "type": "number",
+            "sensitive": false,
+            "required": false
+          },
+          "BASE_URL": {
+            "value": "https://openrouter.ai/api/v1",
+            "source": "../.env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "LLM_API_KEY": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "OPENAI_API_KEY": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "REASONER_MODEL": {
+            "value": "gpt-4",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "PRIMARY_MODEL": {
+            "value": "gpt-4",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "EMBEDDING_MODEL": {
+            "value": "text-embedding-3-small",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          },
+          "SUPABASE_URL": {
+            "value": "https://bfzdljnalladqtdoaijb.supabase.co",
+            "source": "../.env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "SUPABASE_SERVICE_KEY": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
+          "SUPABASE_ENV": {
+            "value": "dev",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": false,
+            "required": false
+          }
+        },
+        "required_count": 0,
+        "optional_count": 0,
+        "detected_count": 28
+      }
+    }
+  },
+  "infrastructure": {
+    "ci": "GitHub Actions",
+    "ci_workflows": [
+      "project_board.yml",
+      "code-quality.yml",
+      "code-coverage.yml",
+      "flutter-ci.yml",
+      "cost-audit.yml"
+    ]
+  },
+  "conventions": {}
+}

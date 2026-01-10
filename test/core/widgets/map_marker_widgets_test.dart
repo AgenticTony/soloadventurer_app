@@ -7,14 +7,14 @@ import 'package:latlong2/latlong.dart';
 void main() {
   group('MapMarkerWidget', () {
     testWidgets('renders marker with default size', (tester) async {
-      final marker = MapMarker(
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(37.7749, -122.4194),
+        position: LatLng(37.7749, -122.4194),
         type: MarkerType.trip,
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MapMarkerWidget(marker: marker),
           ),
@@ -26,14 +26,14 @@ void main() {
     });
 
     testWidgets('renders marker with custom size', (tester) async {
-      final marker = MapMarker(
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         type: MarkerType.activity,
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MapMarkerWidget(marker: marker, size: 60.0),
           ),
@@ -51,16 +51,17 @@ void main() {
       expect(container.constraints?.minHeight, 60.0);
     });
 
-    testWidgets('renders marker with title when showTitle is true', (tester) async {
-      final marker = MapMarker(
+    testWidgets('renders marker with title when showTitle is true',
+        (tester) async {
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'San Francisco',
         type: MarkerType.trip,
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MapMarkerWidget(marker: marker, showTitle: true),
           ),
@@ -70,16 +71,17 @@ void main() {
       expect(find.text('San Francisco'), findsOneWidget);
     });
 
-    testWidgets('does not render title when showTitle is false', (tester) async {
-      final marker = MapMarker(
+    testWidgets('does not render title when showTitle is false',
+        (tester) async {
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'San Francisco',
         type: MarkerType.trip,
       );
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MapMarkerWidget(marker: marker, showTitle: false),
           ),
@@ -91,9 +93,9 @@ void main() {
 
     testWidgets('calls onTap callback when tapped', (tester) async {
       bool tapped = false;
-      final marker = MapMarker(
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         type: MarkerType.poi,
       );
 
@@ -143,10 +145,11 @@ void main() {
       }
     });
 
-    testWidgets('small convenience constructor renders small marker', (tester) async {
-      final marker = MapMarker(
+    testWidgets('small convenience constructor renders small marker',
+        (tester) async {
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         type: MarkerType.trip,
       );
 
@@ -161,10 +164,11 @@ void main() {
       expect(find.byType(MapMarkerWidget), findsOneWidget);
     });
 
-    testWidgets('large convenience constructor renders large marker', (tester) async {
-      final marker = MapMarker(
+    testWidgets('large convenience constructor renders large marker',
+        (tester) async {
+      const marker = MapMarker(
         id: 'test-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'Large Marker',
         type: MarkerType.activity,
       );
@@ -207,7 +211,8 @@ void main() {
       expect(find.text('25'), findsOneWidget);
     });
 
-    testWidgets('abbreviates count when abbreviateCount is true', (tester) async {
+    testWidgets('abbreviates count when abbreviateCount is true',
+        (tester) async {
       final cluster = MapCluster(
         id: 'test-cluster',
         position: const LatLng(0, 0),
@@ -229,7 +234,8 @@ void main() {
       expect(find.text('1.5k'), findsOneWidget);
     });
 
-    testWidgets('does not abbreviate count when abbreviateCount is false', (tester) async {
+    testWidgets('does not abbreviate count when abbreviateCount is false',
+        (tester) async {
       final cluster = MapCluster(
         id: 'test-cluster',
         position: const LatLng(0, 0),
@@ -298,10 +304,11 @@ void main() {
       expect(find.byType(MapClusterWidget), findsOneWidget);
     });
 
-    testWidgets('small convenience constructor renders small cluster', (tester) async {
-      final cluster = MapCluster(
+    testWidgets('small convenience constructor renders small cluster',
+        (tester) async {
+      const cluster = MapCluster(
         id: 'test-cluster',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         markerCount: 5,
         markerIds: ['1', '2', '3', '4', '5'],
       );
@@ -318,7 +325,8 @@ void main() {
       expect(find.text('5'), findsOneWidget);
     });
 
-    testWidgets('large convenience constructor renders large cluster', (tester) async {
+    testWidgets('large convenience constructor renders large cluster',
+        (tester) async {
       final cluster = MapCluster(
         id: 'test-cluster',
         position: const LatLng(0, 0),
@@ -393,7 +401,7 @@ void main() {
         position: const LatLng(0, 0),
         markerCount: 10,
         markerIds: List.generate(10, (i) => 'marker-$i'),
-        markerTypes: [
+        markerTypes: const [
           MarkerType.trip,
           MarkerType.activity,
           MarkerType.photo,
@@ -418,7 +426,7 @@ void main() {
         position: const LatLng(0, 0),
         markerCount: 10,
         markerIds: List.generate(10, (i) => 'marker-$i'),
-        markerTypes: [
+        markerTypes: const [
           MarkerType.trip,
           MarkerType.activity,
           MarkerType.photo,
@@ -449,7 +457,7 @@ void main() {
         position: const LatLng(0, 0),
         markerCount: 10,
         markerIds: List.generate(10, (i) => 'marker-$i'),
-        markerTypes: [],
+        markerTypes: const [],
       );
 
       await tester.pumpWidget(
@@ -465,13 +473,14 @@ void main() {
   });
 
   group('MapClusterWithTypesWidget', () {
-    testWidgets('renders cluster with type icons when showTypeIcons is true', (tester) async {
+    testWidgets('renders cluster with type icons when showTypeIcons is true',
+        (tester) async {
       final cluster = MapCluster(
         id: 'test-cluster',
         position: const LatLng(0, 0),
         markerCount: 15,
         markerIds: List.generate(15, (i) => 'marker-$i'),
-        markerTypes: [
+        markerTypes: const [
           MarkerType.trip,
           MarkerType.activity,
         ],
@@ -493,13 +502,15 @@ void main() {
       expect(find.byType(ClusterTypeIcons), findsOneWidget);
     });
 
-    testWidgets('renders cluster without type icons when showTypeIcons is false', (tester) async {
+    testWidgets(
+        'renders cluster without type icons when showTypeIcons is false',
+        (tester) async {
       final cluster = MapCluster(
         id: 'test-cluster',
         position: const LatLng(0, 0),
         markerCount: 15,
         markerIds: List.generate(15, (i) => 'marker-$i'),
-        markerTypes: [
+        markerTypes: const [
           MarkerType.trip,
           MarkerType.activity,
         ],
@@ -528,7 +539,7 @@ void main() {
         position: const LatLng(0, 0),
         markerCount: 15,
         markerIds: List.generate(15, (i) => 'marker-$i'),
-        markerTypes: [MarkerType.trip],
+        markerTypes: const [MarkerType.trip],
       );
 
       await tester.pumpWidget(
@@ -549,7 +560,7 @@ void main() {
 
   group('Integration Tests', () {
     testWidgets('MapMarkerWidget with all marker types', (tester) async {
-      final markerTypes = MarkerType.values;
+      const markerTypes = MarkerType.values;
 
       for (final type in markerTypes) {
         final marker = MapMarker(
@@ -594,9 +605,9 @@ void main() {
     });
 
     testWidgets('Mixed markers and clusters', (tester) async {
-      final marker = MapMarker(
+      const marker = MapMarker(
         id: 'single-marker',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         type: MarkerType.trip,
       );
 
@@ -612,7 +623,7 @@ void main() {
           home: Scaffold(
             body: Column(
               children: [
-                MapMarkerWidget(marker: marker),
+                const MapMarkerWidget(marker: marker),
                 MapClusterWidget(cluster: cluster),
               ],
             ),

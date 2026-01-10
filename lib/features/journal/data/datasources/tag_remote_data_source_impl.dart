@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/tag_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';
 
@@ -29,7 +29,7 @@ class TagRemoteDataSourceImpl implements TagRemoteDataSource {
     } on PostgrestException catch (e) {
       if (e.code == '23505') {
         // Unique constraint violation (user_id, name)
-        throw ServerException(
+        throw const ServerException(
           message: 'A tag with this name already exists',
           code: 'duplicate_tag',
         );
@@ -59,7 +59,7 @@ class TagRemoteDataSourceImpl implements TagRemoteDataSource {
       return TagModel.fromJson(response);
     } on PostgrestException catch (e) {
       if (e.code == 'PGRST116') {
-        throw ServerException(
+        throw const ServerException(
           message: 'Tag not found',
           code: 'tag_not_found',
         );
@@ -150,7 +150,7 @@ class TagRemoteDataSourceImpl implements TagRemoteDataSource {
       return TagModel.fromJson(response);
     } on PostgrestException catch (e) {
       if (e.code == '23505') {
-        throw ServerException(
+        throw const ServerException(
           message: 'A tag with this name already exists',
           code: 'duplicate_tag',
         );
@@ -198,7 +198,7 @@ class TagRemoteDataSourceImpl implements TagRemoteDataSource {
     } on PostgrestException catch (e) {
       if (e.code == '23505') {
         // Unique constraint violation - tag already added
-        throw ServerException(
+        throw const ServerException(
           message: 'Tag is already added to this entry',
           code: 'tag_already_added',
         );
@@ -247,10 +247,12 @@ class TagRemoteDataSourceImpl implements TagRemoteDataSource {
 
       // Add new tags
       if (tagIds.isNotEmpty) {
-        final inserts = tagIds.map((tagId) => {
-          'journal_entry_id': entryId,
-          'tag_id': tagId,
-        }).toList();
+        final inserts = tagIds
+            .map((tagId) => {
+                  'journal_entry_id': entryId,
+                  'tag_id': tagId,
+                })
+            .toList();
 
         await _client.from('journal_tags').insert(inserts);
       }

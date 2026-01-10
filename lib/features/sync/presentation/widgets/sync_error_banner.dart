@@ -142,11 +142,14 @@ class SyncErrorBanner extends StatelessWidget {
                 ],
 
                 // Action buttons row
-                if (onViewDetails != null || (error.isRetryable && onRetry != null)) ...[
+                if (onViewDetails != null ||
+                    (error.isRetryable && onRetry != null)) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      if (error.isRetryable && showRetryButton && onRetry != null)
+                      if (error.isRetryable &&
+                          showRetryButton &&
+                          onRetry != null)
                         TextButton.icon(
                           onPressed: onRetry,
                           icon: const Icon(Icons.refresh, size: 16),
@@ -161,7 +164,6 @@ class SyncErrorBanner extends StatelessWidget {
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                         ),
-
                       if (onViewDetails != null) ...[
                         const SizedBox(width: 8),
                         TextButton.icon(
@@ -169,7 +171,8 @@ class SyncErrorBanner extends StatelessWidget {
                           icon: const Icon(Icons.info_outline, size: 16),
                           label: const Text('Details'),
                           style: TextButton.styleFrom(
-                            foregroundColor: theme.colorScheme.onSurface.withOpacity(0.7),
+                            foregroundColor:
+                                theme.colorScheme.onSurface.withOpacity(0.7),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
@@ -412,15 +415,12 @@ class MultipleSyncErrorsBanner extends StatelessWidget {
 
   /// Gets summary text for errors
   String _getSummaryText() {
-    final highSeverity = errors
-        .where((e) => e.severity == SyncErrorSeverity.high)
-        .length;
-    final mediumSeverity = errors
-        .where((e) => e.severity == SyncErrorSeverity.medium)
-        .length;
-    final lowSeverity = errors
-        .where((e) => e.severity == SyncErrorSeverity.low)
-        .length;
+    final highSeverity =
+        errors.where((e) => e.severity == SyncErrorSeverity.high).length;
+    final mediumSeverity =
+        errors.where((e) => e.severity == SyncErrorSeverity.medium).length;
+    final lowSeverity =
+        errors.where((e) => e.severity == SyncErrorSeverity.low).length;
 
     final parts = <String>[];
     if (highSeverity > 0) {

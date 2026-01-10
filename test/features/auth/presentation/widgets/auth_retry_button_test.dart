@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
@@ -19,7 +18,7 @@ void main() {
 
     Widget makeTestableWidget(Widget child) {
       return ProviderScope(
-        overrides: [],
+        overrides: const [],
         child: MaterialApp(
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -45,7 +44,8 @@ void main() {
         expect(find.text('Retry'), findsOneWidget);
       });
 
-      testWidgets('renders with custom button text', (WidgetTester tester) async {
+      testWidgets('renders with custom button text',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -59,7 +59,8 @@ void main() {
         expect(find.text('Retry'), findsNothing);
       });
 
-      testWidgets('shows loading indicator when retrying', (WidgetTester tester) async {
+      testWidgets('shows loading indicator when retrying',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -78,7 +79,8 @@ void main() {
     });
 
     group('Retry Attempts Counter', () {
-      testWidgets('displays attempt counter after first retry', (WidgetTester tester) async {
+      testWidgets('displays attempt counter after first retry',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -104,7 +106,8 @@ void main() {
         expect(find.text('Attempt 1 of 3'), findsOneWidget);
       });
 
-      testWidgets('hides attempt counter when configured', (WidgetTester tester) async {
+      testWidgets('hides attempt counter when configured',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -124,7 +127,8 @@ void main() {
         expect(find.textContaining('Attempt'), findsNothing);
       });
 
-      testWidgets('disables button after max attempts reached', (WidgetTester tester) async {
+      testWidgets('disables button after max attempts reached',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -159,7 +163,8 @@ void main() {
     });
 
     group('Countdown Timer', () {
-      testWidgets('shows countdown after retry attempt', (WidgetTester tester) async {
+      testWidgets('shows countdown after retry attempt',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -184,18 +189,23 @@ void main() {
         expect(find.textContaining('Next retry in'), findsOneWidget);
 
         // Countdown should decrease
-        final countdownBefore = tester.widget<Text>(
-          find.textContaining('Next retry in'),
-        ).data;
+        final countdownBefore = tester
+            .widget<Text>(
+              find.textContaining('Next retry in'),
+            )
+            .data;
         await tester.pump(const Duration(seconds: 1));
-        final countdownAfter = tester.widget<Text>(
-          find.textContaining('Next retry in'),
-        ).data;
+        final countdownAfter = tester
+            .widget<Text>(
+              find.textContaining('Next retry in'),
+            )
+            .data;
 
         expect(countdownBefore, isNot(equals(countdownAfter)));
       });
 
-      testWidgets('disables button during countdown', (WidgetTester tester) async {
+      testWidgets('disables button during countdown',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -230,7 +240,8 @@ void main() {
         expect(buttonAfter.onPressed, isNotNull);
       });
 
-      testWidgets('hides countdown when configured', (WidgetTester tester) async {
+      testWidgets('hides countdown when configured',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -250,7 +261,8 @@ void main() {
         expect(find.textContaining('Next retry in'), findsNothing);
       });
 
-      testWidgets('shows "Ready to retry" when countdown finishes', (WidgetTester tester) async {
+      testWidgets('shows "Ready to retry" when countdown finishes',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -277,7 +289,8 @@ void main() {
     });
 
     group('Exponential Backoff', () {
-      testWidgets('increases delay time exponentially', (WidgetTester tester) async {
+      testWidgets('increases delay time exponentially',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -308,15 +321,18 @@ void main() {
         await tester.pump(const Duration(seconds: 1));
 
         // Countdown should be for 2 seconds (2^1)
-        final countdown = tester.widget<Text>(
-          find.textContaining('Next retry in'),
-        ).data;
+        final countdown = tester
+            .widget<Text>(
+              find.textContaining('Next retry in'),
+            )
+            .data;
         expect(countdown, contains('2 seconds'));
       });
     });
 
     group('Cancel Button', () {
-      testWidgets('shows cancel button after retry attempt', (WidgetTester tester) async {
+      testWidgets('shows cancel button after retry attempt',
+          (WidgetTester tester) async {
         bool cancelPressed = false;
 
         await tester.pumpWidget(
@@ -343,7 +359,8 @@ void main() {
         expect(find.text('Cancel'), findsOneWidget);
       });
 
-      testWidgets('hides cancel button when configured', (WidgetTester tester) async {
+      testWidgets('hides cancel button when configured',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -363,7 +380,8 @@ void main() {
         expect(find.text('Cancel'), findsNothing);
       });
 
-      testWidgets('calls onCancel callback when cancel pressed', (WidgetTester tester) async {
+      testWidgets('calls onCancel callback when cancel pressed',
+          (WidgetTester tester) async {
         bool cancelPressed = false;
 
         await tester.pumpWidget(
@@ -392,7 +410,8 @@ void main() {
     });
 
     group('External Control', () {
-      testWidgets('respects externallyEnabled property', (WidgetTester tester) async {
+      testWidgets('respects externallyEnabled property',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -409,7 +428,8 @@ void main() {
         expect(button.onPressed, isNull);
       });
 
-      testWidgets('resets state when externallyEnabled changes to true', (WidgetTester tester) async {
+      testWidgets('resets state when externallyEnabled changes to true',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -446,7 +466,8 @@ void main() {
     });
 
     group('Minimal Configuration', () {
-      testWidgets('minimal config hides all extra UI', (WidgetTester tester) async {
+      testWidgets('minimal config hides all extra UI',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             AuthRetryButton(
@@ -481,7 +502,8 @@ void main() {
         expect(find.text('Retry'), findsOneWidget);
       });
 
-      testWidgets('shows loading when refresh is in progress', (WidgetTester tester) async {
+      testWidgets('shows loading when refresh is in progress',
+          (WidgetTester tester) async {
         final service = TokenRefreshService(
           authRepository: mockAuthRepository,
         );
@@ -502,7 +524,8 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
       });
 
-      testWidgets('disables button when max attempts reached', (WidgetTester tester) async {
+      testWidgets('disables button when max attempts reached',
+          (WidgetTester tester) async {
         final service = TokenRefreshService(
           authRepository: mockAuthRepository,
         );
@@ -523,7 +546,8 @@ void main() {
         expect(find.text('Max Attempts Reached'), findsOneWidget);
       });
 
-      testWidgets('cancel button calls onCancel and cancels refresh', (WidgetTester tester) async {
+      testWidgets('cancel button calls onCancel and cancels refresh',
+          (WidgetTester tester) async {
         final service = TokenRefreshService(
           authRepository: mockAuthRepository,
         );
@@ -557,7 +581,7 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 
 // Helper function to create a mock user
 User createMockUser() {
-  return User(
+  return const User(
     id: 'test-id',
     email: 'test@example.com',
     name: 'Test User',

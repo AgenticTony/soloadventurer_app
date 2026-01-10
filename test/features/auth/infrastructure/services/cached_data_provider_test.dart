@@ -48,7 +48,13 @@ void main() {
       );
 
       // Register fallback values
-      registerFallbackValue(const NetworkStatus.connected);
+      registerFallbackValue(
+        NetworkStatus(
+          isOnline: true,
+          connectionType: NetworkConnectionType.wifi,
+          timestamp: DateTime.fromMillisecondsSinceEpoch(0),
+        ),
+      );
     });
 
     group('getCachedUserProfile', () {
@@ -86,7 +92,8 @@ void main() {
         expect(result.isFresh, false);
       });
 
-      test('should mark cached data as not fresh when older than 24 hours', () async {
+      test('should mark cached data as not fresh when older than 24 hours',
+          () async {
         // Arrange
         final oldUserData = Map<String, dynamic>.from(testUserData);
         oldUserData['cached_at'] = DateTime.now()
@@ -108,7 +115,8 @@ void main() {
 
       test('should handle missing cached_at timestamp', () async {
         // Arrange
-        final userDataWithoutTimestamp = Map<String, dynamic>.from(testUserData);
+        final userDataWithoutTimestamp =
+            Map<String, dynamic>.from(testUserData);
         userDataWithoutTimestamp.remove('cached_at');
 
         when(() => mockLocalDataSource.getUserData())
@@ -141,7 +149,8 @@ void main() {
         expect(result.success, false);
         expect(result.data, isNull);
         expect(result.errorMessage, isNotNull);
-        expect(result.errorMessage, contains('Failed to parse cached user data'));
+        expect(
+            result.errorMessage, contains('Failed to parse cached user data'));
       });
 
       test('should return failure when exception occurs', () async {
@@ -155,12 +164,14 @@ void main() {
         // Assert
         expect(result.success, false);
         expect(result.data, isNull);
-        expect(result.errorMessage, contains('Failed to get cached user profile'));
+        expect(
+            result.errorMessage, contains('Failed to get cached user profile'));
       });
 
       test('should handle invalid cached_at timestamp gracefully', () async {
         // Arrange
-        final userDataWithInvalidTimestamp = Map<String, dynamic>.from(testUserData);
+        final userDataWithInvalidTimestamp =
+            Map<String, dynamic>.from(testUserData);
         userDataWithInvalidTimestamp['cached_at'] = 'invalid-date';
 
         when(() => mockLocalDataSource.getUserData())
@@ -215,7 +226,8 @@ void main() {
         expect(result.isFresh, false);
       });
 
-      test('should return no data when offline (not yet implemented)', () async {
+      test('should return no data when offline (not yet implemented)',
+          () async {
         // Arrange
         when(() => mockOfflineAuthManager.isCurrentlyOffline())
             .thenAnswer((_) async => true);
@@ -292,8 +304,8 @@ void main() {
         // Act & Assert
         expect(
           () => provider.updateUserProfile(testUser),
-          throwsA(isA<AuthException>()
-              .having((e) => e.message, 'message', contains('Failed to update'))),
+          throwsA(isA<AuthException>().having(
+              (e) => e.message, 'message', contains('Failed to update'))),
         );
       });
 
@@ -308,8 +320,10 @@ void main() {
         await provider.updateUserProfile(testUser);
 
         // Assert
-        final captured = verify(() => mockLocalDataSource.cacheUserData(captureAny()))
-            .captured.single as Map<String, dynamic>;
+        final captured =
+            verify(() => mockLocalDataSource.cacheUserData(captureAny()))
+                .captured
+                .single as Map<String, dynamic>;
         expect(captured['cached_at'], isNotNull);
         expect(captured['cached_at'], isA<String>());
       });
@@ -325,8 +339,10 @@ void main() {
         await provider.updateUserProfile(testUser);
 
         // Assert
-        final captured = verify(() => mockLocalDataSource.cacheUserData(captureAny()))
-            .captured.single as Map<String, dynamic>;
+        final captured =
+            verify(() => mockLocalDataSource.cacheUserData(captureAny()))
+                .captured
+                .single as Map<String, dynamic>;
         expect(captured['id'], testUser.id);
         expect(captured['email'], testUser.email);
         expect(captured['username'], testUser.username);
@@ -379,12 +395,11 @@ void main() {
         // Act & Assert
         expect(
           () => provider.updateTrip('trip-id', {'title': 'Updated Trip'}),
-          throwsA(isA<OfflineException>()
-              .having(
-                (e) => e.message,
-                'message',
-                contains('Cannot update trip while offline'),
-              )),
+          throwsA(isA<OfflineException>().having(
+            (e) => e.message,
+            'message',
+            contains('Cannot update trip while offline'),
+          )),
         );
       });
 
@@ -410,12 +425,11 @@ void main() {
         // Act & Assert
         expect(
           () => provider.deleteTrip('trip-id'),
-          throwsA(isA<OfflineException>()
-              .having(
-                (e) => e.message,
-                'message',
-                contains('Cannot delete trip while offline'),
-              )),
+          throwsA(isA<OfflineException>().having(
+            (e) => e.message,
+            'message',
+            contains('Cannot delete trip while offline'),
+          )),
         );
       });
 

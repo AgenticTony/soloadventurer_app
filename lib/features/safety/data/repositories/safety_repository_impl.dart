@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/core/error/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';

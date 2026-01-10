@@ -9,19 +9,19 @@ class Example1BasicClustering {
   void example() {
     // Create sample markers
     final markers = [
-      MapMarker(
+      const MapMarker(
         id: 'marker-1',
         position: LatLng(37.7749, -122.4194),
         title: 'Golden Gate Bridge',
         type: MarkerType.poi,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'marker-2',
         position: LatLng(37.7750, -122.4195),
         title: 'Golden Gate Viewpoint',
         type: MarkerType.poi,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'marker-3',
         position: LatLng(37.8080, -122.4177),
         title: 'Fisherman\'s Wharf',
@@ -61,7 +61,7 @@ class Example2HighDensityClustering {
 
     // Use high-density parameters
     final service = MapMarkerClusteringService(
-      ClusteringParams.highDensity(
+      const ClusteringParams.highDensity(
         clusterRadius: 50,
         minClusterSize: 3,
       ),
@@ -121,7 +121,7 @@ class Example4AlgorithmComparison {
 
     // Test distance-based clustering
     final distanceService = MapMarkerClusteringService(
-      ClusteringParams(
+      const ClusteringParams(
         algorithm: ClusteringAlgorithm.distance,
         clusterRadius: 80,
       ),
@@ -134,11 +134,12 @@ class Example4AlgorithmComparison {
     print('Distance-based clustering:');
     print('  Time: ${stopwatch.elapsedMilliseconds}ms');
     print('  Clusters: ${distanceResult.clusters.length}');
-    print('  Efficiency: ${(distanceResult.efficiency * 100).toStringAsFixed(1)}%');
+    print(
+        '  Efficiency: ${(distanceResult.efficiency * 100).toStringAsFixed(1)}%');
 
     // Test grid-based clustering
     final gridService = MapMarkerClusteringService(
-      ClusteringParams(
+      const ClusteringParams(
         algorithm: ClusteringAlgorithm.grid,
         gridCellSize: 100,
       ),
@@ -164,9 +165,7 @@ class Example5TripMarkers {
   void example(List<Map<String, dynamic>> tripsData) {
     // Convert trip data to markers
     final tripMarkers = tripsData
-        .where((trip) =>
-            trip['latitude'] != null &&
-            trip['longitude'] != null)
+        .where((trip) => trip['latitude'] != null && trip['longitude'] != null)
         .map((trip) => MapMarker.fromTrip(
               tripId: trip['id'],
               title: trip['title'],
@@ -179,7 +178,7 @@ class Example5TripMarkers {
 
     // Cluster with trip-specific parameters
     final service = MapMarkerClusteringService(
-      ClusteringParams(
+      const ClusteringParams(
         clusterRadius: 100,
         minClusterSize: 2,
         useWeightedCenter: true, // Better for varying importance
@@ -196,7 +195,8 @@ class Example5TripMarkers {
     // Analyze cluster composition
     for (final cluster in result.clusters) {
       if (cluster.containsType(MarkerType.trip)) {
-        print('  Cluster ${cluster.id}: ${cluster.countByType(MarkerType.trip)} trips');
+        print(
+            '  Cluster ${cluster.id}: ${cluster.countByType(MarkerType.trip)} trips');
       }
     }
   }
@@ -210,8 +210,7 @@ class Example6ActivityMarkers {
     // Convert activity data to markers
     final activityMarkers = activitiesData
         .where((activity) =>
-            activity['latitude'] != null &&
-            activity['longitude'] != null)
+            activity['latitude'] != null && activity['longitude'] != null)
         .map((activity) => MapMarker.fromActivity(
               activityId: activity['id'],
               title: activity['title'],
@@ -223,7 +222,7 @@ class Example6ActivityMarkers {
 
     // Cluster with activity-specific parameters
     final service = MapMarkerClusteringService(
-      ClusteringParams(
+      const ClusteringParams(
         clusterRadius: 60, // Smaller radius for activities
         minClusterSize: 2,
         algorithm: ClusteringAlgorithm.distance,
@@ -247,8 +246,8 @@ class Example7BoundsBasedClustering {
 
     // Define visible area (e.g., San Francisco Bay Area)
     final bounds = LatLngBounds(
-      southwest: LatLng(37.4, -122.5),
-      northeast: LatLng(37.8, -122.0),
+      southwest: const LatLng(37.4, -122.5),
+      northeast: const LatLng(37.8, -122.0),
     );
 
     // Cluster only markers within bounds
@@ -256,9 +255,12 @@ class Example7BoundsBasedClustering {
 
     print('Visible area clustering:');
     print('  Total markers: ${allMarkers.length}');
-    print('  Markers in bounds: ${result.clusters.length + result.unclusteredMarkers.length}');
-    print('  Rendered items: ${result.clusters.length + result.unclusteredMarkers.length}');
-    print('  Performance improvement: ${((1.0 - (result.clusters.length + result.unclusteredMarkers.length) / allMarkers.length) * 100).toStringAsFixed(1)}%');
+    print(
+        '  Markers in bounds: ${result.clusters.length + result.unclusteredMarkers.length}');
+    print(
+        '  Rendered items: ${result.clusters.length + result.unclusteredMarkers.length}');
+    print(
+        '  Performance improvement: ${((1.0 - (result.clusters.length + result.unclusteredMarkers.length) / allMarkers.length) * 100).toStringAsFixed(1)}%');
   }
 }
 
@@ -287,12 +289,12 @@ class Example8IncrementalClustering {
 
     // Simulate adding new markers
     final newMarkers = [
-      MapMarker(
+      const MapMarker(
         id: 'marker-50',
         position: LatLng(37.750, -122.450),
         type: MarkerType.poi,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'marker-51',
         position: LatLng(37.751, -122.451),
         type: MarkerType.poi,
@@ -310,7 +312,8 @@ class Example8IncrementalClustering {
 
     print('\nAfter adding 2 new markers:');
     print('  Clusters: ${updatedResult.clusters.length}');
-    print('  Used incremental clustering: more efficient than reclustering all ${markers.length} markers');
+    print(
+        '  Used incremental clustering: more efficient than reclustering all ${markers.length} markers');
   }
 }
 
@@ -321,28 +324,28 @@ class Example9MixedMarkerTypes {
   void example() {
     final markers = [
       // Trip markers
-      MapMarker(
+      const MapMarker(
         id: 'trip-1',
         position: LatLng(37.7749, -122.4194),
         title: 'San Francisco Trip',
         type: MarkerType.trip,
       ),
       // Activity markers
-      MapMarker(
+      const MapMarker(
         id: 'activity-1',
         position: LatLng(37.7750, -122.4195),
         title: 'Golden Gate Visit',
         type: MarkerType.activity,
       ),
       // Photo markers
-      MapMarker(
+      const MapMarker(
         id: 'photo-1',
         position: LatLng(37.7751, -122.4196),
         title: 'Photo at Golden Gate',
         type: MarkerType.photo,
       ),
       // Restaurant markers
-      MapMarker(
+      const MapMarker(
         id: 'restaurant-1',
         position: LatLng(37.7752, -122.4197),
         title: 'Seafood Restaurant',
@@ -383,7 +386,7 @@ class Example10CustomParameters {
     );
 
     // Custom parameters for specific use case
-    final customParams = ClusteringParams(
+    const customParams = ClusteringParams(
       clusterRadius: 75, // Between markers
       minClusterSize: 3, // Require at least 3 markers
       maxClusterSize: 40, // Limit cluster size
@@ -408,31 +411,33 @@ class MapMarkerClusteringExamples {
     print('=== Map Marker Clustering Examples ===\n');
 
     Example1BasicClustering().example();
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example2HighDensityClustering().example();
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example3ZoomAwareClustering().example();
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example4AlgorithmComparison().example();
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example7BoundsBasedClustering().example(
-      List.generate(100, (i) => MapMarker(
-        id: 'marker-$i',
-        position: LatLng(37.6 + i * 0.002, -122.4 + i * 0.001),
-        type: MarkerType.poi,
-      )),
+      List.generate(
+          100,
+          (i) => MapMarker(
+                id: 'marker-$i',
+                position: LatLng(37.6 + i * 0.002, -122.4 + i * 0.001),
+                type: MarkerType.poi,
+              )),
     );
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example8IncrementalClustering().example();
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example9MixedMarkerTypes().example();
-    print('\n' + '-' * 50 + '\n');
+    print('\n${'-' * 50}\n');
 
     Example10CustomParameters().example();
   }

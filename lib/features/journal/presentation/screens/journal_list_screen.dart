@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_list_provider.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/journal_entry_detail_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/journal_entry_card.dart';
 
 /// Screen displaying all journal entries organized by trip or date
@@ -114,7 +113,8 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
           children: [
             Semantics(
               label: 'Error icon',
-              child: const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              child:
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
             ),
             const SizedBox(height: 16),
             Text(
@@ -263,7 +263,8 @@ class _DateGroup extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
@@ -279,9 +280,11 @@ class _DateGroup extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
+                    color:
+                        theme.colorScheme.secondaryContainer.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -289,7 +292,8 @@ class _DateGroup extends StatelessWidget {
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSecondaryContainer,
                     ),
-                    semanticsLabel: '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'} in this date',
+                    semanticsLabel:
+                        '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'} in this date',
                   ),
                 ),
               ],
@@ -345,7 +349,8 @@ class _TripGroup extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(16),
@@ -353,7 +358,9 @@ class _TripGroup extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        tripId == null ? Icons.folder_outlined : Icons.flight_takeoff,
+                        tripId == null
+                            ? Icons.folder_outlined
+                            : Icons.flight_takeoff,
                         size: 18,
                         color: theme.colorScheme.onPrimaryContainer,
                       ),
@@ -371,9 +378,11 @@ class _TripGroup extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.secondaryContainer.withOpacity(0.5),
+                    color:
+                        theme.colorScheme.secondaryContainer.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -381,7 +390,8 @@ class _TripGroup extends StatelessWidget {
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSecondaryContainer,
                     ),
-                    semanticsLabel: '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'} in this trip',
+                    semanticsLabel:
+                        '${entries.length} ${entries.length == 1 ? 'entry' : 'entries'} in this trip',
                   ),
                 ),
               ],

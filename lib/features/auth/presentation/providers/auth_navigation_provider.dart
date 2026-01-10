@@ -101,7 +101,7 @@ class AuthNavigation extends _$AuthNavigation {
 
   /// Check if navigation to a route is allowed
   bool _canNavigate(String route) {
-    final authState = ref.read(authNotifierProvider).valueOrNull;
+    final authState = ref.read(authNotifierProvider).value;
     if (authState == null) return false;
 
     switch (route) {

@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/core/services/data_unload_strategy.dart';
 import 'package:soloadventurer/core/services/memory_monitor.dart';
@@ -185,7 +183,8 @@ void main() {
 
       test('should update access time', () {
         DataUnloadStrategy.register(testEntries[0]);
-        final originalTime = DataUnloadStrategy.getEntry('entry_1')!.lastAccessTime;
+        final originalTime =
+            DataUnloadStrategy.getEntry('entry_1')!.lastAccessTime;
 
         // Wait a bit and update
         await Future.delayed(const Duration(milliseconds: 10));
@@ -268,8 +267,9 @@ void main() {
         );
 
         expect(result.entriesUnloaded, greaterThan(0));
-        expect(DataUnloadStrategy.getEntry('entry_1'), isNotNull); // Still visible
-        expect(DataUnloadStrategy.getEntry('entry_2'), isNull);    // Unloaded
+        expect(
+            DataUnloadStrategy.getEntry('entry_1'), isNotNull); // Still visible
+        expect(DataUnloadStrategy.getEntry('entry_2'), isNull); // Unloaded
       });
 
       test('should respect max priority limit', () async {
@@ -439,7 +439,7 @@ void main() {
           targetFreeBytes: 2 * 1024 * 1024, // Only 2 MB needed
         );
 
-        expect(DataUnloadStrategy.getEntry('low'), isNull);    // Unloaded
+        expect(DataUnloadStrategy.getEntry('low'), isNull); // Unloaded
         expect(DataUnloadStrategy.getEntry('normal'), isNotNull); // Kept
       });
 
@@ -476,7 +476,7 @@ void main() {
 
     group('Configuration Updates', () {
       test('should update configuration', () {
-        final newConfig = const DataUnloadConfig(
+        const newConfig = DataUnloadConfig(
           autoUnloadOnWarning: false,
           targetFreePercentageWarning: 0.5,
         );
@@ -636,7 +636,7 @@ void main() {
 
     group('UnloadResult Model', () {
       test('should calculate memory freed in MB', () {
-        final result = const UnloadResult(
+        const result = UnloadResult(
           entriesUnloaded: 10,
           memoryFreedBytes: 20 * 1024 * 1024, // 20 MB
           duration: Duration(milliseconds: 100),
@@ -646,7 +646,7 @@ void main() {
       });
 
       test('should calculate success rate', () {
-        final result = const UnloadResult(
+        const result = UnloadResult(
           entriesUnloaded: 8,
           memoryFreedBytes: 10 * 1024 * 1024,
           failedUnloads: 2,
@@ -657,7 +657,7 @@ void main() {
       });
 
       test('should handle zero total entries', () {
-        final result = const UnloadResult(
+        const result = UnloadResult(
           entriesUnloaded: 0,
           memoryFreedBytes: 0,
           failedUnloads: 0,
@@ -670,7 +670,7 @@ void main() {
 
     group('UnloadStatistics Model', () {
       test('should calculate total memory freed in MB', () {
-        final stats = const UnloadStatistics(
+        const stats = UnloadStatistics(
           totalUnloads: 5,
           totalEntriesUnloaded: 50,
           totalMemoryFreedBytes: 100 * 1024 * 1024, // 100 MB
@@ -681,7 +681,7 @@ void main() {
       });
 
       test('should calculate average memory freed', () {
-        final stats = const UnloadStatistics(
+        const stats = UnloadStatistics(
           totalUnloads: 5,
           totalEntriesUnloaded: 50,
           totalMemoryFreedBytes: 100 * 1024 * 1024, // 100 MB
@@ -692,7 +692,7 @@ void main() {
       });
 
       test('should handle zero unloads', () {
-        final stats = const UnloadStatistics(
+        const stats = UnloadStatistics(
           totalUnloads: 0,
           totalEntriesUnloaded: 0,
           totalMemoryFreedBytes: 0,

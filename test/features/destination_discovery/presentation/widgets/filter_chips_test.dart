@@ -164,7 +164,8 @@ void main() {
         expect(find.text('Clear All'), findsNothing);
       });
 
-      testWidgets('renders custom tags when provided', (WidgetTester tester) async {
+      testWidgets('renders custom tags when provided',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
@@ -597,13 +598,14 @@ void main() {
           ),
         );
 
-        expect(find.byWidgetPredicate(
-          (widget) =>
-              widget is FilterChip &&
-              widget.label is Text &&
-              (widget.label as Text).data == 'Budget' &&
-              widget.label != null,
-        ), findsOneWidget);
+        expect(
+            find.byWidgetPredicate(
+              (widget) =>
+                  widget is FilterChip &&
+                  widget.label is Text &&
+                  (widget.label as Text).data == 'Budget',
+            ),
+            findsOneWidget);
       });
 
       testWidgets('hidden gems chip has proper label',

@@ -34,7 +34,8 @@ class AuthInterceptor extends Interceptor {
         // Check if token is expiring soon and needs proactive refresh
         if (_shouldRefreshToken(session)) {
           if (kDebugMode) {
-            debugPrint('AuthInterceptor: Token expiring soon, triggering proactive refresh');
+            debugPrint(
+                'AuthInterceptor: Token expiring soon, triggering proactive refresh');
           }
 
           // Wait for in-progress refresh or start a new one
@@ -42,7 +43,8 @@ class AuthInterceptor extends Interceptor {
 
           // Use the new session if refresh was successful
           if (newSession != null) {
-            options.headers['Authorization'] = 'Bearer ${newSession.accessToken}';
+            options.headers['Authorization'] =
+                'Bearer ${newSession.accessToken}';
             return handler.next(options);
           }
           // If refresh failed, continue with the existing token

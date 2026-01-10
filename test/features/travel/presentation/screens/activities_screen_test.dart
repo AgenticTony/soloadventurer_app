@@ -155,7 +155,8 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            activitiesProvider.overrideWithValue(testActivities.take(5).toList()),
+            activitiesProvider
+                .overrideWithValue(testActivities.take(5).toList()),
             activitiesLoadingProvider.overrideWithValue(false),
             activitiesErrorProvider.overrideWithValue(false),
           ],

@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Builder function for creating a widget from an item (type-safe)
+/// This builder receives the actual item instead of just the index
+typedef ItemWidgetBuilder<T> = Widget Function(BuildContext context, T item);
+
+/// Builder function for creating a widget for list/grid items
+/// Note: In VirtualListView, this is called with int index.
+/// In InfiniteScrollListView, this is called with the actual item type T.
+typedef NullableItemWidgetBuilder<T> = Widget Function(BuildContext, dynamic);
+
 /// A generic virtual list widget that optimizes rendering of large lists.
 ///
 /// This widget wraps [ListView.builder] with virtual scrolling to efficiently
@@ -150,11 +159,9 @@ class VirtualListView<T> extends StatelessWidget {
       scrollDirection: scrollDirection,
       reverse: reverse,
       slivers: [
-        if (header != null)
-          SliverToBoxAdapter(child: header!),
+        if (header != null) SliverToBoxAdapter(child: header!),
         list,
-        if (footer != null)
-          SliverToBoxAdapter(child: footer!),
+        if (footer != null) SliverToBoxAdapter(child: footer!),
       ],
     );
   }

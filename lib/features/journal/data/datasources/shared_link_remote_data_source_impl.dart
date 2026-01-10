@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/shared_link_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/shared_link_model.dart';
 
@@ -44,11 +44,8 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
   @override
   Future<SharedLinkModel> getSharedLink(String linkId) async {
     try {
-      final response = await _client
-          .from('shared_links')
-          .select()
-          .eq('id', linkId)
-          .single();
+      final response =
+          await _client.from('shared_links').select().eq('id', linkId).single();
 
       return _parseSharedLinkFromJson(response);
     } on PostgrestException catch (e) {
@@ -73,11 +70,8 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
   @override
   Future<SharedLinkModel> getSharedLinkBySlug(String slug) async {
     try {
-      final response = await _client
-          .from('shared_links')
-          .select()
-          .eq('slug', slug)
-          .single();
+      final response =
+          await _client.from('shared_links').select().eq('slug', slug).single();
 
       return _parseSharedLinkFromJson(response);
     } on PostgrestException catch (e) {
@@ -210,8 +204,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     try {
       await _client
           .from('shared_links')
-          .update({'is_active': false})
-          .eq('id', linkId);
+          .update({'is_active': false}).eq('id', linkId);
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to deactivate shared link: ${e.message}',
@@ -248,7 +241,8 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     String? password,
   }) async {
     try {
-      final response = await _client.rpc('validate_shared_link_access', params: {
+      final response =
+          await _client.rpc('validate_shared_link_access', params: {
         'link_slug': slug,
         'password': password,
       });

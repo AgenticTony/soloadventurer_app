@@ -44,7 +44,6 @@ enum OptimizationType {
 /// ```
 @freezed
 class OptimizationSuggestion with _$OptimizationSuggestion {
-  const OptimizationSuggestion._();
 
   /// Creates an optimization suggestion
   ///
@@ -69,6 +68,12 @@ class OptimizationSuggestion with _$OptimizationSuggestion {
     double? costSaved,
   }) = _OptimizationSuggestion;
 
+  // Private constructor for freezed
+  const OptimizationSuggestion._();
+}
+
+/// Extension on [OptimizationSuggestion] for computed properties
+extension OptimizationSuggestionExtension on OptimizationSuggestion {
   /// Returns the priority of this suggestion for sorting
   ///
   /// Suggestions that save more time or money have higher priority.

@@ -23,16 +23,3 @@ class VerifyEmail {
     return _repository.verifyEmail(params.code, params.email);
   }
 }
-
-/// Use case for resending verification email
-class ResendVerificationEmail {
-  final AuthRepository _repository;
-
-  /// Creates a new [ResendVerificationEmail] use case
-  const ResendVerificationEmail(this._repository);
-
-  /// Execute the use case
-  Future<void> call() async {
-    return _repository.resendVerificationEmail();
-  }
-}

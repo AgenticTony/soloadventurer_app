@@ -142,7 +142,7 @@ class _MediaUploadProgressExampleScreenState
           children: [
             const Text('Single Task (Compact)'),
             const SizedBox(height: 16),
-            MediaUploadProgressIndicator(
+            const MediaUploadProgressIndicator(
               taskId: 'example-task-2',
               config: UploadProgressConfig.compact(),
             ),
@@ -426,9 +426,9 @@ class _JournalEntryWithUploadExampleState
       body: Column(
         children: [
           // Journal entry content fields would go here
-          Expanded(
+          const Expanded(
             child: TextField(
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: 'Write your journal entry...',
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.all(16),
@@ -449,7 +449,7 @@ class _JournalEntryWithUploadExampleState
                   return MediaUploadProgressIndicator(
                     key: ValueKey(_uploadTaskIds[index]),
                     taskId: _uploadTaskIds[index],
-                    config: UploadProgressConfig.compact(),
+                    config: const UploadProgressConfig.compact(),
                     onUploadComplete: () {
                       // Could update UI to show completion
                       setState(() {

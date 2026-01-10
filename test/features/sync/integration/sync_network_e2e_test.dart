@@ -15,7 +15,7 @@ import 'package:soloadventurer/features/sync/domain/services/network_connectivit
 
 /// Mock network connectivity that simulates various network conditions
 class SimulatedNetworkConnectivity implements NetworkConnectivity {
-  NetworkStatus _currentStatus = NetworkStatus(
+  NetworkStatus _currentStatus = const NetworkStatus(
     isConnected: true,
     connectionType: NetworkConnectionType.wifi,
   );
@@ -48,7 +48,7 @@ class SimulatedNetworkConnectivity implements NetworkConnectivity {
   /// Simulate going offline
   Future<void> goOffline() async {
     await _applyLatency();
-    _currentStatus = NetworkStatus(
+    _currentStatus = const NetworkStatus(
       isConnected: false,
       connectionType: NetworkConnectionType.none,
     );
@@ -90,6 +90,7 @@ class SimulatedNetworkConnectivity implements NetworkConnectivity {
     return _currentStatus;
   }
 
+  @override
   void dispose() {
     _statusController.close();
   }
@@ -296,7 +297,7 @@ void main() {
       ),
     );
 
-    backoff = ExponentialBackoff();
+    backoff = const ExponentialBackoff();
 
     syncService = SyncServiceImpl(
       persistence: persistence,
@@ -306,14 +307,15 @@ void main() {
   });
 
   tearDown(() async {
-    await syncService.dispose();
+    syncService.dispose();
     networkConnectivity.dispose();
     persistence.dispose();
     backend.dispose();
   });
 
   group('E2E Tests - Offline Mode Scenarios', () {
-    test('should queue operations while offline and sync when online', () async {
+    test('should queue operations while offline and sync when online',
+        () async {
       // Arrange: Setup network as offline
       await networkConnectivity.goOffline();
 
@@ -321,12 +323,12 @@ void main() {
         SyncOperation.create(
           entityId: 'trip-1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip to Paris', 'days': 5},
+          data: const {'title': 'Trip to Paris', 'days': 5},
         ),
         SyncOperation.create(
           entityId: 'trip-2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip to London', 'days': 3},
+          data: const {'title': 'Trip to London', 'days': 3},
         ),
       ];
 
@@ -337,11 +339,11 @@ void main() {
 
       // Verify operations are queued
       expect(syncService.queueSize, equals(2));
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
 
       // Verify sync didn't start while offline
       await Future.delayed(const Duration(milliseconds: 100));
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
 
       // Act: Go online
       await networkConnectivity.goOnline();
@@ -350,24 +352,25 @@ void main() {
       await syncService.processQueue();
 
       // Assert: Sync should have started when coming online
-      expect(syncService.status, anyOf(SyncStatus.success, SyncStatus.idle));
+      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
-    test('should handle offline mode with persistence across restarts', () async {
+    test('should handle offline mode with persistence across restarts',
+        () async {
       // Arrange: Go offline and enqueue operations
       await networkConnectivity.goOffline();
 
       final operation = SyncOperation.update(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Updated Trip'},
+        data: const {'title': 'Updated Trip'},
       );
 
       await syncService.enqueue(operation);
       expect(syncService.queueSize, equals(1));
 
       // Simulate app restart: Create new sync service with same persistence
-      await syncService.dispose();
+      syncService.dispose();
 
       final newSyncService = SyncServiceImpl(
         persistence: persistence,
@@ -385,7 +388,7 @@ void main() {
       // Assert: Sync should complete
       expect(newSyncService.queueSize, equals(0));
 
-      await newSyncService.dispose();
+      newSyncService.dispose();
     });
 
     test('should handle offline to online transition with conflict detection',
@@ -412,7 +415,7 @@ void main() {
       final localOperation = SyncOperation.update(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Local Trip', 'days': 5},
+        data: const {'title': 'Local Trip', 'days': 5},
         localVersion: EntityVersion(
           entityId: 'trip-1',
           entityType: 'trip',
@@ -444,7 +447,7 @@ void main() {
       await syncService.processQueue();
 
       // Assert: Sync should complete (conflict detection handled by service)
-      expect(syncService.status, anyOf(SyncStatus.success, SyncStatus.idle));
+      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
     test('should handle multiple offline to online transitions', () async {
@@ -454,7 +457,7 @@ void main() {
       await syncService.enqueue(SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
       ));
 
       await networkConnectivity.goOnline();
@@ -468,7 +471,7 @@ void main() {
       await syncService.enqueue(SyncOperation.create(
         entityId: 'trip-2',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 2'},
+        data: const {'title': 'Trip 2'},
       ));
 
       await networkConnectivity.goOnline();
@@ -476,7 +479,7 @@ void main() {
 
       // Assert: All operations should sync
       expect(syncService.queueSize, equals(0));
-      expect(syncService.status, anyOf(SyncStatus.success, SyncStatus.idle));
+      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
   });
 
@@ -495,7 +498,7 @@ void main() {
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip with slow network'},
+        data: const {'title': 'Trip with slow network'},
       );
 
       // Act: Enqueue and process with slow network
@@ -511,7 +514,7 @@ void main() {
         greaterThan(const Duration(seconds: 1)),
       );
 
-      await slowSyncService.dispose();
+      slowSyncService.dispose();
       slowNetwork.dispose();
     });
 
@@ -548,7 +551,7 @@ void main() {
       // Assert: All operations should complete
       expect(variableSyncService.queueSize, equals(0));
 
-      await variableSyncService.dispose();
+      variableSyncService.dispose();
       variableNetwork.dispose();
     });
 
@@ -556,8 +559,9 @@ void main() {
       // Arrange: Start with slow network
       var isSlowNetwork = true;
       final variableNetwork = SimulatedNetworkConnectivity(
-        simulatedLatency: () =>
-            isSlowNetwork ? const Duration(seconds: 2) : const Duration(milliseconds: 100),
+        simulatedLatency: () => isSlowNetwork
+            ? const Duration(seconds: 2)
+            : const Duration(milliseconds: 100),
       );
 
       final syncService = SyncServiceImpl(
@@ -569,7 +573,7 @@ void main() {
       await syncService.enqueue(SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
       ));
 
       // Act: Switch to fast network and sync
@@ -579,7 +583,7 @@ void main() {
       // Assert: Operation should complete
       expect(syncService.queueSize, equals(0));
 
-      await syncService.dispose();
+      syncService.dispose();
       variableNetwork.dispose();
     });
 
@@ -592,11 +596,12 @@ void main() {
       await syncService.enqueue(SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
       ));
 
       // Act: Switch to mobile and sync
-      await networkConnectivity.changeConnectionType(NetworkConnectionType.mobile);
+      await networkConnectivity
+          .changeConnectionType(NetworkConnectionType.mobile);
       await syncService.processQueue();
 
       // Assert: Sync should complete
@@ -617,7 +622,7 @@ void main() {
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip with flaky server'},
+        data: const {'title': 'Trip with flaky server'},
       );
 
       await syncService.enqueue(operation);
@@ -630,11 +635,13 @@ void main() {
       }
 
       // Assert: Service should handle errors gracefully
-      expect(syncService.status, anyOf(
-        SyncStatus.success,
-        SyncStatus.failed,
-        SyncStatus.idle,
-      ));
+      expect(
+          syncService.status,
+          anyOf(
+            SyncOperationStatus.success,
+            SyncOperationStatus.failed,
+            SyncOperationStatus.idle,
+          ));
 
       flakyBackend.dispose();
     });
@@ -649,7 +656,7 @@ void main() {
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Protected trip'},
+        data: const {'title': 'Protected trip'},
       );
 
       await syncService.enqueue(operation);
@@ -677,7 +684,7 @@ void main() {
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Slow trip'},
+        data: const {'title': 'Slow trip'},
       );
 
       await syncService.enqueue(operation);
@@ -742,7 +749,7 @@ void main() {
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip with recovering server'},
+        data: const {'title': 'Trip with recovering server'},
       );
 
       await syncService.enqueue(operation);
@@ -770,12 +777,12 @@ void main() {
   group('E2E Tests - Manual Sync Trigger', () {
     test('should handle manual sync trigger while idle', () async {
       // Arrange: Sync service is idle
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
 
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Manual sync trip'},
+        data: const {'title': 'Manual sync trip'},
       );
 
       // Act: Manually trigger sync
@@ -783,10 +790,11 @@ void main() {
       await syncService.processQueue();
 
       // Assert: Sync should complete
-      expect(syncService.status, anyOf(SyncStatus.success, SyncStatus.idle));
+      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
-    test('should handle manual sync trigger while auto-sync is running', () async {
+    test('should handle manual sync trigger while auto-sync is running',
+        () async {
       // Arrange: Start auto-sync
       final operations = List.generate(
         5,
@@ -808,7 +816,7 @@ void main() {
       final manualOperation = SyncOperation.create(
         entityId: 'manual-trip',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Manual trip'},
+        data: const {'title': 'Manual trip'},
       );
 
       await syncService.enqueue(manualOperation);
@@ -828,7 +836,7 @@ void main() {
       final operation = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Offline manual sync'},
+        data: const {'title': 'Offline manual sync'},
       );
 
       // Act: Manually trigger sync while offline
@@ -837,7 +845,7 @@ void main() {
 
       // Assert: Operations should be queued but not sync
       expect(syncService.queueSize, greaterThan(0));
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
 
       // Act: Go online
       await networkConnectivity.goOnline();
@@ -889,7 +897,7 @@ void main() {
       final operation = SyncOperation.update(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Local Trip', 'days': 5},
+        data: const {'title': 'Local Trip', 'days': 5},
         localVersion: EntityVersion(
           entityId: 'trip-1',
           entityType: 'trip',
@@ -906,7 +914,7 @@ void main() {
 
       // Assert: Sync should complete (conflict resolved)
       expect(syncService.queueSize, equals(0));
-      expect(syncService.status, anyOf(SyncStatus.success, SyncStatus.idle));
+      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
     test('should handle manual sync cancellation', () async {
@@ -928,7 +936,7 @@ void main() {
       expect(syncService.isProcessing, false);
 
       // Cleanup
-      await syncService.dispose();
+      syncService.dispose();
     });
   });
 
@@ -969,7 +977,7 @@ void main() {
       // Assert: Should eventually complete
       expect(complexSyncService.queueSize, equals(0));
 
-      await complexSyncService.dispose();
+      complexSyncService.dispose();
       complexNetwork.dispose();
       complexPersistence.dispose();
     });

@@ -5,9 +5,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
+import 'package:fpdart/fpdart.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i8;
+import 'package:soloadventurer/core/error/failures.dart' as _i5;
+import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart'
+    as _i6;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart'
-    as _i4;
+    as _i7;
 import 'package:soloadventurer/features/recommendations/domain/services/recommendation_service.dart'
     as _i2;
 
@@ -24,6 +29,7 @@ import 'package:soloadventurer/features/recommendations/domain/services/recommen
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 /// A class which mocks [RecommendationService].
 ///
@@ -31,69 +37,172 @@ import 'package:soloadventurer/features/recommendations/domain/services/recommen
 class MockRecommendationService extends _i1.Mock
     implements _i2.RecommendationService {
   @override
-  _i3.Future<dynamic> getPersonalizedRecommendations(
-          _i4.RecommendationRequest? request) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getPersonalizedRecommendations,
-          [request],
-        ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+  _i3.Future<_i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>
+      getPersonalizedRecommendations(_i7.RecommendationRequest? request) =>
+          (super.noSuchMethod(
+            Invocation.method(
+              #getPersonalizedRecommendations,
+              [request],
+            ),
+            returnValue: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getPersonalizedRecommendations,
+                [request],
+              ),
+            )),
+            returnValueForMissingStub: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getPersonalizedRecommendations,
+                [request],
+              ),
+            )),
+          ) as _i3.Future<
+              _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>);
 
   @override
-  _i3.Future<dynamic> getRecommendationsForDate(
-    _i4.RecommendationRequest? request,
+  _i3.Future<_i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>
+      getRecommendationsForDate(
+    _i7.RecommendationRequest? request,
     DateTime? specificDate,
   ) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getRecommendationsForDate,
-          [
-            request,
-            specificDate,
-          ],
-        ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+          (super.noSuchMethod(
+            Invocation.method(
+              #getRecommendationsForDate,
+              [
+                request,
+                specificDate,
+              ],
+            ),
+            returnValue: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getRecommendationsForDate,
+                [
+                  request,
+                  specificDate,
+                ],
+              ),
+            )),
+            returnValueForMissingStub: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getRecommendationsForDate,
+                [
+                  request,
+                  specificDate,
+                ],
+              ),
+            )),
+          ) as _i3.Future<
+              _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>);
 
   @override
-  _i3.Future<dynamic> getCollaborativeRecommendations({
+  _i3.Future<_i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>
+      getCollaborativeRecommendations({
     required String? userId,
     required String? destination,
     required int? limit,
   }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getCollaborativeRecommendations,
-          [],
-          {
-            #userId: userId,
-            #destination: destination,
-            #limit: limit,
-          },
-        ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+          (super.noSuchMethod(
+            Invocation.method(
+              #getCollaborativeRecommendations,
+              [],
+              {
+                #userId: userId,
+                #destination: destination,
+                #limit: limit,
+              },
+            ),
+            returnValue: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getCollaborativeRecommendations,
+                [],
+                {
+                  #userId: userId,
+                  #destination: destination,
+                  #limit: limit,
+                },
+              ),
+            )),
+            returnValueForMissingStub: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getCollaborativeRecommendations,
+                [],
+                {
+                  #userId: userId,
+                  #destination: destination,
+                  #limit: limit,
+                },
+              ),
+            )),
+          ) as _i3.Future<
+              _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>);
 
   @override
-  _i3.Future<dynamic> getTrendingRecommendations({
+  _i3.Future<_i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>
+      getTrendingRecommendations({
     required String? destination,
     required int? limit,
   }) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getTrendingRecommendations,
-          [],
-          {
-            #destination: destination,
-            #limit: limit,
-          },
-        ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+          (super.noSuchMethod(
+            Invocation.method(
+              #getTrendingRecommendations,
+              [],
+              {
+                #destination: destination,
+                #limit: limit,
+              },
+            ),
+            returnValue: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getTrendingRecommendations,
+                [],
+                {
+                  #destination: destination,
+                  #limit: limit,
+                },
+              ),
+            )),
+            returnValueForMissingStub: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i8.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getTrendingRecommendations,
+                [],
+                {
+                  #destination: destination,
+                  #limit: limit,
+                },
+              ),
+            )),
+          ) as _i3.Future<
+              _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>);
 }

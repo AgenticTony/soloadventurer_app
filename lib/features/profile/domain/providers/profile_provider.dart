@@ -1,27 +1,39 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../entities/profile.dart';
 import '../entities/profile_state.dart';
 import '../repositories/profile_repository.dart';
-import '../../presentation/providers/profile_providers.dart';
+import '../../presentation/providers/profile_providers.dart' show profileRepositoryProvider;
 
-/// Provider for profile domain state
-final profileDomainProvider =
-    StateNotifierProvider<ProfileDomainNotifier, ProfileDomainState>((ref) {
-  final repository = ref.watch(profileRepositoryProvider);
-  return ProfileDomainNotifier(repository);
-});
+part 'profile_provider.g.dart';
 
-/// Notifier for profile domain state
-class ProfileDomainNotifier extends StateNotifier<ProfileDomainState> {
-  final ProfileRepository _repository;
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
+/// - Dependencies injected via ref.watch() in build() method
+/// - build() returns ProfileDomainState not AsyncValue
+/// - Constructor auto-load moved to build() method
 
-  ProfileDomainNotifier(this._repository) : super(const ProfileDomainState()) {
-    loadProfile();
+@riverpod
+class ProfileDomain extends _$ProfileDomain {
+  @override
+  ProfileDomainState build() {
+    final repository = ref.watch(profileRepositoryProvider);
+    _loadProfile(repository);
+    return const ProfileDomainState();
+  }
+
+  Future<void> _loadProfile(ProfileRepository repository) async {
+    try {
+      final profile = await repository.getCurrentProfile();
+      state = state.copyWith(profile: profile);
+    } catch (e) {
+      state = const ProfileDomainState();
+    }
   }
 
   Future<void> loadProfile() async {
+    final repository = ref.read(profileRepositoryProvider);
     try {
-      final profile = await _repository.getCurrentProfile();
+      final profile = await repository.getCurrentProfile();
       state = state.copyWith(profile: profile);
     } catch (e) {
       state = const ProfileDomainState();
@@ -29,31 +41,32 @@ class ProfileDomainNotifier extends StateNotifier<ProfileDomainState> {
   }
 
   Future<void> updateProfile(Profile profile) async {
+    final repository = ref.read(profileRepositoryProvider);
     try {
-      await _repository.updateProfile(profile);
+      await repository.updateProfile(profile);
       state = state.copyWith(profile: profile);
     } catch (e) {
-      // Domain layer maintains current state on error
       state = state;
     }
   }
 
   Future<void> toggleVisibility() async {
-    if (state.profile == null) return;
+    final currentProfile = state.profile;
+    if (currentProfile == null) return;
 
-    final updatedProfile = state.profile!.copyWith(
-      isPublic: !state.profile!.isPublic,
+    final updatedProfile = currentProfile.copyWith(
+      isPublic: !currentProfile.isPublic,
     );
 
     await updateProfile(updatedProfile);
   }
 
   Future<void> deleteProfile() async {
+    final repository = ref.read(profileRepositoryProvider);
     try {
-      await _repository.deleteProfile(state.profile?.id ?? '');
+      await repository.deleteProfile(state.profile?.id ?? '');
       state = const ProfileDomainState();
     } catch (e) {
-      // Domain layer maintains current state on error
       state = state;
     }
   }

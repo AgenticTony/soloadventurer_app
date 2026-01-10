@@ -56,6 +56,7 @@ class MockExponentialBackoff implements ExponentialBackoff {
   }
 
   int get callCount => _callCount;
+  @override
   void reset() => _callCount = 0;
 }
 
@@ -75,7 +76,7 @@ void main() {
   });
 
   tearDown(() async {
-    await syncService.dispose();
+    syncService.dispose();
   });
 
   group('SyncServiceImpl - Initialization', () {
@@ -85,7 +86,7 @@ void main() {
     });
 
     test('should initialize with idle status', () {
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
       expect(syncService.isProcessing, false);
     });
 
@@ -99,13 +100,13 @@ void main() {
     });
 
     test('should have working status stream', () async {
-      final statuses = <SyncStatus>[];
+      final statuses = <SyncOperationStatus>[];
       final subscription = syncService.statusStream.listen(statuses.add);
 
       // Enqueue operation should trigger status change
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
       await syncService.enqueueOperation(operation);
 
@@ -122,7 +123,7 @@ void main() {
 
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
       await syncService.enqueueOperation(operation);
 
@@ -140,7 +141,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       final result = await syncService.enqueueOperation(operation);
@@ -155,17 +156,17 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 2'},
+          data: const {'title': 'Trip 2'},
         ),
         SyncOperation.create(
           id: 'op3',
           entityType: SyncEntityType.activity,
-          data: {'title': 'Activity 1'},
+          data: const {'title': 'Activity 1'},
         ),
       ];
 
@@ -180,17 +181,17 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.profile, // priority: 10
-          data: {'name': 'Profile'},
+          data: const {'name': 'Profile'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip, // priority: 5
-          data: {'title': 'Trip'},
+          data: const {'title': 'Trip'},
         ),
         SyncOperation.create(
           id: 'op3',
           entityType: SyncEntityType.authTokens, // priority: 100
-          data: {'token': 'abc'},
+          data: const {'token': 'abc'},
         ),
       ];
 
@@ -207,17 +208,17 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 2'},
+          data: const {'title': 'Trip 2'},
         ),
         SyncOperation.create(
           id: 'op3',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 3'},
+          data: const {'title': 'Trip 3'},
         ),
       ];
 
@@ -239,17 +240,17 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 2'},
+          data: const {'title': 'Trip 2'},
         ),
         SyncOperation.create(
           id: 'op3',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 3'},
+          data: const {'title': 'Trip 3'},
         ),
       ];
 
@@ -262,27 +263,27 @@ void main() {
     test('should update status to pending when operation enqueued', () async {
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
 
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
     });
 
     test('should trigger status change on queue stream', () async {
-      final statuses = <SyncStatus>[];
+      final statuses = <SyncOperationStatus>[];
       final subscription = syncService.statusStream.listen(statuses.add);
 
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
       await Future.delayed(const Duration(milliseconds: 50));
 
-      expect(statuses, contains(SyncStatus.pending));
+      expect(statuses, contains(SyncOperationStatus.pending));
       await subscription.cancel();
     });
 
@@ -292,7 +293,7 @@ void main() {
 
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -308,7 +309,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -333,7 +334,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -351,12 +352,12 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 2'},
+          data: const {'title': 'Trip 2'},
         ),
       ];
 
@@ -372,15 +373,15 @@ void main() {
     test('should update status to idle after clearing queue', () async {
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
 
       await syncService.clearQueue();
 
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
     });
 
     test('should emit queue change when queue cleared', () async {
@@ -390,7 +391,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -409,25 +410,25 @@ void main() {
           id: 'op1',
           entityType: SyncEntityType.trip,
           entityId: 'trip-1',
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
         ),
         SyncOperation.update(
           id: 'op2',
           entityType: SyncEntityType.trip,
           entityId: 'trip-2',
-          data: {'title': 'Trip 2'},
+          data: const {'title': 'Trip 2'},
         ),
         SyncOperation.create(
           id: 'op3',
           entityType: SyncEntityType.activity,
           entityId: 'activity-1',
-          data: {'title': 'Activity 1'},
+          data: const {'title': 'Activity 1'},
         ),
         SyncOperation.delete(
           id: 'op4',
           entityType: SyncEntityType.trip,
           entityId: 'trip-1',
-          data: {},
+          data: const {},
         ),
       ];
 
@@ -474,13 +475,13 @@ void main() {
       // Processing should be paused (no auto-processing when ops enqueued)
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       syncService.enqueueOperation(operation);
 
       // Status should be pending but not processing
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
       expect(syncService.isProcessing, false);
     });
 
@@ -489,7 +490,7 @@ void main() {
 
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -518,39 +519,39 @@ void main() {
   group('SyncServiceImpl - Status Transitions', () {
     test('should transition from idle to pending when operation enqueued',
         () async {
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
 
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
     });
 
     test('should transition to idle when queue cleared', () async {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
       await syncService.clearQueue();
 
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
     });
 
     test('should emit status changes on stream', () async {
-      final statuses = <SyncStatus>[];
+      final statuses = <SyncOperationStatus>[];
       final subscription = syncService.statusStream.listen(statuses.add);
 
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -558,8 +559,8 @@ void main() {
 
       await Future.delayed(const Duration(milliseconds: 50));
 
-      expect(statuses, contains(SyncStatus.idle));
-      expect(statuses, contains(SyncStatus.pending));
+      expect(statuses, contains(SyncOperationStatus.idle));
+      expect(statuses, contains(SyncOperationStatus.pending));
 
       await subscription.cancel();
     });
@@ -616,7 +617,7 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -633,11 +634,11 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
-      final statuses = <SyncStatus>[];
+      final statuses = <SyncOperationStatus>[];
       final subscription = syncService.statusStream.listen(statuses.add);
 
       syncService.resumeProcessing();
@@ -648,8 +649,8 @@ void main() {
       expect(
         statuses,
         anyOf([
-          contains(SyncStatus.syncing),
-          contains(SyncStatus.pending),
+          contains(SyncOperationStatus.syncing),
+          contains(SyncOperationStatus.pending),
         ]),
       );
 
@@ -665,12 +666,12 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 2'},
+          data: const {'title': 'Trip 2'},
         ),
       ];
 
@@ -680,7 +681,8 @@ void main() {
       final result = await syncService.processQueue();
 
       expect(syncService.queueSize, 0);
-      expect(result.successCount + result.failureCount, greaterThanOrEqualTo(0));
+      expect(
+          result.successCount + result.failureCount, greaterThanOrEqualTo(0));
     });
 
     test('should process operations in priority order', () async {
@@ -691,17 +693,17 @@ void main() {
         SyncOperation.create(
           id: 'low',
           entityType: SyncEntityType.travelNote, // priority: 1
-          data: {'title': 'Note'},
+          data: const {'title': 'Note'},
         ),
         SyncOperation.create(
           id: 'high',
           entityType: SyncEntityType.authTokens, // priority: 100
-          data: {'token': 'abc'},
+          data: const {'token': 'abc'},
         ),
         SyncOperation.create(
           id: 'medium',
           entityType: SyncEntityType.trip, // priority: 5
-          data: {'title': 'Trip'},
+          data: const {'title': 'Trip'},
         ),
       ];
 
@@ -720,7 +722,7 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -740,7 +742,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       ).copyWith(retryCount: 2);
 
       await syncService.enqueueOperation(operation);
@@ -760,7 +762,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       ).copyWith(retryCount: 3); // At max attempts
 
       await syncService.enqueueOperation(operation);
@@ -784,7 +786,7 @@ void main() {
       await syncService.clearQueue();
 
       expect(syncService.queueSize, 0);
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
     });
 
     test('should handle removing from empty queue gracefully', () async {
@@ -813,7 +815,7 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -834,20 +836,20 @@ void main() {
 
       final operation = SyncOperation.create(
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test'},
+        data: const {'title': 'Test'},
       );
 
       await syncService.enqueueOperation(operation);
 
       // Should remain in pending state
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
     });
   });
 
   group('SyncServiceImpl - Stream Behavior', () {
     test('statusStream should broadcast to multiple listeners', () async {
-      final listener1 = <SyncStatus>[];
-      final listener2 = <SyncStatus>[];
+      final listener1 = <SyncOperationStatus>[];
+      final listener2 = <SyncOperationStatus>[];
 
       final sub1 = syncService.statusStream.listen(listener1.add);
       final sub2 = syncService.statusStream.listen(listener2.add);
@@ -855,7 +857,7 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -879,7 +881,7 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -893,13 +895,13 @@ void main() {
     });
 
     test('should not emit duplicate status changes', () async {
-      final statuses = <SyncStatus>[];
+      final statuses = <SyncOperationStatus>[];
       final subscription = syncService.statusStream.listen(statuses.add);
 
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
@@ -907,7 +909,7 @@ void main() {
 
       // Count pending status emissions
       final pendingCount =
-          statuses.where((s) => s == SyncStatus.pending).length;
+          statuses.where((s) => s == SyncOperationStatus.pending).length;
 
       // Should only emit pending once (or minimal times)
       expect(pendingCount, lessThanOrEqualTo(2));
@@ -921,16 +923,16 @@ void main() {
       final service = SyncServiceImpl();
 
       // Should not throw
-      await service.dispose();
+      service.dispose();
 
       // Multiple disposals should be safe
-      await service.dispose();
+      service.dispose();
     });
 
     test('should not process after disposal', () async {
       final service = SyncServiceImpl();
 
-      await service.dispose();
+      service.dispose();
 
       // Should handle gracefully
       await service.clearQueue();
@@ -1021,22 +1023,22 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.travelNote, // priority: 1
-          data: {'title': 'Note'},
+          data: const {'title': 'Note'},
         ),
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.trip, // priority: 5
-          data: {'title': 'Trip'},
+          data: const {'title': 'Trip'},
         ),
         SyncOperation.create(
           id: 'op3',
           entityType: SyncEntityType.profile, // priority: 10
-          data: {'name': 'Profile'},
+          data: const {'name': 'Profile'},
         ),
         SyncOperation.create(
           id: 'op4',
           entityType: SyncEntityType.authTokens, // priority: 100
-          data: {'token': 'abc'},
+          data: const {'token': 'abc'},
         ),
       ];
 
@@ -1054,7 +1056,7 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.travelNote, // priority: 1
-          data: {'title': 'Note'},
+          data: const {'title': 'Note'},
         ),
       );
 
@@ -1063,7 +1065,7 @@ void main() {
         SyncOperation.create(
           id: 'op2',
           entityType: SyncEntityType.authTokens, // priority: 100
-          data: {'token': 'abc'},
+          data: const {'token': 'abc'},
         ),
       );
 
@@ -1085,11 +1087,11 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
     });
 
     test('should not auto process when disabled', () async {
@@ -1100,12 +1102,12 @@ void main() {
       await syncService.enqueueOperation(
         SyncOperation.create(
           entityType: SyncEntityType.trip,
-          data: {'title': 'Test'},
+          data: const {'title': 'Test'},
         ),
       );
 
       // Should remain pending
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
       expect(syncService.isProcessing, false);
     });
   });

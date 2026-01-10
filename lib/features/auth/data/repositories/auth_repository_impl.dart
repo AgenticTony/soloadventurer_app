@@ -260,7 +260,8 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthSession> refreshToken() async {
     // Use RefreshQueueManager if available for robust refresh with retry logic
     if (refreshQueueManager != null) {
-      debugPrint('AuthRepositoryImpl: Using RefreshQueueManager for token refresh');
+      debugPrint(
+          'AuthRepositoryImpl: Using RefreshQueueManager for token refresh');
       try {
         final queuedResult = await refreshQueueManager!.enqueueRefresh();
         if (queuedResult.success && queuedResult.session != null) {
@@ -282,7 +283,8 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     // Fallback to simple refresh without retry logic
-    debugPrint('AuthRepositoryImpl: Using basic token refresh (no queue manager)');
+    debugPrint(
+        'AuthRepositoryImpl: Using basic token refresh (no queue manager)');
     return performBasicTokenRefresh();
   }
 
@@ -381,9 +383,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final expiresAt = await localDataSource.getTokenExpiration();
 
       // Validate we have all required data
-      if (accessToken == null ||
-          refreshToken == null ||
-          expiresAt == null) {
+      if (accessToken == null || refreshToken == null || expiresAt == null) {
         return null;
       }
 

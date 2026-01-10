@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/utils/media_compression.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -27,7 +26,8 @@ class MediaCompressionExample {
       debugPrint('Size reduction: ${result.sizeReductionPercent}%');
       debugPrint('Dimensions: ${result.width}x${result.height}');
       debugPrint('Format: ${result.format}');
-      debugPrint('Compression ratio: ${result.compressionRatio.toStringAsFixed(2)}x');
+      debugPrint(
+          'Compression ratio: ${result.compressionRatio.toStringAsFixed(2)}x');
 
       // Use compressed bytes for upload
       final compressedBytes = result.bytes;
@@ -45,7 +45,7 @@ class MediaCompressionExample {
       final imageFile = File('/path/to/large-photo.jpg');
 
       // Create custom configuration for large photos
-      final config = ImageCompressionConfig(
+      const config = ImageCompressionConfig(
         maxWidth: 2560, // Limit to 2560px width
         maxHeight: 2560, // Limit to 2560px height
         quality: 90, // Higher quality for important photos
@@ -152,7 +152,7 @@ class MediaCompressionExample {
       debugPrint('Compression failed: ${e.message}');
       // Try with lower quality
       try {
-        final fallbackConfig = ImageCompressionConfig(
+        const fallbackConfig = ImageCompressionConfig(
           quality: 70, // Lower quality
           maxWidth: 1280,
           maxHeight: 1280,

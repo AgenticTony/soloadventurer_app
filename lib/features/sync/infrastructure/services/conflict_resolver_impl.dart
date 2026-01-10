@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../../domain/models/conflict_info.dart';
 import '../../domain/models/conflict_resolution.dart';
 import '../../domain/models/entity_version.dart';
@@ -22,9 +21,10 @@ class ConflictResolverImpl extends ConflictResolver {
   /// Creates a new [ConflictResolverImpl] with the given configuration
   ConflictResolverImpl({
     ConflictResolutionConfig? config,
-  }) : config = config ?? ConflictResolutionConfig.defaultConfig(
-          deviceId: 'default-device',
-        ) {
+  }) : config = config ??
+            ConflictResolutionConfig.defaultConfig(
+              deviceId: 'default-device',
+            ) {
     _resolutionStreamController =
         StreamController<ConflictResolution>.broadcast();
   }
@@ -74,7 +74,7 @@ class ConflictResolverImpl extends ConflictResolver {
     required List<ConflictInfo> conflicts,
     List<ConflictResolutionStrategy>? strategies,
     List<ManualResolutionChoice>? userChoices,
-    List<Map<String, dynamic>? > userDataList,
+    List<Map<String, dynamic>?> userDataList,
   }) async {
     final resolutions = <ConflictResolution>[];
     final failedConflicts = <ConflictInfo>[];
@@ -84,7 +84,7 @@ class ConflictResolverImpl extends ConflictResolver {
       final conflict = conflicts[i];
       final strategy = strategies?.elementAt(i);
       final userChoice = userChoices?.elementAt(i);
-      final userData = userDataList?.elementAt(i);
+      final userData = userDataList.elementAt(i);
 
       try {
         final resolution = await resolveConflict(
@@ -343,7 +343,9 @@ class ConflictResolverImpl extends ConflictResolver {
       final localValue = conflict.localData![field];
       final remoteValue = conflict.remoteData![field];
 
-      if (localValue != null && remoteValue != null && localValue != remoteValue) {
+      if (localValue != null &&
+          remoteValue != null &&
+          localValue != remoteValue) {
         // Protected field has different values, cannot auto-merge
         return false;
       }
@@ -434,8 +436,10 @@ class ConflictResolverImpl extends ConflictResolver {
     EntityVersion? baseVersion,
   }) {
     // Increment version number from max of local and remote
-    final maxVersion = [conflict.localVersion.version, conflict.remoteVersion.version]
-        .reduce((a, b) => a > b ? a : b);
+    final maxVersion = [
+      conflict.localVersion.version,
+      conflict.remoteVersion.version
+    ].reduce((a, b) => a > b ? a : b);
 
     // Use most recent timestamp
     final latestTimestamp = [

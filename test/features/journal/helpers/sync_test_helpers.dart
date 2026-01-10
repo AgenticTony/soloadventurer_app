@@ -1,6 +1,6 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
@@ -12,12 +12,15 @@ import 'package:soloadventurer/features/journal/data/models/journal_entry_model.
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/domain/services/sync_service.dart';
 
 // Mock classes
-class MockJournalLocalDataSource extends Mock implements JournalLocalDataSource {}
+class MockJournalLocalDataSource extends Mock
+    implements JournalLocalDataSource {}
 
-class MockJournalRemoteDataSource extends Mock implements JournalRemoteDataSource {}
+class MockJournalRemoteDataSource extends Mock
+    implements JournalRemoteDataSource {}
 
 class MockTripLocalDataSource extends Mock implements TripLocalDataSource {}
 
@@ -234,7 +237,8 @@ SyncConflict createTestSyncConflict({
     entityType: entityType,
     entityId: entityId,
     localVersion: localVersion ?? entry.toJson(),
-    remoteVersion: remoteVersion ?? entry.copyWith(title: 'Remote Title').toJson(),
+    remoteVersion:
+        remoteVersion ?? entry.copyWith(title: 'Remote Title').toJson(),
     localUpdatedAt: localUpdatedAt ?? testDateTime,
     remoteUpdatedAt: remoteUpdatedAt ?? testDateTimeLater,
     reason: reason,
@@ -361,8 +365,7 @@ void assertSyncResultMatches(
         reason: 'Conflict count mismatch');
   }
   if (failedCount != null) {
-    expect(actual.failedCount, failedCount,
-        reason: 'Failed count mismatch');
+    expect(actual.failedCount, failedCount, reason: 'Failed count mismatch');
   }
   if (errors != null) {
     expect(actual.errors, errors, reason: 'Errors mismatch');
@@ -390,16 +393,14 @@ void assertSyncProgressMatches(
     expect(actual.syncedItems, syncedItems, reason: 'Synced items mismatch');
   }
   if (syncingItems != null) {
-    expect(actual.syncingItems, syncingItems,
-        reason: 'Syncing items mismatch');
+    expect(actual.syncingItems, syncingItems, reason: 'Syncing items mismatch');
   }
   if (conflictItems != null) {
     expect(actual.conflictItems, conflictItems,
         reason: 'Conflict items mismatch');
   }
   if (failedItems != null) {
-    expect(actual.failedItems, failedItems,
-        reason: 'Failed items mismatch');
+    expect(actual.failedItems, failedItems, reason: 'Failed items mismatch');
   }
   if (progress != null) {
     expect(actual.progress, closeTo(progress, 0.01),
@@ -447,6 +448,6 @@ void setupRemoteThrows500<T>(T mockDataSource, Future Function() method) {
 /// Helper to setup local data source to throw NotFoundException
 void setupLocalThrowsNotFound<T>(T mockDataSource, Future Function() method) {
   when(method).thenThrow(
-    NotFoundException(message: 'Not found locally'),
+    const NotFoundException(message: 'Not found locally'),
   );
 }

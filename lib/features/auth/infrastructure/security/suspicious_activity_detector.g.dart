@@ -6,25 +6,63 @@ part of 'suspicious_activity_detector.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$suspiciousActivityDetectorHash() =>
-    r'8637ecc6e7ed7122f11aa7fb6c60c314a7165fb1';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Detects and logs suspicious activity patterns related to authentication and API usage
+
+@ProviderFor(SuspiciousActivityDetector)
+final suspiciousActivityDetectorProvider =
+    SuspiciousActivityDetectorProvider._();
 
 /// Detects and logs suspicious activity patterns related to authentication and API usage
-///
-/// Copied from [SuspiciousActivityDetector].
-@ProviderFor(SuspiciousActivityDetector)
-final suspiciousActivityDetectorProvider = AutoDisposeNotifierProvider<
-    SuspiciousActivityDetector, SuspiciousActivityDetector>.internal(
-  SuspiciousActivityDetector.new,
-  name: r'suspiciousActivityDetectorProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$suspiciousActivityDetectorHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class SuspiciousActivityDetectorProvider extends $NotifierProvider<
+    SuspiciousActivityDetector, SuspiciousActivityDetector> {
+  /// Detects and logs suspicious activity patterns related to authentication and API usage
+  SuspiciousActivityDetectorProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'suspiciousActivityDetectorProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-typedef _$SuspiciousActivityDetector
-    = AutoDisposeNotifier<SuspiciousActivityDetector>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$suspiciousActivityDetectorHash();
+
+  @$internal
+  @override
+  SuspiciousActivityDetector create() => SuspiciousActivityDetector();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SuspiciousActivityDetector value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SuspiciousActivityDetector>(value),
+    );
+  }
+}
+
+String _$suspiciousActivityDetectorHash() =>
+    r'21bc6b55570c17e7cd644a4c6229ad1163adcc93';
+
+/// Detects and logs suspicious activity patterns related to authentication and API usage
+
+abstract class _$SuspiciousActivityDetector
+    extends $Notifier<SuspiciousActivityDetector> {
+  SuspiciousActivityDetector build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref
+        as $Ref<SuspiciousActivityDetector, SuspiciousActivityDetector>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<SuspiciousActivityDetector, SuspiciousActivityDetector>,
+        SuspiciousActivityDetector,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

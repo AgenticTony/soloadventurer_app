@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/features/auth/domain/models/user.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
-import 'package:soloadventurer_test/utils/performance/performance_test_utils.dart';
+import 'package:soloadventurer/test/utils/performance/performance_test_utils.dart';
 
 /// Example performance tests demonstrating the use of performance test data generators
 ///
@@ -46,8 +46,8 @@ void main() {
     test('Generate geographically distributed trips for map tests', () {
       final stopwatch = Stopwatch()..start();
 
-      final trips = PerformanceTestDataGenerator
-          .generateGeographicallyDistributedTrips(
+      final trips =
+          PerformanceTestDataGenerator.generateGeographicallyDistributedTrips(
         count: 500,
       );
 
@@ -66,11 +66,13 @@ void main() {
       expect(longitudes.reduce((a, b) => a > b ? a : b), greaterThan(100));
 
       print('Generated 500 geographically distributed trips in '
-            '${stopwatch.elapsedMilliseconds}ms');
-      print('Latitude range: ${latitudes.reduce((a, b) => a < b ? a : b).toStringAsFixed(2)} '
-            'to ${latitudes.reduce((a, b) => a > b ? a : b).toStringAsFixed(2)}');
-      print('Longitude range: ${longitudes.reduce((a, b) => a < b ? a : b).toStringAsFixed(2)} '
-            'to ${longitudes.reduce((a, b) => a > b ? a : b).toStringAsFixed(2)}');
+          '${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Latitude range: ${latitudes.reduce((a, b) => a < b ? a : b).toStringAsFixed(2)} '
+          'to ${latitudes.reduce((a, b) => a > b ? a : b).toStringAsFixed(2)}');
+      print(
+          'Longitude range: ${longitudes.reduce((a, b) => a < b ? a : b).toStringAsFixed(2)} '
+          'to ${longitudes.reduce((a, b) => a > b ? a : b).toStringAsFixed(2)}');
     });
 
     test('Generate clustered trips for map clustering tests', () {
@@ -96,7 +98,8 @@ void main() {
         expect(lonDiff, lessThan(0.5));
       }
 
-      print('Generated 100 clustered trips in ${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Generated 100 clustered trips in ${stopwatch.elapsedMilliseconds}ms');
     });
 
     test('Generate complex trip with sub-items', () {
@@ -122,7 +125,8 @@ void main() {
       expect(metadata['estimatedMemoryUsage'], isNotNull);
 
       final memoryMB = (metadata['estimatedMemoryUsage'] as int) / 1024 / 1024;
-      print('Estimated memory usage for complex trip: ${memoryMB.toStringAsFixed(2)} MB');
+      print(
+          'Estimated memory usage for complex trip: ${memoryMB.toStringAsFixed(2)} MB');
     });
 
     test('Generate users with trips for multi-user testing', () {
@@ -144,7 +148,8 @@ void main() {
         }
       });
 
-      final totalTrips = userTrips.values.fold<int>(0, (sum, trips) => sum + trips.length);
+      final totalTrips =
+          userTrips.values.fold<int>(0, (sum, trips) => sum + trips.length);
       print('Generated ${userTrips.length} users with $totalTrips total trips');
     });
 
@@ -168,13 +173,15 @@ void main() {
       final uniqueUrls = photoUrls.toSet();
       expect(uniqueUrls.length, equals(500));
 
-      print('Generated 500 unique photo URLs in ${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Generated 500 unique photo URLs in ${stopwatch.elapsedMilliseconds}ms');
     });
 
     test('Generate photo metadata for list rendering tests', () {
       final stopwatch = Stopwatch()..start();
 
-      final photoMetadata = PhotoDataGenerator.generatePhotoMetadata(count: 500);
+      final photoMetadata =
+          PhotoDataGenerator.generatePhotoMetadata(count: 500);
 
       stopwatch.stop();
 
@@ -197,7 +204,8 @@ void main() {
         expect(photo['tags'], isNotNull);
       }
 
-      print('Generated 500 photo metadata entries in ${stopwatch.elapsedMilliseconds}ms');
+      print(
+          'Generated 500 photo metadata entries in ${stopwatch.elapsedMilliseconds}ms');
     });
 
     test('Generate trip-specific photo URLs', () {
@@ -219,15 +227,19 @@ void main() {
     test('Estimate memory usage for photo caching', () {
       final memory100 = PhotoDataGenerator.estimateMemoryUsage(photoCount: 100);
       final memory500 = PhotoDataGenerator.estimateMemoryUsage(photoCount: 500);
-      final memory1000 = PhotoDataGenerator.estimateMemoryUsage(photoCount: 1000);
+      final memory1000 =
+          PhotoDataGenerator.estimateMemoryUsage(photoCount: 1000);
 
       expect(memory100, equals(100 * 1024 * 1024));
       expect(memory500, equals(500 * 1024 * 1024));
       expect(memory1000, equals(1000 * 1024 * 1024));
 
-      print('Estimated memory for 100 photos: ${(memory100 / 1024 / 1024).toStringAsFixed(0)} MB');
-      print('Estimated memory for 500 photos: ${(memory500 / 1024 / 1024).toStringAsFixed(0)} MB');
-      print('Estimated memory for 1000 photos: ${(memory1000 / 1024 / 1024).toStringAsFixed(0)} MB');
+      print(
+          'Estimated memory for 100 photos: ${(memory100 / 1024 / 1024).toStringAsFixed(0)} MB');
+      print(
+          'Estimated memory for 500 photos: ${(memory500 / 1024 / 1024).toStringAsFixed(0)} MB');
+      print(
+          'Estimated memory for 1000 photos: ${(memory1000 / 1024 / 1024).toStringAsFixed(0)} MB');
     });
 
     test('Generate variable size photo URLs', () {
@@ -247,11 +259,12 @@ void main() {
       expect(sizes.contains('400x300'), isTrue);
       expect(sizes.contains('1920x1080'), isTrue);
 
-      print('Generated 500 photos with ${sizes.length} different size variations');
+      print(
+          'Generated 500 photos with ${sizes.length} different size variations');
     });
 
     test('Data generation performance benchmark', () {
-      final iterations = 10;
+      const iterations = 10;
       final timings = <int>[];
 
       for (int i = 0; i < iterations; i++) {

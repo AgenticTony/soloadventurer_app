@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../domain/models/sync_status.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 
 /// Icon widget displaying sync status with appropriate colors and animations
 ///
@@ -9,9 +9,9 @@ import '../../../domain/models/sync_status.dart';
 /// - Optional size customization
 /// - Optional label display
 /// - Accessibility support
-class SyncStatusIcon extends StatelessWidget {
+class SyncOperationStatusIcon extends StatelessWidget {
   /// Current sync status
-  final SyncStatus status;
+  final SyncOperationStatus status;
 
   /// Icon size
   final double size;
@@ -25,7 +25,7 @@ class SyncStatusIcon extends StatelessWidget {
   /// Whether to use a background circle
   final bool withBackground;
 
-  const SyncStatusIcon({
+  const SyncOperationStatusIcon({
     super.key,
     required this.status,
     this.size = 24,
@@ -82,7 +82,7 @@ class SyncStatusIcon extends StatelessWidget {
   }
 
   Widget _buildIconContent(Color color, IconData iconData) {
-    if (status == SyncStatus.syncing) {
+    if (status == SyncOperationStatus.syncing) {
       // Animated spinning icon for syncing state
       return SizedBox(
         width: size,
@@ -102,7 +102,7 @@ class SyncStatusIcon extends StatelessWidget {
           },
           onEnd: () {
             // Animation loops infinitely by rebuilding
-            if (status == SyncStatus.syncing) {
+            if (status == SyncOperationStatus.syncing) {
               (context as Element).markNeedsBuild();
             }
           },
@@ -120,15 +120,15 @@ class SyncStatusIcon extends StatelessWidget {
   /// Get color based on sync status
   Color _getStatusColor(ThemeData theme) {
     switch (status) {
-      case SyncStatus.idle:
+      case SyncOperationStatus.idle:
         return theme.colorScheme.onSurfaceVariant;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return theme.colorScheme.primary;
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return const Color(0xFF4CAF50); // Green
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return theme.colorScheme.error;
-      case SyncStatus.pending:
+      case SyncOperationStatus.pending:
         return const Color(0xFFFF9800); // Orange
     }
   }
@@ -136,15 +136,15 @@ class SyncStatusIcon extends StatelessWidget {
   /// Get icon data based on sync status
   IconData _getIconData() {
     switch (status) {
-      case SyncStatus.idle:
+      case SyncOperationStatus.idle:
         return Icons.sync;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return Icons.sync;
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return Icons.check_circle;
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return Icons.error;
-      case SyncStatus.pending:
+      case SyncOperationStatus.pending:
         return Icons.schedule;
     }
   }
@@ -153,9 +153,9 @@ class SyncStatusIcon extends StatelessWidget {
 /// Small circular indicator for sync status
 ///
 /// Shows a colored dot with optional pulsing animation for syncing state
-class SyncStatusIndicator extends StatelessWidget {
+class SyncOperationStatusIndicator extends StatelessWidget {
   /// Current sync status
-  final SyncStatus status;
+  final SyncOperationStatus status;
 
   /// Indicator size (diameter)
   final double size;
@@ -163,7 +163,7 @@ class SyncStatusIndicator extends StatelessWidget {
   /// Whether to show pulsing animation when syncing
   final bool animateWhenSyncing;
 
-  const SyncStatusIndicator({
+  const SyncOperationStatusIndicator({
     super.key,
     required this.status,
     this.size = 12,
@@ -175,7 +175,7 @@ class SyncStatusIndicator extends StatelessWidget {
     final theme = Theme.of(context);
     final color = _getStatusColor(theme);
 
-    if (animateWhenSyncing && status == SyncStatus.syncing) {
+    if (animateWhenSyncing && status == SyncOperationStatus.syncing) {
       return _buildPulsingIndicator(color);
     }
 
@@ -213,7 +213,7 @@ class SyncStatusIndicator extends StatelessWidget {
       },
       onEnd: () {
         // Animation loops
-        if (status == SyncStatus.syncing) {
+        if (status == SyncOperationStatus.syncing) {
           (context as Element).markNeedsBuild();
         }
       },
@@ -222,15 +222,15 @@ class SyncStatusIndicator extends StatelessWidget {
 
   Color _getStatusColor(ThemeData theme) {
     switch (status) {
-      case SyncStatus.idle:
+      case SyncOperationStatus.idle:
         return theme.colorScheme.onSurfaceVariant;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return theme.colorScheme.primary;
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return const Color(0xFF4CAF50); // Green
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return theme.colorScheme.error;
-      case SyncStatus.pending:
+      case SyncOperationStatus.pending:
         return const Color(0xFFFF9800); // Orange
     }
   }

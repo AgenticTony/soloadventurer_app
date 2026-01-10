@@ -74,7 +74,8 @@ class SharedLinkManager extends ConsumerWidget {
     );
   }
 
-  Future<void> _deleteLink(BuildContext context, WidgetRef ref, String linkId) async {
+  Future<void> _deleteLink(
+      BuildContext context, WidgetRef ref, String linkId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -202,8 +203,8 @@ class SharedLinkCard extends ConsumerWidget {
                         Text(
                           'Created ${DateFormat('MMM dd, yyyy').format(link.createdAt)}',
                           style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -226,9 +227,9 @@ class SharedLinkCard extends ConsumerWidget {
                 runSpacing: 8,
                 children: [
                   if (link.hasPassword)
-                    Chip(
-                      avatar: const Icon(Icons.lock, size: 16),
-                      label: const Text('Password Protected'),
+                    const Chip(
+                      avatar: Icon(Icons.lock, size: 16),
+                      label: Text('Password Protected'),
                       visualDensity: VisualDensity.compact,
                     ),
                   if (!link.isActive)
@@ -269,8 +270,8 @@ class SharedLinkCard extends ConsumerWidget {
                       Text(
                         '${stats.totalViews} views',
                         style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       if (stats.lastViewedAt != null) ...[
                         const SizedBox(width: 16),
@@ -283,8 +284,8 @@ class SharedLinkCard extends ConsumerWidget {
                         Text(
                           'Last ${_formatLastViewed(stats.lastViewedAt!)}',
                           style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ],
@@ -407,18 +408,19 @@ class SharedLinkDetailsSheet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _StatusRow(
-                          icon: link.isActive ? Icons.check_circle : Icons.block,
+                          icon:
+                              link.isActive ? Icons.check_circle : Icons.block,
                           label: link.isActive ? 'Active' : 'Inactive',
                           color: link.isActive ? Colors.green : Colors.red,
                         ),
                         if (link.hasPassword)
-                          _StatusRow(
+                          const _StatusRow(
                             icon: Icons.lock,
                             label: 'Password Protected',
                             color: Colors.orange,
                           ),
                         if (link.isExpired)
-                          _StatusRow(
+                          const _StatusRow(
                             icon: Icons.timer_off,
                             label: 'Expired',
                             color: Colors.red,
@@ -471,8 +473,7 @@ class SharedLinkDetailsSheet extends StatelessWidget {
                               ],
                             );
                           },
-                          loading: () =>
-                              const CircularProgressIndicator(),
+                          loading: () => const CircularProgressIndicator(),
                           error: (_, __) =>
                               const Text('Failed to load statistics'),
                         );

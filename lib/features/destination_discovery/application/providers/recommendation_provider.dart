@@ -1,14 +1,28 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/personalized_recommendation.dart';
-import '../../domain/repositories/destination_repository.dart';
 import '../state/recommendation_state.dart';
+import 'destination_repository_provider.dart';
 
+part 'recommendation_provider.g.dart';
+
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Dependencies injected via ref.watch() in build() method
+/// - Family provider with userId parameter in build()
+/// - AutoDispose enabled via @Riverpod annotation
+/// - build() returns Future<T> not AsyncValue<T>
+/// - State is automatically AsyncValue<RecommendationState> when consumed
+/// - Constructor auto-load logic moved to build() method
+///
 /// Provider for personalized recommendations state management
 ///
 /// This provider manages the state of personalized destination recommendations including:
 /// - Recommendation data with match scores and reasons
 /// - Loading and error states
 /// - Expiration checking and auto-refresh
+///
+/// Riverpod 3.0: Uses @riverpod annotation with AsyncNotifier pattern.
+/// Auto-dispose behavior for family provider.
 ///
 /// Usage:
 /// ```dart
@@ -26,56 +40,24 @@ import '../state/recommendation_state.dart';
 /// ```
 ///
 /// The [userId] parameter is the user ID to load recommendations for.
-final recommendationProvider = StateNotifierProvider.autoDispose
-    .family<RecommendationNotifier, AsyncValue<RecommendationState>, String>(
-  (ref, userId) {
+@riverpod
+class Recommendation extends _$Recommendation {
+  /// Initialize the notifier and auto-load recommendations
+  ///
+  /// Riverpod 3.0: build() returns Future<RecommendationState>
+  /// Family provider parameter (userId) is passed here
+  /// AutoDispose behavior: provider will be disposed when no longer watched
+  @override
+  Future<RecommendationState> build(String userId) async {
+    // Get dependencies via ref.watch()
     final repository = ref.watch(destinationRepositoryProvider);
-    return RecommendationNotifier(repository, userId);
-  },
-);
 
-/// Notifier for managing personalized recommendations state
-///
-/// This notifier handles all operations for personalized recommendations:
-/// - Loading recommendations for a user
-/// - Refreshing recommendations
-/// - Checking expiration and auto-refreshing if needed
-/// - Clearing recommendations
-class RecommendationNotifier
-    extends StateNotifier<AsyncValue<RecommendationState>> {
-  final DestinationRepository _repository;
-  final String _userId;
+    // Auto-load recommendations on build
+    final recommendation = await repository.getPersonalizedRecommendations(userId);
 
-  /// Creates a new [RecommendationNotifier]
-  ///
-  /// The [repository] parameter is required for performing data operations.
-  /// The [userId] parameter is the ID of the user to load recommendations for.
-  RecommendationNotifier(this._repository, this._userId)
-      : super(const AsyncValue.data(RecommendationState.initial())) {
-    // Auto-load recommendations on creation
-    loadRecommendations();
-  }
-
-  /// Load personalized recommendations for the user
-  ///
-  /// This method fetches recommendations from the repository.
-  /// Throws an exception if loading fails.
-  ///
-  /// Note: This is automatically called when the notifier is created.
-  Future<void> loadRecommendations() async {
-    state = const AsyncValue.loading();
-
-    try {
-      final recommendation =
-          await _repository.getPersonalizedRecommendations(_userId);
-
-      state = AsyncValue.data(RecommendationState(
-        recommendation: recommendation,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+    return RecommendationState(
+      recommendation: recommendation,
+    );
   }
 
   /// Refresh the recommendations
@@ -85,22 +67,26 @@ class RecommendationNotifier
   ///
   /// Throws an exception if refreshing fails.
   Future<void> refresh() async {
-    // Preserve current state while loading if available
-    if (state.hasValue && state.value!.recommendation != null) {
-      state = AsyncValue.data(state.value!);
+    // Get userId and repository
+    final currentState = state.value;
+    if (currentState == null) {
+      return;
     }
 
-    try {
-      final recommendation =
-          await _repository.getPersonalizedRecommendations(_userId);
+    final userId = currentState.recommendation?.userId ?? '';
+    final repository = ref.read(destinationRepositoryProvider);
 
-      state = AsyncValue.data(RecommendationState(
+    // Set loading state
+    state = const AsyncValue.loading();
+
+    // Load recommendations
+    state = await AsyncValue.guard(() async {
+      final recommendation = await repository.getPersonalizedRecommendations(userId);
+
+      return RecommendationState(
         recommendation: recommendation,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+      );
+    });
   }
 
   /// Refresh recommendations only if they have expired

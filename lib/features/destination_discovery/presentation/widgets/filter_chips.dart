@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../domain/models/destination.dart';
 import '../../domain/models/destination_filter.dart';
 import '../../application/providers/filter_provider.dart';
 
@@ -125,7 +126,8 @@ class FilterChips extends ConsumerWidget {
             SizedBox(width: chipSpacing),
             _ActivityChip(
               activityLevel: ActivityLevel.adventurous,
-              isSelected: filterState.activityLevel == ActivityLevel.adventurous,
+              isSelected:
+                  filterState.activityLevel == ActivityLevel.adventurous,
               onTap: () {
                 _toggleActivity(filterNotifier, ActivityLevel.adventurous);
                 onFilterChanged?.call();
@@ -179,7 +181,7 @@ class FilterChips extends ConsumerWidget {
   }
 
   /// Toggles budget level filter
-  void _toggleBudget(FilterNotifier notifier, BudgetLevel level) {
+  void _toggleBudget(FilterNotifier notifier, FilterBudgetLevel level) {
     // If already selected, deselect it; otherwise, select it
     if (notifier.budgetLevel == level) {
       notifier.updateBudgetLevel(null);
@@ -189,7 +191,7 @@ class FilterChips extends ConsumerWidget {
   }
 
   /// Toggles activity level filter
-  void _toggleActivity(FilterNotifier notifier, ActivityLevel level) {
+  void _toggleActivity(FilterNotifier notifier, FilterActivityLevel level) {
     // If already selected, deselect it; otherwise, select it
     if (notifier.activityLevel == level) {
       notifier.updateActivityLevel(null);
@@ -201,7 +203,7 @@ class FilterChips extends ConsumerWidget {
 
 /// A budget level filter chip
 class _BudgetChip extends StatelessWidget {
-  final BudgetLevel budgetLevel;
+  final FilterBudgetLevel budgetLevel;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -220,7 +222,8 @@ class _BudgetChip extends StatelessWidget {
     return Semantics(
       label: '$label budget filter',
       value: isSelected ? 'Selected' : 'Not selected',
-      hint: 'Double tap to ${isSelected ? "remove" : "apply"} $label budget filter',
+      hint:
+          'Double tap to ${isSelected ? "remove" : "apply"} $label budget filter',
       button: true,
       selected: isSelected,
       child: FilterChip(
@@ -246,32 +249,44 @@ class _BudgetChip extends StatelessWidget {
     );
   }
 
-  String _getBudgetLabel(BudgetLevel level) {
+  String _getBudgetLabel(FilterBudgetLevel level) {
     switch (level) {
-      case BudgetLevel.budget:
+      case FilterBudgetLevel.budget:
         return 'Budget';
-      case BudgetLevel.moderate:
-        return 'Moderate';
-      case BudgetLevel.expensive:
+      case FilterBudgetLevel.economy:
+        return 'Economy';
+      case FilterBudgetLevel.midRange:
+        return 'Mid-Range';
+      case FilterBudgetLevel.premium:
+        return 'Premium';
+      case FilterBudgetLevel.luxury:
         return 'Luxury';
+      case FilterBudgetLevel.ultraLuxury:
+        return 'Ultra Luxury';
     }
   }
 
-  IconData _getBudgetIcon(BudgetLevel level) {
+  IconData _getBudgetIcon(FilterBudgetLevel level) {
     switch (level) {
-      case BudgetLevel.budget:
+      case FilterBudgetLevel.budget:
         return Icons.attach_money;
-      case BudgetLevel.moderate:
+      case FilterBudgetLevel.economy:
+        return Icons.account_balance_wallet;
+      case FilterBudgetLevel.midRange:
         return Icons.money;
-      case BudgetLevel.expensive:
-        return Icons.trending_up;
+      case FilterBudgetLevel.premium:
+        return Icons.stars;
+      case FilterBudgetLevel.luxury:
+        return Icons.diamond;
+      case FilterBudgetLevel.ultraLuxury:
+        return Icons.emoji_events;
     }
   }
 }
 
 /// An activity level filter chip
 class _ActivityChip extends StatelessWidget {
-  final ActivityLevel activityLevel;
+  final FilterActivityLevel activityLevel;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -290,7 +305,8 @@ class _ActivityChip extends StatelessWidget {
     return Semantics(
       label: '$label activity level filter',
       value: isSelected ? 'Selected' : 'Not selected',
-      hint: 'Double tap to ${isSelected ? "remove" : "apply"} $label activity filter',
+      hint:
+          'Double tap to ${isSelected ? "remove" : "apply"} $label activity filter',
       button: true,
       selected: isSelected,
       child: FilterChip(
@@ -316,25 +332,37 @@ class _ActivityChip extends StatelessWidget {
     );
   }
 
-  String _getActivityLabel(ActivityLevel level) {
+  String _getActivityLabel(FilterActivityLevel level) {
     switch (level) {
-      case ActivityLevel.relaxed:
+      case FilterActivityLevel.relaxed:
         return 'Relaxed';
-      case ActivityLevel.moderate:
+      case FilterActivityLevel.light:
+        return 'Light';
+      case FilterActivityLevel.moderate:
         return 'Moderate';
-      case ActivityLevel.adventurous:
-        return 'Adventurous';
+      case FilterActivityLevel.active:
+        return 'Active';
+      case FilterActivityLevel.intense:
+        return 'Intense';
+      case FilterActivityLevel.extreme:
+        return 'Extreme';
     }
   }
 
-  IconData _getActivityIcon(ActivityLevel level) {
+  IconData _getActivityIcon(FilterActivityLevel level) {
     switch (level) {
-      case ActivityLevel.relaxed:
+      case FilterActivityLevel.relaxed:
         return Icons.self_improvement;
-      case ActivityLevel.moderate:
+      case FilterActivityLevel.light:
         return Icons.directions_walk;
-      case ActivityLevel.adventurous:
+      case FilterActivityLevel.moderate:
         return Icons.hiking;
+      case FilterActivityLevel.active:
+        return Icons.terrain;
+      case FilterActivityLevel.intense:
+        return Icons.fire_mode;
+      case FilterActivityLevel.extreme:
+        return Icons.warning;
     }
   }
 }
@@ -356,16 +384,17 @@ class _HiddenGemChip extends StatelessWidget {
     return Semantics(
       label: 'Hidden gems filter',
       value: isSelected ? 'Selected' : 'Not selected',
-      hint: 'Double tap to ${isSelected ? "remove" : "apply"} hidden gems filter',
+      hint:
+          'Double tap to ${isSelected ? "remove" : "apply"} hidden gems filter',
       button: true,
       selected: isSelected,
       child: FilterChip(
-        label: Row(
+        label: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.diamond, size: 16),
-            const SizedBox(width: 4),
-            const Text('Hidden Gems'),
+            Icon(Icons.diamond, size: 16),
+            SizedBox(width: 4),
+            Text('Hidden Gems'),
           ],
         ),
         selected: isSelected,
@@ -444,12 +473,12 @@ class _ClearAllChip extends StatelessWidget {
       hint: 'Removes all active filters. Double tap to clear',
       button: true,
       child: FilterChip(
-        label: Row(
+        label: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.clear_all, size: 16),
-            const SizedBox(width: 4),
-            const Text('Clear All'),
+            Icon(Icons.clear_all, size: 16),
+            SizedBox(width: 4),
+            Text('Clear All'),
           ],
         ),
         selected: false,

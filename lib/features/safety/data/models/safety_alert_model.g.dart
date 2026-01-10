@@ -6,9 +6,8 @@ part of 'safety_alert_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SafetyAlertModelImpl _$$SafetyAlertModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SafetyAlertModelImpl(
+_SafetyAlertModel _$SafetyAlertModelFromJson(Map<String, dynamic> json) =>
+    _SafetyAlertModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
       type: $enumDecode(_$SafetyAlertTypeEnumMap, json['type']),
@@ -45,8 +44,7 @@ _$SafetyAlertModelImpl _$$SafetyAlertModelImplFromJson(
           : DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$SafetyAlertModelImplToJson(
-        _$SafetyAlertModelImpl instance) =>
+Map<String, dynamic> _$SafetyAlertModelToJson(_SafetyAlertModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

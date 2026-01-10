@@ -1,5 +1,5 @@
 import 'package:soloadventurer/core/api/client/api_client.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 
 /// API endpoints for authentication

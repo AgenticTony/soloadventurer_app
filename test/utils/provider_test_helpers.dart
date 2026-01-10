@@ -1,8 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:riverpod/riverpod.dart' as riverpod;
 import 'provider_container_utils.dart';
 
 /// Tests a [StateNotifierProvider] with various scenarios.
+///
+/// **DEPRECATED: StateNotifier is now legacy in Riverpod 3.0**
+/// Consider migrating to the new `Notifier` API instead.
+/// See: https://riverpod.dev/docs/3.0_migration
+///
+/// To keep using StateNotifier, import from `package:riverpod/legacy.dart`.
 ///
 /// This utility function helps test state notifier providers by running
 /// a series of test cases with different inputs and expected outputs.
@@ -12,14 +19,15 @@ import 'provider_container_utils.dart';
 /// [testCases] - A list of test cases to run.
 /// [setUp] - An optional function to run before each test.
 /// [tearDown] - An optional function to run after each test.
-void testStateNotifierProvider<Notifier extends StateNotifier<State>, State>({
-  required StateNotifierProvider<Notifier, State> provider,
+@Deprecated('Use Notifier instead of StateNotifier. See: https://riverpod.dev/docs/3.0_migration')
+void testStateNotifierProvider<Notifier extends riverpod.StateNotifier<State>, State>({
+  required Object provider, // StateNotifierProvider
   required List<Function> buildMocks,
   required List<StateNotifierTestCase<State>> testCases,
   Function()? setUp,
   Function()? tearDown,
 }) {
-  group('${provider.name}', () {
+  group('${provider.toString()}', () {
     for (final testCase in testCases) {
       test(testCase.description, () async {
         // Run setup if provided
@@ -38,7 +46,7 @@ void testStateNotifierProvider<Notifier extends StateNotifier<State>, State>({
         );
 
         // Add listener to track state changes
-        final listener = container.listenToProvider(provider);
+        final listener = container.listenToProvider<State>(provider);
 
         // Run the action that should trigger state changes
         await testCase.action(container);
@@ -68,6 +76,10 @@ void testStateNotifierProvider<Notifier extends StateNotifier<State>, State>({
 
 /// Tests a [FutureProvider] with various scenarios.
 ///
+/// Riverpod 3.0 Migration:
+/// - Updated to use new provider listening API
+/// - Override type changed to Object for compatibility
+///
 /// This utility function helps test future providers by running
 /// a series of test cases with different inputs and expected outputs.
 ///
@@ -77,13 +89,13 @@ void testStateNotifierProvider<Notifier extends StateNotifier<State>, State>({
 /// [setUp] - An optional function to run before each test.
 /// [tearDown] - An optional function to run after each test.
 void testFutureProvider<T>({
-  required FutureProvider<T> provider,
+  required Object provider, // FutureProvider<T>
   required List<Function> buildMocks,
   required List<FutureProviderTestCase<T>> testCases,
   Function()? setUp,
   Function()? tearDown,
 }) {
-  group('${provider.name}', () {
+  group('${provider.toString()}', () {
     for (final testCase in testCases) {
       test(testCase.description, () async {
         // Run setup if provided
@@ -102,7 +114,7 @@ void testFutureProvider<T>({
         );
 
         // Add listener to track state changes
-        final listener = container.listenToProvider(provider);
+        final listener = container.listenToProvider<AsyncValue<T>>(provider);
 
         // Initial state should be loading
         expect(listener.lastValue, isA<AsyncLoading<T>>());
@@ -143,6 +155,10 @@ void testFutureProvider<T>({
 
 /// Tests a [StreamProvider] with various scenarios.
 ///
+/// Riverpod 3.0 Migration:
+/// - Updated to use new provider listening API
+/// - Override type changed to Object for compatibility
+///
 /// This utility function helps test stream providers by running
 /// a series of test cases with different inputs and expected outputs.
 ///
@@ -152,13 +168,13 @@ void testFutureProvider<T>({
 /// [setUp] - An optional function to run before each test.
 /// [tearDown] - An optional function to run after each test.
 void testStreamProvider<T>({
-  required StreamProvider<T> provider,
+  required Object provider, // StreamProvider<T>
   required List<Function> buildMocks,
   required List<StreamProviderTestCase<T>> testCases,
   Function()? setUp,
   Function()? tearDown,
 }) {
-  group('${provider.name}', () {
+  group('${provider.toString()}', () {
     for (final testCase in testCases) {
       test(testCase.description, () async {
         // Run setup if provided
@@ -177,7 +193,7 @@ void testStreamProvider<T>({
         );
 
         // Add listener to track state changes
-        final listener = container.listenToProvider(provider);
+        final listener = container.listenToProvider<AsyncValue<T>>(provider);
 
         // Initial state should be loading
         expect(listener.lastValue, isA<AsyncLoading<T>>());
@@ -217,9 +233,12 @@ void testStreamProvider<T>({
 }
 
 /// A test case for a [StateNotifierProvider].
+///
+/// Riverpod 3.0 Migration:
+/// - Override type changed to Object for compatibility
 class StateNotifierTestCase<T> {
   final String description;
-  final List<Override>? overrides;
+  final List<Object>? overrides;
   final Future<void> Function(ProviderContainer container) action;
   final T? expectedState;
   final List<T>? expectedStateChanges;
@@ -234,9 +253,12 @@ class StateNotifierTestCase<T> {
 }
 
 /// A test case for a [FutureProvider].
+///
+/// Riverpod 3.0 Migration:
+/// - Override type changed to Object for compatibility
 class FutureProviderTestCase<T> {
   final String description;
-  final List<Override>? overrides;
+  final List<Object>? overrides;
   final Future<void> Function(ProviderContainer container) action;
   final AsyncValue<T>? expectedState;
   final T? expectedData;
@@ -253,9 +275,12 @@ class FutureProviderTestCase<T> {
 }
 
 /// A test case for a [StreamProvider].
+///
+/// Riverpod 3.0 Migration:
+/// - Override type changed to Object for compatibility
 class StreamProviderTestCase<T> {
   final String description;
-  final List<Override>? overrides;
+  final List<Object>? overrides;
   final Future<void> Function(ProviderContainer container) action;
   final AsyncValue<T>? expectedState;
   final T? expectedData;

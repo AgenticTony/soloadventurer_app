@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,36 +9,56 @@ part of 'check_in_data.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-CheckInData _$CheckInDataFromJson(Map<String, dynamic> json) {
-  return _CheckInData.fromJson(json);
-}
 
 /// @nodoc
 mixin _$CheckInData {
-  List<CheckIn> get checkIns => throw _privateConstructorUsedError;
-  List<CheckIn> get upcomingCheckIns => throw _privateConstructorUsedError;
-  CheckIn? get selectedCheckIn => throw _privateConstructorUsedError;
-
-  /// Serializes this CheckInData to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  List<CheckIn> get checkIns;
+  List<CheckIn> get upcomingCheckIns;
+  CheckIn? get selectedCheckIn;
 
   /// Create a copy of CheckInData
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $CheckInDataCopyWith<CheckInData> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$CheckInDataCopyWithImpl<CheckInData>(this as CheckInData, _$identity);
+
+  /// Serializes this CheckInData to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is CheckInData &&
+            const DeepCollectionEquality().equals(other.checkIns, checkIns) &&
+            const DeepCollectionEquality()
+                .equals(other.upcomingCheckIns, upcomingCheckIns) &&
+            (identical(other.selectedCheckIn, selectedCheckIn) ||
+                other.selectedCheckIn == selectedCheckIn));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(checkIns),
+      const DeepCollectionEquality().hash(upcomingCheckIns),
+      selectedCheckIn);
+
+  @override
+  String toString() {
+    return 'CheckInData(checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn)';
+  }
 }
 
 /// @nodoc
-abstract class $CheckInDataCopyWith<$Res> {
+abstract mixin class $CheckInDataCopyWith<$Res> {
   factory $CheckInDataCopyWith(
-          CheckInData value, $Res Function(CheckInData) then) =
-      _$CheckInDataCopyWithImpl<$Res, CheckInData>;
+          CheckInData value, $Res Function(CheckInData) _then) =
+      _$CheckInDataCopyWithImpl;
   @useResult
   $Res call(
       {List<CheckIn> checkIns,
@@ -49,14 +69,11 @@ abstract class $CheckInDataCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$CheckInDataCopyWithImpl<$Res, $Val extends CheckInData>
-    implements $CheckInDataCopyWith<$Res> {
-  _$CheckInDataCopyWithImpl(this._value, this._then);
+class _$CheckInDataCopyWithImpl<$Res> implements $CheckInDataCopyWith<$Res> {
+  _$CheckInDataCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final CheckInData _self;
+  final $Res Function(CheckInData) _then;
 
   /// Create a copy of CheckInData
   /// with the given fields replaced by the non-null parameter values.
@@ -67,20 +84,20 @@ class _$CheckInDataCopyWithImpl<$Res, $Val extends CheckInData>
     Object? upcomingCheckIns = null,
     Object? selectedCheckIn = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       checkIns: null == checkIns
-          ? _value.checkIns
+          ? _self.checkIns
           : checkIns // ignore: cast_nullable_to_non_nullable
               as List<CheckIn>,
       upcomingCheckIns: null == upcomingCheckIns
-          ? _value.upcomingCheckIns
+          ? _self.upcomingCheckIns
           : upcomingCheckIns // ignore: cast_nullable_to_non_nullable
               as List<CheckIn>,
       selectedCheckIn: freezed == selectedCheckIn
-          ? _value.selectedCheckIn
+          ? _self.selectedCheckIn
           : selectedCheckIn // ignore: cast_nullable_to_non_nullable
               as CheckIn?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of CheckInData
@@ -88,80 +105,194 @@ class _$CheckInDataCopyWithImpl<$Res, $Val extends CheckInData>
   @override
   @pragma('vm:prefer-inline')
   $CheckInCopyWith<$Res>? get selectedCheckIn {
-    if (_value.selectedCheckIn == null) {
+    if (_self.selectedCheckIn == null) {
       return null;
     }
 
-    return $CheckInCopyWith<$Res>(_value.selectedCheckIn!, (value) {
-      return _then(_value.copyWith(selectedCheckIn: value) as $Val);
+    return $CheckInCopyWith<$Res>(_self.selectedCheckIn!, (value) {
+      return _then(_self.copyWith(selectedCheckIn: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$CheckInDataImplCopyWith<$Res>
-    implements $CheckInDataCopyWith<$Res> {
-  factory _$$CheckInDataImplCopyWith(
-          _$CheckInDataImpl value, $Res Function(_$CheckInDataImpl) then) =
-      __$$CheckInDataImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {List<CheckIn> checkIns,
-      List<CheckIn> upcomingCheckIns,
-      CheckIn? selectedCheckIn});
+/// Adds pattern-matching-related methods to [CheckInData].
+extension CheckInDataPatterns on CheckInData {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $CheckInCopyWith<$Res>? get selectedCheckIn;
-}
-
-/// @nodoc
-class __$$CheckInDataImplCopyWithImpl<$Res>
-    extends _$CheckInDataCopyWithImpl<$Res, _$CheckInDataImpl>
-    implements _$$CheckInDataImplCopyWith<$Res> {
-  __$$CheckInDataImplCopyWithImpl(
-      _$CheckInDataImpl _value, $Res Function(_$CheckInDataImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of CheckInData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? checkIns = null,
-    Object? upcomingCheckIns = null,
-    Object? selectedCheckIn = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_CheckInData value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$CheckInDataImpl(
-      checkIns: null == checkIns
-          ? _value._checkIns
-          : checkIns // ignore: cast_nullable_to_non_nullable
-              as List<CheckIn>,
-      upcomingCheckIns: null == upcomingCheckIns
-          ? _value._upcomingCheckIns
-          : upcomingCheckIns // ignore: cast_nullable_to_non_nullable
-              as List<CheckIn>,
-      selectedCheckIn: freezed == selectedCheckIn
-          ? _value.selectedCheckIn
-          : selectedCheckIn // ignore: cast_nullable_to_non_nullable
-              as CheckIn?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _CheckInData() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_CheckInData value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CheckInData():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_CheckInData value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CheckInData() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(List<CheckIn> checkIns, List<CheckIn> upcomingCheckIns,
+            CheckIn? selectedCheckIn)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _CheckInData() when $default != null:
+        return $default(
+            _that.checkIns, _that.upcomingCheckIns, _that.selectedCheckIn);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(List<CheckIn> checkIns, List<CheckIn> upcomingCheckIns,
+            CheckIn? selectedCheckIn)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CheckInData():
+        return $default(
+            _that.checkIns, _that.upcomingCheckIns, _that.selectedCheckIn);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(List<CheckIn> checkIns, List<CheckIn> upcomingCheckIns,
+            CheckIn? selectedCheckIn)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _CheckInData() when $default != null:
+        return $default(
+            _that.checkIns, _that.upcomingCheckIns, _that.selectedCheckIn);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$CheckInDataImpl extends _CheckInData {
-  const _$CheckInDataImpl(
+class _CheckInData extends CheckInData {
+  const _CheckInData(
       {final List<CheckIn> checkIns = const [],
       final List<CheckIn> upcomingCheckIns = const [],
       this.selectedCheckIn})
       : _checkIns = checkIns,
         _upcomingCheckIns = upcomingCheckIns,
         super._();
-
-  factory _$CheckInDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$CheckInDataImplFromJson(json);
+  factory _CheckInData.fromJson(Map<String, dynamic> json) =>
+      _$CheckInDataFromJson(json);
 
   final List<CheckIn> _checkIns;
   @override
@@ -185,16 +316,26 @@ class _$CheckInDataImpl extends _CheckInData {
   @override
   final CheckIn? selectedCheckIn;
 
+  /// Create a copy of CheckInData
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'CheckInData(checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$CheckInDataCopyWith<_CheckInData> get copyWith =>
+      __$CheckInDataCopyWithImpl<_CheckInData>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$CheckInDataToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CheckInDataImpl &&
+            other is _CheckInData &&
             const DeepCollectionEquality().equals(other._checkIns, _checkIns) &&
             const DeepCollectionEquality()
                 .equals(other._upcomingCheckIns, _upcomingCheckIns) &&
@@ -210,43 +351,74 @@ class _$CheckInDataImpl extends _CheckInData {
       const DeepCollectionEquality().hash(_upcomingCheckIns),
       selectedCheckIn);
 
-  /// Create a copy of CheckInData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$CheckInDataImplCopyWith<_$CheckInDataImpl> get copyWith =>
-      __$$CheckInDataImplCopyWithImpl<_$CheckInDataImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$CheckInDataImplToJson(
-      this,
-    );
+  String toString() {
+    return 'CheckInData(checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn)';
   }
 }
 
-abstract class _CheckInData extends CheckInData {
-  const factory _CheckInData(
-      {final List<CheckIn> checkIns,
-      final List<CheckIn> upcomingCheckIns,
-      final CheckIn? selectedCheckIn}) = _$CheckInDataImpl;
-  const _CheckInData._() : super._();
+/// @nodoc
+abstract mixin class _$CheckInDataCopyWith<$Res>
+    implements $CheckInDataCopyWith<$Res> {
+  factory _$CheckInDataCopyWith(
+          _CheckInData value, $Res Function(_CheckInData) _then) =
+      __$CheckInDataCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {List<CheckIn> checkIns,
+      List<CheckIn> upcomingCheckIns,
+      CheckIn? selectedCheckIn});
 
-  factory _CheckInData.fromJson(Map<String, dynamic> json) =
-      _$CheckInDataImpl.fromJson;
+  @override
+  $CheckInCopyWith<$Res>? get selectedCheckIn;
+}
 
-  @override
-  List<CheckIn> get checkIns;
-  @override
-  List<CheckIn> get upcomingCheckIns;
-  @override
-  CheckIn? get selectedCheckIn;
+/// @nodoc
+class __$CheckInDataCopyWithImpl<$Res> implements _$CheckInDataCopyWith<$Res> {
+  __$CheckInDataCopyWithImpl(this._self, this._then);
+
+  final _CheckInData _self;
+  final $Res Function(_CheckInData) _then;
 
   /// Create a copy of CheckInData
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$CheckInDataImplCopyWith<_$CheckInDataImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? checkIns = null,
+    Object? upcomingCheckIns = null,
+    Object? selectedCheckIn = freezed,
+  }) {
+    return _then(_CheckInData(
+      checkIns: null == checkIns
+          ? _self._checkIns
+          : checkIns // ignore: cast_nullable_to_non_nullable
+              as List<CheckIn>,
+      upcomingCheckIns: null == upcomingCheckIns
+          ? _self._upcomingCheckIns
+          : upcomingCheckIns // ignore: cast_nullable_to_non_nullable
+              as List<CheckIn>,
+      selectedCheckIn: freezed == selectedCheckIn
+          ? _self.selectedCheckIn
+          : selectedCheckIn // ignore: cast_nullable_to_non_nullable
+              as CheckIn?,
+    ));
+  }
+
+  /// Create a copy of CheckInData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CheckInCopyWith<$Res>? get selectedCheckIn {
+    if (_self.selectedCheckIn == null) {
+      return null;
+    }
+
+    return $CheckInCopyWith<$Res>(_self.selectedCheckIn!, (value) {
+      return _then(_self.copyWith(selectedCheckIn: value));
+    });
+  }
 }
+
+// dart format on

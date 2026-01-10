@@ -1,22 +1,24 @@
 import 'dart:io';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../data/models/upload_task.dart';
 import '../../data/services/media_upload_service_impl.dart';
+import '../../domain/entities/media_item.dart';
 import '../../domain/services/media_upload_service.dart';
 
 part 'media_upload_providers.g.dart';
+part 'media_upload_state.dart';
 
 /// Provider for SharedPreferences
 @riverpod
-Future<SharedPreferences> sharedPreferences(SharedPreferencesRef ref) async {
+Future<SharedPreferences> sharedPreferences(Ref ref) async {
   return await SharedPreferences.getInstance();
 }
 
 /// Provider for MediaUploadService
 @riverpod
-MediaUploadService mediaUploadService(MediaUploadServiceRef ref) {
+MediaUploadService mediaUploadService(Ref ref) {
   final prefsAsync = ref.watch(sharedPreferencesProvider);
 
   // We need to handle the async nature of SharedPreferences
@@ -36,14 +38,14 @@ MediaUploadService mediaUploadService(MediaUploadServiceRef ref) {
 
 /// Provider for upload statistics
 @riverpod
-Future<UploadStatistics> uploadStatistics(UploadStatisticsRef ref) async {
+Future<UploadStatistics> uploadStatistics(Ref ref) async {
   final service = ref.watch(mediaUploadServiceProvider);
   return service.getStatistics();
 }
 
 /// Provider for all upload tasks
 @riverpod
-Future<List<UploadTask>> uploadTasks(UploadTasksRef ref) async {
+Future<List<UploadTask>> uploadTasks(Ref ref) async {
   final service = ref.watch(mediaUploadServiceProvider);
   return service.getTasks();
 }
@@ -51,7 +53,7 @@ Future<List<UploadTask>> uploadTasks(UploadTasksRef ref) async {
 /// Provider for tasks of a specific journal entry
 @riverpod
 Future<List<UploadTask>> uploadTasksForEntry(
-  UploadTasksForEntryRef ref,
+  Ref ref,
   String entryId,
 ) async {
   final service = ref.watch(mediaUploadServiceProvider);
@@ -60,14 +62,14 @@ Future<List<UploadTask>> uploadTasksForEntry(
 
 /// Provider for a specific upload task
 @riverpod
-Future<UploadTask?> uploadTask(UploadTaskRef ref, String taskId) async {
+Future<UploadTask?> uploadTask(Ref ref, String taskId) async {
   final service = ref.watch(mediaUploadServiceProvider);
   return service.getTask(taskId);
 }
 
 /// Provider for upload queue status stream
 @riverpod
-Stream<List<UploadTask>> uploadQueueStatus(UploadQueueStatusRef ref) async* {
+Stream<List<UploadTask>> uploadQueueStatus(Ref ref) async* {
   final service = ref.watch(mediaUploadServiceProvider);
   yield* service.getQueueStatus();
 }
@@ -75,7 +77,7 @@ Stream<List<UploadTask>> uploadQueueStatus(UploadQueueStatusRef ref) async* {
 /// Provider for upload progress of a specific task
 @riverpod
 Stream<UploadTask> uploadTaskProgress(
-  UploadTaskProgressRef ref,
+  Ref ref,
   String taskId,
 ) async* {
   final service = ref.watch(mediaUploadServiceProvider);

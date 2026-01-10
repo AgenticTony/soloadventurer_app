@@ -1,15 +1,27 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models/destination.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/destination_filter.dart';
-import '../../domain/repositories/destination_repository.dart';
 import '../state/destination_detail_state.dart';
+import 'destination_repository_provider.dart';
 
+part 'destination_detail_provider.g.dart';
+
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Dependencies injected via ref.watch() in build() method
+/// - Family provider with destinationId parameter in build()
+/// - AutoDispose enabled via @Riverpod annotation
+/// - build() returns Future<T> not AsyncValue<T>
+/// - State is automatically AsyncValue<DestinationDetailState> when consumed
+///
 /// Provider for destination detail state management
 ///
 /// This provider manages the state of a single destination's detail view including:
 /// - Destination data
 /// - Related/suggested destinations
 /// - Loading and error states
+///
+/// Riverpod 3.0: Uses @riverpod annotation with AsyncNotifier pattern.
+/// Auto-dispose behavior for family provider.
 ///
 /// Usage:
 /// ```dart
@@ -27,57 +39,24 @@ import '../state/destination_detail_state.dart';
 /// ```
 ///
 /// The [destinationId] parameter is the unique identifier of the destination to load.
-final destinationDetailProvider = StateNotifierProvider.autoDispose
-    .family<DestinationDetailNotifier, AsyncValue<DestinationDetailState>, String>(
-  (ref, destinationId) {
-    final repository = ref.watch(destinationRepositoryProvider);
-    return DestinationDetailNotifier(repository, destinationId);
-  },
-);
-
-/// Notifier for managing destination detail state
-///
-/// This notifier handles all operations for a single destination detail view:
-/// - Loading destination by ID
-/// - Refreshing destination data
-/// - Loading related/suggested destinations
-class DestinationDetailNotifier
-    extends StateNotifier<AsyncValue<DestinationDetailState>> {
-  final DestinationRepository _repository;
-  final String _destinationId;
-
+@riverpod
+class DestinationDetail extends _$DestinationDetail {
   /// Maximum number of related destinations to load
   static const int _maxRelatedDestinations = 5;
 
-  /// Creates a new [DestinationDetailNotifier]
+  /// Initialize the notifier with dependencies
   ///
-  /// The [repository] parameter is required for performing data operations.
-  /// The [destinationId] parameter is the ID of the destination to manage.
-  DestinationDetailNotifier(this._repository, this._destinationId)
-      : super(const AsyncValue.data(DestinationDetailState.initial())) {
-    // Auto-load destination on creation
-    loadDestination();
-  }
+  /// Riverpod 3.0: build() returns Future<DestinationDetailState>
+  /// Family provider parameter (destinationId) is passed here
+  /// AutoDispose behavior: provider will be disposed when no longer watched
+  @override
+  Future<DestinationDetailState> build(String destinationId) async {
+    // Get dependencies via ref.watch()
+    final repository = ref.watch(destinationRepositoryProvider);
 
-  /// Load the destination by ID
-  ///
-  /// This method fetches the destination data from the repository.
-  /// Throws an exception if loading fails.
-  ///
-  /// Note: This is automatically called when the notifier is created.
-  Future<void> loadDestination() async {
-    state = const AsyncValue.loading();
-
-    try {
-      final destination = await _repository.getDestinationById(_destinationId);
-
-      state = AsyncValue.data(DestinationDetailState(
-        destination: destination,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+    // Auto-load destination on build
+    final destination = await repository.getDestinationById(destinationId);
+    return DestinationDetailState(destination: destination);
   }
 
   /// Refresh the destination data
@@ -87,22 +66,29 @@ class DestinationDetailNotifier
   ///
   /// Throws an exception if refreshing fails.
   Future<void> refresh() async {
-    // Preserve current state while loading if available
-    if (state.hasValue && state.value!.destination != null) {
-      state = AsyncValue.data(state.value!);
+    // Get destinationId from state
+    final currentState = state.value;
+    if (currentState == null || currentState.destination == null) {
+      return;
     }
 
-    try {
-      final destination = await _repository.getDestinationById(_destinationId);
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
 
-      state = AsyncValue.data(DestinationDetailState(
+    // Get destinationId from the first load
+    final destinationId = currentState.destination!.id;
+
+    // Preserve current state while loading
+    state = const AsyncValue.loading();
+
+    // Load destination
+    state = await AsyncValue.guard(() async {
+      final destination = await repository.getDestinationById(destinationId);
+      return DestinationDetailState(
         destination: destination,
-        relatedDestinations: state.value?.relatedDestinations ?? [],
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+        relatedDestinations: currentState.relatedDestinations,
+      );
+    });
   }
 
   /// Load related/suggested destinations
@@ -118,48 +104,43 @@ class DestinationDetailNotifier
   ///
   /// Throws an exception if loading related destinations fails.
   Future<void> loadRelatedDestinations() async {
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
     // Guard against loading if no destination is loaded
-    if (!state.hasValue || state.value!.destination == null) {
+    final currentValue = state.value;
+    final currentDestination = currentValue?.destination;
+    if (currentDestination == null) {
       return;
     }
 
-    final currentDestination = state.value!.destination!;
+    // Build filter for related destinations
+    final filter = DestinationFilter(
+      countryCode: currentDestination.countryCode,
+      region: currentDestination.region,
+      tags: currentDestination.tags,
+      budgetLevel: currentDestination.budgetLevel as BudgetLevel?,
+    );
 
-    // Update state to loading while keeping current data
-    state = AsyncValue.data(state.value!);
-
-    try {
-      // Build filter for related destinations
-      final filter = DestinationFilter(
-        countryCode: currentDestination.countryCode,
-        region: currentDestination.region,
-        tags: currentDestination.tags,
-        budgetLevel: currentDestination.budgetLevel,
-        // Exclude current destination by searching for similar destinations
-        // The repository implementation should handle exclusion
-      );
-
+    // Set loading state
+    state = await AsyncValue.guard(() async {
       // Search for related destinations
-      final related = await _repository.searchDestinations(
+      final related = await repository.searchDestinations(
         filter.copyWith(limit: _maxRelatedDestinations + 1),
       );
 
       // Exclude current destination from results and limit results
+      final destinationId = currentDestination.id;
       final filteredRelated = related
-          .where((d) => d.id != _destinationId)
+          .where((d) => d.id != destinationId)
           .take(_maxRelatedDestinations)
           .toList();
 
-      // Update state with related destinations
-      final currentState = state.value!;
-      state = AsyncValue.data(currentState.copyWith(
+      // Return state with related destinations
+      return currentValue!.copyWith(
         relatedDestinations: filteredRelated,
-      ));
-    } catch (error, stackTrace) {
-      // Revert to previous state on error
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+      );
+    });
   }
 
   /// Load related destinations with specific criteria
@@ -173,36 +154,35 @@ class DestinationDetailNotifier
   /// Throws an exception if loading related destinations fails.
   Future<void> loadRelatedDestinationsWithFilter(
       DestinationFilter filter) async {
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
     // Guard against loading if no destination is loaded
-    if (!state.hasValue || state.value!.destination == null) {
+    final currentValue = state.value;
+    if (currentValue == null || currentValue.destination == null) {
       return;
     }
 
-    // Update state to loading while keeping current data
-    state = AsyncValue.data(state.value!);
+    final destinationId = currentValue.destination!.id;
 
-    try {
+    // Set loading state
+    state = await AsyncValue.guard(() async {
       // Search for related destinations with custom filter
-      final related = await _repository.searchDestinations(
+      final related = await repository.searchDestinations(
         filter.copyWith(limit: _maxRelatedDestinations + 1),
       );
 
       // Exclude current destination from results and limit results
       final filteredRelated = related
-          .where((d) => d.id != _destinationId)
+          .where((d) => d.id != destinationId)
           .take(_maxRelatedDestinations)
           .toList();
 
-      // Update state with related destinations
-      final currentState = state.value!;
-      state = AsyncValue.data(currentState.copyWith(
+      // Return state with related destinations
+      return currentValue.copyWith(
         relatedDestinations: filteredRelated,
-      ));
-    } catch (error, stackTrace) {
-      // Revert to previous state on error
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+      );
+    });
   }
 
   /// Clear the destination detail state

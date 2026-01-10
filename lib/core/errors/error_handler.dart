@@ -61,7 +61,7 @@ class ErrorHandler {
   }
 
   /// Configuration
-  ErrorHandlerConfig _config;
+  late ErrorHandlerConfig _config;
 
   /// Error history
   final List<AppError> _errorHistory = [];
@@ -106,7 +106,7 @@ class ErrorHandler {
       );
     } else if (exception is Exception) {
       error = AppError.fromGenericException(
-        exception as Exception,
+        exception,
         stackTrace: stackTrace,
         context: context,
       );
@@ -243,8 +243,7 @@ class ErrorHandler {
     stats['byCode'] = codeCounts;
 
     // Recoverable vs non-recoverable
-    stats['recoverable'] =
-        _errorHistory.where((e) => e.isRecoverable).length;
+    stats['recoverable'] = _errorHistory.where((e) => e.isRecoverable).length;
     stats['nonRecoverable'] =
         _errorHistory.where((e) => !e.isRecoverable).length;
 
@@ -326,18 +325,21 @@ ${error.context?.toString() ?? 'N/A'}
 
   /// Export error history as JSON
   String exportErrorsAsJson() {
-    final errorsJson = _errorHistory.map((e) => {
-      'id': e.id,
-      'message': e.message,
-      'technicalMessage': e.technicalMessage,
-      'code': e.code,
-      'severity': e.severity.name,
-      'availableActions': e.availableActions.map((a) => a.name).toList(),
-      'primaryAction': e.primaryAction?.name,
-      'isRecoverable': e.isRecoverable,
-      'timestamp': e.timestamp.toIso8601String(),
-      'context': e.context,
-    }).toList();
+    final errorsJson = _errorHistory
+        .map((e) => {
+              'id': e.id,
+              'message': e.message,
+              'technicalMessage': e.technicalMessage,
+              'code': e.code,
+              'severity': e.severity.name,
+              'availableActions':
+                  e.availableActions.map((a) => a.name).toList(),
+              'primaryAction': e.primaryAction?.name,
+              'isRecoverable': e.isRecoverable,
+              'timestamp': e.timestamp.toIso8601String(),
+              'context': e.context,
+            })
+        .toList();
 
     return errorsJson.toString();
   }

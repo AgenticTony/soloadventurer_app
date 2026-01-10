@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,65 +9,106 @@ part of 'safety_status.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SafetyStatus _$SafetyStatusFromJson(Map<String, dynamic> json) {
-  return _SafetyStatus.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SafetyStatus {
   /// Unique identifier for the safety status
-  String get id => throw _privateConstructorUsedError;
+  String get id;
 
   /// User ID
-  String get userId => throw _privateConstructorUsedError;
+  String get userId;
 
   /// Current safety status
-  SafetyStatusType get status => throw _privateConstructorUsedError;
+  SafetyStatusType get status;
 
   /// Optional message describing the status
-  String? get message => throw _privateConstructorUsedError;
+  String? get message;
 
   /// Location associated with this status
-  SafetyStatusLocation? get location => throw _privateConstructorUsedError;
+  SafetyStatusLocation? get location;
 
   /// Battery level at time of status update (0-100)
-  int? get batteryLevel => throw _privateConstructorUsedError;
+  int? get batteryLevel;
 
   /// When this status was set
-  DateTime get timestamp => throw _privateConstructorUsedError;
+  DateTime get timestamp;
 
   /// When this status was last updated
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get updatedAt;
 
   /// Associated safety alert ID (if status was set via alert)
-  String? get safetyAlertId => throw _privateConstructorUsedError;
+  String? get safetyAlertId;
 
   /// Associated check-in ID (if status was set via check-in)
-  String? get checkInId => throw _privateConstructorUsedError;
+  String? get checkInId;
 
   /// Additional metadata
-  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
-
-  /// Serializes this SafetyStatus to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get metadata;
 
   /// Create a copy of SafetyStatus
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $SafetyStatusCopyWith<SafetyStatus> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$SafetyStatusCopyWithImpl<SafetyStatus>(
+          this as SafetyStatus, _$identity);
+
+  /// Serializes this SafetyStatus to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SafetyStatus &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.batteryLevel, batteryLevel) ||
+                other.batteryLevel == batteryLevel) &&
+            (identical(other.timestamp, timestamp) ||
+                other.timestamp == timestamp) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.safetyAlertId, safetyAlertId) ||
+                other.safetyAlertId == safetyAlertId) &&
+            (identical(other.checkInId, checkInId) ||
+                other.checkInId == checkInId) &&
+            const DeepCollectionEquality().equals(other.metadata, metadata));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      status,
+      message,
+      location,
+      batteryLevel,
+      timestamp,
+      updatedAt,
+      safetyAlertId,
+      checkInId,
+      const DeepCollectionEquality().hash(metadata));
+
+  @override
+  String toString() {
+    return 'SafetyStatus(id: $id, userId: $userId, status: $status, message: $message, location: $location, batteryLevel: $batteryLevel, timestamp: $timestamp, updatedAt: $updatedAt, safetyAlertId: $safetyAlertId, checkInId: $checkInId, metadata: $metadata)';
+  }
 }
 
 /// @nodoc
-abstract class $SafetyStatusCopyWith<$Res> {
+abstract mixin class $SafetyStatusCopyWith<$Res> {
   factory $SafetyStatusCopyWith(
-          SafetyStatus value, $Res Function(SafetyStatus) then) =
-      _$SafetyStatusCopyWithImpl<$Res, SafetyStatus>;
+          SafetyStatus value, $Res Function(SafetyStatus) _then) =
+      _$SafetyStatusCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -86,14 +127,11 @@ abstract class $SafetyStatusCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SafetyStatusCopyWithImpl<$Res, $Val extends SafetyStatus>
-    implements $SafetyStatusCopyWith<$Res> {
-  _$SafetyStatusCopyWithImpl(this._value, this._then);
+class _$SafetyStatusCopyWithImpl<$Res> implements $SafetyStatusCopyWith<$Res> {
+  _$SafetyStatusCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SafetyStatus _self;
+  final $Res Function(SafetyStatus) _then;
 
   /// Create a copy of SafetyStatus
   /// with the given fields replaced by the non-null parameter values.
@@ -112,52 +150,52 @@ class _$SafetyStatusCopyWithImpl<$Res, $Val extends SafetyStatus>
     Object? checkInId = freezed,
     Object? metadata = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       userId: null == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
       status: null == status
-          ? _value.status
+          ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as SafetyStatusType,
       message: freezed == message
-          ? _value.message
+          ? _self.message
           : message // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as SafetyStatusLocation?,
       batteryLevel: freezed == batteryLevel
-          ? _value.batteryLevel
+          ? _self.batteryLevel
           : batteryLevel // ignore: cast_nullable_to_non_nullable
               as int?,
       timestamp: null == timestamp
-          ? _value.timestamp
+          ? _self.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updatedAt: freezed == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       safetyAlertId: freezed == safetyAlertId
-          ? _value.safetyAlertId
+          ? _self.safetyAlertId
           : safetyAlertId // ignore: cast_nullable_to_non_nullable
               as String?,
       checkInId: freezed == checkInId
-          ? _value.checkInId
+          ? _self.checkInId
           : checkInId // ignore: cast_nullable_to_non_nullable
               as String?,
       metadata: freezed == metadata
-          ? _value.metadata
+          ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of SafetyStatus
@@ -165,119 +203,246 @@ class _$SafetyStatusCopyWithImpl<$Res, $Val extends SafetyStatus>
   @override
   @pragma('vm:prefer-inline')
   $SafetyStatusLocationCopyWith<$Res>? get location {
-    if (_value.location == null) {
+    if (_self.location == null) {
       return null;
     }
 
-    return $SafetyStatusLocationCopyWith<$Res>(_value.location!, (value) {
-      return _then(_value.copyWith(location: value) as $Val);
+    return $SafetyStatusLocationCopyWith<$Res>(_self.location!, (value) {
+      return _then(_self.copyWith(location: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$SafetyStatusImplCopyWith<$Res>
-    implements $SafetyStatusCopyWith<$Res> {
-  factory _$$SafetyStatusImplCopyWith(
-          _$SafetyStatusImpl value, $Res Function(_$SafetyStatusImpl) then) =
-      __$$SafetyStatusImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String userId,
-      SafetyStatusType status,
-      String? message,
-      SafetyStatusLocation? location,
-      int? batteryLevel,
-      DateTime timestamp,
-      DateTime? updatedAt,
-      String? safetyAlertId,
-      String? checkInId,
-      Map<String, dynamic>? metadata});
+/// Adds pattern-matching-related methods to [SafetyStatus].
+extension SafetyStatusPatterns on SafetyStatus {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $SafetyStatusLocationCopyWith<$Res>? get location;
-}
-
-/// @nodoc
-class __$$SafetyStatusImplCopyWithImpl<$Res>
-    extends _$SafetyStatusCopyWithImpl<$Res, _$SafetyStatusImpl>
-    implements _$$SafetyStatusImplCopyWith<$Res> {
-  __$$SafetyStatusImplCopyWithImpl(
-      _$SafetyStatusImpl _value, $Res Function(_$SafetyStatusImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of SafetyStatus
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? status = null,
-    Object? message = freezed,
-    Object? location = freezed,
-    Object? batteryLevel = freezed,
-    Object? timestamp = null,
-    Object? updatedAt = freezed,
-    Object? safetyAlertId = freezed,
-    Object? checkInId = freezed,
-    Object? metadata = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SafetyStatus value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$SafetyStatusImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as SafetyStatusType,
-      message: freezed == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as SafetyStatusLocation?,
-      batteryLevel: freezed == batteryLevel
-          ? _value.batteryLevel
-          : batteryLevel // ignore: cast_nullable_to_non_nullable
-              as int?,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      safetyAlertId: freezed == safetyAlertId
-          ? _value.safetyAlertId
-          : safetyAlertId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      checkInId: freezed == checkInId
-          ? _value.checkInId
-          : checkInId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value._metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatus() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SafetyStatus value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatus():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SafetyStatus value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatus() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            SafetyStatusType status,
+            String? message,
+            SafetyStatusLocation? location,
+            int? batteryLevel,
+            DateTime timestamp,
+            DateTime? updatedAt,
+            String? safetyAlertId,
+            String? checkInId,
+            Map<String, dynamic>? metadata)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatus() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.status,
+            _that.message,
+            _that.location,
+            _that.batteryLevel,
+            _that.timestamp,
+            _that.updatedAt,
+            _that.safetyAlertId,
+            _that.checkInId,
+            _that.metadata);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            SafetyStatusType status,
+            String? message,
+            SafetyStatusLocation? location,
+            int? batteryLevel,
+            DateTime timestamp,
+            DateTime? updatedAt,
+            String? safetyAlertId,
+            String? checkInId,
+            Map<String, dynamic>? metadata)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatus():
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.status,
+            _that.message,
+            _that.location,
+            _that.batteryLevel,
+            _that.timestamp,
+            _that.updatedAt,
+            _that.safetyAlertId,
+            _that.checkInId,
+            _that.metadata);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String userId,
+            SafetyStatusType status,
+            String? message,
+            SafetyStatusLocation? location,
+            int? batteryLevel,
+            DateTime timestamp,
+            DateTime? updatedAt,
+            String? safetyAlertId,
+            String? checkInId,
+            Map<String, dynamic>? metadata)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatus() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.status,
+            _that.message,
+            _that.location,
+            _that.batteryLevel,
+            _that.timestamp,
+            _that.updatedAt,
+            _that.safetyAlertId,
+            _that.checkInId,
+            _that.metadata);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$SafetyStatusImpl implements _SafetyStatus {
-  const _$SafetyStatusImpl(
+class _SafetyStatus implements SafetyStatus {
+  const _SafetyStatus(
       {required this.id,
       required this.userId,
       required this.status,
@@ -290,9 +455,8 @@ class _$SafetyStatusImpl implements _SafetyStatus {
       this.checkInId,
       final Map<String, dynamic>? metadata})
       : _metadata = metadata;
-
-  factory _$SafetyStatusImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SafetyStatusImplFromJson(json);
+  factory _SafetyStatus.fromJson(Map<String, dynamic> json) =>
+      _$SafetyStatusFromJson(json);
 
   /// Unique identifier for the safety status
   @override
@@ -347,16 +511,26 @@ class _$SafetyStatusImpl implements _SafetyStatus {
     return EqualUnmodifiableMapView(value);
   }
 
+  /// Create a copy of SafetyStatus
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SafetyStatus(id: $id, userId: $userId, status: $status, message: $message, location: $location, batteryLevel: $batteryLevel, timestamp: $timestamp, updatedAt: $updatedAt, safetyAlertId: $safetyAlertId, checkInId: $checkInId, metadata: $metadata)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SafetyStatusCopyWith<_SafetyStatus> get copyWith =>
+      __$SafetyStatusCopyWithImpl<_SafetyStatus>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SafetyStatusToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SafetyStatusImpl &&
+            other is _SafetyStatus &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.status, status) || other.status == status) &&
@@ -392,208 +566,195 @@ class _$SafetyStatusImpl implements _SafetyStatus {
       checkInId,
       const DeepCollectionEquality().hash(_metadata));
 
-  /// Create a copy of SafetyStatus
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SafetyStatusImplCopyWith<_$SafetyStatusImpl> get copyWith =>
-      __$$SafetyStatusImplCopyWithImpl<_$SafetyStatusImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SafetyStatusImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SafetyStatus(id: $id, userId: $userId, status: $status, message: $message, location: $location, batteryLevel: $batteryLevel, timestamp: $timestamp, updatedAt: $updatedAt, safetyAlertId: $safetyAlertId, checkInId: $checkInId, metadata: $metadata)';
   }
 }
 
-abstract class _SafetyStatus implements SafetyStatus {
-  const factory _SafetyStatus(
-      {required final String id,
-      required final String userId,
-      required final SafetyStatusType status,
-      final String? message,
-      final SafetyStatusLocation? location,
-      final int? batteryLevel,
-      required final DateTime timestamp,
-      final DateTime? updatedAt,
-      final String? safetyAlertId,
-      final String? checkInId,
-      final Map<String, dynamic>? metadata}) = _$SafetyStatusImpl;
-
-  factory _SafetyStatus.fromJson(Map<String, dynamic> json) =
-      _$SafetyStatusImpl.fromJson;
-
-  /// Unique identifier for the safety status
+/// @nodoc
+abstract mixin class _$SafetyStatusCopyWith<$Res>
+    implements $SafetyStatusCopyWith<$Res> {
+  factory _$SafetyStatusCopyWith(
+          _SafetyStatus value, $Res Function(_SafetyStatus) _then) =
+      __$SafetyStatusCopyWithImpl;
   @override
-  String get id;
+  @useResult
+  $Res call(
+      {String id,
+      String userId,
+      SafetyStatusType status,
+      String? message,
+      SafetyStatusLocation? location,
+      int? batteryLevel,
+      DateTime timestamp,
+      DateTime? updatedAt,
+      String? safetyAlertId,
+      String? checkInId,
+      Map<String, dynamic>? metadata});
 
-  /// User ID
   @override
-  String get userId;
+  $SafetyStatusLocationCopyWith<$Res>? get location;
+}
 
-  /// Current safety status
-  @override
-  SafetyStatusType get status;
+/// @nodoc
+class __$SafetyStatusCopyWithImpl<$Res>
+    implements _$SafetyStatusCopyWith<$Res> {
+  __$SafetyStatusCopyWithImpl(this._self, this._then);
 
-  /// Optional message describing the status
-  @override
-  String? get message;
-
-  /// Location associated with this status
-  @override
-  SafetyStatusLocation? get location;
-
-  /// Battery level at time of status update (0-100)
-  @override
-  int? get batteryLevel;
-
-  /// When this status was set
-  @override
-  DateTime get timestamp;
-
-  /// When this status was last updated
-  @override
-  DateTime? get updatedAt;
-
-  /// Associated safety alert ID (if status was set via alert)
-  @override
-  String? get safetyAlertId;
-
-  /// Associated check-in ID (if status was set via check-in)
-  @override
-  String? get checkInId;
-
-  /// Additional metadata
-  @override
-  Map<String, dynamic>? get metadata;
+  final _SafetyStatus _self;
+  final $Res Function(_SafetyStatus) _then;
 
   /// Create a copy of SafetyStatus
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SafetyStatusImplCopyWith<_$SafetyStatusImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? userId = null,
+    Object? status = null,
+    Object? message = freezed,
+    Object? location = freezed,
+    Object? batteryLevel = freezed,
+    Object? timestamp = null,
+    Object? updatedAt = freezed,
+    Object? safetyAlertId = freezed,
+    Object? checkInId = freezed,
+    Object? metadata = freezed,
+  }) {
+    return _then(_SafetyStatus(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as SafetyStatusType,
+      message: freezed == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+      location: freezed == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as SafetyStatusLocation?,
+      batteryLevel: freezed == batteryLevel
+          ? _self.batteryLevel
+          : batteryLevel // ignore: cast_nullable_to_non_nullable
+              as int?,
+      timestamp: null == timestamp
+          ? _self.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      safetyAlertId: freezed == safetyAlertId
+          ? _self.safetyAlertId
+          : safetyAlertId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      checkInId: freezed == checkInId
+          ? _self.checkInId
+          : checkInId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadata: freezed == metadata
+          ? _self._metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+    ));
+  }
 
-SafetyStatusLocation _$SafetyStatusLocationFromJson(Map<String, dynamic> json) {
-  return _SafetyStatusLocation.fromJson(json);
+  /// Create a copy of SafetyStatus
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SafetyStatusLocationCopyWith<$Res>? get location {
+    if (_self.location == null) {
+      return null;
+    }
+
+    return $SafetyStatusLocationCopyWith<$Res>(_self.location!, (value) {
+      return _then(_self.copyWith(location: value));
+    });
+  }
 }
 
 /// @nodoc
 mixin _$SafetyStatusLocation {
   /// Latitude
-  double get latitude => throw _privateConstructorUsedError;
+  double get latitude;
 
   /// Longitude
-  double get longitude => throw _privateConstructorUsedError;
+  double get longitude;
 
   /// Accuracy of the location in meters
-  double? get accuracy => throw _privateConstructorUsedError;
+  double? get accuracy;
 
   /// Altitude in meters
-  double? get altitude => throw _privateConstructorUsedError;
+  double? get altitude;
 
   /// Human-readable address
-  String? get address => throw _privateConstructorUsedError;
+  String? get address;
 
   /// Place name (if applicable)
-  String? get placeName => throw _privateConstructorUsedError;
+  String? get placeName;
 
   /// When this location was recorded
-  DateTime get timestamp => throw _privateConstructorUsedError;
-
-  /// Serializes this SafetyStatusLocation to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  DateTime get timestamp;
 
   /// Create a copy of SafetyStatusLocation
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $SafetyStatusLocationCopyWith<SafetyStatusLocation> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SafetyStatusLocationCopyWith<$Res> {
-  factory $SafetyStatusLocationCopyWith(SafetyStatusLocation value,
-          $Res Function(SafetyStatusLocation) then) =
-      _$SafetyStatusLocationCopyWithImpl<$Res, SafetyStatusLocation>;
-  @useResult
-  $Res call(
-      {double latitude,
-      double longitude,
-      double? accuracy,
-      double? altitude,
-      String? address,
-      String? placeName,
-      DateTime timestamp});
-}
-
-/// @nodoc
-class _$SafetyStatusLocationCopyWithImpl<$Res,
-        $Val extends SafetyStatusLocation>
-    implements $SafetyStatusLocationCopyWith<$Res> {
-  _$SafetyStatusLocationCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SafetyStatusLocation
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $SafetyStatusLocationCopyWith<SafetyStatusLocation> get copyWith =>
+      _$SafetyStatusLocationCopyWithImpl<SafetyStatusLocation>(
+          this as SafetyStatusLocation, _$identity);
+
+  /// Serializes this SafetyStatusLocation to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? latitude = null,
-    Object? longitude = null,
-    Object? accuracy = freezed,
-    Object? altitude = freezed,
-    Object? address = freezed,
-    Object? placeName = freezed,
-    Object? timestamp = null,
-  }) {
-    return _then(_value.copyWith(
-      latitude: null == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      longitude: null == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      accuracy: freezed == accuracy
-          ? _value.accuracy
-          : accuracy // ignore: cast_nullable_to_non_nullable
-              as double?,
-      altitude: freezed == altitude
-          ? _value.altitude
-          : altitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      address: freezed == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String?,
-      placeName: freezed == placeName
-          ? _value.placeName
-          : placeName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SafetyStatusLocation &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
+            (identical(other.accuracy, accuracy) ||
+                other.accuracy == accuracy) &&
+            (identical(other.altitude, altitude) ||
+                other.altitude == altitude) &&
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.placeName, placeName) ||
+                other.placeName == placeName) &&
+            (identical(other.timestamp, timestamp) ||
+                other.timestamp == timestamp));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, latitude, longitude, accuracy,
+      altitude, address, placeName, timestamp);
+
+  @override
+  String toString() {
+    return 'SafetyStatusLocation(latitude: $latitude, longitude: $longitude, accuracy: $accuracy, altitude: $altitude, address: $address, placeName: $placeName, timestamp: $timestamp)';
   }
 }
 
 /// @nodoc
-abstract class _$$SafetyStatusLocationImplCopyWith<$Res>
-    implements $SafetyStatusLocationCopyWith<$Res> {
-  factory _$$SafetyStatusLocationImplCopyWith(_$SafetyStatusLocationImpl value,
-          $Res Function(_$SafetyStatusLocationImpl) then) =
-      __$$SafetyStatusLocationImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SafetyStatusLocationCopyWith<$Res> {
+  factory $SafetyStatusLocationCopyWith(SafetyStatusLocation value,
+          $Res Function(SafetyStatusLocation) _then) =
+      _$SafetyStatusLocationCopyWithImpl;
   @useResult
   $Res call(
       {double latitude,
@@ -606,12 +767,12 @@ abstract class _$$SafetyStatusLocationImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SafetyStatusLocationImplCopyWithImpl<$Res>
-    extends _$SafetyStatusLocationCopyWithImpl<$Res, _$SafetyStatusLocationImpl>
-    implements _$$SafetyStatusLocationImplCopyWith<$Res> {
-  __$$SafetyStatusLocationImplCopyWithImpl(_$SafetyStatusLocationImpl _value,
-      $Res Function(_$SafetyStatusLocationImpl) _then)
-      : super(_value, _then);
+class _$SafetyStatusLocationCopyWithImpl<$Res>
+    implements $SafetyStatusLocationCopyWith<$Res> {
+  _$SafetyStatusLocationCopyWithImpl(this._self, this._then);
+
+  final SafetyStatusLocation _self;
+  final $Res Function(SafetyStatusLocation) _then;
 
   /// Create a copy of SafetyStatusLocation
   /// with the given fields replaced by the non-null parameter values.
@@ -626,43 +787,227 @@ class __$$SafetyStatusLocationImplCopyWithImpl<$Res>
     Object? placeName = freezed,
     Object? timestamp = null,
   }) {
-    return _then(_$SafetyStatusLocationImpl(
+    return _then(_self.copyWith(
       latitude: null == latitude
-          ? _value.latitude
+          ? _self.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
               as double,
       longitude: null == longitude
-          ? _value.longitude
+          ? _self.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double,
       accuracy: freezed == accuracy
-          ? _value.accuracy
+          ? _self.accuracy
           : accuracy // ignore: cast_nullable_to_non_nullable
               as double?,
       altitude: freezed == altitude
-          ? _value.altitude
+          ? _self.altitude
           : altitude // ignore: cast_nullable_to_non_nullable
               as double?,
       address: freezed == address
-          ? _value.address
+          ? _self.address
           : address // ignore: cast_nullable_to_non_nullable
               as String?,
       placeName: freezed == placeName
-          ? _value.placeName
+          ? _self.placeName
           : placeName // ignore: cast_nullable_to_non_nullable
               as String?,
       timestamp: null == timestamp
-          ? _value.timestamp
+          ? _self.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [SafetyStatusLocation].
+extension SafetyStatusLocationPatterns on SafetyStatusLocation {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SafetyStatusLocation value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatusLocation() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SafetyStatusLocation value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatusLocation():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SafetyStatusLocation value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatusLocation() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            double latitude,
+            double longitude,
+            double? accuracy,
+            double? altitude,
+            String? address,
+            String? placeName,
+            DateTime timestamp)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatusLocation() when $default != null:
+        return $default(_that.latitude, _that.longitude, _that.accuracy,
+            _that.altitude, _that.address, _that.placeName, _that.timestamp);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            double latitude,
+            double longitude,
+            double? accuracy,
+            double? altitude,
+            String? address,
+            String? placeName,
+            DateTime timestamp)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatusLocation():
+        return $default(_that.latitude, _that.longitude, _that.accuracy,
+            _that.altitude, _that.address, _that.placeName, _that.timestamp);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            double latitude,
+            double longitude,
+            double? accuracy,
+            double? altitude,
+            String? address,
+            String? placeName,
+            DateTime timestamp)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyStatusLocation() when $default != null:
+        return $default(_that.latitude, _that.longitude, _that.accuracy,
+            _that.altitude, _that.address, _that.placeName, _that.timestamp);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$SafetyStatusLocationImpl implements _SafetyStatusLocation {
-  const _$SafetyStatusLocationImpl(
+class _SafetyStatusLocation implements SafetyStatusLocation {
+  const _SafetyStatusLocation(
       {required this.latitude,
       required this.longitude,
       this.accuracy,
@@ -670,9 +1015,8 @@ class _$SafetyStatusLocationImpl implements _SafetyStatusLocation {
       this.address,
       this.placeName,
       required this.timestamp});
-
-  factory _$SafetyStatusLocationImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SafetyStatusLocationImplFromJson(json);
+  factory _SafetyStatusLocation.fromJson(Map<String, dynamic> json) =>
+      _$SafetyStatusLocationFromJson(json);
 
   /// Latitude
   @override
@@ -702,16 +1046,27 @@ class _$SafetyStatusLocationImpl implements _SafetyStatusLocation {
   @override
   final DateTime timestamp;
 
+  /// Create a copy of SafetyStatusLocation
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SafetyStatusLocation(latitude: $latitude, longitude: $longitude, accuracy: $accuracy, altitude: $altitude, address: $address, placeName: $placeName, timestamp: $timestamp)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SafetyStatusLocationCopyWith<_SafetyStatusLocation> get copyWith =>
+      __$SafetyStatusLocationCopyWithImpl<_SafetyStatusLocation>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SafetyStatusLocationToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SafetyStatusLocationImpl &&
+            other is _SafetyStatusLocation &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
@@ -732,69 +1087,82 @@ class _$SafetyStatusLocationImpl implements _SafetyStatusLocation {
   int get hashCode => Object.hash(runtimeType, latitude, longitude, accuracy,
       altitude, address, placeName, timestamp);
 
-  /// Create a copy of SafetyStatusLocation
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SafetyStatusLocationImplCopyWith<_$SafetyStatusLocationImpl>
-      get copyWith =>
-          __$$SafetyStatusLocationImplCopyWithImpl<_$SafetyStatusLocationImpl>(
-              this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SafetyStatusLocationImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SafetyStatusLocation(latitude: $latitude, longitude: $longitude, accuracy: $accuracy, altitude: $altitude, address: $address, placeName: $placeName, timestamp: $timestamp)';
   }
 }
 
-abstract class _SafetyStatusLocation implements SafetyStatusLocation {
-  const factory _SafetyStatusLocation(
-      {required final double latitude,
-      required final double longitude,
-      final double? accuracy,
-      final double? altitude,
-      final String? address,
-      final String? placeName,
-      required final DateTime timestamp}) = _$SafetyStatusLocationImpl;
-
-  factory _SafetyStatusLocation.fromJson(Map<String, dynamic> json) =
-      _$SafetyStatusLocationImpl.fromJson;
-
-  /// Latitude
+/// @nodoc
+abstract mixin class _$SafetyStatusLocationCopyWith<$Res>
+    implements $SafetyStatusLocationCopyWith<$Res> {
+  factory _$SafetyStatusLocationCopyWith(_SafetyStatusLocation value,
+          $Res Function(_SafetyStatusLocation) _then) =
+      __$SafetyStatusLocationCopyWithImpl;
   @override
-  double get latitude;
+  @useResult
+  $Res call(
+      {double latitude,
+      double longitude,
+      double? accuracy,
+      double? altitude,
+      String? address,
+      String? placeName,
+      DateTime timestamp});
+}
 
-  /// Longitude
-  @override
-  double get longitude;
+/// @nodoc
+class __$SafetyStatusLocationCopyWithImpl<$Res>
+    implements _$SafetyStatusLocationCopyWith<$Res> {
+  __$SafetyStatusLocationCopyWithImpl(this._self, this._then);
 
-  /// Accuracy of the location in meters
-  @override
-  double? get accuracy;
-
-  /// Altitude in meters
-  @override
-  double? get altitude;
-
-  /// Human-readable address
-  @override
-  String? get address;
-
-  /// Place name (if applicable)
-  @override
-  String? get placeName;
-
-  /// When this location was recorded
-  @override
-  DateTime get timestamp;
+  final _SafetyStatusLocation _self;
+  final $Res Function(_SafetyStatusLocation) _then;
 
   /// Create a copy of SafetyStatusLocation
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SafetyStatusLocationImplCopyWith<_$SafetyStatusLocationImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? latitude = null,
+    Object? longitude = null,
+    Object? accuracy = freezed,
+    Object? altitude = freezed,
+    Object? address = freezed,
+    Object? placeName = freezed,
+    Object? timestamp = null,
+  }) {
+    return _then(_SafetyStatusLocation(
+      latitude: null == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      accuracy: freezed == accuracy
+          ? _self.accuracy
+          : accuracy // ignore: cast_nullable_to_non_nullable
+              as double?,
+      altitude: freezed == altitude
+          ? _self.altitude
+          : altitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      address: freezed == address
+          ? _self.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      placeName: freezed == placeName
+          ? _self.placeName
+          : placeName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      timestamp: null == timestamp
+          ? _self.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+    ));
+  }
 }
+
+// dart format on

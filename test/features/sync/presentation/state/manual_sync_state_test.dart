@@ -10,7 +10,7 @@ void main() {
         final state = ManualSyncState.initial();
 
         // Assert
-        expect(state.status, SyncStatus.idle);
+        expect(state.status, SyncOperationStatus.idle);
         expect(state.isSyncing, false);
         expect(state.lastSyncSuccess, isNull);
         expect(state.successCount, 0);
@@ -26,7 +26,7 @@ void main() {
         final state = ManualSyncState.syncing(startedAt: startedAt);
 
         // Assert
-        expect(state.status, SyncStatus.syncing);
+        expect(state.status, SyncOperationStatus.syncing);
         expect(state.isSyncing, true);
         expect(state.startedAt, startedAt);
         expect(state.lastSyncSuccess, isNull);
@@ -47,7 +47,7 @@ void main() {
         );
 
         // Assert
-        expect(state.status, SyncStatus.success);
+        expect(state.status, SyncOperationStatus.success);
         expect(state.isSyncing, false);
         expect(state.lastSyncSuccess, true);
         expect(state.successCount, 10);
@@ -73,7 +73,7 @@ void main() {
         );
 
         // Assert
-        expect(state.status, SyncStatus.failed);
+        expect(state.status, SyncOperationStatus.failed);
         expect(state.isSyncing, false);
         expect(state.lastSyncSuccess, false);
         expect(state.errorMessage, 'Network error');

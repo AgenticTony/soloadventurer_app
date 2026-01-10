@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:solodventurer_app/core/models/paginated_data.dart';
-import 'package:solodventurer_app/core/utils/preloading_strategy.dart';
-import 'package:solodventurer_app/core/widgets/infinite_scroll_list_view.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/utils/preloading_strategy.dart';
+import 'package:soloadventurer/core/widgets/infinite_scroll_list_view.dart';
 
 /// Example 1: Basic intelligent preloading with default configuration
 class Example1BasicIntelligentPreloading extends StatelessWidget {
   final List<String> _items = List.generate(100, (i) => 'Item ${i + 1}');
+
+  Example1BasicIntelligentPreloading({super.key});
 
   Future<PaginatedData<String>> _mockFetchData(String? cursor) async {
     await Future.delayed(const Duration(milliseconds: 500));
@@ -50,6 +52,8 @@ class Example1BasicIntelligentPreloading extends StatelessWidget {
 /// Example 2: Aggressive preloading for fast networks
 class Example2AggressivePreloading extends StatelessWidget {
   final List<String> _items = List.generate(100, (i) => 'Item ${i + 1}');
+
+  Example2AggressivePreloading({super.key});
 
   Future<PaginatedData<String>> _mockFetchData(String? cursor) async {
     await Future.delayed(const Duration(milliseconds: 300));
@@ -96,6 +100,8 @@ class Example2AggressivePreloading extends StatelessWidget {
 /// Example 3: Conservative preloading for slow networks
 class Example3ConservativePreloading extends StatelessWidget {
   final List<String> _items = List.generate(100, (i) => 'Item ${i + 1}');
+
+  Example3ConservativePreloading({super.key});
 
   Future<PaginatedData<String>> _mockFetchData(String? cursor) async {
     await Future.delayed(const Duration(milliseconds: 1500));
@@ -157,6 +163,8 @@ class Example3ConservativePreloading extends StatelessWidget {
 class Example4CustomPreloading extends StatelessWidget {
   final List<String> _items = List.generate(100, (i) => 'Item ${i + 1}');
 
+  Example4CustomPreloading({super.key});
+
   Future<PaginatedData<String>> _mockFetchData(String? cursor) async {
     await Future.delayed(const Duration(milliseconds: 600));
     final startIndex = cursor == null ? 0 : int.parse(cursor);
@@ -196,7 +204,7 @@ class Example4CustomPreloading extends StatelessWidget {
             ),
           ),
         ),
-        preloadConfig: PreloadConfig(
+        preloadConfig: const PreloadConfig(
           strategy: PreloadStrategy.predictive,
           fixedThreshold: 600.0,
           velocityThreshold: 1200.0,
@@ -211,13 +219,14 @@ class Example4CustomPreloading extends StatelessWidget {
 
 /// Example 5: Monitoring preload metrics
 class Example5MonitoringMetrics extends StatefulWidget {
+  const Example5MonitoringMetrics({super.key});
+
   @override
   _Example5MonitoringMetricsState createState() =>
       _Example5MonitoringMetricsState();
 }
 
-class _Example5MonitoringMetricsState
-    extends State<Example5MonitoringMetrics> {
+class _Example5MonitoringMetricsState extends State<Example5MonitoringMetrics> {
   final List<String> _items = List.generate(100, (i) => 'Item ${i + 1}');
   PreloadMetrics? _metrics;
 
@@ -279,7 +288,7 @@ class _Example5MonitoringMetricsState
                     style: const TextStyle(fontSize: 12),
                   ),
                   Text(
-                    '📊 Cache Hit Rate: ${( _metrics!.cacheHitRate * 100).toStringAsFixed(0)}%',
+                    '📊 Cache Hit Rate: ${(_metrics!.cacheHitRate * 100).toStringAsFixed(0)}%',
                     style: const TextStyle(fontSize: 12),
                   ),
                   Text(
@@ -318,6 +327,8 @@ class _Example5MonitoringMetricsState
 
 /// Example 6: Comparing strategies
 class Example6ComparingStrategies extends StatefulWidget {
+  const Example6ComparingStrategies({super.key});
+
   @override
   _Example6ComparingStrategiesState createState() =>
       _Example6ComparingStrategiesState();
@@ -434,6 +445,8 @@ class _Example6ComparingStrategiesState
 
 /// Example 7: Velocity-based preloading visualization
 class Example7VelocityBased extends StatefulWidget {
+  const Example7VelocityBased({super.key});
+
   @override
   _Example7VelocityBasedState createState() => _Example7VelocityBasedState();
 }
@@ -522,7 +535,7 @@ class _Example7VelocityBasedState extends State<Example7VelocityBased> {
                   trailing: const Icon(Icons.arrow_forward),
                 ),
                 separatorBuilder: (context, index) => const Divider(height: 1),
-                preloadConfig: PreloadConfig(
+                preloadConfig: const PreloadConfig(
                   strategy: PreloadStrategy.velocityBased,
                   velocityThreshold: 1000.0,
                   velocityMultiplier: 0.5,
@@ -538,12 +551,15 @@ class _Example7VelocityBasedState extends State<Example7VelocityBased> {
 
 /// Example 8: Adaptive preloading with performance tracking
 class Example8AdaptivePreloading extends StatefulWidget {
+  const Example8AdaptivePreloading({super.key});
+
   @override
   _Example8AdaptivePreloadingState createState() =>
       _Example8AdaptivePreloadingState();
 }
 
-class _Example8AdaptivePreloadingState extends State<Example8AdaptivePreloading> {
+class _Example8AdaptivePreloadingState
+    extends State<Example8AdaptivePreloading> {
   final List<String> _items = List.generate(100, (i) => 'Item ${i + 1}');
   PreloadMetrics? _metrics;
   int _currentLoadTime = 500;
@@ -655,7 +671,7 @@ class _Example8AdaptivePreloadingState extends State<Example8AdaptivePreloading>
                 subtitle: Text('Load time: $_currentLoadTime ms'),
               ),
               separatorBuilder: (context, index) => const Divider(height: 1),
-              preloadConfig: PreloadConfig(
+              preloadConfig: const PreloadConfig(
                 strategy: PreloadStrategy.predictive,
                 enableAdaptiveThreshold: true,
               ),
@@ -674,6 +690,8 @@ class _Example8AdaptivePreloadingState extends State<Example8AdaptivePreloading>
 
 /// Main example app with navigation
 class IntelligentPreloadingExamples extends StatelessWidget {
+  const IntelligentPreloadingExamples({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

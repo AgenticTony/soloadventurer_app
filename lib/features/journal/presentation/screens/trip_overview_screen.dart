@@ -51,7 +51,9 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {
-              ref.read(tripDetailProvider(widget.tripId).notifier).loadTrip(widget.tripId);
+              ref
+                  .read(tripDetailProvider(widget.tripId).notifier)
+                  .loadTrip(widget.tripId);
             },
             child: const Text('Retry'),
           ),
@@ -60,7 +62,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
     );
   }
 
-  Widget _buildContent(BuildContext context, Trip trip, TripOverviewState overviewState) {
+  Widget _buildContent(
+      BuildContext context, Trip trip, TripOverviewState overviewState) {
     return RefreshIndicator(
       onRefresh: () async {
         await ref.read(tripOverviewProvider(widget.tripId).notifier).refresh();
@@ -150,7 +153,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
     );
   }
 
-  Widget _buildStatistics(BuildContext context, Trip trip, TripOverviewState overviewState) {
+  Widget _buildStatistics(
+      BuildContext context, Trip trip, TripOverviewState overviewState) {
     final theme = Theme.of(context);
 
     return Card(
@@ -199,7 +203,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
     );
   }
 
-  Widget _buildEntriesSection(BuildContext context, TripOverviewState overviewState) {
+  Widget _buildEntriesSection(
+      BuildContext context, TripOverviewState overviewState) {
     final theme = Theme.of(context);
 
     if (overviewState.isLoadingEntries) {
@@ -266,7 +271,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
           ],
         ),
         const SizedBox(height: 12),
-        ...overviewState.sortedEntries.map((entry) => _buildEntryCard(context, entry)),
+        ...overviewState.sortedEntries
+            .map((entry) => _buildEntryCard(context, entry)),
       ],
     );
   }
@@ -304,7 +310,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
                     ),
                   ),
                   if (entry.isFavorite)
-                    Icon(
+                    const Icon(
                       Icons.favorite,
                       size: 20,
                       color: Colors.red,
@@ -392,7 +398,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
     );
   }
 
-  Widget _buildMediaSection(BuildContext context, TripOverviewState overviewState) {
+  Widget _buildMediaSection(
+      BuildContext context, TripOverviewState overviewState) {
     final theme = Theme.of(context);
 
     if (overviewState.isLoadingMedia) {
@@ -466,16 +473,13 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
         fit: StackFit.expand,
         children: [
           // Media thumbnail
-          if (media.storagePath != null)
-            Image.network(
-              media.storagePath!,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return _buildMediaPlaceholder(context, media);
-              },
-            )
-          else
-            _buildMediaPlaceholder(context, media),
+          Image.network(
+            media.storagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildMediaPlaceholder(context, media);
+            },
+          ),
 
           // Video indicator
           if (media.mediaType == MediaType.video)
@@ -553,7 +557,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
     final lowerMood = mood.toLowerCase();
     if (lowerMood.contains('happy') || lowerMood.contains('joy')) {
       return '😊';
-    } else if (lowerMood.contains('adventurous') || lowerMood.contains('excited')) {
+    } else if (lowerMood.contains('adventurous') ||
+        lowerMood.contains('excited')) {
       return '🤩';
     } else if (lowerMood.contains('tired') || lowerMood.contains('exhausted')) {
       return '😴';

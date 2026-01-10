@@ -12,7 +12,7 @@ void main() {
 
     group('Error Categorization', () {
       test('categorizes network errors correctly', () {
-        final networkError = AuthException(
+        const networkError = AuthException(
           'Network connection failed',
           code: 'NETWORK_ERROR',
         );
@@ -25,7 +25,7 @@ void main() {
       });
 
       test('categorizes credential errors correctly', () {
-        final credentialError = AuthException(
+        const credentialError = AuthException(
           'Invalid credentials',
           code: 'INVALID_CREDENTIALS',
         );
@@ -38,7 +38,7 @@ void main() {
       });
 
       test('categorizes token expiration errors correctly', () {
-        final expiredError = AuthException(
+        const expiredError = AuthException(
           'Token has expired',
           code: 'TOKEN_EXPIRED',
         );
@@ -51,7 +51,7 @@ void main() {
       });
 
       test('categorizes rate limit errors correctly', () {
-        final rateLimitError = AuthException(
+        const rateLimitError = AuthException(
           'Too many requests',
           code: 'RATE_LIMIT_EXCEEDED',
         );
@@ -64,7 +64,7 @@ void main() {
       });
 
       test('categorizes server errors correctly', () {
-        final serverError = AuthException(
+        const serverError = AuthException(
           'Internal server error',
           code: 'INTERNAL_ERROR',
         );
@@ -77,7 +77,7 @@ void main() {
       });
 
       test('categorizes validation errors correctly', () {
-        final validationError = AuthException(
+        const validationError = AuthException(
           'Invalid password',
           code: 'INVALID_PASSWORD',
         );
@@ -92,7 +92,7 @@ void main() {
 
     group('User-Friendly Messages', () {
       test('provides clear message for user not found', () {
-        final error = AuthException(
+        const error = AuthException(
           'User not found',
           code: 'USER_NOT_FOUND',
         );
@@ -110,7 +110,7 @@ void main() {
       });
 
       test('provides clear message for invalid credentials', () {
-        final error = AuthException(
+        const error = AuthException(
           'Invalid credentials',
           code: 'INVALID_CREDENTIALS',
         );
@@ -124,7 +124,7 @@ void main() {
       });
 
       test('provides clear message for email not verified', () {
-        final error = AuthException(
+        const error = AuthException(
           'Email not verified',
           code: 'EMAIL_NOT_VERIFIED',
         );
@@ -142,7 +142,7 @@ void main() {
       });
 
       test('provides clear message for password reset required', () {
-        final error = AuthException(
+        const error = AuthException(
           'Password reset required',
           code: 'PASSWORD_RESET_REQUIRED',
         );
@@ -160,7 +160,7 @@ void main() {
       });
 
       test('provides clear message for expired token', () {
-        final error = AuthException(
+        const error = AuthException(
           'Token expired',
           code: 'TOKEN_EXPIRED',
         );
@@ -178,7 +178,7 @@ void main() {
       });
 
       test('provides clear message for rate limit exceeded', () {
-        final error = AuthException(
+        const error = AuthException(
           'Rate limit exceeded',
           code: 'RATE_LIMIT_EXCEEDED',
         );
@@ -197,7 +197,7 @@ void main() {
       });
 
       test('provides clear message for invalid password', () {
-        final error = AuthException(
+        const error = AuthException(
           'Password does not meet requirements',
           code: 'INVALID_PASSWORD',
         );
@@ -215,7 +215,7 @@ void main() {
       });
 
       test('provides clear message for invalid code', () {
-        final error = AuthException(
+        const error = AuthException(
           'Invalid verification code',
           code: 'INVALID_CODE',
         );
@@ -233,7 +233,7 @@ void main() {
       });
 
       test('provides clear message for expired code', () {
-        final error = AuthException(
+        const error = AuthException(
           'Code expired',
           code: 'EXPIRED_CODE',
         );
@@ -251,7 +251,7 @@ void main() {
       });
 
       test('provides clear message for email already exists', () {
-        final error = AuthException(
+        const error = AuthException(
           'Email already exists',
           code: 'EMAIL_EXISTS',
         );
@@ -271,7 +271,7 @@ void main() {
 
     group('Recovery Actions', () {
       test('provides network recovery actions', () {
-        final error = AuthException(
+        const error = AuthException(
           'Network failed',
           code: 'NETWORK_ERROR',
         );
@@ -287,7 +287,7 @@ void main() {
       });
 
       test('provides credential recovery actions', () {
-        final error = AuthException(
+        const error = AuthException(
           'Wrong password',
           code: 'INVALID_CREDENTIALS',
         );
@@ -306,7 +306,7 @@ void main() {
       });
 
       test('provides reauthentication recovery actions', () {
-        final error = AuthException(
+        const error = AuthException(
           'Session expired',
           code: 'SESSION_EXPIRED',
         );
@@ -321,7 +321,7 @@ void main() {
       });
 
       test('provides rate limit recovery actions with wait time', () {
-        final error = AuthException(
+        const error = AuthException(
           'Too many attempts',
           code: 'TOO_MANY_REQUESTS',
         );
@@ -337,7 +337,7 @@ void main() {
       });
 
       test('provides server error recovery actions', () {
-        final error = AuthException(
+        const error = AuthException(
           'Server error',
           code: 'INTERNAL_ERROR',
         );
@@ -358,7 +358,7 @@ void main() {
 
     group('Exception Type Handling', () {
       test('handles AuthException correctly', () {
-        final error = AuthException(
+        const error = AuthException(
           'Auth failed',
           code: 'INVALID_CREDENTIALS',
         );
@@ -371,7 +371,7 @@ void main() {
       });
 
       test('handles NetworkTimeoutException correctly', () {
-        final error = const NetworkTimeoutException(
+        const error = NetworkTimeoutException(
           message: 'Request timed out',
         );
 
@@ -386,7 +386,7 @@ void main() {
       });
 
       test('handles NetworkConnectivityException correctly', () {
-        final error = const NetworkConnectivityException(
+        const error = NetworkConnectivityException(
           message: 'No internet',
         );
 
@@ -401,7 +401,7 @@ void main() {
       });
 
       test('handles generic ServerException correctly', () {
-        final error = const ServerException(
+        const error = ServerException(
           message: 'Server error',
           code: 'SERVER_ERROR',
         );
@@ -430,7 +430,7 @@ void main() {
       });
 
       test('handles UnauthorizedException correctly', () {
-        final error = const UnauthorizedException(
+        const error = UnauthorizedException(
           message: 'Unauthorized',
         );
 
@@ -444,7 +444,7 @@ void main() {
       });
 
       test('handles NotFoundException correctly', () {
-        final error = const NotFoundException(
+        const error = NotFoundException(
           message: 'Not found',
         );
 
@@ -460,7 +460,7 @@ void main() {
 
     group('Convenience Methods', () {
       test('isRetryable returns true for retryable errors', () {
-        final networkError = AuthException(
+        const networkError = AuthException(
           'Network failed',
           code: 'NETWORK_ERROR',
         );
@@ -469,7 +469,7 @@ void main() {
       });
 
       test('isRetryable returns false for non-retryable errors', () {
-        final rateLimitError = AuthException(
+        const rateLimitError = AuthException(
           'Rate limit exceeded',
           code: 'RATE_LIMIT_EXCEEDED',
         );
@@ -478,7 +478,7 @@ void main() {
       });
 
       test('shouldRefreshToken returns true for token errors', () {
-        final expiredError = AuthException(
+        const expiredError = AuthException(
           'Token expired',
           code: 'TOKEN_EXPIRED',
         );
@@ -487,7 +487,7 @@ void main() {
       });
 
       test('shouldRefreshToken returns false for other errors', () {
-        final credentialError = AuthException(
+        const credentialError = AuthException(
           'Invalid credentials',
           code: 'INVALID_CREDENTIALS',
         );
@@ -496,7 +496,7 @@ void main() {
       });
 
       test('isCredentialError returns true for credential errors', () {
-        final error = AuthException(
+        const error = AuthException(
           'Wrong password',
           code: 'INVALID_CREDENTIALS',
         );
@@ -505,7 +505,7 @@ void main() {
       });
 
       test('isCredentialError returns false for other errors', () {
-        final error = AuthException(
+        const error = AuthException(
           'Network failed',
           code: 'NETWORK_ERROR',
         );
@@ -514,7 +514,7 @@ void main() {
       });
 
       test('isNetworkError returns true for network errors', () {
-        final error = AuthException(
+        const error = AuthException(
           'Network failed',
           code: 'NETWORK_ERROR',
         );
@@ -523,7 +523,7 @@ void main() {
       });
 
       test('isNetworkError returns false for other errors', () {
-        final error = AuthException(
+        const error = AuthException(
           'Wrong password',
           code: 'INVALID_CREDENTIALS',
         );
@@ -534,7 +534,7 @@ void main() {
 
     group('Edge Cases', () {
       test('handles exception with null error code', () {
-        final error = AuthException('Some error');
+        const error = AuthException('Some error');
 
         final errorInfo = errorHandler.handleError(error);
 
@@ -544,7 +544,7 @@ void main() {
       });
 
       test('handles exception with lowercase error code', () {
-        final error = AuthException(
+        const error = AuthException(
           'Network failed',
           code: 'network_error',
         );
@@ -556,7 +556,7 @@ void main() {
       });
 
       test('handles exception with mixed case error code', () {
-        final error = AuthException(
+        const error = AuthException(
           'Invalid credentials',
           code: 'Invalid_Credentials',
         );
@@ -568,7 +568,7 @@ void main() {
       });
 
       test('infers category from message for unknown codes', () {
-        final error = AuthException(
+        const error = AuthException(
           'Network connection failed',
           code: 'UNKNOWN_CODE',
         );
@@ -580,7 +580,7 @@ void main() {
       });
 
       test('provides fallback for completely unknown errors', () {
-        final error = AuthException(
+        const error = AuthException(
           'Something went wrong',
           code: 'XYZ123',
         );
@@ -643,7 +643,7 @@ void main() {
       });
 
       test('toString combines primary and secondary actions', () {
-        final recovery = const AuthErrorRecovery(
+        const recovery = AuthErrorRecovery(
           primaryAction: 'Do this',
           secondaryAction: 'Or do that',
         );

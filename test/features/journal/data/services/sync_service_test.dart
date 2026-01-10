@@ -1,10 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/services/sync_service_impl.dart';
 import 'package:soloadventurer/features/journal/domain/services/sync_service.dart';
-import '../../../features/journal/helpers/sync_test_helpers.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
+import 'package:soloadventurer/features/journal/helpers/sync_test_helpers.dart';
 
 void main() {
   late SyncServiceImpl syncService;
@@ -74,8 +75,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -118,8 +118,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -151,8 +150,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -170,7 +168,7 @@ void main() {
 
     test('should use custom config when provided', () async {
       // Arrange
-      final customConfig = SyncConfig(
+      const customConfig = SyncConfig(
         batchSize: 100,
         syncMedia: false,
         autoResolveConflicts: true,
@@ -186,14 +184,14 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
 
       // Act
       await syncService.syncAll(customConfig);
 
       // Assert - Media sync should be skipped
-      verifyNever(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'));
+      verifyNever(
+          () => mockJournalLocalDataSource.getMediaBySyncStatus('pending'));
     });
   });
 
@@ -206,14 +204,16 @@ void main() {
 
       // Setup remote to return 404 (entry doesn't exist)
       for (final entry in pendingEntries) {
-        when(() => mockJournalRemoteDataSource.getEntry(entry.id))
-            .thenThrow(
+        when(() => mockJournalRemoteDataSource.getEntry(entry.id)).thenThrow(
           const ServerException(message: 'Not found', statusCode: 404),
         );
         when(() => mockJournalRemoteDataSource.createEntry(entry))
             .thenAnswer((_) async => entry);
-        when(() => mockJournalLocalDataSource.updateSyncStatus(entry.id, 'synced'))
-            .thenAnswer((_) async {});
+        when(() =>
+                mockJournalLocalDataSource.updateSyncStatus(entry.id, 'synced'))
+            .thenAnswer((_) async {
+          return null;
+        });
       }
 
       when(() => mockJournalRemoteDataSource.getEntries())
@@ -229,10 +229,10 @@ void main() {
           .called(1);
       verify(() => mockJournalRemoteDataSource.createEntry(pendingEntries[1]))
           .called(1);
-      verify(() => mockJournalLocalDataSource.updateSyncStatus(pendingEntries[0].id, 'synced'))
-          .called(1);
-      verify(() => mockJournalLocalDataSource.updateSyncStatus(pendingEntries[1].id, 'synced'))
-          .called(1);
+      verify(() => mockJournalLocalDataSource.updateSyncStatus(
+          pendingEntries[0].id, 'synced')).called(1);
+      verify(() => mockJournalLocalDataSource.updateSyncStatus(
+          pendingEntries[1].id, 'synced')).called(1);
     });
 
     test('should download remote entries', () async {
@@ -244,9 +244,11 @@ void main() {
       // Setup local to return 404 (entry doesn't exist locally)
       for (final entry in remoteEntries) {
         when(() => mockJournalLocalDataSource.getEntry(entry.id))
-            .thenThrow(NotFoundException(message: 'Not found locally'));
+            .thenThrow(const NotFoundException(message: 'Not found locally'));
         when(() => mockJournalLocalDataSource.createEntry(entry))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          return null;
+        });
       }
 
       // Act
@@ -314,7 +316,9 @@ void main() {
       when(() => mockJournalLocalDataSource.getEntry(localEntry.id))
           .thenAnswer((_) async => localEntry);
       when(() => mockJournalLocalDataSource.updateEntry(remoteEntry))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
 
       // Act
       final result = await syncService.syncEntries(SyncDirection.download);
@@ -367,15 +371,19 @@ void main() {
       );
       when(() => mockJournalRemoteDataSource.createEntry(pendingEntries[0]))
           .thenAnswer((_) async => pendingEntries[0]);
-      when(() => mockJournalLocalDataSource.updateSyncStatus(pendingEntries[0].id, 'synced'))
-          .thenAnswer((_) async {});
+      when(() => mockJournalLocalDataSource.updateSyncStatus(
+          pendingEntries[0].id, 'synced')).thenAnswer((_) async {
+        return null;
+      });
 
       when(() => mockJournalRemoteDataSource.getEntries())
           .thenAnswer((_) async => remoteEntries);
       when(() => mockJournalLocalDataSource.getEntry(remoteEntries[0].id))
-          .thenThrow(NotFoundException(message: 'Not found locally'));
+          .thenThrow(const NotFoundException(message: 'Not found locally'));
       when(() => mockJournalLocalDataSource.createEntry(remoteEntries[0]))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
 
       // Act
       final result = await syncService.syncEntries(SyncDirection.bidirectional);
@@ -396,11 +404,13 @@ void main() {
 
       for (final trip in pendingTrips) {
         when(() => mockTripRemoteDataSource.getTrip(trip.id))
-            .thenThrow(NotFoundException(message: 'Not found'));
+            .thenThrow(const NotFoundException(message: 'Not found'));
         when(() => mockTripRemoteDataSource.createTrip(trip))
             .thenAnswer((_) async => trip);
         when(() => mockTripLocalDataSource.updateSyncStatus(trip.id, 'synced'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          return null;
+        });
       }
 
       when(() => mockTripRemoteDataSource.getTrips())
@@ -429,9 +439,11 @@ void main() {
 
       for (final trip in syncedTrips) {
         when(() => mockTripLocalDataSource.getTrip(trip.id))
-            .thenThrow(NotFoundException(message: 'Not found locally'));
+            .thenThrow(const NotFoundException(message: 'Not found locally'));
         when(() => mockTripLocalDataSource.createTrip(trip))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          return null;
+        });
       }
 
       // Act
@@ -489,15 +501,16 @@ void main() {
 
       for (final tag in pendingTags) {
         when(() => mockTagRemoteDataSource.getTag(tag.id))
-            .thenThrow(NotFoundException(message: 'Not found'));
+            .thenThrow(const NotFoundException(message: 'Not found'));
         when(() => mockTagRemoteDataSource.createTag(tag))
             .thenAnswer((_) async => tag);
         when(() => mockTagLocalDataSource.updateSyncStatus(tag.id, 'synced'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          return null;
+        });
       }
 
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
 
       // Act
       final result = await syncService.syncTags(SyncDirection.upload);
@@ -505,8 +518,7 @@ void main() {
       // Assert
       expect(result.success, true);
       expect(result.uploadedCount, 2);
-      verify(() => mockTagRemoteDataSource.createTag(pendingTags[0]))
-          .called(1);
+      verify(() => mockTagRemoteDataSource.createTag(pendingTags[0])).called(1);
     });
 
     test('should download remote tags', () async {
@@ -520,9 +532,10 @@ void main() {
 
       for (final tag in syncedTags) {
         when(() => mockTagLocalDataSource.getTag(tag.id))
-            .thenThrow(NotFoundException(message: 'Not found locally'));
-        when(() => mockTagLocalDataSource.createTag(tag))
-            .thenAnswer((_) async {});
+            .thenThrow(const NotFoundException(message: 'Not found locally'));
+        when(() => mockTagLocalDataSource.createTag(tag)).thenAnswer((_) async {
+          return null;
+        });
       }
 
       // Act
@@ -531,8 +544,7 @@ void main() {
       // Assert
       expect(result.success, true);
       expect(result.downloadedCount, 2);
-      verify(() => mockTagLocalDataSource.createTag(syncedTags[0]))
-          .called(1);
+      verify(() => mockTagLocalDataSource.createTag(syncedTags[0])).called(1);
     });
 
     test('should detect conflict when tag exists both locally and remotely',
@@ -577,12 +589,16 @@ void main() {
           .thenAnswer((_) async => pendingMedia);
 
       for (final media in pendingMedia) {
-        when(() => mockJournalRemoteDataSource.getMediaForEntry(media.journalEntryId))
-            .thenAnswer((_) async => []);
+        when(() => mockJournalRemoteDataSource.getMediaForEntry(
+            media.journalEntryId)).thenAnswer((_) async => []);
         when(() => mockJournalRemoteDataSource.addMedia(media))
-            .thenAnswer((_) async {});
-        when(() => mockJournalLocalDataSource.updateMediaSyncStatus(media.id, 'synced'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          return null;
+        });
+        when(() => mockJournalLocalDataSource.updateMediaSyncStatus(
+            media.id, 'synced')).thenAnswer((_) async {
+          return null;
+        });
       }
 
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
@@ -609,14 +625,18 @@ void main() {
 
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => syncedEntries);
-      when(() => mockJournalRemoteDataSource.getMediaForEntry(syncedEntries[0].id))
+      when(() =>
+              mockJournalRemoteDataSource.getMediaForEntry(syncedEntries[0].id))
           .thenAnswer((_) async => remoteMedia);
-      when(() => mockJournalLocalDataSource.getMediaForEntry(syncedEntries[0].id))
+      when(() =>
+              mockJournalLocalDataSource.getMediaForEntry(syncedEntries[0].id))
           .thenAnswer((_) async => []);
 
       for (final media in remoteMedia) {
         when(() => mockJournalLocalDataSource.addMedia(media))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          return null;
+        });
       }
 
       // Act
@@ -636,10 +656,13 @@ void main() {
       final pendingMedia = createPendingMediaItems(count: 1);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
           .thenAnswer((_) async => pendingMedia);
-      when(() => mockJournalRemoteDataSource.getMediaForEntry(pendingMedia[0].journalEntryId))
+      when(() => mockJournalRemoteDataSource
+              .getMediaForEntry(pendingMedia[0].journalEntryId))
           .thenThrow(Exception('Network error'));
-      when(() => mockJournalLocalDataSource.updateMediaSyncStatus(pendingMedia[0].id, 'pending'))
-          .thenAnswer((_) async {});
+      when(() => mockJournalLocalDataSource.updateMediaSyncStatus(
+          pendingMedia[0].id, 'pending')).thenAnswer((_) async {
+        return null;
+      });
 
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
@@ -651,9 +674,9 @@ void main() {
       expect(result.success, true); // Success overall despite error
       expect(result.uploadedCount, 0);
       verify(() => mockJournalLocalDataSource.updateMediaSyncStatus(
-        pendingMedia[0].id,
-        'pending',
-      )).called(1);
+            pendingMedia[0].id,
+            'pending',
+          )).called(1);
     });
   });
 
@@ -672,9 +695,13 @@ void main() {
                 updatedAt: testDateTimeEarlier,
               ));
       when(() => mockJournalRemoteDataSource.updateEntry(any()))
-          .thenAnswer((_) async {});
-      when(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
+      when(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).thenAnswer((_) async {
+        return null;
+      });
 
       // Act
       await syncService.resolveConflict(
@@ -684,8 +711,8 @@ void main() {
 
       // Assert - Remote is newer, so local should be updated
       verify(() => mockJournalLocalDataSource.updateEntry(any())).called(1);
-      verify(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .called(1);
+      verify(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).called(1);
     });
 
     test('should resolve conflict with localWins strategy', () async {
@@ -699,9 +726,13 @@ void main() {
                 updatedAt: testDateTime,
               ));
       when(() => mockJournalRemoteDataSource.updateEntry(any()))
-          .thenAnswer((_) async {});
-      when(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
+      when(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).thenAnswer((_) async {
+        return null;
+      });
 
       // Act
       await syncService.resolveConflict(
@@ -711,8 +742,8 @@ void main() {
 
       // Assert - Local wins, so remote should be updated
       verify(() => mockJournalRemoteDataSource.updateEntry(any())).called(1);
-      verify(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .called(1);
+      verify(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).called(1);
     });
 
     test('should resolve conflict with remoteWins strategy', () async {
@@ -726,9 +757,13 @@ void main() {
       );
 
       when(() => mockJournalLocalDataSource.updateEntry(any()))
-          .thenAnswer((_) async {});
-      when(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
+      when(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).thenAnswer((_) async {
+        return null;
+      });
 
       // Act
       await syncService.resolveConflict(
@@ -738,8 +773,8 @@ void main() {
 
       // Assert - Remote wins, so local should be updated
       verify(() => mockJournalLocalDataSource.updateEntry(any())).called(1);
-      verify(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .called(1);
+      verify(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).called(1);
     });
 
     test('should resolve conflict with manual strategy', () async {
@@ -752,9 +787,13 @@ void main() {
       ).toJson();
 
       when(() => mockJournalLocalDataSource.updateEntry(any()))
-          .thenAnswer((_) async {});
-      when(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
+      when(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).thenAnswer((_) async {
+        return null;
+      });
 
       // Act
       await syncService.resolveConflict(
@@ -765,8 +804,8 @@ void main() {
 
       // Assert
       verify(() => mockJournalLocalDataSource.updateEntry(any())).called(1);
-      verify(() => mockJournalLocalDataSource.updateSyncStatus(conflict.entityId, 'synced'))
-          .called(1);
+      verify(() => mockJournalLocalDataSource.updateSyncStatus(
+          conflict.entityId, 'synced')).called(1);
     });
   });
 
@@ -783,8 +822,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -827,8 +865,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -855,8 +892,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -889,8 +925,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -921,8 +956,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -952,8 +986,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))
@@ -1013,14 +1046,15 @@ void main() {
 
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('pending'))
           .thenAnswer((_) async => pendingEntries);
-      when(() => mockJournalRemoteDataSource.getEntry(any()))
-          .thenThrow(
+      when(() => mockJournalRemoteDataSource.getEntry(any())).thenThrow(
         const ServerException(message: 'Not found', statusCode: 404),
       );
       when(() => mockJournalRemoteDataSource.createEntry(any()))
           .thenAnswer((_) async => pendingEntries.first);
       when(() => mockJournalLocalDataSource.updateSyncStatus(any(), any()))
-          .thenAnswer((_) async {});
+          .thenAnswer((_) async {
+        return null;
+      });
 
       when(() => mockJournalRemoteDataSource.getEntries())
           .thenAnswer((_) async => []);
@@ -1061,8 +1095,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTripRemoteDataSource.getTrips())
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
 
@@ -1086,8 +1119,7 @@ void main() {
           .thenAnswer((_) async => []);
       when(() => mockTagLocalDataSource.getTagsBySyncStatus('pending'))
           .thenAnswer((_) async => []);
-      when(() => mockTagRemoteDataSource.getTags())
-          .thenAnswer((_) async => []);
+      when(() => mockTagRemoteDataSource.getTags()).thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getEntriesBySyncStatus('synced'))
           .thenAnswer((_) async => []);
       when(() => mockJournalLocalDataSource.getMediaBySyncStatus('pending'))

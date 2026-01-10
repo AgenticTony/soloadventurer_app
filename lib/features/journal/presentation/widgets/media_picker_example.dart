@@ -13,7 +13,8 @@ class MediaPickerExampleScreen extends ConsumerStatefulWidget {
       _MediaPickerExampleScreenState();
 }
 
-class _MediaPickerExampleScreenState extends ConsumerState<MediaPickerExampleScreen> {
+class _MediaPickerExampleScreenState
+    extends ConsumerState<MediaPickerExampleScreen> {
   final List<PickedMediaFile> _selectedMedia = [];
   MediaQuality _selectedQuality = MediaQuality.optimized;
 
@@ -164,16 +165,14 @@ class _MediaPickerExampleScreenState extends ConsumerState<MediaPickerExampleScr
                         Text(
                           'No media selected',
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color:
-                                theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withOpacity(0.6),
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Tap the button above to add photos or videos',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color:
-                                theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
                           ),
                         ),
                       ],
@@ -188,9 +187,7 @@ class _MediaPickerExampleScreenState extends ConsumerState<MediaPickerExampleScr
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: Icon(
-                            media.isVideo
-                                ? Icons.videocam
-                                : Icons.image,
+                            media.isVideo ? Icons.videocam : Icons.image,
                             color: theme.colorScheme.primary,
                           ),
                           title: Text(

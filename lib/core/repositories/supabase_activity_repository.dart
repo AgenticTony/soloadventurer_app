@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../features/travel/domain/models/activity.dart';
 import '../../features/travel/domain/repositories/activity_repository.dart';
 import '../models/paginated_data.dart';
-import '../models/page_info.dart';
 import 'paginated_repository_mixin.dart';
 
 /// Supabase implementation of ActivityRepository with cursor-based pagination
@@ -48,7 +48,8 @@ import 'paginated_repository_mixin.dart';
 ///
 /// **Note:** This is a placeholder implementation. Actual Supabase queries
 /// will be added when the supabase_flutter package is integrated into the project.
-class SupabaseActivityRepository with PaginatedRepositoryMixin
+class SupabaseActivityRepository
+    with PaginatedRepositoryMixin
     implements ActivityRepository {
   final SupabaseClient _client;
 
@@ -78,10 +79,7 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
     final lastSortValue = cursorData?['lastSortValue'];
 
     // Build Supabase query
-    var query = _client
-        .from('activities')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('activities').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -107,16 +105,17 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
       // This is more efficient than OFFSET for large datasets
       final sortField = _mapSortField(sortBy);
       if (sortOrder == SortOrder.ascending) {
-        query = query
-            .or('$sortField.gt.$lastSortValue,$sortField.eq.$lastSortValue and id.gt.$lastId');
+        query = query.or(
+            '$sortField.gt.$lastSortValue,$sortField.eq.$lastSortValue and id.gt.$lastId');
       } else {
-        query = query
-            .or('$sortField.lt.$lastSortValue,$sortField.eq.$lastSortValue and id.lt.$lastId');
+        query = query.or(
+            '$sortField.lt.$lastSortValue,$sortField.eq.$lastSortValue and id.lt.$lastId');
       }
     }
 
     // Add ordering
-    query = query.order(_mapSortField(sortBy), ascending: sortOrder == SortOrder.ascending);
+    query = query.order(_mapSortField(sortBy),
+        ascending: sortOrder == SortOrder.ascending);
 
     // Add pagination with limit
     query = query.limit(validatedPageSize);
@@ -182,10 +181,7 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
     final offset = (page - 1) * validatedPageSize;
 
     // Build Supabase query
-    var query = _client
-        .from('activities')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('activities').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -206,13 +202,12 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
     }
 
     // Get total count for pagination metadata
-    final countResponse = await query
-        .select()
-        .count(CountOption.exact);
+    final countResponse = await query.select().count(CountOption.exact);
     final totalItems = countResponse.count ?? 0;
 
     // Add ordering
-    query = query.order(_mapSortField(sortBy), ascending: sortOrder == SortOrder.ascending);
+    query = query.order(_mapSortField(sortBy),
+        ascending: sortOrder == SortOrder.ascending);
 
     // Add offset and limit
     query = query.range(offset, offset + validatedPageSize - 1);
@@ -254,7 +249,8 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
     // Build query with only metadata fields (more efficient)
     var query = _client
         .from('activities')
-        .select('id, title, category, startDateTime, locationName, isCompleted, isPriority')
+        .select(
+            'id, title, category, startDateTime, locationName, isCompleted, isPriority')
         .eq('userId', userId);
 
     if (tripId != null) {
@@ -309,9 +305,7 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
         .single()
         .catchError((_) => null);
 
-    if (response == null) return null;
-
-    return _mapToActivity(response as Map<String, dynamic>);
+    return _mapToActivity(response);
   }
 
   @override
@@ -320,10 +314,8 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
   }) async {
     if (activityIds.isEmpty) return [];
 
-    final response = await _client
-        .from('activities')
-        .select()
-        .inFilter('id', activityIds);
+    final response =
+        await _client.from('activities').select().inFilter('id', activityIds);
 
     final activitiesData = response as List<dynamic>;
     return activitiesData
@@ -335,13 +327,10 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
   Future<Activity> createActivity({required Activity activity}) async {
     final data = _mapToDatabase(activity);
 
-    final response = await _client
-        .from('activities')
-        .insert(data)
-        .select()
-        .single();
+    final response =
+        await _client.from('activities').insert(data).select().single();
 
-    return _mapToActivity(response as Map<String, dynamic>);
+    return _mapToActivity(response);
   }
 
   @override
@@ -358,7 +347,7 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
         .select()
         .single();
 
-    return _mapToActivity(response as Map<String, dynamic>);
+    return _mapToActivity(response);
   }
 
   @override
@@ -380,12 +369,15 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
   }) async {
     final response = await _client
         .from('activities')
-        .update({'isCompleted': isCompleted, 'updatedAt': DateTime.now().toIso8601String()})
+        .update({
+          'isCompleted': isCompleted,
+          'updatedAt': DateTime.now().toIso8601String()
+        })
         .eq('id', activityId)
         .select()
         .single();
 
-    return _mapToActivity(response as Map<String, dynamic>);
+    return _mapToActivity(response);
   }
 
   @override
@@ -414,10 +406,7 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
     final offset = (currentPage - 1) * validatedPageSize;
 
     // Build search query using text search or ILIKE
-    var queryBuilder = _client
-        .from('activities')
-        .select()
-        .eq('userId', userId);
+    var queryBuilder = _client.from('activities').select().eq('userId', userId);
 
     if (tripId != null) {
       queryBuilder = queryBuilder.eq('tripId', tripId);
@@ -553,10 +542,7 @@ class SupabaseActivityRepository with PaginatedRepositoryMixin
     required String userId,
     Map<String, dynamic>? filters,
   }) async {
-    var query = _client
-        .from('activities')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('activities').select().eq('userId', userId);
 
     if (tripId != null) {
       query = query.eq('tripId', tripId);

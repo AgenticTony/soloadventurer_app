@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/config/app_config.dart';
+import 'package:soloadventurer/core/config/image_cache_config.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/token_manager_provider.dart';
@@ -59,7 +60,7 @@ Future<void> bootstrap() async {
     AppStartTracker.startPhase('error_handling_init');
 
     // Initialize error handling
-    ErrorHandler.initialize();
+    ErrorHandler().initialize();
 
     AppStartTracker.endPhase('error_handling_init');
 
@@ -123,10 +124,10 @@ Future<void> bootstrap() async {
     );
   }, (error, stackTrace) {
     // Report any errors not caught by the Flutter framework
-    ErrorHandler.reportError(
-      'Uncaught exception',
+    ErrorHandler().handleException(
       error,
-      stackTrace,
+      stackTrace: stackTrace,
+      context: {'source': 'bootstrap_uncaught'},
     );
   });
 }
@@ -134,68 +135,64 @@ Future<void> bootstrap() async {
 /// Logger for provider state changes
 ///
 /// This observer logs provider lifecycle events for debugging purposes.
-/// Provider logger using Riverpod 2.6.1 ProviderObserver API
+/// Temporarily disabled for Riverpod 3.0 migration - needs API update
 ///
-/// Monitors provider state changes for debugging purposes.
-final class ProviderLogger extends ProviderObserver {
-  @override
-  void didAddProvider(
-    ProviderBase<Object?> provider,
-    Object? value,
-    ProviderContainer? container,
-  ) {
-    debugPrint('''
-{
-  "event": "didAddProvider",
-  "provider": "$provider",
-  "value": "$value"
-}''');
-  }
-
-  @override
-  void didUpdateProvider(
-    ProviderBase<Object?> provider,
-    Object? previousValue,
-    Object? newValue,
-    ProviderContainer? container,
-  ) {
-    debugPrint('''
-{
-  "event": "didUpdateProvider",
-  "provider": "$provider",
-  "previousValue": "$previousValue",
-  "newValue": "$newValue"
-}''');
-  }
-
-  @override
-  void didDisposeProvider(
-    ProviderBase<Object?> provider,
-    ProviderContainer? container,
-  ) {
-    debugPrint('''
-{
-  "event": "didDisposeProvider",
-  "provider": "$provider"
-}''');
-  }
-
-  @override
-  void providerDidFail(
-    ProviderBase<Object?> provider,
-    Object error,
-    StackTrace stackTrace,
-    ProviderContainer? container,
-  ) {
-    debugPrint('''
-{
-  "event": "providerDidFail",
-  "provider": "$provider",
-  "error": "$error",
-  "stackTrace": "$stackTrace"
-}''');
-  }
-}
+/// TODO: Update to Riverpod 3.0 ProviderObserver API
+// final class ProviderLogger extends ProviderObserver {
+//   @override
+//   void didAddProvider(
+//     RiverpodProviderBase provider,
+//     Object? value,
+//   ) {
+//     debugPrint('''
+// {
+//   "event": "didAddProvider",
+//   "provider": "$provider",
+//   "value": "$value"
+// }''');
+//   }
+//
+//   @override
+//   void didUpdateProvider(
+//     RiverpodProviderBase provider,
+//     Object? previousValue,
+//     Object? newValue,
+//   ) {
+//     debugPrint('''
+// {
+//   "event": "didUpdateProvider",
+//   "provider": "$provider",
+//   "previousValue": "$previousValue",
+//   "newValue": "$newValue"
+// }''');
+//   }
+//
+//   @override
+//   void didDisposeProvider(
+//     RiverpodProviderBase provider,
+//   ) {
+//     debugPrint('''
+// {
+//   "event": "didDisposeProvider",
+//   "provider": "$provider"
+// }''');
+//   }
+//
+//   @override
+//   void providerDidFail(
+//     RiverpodProviderBase provider,
+//     Object error,
+//     StackTrace stackTrace,
+//   ) {
+//     debugPrint('''
+// {
+//   "event": "providerDidFail",
+//   "provider": "$provider",
+//   "error": "$error",
+//   "stackTrace": "$stackTrace"
+// }''');
+//   }
+// }
 
 /// This function will be called when the app is run in debug mode
 /// to set up any debug-specific configurations.

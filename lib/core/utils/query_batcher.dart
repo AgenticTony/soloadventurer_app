@@ -355,14 +355,14 @@ class QueryBatcher {
     if (_pendingQueries.any((q) => q.priority != 0)) {
       _pendingQueries.sort((a, b) => a.priority.compareTo(b.priority));
       if (debug) {
-        debugPrint('[QueryBatcher] Sorted ${_pendingQueries.length} queries by priority');
+        debugPrint(
+            '[QueryBatcher] Sorted ${_pendingQueries.length} queries by priority');
       }
     }
 
     // Execute queries
-    final results = config.parallel
-        ? await _executeParallel()
-        : await _executeSequential();
+    final results =
+        config.parallel ? await _executeParallel() : await _executeSequential();
 
     stopwatch.stop();
 
@@ -387,7 +387,8 @@ class QueryBatcher {
     );
 
     if (debug) {
-      debugPrint('[QueryBatcher] Batch executed in ${stopwatch.elapsedMilliseconds}ms: $stats');
+      debugPrint(
+          '[QueryBatcher] Batch executed in ${stopwatch.elapsedMilliseconds}ms: $stats');
     }
 
     // Notify callback

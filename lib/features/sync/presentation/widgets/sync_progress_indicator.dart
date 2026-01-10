@@ -49,7 +49,8 @@ class SyncProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final progressColor = color ?? theme.colorScheme.primary;
-    final trackColor = backgroundColor ?? theme.colorScheme.surfaceVariant;
+    final trackColor =
+        backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
 
     Widget progressBar;
 
@@ -158,7 +159,8 @@ class SyncCircularProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final progressColor = color ?? theme.colorScheme.primary;
-    final trackColor = backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
+    final trackColor =
+        backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
 
     Widget progressIndicator;
 

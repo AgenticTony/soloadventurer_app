@@ -5,10 +5,8 @@ import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
-import 'package:soloadventurer/features/auth/domain/usecases/login.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
-import 'dart:async';
 import 'dart:developer' as developer;
 
 /// Mock implementation of AuthRepository for performance testing
@@ -54,7 +52,9 @@ class PerformanceTestResult {
   @override
   String toString() {
     final status = passed ? '✓ PASS' : '✗ FAIL';
-    final percentage = (actualTime.inMilliseconds / threshold.inMilliseconds * 100).toStringAsFixed(1);
+    final percentage =
+        (actualTime.inMilliseconds / threshold.inMilliseconds * 100)
+            .toStringAsFixed(1);
     return '$status - $testName: ${actualTime.inMilliseconds}ms / ${threshold.inMilliseconds}ms ($percentage%)${details != null ? " - $details" : ""}';
   }
 }
@@ -98,10 +98,12 @@ void main() {
         final testUser = _createTestUser();
 
         // Simulate network delay (4G-like latency: 100-300ms)
-        final networkDelay = Duration(milliseconds: 200 + DateTime.now().millisecond % 100);
+        final networkDelay =
+            Duration(milliseconds: 200 + DateTime.now().millisecond % 100);
 
         // Mock the repository to simulate network call
-        when(() => mockAuthRepository.signInWithEmailAndPassword(email, password))
+        when(() =>
+                mockAuthRepository.signInWithEmailAndPassword(email, password))
             .thenAnswer((_) async {
           await Future.delayed(networkDelay);
           return testUser;
@@ -145,7 +147,8 @@ void main() {
           final stopwatch = Stopwatch()..start();
 
           try {
-            await Future.delayed(Duration(milliseconds: 50)); // Simulate quick login
+            await Future.delayed(
+                const Duration(milliseconds: 50)); // Simulate quick login
           } catch (e) {
             // Ignore errors
           }
@@ -155,10 +158,9 @@ void main() {
         }
 
         final averageTime = Duration(
-          milliseconds: timings
-                  .map((d) => d.inMilliseconds)
-                  .reduce((a, b) => a + b) ~/
-              timings.length,
+          milliseconds:
+              timings.map((d) => d.inMilliseconds).reduce((a, b) => a + b) ~/
+                  timings.length,
         );
 
         final maxTime = timings.reduce((a, b) => a > b ? a : b);
@@ -175,7 +177,8 @@ void main() {
           threshold: AuthPerformanceThresholds.maxLoginTime,
           passed: averageTime < AuthPerformanceThresholds.maxLoginTime &&
               maxTime < AuthPerformanceThresholds.maxLoginTime,
-          details: 'Min: ${minTime.inMilliseconds}ms, Max: ${maxTime.inMilliseconds}ms',
+          details:
+              'Min: ${minTime.inMilliseconds}ms, Max: ${maxTime.inMilliseconds}ms',
         );
 
         results.add(result);
@@ -250,7 +253,8 @@ void main() {
           testName: 'Token refresh',
           actualTime: stopwatch.elapsed,
           threshold: AuthPerformanceThresholds.maxTokenRefreshTime,
-          passed: stopwatch.elapsed < AuthPerformanceThresholds.maxTokenRefreshTime,
+          passed:
+              stopwatch.elapsed < AuthPerformanceThresholds.maxTokenRefreshTime,
         );
 
         results.add(result);
@@ -273,7 +277,7 @@ void main() {
             .thenAnswer((_) async {
           attemptCount++;
           if (attemptCount == 1) {
-            throw AuthException(
+            throw const AuthException(
               'Network error',
               code: 'NETWORK_ERROR',
             );
@@ -383,7 +387,8 @@ void main() {
           testName: 'Session restoration',
           actualTime: stopwatch.elapsed,
           threshold: AuthPerformanceThresholds.maxSessionRestorationTime,
-          passed: stopwatch.elapsed < AuthPerformanceThresholds.maxSessionRestorationTime,
+          passed: stopwatch.elapsed <
+              AuthPerformanceThresholds.maxSessionRestorationTime,
         );
 
         results.add(result);
@@ -489,8 +494,7 @@ void main() {
 
         when(() => mockAuthRepository.signInWithEmailAndPassword(any(), any()))
             .thenAnswer((_) async => testUser);
-        when(() => mockAuthRepository.signOut())
-            .thenAnswer((_) async {});
+        when(() => mockAuthRepository.signOut()).thenAnswer((_) async {});
 
         // Get initial memory
         final initialMemory = await _getMemoryUsage();
@@ -499,7 +503,8 @@ void main() {
         const int cycles = 20;
         for (var i = 0; i < cycles; i++) {
           try {
-            await mockAuthRepository.signInWithEmailAndPassword('test@example.com', 'password');
+            await mockAuthRepository.signInWithEmailAndPassword(
+                'test@example.com', 'password');
             await mockAuthRepository.signOut();
           } catch (e) {
             // Ignore errors
@@ -523,9 +528,12 @@ void main() {
         final result = PerformanceTestResult(
           testName: 'Memory leak detection',
           actualTime: Duration(milliseconds: memoryDelta),
-          threshold: Duration(milliseconds: AuthPerformanceThresholds.maxMemoryIncreaseBytes),
-          passed: memoryDelta < AuthPerformanceThresholds.maxMemoryIncreaseBytes,
-          details: '${(memoryDelta / 1024 / 1024).toStringAsFixed(2)}MB increase',
+          threshold: const Duration(
+              milliseconds: AuthPerformanceThresholds.maxMemoryIncreaseBytes),
+          passed:
+              memoryDelta < AuthPerformanceThresholds.maxMemoryIncreaseBytes,
+          details:
+              '${(memoryDelta / 1024 / 1024).toStringAsFixed(2)}MB increase',
         );
 
         results.add(result);
@@ -569,7 +577,7 @@ void main() {
 
         // Get final memory
         final finalMemory = await _getMemoryUsage();
-        final memoryDelta = finalMemory - initialMemory!;
+        final memoryDelta = finalMemory - initialMemory;
 
         developer.log(
           'Memory usage after $refreshes refreshes: '
@@ -630,7 +638,8 @@ void main() {
           actualTime: averageFrameTime,
           threshold: AuthPerformanceThresholds.maxUIFrameTime,
           passed: averageFrameTime < AuthPerformanceThresholds.maxUIFrameTime,
-          details: '${(1000 / averageFrameTime.inMilliseconds).toStringAsFixed(1)} FPS',
+          details:
+              '${(1000 / averageFrameTime.inMilliseconds).toStringAsFixed(1)} FPS',
         );
 
         results.add(result);
@@ -684,10 +693,14 @@ void main() {
     });
 
     group('Performance Summary', () {
-      testWidgets('Generate performance test summary', (WidgetTester tester) async {
-        developer.log('═══════════════════════════════════════════════════════');
-        developer.log('         AUTHENTICATION PERFORMANCE TEST SUMMARY       ');
-        developer.log('═══════════════════════════════════════════════════════');
+      testWidgets('Generate performance test summary',
+          (WidgetTester tester) async {
+        developer
+            .log('═══════════════════════════════════════════════════════');
+        developer
+            .log('         AUTHENTICATION PERFORMANCE TEST SUMMARY       ');
+        developer
+            .log('═══════════════════════════════════════════════════════');
 
         if (results.isEmpty) {
           developer.log('No test results available. Run tests first.');
@@ -706,11 +719,14 @@ void main() {
           developer.log(result.toString());
         }
 
-        developer.log('═══════════════════════════════════════════════════════');
+        developer
+            .log('═══════════════════════════════════════════════════════');
         developer.log('SUMMARY: $passedCount passed, $failedCount failed');
-        developer.log('═══════════════════════════════════════════════════════');
+        developer
+            .log('═══════════════════════════════════════════════════════');
 
-        expect(failedCount, equals(0), reason: 'All performance tests should pass');
+        expect(failedCount, equals(0),
+            reason: 'All performance tests should pass');
       });
     });
   });

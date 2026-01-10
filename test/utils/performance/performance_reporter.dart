@@ -81,7 +81,8 @@ Performance Metrics:
           'List render time ${listRenderTimeMs}ms exceeds target of 3000ms');
     }
     if (scrollFPS < 55) {
-      failures.add('Scroll FPS ${scrollFPS.toStringAsFixed(1)} below target of 55');
+      failures
+          .add('Scroll FPS ${scrollFPS.toStringAsFixed(1)} below target of 55');
     }
     if (jankyFramePercentage >= 10) {
       failures.add(
@@ -178,15 +179,13 @@ class PerformanceReporter {
     }
 
     // Calculate metrics
-    final scrollDurationMs = frameTimes.isNotEmpty
-        ? frameTimes.reduce((a, b) => a + b)
-        : 1000;
+    final scrollDurationMs =
+        frameTimes.isNotEmpty ? frameTimes.reduce((a, b) => a + b) : 1000;
 
     final avgFrameTime = scrollDurationMs / (frameCount.clamp(1, 1000));
     final fps = avgFrameTime > 0 ? 1000 / avgFrameTime : 60.0;
-    final jankyPercentage = frameCount > 0
-        ? (jankyFrames / frameCount * 100)
-        : 0.0;
+    final jankyPercentage =
+        frameCount > 0 ? (jankyFrames / frameCount * 100) : 0.0;
 
     return ScrollMetrics(
       fps: fps,

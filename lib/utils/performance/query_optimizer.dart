@@ -115,9 +115,7 @@ class CacheStats {
   });
 
   double get hitRate =>
-      totalHits + totalMisses > 0
-          ? totalHits / (totalHits + totalMisses)
-          : 0.0;
+      totalHits + totalMisses > 0 ? totalHits / (totalHits + totalMisses) : 0.0;
 
   int get totalRequests => totalHits + totalMisses;
 
@@ -228,7 +226,8 @@ class QueryCache<T> {
     DateTime? oldestAccess;
 
     for (final entry in _cache.entries) {
-      if (oldestAccess == null || entry.value.createdAt.isBefore(oldestAccess)) {
+      if (oldestAccess == null ||
+          entry.value.createdAt.isBefore(oldestAccess)) {
         oldestAccess = entry.value.createdAt;
         lruKey = entry.key;
       }
@@ -451,7 +450,7 @@ class QueryOptimizer {
     return {
       'totalQueries': _queryCount,
       'averageQueryTime': _queryCount > 0
-          ? (_totalQueryTime / _queryCount).toStringAsFixed(2) + 'ms'
+          ? '${(_totalQueryTime / _queryCount).toStringAsFixed(2)}ms'
           : 'N/A',
       'cacheStats': cache.stats.toString(),
     };

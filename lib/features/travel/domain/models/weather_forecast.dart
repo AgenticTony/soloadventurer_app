@@ -9,7 +9,6 @@ part 'weather_forecast.g.dart';
 /// activity recommendations and packing suggestions.
 @freezed
 class WeatherForecast with _$WeatherForecast {
-  const WeatherForecast._();
 
   /// Creates a weather forecast with all required fields
   ///
@@ -37,7 +36,10 @@ class WeatherForecast with _$WeatherForecast {
   /// Creates a WeatherForecast from JSON
   factory WeatherForecast.fromJson(Map<String, dynamic> json) =>
       _$WeatherForecastFromJson(json);
+}
 
+/// WeatherForecast extensions for computed properties
+extension WeatherForecastExtension on WeatherForecast {
   /// Returns true if rain is expected
   ///
   /// Considers precipitation probability and condition text.
@@ -58,7 +60,7 @@ class WeatherForecast with _$WeatherForecast {
 
   /// Returns a formatted temperature range string
   ///
-  /// Example: "�C - �C"
+  /// Example: "°C - °C"
   String get temperatureRange =>
-      '${temperatureMin.round()}�C - ${temperatureMax.round()}�C';
+      '${temperatureMin.round()}°C - ${temperatureMax.round()}°C';
 }

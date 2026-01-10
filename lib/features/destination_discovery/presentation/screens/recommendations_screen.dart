@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import '../../domain/models/personalized_recommendation.dart';
 import '../../application/providers/recommendation_provider.dart';
 import '../../application/providers/saved_destinations_provider.dart';
 import '../../domain/models/saved_destination.dart';
-import '../widgets/destination_card.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
 import '../utils/error_handler.dart';
@@ -58,7 +57,8 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
     }
 
     final userId = authState.value!.user!.id;
-    final recommendationNotifier = ref.read(recommendationProvider(userId).notifier);
+    final recommendationNotifier =
+        ref.read(recommendationProvider(userId).notifier);
 
     try {
       await recommendationNotifier.refresh();
@@ -126,7 +126,8 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
         final recommendationState = ref.read(recommendationProvider(userId));
         if (recommendationState.hasValue &&
             recommendationState.value!.recommendation != null) {
-          final recommendedDest = recommendationState.value!.recommendation!.recommendations
+          final recommendedDest = recommendationState
+              .value!.recommendation!.recommendations
               .where((r) => r.destination.id == destinationId)
               .firstOrNull;
 
@@ -166,13 +167,9 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
   ) {
     switch (_selectedFilter) {
       case RecommendationFilter.highMatch:
-        return recommendations
-            .where((r) => r.matchScore >= 0.7)
-            .toList();
+        return recommendations.where((r) => r.matchScore >= 0.7).toList();
       case RecommendationFilter.hiddenGems:
-        return recommendations
-            .where((r) => r.isHiddenGemMatch)
-            .toList();
+        return recommendations.where((r) => r.isHiddenGemMatch).toList();
       case RecommendationFilter.all:
       default:
         return recommendations;
@@ -569,7 +566,9 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
 
     if (difference.inMinutes < 60) {
       final minutes = difference.inMinutes;
-      return minutes == 0 ? 'just now' : '$minutes ${minutes == 1 ? 'minute' : 'minutes'} ago';
+      return minutes == 0
+          ? 'just now'
+          : '$minutes ${minutes == 1 ? 'minute' : 'minutes'} ago';
     } else if (difference.inHours < 24) {
       final hours = difference.inHours;
       return '$hours ${hours == 1 ? 'hour' : 'hours'} ago';
@@ -749,7 +748,8 @@ class _RecommendationCard extends StatelessWidget {
                           : theme.colorScheme.onSurfaceVariant,
                     ),
                     onPressed: onBookmarkTap,
-                    tooltip: isSaved ? 'Remove from wishlist' : 'Save to wishlist',
+                    tooltip:
+                        isSaved ? 'Remove from wishlist' : 'Save to wishlist',
                   ),
                 ],
               ),

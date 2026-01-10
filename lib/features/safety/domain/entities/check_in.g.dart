@@ -6,8 +6,7 @@ part of 'check_in.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CheckInImpl _$$CheckInImplFromJson(Map<String, dynamic> json) =>
-    _$CheckInImpl(
+_CheckIn _$CheckInFromJson(Map<String, dynamic> json) => _CheckIn(
       id: json['id'] as String,
       userId: json['userId'] as String,
       triggerType:
@@ -41,8 +40,7 @@ _$CheckInImpl _$$CheckInImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$CheckInImplToJson(_$CheckInImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$CheckInToJson(_CheckIn instance) => <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
       'triggerType': _$CheckInTriggerTypeEnumMap[instance.triggerType]!,
@@ -76,9 +74,8 @@ const _$CheckInStatusEnumMap = {
   CheckInStatus.cancelled: 'cancelled',
 };
 
-_$CheckInLocationImpl _$$CheckInLocationImplFromJson(
-        Map<String, dynamic> json) =>
-    _$CheckInLocationImpl(
+_CheckInLocation _$CheckInLocationFromJson(Map<String, dynamic> json) =>
+    _CheckInLocation(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       accuracy: (json['accuracy'] as num?)?.toDouble(),
@@ -88,8 +85,7 @@ _$CheckInLocationImpl _$$CheckInLocationImplFromJson(
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
 
-Map<String, dynamic> _$$CheckInLocationImplToJson(
-        _$CheckInLocationImpl instance) =>
+Map<String, dynamic> _$CheckInLocationToJson(_CheckInLocation instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,

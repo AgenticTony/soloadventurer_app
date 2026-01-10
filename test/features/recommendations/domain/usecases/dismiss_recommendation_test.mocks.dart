@@ -5,11 +5,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i3;
 
+import 'package:fpdart/fpdart.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i7;
+import 'package:soloadventurer/core/error/failures.dart' as _i5;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart'
-    as _i4;
+    as _i6;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart'
-    as _i5;
+    as _i8;
 import 'package:soloadventurer/features/recommendations/domain/repositories/recommendation_repository.dart'
     as _i2;
 
@@ -26,6 +29,7 @@ import 'package:soloadventurer/features/recommendations/domain/repositories/reco
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
+// ignore_for_file: invalid_use_of_internal_member
 
 /// A class which mocks [RecommendationRepository].
 ///
@@ -33,9 +37,11 @@ import 'package:soloadventurer/features/recommendations/domain/repositories/reco
 class MockRecommendationRepository extends _i1.Mock
     implements _i2.RecommendationRepository {
   @override
-  _i3.Future<dynamic> saveRecommendation(
+  _i3.Future<
+      _i4
+      .Either<_i5.Failure, _i6.PersonalizedRecommendation>> saveRecommendation(
     String? userId,
-    _i4.PersonalizedRecommendation? recommendation,
+    _i6.PersonalizedRecommendation? recommendation,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -45,23 +51,66 @@ class MockRecommendationRepository extends _i1.Mock
             recommendation,
           ],
         ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+        returnValue: _i3.Future<
+                _i4.Either<_i5.Failure, _i6.PersonalizedRecommendation>>.value(
+            _i7.dummyValue<
+                _i4.Either<_i5.Failure, _i6.PersonalizedRecommendation>>(
+          this,
+          Invocation.method(
+            #saveRecommendation,
+            [
+              userId,
+              recommendation,
+            ],
+          ),
+        )),
+        returnValueForMissingStub: _i3.Future<
+                _i4.Either<_i5.Failure, _i6.PersonalizedRecommendation>>.value(
+            _i7.dummyValue<
+                _i4.Either<_i5.Failure, _i6.PersonalizedRecommendation>>(
+          this,
+          Invocation.method(
+            #saveRecommendation,
+            [
+              userId,
+              recommendation,
+            ],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.Failure, _i6.PersonalizedRecommendation>>);
 
   @override
-  _i3.Future<dynamic> getSavedRecommendations(String? userId) =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getSavedRecommendations,
-          [userId],
-        ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+  _i3.Future<_i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>
+      getSavedRecommendations(String? userId) => (super.noSuchMethod(
+            Invocation.method(
+              #getSavedRecommendations,
+              [userId],
+            ),
+            returnValue: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i7.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getSavedRecommendations,
+                [userId],
+              ),
+            )),
+            returnValueForMissingStub: _i3.Future<
+                _i4.Either<_i5.Failure,
+                    List<_i6.PersonalizedRecommendation>>>.value(_i7.dummyValue<
+                _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>(
+              this,
+              Invocation.method(
+                #getSavedRecommendations,
+                [userId],
+              ),
+            )),
+          ) as _i3.Future<
+              _i4.Either<_i5.Failure, List<_i6.PersonalizedRecommendation>>>);
 
   @override
-  _i3.Future<dynamic> dismissRecommendation(
+  _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>> dismissRecommendation(
     String? userId,
     String? recommendationId,
   ) =>
@@ -73,14 +122,35 @@ class MockRecommendationRepository extends _i1.Mock
             recommendationId,
           ],
         ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+        returnValue: _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>>.value(
+            _i7.dummyValue<_i4.Either<_i5.Failure, _i4.Unit>>(
+          this,
+          Invocation.method(
+            #dismissRecommendation,
+            [
+              userId,
+              recommendationId,
+            ],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>>.value(
+                _i7.dummyValue<_i4.Either<_i5.Failure, _i4.Unit>>(
+          this,
+          Invocation.method(
+            #dismissRecommendation,
+            [
+              userId,
+              recommendationId,
+            ],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>>);
 
   @override
-  _i3.Future<dynamic> recordFeedback(
+  _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>> recordFeedback(
     String? recommendationId,
-    _i5.RecommendationFeedback? feedback,
+    _i8.RecommendationFeedback? feedback,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -90,23 +160,60 @@ class MockRecommendationRepository extends _i1.Mock
             feedback,
           ],
         ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+        returnValue: _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>>.value(
+            _i7.dummyValue<_i4.Either<_i5.Failure, _i4.Unit>>(
+          this,
+          Invocation.method(
+            #recordFeedback,
+            [
+              recommendationId,
+              feedback,
+            ],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>>.value(
+                _i7.dummyValue<_i4.Either<_i5.Failure, _i4.Unit>>(
+          this,
+          Invocation.method(
+            #recordFeedback,
+            [
+              recommendationId,
+              feedback,
+            ],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.Failure, _i4.Unit>>);
 
   @override
-  _i3.Future<dynamic> getDismissedRecommendations(String? userId) =>
+  _i3.Future<_i4.Either<_i5.Failure, Set<String>>> getDismissedRecommendations(
+          String? userId) =>
       (super.noSuchMethod(
         Invocation.method(
           #getDismissedRecommendations,
           [userId],
         ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+        returnValue: _i3.Future<_i4.Either<_i5.Failure, Set<String>>>.value(
+            _i7.dummyValue<_i4.Either<_i5.Failure, Set<String>>>(
+          this,
+          Invocation.method(
+            #getDismissedRecommendations,
+            [userId],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i3.Future<_i4.Either<_i5.Failure, Set<String>>>.value(
+                _i7.dummyValue<_i4.Either<_i5.Failure, Set<String>>>(
+          this,
+          Invocation.method(
+            #getDismissedRecommendations,
+            [userId],
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.Failure, Set<String>>>);
 
   @override
-  _i3.Future<dynamic> clearOldDismissals({
+  _i3.Future<_i4.Either<_i5.Failure, int>> clearOldDismissals({
     required String? userId,
     required Duration? olderThan,
   }) =>
@@ -119,7 +226,30 @@ class MockRecommendationRepository extends _i1.Mock
             #olderThan: olderThan,
           },
         ),
-        returnValue: _i3.Future<dynamic>.value(),
-        returnValueForMissingStub: _i3.Future<dynamic>.value(),
-      ) as _i3.Future<dynamic>);
+        returnValue: _i3.Future<_i4.Either<_i5.Failure, int>>.value(
+            _i7.dummyValue<_i4.Either<_i5.Failure, int>>(
+          this,
+          Invocation.method(
+            #clearOldDismissals,
+            [],
+            {
+              #userId: userId,
+              #olderThan: olderThan,
+            },
+          ),
+        )),
+        returnValueForMissingStub:
+            _i3.Future<_i4.Either<_i5.Failure, int>>.value(
+                _i7.dummyValue<_i4.Either<_i5.Failure, int>>(
+          this,
+          Invocation.method(
+            #clearOldDismissals,
+            [],
+            {
+              #userId: userId,
+              #olderThan: olderThan,
+            },
+          ),
+        )),
+      ) as _i3.Future<_i4.Either<_i5.Failure, int>>);
 }

@@ -49,7 +49,7 @@ class MediaViewerConfig {
     showNavigation: true,
     backgroundColor: Colors.black,
     autoplayVideos: true,
-  });
+  );
 }
 
 /// Callback when page is changed
@@ -494,7 +494,9 @@ class _MediaViewerState extends State<MediaViewer> {
               if (hasMetadata)
                 Row(
                   children: [
-                    if (media.isPhoto && media.width != null && media.height != null)
+                    if (media.isPhoto &&
+                        media.width != null &&
+                        media.height != null)
                       _buildMetadataChip(
                         Icons.photo_size_select_large,
                         '${media.width} × ${media.height}',
@@ -546,7 +548,7 @@ class _MediaViewerState extends State<MediaViewer> {
   String _formatDuration(int seconds) {
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
-    return '${minutes}:${remainingSeconds.toString().padLeft(2, '0')}';
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }
 
@@ -583,7 +585,8 @@ class _BuildPhotoViewState extends State<BuildPhotoView> {
       onScaleUpdate: (details) {
         setState(() {
           _scale = _previousScale * details.scale;
-          _offset = _previousOffset + details.focalPoint - details.localFocalPoint;
+          _offset =
+              _previousOffset + details.focalPoint - details.localFocalPoint;
         });
       },
       onScaleEnd: (details) {

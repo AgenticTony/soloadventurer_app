@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 
 /// Represents a custom tag for categorizing journal entries
 class Tag extends Equatable {
@@ -20,6 +21,9 @@ class Tag extends Equatable {
   /// Number of times this tag has been used
   final int usageCount;
 
+  /// Sync status for offline support
+  final SyncStatus syncStatus;
+
   /// When the tag was created
   final DateTime createdAt;
 
@@ -30,6 +34,7 @@ class Tag extends Equatable {
     this.color,
     this.icon,
     this.usageCount = 0,
+    this.syncStatus = SyncStatus.synced,
     required this.createdAt,
   });
 
@@ -41,6 +46,7 @@ class Tag extends Equatable {
         color,
         icon,
         usageCount,
+        syncStatus,
         createdAt,
       ];
 
@@ -52,6 +58,7 @@ class Tag extends Equatable {
     String? color,
     String? icon,
     int? usageCount,
+    SyncStatus? syncStatus,
     DateTime? createdAt,
   }) {
     return Tag(
@@ -61,6 +68,7 @@ class Tag extends Equatable {
       color: color ?? this.color,
       icon: icon ?? this.icon,
       usageCount: usageCount ?? this.usageCount,
+      syncStatus: syncStatus ?? this.syncStatus,
       createdAt: createdAt ?? this.createdAt,
     );
   }

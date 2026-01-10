@@ -321,7 +321,6 @@ class _MediaGridItem extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.onLongPress,
-    this.imageConfig,
   });
 
   @override
@@ -395,13 +394,16 @@ class _MediaGridItem extends StatelessWidget {
               ),
 
             // Caption overlay
-            if (config.showCaption && media.caption != null && media.caption!.isNotEmpty)
+            if (config.showCaption &&
+                media.caption != null &&
+                media.caption!.isNotEmpty)
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
@@ -435,9 +437,7 @@ class _MediaGridItem extends StatelessWidget {
       color: theme.colorScheme.surfaceContainerHighest,
       child: Center(
         child: Icon(
-          media.isVideo
-              ? Icons.videocam_outlined
-              : Icons.image_outlined,
+          media.isVideo ? Icons.videocam_outlined : Icons.image_outlined,
           size: 32,
           color: theme.colorScheme.onSurface.withOpacity(0.4),
         ),
@@ -523,7 +523,8 @@ class MediaGalleryWithSelection extends StatefulWidget {
   });
 
   @override
-  State<MediaGalleryWithSelection> createState() => _MediaGalleryWithSelectionState();
+  State<MediaGalleryWithSelection> createState() =>
+      _MediaGalleryWithSelectionState();
 }
 
 class _MediaGalleryWithSelectionState extends State<MediaGalleryWithSelection> {

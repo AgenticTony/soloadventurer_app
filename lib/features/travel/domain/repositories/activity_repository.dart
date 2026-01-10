@@ -1,5 +1,5 @@
-import '../../../core/models/paginated_data.dart';
-import '../../../core/repositories/paginated_repository_mixin.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 import '../models/activity.dart';
 
 /// Repository interface for managing activity data with pagination support
@@ -145,7 +145,8 @@ abstract class ActivityRepository {
   ///   activityIds: ['activity1', 'activity2', 'activity3'],
   /// );
   /// ```
-  Future<List<Activity>> getActivitiesByIds({required List<String> activityIds});
+  Future<List<Activity>> getActivitiesByIds(
+      {required List<String> activityIds});
 
   /// Create a new activity
   ///

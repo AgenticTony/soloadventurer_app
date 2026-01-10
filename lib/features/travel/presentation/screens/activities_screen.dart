@@ -54,7 +54,7 @@ class ActivitiesScreen extends ConsumerWidget {
 
     // Parse cursor (page number)
     final page = cursor == null ? 1 : int.parse(cursor);
-    final itemsPerPage = 20;
+    const itemsPerPage = 20;
 
     // Generate mock activities
     final activities = List.generate(
@@ -62,11 +62,18 @@ class ActivitiesScreen extends ConsumerWidget {
       (i) => Activity(
         id: '${page}_$i',
         title: 'Activity ${(page - 1) * itemsPerPage + i + 1}',
-        description: 'Description for activity ${(page - 1) * itemsPerPage + i + 1}',
+        description:
+            'Description for activity ${(page - 1) * itemsPerPage + i + 1}',
         startTime: DateTime.now().add(Duration(hours: i)),
         endTime: DateTime.now().add(Duration(hours: i + 2)),
         location: 'Location ${(page - 1) * itemsPerPage + i + 1}',
-        category: ['Food', 'Transport', 'Accommodation', 'Activity', 'Sightseeing'][i % 5],
+        category: [
+          'Food',
+          'Transport',
+          'Accommodation',
+          'Activity',
+          'Sightseeing'
+        ][i % 5],
         estimatedCost: (i % 3 + 1) * 20.0,
       ),
     );

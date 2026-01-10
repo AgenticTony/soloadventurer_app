@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/core/models/paginated_data.dart';
-import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 import 'package:soloadventurer/features/travel/domain/models/activity.dart';
 import 'package:soloadventurer/features/travel/infrastructure/repositories/in_memory_activity_repository.dart';
 
@@ -25,8 +23,10 @@ void main() {
           userId: testUserId,
           title: 'Activity $index',
           description: 'Description for activity $index',
-          category: ActivityCategory.values[index % ActivityCategory.values.length],
-          startDateTime: DateTime(2024, 1, 1, 10, 0).add(Duration(hours: index)),
+          category:
+              ActivityCategory.values[index % ActivityCategory.values.length],
+          startDateTime:
+              DateTime(2024, 1, 1, 10, 0).add(Duration(hours: index)),
           endDateTime: DateTime(2024, 1, 1, 12, 0).add(Duration(hours: index)),
           estimatedCost: 50.0 + (index * 10),
           locationName: 'Location $index',
@@ -153,11 +153,13 @@ void main() {
       });
 
       test('deleteActivity removes activity', () async {
-        final result = await repository.deleteActivity(activityId: 'activity-0');
+        final result =
+            await repository.deleteActivity(activityId: 'activity-0');
 
         expect(result, isTrue);
 
-        final activity = await repository.getActivityById(activityId: 'activity-0');
+        final activity =
+            await repository.getActivityById(activityId: 'activity-0');
         expect(activity, isNull);
       });
     });
@@ -173,7 +175,8 @@ void main() {
 
         expect(result.items.length, greaterThan(0));
         expect(
-          result.items.every((activity) => activity.title.contains('Activity 1')),
+          result.items
+              .every((activity) => activity.title.contains('Activity 1')),
           isTrue,
         );
       });
@@ -274,7 +277,8 @@ void main() {
 
         expect(updatedCount, equals(3));
 
-        final activity0 = await repository.getActivityById(activityId: 'activity-0');
+        final activity0 =
+            await repository.getActivityById(activityId: 'activity-0');
         expect(activity0!.isCompleted, isTrue);
       });
     });

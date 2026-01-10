@@ -1,0 +1,28 @@
+{
+  "file_path": "lib/features/travel/domain/models/activity.dart",
+  "main_branch_history": [],
+  "task_views": {
+    "006-performance-optimization-for-large-trips": {
+      "task_id": "006-performance-optimization-for-large-trips",
+      "branch_point": {
+        "commit_hash": "20dd5b9cdb7f9994913f6179576f194a9e9883e1",
+        "content": "",
+        "timestamp": "2026-01-05T12:48:39.346326"
+      },
+      "worktree_state": {
+        "content": "import 'package:freezed_annotation/freezed_annotation.dart';\n\npart 'activity.freezed.dart';\npart 'activity.g.dart';\n\n/// Category of travel activity\nenum ActivityCategory {\n  /// Dining and food-related activities\n  food,\n\n  /// Transportation and travel between locations\n  transport,\n\n  /// Accommodation and lodging\n  accommodation,\n\n  /// Entertainment and recreational activities\n  activity,\n\n  /// Sightseeing and tourist attractions\n  sightseeing,\n\n  /// Shopping and markets\n  shopping,\n\n  /// Other activities\n  other,\n}\n\n/// Activity model representing a planned or completed activity during a trip\n///\n/// Activities are individual events, tasks, or locations that are part of\n/// a larger trip itinerary. Examples include restaurant reservations, museum\n/// visits, transportation bookings, etc.\n@freezed\nclass Activity with _$Activity {\n  const factory Activity({\n    /// Unique identifier for the activity\n    required String id,\n\n    /// ID of the trip this activity belongs to\n    required String tripId,\n\n    /// ID of the user who created this activity\n    required String userId,\n\n    /// Activity title or name\n    required String title,\n\n    /// Detailed description of the activity\n    String? description,\n\n    /// Category of the activity\n    required ActivityCategory category,\n\n    /// Location name (e.g., restaurant name, museum name)\n    String? locationName,\n\n    /// Physical address\n    String? address,\n\n    /// Latitude coordinate\n    double? latitude,\n\n    /// Longitude coordinate\n    double? longitude,\n\n    /// Scheduled start date and time\n    DateTime? startDateTime,\n\n    /// Scheduled end date and time\n    DateTime? endDateTime,\n\n    /// Estimated cost for this activity\n    double? estimatedCost,\n\n    /// Actual cost (if completed)\n    double? actualCost,\n\n    /// Currency code for costs (e.g., USD, EUR)\n    String? currency,\n\n    /// Booking confirmation code or reference number\n    String? confirmationNumber,\n\n    /// Website URL related to this activity\n    String? websiteUrl,\n\n    /// Phone number for reservations\n    String? phoneNumber,\n\n    /// Activity notes or special instructions\n    String? notes,\n\n    /// Whether this activity is completed\n    @Default(false) bool isCompleted,\n\n    /// Whether this activity is a high priority\n    @Default(false) isPriority,\n\n    /// List of photo IDs associated with this activity\n    List<String>? photoIds,\n\n    /// Tags for organizing and filtering activities\n    List<String>? tags,\n\n    /// Date and time when the activity was created\n    required DateTime createdAt,\n\n    /// Date and time when the activity was last updated\n    required DateTime updatedAt,\n  }) = _Activity;\n\n  factory Activity.fromJson(Map<String, dynamic> json) =>\n      _$ActivityFromJson(json);\n\n  const Activity._();\n\n  /// Whether this activity has geographic coordinates\n  bool get hasLocation => latitude != null && longitude != null;\n\n  /// Whether this activity has scheduled time\n  bool get hasScheduledTime => startDateTime != null;\n\n  /// Whether this activity has cost information\n  bool get hasCostInfo => estimatedCost != null || actualCost != null;\n\n  /// Duration of the activity (if both start and end times are set)\n  Duration? get duration {\n    if (startDateTime == null || endDateTime == null) return null;\n    return endDateTime!.difference(startDateTime!);\n  }\n}\n",
+        "last_modified": "2026-01-05T12:48:42.743168"
+      },
+      "task_intent": {
+        "title": "Performance Optimization for Large Trips",
+        "description": "Optimize app performance for handling large, complex trips with hundreds of locations, activities, and photos",
+        "from_plan": true
+      },
+      "commits_behind_main": 203,
+      "status": "active",
+      "merged_at": null
+    }
+  },
+  "created_at": "2026-01-05T12:48:41.485722",
+  "last_updated": "2026-01-05T12:48:41.499887"
+}

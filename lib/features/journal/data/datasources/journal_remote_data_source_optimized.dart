@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
@@ -191,7 +191,8 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
         );
       }
 
-      final cacheKey = 'journal_entries_date_${startDate.toIso8601String()}_${endDate.toIso8601String()}';
+      final cacheKey =
+          'journal_entries_date_${startDate.toIso8601String()}_${endDate.toIso8601String()}';
 
       final result = await _queryOptimizer.execute<List<JournalEntryModel>>(
         cacheKey,
@@ -434,7 +435,8 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
   }
 
   /// Fetch entries with location data
-  Future<List<JournalEntryModel>> _fetchEntriesWithLocation(String userId) async {
+  Future<List<JournalEntryModel>> _fetchEntriesWithLocation(
+      String userId) async {
     final response = await _client
         .from('journal_entries')
         .select(QueryFields.forCard.toSelectString())
@@ -633,7 +635,8 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
         .select('id')
         .eq('trip_id', tripId);
 
-    final entryIds = (entriesResponse as List).map((e) => e['id'] as String).toList();
+    final entryIds =
+        (entriesResponse as List).map((e) => e['id'] as String).toList();
 
     if (entryIds.isEmpty) {
       return [];
@@ -840,10 +843,12 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
 
       // Add new tags
       if (tagIds.isNotEmpty) {
-        final inserts = tagIds.map((tagId) => {
-          'journal_entry_id': entryId,
-          'tag_id': tagId,
-        }).toList();
+        final inserts = tagIds
+            .map((tagId) => {
+                  'journal_entry_id': entryId,
+                  'tag_id': tagId,
+                })
+            .toList();
 
         await _client.from('journal_tags').insert(inserts);
       }

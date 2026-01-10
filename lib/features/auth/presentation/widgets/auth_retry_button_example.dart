@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
-import 'package:soloadventurer/features/auth/presentation/widgets/auth_retry_button.dart';
 
 /// Example usage of AuthRetryButton widget
 ///
@@ -14,16 +12,17 @@ class AuthRetryButtonExample extends StatelessWidget {
       appBar: AppBar(title: const Text('Auth Retry Button Examples')),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: [
+        children: const [
           // Example 1: Basic usage
-          const Card(
+          Card(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Example 1: Basic Retry Button',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
                   Text('Simple retry button with all features enabled'),
                   SizedBox(height: 16),
@@ -41,19 +40,21 @@ class AuthRetryButtonExample extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Example 2: Minimal configuration
-          const Card(
+          Card(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Example 2: Minimal Configuration',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
-                  Text('Only shows the button, no countdown or attempt counter'),
+                  Text(
+                      'Only shows the button, no countdown or attempt counter'),
                   SizedBox(height: 16),
                   // In real usage:
                   // AuthRetryButton(
@@ -65,17 +66,18 @@ class AuthRetryButtonExample extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Example 3: Custom max attempts and delay
-          const Card(
+          Card(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Example 3: Custom Configuration',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
                   Text('5 max attempts with 5-second base delay'),
                   SizedBox(height: 16),
@@ -93,17 +95,18 @@ class AuthRetryButtonExample extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Example 4: Integration with TokenRefreshService
-          const Card(
+          Card(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Example 4: Automatic Mode',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
                   Text('Connects directly to TokenRefreshService'),
                   SizedBox(height: 16),
@@ -122,17 +125,18 @@ class AuthRetryButtonExample extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Example 5: With custom labels
-          const Card(
+          Card(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text('Example 5: Custom Labels',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   SizedBox(height: 8),
                   Text('Custom button text and labels'),
                   SizedBox(height: 16),

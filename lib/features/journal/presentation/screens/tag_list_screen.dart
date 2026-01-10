@@ -41,7 +41,8 @@ class _TagListScreenState extends ConsumerState<TagListScreen> {
                   Text(tagListState.error!),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => ref.read(tagListProvider.notifier).loadTags(),
+                    onPressed: () =>
+                        ref.read(tagListProvider.notifier).loadTags(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -57,7 +58,8 @@ class _TagListScreenState extends ConsumerState<TagListScreen> {
                   Icon(
                     Icons.label_outline,
                     size: 64,
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -184,9 +186,8 @@ class _TagTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = tag.hasColor
-        ? _tryParseColor(tag.color!)
-        : theme.colorScheme.primary;
+    final color =
+        tag.hasColor ? _tryParseColor(tag.color!) : theme.colorScheme.primary;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),

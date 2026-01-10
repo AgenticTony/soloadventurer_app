@@ -22,7 +22,7 @@ import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_d
 import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
 import 'package:soloadventurer/features/destination_discovery/domain/models/curated_list.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/personalized_recommendation.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/saved_destination.dart';
@@ -41,12 +41,14 @@ class MockDestinationRepository implements DestinationRepository {
 
   /// Set up test data
   void setupTestData() {
+    final now = DateTime.now();
     // Create test destinations
     final tokyo = Destination(
       id: 'tokyo-1',
       name: 'Tokyo',
       description: 'Vibrant metropolis blending ancient traditions with cutting-edge technology',
-      location: (lat: 35.6762, lng: 139.6503),
+      latitude: 35.6762,
+      longitude: 139.6503,
       safetyScore: 8.5,
       soloSuitabilityScore: 8.0,
       soloSuitabilityFactors: const SoloSuitabilityFactors(
@@ -61,21 +63,24 @@ class MockDestinationRepository implements DestinationRepository {
       countryCode: 'JP',
       region: 'Kanto',
       budgetLevel: BudgetLevel.moderate,
-      activityLevel: ActivityLevel.moderate,
+      activityLevels: const [ActivityLevel.moderate],
+      safetyInsights: const [],
       tags: ['urban', 'cultural', 'food'],
       images: ['https://images.unsplash.com/photo-1540959733332-eab4deabeeaf'],
       popularActivities: const [],
       bestTimeToVisit: 'March-May, October-November',
       isHiddenGem: false,
       popularityScore: 9.2,
-      maxDailyCost: 150.0,
+      createdAt: now,
+      updatedAt: now,
     );
 
     final kyoto = Destination(
       id: 'kyoto-1',
       name: 'Kyoto',
       description: 'Ancient capital with stunning temples and traditional culture',
-      location: (lat: 35.0116, lng: 135.7681),
+      latitude: 35.0116,
+      longitude: 135.7681,
       safetyScore: 9.0,
       soloSuitabilityScore: 8.5,
       soloSuitabilityFactors: const SoloSuitabilityFactors(
@@ -90,21 +95,24 @@ class MockDestinationRepository implements DestinationRepository {
       countryCode: 'JP',
       region: 'Kansai',
       budgetLevel: BudgetLevel.moderate,
-      activityLevel: ActivityLevel.relaxed,
+      activityLevels: const [ActivityLevel.relaxed],
+      safetyInsights: const [],
       tags: ['cultural', 'historical', 'nature'],
       images: ['https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e'],
       popularActivities: const [],
       bestTimeToVisit: 'March-May, October-November',
       isHiddenGem: false,
       popularityScore: 8.8,
-      maxDailyCost: 120.0,
+      createdAt: now,
+      updatedAt: now,
     );
 
     final bali = Destination(
       id: 'bali-1',
       name: 'Bali',
       description: 'Tropical paradise with beautiful beaches and rich culture',
-      location: (lat: -8.3405, lng: 115.0920),
+      latitude: -8.3405,
+      longitude: 115.0920,
       safetyScore: 7.5,
       soloSuitabilityScore: 7.0,
       soloSuitabilityFactors: const SoloSuitabilityFactors(
@@ -119,14 +127,16 @@ class MockDestinationRepository implements DestinationRepository {
       countryCode: 'ID',
       region: 'Bali',
       budgetLevel: BudgetLevel.budget,
-      activityLevel: ActivityLevel.moderate,
+      activityLevels: const [ActivityLevel.moderate],
+      safetyInsights: const [],
       tags: ['beach', 'nature', 'wellness'],
       images: ['https://images.unsplash.com/photo-1537996194471-e657df975ab4'],
       popularActivities: const [],
       bestTimeToVisit: 'April-October',
       isHiddenGem: false,
       popularityScore: 8.5,
-      maxDailyCost: 80.0,
+      createdAt: now,
+      updatedAt: now,
     );
 
     _destinations.addAll({
@@ -144,15 +154,11 @@ class MockDestinationRepository implements DestinationRepository {
         type: CuratedListType.popularSolo,
         destinations: [tokyo, kyoto, bali],
         coverImageUrl: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800',
-        curator: CuratorInfo(
-          name: 'SoloAdventurer Team',
-          avatarUrl: null,
-        ),
-        metadata: CuratedListMetadata(
-          viewCount: 15234,
-          saveCount: 892,
-          isFeatured: true,
-        ),
+        curatorName: 'SoloAdventurer Team',
+        destinationCount: 3,
+        isFeatured: true,
+        viewCount: 15234,
+        saveCount: 892,
         tags: ['popular', 'solo', 'urban'],
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
@@ -164,15 +170,11 @@ class MockDestinationRepository implements DestinationRepository {
         type: CuratedListType.hiddenGems,
         destinations: [kyoto],
         coverImageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
-        curator: CuratorInfo(
-          name: 'Adventure Curator',
-          avatarUrl: null,
-        ),
-        metadata: CuratedListMetadata(
-          viewCount: 5421,
-          saveCount: 423,
-          isFeatured: false,
-        ),
+        curatorName: 'Adventure Curator',
+        destinationCount: 1,
+        isFeatured: false,
+        viewCount: 5421,
+        saveCount: 423,
         tags: ['hidden', 'gems', 'asia'],
         createdAt: DateTime(2024, 1, 1),
         updatedAt: DateTime(2024, 1, 1),
@@ -183,7 +185,7 @@ class MockDestinationRepository implements DestinationRepository {
     _recommendations = PersonalizedRecommendation(
       id: 'rec-1',
       userId: 'test-user-id',
-      recommendedDestinations: [
+      recommendations: [
         RecommendedDestination(
           destination: tokyo,
           matchScore: 0.92,
@@ -227,7 +229,7 @@ class MockDestinationRepository implements DestinationRepository {
 
     // Apply activity level filter
     if (filter.activityLevel != null) {
-      results = results.where((d) => d.activityLevel == filter.activityLevel).toList();
+      results = results.where((d) => d.activityLevels.contains(filter.activityLevel!)).toList();
     }
 
     // Apply safety score filter
@@ -263,7 +265,7 @@ class MockDestinationRepository implements DestinationRepository {
     }
 
     // Apply sorting
-    switch (filter.sortOrder) {
+    switch (filter.sortBy) {
       case DestinationSortOrder.popularity:
         results.sort((a, b) => b.popularityScore.compareTo(a.popularityScore));
         break;
@@ -274,10 +276,10 @@ class MockDestinationRepository implements DestinationRepository {
         results.sort((a, b) => b.soloSuitabilityScore.compareTo(a.soloSuitabilityScore));
         break;
       case DestinationSortOrder.budgetAsc:
-        results.sort((a, b) => a.maxDailyCost.compareTo(b.maxDailyCost));
+        results.sort((a, b) => (a.averageDailyCost ?? 0).compareTo(b.averageDailyCost ?? 0));
         break;
       case DestinationSortOrder.budgetDesc:
-        results.sort((a, b) => b.maxDailyCost.compareTo(a.maxDailyCost));
+        results.sort((a, b) => (b.averageDailyCost ?? 0).compareTo(a.averageDailyCost ?? 0));
         break;
       case DestinationSortOrder.newest:
         // For simplicity, sort by ID (newer destinations have higher IDs)

@@ -6,8 +6,7 @@ part of 'safety_alert.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SafetyAlertImpl _$$SafetyAlertImplFromJson(Map<String, dynamic> json) =>
-    _$SafetyAlertImpl(
+_SafetyAlert _$SafetyAlertFromJson(Map<String, dynamic> json) => _SafetyAlert(
       id: json['id'] as String,
       userId: json['userId'] as String,
       type: $enumDecode(_$SafetyAlertTypeEnumMap, json['type']),
@@ -44,7 +43,7 @@ _$SafetyAlertImpl _$$SafetyAlertImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$SafetyAlertImplToJson(_$SafetyAlertImpl instance) =>
+Map<String, dynamic> _$SafetyAlertToJson(_SafetyAlert instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
@@ -82,9 +81,8 @@ const _$SafetyAlertStatusEnumMap = {
   SafetyAlertStatus.cancelled: 'cancelled',
 };
 
-_$SafetyAlertLocationImpl _$$SafetyAlertLocationImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SafetyAlertLocationImpl(
+_SafetyAlertLocation _$SafetyAlertLocationFromJson(Map<String, dynamic> json) =>
+    _SafetyAlertLocation(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       accuracy: (json['accuracy'] as num?)?.toDouble(),
@@ -95,8 +93,8 @@ _$SafetyAlertLocationImpl _$$SafetyAlertLocationImplFromJson(
       mapsUrl: json['mapsUrl'] as String?,
     );
 
-Map<String, dynamic> _$$SafetyAlertLocationImplToJson(
-        _$SafetyAlertLocationImpl instance) =>
+Map<String, dynamic> _$SafetyAlertLocationToJson(
+        _SafetyAlertLocation instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,

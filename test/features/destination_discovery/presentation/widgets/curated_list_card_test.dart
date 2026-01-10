@@ -216,7 +216,8 @@ void main() {
         expect(find.text('Kyoto'), findsOneWidget);
       });
 
-      testWidgets('respects previewCount parameter', (WidgetTester tester) async {
+      testWidgets('respects previewCount parameter',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(

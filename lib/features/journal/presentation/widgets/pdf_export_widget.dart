@@ -212,7 +212,8 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
             _buildStatRow('Pages', '${state.result?.pageCount ?? 0}'),
             _buildStatRow('Entries', '${state.result?.entryCount ?? 0}'),
             _buildStatRow('Media items', '${state.result?.mediaCount ?? 0}'),
-            _buildStatRow('File size', state.result?.fileSizeReadable ?? 'Unknown'),
+            _buildStatRow(
+                'File size', state.result?.fileSizeReadable ?? 'Unknown'),
             if (state.exportDuration != null)
               _buildStatRow('Duration', _formatDuration(state.exportDuration!)),
             const SizedBox(height: 16),
@@ -228,7 +229,8 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => ref.read(pdfExportNotifierProvider.notifier).reset(),
+                    onPressed: () =>
+                        ref.read(pdfExportNotifierProvider.notifier).reset(),
                     icon: const Icon(Icons.close),
                     label: const Text('Close'),
                   ),
@@ -300,7 +302,8 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
   }
 
   void _startExport() async {
-    final outputPath = await ref.read(defaultPdfPathProvider(widget.tripName).future);
+    final outputPath =
+        await ref.read(defaultPdfPathProvider(widget.tripName).future);
     await ref.read(pdfExportNotifierProvider.notifier).exportTrip(
           tripId: widget.tripId,
           config: _selectedConfig,
@@ -369,8 +372,10 @@ class _ExportStatsCard extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            _buildStatRow(context, 'Journal Entries', '${stats['entryCount'] ?? 0}'),
-            _buildStatRow(context, 'Media Items', '${stats['totalMediaCount'] ?? 0}'),
+            _buildStatRow(
+                context, 'Journal Entries', '${stats['entryCount'] ?? 0}'),
+            _buildStatRow(
+                context, 'Media Items', '${stats['totalMediaCount'] ?? 0}'),
             _buildStatRow(context, 'Total Words', '${stats['wordCount'] ?? 0}'),
             _buildStatRow(
               context,

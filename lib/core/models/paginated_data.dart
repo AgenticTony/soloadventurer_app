@@ -1,3 +1,5 @@
+import 'page_info.dart';
+
 /// Generic model wrapping paginated data with metadata
 ///
 /// This model contains a list of items along with pagination information,

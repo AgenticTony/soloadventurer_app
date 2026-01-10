@@ -17,6 +17,7 @@
 ///   DestinationDto.fromJsonList(apiResponseList),
 /// );
 /// ```
+library;
 
 // Destination DTOs
 export 'destination_dto.dart';

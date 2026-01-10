@@ -10,7 +10,6 @@ part 'itinerary_item.g.dart';
 /// Each type has its own specific fields while sharing common properties.
 @freezed
 sealed class ItineraryItem with _$ItineraryItem {
-  const ItineraryItem._();
 
   /// Flight arrival at the destination
   ///
@@ -296,4 +295,7 @@ sealed class ItineraryItem with _$ItineraryItem {
                 isCompleted) =>
             isCompleted,
       );
+
+  // Private constructor for freezed getters
+  const ItineraryItem._();
 }

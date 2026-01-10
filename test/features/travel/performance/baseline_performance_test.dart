@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
-import 'package:soloadventurer_test/utils/performance/performance_test_utils.dart';
+import '../../../utils/performance/performance_test_utils.dart';
 
 /// Performance baseline tests for large datasets
 ///
@@ -27,7 +27,8 @@ void main() {
 
       // Capture initial memory
       final initialMemory = await PerformanceReporter.captureMemoryUsage();
-      debugPrint('Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Load all trips into memory
       final loadedTrips = <Trip>[];
@@ -39,8 +40,10 @@ void main() {
       final finalMemory = await PerformanceReporter.captureMemoryUsage();
       final memoryDelta = finalMemory - initialMemory;
 
-      debugPrint('Memory after loading 500 trips: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory after loading 500 trips: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Verify memory usage is reasonable
       // Target: Memory increase should be less than 50MB for 500 simple trip objects
@@ -51,7 +54,8 @@ void main() {
       );
 
       // Log baseline metric
-      debugPrint('BASELINE: Memory for 500 trips = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'BASELINE: Memory for 500 trips = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
     });
 
     test('Memory usage with 500 photo URLs loaded', () async {
@@ -60,7 +64,8 @@ void main() {
 
       // Capture initial memory
       final initialMemory = await PerformanceReporter.captureMemoryUsage();
-      debugPrint('Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Load all photo URLs into memory
       final loadedUrls = <String>[];
@@ -72,8 +77,10 @@ void main() {
       final finalMemory = await PerformanceReporter.captureMemoryUsage();
       final memoryDelta = finalMemory - initialMemory;
 
-      debugPrint('Memory after loading 500 photo URLs: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory after loading 500 photo URLs: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Photo URLs are strings, should be very lightweight
       expect(
@@ -82,16 +89,19 @@ void main() {
         reason: 'Memory usage for 500 photo URLs should be less than 5MB',
       );
 
-      debugPrint('BASELINE: Memory for 500 photo URLs = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'BASELINE: Memory for 500 photo URLs = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
     });
 
     test('Memory usage with 500 photo metadata objects', () async {
       // Generate large dataset
-      final photoMetadata = PhotoDataGenerator.generatePhotoMetadata(count: 500);
+      final photoMetadata =
+          PhotoDataGenerator.generatePhotoMetadata(count: 500);
 
       // Capture initial memory
       final initialMemory = await PerformanceReporter.captureMemoryUsage();
-      debugPrint('Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Load all metadata into memory
       final loadedMetadata = <Map<String, dynamic>>[];
@@ -103,8 +113,10 @@ void main() {
       final finalMemory = await PerformanceReporter.captureMemoryUsage();
       final memoryDelta = finalMemory - initialMemory;
 
-      debugPrint('Memory after loading 500 photo metadata: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory after loading 500 photo metadata: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Photo metadata contains more data, but should still be reasonable
       expect(
@@ -113,7 +125,8 @@ void main() {
         reason: 'Memory usage for 500 photo metadata should be less than 30MB',
       );
 
-      debugPrint('BASELINE: Memory for 500 photo metadata = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'BASELINE: Memory for 500 photo metadata = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
     });
 
     testWidgets('List rendering performance with 500 items', (tester) async {
@@ -158,7 +171,8 @@ void main() {
         reason: 'List of 500 items should render in less than 3 seconds',
       );
 
-      debugPrint('BASELINE: List render time for 500 items = ${renderTime.inMilliseconds}ms');
+      debugPrint(
+          'BASELINE: List render time for 500 items = ${renderTime.inMilliseconds}ms');
     });
 
     testWidgets('Scroll performance with 500 items', (tester) async {
@@ -205,7 +219,7 @@ void main() {
         // Trigger a scroll event
         await tester.drag(
           find.byType(ListView),
-          Offset(0, -300),
+          const Offset(0, -300),
         );
         await tester.pump();
 
@@ -220,7 +234,7 @@ void main() {
 
       scrollStopwatch.stop();
 
-      final totalFrames = 20;
+      const totalFrames = 20;
       final jankyPercentage = (jankyFrames / totalFrames * 100);
       final avgFPS = totalFrames / (scrollStopwatch.elapsedMilliseconds / 1000);
 
@@ -237,12 +251,13 @@ void main() {
         reason: 'Janky frame percentage should be less than 10%',
       );
 
-      debugPrint('BASELINE: Scroll janky frames = ${jankyPercentage.toStringAsFixed(1)}%');
+      debugPrint(
+          'BASELINE: Scroll janky frames = ${jankyPercentage.toStringAsFixed(1)}%');
       debugPrint('BASELINE: Scroll FPS = ${avgFPS.toStringAsFixed(1)}');
     });
 
     test('Data generation performance', () {
-      final iterations = 10;
+      const iterations = 10;
       final timings = <int>[];
 
       // Measure data generation performance over multiple iterations
@@ -278,7 +293,8 @@ void main() {
         reason: 'Max data generation time should be less than 500ms',
       );
 
-      debugPrint('BASELINE: Data generation = ${averageTime.toStringAsFixed(2)}ms avg');
+      debugPrint(
+          'BASELINE: Data generation = ${averageTime.toStringAsFixed(2)}ms avg');
     });
 
     test('Memory stress test with 1000 trips', () async {
@@ -288,7 +304,8 @@ void main() {
       );
 
       final initialMemory = await PerformanceReporter.captureMemoryUsage();
-      debugPrint('Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Initial memory: ${(initialMemory / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Load all trips
       final loadedTrips = <Trip>[];
@@ -299,8 +316,10 @@ void main() {
       final finalMemory = await PerformanceReporter.captureMemoryUsage();
       final memoryDelta = finalMemory - initialMemory;
 
-      debugPrint('Memory after loading 1000 trips: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory after loading 1000 trips: ${(finalMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'Memory delta: ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
 
       // Even with 1000 trips, memory should be reasonable
       expect(
@@ -309,12 +328,14 @@ void main() {
         reason: 'Memory usage for 1000 trips should be less than 100MB',
       );
 
-      debugPrint('BASELINE: Memory for 1000 trips = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          'BASELINE: Memory for 1000 trips = ${(memoryDelta / 1024 / 1024).toStringAsFixed(2)} MB');
     });
 
     testWidgets('List rendering with complex items', (tester) async {
       // Generate dataset with more complex data
-      final photoMetadata = PhotoDataGenerator.generatePhotoMetadata(count: 500);
+      final photoMetadata =
+          PhotoDataGenerator.generatePhotoMetadata(count: 500);
 
       final renderTime = await PerformanceReporter.measureTime(
         'Complex list rendering',
@@ -334,7 +355,8 @@ void main() {
                           children: [
                             Text(
                               photo['title'] as String,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 4),
                             Text(photo['description'] as String),
@@ -362,16 +384,19 @@ void main() {
       expect(
         renderTime.inMilliseconds,
         lessThan(5000),
-        reason: 'Complex list of 500 items should render in less than 5 seconds',
+        reason:
+            'Complex list of 500 items should render in less than 5 seconds',
       );
 
-      debugPrint('BASELINE: Complex list render time = ${renderTime.inMilliseconds}ms');
+      debugPrint(
+          'BASELINE: Complex list render time = ${renderTime.inMilliseconds}ms');
     });
 
     test('Geographic distribution performance', () {
       final stopwatch = Stopwatch()..start();
 
-      final trips = PerformanceTestDataGenerator.generateGeographicallyDistributedTrips(
+      final trips =
+          PerformanceTestDataGenerator.generateGeographicallyDistributedTrips(
         count: 500,
       );
 
@@ -394,7 +419,8 @@ void main() {
       debugPrint('  Longitude: ${lonSpread.toStringAsFixed(2)}°');
       debugPrint('  Generation time: ${stopwatch.elapsedMilliseconds}ms');
 
-      debugPrint('BASELINE: Geographic generation = ${stopwatch.elapsedMilliseconds}ms for 500 trips');
+      debugPrint(
+          'BASELINE: Geographic generation = ${stopwatch.elapsedMilliseconds}ms for 500 trips');
     });
 
     test('Comprehensive performance baseline', () async {
@@ -403,7 +429,8 @@ void main() {
       debugPrint('========================================\n');
 
       // Generate test data
-      final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);
+      final trips =
+          PerformanceTestDataGenerator.generateLargeTripList(count: 500);
       final photos = PhotoDataGenerator.generatePhotoMetadata(count: 500);
 
       // Measure 1: Memory with trips
@@ -430,17 +457,23 @@ void main() {
       debugPrint('Dataset Size: 500 trips, 500 photos');
       debugPrint('');
       debugPrint('Memory Usage:');
-      debugPrint('  Trip objects: ${(tripMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('  Photo metadata: ${(photoMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('  Total: ${((tripMemory + photoMemory) / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Trip objects: ${(tripMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Photo metadata: ${(photoMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Total: ${((tripMemory + photoMemory) / 1024 / 1024).toStringAsFixed(2)} MB');
       debugPrint('');
       debugPrint('Data Generation Speed:');
       debugPrint('  Total time: ${genStopwatch.elapsedMilliseconds}ms');
-      debugPrint('  Average per item: ${(genStopwatch.elapsedMilliseconds / 1000).toStringAsFixed(2)}ms');
+      debugPrint(
+          '  Average per item: ${(genStopwatch.elapsedMilliseconds / 1000).toStringAsFixed(2)}ms');
       debugPrint('');
       debugPrint('Targets:');
-      debugPrint('  ✓ Memory < 200 MB: ${(tripMemory + photoMemory) < 200 * 1024 * 1024 ? "PASS" : "FAIL"}');
-      debugPrint('  ✓ Generation < 200ms: ${genStopwatch.elapsedMilliseconds < 200 ? "PASS" : "FAIL"}');
+      debugPrint(
+          '  ✓ Memory < 200 MB: ${(tripMemory + photoMemory) < 200 * 1024 * 1024 ? "PASS" : "FAIL"}');
+      debugPrint(
+          '  ✓ Generation < 200ms: ${genStopwatch.elapsedMilliseconds < 200 ? "PASS" : "FAIL"}');
       debugPrint('');
       debugPrint('═' * 40);
 

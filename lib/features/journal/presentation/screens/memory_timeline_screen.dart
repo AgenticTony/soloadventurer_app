@@ -11,7 +11,8 @@ class MemoryTimelineScreen extends ConsumerStatefulWidget {
   const MemoryTimelineScreen({super.key});
 
   @override
-  ConsumerState<MemoryTimelineScreen> createState() => _MemoryTimelineScreenState();
+  ConsumerState<MemoryTimelineScreen> createState() =>
+      _MemoryTimelineScreenState();
 }
 
 class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
@@ -100,8 +101,8 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
           Text(
             'No Memories Yet',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 12),
           Padding(
@@ -109,8 +110,8 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
             child: Text(
               'Start documenting your travel adventures to see them appear here in a beautiful timeline.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -250,7 +251,7 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
               ),
             ],
           );
-        }).toList(),
+        }),
 
         const SizedBox(height: 16),
       ],
@@ -290,7 +291,8 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
                   Text(
                     group.subtitle!,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSecondaryContainer.withOpacity(0.8),
+                      color: theme.colorScheme.onSecondaryContainer
+                          .withOpacity(0.8),
                     ),
                   ),
               ],

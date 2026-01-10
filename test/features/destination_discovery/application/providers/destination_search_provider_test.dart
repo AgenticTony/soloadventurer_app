@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:solo_adventurer/features/destination_discovery/application/providers/destination_search_provider.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination_filter.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/destination_search_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
+import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
 
 // Mock classes
 class MockDestinationRepository extends Mock implements DestinationRepository {}
@@ -22,7 +22,7 @@ void main() {
       location: (lat: 35.6762, lng: 139.6503),
       safetyScore: 8.5,
       soloSuitabilityScore: 8.0,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -47,7 +47,7 @@ void main() {
       location: (lat: 35.0116, lng: 135.7681),
       safetyScore: 9.0,
       soloSuitabilityScore: 8.5,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 9.0,
         nightlife: 6.0,
         walkability: 8.5,
@@ -85,7 +85,7 @@ void main() {
 
     group('search', () {
       test('should load destinations successfully with reset=true', () async {
-        final filter = const DestinationFilter(searchQuery: 'Tokyo');
+        const filter = DestinationFilter(searchQuery: 'Tokyo');
         when(() => mockRepository.searchDestinations(any()))
             .thenAnswer((_) async => testDestinations);
 
@@ -101,7 +101,7 @@ void main() {
       });
 
       test('should load destinations successfully with reset=false', () async {
-        final filter = DestinationFilter(
+        const filter = DestinationFilter(
           searchQuery: 'Tokyo',
           offset: 20,
           limit: 20,
@@ -115,8 +115,9 @@ void main() {
         expect(notifier.state.value!.currentOffset, 22); // 20 + 2
       });
 
-      test('should set hasMore to false when results less than limit', () async {
-        final filter = DestinationFilter(
+      test('should set hasMore to false when results less than limit',
+          () async {
+        const filter = DestinationFilter(
           searchQuery: 'Tokyo',
           limit: 20,
         );
@@ -129,7 +130,7 @@ void main() {
       });
 
       test('should handle empty results', () async {
-        final filter = const DestinationFilter(searchQuery: 'Unknown');
+        const filter = DestinationFilter(searchQuery: 'Unknown');
         when(() => mockRepository.searchDestinations(any()))
             .thenAnswer((_) async => []);
 
@@ -140,7 +141,7 @@ void main() {
       });
 
       test('should handle errors', () async {
-        final filter = const DestinationFilter();
+        const filter = DestinationFilter();
         when(() => mockRepository.searchDestinations(any()))
             .thenThrow(Exception('Network error'));
 
@@ -215,7 +216,7 @@ void main() {
 
     group('refresh', () {
       test('should refresh with current filter', () async {
-        final filter = const DestinationFilter(searchQuery: 'Tokyo');
+        const filter = DestinationFilter(searchQuery: 'Tokyo');
         when(() => mockRepository.searchDestinations(any()))
             .thenAnswer((_) async => testDestinations);
 
@@ -262,7 +263,7 @@ void main() {
             .thenAnswer((_) async => testDestinations);
         await notifier.search(const DestinationFilter(), reset: true);
 
-        final newFilter = const DestinationFilter(searchQuery: 'Kyoto');
+        const newFilter = DestinationFilter(searchQuery: 'Kyoto');
         notifier.updateFilter(newFilter);
 
         expect(notifier.state.value!.filter.searchQuery, 'Kyoto');
@@ -333,7 +334,8 @@ void main() {
         expect(notifier.state.value!.resultCount, 2);
       });
 
-      test('isEmpty should return true when no results and not initial', () async {
+      test('isEmpty should return true when no results and not initial',
+          () async {
         when(() => mockRepository.searchDestinations(any()))
             .thenAnswer((_) async => []);
         await notifier.search(const DestinationFilter(), reset: true);

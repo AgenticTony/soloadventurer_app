@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/models/upload_task.dart';
+import 'package:soloadventurer/features/journal/data/models/upload_task.dart';
 import '../providers/media_upload_providers.dart';
 import '../../domain/entities/media_item.dart';
 
@@ -158,9 +158,10 @@ class _MediaUploadProgressIndicatorState
     }
 
     // Watch the task progress stream
-    final taskStream = widget.config.displayMode == UploadProgressDisplayMode.minimal
-        ? ref.watch(uploadTaskProgressProvider(widget.taskId!))
-        : ref.watch(uploadTaskProgressProvider(widget.taskId!));
+    final taskStream =
+        widget.config.displayMode == UploadProgressDisplayMode.minimal
+            ? ref.watch(uploadTaskProgressProvider(widget.taskId!))
+            : ref.watch(uploadTaskProgressProvider(widget.taskId!));
 
     return taskStream.when(
       data: (task) {
@@ -269,8 +270,7 @@ class _MediaUploadProgressIndicatorState
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildStatusText(task, theme, colorScheme),
-                if (widget.config.showActions &&
-                    _canShowActions(task.status))
+                if (widget.config.showActions && _canShowActions(task.status))
                   _buildActionButton(task, colorScheme),
               ],
             ),
@@ -505,9 +505,7 @@ class _MediaUploadProgressIndicatorState
         icon: const Icon(Icons.close),
         color: colorScheme.error,
         onPressed: () {
-          ref
-              .read(mediaUploadNotifierProvider.notifier)
-              .cancelUpload(task.id);
+          ref.read(mediaUploadNotifierProvider.notifier).cancelUpload(task.id);
         },
         tooltip: 'Cancel upload',
       );

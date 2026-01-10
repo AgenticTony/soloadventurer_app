@@ -14,7 +14,7 @@ part 'pdf_export_providers.g.dart';
 
 /// Provider for the PDF export service
 @Riverpod(keepAlive: true)
-PdfExportService pdfExportService(PdfExportServiceRef ref) {
+PdfExportService pdfExportService(Ref ref) {
   final journalRepository = ref.watch(journalRepositoryProvider);
   final tripRepository = ref.watch(tripRepositoryProvider);
 
@@ -157,7 +157,7 @@ class PdfExportNotifier extends _$PdfExportNotifier {
 
     try {
       // Get trip
-      final trip = await ref.read(tripRepositoryProvider).getTripById(tripId);
+      final trip = await ref.read(tripRepositoryProvider).getTrip(tripId);
 
       // Get entries
       final entries =
@@ -221,7 +221,7 @@ class PdfExportNotifier extends _$PdfExportNotifier {
 
     try {
       final entry =
-          await ref.read(journalRepositoryProvider).getEntryById(entryId);
+          await ref.read(journalRepositoryProvider).getEntry(entryId);
 
       final result = await service.exportEntryToPdf(
         entry: entry,
@@ -276,8 +276,9 @@ class PdfExportNotifier extends _$PdfExportNotifier {
     );
 
     try {
-      final entries = await Future.wait(
-        entryIds.map((id) => ref.read(journalRepositoryProvider).getEntryById(id)),
+      final entries = await Future.wait<JournalEntry>(
+        entryIds
+            .map((id) => ref.read(journalRepositoryProvider).getEntry(id)),
       );
 
       final result = await service.exportEntriesToPdf(
@@ -331,23 +332,22 @@ class PdfExportNotifier extends _$PdfExportNotifier {
 /// Provider for PDF export statistics
 @riverpod
 Future<Map<String, dynamic>> pdfExportStats(
-    PdfExportStatsRef ref, String tripId) async {
+    Ref ref, String tripId) async {
   final service = ref.read(pdfExportServiceProvider);
-  final trip = await ref.read(tripRepositoryProvider).getTripById(tripId);
+  final trip = await ref.read(tripRepositoryProvider).getTrip(tripId);
   return service.getExportStats(trip: trip);
 }
 
 /// Provider for estimated file size
 @riverpod
-Future<int> estimatedPdfSize(
-    EstimatedPdfSizeRef ref, String tripId) async {
+Future<int> estimatedPdfSize(Ref ref, String tripId) async {
   final stats = await ref.watch(pdfExportStatsProvider(tripId).future);
   return stats['estimatedFileSize'] as int;
 }
 
 /// Provider for default output path
 @riverpod
-Future<String> defaultPdfPath(DefaultPdfPathRef ref, String tripName) async {
+Future<String> defaultPdfPath(Ref ref, String tripName) async {
   final directory = await getApplicationDocumentsDirectory();
   final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
   final safeName = tripName.replaceAll(RegExp(r'[^\w\s-]'), '_').trim();

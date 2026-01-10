@@ -1,25 +1,36 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/journal/data/datasources/tag_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/journal/data/repositories/tag_repository_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/tag.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/tag_repository.dart';
 
+// Generated file
+part 'tag_providers.g.dart';
+
 // ============================================================================
 // Dependency Injection Providers
 // ============================================================================
 
+/// Provider for Supabase client
+@riverpod
+SupabaseClient tagSupabaseClient(Ref ref) {
+  return Supabase.instance.client;
+}
+
 /// Provides the TagRemoteDataSource implementation
-final tagRemoteDataSourceProvider = Provider<TagRemoteDataSourceImpl>((ref) {
-  final client = ref.watch(supabaseClientProvider);
+@riverpod
+TagRemoteDataSourceImpl tagRemoteDataSource(Ref ref) {
+  final client = ref.watch(tagSupabaseClientProvider);
   return TagRemoteDataSourceImpl(client: client);
-});
+}
 
 /// Provides the TagRepository implementation
-final tagRepositoryProvider = Provider<TagRepository>((ref) {
+@riverpod
+TagRepository tagRepository(Ref ref) {
   final remoteDataSource = ref.watch(tagRemoteDataSourceProvider);
   return TagRepositoryImpl(remoteDataSource: remoteDataSource);
-});
+}
 
 // ============================================================================
 // Tag List State
@@ -51,18 +62,24 @@ class TagListState {
 }
 
 /// Notifier for managing tag list state
-class TagListNotifier extends StateNotifier<TagListState> {
-  final TagRepository _repository;
-
-  TagListNotifier(this._repository) : super(const TagListState()) {
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class TagList extends _$TagList {
+  @override
+  TagListState build() {
+    // Load tags automatically on build
     loadTags();
+    return const TagListState();
   }
 
   /// Loads all tags for the current user
   Future<void> loadTags() async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _repository.getTags();
+    final repository = ref.read(tagRepositoryProvider);
+    final result = await repository.getTags();
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -79,7 +96,8 @@ class TagListNotifier extends StateNotifier<TagListState> {
   Future<void> loadPopularTags({int limit = 20}) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _repository.getPopularTags(limit: limit);
+    final repository = ref.read(tagRepositoryProvider);
+    final result = await repository.getPopularTags(limit: limit);
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -101,7 +119,8 @@ class TagListNotifier extends StateNotifier<TagListState> {
 
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _repository.searchTags(query);
+    final repository = ref.read(tagRepositoryProvider);
+    final result = await repository.searchTags(query);
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -119,12 +138,6 @@ class TagListNotifier extends StateNotifier<TagListState> {
     state = state.copyWith(error: null);
   }
 }
-
-/// Provider for tag list state
-final tagListProvider = StateNotifierProvider<TagListNotifier, TagListState>((ref) {
-  final repository = ref.watch(tagRepositoryProvider);
-  return TagListNotifier(repository);
-});
 
 // ============================================================================
 // Tag Creation/Edit State
@@ -171,10 +184,15 @@ class TagFormState {
 }
 
 /// Notifier for managing tag creation/editing state
-class TagFormNotifier extends StateNotifier<TagFormState> {
-  final TagRepository _repository;
-
-  TagFormNotifier(this._repository) : super(const TagFormState());
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class TagForm extends _$TagForm {
+  @override
+  TagFormState build() {
+    return const TagFormState();
+  }
 
   /// Updates the tag name
   void updateName(String name) {
@@ -195,7 +213,8 @@ class TagFormNotifier extends StateNotifier<TagFormState> {
   Future<void> loadTag(String tagId) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _repository.getTag(tagId);
+    final repository = ref.read(tagRepositoryProvider);
+    final result = await repository.getTag(tagId);
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -214,12 +233,14 @@ class TagFormNotifier extends StateNotifier<TagFormState> {
   /// Saves the tag (creates new or updates existing)
   Future<bool> saveTag() async {
     if (!state.isValid) {
-      state = state.copyWith(error: 'Please enter a valid tag name (2-50 characters)');
+      state = state.copyWith(
+          error: 'Please enter a valid tag name (2-50 characters)');
       return false;
     }
 
     state = state.copyWith(isLoading: true, error: null);
 
+    final repository = ref.read(tagRepositoryProvider);
     final tag = Tag(
       id: state.tag?.id ?? '',
       userId: '', // Will be set by server
@@ -231,8 +252,8 @@ class TagFormNotifier extends StateNotifier<TagFormState> {
     );
 
     final result = state.tag?.id == null || state.tag!.id.isEmpty
-        ? await _repository.createTag(tag)
-        : await _repository.updateTag(tag);
+        ? await repository.createTag(tag)
+        : await repository.updateTag(tag);
 
     return result.fold(
       (failure) {
@@ -262,12 +283,6 @@ class TagFormNotifier extends StateNotifier<TagFormState> {
     state = state.copyWith(error: null);
   }
 }
-
-/// Provider for tag form state
-final tagFormProvider = StateNotifierProvider<TagFormNotifier, TagFormState>((ref) {
-  final repository = ref.watch(tagRepositoryProvider);
-  return TagFormNotifier(repository);
-});
 
 // ============================================================================
 // Entry Tags State
@@ -307,17 +322,24 @@ class EntryTagsState {
 }
 
 /// Notifier for managing entry tags
-class EntryTagsNotifier extends StateNotifier<EntryTagsState> {
-  final TagRepository _repository;
-
-  EntryTagsNotifier(this._repository) : super(const EntryTagsState());
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class EntryTags extends _$EntryTags {
+  @override
+  EntryTagsState build() {
+    return const EntryTagsState();
+  }
 
   /// Loads all tags for a journal entry
   Future<void> loadEntryTags(String entryId) async {
     state = state.copyWith(isLoading: true, error: null);
 
+    final repository = ref.read(tagRepositoryProvider);
+
     // Load all available tags
-    final allTagsResult = await _repository.getTags();
+    final allTagsResult = await repository.getTags();
     if (allTagsResult.isLeft()) {
       final failure = allTagsResult.fold((l) => l, (_) => null)!;
       state = state.copyWith(
@@ -327,18 +349,18 @@ class EntryTagsNotifier extends StateNotifier<EntryTagsState> {
       return;
     }
 
-    final allTags = allTagsResult.fold((l) => [], (r) => r);
+    final allTags = allTagsResult.fold((l) => <Tag>[], (r) => r);
 
     // Load entry's tags
-    final entryTagIdsResult = await _repository.getTagsForEntry(entryId);
+    final entryTagIdsResult = await repository.getTagsForEntry(entryId);
     entryTagIdsResult.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
         error: failure.message,
       ),
-      (tagIds) => state = state.copyWith(
+      (entryTags) => state = state.copyWith(
         tags: allTags,
-        selectedTagIds: tagIds,
+        selectedTagIds: entryTags.map((tag) => tag.id).toList(),
         isLoading: false,
       ),
     );
@@ -348,7 +370,8 @@ class EntryTagsNotifier extends StateNotifier<EntryTagsState> {
   Future<void> loadAvailableTags() async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _repository.getTags();
+    final repository = ref.read(tagRepositoryProvider);
+    final result = await repository.getTags();
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -394,7 +417,8 @@ class EntryTagsNotifier extends StateNotifier<EntryTagsState> {
   Future<bool> saveEntryTags(String entryId) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    final result = await _repository.updateTagsForEntry(
+    final repository = ref.read(tagRepositoryProvider);
+    final result = await repository.updateTagsForEntry(
       entryId,
       state.selectedTagIds,
     );
@@ -424,10 +448,3 @@ class EntryTagsNotifier extends StateNotifier<EntryTagsState> {
     state = const EntryTagsState();
   }
 }
-
-/// Provider for entry tags state
-final entryTagsProvider =
-    StateNotifierProvider<EntryTagsNotifier, EntryTagsState>((ref) {
-  final repository = ref.watch(tagRepositoryProvider);
-  return EntryTagsNotifier(repository);
-});

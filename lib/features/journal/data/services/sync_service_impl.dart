@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
@@ -98,7 +96,7 @@ class SyncServiceImpl implements SyncService {
 
       // Sync entries first
       _updateProgress(
-        SyncProgress(
+        const SyncProgress(
           totalItems: 100,
           currentOperation: SyncOperationType.entries,
         ),
@@ -116,7 +114,7 @@ class SyncServiceImpl implements SyncService {
 
       // Sync trips
       _updateProgress(
-        SyncProgress(
+        const SyncProgress(
           totalItems: 100,
           syncedItems: 25,
           currentOperation: SyncOperationType.trips,
@@ -135,7 +133,7 @@ class SyncServiceImpl implements SyncService {
 
       // Sync tags
       _updateProgress(
-        SyncProgress(
+        const SyncProgress(
           totalItems: 100,
           syncedItems: 50,
           currentOperation: SyncOperationType.tags,
@@ -155,7 +153,7 @@ class SyncServiceImpl implements SyncService {
       // Sync media last (can be large)
       if (effectiveConfig.syncMedia) {
         _updateProgress(
-          SyncProgress(
+          const SyncProgress(
             totalItems: 100,
             syncedItems: 75,
             currentOperation: SyncOperationType.media,
@@ -175,7 +173,7 @@ class SyncServiceImpl implements SyncService {
 
       // Mark all synced items
       _updateProgress(
-        SyncProgress(
+        const SyncProgress(
           totalItems: 100,
           syncedItems: 100,
           currentOperation: SyncOperationType.full,
@@ -229,8 +227,8 @@ class SyncServiceImpl implements SyncService {
       if (direction == SyncDirection.upload ||
           direction == SyncDirection.bidirectional) {
         // Upload pending entries
-        final pendingEntries = await _journalLocalDataSource
-            .getEntriesBySyncStatus('pending');
+        final pendingEntries =
+            await _journalLocalDataSource.getEntriesBySyncStatus('pending');
 
         for (final entry in pendingEntries) {
           if (_isCancelled) break;
@@ -340,15 +338,15 @@ class SyncServiceImpl implements SyncService {
       if (direction == SyncDirection.upload ||
           direction == SyncDirection.bidirectional) {
         // Upload pending media
-        final pendingMedia = await _journalLocalDataSource
-            .getMediaBySyncStatus('pending');
+        final pendingMedia =
+            await _journalLocalDataSource.getMediaBySyncStatus('pending');
 
         for (final media in pendingMedia) {
           if (_isCancelled) break;
 
           try {
-            final remoteMedia =
-                await _journalRemoteDataSource.getMediaForEntry(media.journalEntryId);
+            final remoteMedia = await _journalRemoteDataSource
+                .getMediaForEntry(media.journalEntryId);
             final exists = remoteMedia.any((m) => m.id == media.id);
 
             if (exists) {
@@ -375,7 +373,8 @@ class SyncServiceImpl implements SyncService {
           direction == SyncDirection.bidirectional) {
         // Note: Full media download is complex and may need pagination
         // For now, we'll sync media associated with synced entries
-        final syncedEntries = await _journalLocalDataSource.getEntriesBySyncStatus('synced');
+        final syncedEntries =
+            await _journalLocalDataSource.getEntriesBySyncStatus('synced');
 
         for (final entry in syncedEntries) {
           if (_isCancelled) break;
@@ -441,7 +440,8 @@ class SyncServiceImpl implements SyncService {
       if (direction == SyncDirection.upload ||
           direction == SyncDirection.bidirectional) {
         // Upload pending trips
-        final pendingTrips = await _tripLocalDataSource.getTripsBySyncStatus('pending');
+        final pendingTrips =
+            await _tripLocalDataSource.getTripsBySyncStatus('pending');
 
         for (final trip in pendingTrips) {
           if (_isCancelled) break;
@@ -549,7 +549,8 @@ class SyncServiceImpl implements SyncService {
       if (direction == SyncDirection.upload ||
           direction == SyncDirection.bidirectional) {
         // Upload pending tags
-        final pendingTags = await _tagLocalDataSource.getTagsBySyncStatus('pending');
+        final pendingTags =
+            await _tagLocalDataSource.getTagsBySyncStatus('pending');
 
         for (final tag in pendingTags) {
           if (_isCancelled) break;
@@ -643,13 +644,13 @@ class SyncServiceImpl implements SyncService {
 
   @override
   Future<SyncResult> syncPending() async {
-    final config = SyncConfig.quickConfig;
+    const config = SyncConfig.quickConfig;
     return await syncAll(config);
   }
 
   @override
   Future<SyncResult> uploadChanges() async {
-    final config = SyncConfig.defaultConfig;
+    const config = SyncConfig.defaultConfig;
     final startedAt = DateTime.now();
 
     try {
@@ -698,7 +699,7 @@ class SyncServiceImpl implements SyncService {
 
   @override
   Future<SyncResult> downloadChanges() async {
-    final config = SyncConfig.defaultConfig;
+    const config = SyncConfig.defaultConfig;
     final startedAt = DateTime.now();
 
     try {
@@ -757,7 +758,8 @@ class SyncServiceImpl implements SyncService {
     switch (strategy) {
       case ConflictResolutionStrategy.mostRecent:
         if (conflict.remoteUpdatedAt.isAfter(conflict.localUpdatedAt)) {
-          await _applyRemoteResolution(entity, entityId, conflict.remoteVersion);
+          await _applyRemoteResolution(
+              entity, entityId, conflict.remoteVersion);
         } else {
           await _keepLocalVersion(entity, entityId);
         }
@@ -954,11 +956,10 @@ class SyncServiceImpl implements SyncService {
       totalConflictsResolved:
           _statistics.totalConflictsResolved + result.conflictCount,
       averageDuration: Duration(
-        milliseconds:
-            ((_statistics.averageDuration.inMilliseconds * _statistics.totalSyncs) +
-                        duration.inMilliseconds) ~/
-                    (_statistics.totalSyncs + 1)
-                .clamp(1, double.infinity).toInt(),
+        milliseconds: ((_statistics.averageDuration.inMilliseconds *
+                    _statistics.totalSyncs) +
+                duration.inMilliseconds) ~/
+            (_statistics.totalSyncs + 1).clamp(1, double.infinity).toInt(),
       ),
       lastSyncTime: DateTime.now(),
       totalDataTransferred: _statistics.totalDataTransferred,

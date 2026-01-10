@@ -136,7 +136,8 @@ class ActivityList extends StatelessWidget {
         final index = entry.key;
         final activity = entry.value;
         return Padding(
-          padding: EdgeInsets.only(bottom: index < activities.length - 1 ? itemSpacing : 0),
+          padding: EdgeInsets.only(
+              bottom: index < activities.length - 1 ? itemSpacing : 0),
           child: _ActivityCard(
             activity: activity,
             onTap: onActivityTap,
@@ -265,7 +266,8 @@ class _ActivityCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Semantics(
-      label: 'Activity: ${activity.name}${activity.category != null ? ", ${activity.category}" : ""}${activity.isSoloFriendly ? ", Solo-friendly" : ""}',
+      label:
+          'Activity: ${activity.name}${", ${activity.category}"}${activity.soloFriendly ? ", Solo-friendly" : ""}',
       hint: onTap != null ? 'Double tap to view activity details' : null,
       button: onTap != null,
       child: Card(
@@ -578,7 +580,7 @@ class _ActivityCard extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.person,
           size: 12,
           color: Colors.lightBlue,

@@ -29,7 +29,7 @@ class ExampleBasicLazyLoadImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Basic Lazy Load Image')),
-      body: Center(
+      body: const Center(
         child: LazyLoadImage(
           imageUrl: 'https://picsum.photos/400/400',
           width: 200,
@@ -147,10 +147,22 @@ class ExampleThumbnailList extends StatelessWidget {
   const ExampleThumbnailList({super.key});
 
   static const List<Map<String, String>> _items = [
-    {'title': 'Trip to Paris', 'image': 'https://picsum.photos/100/100?random=20'},
-    {'title': 'Tokyo Adventure', 'image': 'https://picsum.photos/100/100?random=21'},
-    {'title': 'New York City', 'image': 'https://picsum.photos/100/100?random=22'},
-    {'title': 'Sydney Harbour', 'image': 'https://picsum.photos/100/100?random=23'},
+    {
+      'title': 'Trip to Paris',
+      'image': 'https://picsum.photos/100/100?random=20'
+    },
+    {
+      'title': 'Tokyo Adventure',
+      'image': 'https://picsum.photos/100/100?random=21'
+    },
+    {
+      'title': 'New York City',
+      'image': 'https://picsum.photos/100/100?random=22'
+    },
+    {
+      'title': 'Sydney Harbour',
+      'image': 'https://picsum.photos/100/100?random=23'
+    },
     {'title': 'Dubai Trip', 'image': 'https://picsum.photos/100/100?random=24'},
   ];
 
@@ -354,25 +366,25 @@ class ExampleCustomVisibility extends StatelessWidget {
       appBar: AppBar(title: const Text('Custom Visibility')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
-        children: [
-          const Text('Load when 10% visible'),
-          const SizedBox(height: 8),
+        children: const [
+          Text('Load when 10% visible'),
+          SizedBox(height: 8),
           LazyLoadImage(
             imageUrl: 'https://picsum.photos/600/200?random=60',
             height: 150,
             visibilityThreshold: 0.1,
           ),
-          const SizedBox(height: 24),
-          const Text('Load when 50% visible'),
-          const SizedBox(height: 8),
+          SizedBox(height: 24),
+          Text('Load when 50% visible'),
+          SizedBox(height: 8),
           LazyLoadImage(
             imageUrl: 'https://picsum.photos/600/200?random=61',
             height: 150,
             visibilityThreshold: 0.5,
           ),
-          const SizedBox(height: 24),
-          const Text('Load when 100% visible'),
-          const SizedBox(height: 8),
+          SizedBox(height: 24),
+          Text('Load when 100% visible'),
+          SizedBox(height: 8),
           LazyLoadImage(
             imageUrl: 'https://picsum.photos/600/200?random=62',
             height: 150,
@@ -394,7 +406,7 @@ class ExampleNoAnimation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('No Animation')),
-      body: Center(
+      body: const Center(
         child: LazyLoadImage(
           imageUrl: 'https://picsum.photos/400/400?random=70',
           width: 300,
@@ -433,7 +445,10 @@ class ExampleLazyLoadImageHome extends StatelessWidget {
     {'title': 'Card Image', 'widget': const ExampleCardImage()},
     {'title': 'Thumbnail List', 'widget': const ExampleThumbnailList()},
     {'title': 'Custom Placeholder', 'widget': const ExampleCustomPlaceholder()},
-    {'title': 'Custom Error Widget', 'widget': const ExampleCustomErrorWidget()},
+    {
+      'title': 'Custom Error Widget',
+      'widget': const ExampleCustomErrorWidget()
+    },
     {'title': 'Border Radius', 'widget': const ExampleWithBorderRadius()},
     {'title': 'Thumbnail Loading', 'widget': const ExampleWithThumbnail()},
     {'title': 'Custom Visibility', 'widget': const ExampleCustomVisibility()},

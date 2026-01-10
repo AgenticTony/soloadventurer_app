@@ -1,0 +1,108 @@
+{
+  "ui_ux_improvements": [
+    {
+      "id": "uiux-006",
+      "type": "ui_ux_improvements",
+      "title": "Add Keyboard Input Enhancement with Autofill and Submit Handling",
+      "description": "Implement proper autofill hints, keyboard submit actions, and automatic text trimming to improve form input UX on mobile devices.",
+      "rationale": "Current forms in login_screen.dart and signup_screen.dart have TextInputAction but NO corresponding onFieldSubmitted handlers. Users cannot submit forms by pressing the keyboard's action button. No autofillHints are configured for email/password fields, preventing password managers from auto-filling credentials. Text inputs don't automatically trim whitespace, which can cause validation errors with accidental spaces.",
+      "category": "usability",
+      "affected_components": [
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/auth/presentation/screens/forgot_password_screen.dart",
+        "lib/features/auth/presentation/screens/confirm_password_reset_screen.dart",
+        "lib/features/safety/presentation/screens/add_edit_trusted_contact_screen.dart"
+      ],
+      "screenshots": [],
+      "current_state": "TextFormField widgets have textInputAction set to TextInputAction.next and TextInputAction.done, but no onFieldSubmitted callback to handle the action. Email fields lack autofillHints: [AutofillHints.email]. Password fields lack autofillHints: [AutofillHints.password]. No AutofillGroup wrapper. Controller text is not trimmed before validation (0 instances of .trim() on controllers found in auth screens).",
+      "proposed_change": "Add onFieldSubmitted handlers to all text fields:\n\n```dart\nTextFormField(\n  controller: _emailController,\n  decoration: const InputDecoration(\n    labelText: 'Email',\n    prefixIcon: Icon(Icons.email),\n  ),\n  keyboardType: TextInputType.emailAddress,\n  textInputAction: TextInputAction.next,\n  autofillHints: const [AutofillHints.email],\n  onFieldSubmitted: (_) {\n    FocusScope.of(context).nextFocus();\n  },\n  validator: _validateEmail,\n)\n\n// For last field\nTextFormField(\n  controller: _passwordController,\n  textInputAction: TextInputAction.done,\n  autofillHints: const [AutofillHints.password],\n  onFieldSubmitted: (_) => _login(), // Submit on done\n)\n```\n\nWrap forms in AutofillGroup. Trim text in validators: `value?.trim() ?? ''`.",
+      "user_benefit": "Users can submit forms faster using keyboard actions instead of tapping submit buttons. Password managers can auto-fill credentials, eliminating manual typing errors. Automatic trimming prevents validation failures from accidental spaces. Overall form completion becomes faster and less error-prone, especially on mobile devices where typing is more difficult.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-007",
+      "type": "ui_ux_improvements",
+      "title": "Implement Swipe-to-Dismiss Actions for List Items",
+      "description": "Add Dismissible widgets to list items (trusted contacts, operation queue, notifications) with swipe-to-delete and swipe-to-action gestures for faster, more intuitive list management.",
+      "rationale": "No Dismissible widgets found in the codebase. List items in TrustedContactsScreen and OperationQueueScreen require tapping a menu button, then selecting an action - a multi-step process. Modern mobile apps use swipe gestures for quick actions (delete, archive, etc.) which is more intuitive and faster than drilling into menus. Swipe gestures are a core Material Design pattern that users expect.",
+      "category": "interaction",
+      "affected_components": [
+        "lib/features/safety/presentation/screens/trusted_contacts_screen.dart",
+        "lib/features/core/presentation/screens/operation_queue_screen.dart",
+        "lib/features/notifications/presentation/screens/notification_history_screen.dart",
+        "lib/features/core/presentation/widgets/operation_list_item.dart"
+      ],
+      "screenshots": [],
+      "current_state": "TrustedContactsScreen shows list items with PopupMenuButton for edit/delete actions. OperationListItem is a Card with inline retry/remove buttons but no swipe actions. NotificationHistoryScreen likely has similar menu-based actions. No swipe gestures available for quick actions. Users must tap menu → select action for each item.",
+      "proposed_change": "Wrap list items in Dismissible widgets:\n\n```dart\nListView.builder(\n  itemBuilder: (context, index) {\n    final contact = contacts[index];\n    return Dismissible(\n      key: Key(contact.id),\n      background: _buildSwipeLeftBackground(), // Delete action\n      secondaryBackground: _buildSwipeRightBackground(), // Edit action\n      onDismissed: (direction) {\n        if (direction == DismissDirection.startToEnd) {\n          _deleteContact(contact);\n        } else {\n          _editContact(contact);\n        }\n        ScaffoldMessenger.of(context).showSnackBar(\n          SnackBar(content: Text('${contact.name} removed')),\n        );\n      },\n      child: _buildContactTile(contact),\n    );\n  },\n)\n\nWidget _buildSwipeLeftBackground() {\n  return Container(\n    alignment: Alignment.centerRight,\n    padding: EdgeInsets.only(right: 20),\n    color: Colors.red,\n    child: Icon(Icons.delete, color: Colors.white),\n  );\n}\n```\n\nAdd undo functionality via SnackBar for destructive actions.",
+      "user_benefit": "Users can quickly delete or perform actions on list items with a single swipe gesture instead of tapping menus. This dramatically speeds up list management tasks. Undo functionality provides safety net for accidental deletions. The app feels more modern and intuitive, matching user expectations from other mobile apps. Particularly valuable for frequently-managed lists like trusted contacts and operation queue.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-008",
+      "type": "ui_ux_improvements",
+      "title": "Add Success Celebration Animations for Key User Achievements",
+      "description": "Implement animated feedback (confetti, checkmark animations, success toasts) when users complete important actions to provide emotional reward and reinforce successful outcomes.",
+      "rationale": "Current app shows basic feedback (SnackBar, navigation) but no celebration for successful actions. After login, signup, adding a trusted contact, or completing check-ins - users see no visual reward or acknowledgment. Success animations create positive emotional response, reinforce user confidence, and make the app feel more engaging. Key moments like first trusted contact added, successful check-in, or emergency contact setup deserve celebration.",
+      "category": "interaction",
+      "affected_components": [
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/safety/presentation/screens/add_edit_trusted_contact_screen.dart",
+        "lib/features/safety/presentation/screens/manual_check_in_screen.dart",
+        "lib/features/auth/presentation/widgets/token_refresh_overlay.dart"
+      ],
+      "screenshots": [],
+      "current_state": "After successful login, app navigates to home screen with no celebration. Signup completion navigates to verify email without acknowledgment. Adding trusted contact returns to list silently. Manual check-in completion shows basic confirmation. No confetti, checkmark animations, or success celebrations. No visual reward system for completing important safety setup tasks.",
+      "proposed_change": "Create celebration widgets and integrate at key moments:\n\n```dart\n// lib/core/widgets/success_checkmark.dart\nclass SuccessCheckmark extends StatefulWidget {\n  @override\n  Widget build(BuildContext context) {\n    return TweenAnimationBuilder(\n      duration: Duration(milliseconds: 800),\n      tween: Tween(begin: 0.0, end: 1.0),\n      builder: (context, value, child) {\n    return CustomPaint(\n      size: Size(100, 100),\n      painter: _CheckmarkPainter(progress: value),\n    );\n      },\n    );\n  }\n}\n\n// Confetti for key achievements\nimport 'package:confetti/confetti.dart';\n\nclass CelebrationOverlay extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return Stack(\n      children: [\n        Positioned.fill(\n          child: ConfettiWidget(\n            confettiController: _controller,\n            blastDirection: pi / 2,\n            emissionFrequency: 0.05,\n          ),\n        ),\n        SuccessCheckmark(),\n      ],\n    );\n  }\n}\n\n// After successful login\nif (authState.isLoggedIn) {\n  _showSuccessCelebration(context);\n  await Future.delayed(Duration(milliseconds: 1500));\n  ref.read(authNavigationNotifierProvider.notifier).navigateTo(AuthRoutes.home);\n}\n```",
+      "user_benefit": "Users feel rewarded and confident when completing important actions. Positive emotional reinforcement increases user engagement and satisfaction. Success celebrations make the app feel more polished and delightful. First-time setup (adding contacts, completing check-ins) becomes more encouraging, increasing completion rates. Particularly important for safety features where user confidence is crucial.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-009",
+      "type": "ui_ux_improvements",
+      "title": "Implement Responsive Layout Support for Tablets and Foldables",
+      "description": "Add LayoutBuilder and responsive breakpoints to adapt layouts for tablets, foldables, and large screens instead of using fixed layouts designed only for phones.",
+      "rationale": "No LayoutBuilder or responsive design patterns found in the codebase. All screens use fixed layouts optimized for phone screens. On tablets (iPad) and foldable devices, this results in narrow content columns with wasted space, poor use of larger screens, and awkward navigation. Material Design encourages adaptive layouts that use available space efficiently. As tablets and foldables become more common, responsive design is increasingly important.",
+      "category": "usability",
+      "affected_components": [
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/safety/presentation/screens/safety_hub_screen.dart",
+        "lib/features/home/presentation/screens/home_screen.dart",
+        "lib/features/safety/presentation/screens/trusted_contacts_screen.dart"
+      ],
+      "screenshots": [],
+      "current_state": "LoginScreen uses SingleChildScrollView with centered Column constrained to phone width. SafetyHubScreen uses CustomScrollView with single-column layout. HomeScreen shows cards in single column. No max-width constraints or adaptive layouts. On tablets, content stretches to fill screen or remains narrow with empty space on sides. No master-detail views or two-column layouts for larger screens.",
+      "proposed_change": "Implement responsive layout helper:\n\n```dart\n// lib/core/utils/responsive_helper.dart\nclass ResponsiveHelper {\n  static bool isMobile(BuildContext context) =>\n      MediaQuery.of(context).size.width < 600;\n  \n  static bool isTablet(BuildContext context) =>\n      MediaQuery.of(context).size.width >= 600 &&\n      MediaQuery.of(context).size.width < 1200;\n  \n  static bool isDesktop(BuildContext context) =>\n      MediaQuery.of(context).size.width >= 1200;\n  \n  static double getAdaptiveWidth(BuildContext context) {\n    final width = MediaQuery.of(context).size.width;\n    if (width >= 1200) return 800; // Max width for desktop\n    if (width >= 600) return 600;  // Max width for tablet\n    return double.infinity; // Full width for mobile\n  }\n}\n\n// In login_screen.dart\nWidget build(BuildContext context) {\n  final maxWidth = ResponsiveHelper.getAdaptiveWidth(context);\n  final isTablet = ResponsiveHelper.isTablet(context);\n  \n  return Scaffold(\n    body: Center(\n      child: Container(\n        constraints: BoxConstraints(maxWidth: maxWidth),\n        child: isTablet\n            ? Row(\n                children: [\n                  Expanded(child: _buildForm()),\n                  Expanded(child: _buildIllustration()),\n                ],\n              )\n            : SingleChildScrollView(child: _buildForm()),\n      ),\n    ),\n  );\n}\n\n// Safety hub - two column on tablet\nWidget build(BuildContext context) {\n  final isTablet = ResponsiveHelper.isTablet(context);\n  \n  return isTablet\n      ? Row(\n          children: [\n            Expanded(flex: 2, child: _buildSafetyStats()),\n            Expanded(flex: 3, child: _buildQuickActions()),\n          ],\n        )\n      : _buildMobileLayout();\n}\n```",
+      "user_benefit": "Tablet and foldable users get much better experience with optimized layouts. Content uses available screen space efficiently instead of appearing stretched or cramped. Multi-column layouts on tablets improve information density and reduce scrolling. App feels professional and polished across all device types. Future-proofs the app as large-screen phones and foldables become more common. Improves accessibility with better text and touch target sizing on larger screens.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-010",
+      "type": "ui_ux_improvements",
+      "title": "Create Enhanced Toast/SnackBar System with Rich Actions",
+      "description": "Build a comprehensive notification system with customizable toasts that support actions, icons, progress indicators, and persistent notifications instead of basic SnackBars.",
+      "rationale": "Current app uses basic ScaffoldMessenger.showSnackBar() with simple text messages (51 occurrences found). These basic toasts have limited functionality - no icons, no action buttons, no persistent options, no progress indicators. Users cannot take action directly from notifications. For async operations (sync, upload, download), there's no progress feedback in the notification. No way to undo actions or provide rich feedback directly from the toast.",
+      "category": "usability",
+      "affected_components": [
+        "lib/features/core/presentation/screens/operation_queue_screen.dart",
+        "lib/features/offline/presentation/widgets/sync_status_banner.dart",
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/safety/presentation/screens/trusted_contacts_screen.dart"
+      ],
+      "screenshots": [],
+      "current_state": "All notifications use basic SnackBar:\n```dart\nScaffoldMessenger.of(context).showSnackBar(\n  const SnackBar(\n    content: Text('Operation queued for retry'),\n    duration: Duration(seconds: 2),\n  ),\n);\n```\nNo icons in toasts. No action buttons (undo, retry, view). No persistent notifications for important alerts. No progress indicators for long-running operations. Error toasts just show text without visual emphasis. No custom styling or branding.",
+      "proposed_change": "Create enhanced toast system:\n\n```dart\n// lib/core/widgets/enhanced_toast.dart\nclass EnhancedToast {\n  static void showSuccess(\n    BuildContext context,\n    String message, {\n    VoidCallback? onAction,\n    String? actionLabel,\n  }) {\n    ScaffoldMessenger.of(context).showSnackBar(\n      SnackBar(\n        content: Row(\n          children: [\n            Icon(Icons.check_circle, color: Colors.white),\n            SizedBox(width: 12),\n            Expanded(child: Text(message)),\n          ],\n        ),\n        backgroundColor: Colors.green,\n        action: onAction != null\n            ? SnackBarAction(\n                label: actionLabel ?? 'UNDO',\n                textColor: Colors.white,\n                onPressed: onAction,\n              )\n            : null,\n        duration: Duration(seconds: 4),\n      ),\n    );\n  }\n  \n  static void showProgress(\n    BuildContext context,\n    String message,\n    Stream<double> progressStream,\n  ) {\n    final controller = ScaffoldMessenger.of(context);\n    controller.showSnackBar(\n      SnackBar(\n        content: StreamBuilder<double>(\n          stream: progressStream,\n          builder: (context, snapshot) {\n            return Column(\n              mainAxisSize: MainAxisSize.min,\n              children: [\n                LinearProgressIndicator(value: snapshot.data),\n                SizedBox(height: 8),\n                Text(message),\n              ],\n            );\n          },\n        ),\n        duration: Duration(minutes: 5), // Persistent\n      ),\n    );\n  }\n  \n  static void showError(\n    BuildContext context,\n    String message, {\n    VoidCallback? onRetry,\n  }) {\n    ScaffoldMessenger.of(context).showSnackBar(\n      SnackBar(\n        content: Row(\n          children: [\n            Icon(Icons.error, color: Colors.white),\n            SizedBox(width: 12),\n            Expanded(child: Text(message)),\n          ],\n        ),\n        backgroundColor: Theme.of(context).colorScheme.error,\n        action: onRetry != null\n            ? SnackBarAction(\n                label: 'RETRY',\n                onPressed: onRetry,\n              )\n            : null,\n        duration: Duration(seconds: 5),\n      ),\n    );\n  }\n}\n\n// Usage\nEnhancedToast.showSuccess(\n  context,\n  'Contact added successfully',\n  onAction: () => _undoAddContact(),\n  actionLabel: 'UNDO',\n);\n```",
+      "user_benefit": "Users get rich, informative notifications with visual context (icons, colors). Action buttons in toasts allow immediate response (undo, retry) without navigating away. Progress indicators keep users informed about long-running operations. Success/error states are visually distinct. Persistent notifications for important alerts prevent missing critical information. Overall communication becomes clearer, more actionable, and more professional.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    }
+  ]
+}

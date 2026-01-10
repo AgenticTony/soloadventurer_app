@@ -38,7 +38,8 @@ void main() {
     testWidgets('wraps child widget correctly', (tester) async {
       // Arrange
       when(mockNotifier.state).thenReturn(ManualSyncState.initial());
-      when(mockNotifier.stream).thenAnswer((_) => Stream.value(ManualSyncState.initial()));
+      when(mockNotifier.stream)
+          .thenAnswer((_) => Stream.value(ManualSyncState.initial()));
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -52,8 +53,11 @@ void main() {
     testWidgets('triggers sync on pull down', (tester) async {
       // Arrange
       when(mockNotifier.state).thenReturn(ManualSyncState.initial());
-      when(mockNotifier.stream).thenAnswer((_) => Stream.value(ManualSyncState.initial()));
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.stream)
+          .thenAnswer((_) => Stream.value(ManualSyncState.initial()));
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -80,7 +84,9 @@ void main() {
       when(mockNotifier.stream).thenAnswer(
         (_) => Stream.fromIterable([initialState, successState]),
       );
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -113,7 +119,9 @@ void main() {
       when(mockNotifier.stream).thenAnswer(
         (_) => Stream.fromIterable([initialState, errorState]),
       );
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -134,7 +142,8 @@ void main() {
       expect(find.textContaining('Sync failed'), findsOneWidget);
     });
 
-    testWidgets('does not show notifications when showNotifications is false', (tester) async {
+    testWidgets('does not show notifications when showNotifications is false',
+        (tester) async {
       // Arrange
       final initialState = ManualSyncState.syncing(startedAt: DateTime.now());
       final successState = ManualSyncState.success(
@@ -147,7 +156,9 @@ void main() {
       when(mockNotifier.stream).thenAnswer(
         (_) => Stream.fromIterable([initialState, successState]),
       );
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(
@@ -181,11 +192,15 @@ void main() {
       expect(find.byType(SnackBar), findsNothing);
     });
 
-    testWidgets('triggers sync on mount when triggerOnMount is true', (tester) async {
+    testWidgets('triggers sync on mount when triggerOnMount is true',
+        (tester) async {
       // Arrange
       when(mockNotifier.state).thenReturn(ManualSyncState.initial());
-      when(mockNotifier.stream).thenAnswer((_) => Stream.value(ManualSyncState.initial()));
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.stream)
+          .thenAnswer((_) => Stream.value(ManualSyncState.initial()));
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(
@@ -220,7 +235,9 @@ void main() {
           ManualSyncState.syncing(startedAt: DateTime.now()),
         ),
       );
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());

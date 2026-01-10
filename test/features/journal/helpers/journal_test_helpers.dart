@@ -1,14 +1,16 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 
 // Mock classes
-class MockJournalRemoteDataSource extends Mock implements JournalRemoteDataSource {}
+class MockJournalRemoteDataSource extends Mock
+    implements JournalRemoteDataSource {}
 
 // Test constants
 const testUserId = 'user-123';

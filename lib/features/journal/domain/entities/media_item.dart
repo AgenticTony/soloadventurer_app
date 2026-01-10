@@ -1,5 +1,5 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:equatable/equatable.dart';
-import 'journal_entry.dart';
 
 /// Represents a photo or video attached to a journal entry
 class MediaItem extends Equatable {
@@ -218,39 +218,90 @@ extension MediaTypeExtension on MediaType {
 
 /// Upload status for media
 enum UploadStatus {
-  pending,
+  /// Task is queued and waiting to be uploaded
+  queued,
+
+  /// Upload is in progress
   uploading,
+
+  /// Upload completed successfully
   completed,
+
+  /// Upload failed and will retry
   failed,
+
+  /// Upload failed permanently and won't retry
+  permanentFailure,
+
+  /// Upload was paused
+  paused,
+
+  /// Upload was cancelled
+  cancelled,
+
+  /// Legacy: same as queued (for backward compatibility)
+  pending,
 }
 
 /// Extension to convert UploadStatus to/from string
 extension UploadStatusExtension on UploadStatus {
   String get value {
     switch (this) {
+      case UploadStatus.queued:
+        return 'queued';
       case UploadStatus.pending:
-        return 'pending';
+        return 'pending'; // Legacy support
       case UploadStatus.uploading:
         return 'uploading';
       case UploadStatus.completed:
         return 'completed';
       case UploadStatus.failed:
         return 'failed';
+      case UploadStatus.permanentFailure:
+        return 'permanent_failure';
+      case UploadStatus.paused:
+        return 'paused';
+      case UploadStatus.cancelled:
+        return 'cancelled';
     }
   }
 
   static UploadStatus fromString(String value) {
     switch (value) {
+      case 'queued':
+        return UploadStatus.queued;
       case 'pending':
-        return UploadStatus.pending;
+        return UploadStatus.pending; // Legacy support
       case 'uploading':
         return UploadStatus.uploading;
       case 'completed':
         return UploadStatus.completed;
       case 'failed':
         return UploadStatus.failed;
+      case 'permanent_failure':
+        return UploadStatus.permanentFailure;
+      case 'paused':
+        return UploadStatus.paused;
+      case 'cancelled':
+        return UploadStatus.cancelled;
       default:
         throw ArgumentError('Invalid UploadStatus value: $value');
     }
   }
+
+  /// Whether the upload is in a terminal state
+  bool get isTerminal =>
+      this == UploadStatus.completed ||
+      this == UploadStatus.permanentFailure ||
+      this == UploadStatus.cancelled;
+
+  /// Whether the upload can be retried
+  bool get canRetry =>
+      this == UploadStatus.failed || this == UploadStatus.paused;
+
+  /// Whether the upload is active
+  bool get isActive =>
+      this == UploadStatus.queued ||
+      this == UploadStatus.pending ||
+      this == UploadStatus.uploading;
 }

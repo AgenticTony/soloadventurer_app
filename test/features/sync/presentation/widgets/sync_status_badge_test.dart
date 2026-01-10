@@ -3,17 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/features/sync/presentation/widgets/sync_status_badge.dart';
 
 void main() {
-  group('SyncStatusBadge', () {
+  group('SyncOperationStatusBadge', () {
     testWidgets('renders badge with count', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 5),
+            body: SyncOperationStatusBadge(count: 5),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadge), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
     });
 
@@ -21,7 +21,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 150),
+            body: SyncOperationStatusBadge(count: 150),
           ),
         ),
       );
@@ -35,12 +35,12 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 0, hideWhenZero: true),
+            body: SyncOperationStatusBadge(count: 0, hideWhenZero: true),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadge), findsOneWidget);
       expect(find.byType(Container), findsNothing);
     });
 
@@ -49,7 +49,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 0, hideWhenZero: false),
+            body: SyncOperationStatusBadge(count: 0, hideWhenZero: false),
           ),
         ),
       );
@@ -62,7 +62,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(
+            body: SyncOperationStatusBadge(
               count: 3,
               child: Icon(Icons.notifications),
             ),
@@ -70,7 +70,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadge), findsOneWidget);
       expect(find.byIcon(Icons.notifications), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
     });
@@ -79,7 +79,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(
+            body: SyncOperationStatusBadge(
               count: 5,
               child: Icon(Icons.mail),
             ),
@@ -98,7 +98,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(
+            body: SyncOperationStatusBadge(
               count: 5,
               color: customColor,
             ),
@@ -107,10 +107,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(SyncStatusBadge),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncOperationStatusBadge),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       final decoration = container.decoration as BoxDecoration;
@@ -123,7 +125,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(
+            body: SyncOperationStatusBadge(
               count: 5,
               size: customSize,
             ),
@@ -132,10 +134,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(SyncStatusBadge),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncOperationStatusBadge),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       expect(container.constraints?.maxHeight, customSize);
@@ -148,16 +152,18 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 5, size: 18),
+            body: SyncOperationStatusBadge(count: 5, size: 18),
           ),
         ),
       );
 
       var container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(SyncStatusBadge),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncOperationStatusBadge),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       var width = container.constraints?.maxWidth;
       expect(width, greaterThan(18));
@@ -166,16 +172,18 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 99, size: 18),
+            body: SyncOperationStatusBadge(count: 99, size: 18),
           ),
         ),
       );
 
       container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(SyncStatusBadge),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncOperationStatusBadge),
+              matching: find.byType(Container),
+            )
+            .first,
       );
       width = container.constraints?.maxWidth;
       expect(width, greaterThan(22));
@@ -184,7 +192,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 150, size: 18),
+            body: SyncOperationStatusBadge(count: 150, size: 18),
           ),
         ),
       );
@@ -198,20 +206,22 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(
+            body: SyncOperationStatusBadge(
               count: 5,
-              child: Icon(Icons.notifications),
               offset: customOffset,
+              child: Icon(Icons.notifications),
             ),
           ),
         ),
       );
 
       final positioned = tester.widget<Positioned>(
-        find.descendant(
-          of: find.byType(SyncStatusBadge),
-          matching: find.byType(Positioned),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncOperationStatusBadge),
+              matching: find.byType(Positioned),
+            )
+            .first,
       );
 
       expect(positioned.right, customOffset.dx);
@@ -219,17 +229,17 @@ void main() {
     });
   });
 
-  group('SyncStatusBadgeWithIndicator', () {
+  group('SyncOperationStatusBadgeWithIndicator', () {
     testWidgets('renders with pending count', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadgeWithIndicator(count: 3),
+            body: SyncOperationStatusBadgeWithIndicator(count: 3),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusBadgeWithIndicator), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadgeWithIndicator), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
       expect(find.textContaining('pending'), findsOneWidget);
     });
@@ -238,7 +248,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadgeWithIndicator(count: 1),
+            body: SyncOperationStatusBadgeWithIndicator(count: 1),
           ),
         ),
       );
@@ -251,7 +261,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadgeWithIndicator(count: 5),
+            body: SyncOperationStatusBadgeWithIndicator(count: 5),
           ),
         ),
       );
@@ -266,7 +276,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadgeWithIndicator(
+            body: SyncOperationStatusBadgeWithIndicator(
               count: 3,
               color: customColor,
             ),
@@ -274,14 +284,14 @@ void main() {
         ),
       );
 
-      expect(find.byType(SyncStatusBadgeWithIndicator), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadgeWithIndicator), findsOneWidget);
     });
 
     testWidgets('hides count circle when count is 0', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadgeWithIndicator(count: 0),
+            body: SyncOperationStatusBadgeWithIndicator(count: 0),
           ),
         ),
       );
@@ -292,7 +302,7 @@ void main() {
       // But not the count circle
       final containers = tester.widgetList<Container>(
         find.descendant(
-          of: find.byType(SyncStatusBadgeWithIndicator),
+          of: find.byType(SyncOperationStatusBadgeWithIndicator),
           matching: find.byType(Container),
         ),
       );
@@ -309,16 +319,16 @@ void main() {
           home: Scaffold(
             body: ListView(
               children: const [
-                SyncStatusBadge(count: 1, child: Icon(Icons.mail)),
-                SyncStatusBadge(count: 5, child: Icon(Icons.notifications)),
-                SyncStatusBadge(count: 10, child: Icon(Icons.calendar)),
+                SyncOperationStatusBadge(count: 1, child: Icon(Icons.mail)),
+                SyncOperationStatusBadge(count: 5, child: Icon(Icons.notifications)),
+                SyncOperationStatusBadge(count: 10, child: Icon(Icons.calendar)),
               ],
             ),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsNWidgets(3));
+      expect(find.byType(SyncOperationStatusBadge), findsNWidgets(3));
     });
 
     testWidgets('works in AppBar', (tester) async {
@@ -327,7 +337,7 @@ void main() {
           home: Scaffold(
             appBar: AppBar(
               actions: const [
-                SyncStatusBadge(
+                SyncOperationStatusBadge(
                   count: 5,
                   child: Icon(Icons.notifications),
                 ),
@@ -337,7 +347,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadge), findsOneWidget);
       expect(find.byIcon(Icons.notifications), findsOneWidget);
     });
 
@@ -345,24 +355,24 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusBadge(count: 5),
+            body: SyncOperationStatusBadge(count: 5),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadge), findsOneWidget);
 
       // Change theme
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData.dark(),
           home: const Scaffold(
-            body: SyncStatusBadge(count: 5),
+            body: SyncOperationStatusBadge(count: 5),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusBadge), findsOneWidget);
+      expect(find.byType(SyncOperationStatusBadge), findsOneWidget);
     });
   });
 }

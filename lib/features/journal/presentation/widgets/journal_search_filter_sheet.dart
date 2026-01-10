@@ -55,7 +55,9 @@ class _JournalSearchFilterSheetState
                     if (filters.hasActiveFilters)
                       TextButton(
                         onPressed: () {
-                          ref.read(journalSearchProvider.notifier).clearFilters();
+                          ref
+                              .read(journalSearchProvider.notifier)
+                              .clearFilters();
                         },
                         child: const Text('Clear'),
                       ),
@@ -83,7 +85,9 @@ class _JournalSearchFilterSheetState
                     startDate: filters.startDate,
                     endDate: filters.endDate,
                     onDateRangeChanged: (start, end) {
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(start, end);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(start, end);
                     },
                   ),
                   const SizedBox(height: 24),
@@ -92,7 +96,9 @@ class _JournalSearchFilterSheetState
                   _LocationFilter(
                     locationName: filters.locationName,
                     onLocationChanged: (location) {
-                      ref.read(journalSearchProvider.notifier).updateLocationFilter(location);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateLocationFilter(location);
                     },
                   ),
                   const SizedBox(height: 24),
@@ -101,7 +107,9 @@ class _JournalSearchFilterSheetState
                   _MoodFilter(
                     selectedMood: filters.mood,
                     onMoodChanged: (mood) {
-                      ref.read(journalSearchProvider.notifier).updateMoodFilter(mood);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateMoodFilter(mood);
                     },
                   ),
                   const SizedBox(height: 24),
@@ -110,7 +118,9 @@ class _JournalSearchFilterSheetState
                   _FavoriteFilter(
                     favoriteOnly: filters.favoriteOnly,
                     onFavoriteChanged: (favorite) {
-                      ref.read(journalSearchProvider.notifier).updateFavoriteFilter(favorite);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateFavoriteFilter(favorite);
                     },
                   ),
                   const SizedBox(height: 24),
@@ -450,7 +460,7 @@ class _FavoriteFilter extends StatelessWidget {
       ),
       value: favoriteOnly ?? false,
       onChanged: (value) {
-        onFavoriteChanged(value!);
+        onFavoriteChanged(value);
       },
     );
   }

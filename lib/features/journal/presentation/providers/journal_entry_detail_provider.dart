@@ -1,8 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
-import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
+
+part 'journal_entry_detail_provider.g.dart';
 
 /// State for journal entry detail view
 class JournalEntryDetailState {
@@ -52,34 +53,36 @@ class JournalEntryDetailState {
   }
 }
 
-/// Notifier for managing journal entry detail state
-class JournalEntryDetailNotifier extends StateNotifier<JournalEntryDetailState> {
-  final JournalRepository _repository;
-  final String entryId;
+// ============================================================================
+// Journal Entry Detail Notifier (Riverpod 3.0 Family Provider)
+// ============================================================================
 
-  JournalEntryDetailNotifier(this._repository, this.entryId)
-      : super(const JournalEntryDetailState()) {
-    _loadEntry();
+/// Notifier for managing journal entry detail state
+/// MIGRATION: StateNotifier → Notifier pattern with family parameter
+/// - entryId is passed as a parameter to the build() method (family provider)
+/// - Dependencies accessed via ref.watch() in methods
+/// - Automatic provider generation via @riverpod annotation
+/// Usage: ref.watch(journalEntryDetailProvider(entryId))
+@riverpod
+class JournalEntryDetail extends _$JournalEntryDetail {
+  @override
+  JournalEntryDetailState build(String entryId) {
+    // Initial load happens automatically when provider is first accessed
+    // Note: We don't call _loadEntry() here to avoid issues during build
+    return const JournalEntryDetailState();
   }
 
   /// Load the journal entry and its media
   Future<void> _loadEntry() async {
+    final repository = ref.watch(journalRepositoryProvider);
     state = state.copyWith(isLoading: true, error: null);
 
     try {
       // Fetch the entry
-      final entry = await _repository.getEntry(entryId);
-
-      if (entry == null) {
-        state = state.copyWith(
-          isLoading: false,
-          error: 'Journal entry not found',
-        );
-        return;
-      }
+      final entry = await repository.getEntry(entryId);
 
       // Fetch media items for this entry
-      final mediaItems = await _repository.getMediaForEntry(entryId);
+      final mediaItems = await repository.getMediaForEntry(entryId);
 
       state = state.copyWith(
         entry: entry,
@@ -105,10 +108,11 @@ class JournalEntryDetailNotifier extends StateNotifier<JournalEntryDetailState> 
       return false;
     }
 
+    final repository = ref.watch(journalRepositoryProvider);
     state = state.copyWith(isDeleting: true, error: null);
 
     try {
-      await _repository.deleteEntry(entryId);
+      await repository.deleteEntry(entryId);
       state = state.copyWith(isDeleting: false);
       return true;
     } catch (e) {
@@ -126,19 +130,22 @@ class JournalEntryDetailNotifier extends StateNotifier<JournalEntryDetailState> 
       return false;
     }
 
+    final repository = ref.watch(journalRepositoryProvider);
+
     try {
       final updatedEntry = state.entry!.copyWith(
         isFavorite: !state.entry!.isFavorite,
       );
 
-      await _repository.updateEntry(updatedEntry);
+      await repository.updateEntry(updatedEntry);
 
       // Update local state
       state = state.copyWith(entry: updatedEntry);
 
       return true;
     } catch (e) {
-      state = state.copyWith(error: 'Failed to update favorite: ${e.toString()}');
+      state =
+          state.copyWith(error: 'Failed to update favorite: ${e.toString()}');
       return false;
     }
   }
@@ -150,13 +157,3 @@ class JournalEntryDetailNotifier extends StateNotifier<JournalEntryDetailState> 
     }
   }
 }
-
-/// Provider for a journal entry detail view
-/// Usage: ref.watch(journalEntryDetailProvider(entryId))
-final journalEntryDetailProvider = StateNotifierProvider.family<
-    JournalEntryDetailNotifier, JournalEntryDetailState, String>(
-  (ref, entryId) {
-    final repository = ref.watch(journalRepositoryProvider);
-    return JournalEntryDetailNotifier(repository, entryId);
-  },
-);

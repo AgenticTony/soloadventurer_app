@@ -6,24 +6,53 @@ part of 'background_token_refresh_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Service responsible for managing background token refresh operations
+
+@ProviderFor(BackgroundTokenRefreshService)
+final backgroundTokenRefreshServiceProvider =
+    BackgroundTokenRefreshServiceProvider._();
+
+/// Service responsible for managing background token refresh operations
+final class BackgroundTokenRefreshServiceProvider
+    extends $AsyncNotifierProvider<BackgroundTokenRefreshService, void> {
+  /// Service responsible for managing background token refresh operations
+  BackgroundTokenRefreshServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'backgroundTokenRefreshServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$backgroundTokenRefreshServiceHash();
+
+  @$internal
+  @override
+  BackgroundTokenRefreshService create() => BackgroundTokenRefreshService();
+}
+
 String _$backgroundTokenRefreshServiceHash() =>
     r'7c77d7f80b7a51f339ebdb802b6de16d258e5554';
 
 /// Service responsible for managing background token refresh operations
-///
-/// Copied from [BackgroundTokenRefreshService].
-@ProviderFor(BackgroundTokenRefreshService)
-final backgroundTokenRefreshServiceProvider = AutoDisposeAsyncNotifierProvider<
-    BackgroundTokenRefreshService, void>.internal(
-  BackgroundTokenRefreshService.new,
-  name: r'backgroundTokenRefreshServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$backgroundTokenRefreshServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$BackgroundTokenRefreshService = AutoDisposeAsyncNotifier<void>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$BackgroundTokenRefreshService extends $AsyncNotifier<void> {
+  FutureOr<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, void>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<void>, void>,
+        AsyncValue<void>,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

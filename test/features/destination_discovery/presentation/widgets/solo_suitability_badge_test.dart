@@ -178,7 +178,8 @@ void main() {
           ),
         );
 
-        final semantics = tester.getSemantics(find.byType(SoloSuitabilityBadge));
+        final semantics =
+            tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
           'Solo suitability score: 9.0 out of 10, excellent for solo travelers',
@@ -194,7 +195,8 @@ void main() {
           ),
         );
 
-        final semantics = tester.getSemantics(find.byType(SoloSuitabilityBadge));
+        final semantics =
+            tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(semantics.value, '8.3');
       });
 
@@ -207,7 +209,8 @@ void main() {
           ),
         );
 
-        final semantics = tester.getSemantics(find.byType(SoloSuitabilityBadge));
+        final semantics =
+            tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(semantics.hint, 'Solo travel suitability rating from 1 to 10');
       });
 
@@ -224,7 +227,8 @@ void main() {
           ),
         );
 
-        final semantics = tester.getSemantics(find.byType(SoloSuitabilityBadge));
+        final semantics =
+            tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
           'Rating suitability score: 9.0 out of 10, excellent for solo travelers',
@@ -241,7 +245,8 @@ void main() {
           ),
         );
 
-        final semantics = tester.getSemantics(find.byType(SoloSuitabilityBadge));
+        final semantics =
+            tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
           'Solo suitability score: 7.5 out of 10, good for solo travelers',
@@ -258,7 +263,8 @@ void main() {
           ),
         );
 
-        final semantics = tester.getSemantics(find.byType(SoloSuitabilityBadge));
+        final semantics =
+            tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
           'Solo suitability score: 5.0 out of 10, challenging for solo travelers',
@@ -280,8 +286,7 @@ void main() {
         expect(find.byIcon(Icons.travel_explore), findsOneWidget);
       });
 
-      testWidgets('handles maximum score (10.0)',
-          (WidgetTester tester) async {
+      testWidgets('handles maximum score (10.0)', (WidgetTester tester) async {
         await tester.pumpWidget(
           const MaterialApp(
             home: Scaffold(

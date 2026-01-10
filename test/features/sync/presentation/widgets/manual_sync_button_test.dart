@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 import 'package:soloadventurer/features/sync/presentation/notifiers/manual_sync_notifier.dart';
 import 'package:soloadventurer/features/sync/presentation/providers/sync_providers.dart';
+import 'package:soloadventurer/features/sync/presentation/state/manual_sync_state.dart';
 import 'package:soloadventurer/features/sync/presentation/widgets/manual_sync_button.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -34,10 +35,12 @@ void main() {
       );
     }
 
-    testWidgets('displays sync button with correct label when idle', (tester) async {
+    testWidgets('displays sync button with correct label when idle',
+        (tester) async {
       // Arrange
       when(mockNotifier.state).thenReturn(ManualSyncState.initial());
-      when(mockNotifier.stream).thenAnswer((_) => Stream.value(ManualSyncState.initial()));
+      when(mockNotifier.stream)
+          .thenAnswer((_) => Stream.value(ManualSyncState.initial()));
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -123,8 +126,11 @@ void main() {
     testWidgets('triggers sync when tapped', (tester) async {
       // Arrange
       when(mockNotifier.state).thenReturn(ManualSyncState.initial());
-      when(mockNotifier.stream).thenAnswer((_) => Stream.value(ManualSyncState.initial()));
-      when(mockNotifier.triggerSync()).thenAnswer((_) async {});
+      when(mockNotifier.stream)
+          .thenAnswer((_) => Stream.value(ManualSyncState.initial()));
+      when(mockNotifier.triggerSync()).thenAnswer((_) async {
+        return;
+      });
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());
@@ -154,11 +160,13 @@ void main() {
       expect(button.enabled, isFalse);
     });
 
-    testWidgets('shows pending count in label when pending operations exist', (tester) async {
+    testWidgets('shows pending count in label when pending operations exist',
+        (tester) async {
       // Arrange - This test requires overriding the pendingOperationsCountProvider
       // For now, we'll just test the basic button rendering
       when(mockNotifier.state).thenReturn(ManualSyncState.initial());
-      when(mockNotifier.stream).thenAnswer((_) => Stream.value(ManualSyncState.initial()));
+      when(mockNotifier.stream)
+          .thenAnswer((_) => Stream.value(ManualSyncState.initial()));
 
       // Act
       await tester.pumpWidget(createWidgetUnderTest());

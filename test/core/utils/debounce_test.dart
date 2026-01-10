@@ -1,6 +1,5 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/core/utils/debounce.dart';
+import 'package:soloadventurer/core/utils/debounce.dart';
 
 void main() {
   group('Debouncer', () {
@@ -302,7 +301,8 @@ void main() {
       expect(executed, false);
     });
 
-    test('should call onDebounceStart and onDebounceComplete callbacks', () async {
+    test('should call onDebounceStart and onDebounceComplete callbacks',
+        () async {
       var startCalled = false;
       var completeCalled = false;
 

@@ -91,7 +91,8 @@ class NetworkStatus {
   }
 
   @override
-  int get hashCode => isOnline.hashCode ^ connectionType.hashCode ^ timestamp.hashCode;
+  int get hashCode =>
+      isOnline.hashCode ^ connectionType.hashCode ^ timestamp.hashCode;
 }
 
 /// Abstract interface for monitoring network connectivity

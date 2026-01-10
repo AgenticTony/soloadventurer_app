@@ -54,7 +54,8 @@ class CuratedListCard extends StatelessWidget {
 
     return RepaintBoundary(
       child: Semantics(
-        label: 'Curated list: ${curatedList.name}, ${curatedList.destinationCountLabel}, ${typeInfo['label']} collection',
+        label:
+            'Curated list: ${curatedList.name}, ${curatedList.destinationCountLabel}, ${typeInfo['label']} collection',
         hint: onTap != null ? 'Double tap to view curated list details' : null,
         button: onTap != null,
         child: Card(

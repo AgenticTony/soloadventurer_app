@@ -1,5 +1,5 @@
-import '../../../core/models/paginated_data.dart';
-import '../../../core/repositories/paginated_repository_mixin.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 import '../models/trip.dart';
 
 /// Repository interface for managing trip data with pagination support

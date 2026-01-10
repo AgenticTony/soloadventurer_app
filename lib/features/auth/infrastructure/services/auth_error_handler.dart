@@ -62,7 +62,7 @@ class AuthErrorRecovery {
 
   /// Creates a recovery action for credential errors
   factory AuthErrorRecovery.fixCredentials() {
-    return AuthErrorRecovery(
+    return const AuthErrorRecovery(
       primaryAction: 'Check your email and password and try again',
       secondaryAction: 'Reset your password if you forgot it',
       canRetry: true,
@@ -71,7 +71,7 @@ class AuthErrorRecovery {
 
   /// Creates a recovery action for expired session errors
   factory AuthErrorRecovery.reauthenticate() {
-    return AuthErrorRecovery(
+    return const AuthErrorRecovery(
       primaryAction: 'Please sign in again to continue',
       canRetry: true,
     );
@@ -80,7 +80,8 @@ class AuthErrorRecovery {
   /// Creates a recovery action for rate limit errors
   factory AuthErrorRecovery.waitAndRetry({required Duration waitTime}) {
     return AuthErrorRecovery(
-      primaryAction: 'Please wait ${_formatDuration(waitTime)} before trying again',
+      primaryAction:
+          'Please wait ${_formatDuration(waitTime)} before trying again',
       canRetry: false,
       retryDelay: waitTime,
     );
@@ -88,17 +89,17 @@ class AuthErrorRecovery {
 
   /// Creates a recovery action for server errors
   factory AuthErrorRecovery.contactSupport() {
-    return AuthErrorRecovery(
+    return const AuthErrorRecovery(
       primaryAction: 'Please try again later',
       secondaryAction: 'If the problem persists, contact support',
       canRetry: true,
-      retryDelay: const Duration(seconds: 30),
+      retryDelay: Duration(seconds: 30),
     );
   }
 
   /// Creates a recovery action for validation errors
   factory AuthErrorRecovery.fixInput() {
-    return AuthErrorRecovery(
+    return const AuthErrorRecovery(
       primaryAction: 'Please check your input and try again',
       canRetry: true,
     );
@@ -234,7 +235,8 @@ class AuthErrorHandler {
       case 'CONNECTION_FAILED':
         return AuthErrorInfo(
           category: AuthErrorCategory.network,
-          userMessage: 'Unable to connect to the server. Please check your internet connection.',
+          userMessage:
+              'Unable to connect to the server. Please check your internet connection.',
           recovery: AuthErrorRecovery.retryNetwork(),
           errorCode: code,
           isRetryable: true,
@@ -275,7 +277,8 @@ class AuthErrorHandler {
           category: AuthErrorCategory.credentials,
           userMessage: 'You need to reset your password before continuing.',
           recovery: const AuthErrorRecovery(
-            primaryAction: 'Reset your password using the "Forgot Password" option',
+            primaryAction:
+                'Reset your password using the "Forgot Password" option',
             canRetry: true,
           ),
           errorCode: code,
@@ -346,7 +349,8 @@ class AuthErrorHandler {
       case 'EXPIRED_CODE':
         return AuthErrorInfo(
           category: AuthErrorCategory.validation,
-          userMessage: 'Verification code has expired. Please request a new code.',
+          userMessage:
+              'Verification code has expired. Please request a new code.',
           recovery: const AuthErrorRecovery(
             primaryAction: 'Request a new verification code',
             canRetry: true,
@@ -361,7 +365,8 @@ class AuthErrorHandler {
       case 'WEAK_PASSWORD':
         return AuthErrorInfo(
           category: AuthErrorCategory.validation,
-          userMessage: 'Invalid input. Please check your information and try again.',
+          userMessage:
+              'Invalid input. Please check your information and try again.',
           recovery: AuthErrorRecovery.fixInput(),
           errorCode: code,
           isRetryable: true,
@@ -487,14 +492,15 @@ class AuthErrorHandler {
   }
 
   /// Gets error info for unknown error codes
-  AuthErrorInfo _getUnknownErrorInfo(AuthException exception) {
+  AuthErrorInfo _getUnknownErrorInfo(AppException exception) {
     // Check if message contains common patterns
     final message = exception.message.toLowerCase();
 
     if (message.contains('network') || message.contains('connection')) {
       return AuthErrorInfo(
         category: AuthErrorCategory.network,
-        userMessage: 'Unable to connect to the server. Please check your internet connection.',
+        userMessage:
+            'Unable to connect to the server. Please check your internet connection.',
         recovery: AuthErrorRecovery.retryNetwork(),
         errorCode: exception.code,
         isRetryable: true,
@@ -502,7 +508,9 @@ class AuthErrorHandler {
       );
     }
 
-    if (message.contains('expire') || message.contains('token') || message.contains('session')) {
+    if (message.contains('expire') ||
+        message.contains('token') ||
+        message.contains('session')) {
       return AuthErrorInfo(
         category: AuthErrorCategory.expired,
         userMessage: 'Your session has expired. Please sign in again.',

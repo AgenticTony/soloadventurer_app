@@ -45,25 +45,19 @@ class ConnectivityPlusNetworkMonitor implements NetworkConnectivity {
 
   @override
   Stream<NetworkStatus> get statusStream {
-    if (_statusController == null) {
-      _statusController = StreamController<NetworkStatus>.broadcast();
-    }
+    _statusController ??= StreamController<NetworkStatus>.broadcast();
     return _statusController!.stream;
   }
 
   @override
   Stream<bool> get onOnline {
-    if (_onlineController == null) {
-      _onlineController = StreamController<bool>.broadcast();
-    }
+    _onlineController ??= StreamController<bool>.broadcast();
     return _onlineController!.stream;
   }
 
   @override
   Stream<bool> get onOffline {
-    if (_offlineController == null) {
-      _offlineController = StreamController<bool>.broadcast();
-    }
+    _offlineController ??= StreamController<bool>.broadcast();
     return _offlineController!.stream;
   }
 
@@ -124,15 +118,9 @@ class ConnectivityPlusNetworkMonitor implements NetworkConnectivity {
     }
 
     // Create stream controllers if not exists
-    if (_statusController == null) {
-      _statusController = StreamController<NetworkStatus>.broadcast();
-    }
-    if (_onlineController == null) {
-      _onlineController = StreamController<bool>.broadcast();
-    }
-    if (_offlineController == null) {
-      _offlineController = StreamController<bool>.broadcast();
-    }
+    _statusController ??= StreamController<NetworkStatus>.broadcast();
+    _onlineController ??= StreamController<bool>.broadcast();
+    _offlineController ??= StreamController<bool>.broadcast();
 
     try {
       // Listen to connectivity changes

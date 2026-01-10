@@ -83,12 +83,9 @@ class PersonalizedRecommendationDto {
           : RecommendationSource.aiGenerated,
       summary: summary ?? '',
       totalCount: totalCount ?? recommendations?.length ?? 0,
-      generatedAt: generatedAt != null
-          ? DateTime.parse(generatedAt!)
-          : DateTime.now(),
-      expiresAt: expiresAt != null
-          ? DateTime.parse(expiresAt!)
-          : null,
+      generatedAt:
+          generatedAt != null ? DateTime.parse(generatedAt!) : DateTime.now(),
+      expiresAt: expiresAt != null ? DateTime.parse(expiresAt!) : null,
       preferenceSnapshot: preferenceSnapshot,
       relatedRecommendationIds: relatedRecommendationIds ?? [],
     );
@@ -144,8 +141,8 @@ class PersonalizedRecommendationDto {
     List<dynamic> jsonList,
   ) {
     return jsonList
-        .map((json) =>
-            PersonalizedRecommendationDto.fromJson(json as Map<String, dynamic>))
+        .map((json) => PersonalizedRecommendationDto.fromJson(
+            json as Map<String, dynamic>))
         .toList();
   }
 

@@ -6,27 +6,54 @@ part of 'itinerary_generation_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itineraryGenerationServiceHash() =>
-    r'f641ecf6b2275c21c9e403234491cdff7b6083a1';
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 /// Provider for the itinerary generation service implementation
-///
-/// Copied from [itineraryGenerationService].
+
 @ProviderFor(itineraryGenerationService)
 final itineraryGenerationServiceProvider =
-    AutoDisposeProvider<ItineraryGenerationService>.internal(
-  itineraryGenerationService,
-  name: r'itineraryGenerationServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$itineraryGenerationServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+    ItineraryGenerationServiceProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ItineraryGenerationServiceRef
-    = AutoDisposeProviderRef<ItineraryGenerationService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+/// Provider for the itinerary generation service implementation
+
+final class ItineraryGenerationServiceProvider extends $FunctionalProvider<
+    ItineraryGenerationService,
+    ItineraryGenerationService,
+    ItineraryGenerationService> with $Provider<ItineraryGenerationService> {
+  /// Provider for the itinerary generation service implementation
+  ItineraryGenerationServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'itineraryGenerationServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$itineraryGenerationServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<ItineraryGenerationService> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ItineraryGenerationService create(Ref ref) {
+    return itineraryGenerationService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ItineraryGenerationService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ItineraryGenerationService>(value),
+    );
+  }
+}
+
+String _$itineraryGenerationServiceHash() =>
+    r'f641ecf6b2275c21c9e403234491cdff7b6083a1';

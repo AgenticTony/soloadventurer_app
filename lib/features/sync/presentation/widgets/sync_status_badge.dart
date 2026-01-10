@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 /// - Customizable colors and size
 /// - Supports custom child widget
 /// - Animated count changes
-class SyncStatusBadge extends StatelessWidget {
+class SyncOperationStatusBadge extends StatelessWidget {
   /// Number of pending operations
   final int count;
 
@@ -30,7 +30,7 @@ class SyncStatusBadge extends StatelessWidget {
   /// Position offset for the badge
   final Offset offset;
 
-  const SyncStatusBadge({
+  const SyncOperationStatusBadge({
     super.key,
     required this.count,
     this.size = 18,
@@ -137,7 +137,7 @@ class SyncStatusBadge extends StatelessWidget {
 /// Badge widget for displaying sync status with optional count
 ///
 /// Combines status indicator with count badge
-class SyncStatusBadgeWithIndicator extends StatelessWidget {
+class SyncOperationStatusBadgeWithIndicator extends StatelessWidget {
   /// Number of pending operations
   final int count;
 
@@ -150,7 +150,7 @@ class SyncStatusBadgeWithIndicator extends StatelessWidget {
   /// Custom color for the badge
   final Color? color;
 
-  const SyncStatusBadgeWithIndicator({
+  const SyncOperationStatusBadgeWithIndicator({
     super.key,
     required this.count,
     this.size = 18,

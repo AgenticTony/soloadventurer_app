@@ -6,7 +6,7 @@ part of 'trip.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TripImpl _$$TripImplFromJson(Map<String, dynamic> json) => _$TripImpl(
+_Trip _$TripFromJson(Map<String, dynamic> json) => _Trip(
       id: json['id'] as String,
       userId: json['userId'] as String,
       title: json['title'] as String,
@@ -24,10 +24,19 @@ _$TripImpl _$$TripImplFromJson(Map<String, dynamic> json) => _$TripImpl(
           .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
+      destinationIds: (json['destinationIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      destinationNotes:
+          (json['destinationNotes'] as Map<String, dynamic>?)?.map(
+                (k, e) => MapEntry(k, e as String),
+              ) ??
+              const {},
+      isFromDiscovery: json['isFromDiscovery'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$TripImplToJson(_$TripImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$TripToJson(_Trip instance) => <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
       'title': instance.title,
@@ -43,4 +52,7 @@ Map<String, dynamic> _$$TripImplToJson(_$TripImpl instance) =>
       'travelCompanionIds': instance.travelCompanionIds,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
+      'destinationIds': instance.destinationIds,
+      'destinationNotes': instance.destinationNotes,
+      'isFromDiscovery': instance.isFromDiscovery,
     };

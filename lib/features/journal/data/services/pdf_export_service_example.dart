@@ -125,7 +125,7 @@ class _Example2_CustomConfigurationState
   }
 
   void _showCustomConfigDialog(BuildContext context) {
-    final customConfig = PdfExportConfig(
+    const customConfig = PdfExportConfig(
       pageMargin: 36.0,
       contentMargin: 20.0,
       titleFontSize: 32.0,
@@ -192,7 +192,8 @@ class Example3_ProgressTracking extends ConsumerStatefulWidget {
       _Example3ProgressTrackingState();
 }
 
-class _Example3ProgressTrackingState extends ConsumerState<Example3_ProgressTracking> {
+class _Example3ProgressTrackingState
+    extends ConsumerState<Example3_ProgressTracking> {
   @override
   Widget build(BuildContext context) {
     final exportState = ref.watch(pdfExportNotifierProvider);
@@ -294,7 +295,8 @@ class _Example3ProgressTrackingState extends ConsumerState<Example3_ProgressTrac
               _buildStatRow('Duration', _formatDuration(state.exportDuration!)),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => ref.read(pdfExportNotifierProvider.notifier).reset(),
+              onPressed: () =>
+                  ref.read(pdfExportNotifierProvider.notifier).reset(),
               icon: const Icon(Icons.refresh),
               label: const Text('Export Again'),
             ),
@@ -331,7 +333,8 @@ class _Example3ProgressTrackingState extends ConsumerState<Example3_ProgressTrac
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () => ref.read(pdfExportNotifierProvider.notifier).reset(),
+              onPressed: () =>
+                  ref.read(pdfExportNotifierProvider.notifier).reset(),
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
             ),
@@ -423,11 +426,14 @@ class Example4_ExportStatistics extends ConsumerWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
-                    _buildStatRow(context, 'Journal Entries', '${stats['entryCount']}'),
-                    _buildStatRow(context, 'Media Items', '${stats['totalMediaCount']}'),
+                    _buildStatRow(
+                        context, 'Journal Entries', '${stats['entryCount']}'),
+                    _buildStatRow(
+                        context, 'Media Items', '${stats['totalMediaCount']}'),
                     _buildStatRow(context, 'Photos', '${stats['photoCount']}'),
                     _buildStatRow(context, 'Videos', '${stats['videoCount']}'),
-                    _buildStatRow(context, 'Total Words', '${stats['wordCount']}'),
+                    _buildStatRow(
+                        context, 'Total Words', '${stats['wordCount']}'),
                   ],
                 ),
               ),
@@ -533,7 +539,8 @@ class Example5_MultipleEntries extends ConsumerStatefulWidget {
       _Example5MultipleEntriesState();
 }
 
-class _Example5MultipleEntriesState extends ConsumerState<Example5_MultipleEntries> {
+class _Example5MultipleEntriesState
+    extends ConsumerState<Example5_MultipleEntries> {
   final Set<String> _selectedEntries = {};
 
   @override

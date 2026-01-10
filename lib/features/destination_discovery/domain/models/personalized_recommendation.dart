@@ -66,7 +66,7 @@ class RecommendedDestination with _$RecommendedDestination {
 /// using AI/ML algorithms that analyze multiple factors.
 @freezed
 class PersonalizedRecommendation with _$PersonalizedRecommendation {
-  const factory PersonalizedRecommendation({
+  factory PersonalizedRecommendation({
     /// Unique identifier for this recommendation set
     required String id,
 
@@ -102,6 +102,8 @@ class PersonalizedRecommendation with _$PersonalizedRecommendation {
     /// Example: ["rec_123", "rec_456"] for different categories
     List<String>? relatedRecommendationIds,
   }) = _PersonalizedRecommendation;
+
+  PersonalizedRecommendation._();
 
   factory PersonalizedRecommendation.fromJson(Map<String, dynamic> json) =>
       _$PersonalizedRecommendationFromJson(json);

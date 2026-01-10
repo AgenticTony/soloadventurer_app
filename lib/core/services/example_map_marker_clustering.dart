@@ -2,6 +2,7 @@
 ///
 /// This file demonstrates how to use the zoom-level aware clustering
 /// and custom cluster rendering features.
+library;
 
 import 'package:latlong2/latlong.dart';
 import '../models/map_marker.dart';
@@ -23,7 +24,7 @@ void example1_ZoomLevelClustering() {
 
     final result = clusteringService.clusterMarkers(markers);
     print('Zoom $zoom: ${result.clusters.length} clusters, '
-          '${result.unclusteredMarkers.length} unclustered');
+        '${result.unclusteredMarkers.length} unclustered');
   }
 }
 
@@ -34,14 +35,16 @@ void example2_LimitVisibleItems() {
 
   // Standard clustering (may return 100+ items)
   final standardResult = clusteringService.clusterMarkers(markers);
-  print('Standard: ${standardResult.clusters.length + standardResult.unclusteredMarkers.length} items');
+  print(
+      'Standard: ${standardResult.clusters.length + standardResult.unclusteredMarkers.length} items');
 
   // Limited clustering (max 50 items)
   final limitedResult = clusteringService.limitVisibleItems(
     standardResult,
     maxVisibleItems: 50,
   );
-  print('Limited: ${limitedResult.clusters.length + limitedResult.unclusteredMarkers.length} items');
+  print(
+      'Limited: ${limitedResult.clusters.length + limitedResult.unclusteredMarkers.length} items');
 }
 
 /// Example 3: Convenience method for clustering with limit
@@ -56,7 +59,8 @@ void example3_ClusterWithLimit() {
   );
 
   print('Efficiency: ${(result.efficiency * 100).toStringAsFixed(1)}%');
-  print('Visible items: ${result.clusters.length + result.unclusteredMarkers.length}');
+  print(
+      'Visible items: ${result.clusters.length + result.unclusteredMarkers.length}');
 }
 
 /// Example 4: Bounds-based clustering with limit
@@ -66,8 +70,8 @@ void example4_BoundsBasedClustering() {
 
   // Define viewport bounds
   final bounds = LatLngBounds(
-    LatLng(37.7, -122.5), // Southwest
-    LatLng(37.8, -122.3), // Northeast
+    const LatLng(37.7, -122.5), // Southwest
+    const LatLng(37.8, -122.3), // Northeast
   );
 
   // Cluster only markers within bounds, limited to 50 items
@@ -78,7 +82,7 @@ void example4_BoundsBasedClustering() {
   );
 
   print('Viewport: ${result.clusters.length} clusters, '
-        '${result.unclusteredMarkers.length} markers');
+      '${result.unclusteredMarkers.length} markers');
 }
 
 /// Example 5: Using ZoomAwareClusterWidget in Flutter
@@ -179,7 +183,8 @@ void example7_PriorityBasedSelection() {
     maxVisibleItems: 2,
   );
 
-  print('Kept ${result.clusters.length + result.unclusteredMarkers.length} items');
+  print(
+      'Kept ${result.clusters.length + result.unclusteredMarkers.length} items');
   print('Prioritized: trip, accommodation > activities > photos');
 }
 
@@ -257,7 +262,7 @@ void example8_CompleteWorkflow() {
 List<MapMarker> _generateSampleMarkers(int count) {
   final random = DateTime.now().millisecondsSinceEpoch;
   final markers = <MapMarker>[];
-  final types = MarkerType.values;
+  const types = MarkerType.values;
 
   for (int i = 0; i < count; i++) {
     final lat = 37.7749 + (i % 100 - 50) * 0.001;

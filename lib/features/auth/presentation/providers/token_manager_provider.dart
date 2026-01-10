@@ -32,7 +32,7 @@ class TokenManager extends _$TokenManager {
   }
 
   Future<void> refreshToken() async {
-    final currentState = state.valueOrNull;
+    final currentState = state.value;
     if (currentState == null) return;
 
     // Only refresh if we have a refresh token

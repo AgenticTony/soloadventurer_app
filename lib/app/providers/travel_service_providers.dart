@@ -105,7 +105,7 @@ NotificationLocalDataSource notificationLocalDataSource(Ref ref) {
 NotificationRepository notificationRepository(Ref ref) {
   final localDataSource = ref.watch(notificationLocalDataSourceProvider);
   final connectivityService =
-      ref.watch(offline_connectivity.connectivityServiceProvider);
+      ref.watch(connectivityServiceProvider);
   return NotificationRepositoryImpl(
     localDataSource,
     connectivityService,

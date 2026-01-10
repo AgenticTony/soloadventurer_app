@@ -89,7 +89,7 @@ abstract class ConflictResolver {
     required List<ConflictInfo> conflicts,
     List<ConflictResolutionStrategy>? strategies,
     List<ManualResolutionChoice>? userChoices,
-    List<Map<String, dynamic>? > userDataList,
+    List<Map<String, dynamic>?> userDataList,
   });
 
   /// Apply last-write-wins strategy

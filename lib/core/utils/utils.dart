@@ -53,6 +53,7 @@
 ///   preloadConfig: PreloadConfig.defaultConfig,
 /// )
 /// ```
+library;
 
 export 'scroll_performance_tracker.dart';
 export 'debounce.dart';

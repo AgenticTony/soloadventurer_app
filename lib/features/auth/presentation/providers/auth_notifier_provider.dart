@@ -86,7 +86,7 @@ LoggingService loggingService(LoggingServiceRef ref) {
 /// - Loading/error states handled by AsyncValue, NOT manual state fields
 /// - UI reads STATE via ref.watch(authNotifierProvider)
 /// - UI calls methods via ref.read(authNotifierProvider.notifier)
-@Riverpod(keepAlive: true)
+@riverpod
 class AuthNotifier extends _$AuthNotifier {
   LoggingService get _logger => ref.watch(loggingServiceProvider);
 
@@ -104,6 +104,8 @@ class AuthNotifier extends _$AuthNotifier {
 
   @override
   FutureOr<AuthState> build() async {
+    ref.keepAlive();
+
     _logger.logAuthEvent(
       event: 'Initialize',
       status: 'Started',
@@ -335,7 +337,7 @@ class AuthNotifier extends _$AuthNotifier {
 
     state = await AsyncValue.guard(() async {
       // Get current user from previous state if available
-      final currentUser = state.valueOrNull?.user;
+      final currentUser = state.value?.user;
 
       try {
         await _verifyEmail(VerifyEmailParams(code: code, email: email));
@@ -440,7 +442,7 @@ class AuthNotifier extends _$AuthNotifier {
   /// Resend verification email
   Future<void> resendVerificationEmail() async {
     // Capture current user before setting loading state
-    final currentUser = state.valueOrNull?.user;
+    final currentUser = state.value?.user;
 
     state = const AsyncValue.loading();
 
@@ -468,5 +470,10 @@ class AuthNotifier extends _$AuthNotifier {
   }
 }
 
-/// Provider alias for backward compatibility
-final authProvider = authNotifierProvider;
+/// Provider alias for backward compatibility - using the generated provider name
+@Deprecated('Use authProvider instead, will be removed in future version')
+const authNotifierProvider = authProvider;
+
+/// Provider alias for backward compatibility with tests
+/// Maps authStateProvider to authNotifierProvider for consistency
+final authStateProvider = authNotifierProvider;

@@ -6,9 +6,8 @@ part of 'trusted_contact_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TrustedContactModelImpl _$$TrustedContactModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TrustedContactModelImpl(
+_TrustedContactModel _$TrustedContactModelFromJson(Map<String, dynamic> json) =>
+    _TrustedContactModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
       name: json['name'] as String,
@@ -30,8 +29,8 @@ _$TrustedContactModelImpl _$$TrustedContactModelImplFromJson(
       notes: json['notes'] as String?,
     );
 
-Map<String, dynamic> _$$TrustedContactModelImplToJson(
-        _$TrustedContactModelImpl instance) =>
+Map<String, dynamic> _$TrustedContactModelToJson(
+        _TrustedContactModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

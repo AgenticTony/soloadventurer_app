@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/destination_discovery/application/providers/filter_provider.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination_filter.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/filter_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
 
 void main() {
   late FilterNotifier notifier;

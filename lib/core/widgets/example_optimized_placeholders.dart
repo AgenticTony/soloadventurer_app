@@ -97,8 +97,7 @@ class HomePage extends StatelessWidget {
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    const Example5EnhancedErrorHandling(),
+                builder: (context) => const Example5EnhancedErrorHandling(),
               ),
             ),
           ),
@@ -181,7 +180,7 @@ class Example1ShimmerPlaceholder extends StatelessWidget {
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
         children: [
-          _ImageCard(
+          const _ImageCard(
             title: 'Shimmer Placeholder',
             child: LazyLoadImage(
               imageUrl: 'https://via.placeholder.com/150',
@@ -219,7 +218,7 @@ class Example2SkeletonPlaceholder extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _ImageCard(
+          const _ImageCard(
             title: 'Skeleton with Icon',
             child: LazyLoadImage(
               imageUrl: 'https://via.placeholder.com/150',
@@ -261,7 +260,7 @@ class Example3ColorPlaceholder extends StatelessWidget {
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
         children: [
-          _ImageCard(
+          const _ImageCard(
             title: 'Theme Color',
             child: LazyLoadImage(
               imageUrl: 'https://via.placeholder.com/150',
@@ -301,7 +300,7 @@ class Example4BlurredPlaceholder extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        children: [
+        children: const [
           _ImageCard(
             title: 'With Thumbnail',
             child: LazyLoadImage(
@@ -405,9 +404,9 @@ class Example6CompactErrorWidgets extends StatelessWidget {
       appBar: AppBar(title: const Text('Compact Error Widgets')),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: [
-          const Text('List items with error states'),
-          const SizedBox(height: 16),
+        children: const [
+          Text('List items with error states'),
+          SizedBox(height: 16),
           _ListTile(
             title: 'Item 1',
             imageUrl: 'https://invalid-url.com/1.jpg',
@@ -526,7 +525,7 @@ class Example8ProgressiveLoading extends StatelessWidget {
               onRetry: () {},
             ),
           ),
-          _ImageCard(
+          const _ImageCard(
             title: 'Custom Placeholder',
             subtitle: 'Blurred with fallback',
             child: LazyLoadImage(

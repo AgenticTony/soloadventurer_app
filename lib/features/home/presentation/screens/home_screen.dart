@@ -11,6 +11,7 @@ import 'package:soloadventurer/features/offline/presentation/widgets/offline_ban
 import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
 import 'package:soloadventurer/features/safety/presentation/widgets/sos_button_widget.dart';
 import 'package:soloadventurer/features/home/presentation/widgets/quick_sos_button.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/routes/destination_discovery_routes.dart';
 
 /// Home screen of the app
 class HomeScreen extends ConsumerWidget {
@@ -82,6 +83,7 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildHomeContent(
       BuildContext context, WidgetRef ref, AuthState authState) {
+    final theme = Theme.of(context);
     return Scaffold(
       floatingActionButton: const QuickSOSButton(
         size: SOSButtonSize.medium,
@@ -127,7 +129,7 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Welcome section
-            _buildWelcomeSection(context, theme),
+            _buildWelcomeSection(context, ref, theme, authState),
 
             // Discover Destinations Hero Card
             _buildDiscoverHeroCard(context, theme),
@@ -149,7 +151,8 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// Builds the welcome section
-  Widget _buildWelcomeSection(BuildContext context, ThemeData theme) {
+  Widget _buildWelcomeSection(
+      BuildContext context, WidgetRef ref, ThemeData theme, AuthState authState) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -309,7 +312,8 @@ class HomeScreen extends ConsumerWidget {
                   fit: StackFit.expand,
                   children: [
                     CachedNetworkImage(
-                      imageUrl: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800',
+                      imageUrl:
+                          'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800',
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
                         color: theme.colorScheme.primaryContainer,
@@ -503,7 +507,8 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// Builds the Curated Collections section
-  Widget _buildCuratedCollectionsSection(BuildContext context, ThemeData theme) {
+  Widget _buildCuratedCollectionsSection(
+      BuildContext context, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -545,7 +550,8 @@ class HomeScreen extends ConsumerWidget {
                 subtitle: '12 destinations',
                 icon: Icons.trending_up,
                 color: const Color(0xFF6B4EFF),
-                imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
+                imageUrl:
+                    'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -560,7 +566,8 @@ class HomeScreen extends ConsumerWidget {
                 subtitle: '8 destinations',
                 icon: Icons.diamond,
                 color: Colors.amber,
-                imageUrl: 'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?w=400',
+                imageUrl:
+                    'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?w=400',
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -575,7 +582,8 @@ class HomeScreen extends ConsumerWidget {
                 subtitle: '15 destinations',
                 icon: Icons.attach_money,
                 color: Colors.green,
-                imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400',
+                imageUrl:
+                    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400',
                 onTap: () {
                   Navigator.pushNamed(
                     context,

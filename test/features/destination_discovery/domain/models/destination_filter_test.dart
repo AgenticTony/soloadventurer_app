@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination_filter.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
 
 void main() {
   group('DestinationSortOrder enum', () {
@@ -27,19 +27,26 @@ void main() {
     });
 
     test('should deserialize correctly', () {
-      expect(DestinationSortOrder.fromJson('popularity'), DestinationSortOrder.popularity);
-      expect(DestinationSortOrder.fromJson('safety'), DestinationSortOrder.safety);
-      expect(DestinationSortOrder.fromJson('solo_suitability'), DestinationSortOrder.soloSuitability);
-      expect(DestinationSortOrder.fromJson('budget_asc'), DestinationSortOrder.budgetAsc);
-      expect(DestinationSortOrder.fromJson('budget_desc'), DestinationSortOrder.budgetDesc);
-      expect(DestinationSortOrder.fromJson('newest'), DestinationSortOrder.newest);
-      expect(DestinationSortOrder.fromJson('relevance'), DestinationSortOrder.relevance);
+      expect(DestinationSortOrder.fromJson('popularity'),
+          DestinationSortOrder.popularity);
+      expect(
+          DestinationSortOrder.fromJson('safety'), DestinationSortOrder.safety);
+      expect(DestinationSortOrder.fromJson('solo_suitability'),
+          DestinationSortOrder.soloSuitability);
+      expect(DestinationSortOrder.fromJson('budget_asc'),
+          DestinationSortOrder.budgetAsc);
+      expect(DestinationSortOrder.fromJson('budget_desc'),
+          DestinationSortOrder.budgetDesc);
+      expect(
+          DestinationSortOrder.fromJson('newest'), DestinationSortOrder.newest);
+      expect(DestinationSortOrder.fromJson('relevance'),
+          DestinationSortOrder.relevance);
     });
   });
 
   group('DestinationFilter', () {
     test('should create with default values', () {
-      final filter = const DestinationFilter();
+      const filter = DestinationFilter();
 
       expect(filter.searchQuery, isNull);
       expect(filter.budgetLevel, isNull);
@@ -58,7 +65,7 @@ void main() {
     });
 
     test('should create with all fields', () {
-      final filter = DestinationFilter(
+      const filter = DestinationFilter(
         searchQuery: 'Tokyo',
         budgetLevel: BudgetLevel.moderate,
         minSafetyScore: 7.0,
@@ -92,7 +99,7 @@ void main() {
     });
 
     test('should serialize to JSON correctly', () {
-      final filter = DestinationFilter(
+      const filter = DestinationFilter(
         searchQuery: 'Tokyo',
         budgetLevel: BudgetLevel.moderate,
         minSafetyScore: 7.0,
@@ -158,17 +165,17 @@ void main() {
     });
 
     test('should implement equality correctly', () {
-      final filter1 = DestinationFilter(
+      const filter1 = DestinationFilter(
         searchQuery: 'Tokyo',
         budgetLevel: BudgetLevel.moderate,
       );
 
-      final filter2 = DestinationFilter(
+      const filter2 = DestinationFilter(
         searchQuery: 'Tokyo',
         budgetLevel: BudgetLevel.moderate,
       );
 
-      final filter3 = DestinationFilter(
+      const filter3 = DestinationFilter(
         searchQuery: 'Kyoto',
         budgetLevel: BudgetLevel.moderate,
       );
@@ -179,7 +186,7 @@ void main() {
     });
 
     test('should support copyWith', () {
-      final filter = DestinationFilter(
+      const filter = DestinationFilter(
         searchQuery: 'Tokyo',
         budgetLevel: BudgetLevel.moderate,
         offset: 10,
@@ -204,23 +211,23 @@ void main() {
     });
 
     test('isDefault should return true when no filters are set', () {
-      final filter = const DestinationFilter();
+      const filter = DestinationFilter();
       expect(filter.isDefault, true);
     });
 
     test('isDefault should return false when filters are set', () {
-      final filter1 = DestinationFilter(searchQuery: 'Tokyo');
+      const filter1 = DestinationFilter(searchQuery: 'Tokyo');
       expect(filter1.isDefault, false);
 
-      final filter2 = DestinationFilter(budgetLevel: BudgetLevel.budget);
+      const filter2 = DestinationFilter(budgetLevel: BudgetLevel.budget);
       expect(filter2.isDefault, false);
 
-      final filter3 = const DestinationFilter(hiddenGemsOnly: true);
+      const filter3 = DestinationFilter(hiddenGemsOnly: true);
       expect(filter3.isDefault, false);
     });
 
     test('resetPagination should reset offset and limit', () {
-      final filter = DestinationFilter(
+      const filter = DestinationFilter(
         searchQuery: 'Tokyo',
         offset: 40,
         limit: 50,
@@ -234,26 +241,26 @@ void main() {
     });
 
     test('hasActiveFilters should return true when any filter is set', () {
-      final filter1 = DestinationFilter(searchQuery: 'Tokyo');
+      const filter1 = DestinationFilter(searchQuery: 'Tokyo');
       expect(filter1.hasActiveFilters, true);
 
-      final filter2 = DestinationFilter(budgetLevel: BudgetLevel.moderate);
+      const filter2 = DestinationFilter(budgetLevel: BudgetLevel.moderate);
       expect(filter2.hasActiveFilters, true);
 
-      final filter3 = const DestinationFilter();
+      const filter3 = DestinationFilter();
       expect(filter3.hasActiveFilters, false);
     });
 
     test('should handle null tags correctly', () {
-      final filter1 = const DestinationFilter();
+      const filter1 = DestinationFilter();
       expect(filter1.tags, isNull);
       expect(filter1.isDefault, true);
 
-      final filter2 = DestinationFilter(tags: []);
+      const filter2 = DestinationFilter(tags: []);
       expect(filter2.tags, isEmpty);
       expect(filter2.isDefault, true); // empty tags is treated as no filter
 
-      final filter3 = DestinationFilter(tags: ['urban']);
+      const filter3 = DestinationFilter(tags: ['urban']);
       expect(filter3.isDefault, false);
     });
   });

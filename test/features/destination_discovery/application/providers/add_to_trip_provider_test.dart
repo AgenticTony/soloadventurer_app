@@ -1,12 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:solo_adventurer/features/destination_discovery/application/providers/add_to_trip_provider.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:solo_adventurer/features/travel/domain/models/trip_planning_operation.dart';
-import 'package:solo_adventurer/features/travel/domain/repositories/travel_operation_repository.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/add_to_trip_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
+import 'package:soloadventurer/features/travel/domain/repositories/travel_operation_repository.dart';
 
 // Mock classes
-class MockTravelOperationRepository extends Mock implements TravelOperationRepository {}
+class MockTravelOperationRepository extends Mock
+    implements TravelOperationRepository {}
 
 void main() {
   late MockTravelOperationRepository mockRepository;
@@ -20,7 +21,7 @@ void main() {
     location: (lat: 35.6762, lng: 139.6503),
     safetyScore: 8.5,
     soloSuitabilityScore: 8.0,
-    soloSuitabilityFactors: SoloSuitabilityFactors(
+    soloSuitabilityFactors: const SoloSuitabilityFactors(
       safety: 8.5,
       nightlife: 7.0,
       walkability: 9.0,
@@ -101,8 +102,10 @@ void main() {
           tripName: 'Summer Trip',
         );
 
-        final capturedOperation = verify(() => mockRepository.saveOperation(captureAny()))
-            .captured.single as TripPlanningOperation;
+        final capturedOperation =
+            verify(() => mockRepository.saveOperation(captureAny()))
+                .captured
+                .single as TripPlanningOperation;
 
         expect(capturedOperation.tripId, 'trip456');
         expect(capturedOperation.destinations, ['dest1']);
@@ -112,6 +115,7 @@ void main() {
         // Setup delayed response to check loading state
         when(() => mockRepository.saveOperation(any())).thenAnswer((_) async {
           await Future.delayed(const Duration(milliseconds: 100));
+          return;
         });
 
         final future = notifier.addToExistingTrip(
@@ -204,8 +208,10 @@ void main() {
           tripTitle: 'New Adventure',
         );
 
-        final capturedOperation = verify(() => mockRepository.saveOperation(captureAny()))
-            .captured.single as TripPlanningOperation;
+        final capturedOperation =
+            verify(() => mockRepository.saveOperation(captureAny()))
+                .captured
+                .single as TripPlanningOperation;
 
         expect(capturedOperation.tripId, isNotNull);
         expect(capturedOperation.tripName, 'New Adventure');
@@ -215,6 +221,7 @@ void main() {
       test('should set loading state during operation', () async {
         when(() => mockRepository.saveOperation(any())).thenAnswer((_) async {
           await Future.delayed(const Duration(milliseconds: 100));
+          return;
         });
 
         final future = notifier.addToNewTrip(
@@ -359,6 +366,7 @@ void main() {
       test('isLoading getter should return loading state', () async {
         when(() => mockRepository.saveOperation(any())).thenAnswer((_) async {
           await Future.delayed(const Duration(milliseconds: 50));
+          return;
         });
 
         final future = notifier.addToExistingTrip(

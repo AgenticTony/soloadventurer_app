@@ -1,10 +1,12 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 import 'package:soloadventurer/features/journal/data/datasources/database_helper.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
+import 'package:soloadventurer/features/journal/domain/entities/media_item.dart'; // For UploadStatus and MediaType
 
 /// SQLite implementation of [JournalLocalDataSource]
 class JournalLocalDataSourceImpl implements JournalLocalDataSource {
@@ -29,7 +31,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return entry;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to create journal entry: $e',
       );
     }
@@ -48,16 +50,16 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       if (count == 0) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Journal entry not found',
         );
       }
 
       return entry;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update journal entry: $e',
       );
     }
@@ -78,7 +80,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return _mapToEntry(maps.first);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get journal entry: $e',
       );
     }
@@ -96,7 +98,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get journal entries: $e',
       );
     }
@@ -116,7 +118,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get entries for trip: $e',
       );
     }
@@ -140,7 +142,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get entries by date range: $e',
       );
     }
@@ -161,7 +163,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to search entries: $e',
       );
     }
@@ -181,7 +183,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get favorite entries: $e',
       );
     }
@@ -201,7 +203,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get entries with location: $e',
       );
     }
@@ -235,7 +237,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get entries near location: $e',
       );
     }
@@ -252,7 +254,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
         whereArgs: [entryId],
       );
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to delete journal entry: $e',
       );
     }
@@ -263,7 +265,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
     try {
       final entry = await getEntry(entryId);
       if (entry == null) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Journal entry not found',
         );
       }
@@ -273,10 +275,10 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       return await updateEntry(updatedEntry);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to toggle favorite: $e',
       );
     }
@@ -297,7 +299,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToEntry).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get entries by sync status: $e',
       );
     }
@@ -311,7 +313,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
     try {
       final entry = await getEntry(entryId);
       if (entry == null) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Journal entry not found',
         );
       }
@@ -322,10 +324,10 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       return await updateEntry(updatedEntry);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update sync status: $e',
       );
     }
@@ -346,7 +348,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return media;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to add media: $e',
       );
     }
@@ -365,16 +367,16 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       if (count == 0) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Media item not found',
         );
       }
 
       return media;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update media: $e',
       );
     }
@@ -394,7 +396,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToMedia).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get media for entry: $e',
       );
     }
@@ -411,7 +413,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
         whereArgs: [mediaId],
       );
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to delete media: $e',
       );
     }
@@ -432,7 +434,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       if (maps.isEmpty) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Media item not found',
         );
       }
@@ -440,16 +442,15 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       final media = _mapToMedia(maps.first);
       final updatedMedia = media.copyWith(
         uploadProgress: progress,
-        uploadStatus: progress == 100
-            ? UploadStatus.completed
-            : UploadStatus.uploading,
+        uploadStatus:
+            progress == 100 ? UploadStatus.completed : UploadStatus.uploading,
       );
 
       return await updateMedia(updatedMedia);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update upload progress: $e',
       );
     }
@@ -470,7 +471,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       if (maps.isEmpty) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Media item not found',
         );
       }
@@ -483,10 +484,10 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       return await updateMedia(updatedMedia);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to complete upload: $e',
       );
     }
@@ -507,7 +508,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       if (maps.isEmpty) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Media item not found',
         );
       }
@@ -518,10 +519,10 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       return await updateMedia(updatedMedia);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to mark upload as failed: $e',
       );
     }
@@ -540,7 +541,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       return maps.map(_mapToMedia).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get media by sync status: $e',
       );
     }
@@ -561,7 +562,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       if (maps.isEmpty) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Media item not found',
         );
       }
@@ -573,10 +574,10 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       );
 
       return await updateMedia(updatedMedia);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update media sync status: $e',
       );
     }
@@ -595,11 +596,9 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
         WHERE ${DatabaseHelper.colJournalEntryId} = ?
       ''', [entryId]);
 
-      return maps
-          .map((map) => map[DatabaseHelper.colTagId] as String)
-          .toList();
+      return maps.map((map) => map[DatabaseHelper.colTagId] as String).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get tags for entry: $e',
       );
     }
@@ -613,7 +612,8 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       await db.insert(
         DatabaseHelper.tableEntryTags,
         {
-          DatabaseHelper.colId: DateTime.now().millisecondsSinceEpoch.toString(),
+          DatabaseHelper.colId:
+              DateTime.now().millisecondsSinceEpoch.toString(),
           DatabaseHelper.colJournalEntryId: entryId,
           DatabaseHelper.colTagId: tagId,
           DatabaseHelper.colCreatedAt: DateTime.now().toIso8601String(),
@@ -621,7 +621,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to add tag to entry: $e',
       );
     }
@@ -639,7 +639,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
         whereArgs: [entryId, tagId],
       );
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to remove tag from entry: $e',
       );
     }
@@ -675,7 +675,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
 
       await batch.commit(noResult: true);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update tags for entry: $e',
       );
     }
@@ -686,7 +686,7 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
     try {
       await _databaseHelper.clearAllData();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to clear all data: $e',
       );
     }
@@ -708,9 +708,8 @@ class JournalLocalDataSourceImpl implements JournalLocalDataSource {
       DatabaseHelper.colLongitude: entry.longitude,
       DatabaseHelper.colLocationAccuracy: entry.locationAccuracy,
       DatabaseHelper.colEntryDate: entry.entryDate.toIso8601String(),
-      DatabaseHelper.colWeatherData: entry.weatherData != null
-          ? jsonEncode(entry.weatherData)
-          : null,
+      DatabaseHelper.colWeatherData:
+          entry.weatherData != null ? jsonEncode(entry.weatherData) : null,
       DatabaseHelper.colIsFavorite: entry.isFavorite ? 1 : 0,
       DatabaseHelper.colSyncStatus: entry.syncStatus.value,
       DatabaseHelper.colLastSyncedAt: entry.lastSyncedAt?.toIso8601String(),

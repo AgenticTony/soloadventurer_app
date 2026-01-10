@@ -1,3 +1,4 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 
 /// Data layer representation of [MediaItem] entity

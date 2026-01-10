@@ -34,11 +34,11 @@ void main() {
           deviceId: 'device_002',
           dataHash: 'xyz789',
         ),
-        localData: {
+        localData: const {
           'destination': 'Paris',
           'startDate': '2025-06-15',
         },
-        remoteData: {
+        remoteData: const {
           'destination': 'Paris',
           'startDate': '2025-06-20',
         },
@@ -144,8 +144,7 @@ void main() {
       expect(find.text('Merge'), findsNothing);
     });
 
-    testWidgets('should show correct severity indicator',
-        (tester) async {
+    testWidgets('should show correct severity indicator', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

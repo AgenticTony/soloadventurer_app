@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
 import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
-import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart'
-    show ConflictType, ConflictSeverity;
 import 'conflict_resolution_dialog.dart';
 import 'conflict_banner.dart';
 import 'conflict_list_view.dart';
@@ -225,14 +223,14 @@ class ConflictWidgetsExample extends StatelessWidget {
         deviceId: 'device_002',
         dataHash: 'xyz789uvw012',
       ),
-      localData: {
+      localData: const {
         'destination': 'Paris',
         'startDate': '2025-06-15',
         'endDate': '2025-06-22',
         'budget': 5000,
         'notes': 'Summer vacation',
       },
-      remoteData: {
+      remoteData: const {
         'destination': 'Paris',
         'startDate': '2025-06-15',
         'endDate': '2025-06-25', // Different
@@ -297,7 +295,8 @@ class _ConflictResolutionIntegrationExampleState
 
         // Remove from pending conflicts
         setState(() {
-          pendingConflicts.removeWhere((c) => c.conflictId == conflict.conflictId);
+          pendingConflicts
+              .removeWhere((c) => c.conflictId == conflict.conflictId);
         });
 
         if (mounted) {
@@ -370,13 +369,10 @@ class _ConflictResolutionIntegrationExampleState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    pendingConflicts.isEmpty
-                        ? Icons.check_circle
-                        : Icons.sync,
+                    pendingConflicts.isEmpty ? Icons.check_circle : Icons.sync,
                     size: 64,
-                    color: pendingConflicts.isEmpty
-                        ? Colors.green
-                        : Colors.orange,
+                    color:
+                        pendingConflicts.isEmpty ? Colors.green : Colors.orange,
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -420,11 +416,11 @@ class _ConflictResolutionIntegrationExampleState
         deviceId: 'device_002',
         dataHash: 'xyz789uvw012',
       ),
-      localData: {
+      localData: const {
         'destination': 'Paris',
         'startDate': '2025-06-15',
       },
-      remoteData: {
+      remoteData: const {
         'destination': 'Paris',
         'startDate': '2025-06-20',
       },

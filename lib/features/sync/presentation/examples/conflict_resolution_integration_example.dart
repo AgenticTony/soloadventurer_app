@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_resolution.dart';
-import 'package:soloadventurer/features/sync/presentation/notifiers/conflict_resolution_notifier.dart';
 import 'package:soloadventurer/features/sync/presentation/providers/conflict_resolution_providers.dart';
 import 'package:soloadventurer/features/sync/presentation/widgets/conflict_resolution_dialog.dart';
 import 'package:soloadventurer/features/sync/presentation/widgets/conflict_banner.dart';
@@ -85,7 +84,9 @@ class _ConflictBannerExample extends ConsumerWidget {
       conflict: activeConflict,
       onResolve: () => _showResolutionDialog(context, ref, activeConflict),
       onDismiss: () {
-        ref.read(conflictResolutionNotifierProvider.notifier).cancelResolution();
+        ref
+            .read(conflictResolutionNotifierProvider.notifier)
+            .cancelResolution();
       },
     );
   }
@@ -357,11 +358,11 @@ class _ActionButtonsExample extends ConsumerWidget {
         deviceId: 'device-2',
         dataHash: 'def456',
       ),
-      localData: {
+      localData: const {
         'name': 'Trip to Paris',
         'startDate': '2024-06-01',
       },
-      remoteData: {
+      remoteData: const {
         'name': 'Trip to Paris',
         'startDate': '2024-06-15', // Modified on remote
       },
@@ -410,9 +411,10 @@ class SyncFlowExample {
         final conflict = manualConflicts.first;
         notifier.startResolution(conflict);
 
-        final canMerge = ref.read(conflictResolverProvider).canMergeAutomatically(
-              conflict: conflict,
-            );
+        final canMerge =
+            ref.read(conflictResolverProvider).canMergeAutomatically(
+                  conflict: conflict,
+                );
 
         final choice = await ConflictResolutionDialog.show(
           context: context,
@@ -450,8 +452,8 @@ class _ResolutionListenerExampleState
     ref.listen<AsyncValue<ConflictResolutionState>>(
       conflictResolutionNotifierProvider,
       (previous, next) {
-        final previousValue = previous?.valueOrNull;
-        final nextValue = next.valueOrNull;
+        final previousValue = previous?.value;
+        final nextValue = next.value;
 
         // Check if resolution just completed
         if (previousValue?.isResolved == false &&
@@ -479,7 +481,8 @@ class _ResolutionListenerExampleState
     // Show success message
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Resolved ${resolution.entityType} ${resolution.entityId}'),
+        content:
+            Text('Resolved ${resolution.entityType} ${resolution.entityId}'),
         backgroundColor: Colors.green,
       ),
     );

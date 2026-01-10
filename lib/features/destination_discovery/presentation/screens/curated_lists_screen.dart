@@ -25,8 +25,7 @@ class CuratedListsScreen extends ConsumerStatefulWidget {
   static const String routeName = '/curated-lists';
 
   @override
-  ConsumerState<CuratedListsScreen> createState() =>
-      _CuratedListsScreenState();
+  ConsumerState<CuratedListsScreen> createState() => _CuratedListsScreenState();
 }
 
 class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
@@ -67,25 +66,45 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
       case CuratedListFilter.featured:
         return allLists.where((list) => list.isFeatured).toList();
       case CuratedListFilter.popularSolo:
-        return allLists.where((list) => list.type == CuratedListType.popularSolo).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.popularSolo)
+            .toList();
       case CuratedListFilter.hiddenGems:
-        return allLists.where((list) => list.type == CuratedListType.hiddenGems).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.hiddenGems)
+            .toList();
       case CuratedListFilter.budgetFriendly:
-        return allLists.where((list) => list.type == CuratedListType.budgetFriendly).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.budgetFriendly)
+            .toList();
       case CuratedListFilter.adventure:
-        return allLists.where((list) => list.type == CuratedListType.adventure).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.adventure)
+            .toList();
       case CuratedListFilter.cultural:
-        return allLists.where((list) => list.type == CuratedListType.cultural).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.cultural)
+            .toList();
       case CuratedListFilter.beach:
-        return allLists.where((list) => list.type == CuratedListType.beach).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.beach)
+            .toList();
       case CuratedListFilter.urban:
-        return allLists.where((list) => list.type == CuratedListType.urban).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.urban)
+            .toList();
       case CuratedListFilter.nature:
-        return allLists.where((list) => list.type == CuratedListType.nature).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.nature)
+            .toList();
       case CuratedListFilter.food:
-        return allLists.where((list) => list.type == CuratedListType.food).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.food)
+            .toList();
       case CuratedListFilter.wellness:
-        return allLists.where((list) => list.type == CuratedListType.wellness).toList();
+        return allLists
+            .where((list) => list.type == CuratedListType.wellness)
+            .toList();
       case CuratedListFilter.all:
       default:
         return allLists;
@@ -247,7 +266,8 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
                 SliverPadding(
                   padding: const EdgeInsets.all(16),
                   sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
@@ -281,7 +301,8 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
   }
 
   /// Build the featured section with horizontal scrolling
-  Widget _buildFeaturedSection(ThemeData theme, List<CuratedList> featuredLists) {
+  Widget _buildFeaturedSection(
+      ThemeData theme, List<CuratedList> featuredLists) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(

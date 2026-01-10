@@ -339,10 +339,10 @@ void main() {
       testWidgets('integrates with Flutter image cache', (tester) async {
         await ImageCacheConfig.initialize();
 
-        final imageProvider = NetworkImage('https://example.com/test.jpg');
+        const imageProvider = NetworkImage('https://example.com/test.jpg');
 
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: Image(image: imageProvider),
             ),
@@ -358,7 +358,7 @@ void main() {
       testWidgets('multiple images use cache efficiently', (tester) async {
         await ImageCacheConfig.initialize();
 
-        final imageUrl = 'https://example.com/test.jpg';
+        const imageUrl = 'https://example.com/test.jpg';
 
         await tester.pumpWidget(
           MaterialApp(

@@ -146,13 +146,15 @@ class TokenExpirationTracker {
 
     if (result.shouldRefresh) {
       // Token is already expired or should be refreshed now
-      debugPrint('TokenExpirationTracker: Token should be refreshed immediately');
+      debugPrint(
+          'TokenExpirationTracker: Token should be refreshed immediately');
       _scheduleRefresh(Duration.zero);
     } else if (result.timeUntilRefresh != null) {
       // Schedule refresh for the future
       _scheduleRefresh(result.timeUntilRefresh!);
     } else {
-      debugPrint('TokenExpirationTracker: No expiration information, cannot schedule refresh');
+      debugPrint(
+          'TokenExpirationTracker: No expiration information, cannot schedule refresh');
     }
   }
 
@@ -187,7 +189,8 @@ class TokenExpirationTracker {
 
     // Check if token is already expired
     if (timeUntilExpiration.isNegative) {
-      debugPrint('TokenExpirationTracker: Token is expired (expired at $expirationTime)');
+      debugPrint(
+          'TokenExpirationTracker: Token is expired (expired at $expirationTime)');
       return TokenExpirationResult.expired(expirationTime: expirationTime);
     }
 
@@ -198,7 +201,8 @@ class TokenExpirationTracker {
 
     // Calculate time until refresh (at 75% of lifetime)
     final refreshBeforeExpiration = Duration(
-      microseconds: (assumedTokenLifetime.inMicroseconds * refreshThreshold).round(),
+      microseconds:
+          (assumedTokenLifetime.inMicroseconds * refreshThreshold).round(),
     );
 
     final timeUntilRefresh = timeUntilExpiration - refreshBeforeExpiration;
@@ -216,7 +220,8 @@ class TokenExpirationTracker {
     }
 
     // Token is still valid
-    debugPrint('TokenExpirationTracker: Token is valid, refresh in ${timeUntilRefresh.inMinutes} minutes '
+    debugPrint(
+        'TokenExpirationTracker: Token is valid, refresh in ${timeUntilRefresh.inMinutes} minutes '
         '(expires in ${timeUntilExpiration.inMinutes} minutes)');
 
     return TokenExpirationResult.valid(
@@ -269,7 +274,8 @@ class TokenExpirationTracker {
       _performRefresh();
     } else {
       // Schedule refresh for the future
-      debugPrint('TokenExpirationTracker: Scheduling refresh in ${delay.inMinutes} minutes');
+      debugPrint(
+          'TokenExpirationTracker: Scheduling refresh in ${delay.inMinutes} minutes');
       _refreshTimer = Timer(delay, _performRefresh);
     }
   }
@@ -284,7 +290,8 @@ class TokenExpirationTracker {
     // Check if we're still within the refresh window
     final result = checkExpiration(_currentSession!);
     if (!result.shouldRefresh) {
-      debugPrint('TokenExpirationTracker: Token was refreshed by another operation, rescheduling');
+      debugPrint(
+          'TokenExpirationTracker: Token was refreshed by another operation, rescheduling');
       // Reschedule based on new timing
       if (result.timeUntilRefresh != null) {
         _scheduleRefresh(result.timeUntilRefresh!);
@@ -308,14 +315,16 @@ class TokenExpirationTracker {
 
       // Retry with exponential backoff
       final retryDelay = _calculateRetryDelay();
-      debugPrint('TokenExpirationTracker: Scheduling retry in ${retryDelay.inSeconds} seconds');
+      debugPrint(
+          'TokenExpirationTracker: Scheduling retry in ${retryDelay.inSeconds} seconds');
       _scheduleRefresh(retryDelay);
     } catch (e) {
       debugPrint('TokenExpirationTracker: Unexpected error during refresh: $e');
 
       // Retry with exponential backoff
       final retryDelay = _calculateRetryDelay();
-      debugPrint('TokenExpirationTracker: Scheduling retry in ${retryDelay.inSeconds} seconds');
+      debugPrint(
+          'TokenExpirationTracker: Scheduling retry in ${retryDelay.inSeconds} seconds');
       _scheduleRefresh(retryDelay);
     }
   }

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -24,7 +23,8 @@ void main() {
   });
 
   group('TokenExpirationTracker - Expiration Calculation', () {
-    test('should correctly calculate time until expiration for valid token', () {
+    test('should correctly calculate time until expiration for valid token',
+        () {
       // Arrange
       final expiresAt = DateTime.now().add(const Duration(hours: 1));
       final session = AuthSession(
@@ -413,8 +413,8 @@ void main() {
         expiresAt: expiresAt,
       );
 
-      when(() => mockRefreshService.refreshToken())
-          .thenThrow(const AuthException('Refresh failed', code: 'REFRESH_ERROR'));
+      when(() => mockRefreshService.refreshToken()).thenThrow(
+          const AuthException('Refresh failed', code: 'REFRESH_ERROR'));
 
       // Act
       tracker.startTracking(session);
@@ -566,7 +566,8 @@ void main() {
   group('TokenExpirationResult - Factory Methods', () {
     test('should create expired result correctly', () {
       // Arrange
-      final expirationTime = DateTime.now().subtract(const Duration(minutes: 5));
+      final expirationTime =
+          DateTime.now().subtract(const Duration(minutes: 5));
 
       // Act
       final result = TokenExpirationResult.expired(
@@ -583,8 +584,8 @@ void main() {
     test('should create shouldRefreshNow result correctly', () {
       // Arrange
       final expirationTime = DateTime.now().add(const Duration(minutes: 10));
-      final timeUntilExpiration = const Duration(minutes: 10);
-      final timeUntilRefresh = Duration.zero;
+      const timeUntilExpiration = Duration(minutes: 10);
+      const timeUntilRefresh = Duration.zero;
 
       // Act
       final result = TokenExpirationResult.shouldRefreshNow(
@@ -604,8 +605,8 @@ void main() {
     test('should create valid result correctly', () {
       // Arrange
       final expirationTime = DateTime.now().add(const Duration(minutes: 50));
-      final timeUntilExpiration = const Duration(minutes: 50);
-      final timeUntilRefresh = const Duration(minutes: 5);
+      const timeUntilExpiration = Duration(minutes: 50);
+      const timeUntilRefresh = Duration(minutes: 5);
 
       // Act
       final result = TokenExpirationResult.valid(

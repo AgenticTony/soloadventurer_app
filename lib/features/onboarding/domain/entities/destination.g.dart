@@ -6,8 +6,7 @@ part of 'destination.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$DestinationImpl _$$DestinationImplFromJson(Map<String, dynamic> json) =>
-    _$DestinationImpl(
+_Destination _$DestinationFromJson(Map<String, dynamic> json) => _Destination(
       placeId: json['placeId'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
@@ -19,7 +18,7 @@ _$DestinationImpl _$$DestinationImplFromJson(Map<String, dynamic> json) =>
       imageUrl: json['imageUrl'] as String?,
     );
 
-Map<String, dynamic> _$$DestinationImplToJson(_$DestinationImpl instance) =>
+Map<String, dynamic> _$DestinationToJson(_Destination instance) =>
     <String, dynamic>{
       'placeId': instance.placeId,
       'name': instance.name,

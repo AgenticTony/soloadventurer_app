@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../features/travel/domain/repositories/trip_repository.dart';
-import '../features/travel/domain/repositories/activity_repository.dart';
-import '../core/models/paginated_data.dart';
-import '../features/travel/domain/models/trip.dart';
-import '../features/travel/domain/models/activity.dart';
+import 'package:soloadventurer/features/travel/domain/repositories/trip_repository.dart';
+import 'package:soloadventurer/features/travel/domain/repositories/activity_repository.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/features/travel/domain/models/trip.dart';
+import 'package:soloadventurer/features/travel/domain/models/activity.dart';
 import 'debounce.dart';
 import 'query_batcher.dart';
 
@@ -67,7 +67,7 @@ class _Example1BasicSearchDebouncingState
         if (mounted && result.executed) {
           setState(() {
             _searchResults = result.value?.items ?? [];
-            _lastExecutedResult = result.input;
+            _lastExecutedQuery = result.input;
             _isSearching = false;
           });
         }
@@ -217,7 +217,7 @@ class _Example2FilterDebouncingState extends State<Example2FilterDebouncing> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               decoration: const InputDecoration(
                 labelText: 'Category',
                 border: OutlineInputBorder(),
@@ -243,7 +243,7 @@ class _Example2FilterDebouncingState extends State<Example2FilterDebouncing> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: DropdownButtonFormField<String>(
-              value: _selectedPriority,
+              initialValue: _selectedPriority,
               decoration: const InputDecoration(
                 labelText: 'Priority',
                 border: OutlineInputBorder(),
@@ -321,8 +321,7 @@ class Example3BasicBatching extends StatefulWidget {
   });
 
   @override
-  State<Example3BasicBatching> createState() =>
-      _Example3BasicBatchingState();
+  State<Example3BasicBatching> createState() => _Example3BasicBatchingState();
 }
 
 class _Example3BasicBatchingState extends State<Example3BasicBatching> {
@@ -412,8 +411,10 @@ class _Example3BasicBatchingState extends State<Example3BasicBatching> {
                       Text('Total queries: ${_stats!.totalQueries}'),
                       Text('Successful: ${_stats!.successfulQueries}'),
                       Text('Failed: ${_stats!.failedQueries}'),
-                      Text('Success rate: ${(_stats!.successRate * 100).toStringAsFixed(1)}%'),
-                      Text('Total time: ${_stats!.totalExecutionTime.inMilliseconds}ms'),
+                      Text(
+                          'Success rate: ${(_stats!.successRate * 100).toStringAsFixed(1)}%'),
+                      Text(
+                          'Total time: ${_stats!.totalExecutionTime.inMilliseconds}ms'),
                     ],
                   ),
                 ),
@@ -446,7 +447,8 @@ class _Example3BasicBatchingState extends State<Example3BasicBatching> {
                     title: Text('Activities (${_activities.length})'),
                     subtitle: _activities.isEmpty
                         ? const Text('No activities')
-                        : Text(_activities.take(3).map((a) => a.title).join(', ')),
+                        : Text(
+                            _activities.take(3).map((a) => a.title).join(', ')),
                   ),
                 ],
               ),
@@ -634,18 +636,14 @@ class _Example4AggressiveBatchingState
                 // Upcoming trips
                 _Section(
                   title: 'Upcoming Trips',
-                  items: _upcomingTrips
-                      .map((trip) => trip.title)
-                      .toList(),
+                  items: _upcomingTrips.map((trip) => trip.title).toList(),
                   icon: Icons.upcoming,
                 ),
 
                 // Past trips
                 _Section(
                   title: 'Recent Trips',
-                  items: _pastTrips
-                      .map((trip) => trip.title)
-                      .toList(),
+                  items: _pastTrips.map((trip) => trip.title).toList(),
                   icon: Icons.history,
                 ),
 
@@ -753,7 +751,8 @@ class _Example5CombinedDebounceAndBatchState
 
         return {
           'trips': results['trips-$query']?.data as List<Trip>? ?? [],
-          'activities': results['activities-$query']?.data as List<Activity>? ?? [],
+          'activities':
+              results['activities-$query']?.data as List<Activity>? ?? [],
         };
       },
       onCompleteOverride: (result) {

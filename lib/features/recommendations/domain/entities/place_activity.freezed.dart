@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,191 +9,111 @@ part of 'place_activity.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-PlaceActivity _$PlaceActivityFromJson(Map<String, dynamic> json) {
-  return _PlaceActivity.fromJson(json);
-}
 
 /// @nodoc
 mixin _$PlaceActivity {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  RecommendationCategory get category => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  String? get location => throw _privateConstructorUsedError;
-  double? get latitude => throw _privateConstructorUsedError;
-  double? get longitude => throw _privateConstructorUsedError;
-  double get rating => throw _privateConstructorUsedError;
-  int get reviewCount => throw _privateConstructorUsedError;
-  String? get priceLevel => throw _privateConstructorUsedError;
-  double? get cost => throw _privateConstructorUsedError;
-  Duration? get estimatedDuration => throw _privateConstructorUsedError;
-  List<String> get images => throw _privateConstructorUsedError;
-  List<String> get tags => throw _privateConstructorUsedError;
-  List<String> get localTips => throw _privateConstructorUsedError;
-  String? get bookingUrl => throw _privateConstructorUsedError;
-  bool get requiresBooking => throw _privateConstructorUsedError;
-  String? get openingHours => throw _privateConstructorUsedError;
-
-  /// Serializes this PlaceActivity to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get name;
+  RecommendationCategory get category;
+  String? get description;
+  String? get location;
+  double? get latitude;
+  double? get longitude;
+  double get rating;
+  int get reviewCount;
+  String? get priceLevel;
+  double? get cost;
+  Duration? get estimatedDuration;
+  List<String> get images;
+  List<String> get tags;
+  List<String> get localTips;
+  String? get bookingUrl;
+  bool get requiresBooking;
+  String? get openingHours;
 
   /// Create a copy of PlaceActivity
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $PlaceActivityCopyWith<PlaceActivity> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $PlaceActivityCopyWith<$Res> {
-  factory $PlaceActivityCopyWith(
-          PlaceActivity value, $Res Function(PlaceActivity) then) =
-      _$PlaceActivityCopyWithImpl<$Res, PlaceActivity>;
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      RecommendationCategory category,
-      String? description,
-      String? location,
-      double? latitude,
-      double? longitude,
-      double rating,
-      int reviewCount,
-      String? priceLevel,
-      double? cost,
-      Duration? estimatedDuration,
-      List<String> images,
-      List<String> tags,
-      List<String> localTips,
-      String? bookingUrl,
-      bool requiresBooking,
-      String? openingHours});
-}
-
-/// @nodoc
-class _$PlaceActivityCopyWithImpl<$Res, $Val extends PlaceActivity>
-    implements $PlaceActivityCopyWith<$Res> {
-  _$PlaceActivityCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of PlaceActivity
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $PlaceActivityCopyWith<PlaceActivity> get copyWith =>
+      _$PlaceActivityCopyWithImpl<PlaceActivity>(
+          this as PlaceActivity, _$identity);
+
+  /// Serializes this PlaceActivity to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? category = null,
-    Object? description = freezed,
-    Object? location = freezed,
-    Object? latitude = freezed,
-    Object? longitude = freezed,
-    Object? rating = null,
-    Object? reviewCount = null,
-    Object? priceLevel = freezed,
-    Object? cost = freezed,
-    Object? estimatedDuration = freezed,
-    Object? images = null,
-    Object? tags = null,
-    Object? localTips = null,
-    Object? bookingUrl = freezed,
-    Object? requiresBooking = null,
-    Object? openingHours = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as RecommendationCategory,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String?,
-      latitude: freezed == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      longitude: freezed == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      rating: null == rating
-          ? _value.rating
-          : rating // ignore: cast_nullable_to_non_nullable
-              as double,
-      reviewCount: null == reviewCount
-          ? _value.reviewCount
-          : reviewCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      priceLevel: freezed == priceLevel
-          ? _value.priceLevel
-          : priceLevel // ignore: cast_nullable_to_non_nullable
-              as String?,
-      cost: freezed == cost
-          ? _value.cost
-          : cost // ignore: cast_nullable_to_non_nullable
-              as double?,
-      estimatedDuration: freezed == estimatedDuration
-          ? _value.estimatedDuration
-          : estimatedDuration // ignore: cast_nullable_to_non_nullable
-              as Duration?,
-      images: null == images
-          ? _value.images
-          : images // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      tags: null == tags
-          ? _value.tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      localTips: null == localTips
-          ? _value.localTips
-          : localTips // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      bookingUrl: freezed == bookingUrl
-          ? _value.bookingUrl
-          : bookingUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      requiresBooking: null == requiresBooking
-          ? _value.requiresBooking
-          : requiresBooking // ignore: cast_nullable_to_non_nullable
-              as bool,
-      openingHours: freezed == openingHours
-          ? _value.openingHours
-          : openingHours // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is PlaceActivity &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
+            (identical(other.rating, rating) || other.rating == rating) &&
+            (identical(other.reviewCount, reviewCount) ||
+                other.reviewCount == reviewCount) &&
+            (identical(other.priceLevel, priceLevel) ||
+                other.priceLevel == priceLevel) &&
+            (identical(other.cost, cost) || other.cost == cost) &&
+            (identical(other.estimatedDuration, estimatedDuration) ||
+                other.estimatedDuration == estimatedDuration) &&
+            const DeepCollectionEquality().equals(other.images, images) &&
+            const DeepCollectionEquality().equals(other.tags, tags) &&
+            const DeepCollectionEquality().equals(other.localTips, localTips) &&
+            (identical(other.bookingUrl, bookingUrl) ||
+                other.bookingUrl == bookingUrl) &&
+            (identical(other.requiresBooking, requiresBooking) ||
+                other.requiresBooking == requiresBooking) &&
+            (identical(other.openingHours, openingHours) ||
+                other.openingHours == openingHours));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      category,
+      description,
+      location,
+      latitude,
+      longitude,
+      rating,
+      reviewCount,
+      priceLevel,
+      cost,
+      estimatedDuration,
+      const DeepCollectionEquality().hash(images),
+      const DeepCollectionEquality().hash(tags),
+      const DeepCollectionEquality().hash(localTips),
+      bookingUrl,
+      requiresBooking,
+      openingHours);
+
+  @override
+  String toString() {
+    return 'PlaceActivity(id: $id, name: $name, category: $category, description: $description, location: $location, latitude: $latitude, longitude: $longitude, rating: $rating, reviewCount: $reviewCount, priceLevel: $priceLevel, cost: $cost, estimatedDuration: $estimatedDuration, images: $images, tags: $tags, localTips: $localTips, bookingUrl: $bookingUrl, requiresBooking: $requiresBooking, openingHours: $openingHours)';
   }
 }
 
 /// @nodoc
-abstract class _$$PlaceActivityImplCopyWith<$Res>
-    implements $PlaceActivityCopyWith<$Res> {
-  factory _$$PlaceActivityImplCopyWith(
-          _$PlaceActivityImpl value, $Res Function(_$PlaceActivityImpl) then) =
-      __$$PlaceActivityImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $PlaceActivityCopyWith<$Res> {
+  factory $PlaceActivityCopyWith(
+          PlaceActivity value, $Res Function(PlaceActivity) _then) =
+      _$PlaceActivityCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -217,12 +137,12 @@ abstract class _$$PlaceActivityImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$PlaceActivityImplCopyWithImpl<$Res>
-    extends _$PlaceActivityCopyWithImpl<$Res, _$PlaceActivityImpl>
-    implements _$$PlaceActivityImplCopyWith<$Res> {
-  __$$PlaceActivityImplCopyWithImpl(
-      _$PlaceActivityImpl _value, $Res Function(_$PlaceActivityImpl) _then)
-      : super(_value, _then);
+class _$PlaceActivityCopyWithImpl<$Res>
+    implements $PlaceActivityCopyWith<$Res> {
+  _$PlaceActivityCopyWithImpl(this._self, this._then);
+
+  final PlaceActivity _self;
+  final $Res Function(PlaceActivity) _then;
 
   /// Create a copy of PlaceActivity
   /// with the given fields replaced by the non-null parameter values.
@@ -248,87 +168,355 @@ class __$$PlaceActivityImplCopyWithImpl<$Res>
     Object? requiresBooking = null,
     Object? openingHours = freezed,
   }) {
-    return _then(_$PlaceActivityImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       category: null == category
-          ? _value.category
+          ? _self.category
           : category // ignore: cast_nullable_to_non_nullable
               as RecommendationCategory,
       description: freezed == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as String?,
       latitude: freezed == latitude
-          ? _value.latitude
+          ? _self.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
               as double?,
       longitude: freezed == longitude
-          ? _value.longitude
+          ? _self.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double?,
       rating: null == rating
-          ? _value.rating
+          ? _self.rating
           : rating // ignore: cast_nullable_to_non_nullable
               as double,
       reviewCount: null == reviewCount
-          ? _value.reviewCount
+          ? _self.reviewCount
           : reviewCount // ignore: cast_nullable_to_non_nullable
               as int,
       priceLevel: freezed == priceLevel
-          ? _value.priceLevel
+          ? _self.priceLevel
           : priceLevel // ignore: cast_nullable_to_non_nullable
               as String?,
       cost: freezed == cost
-          ? _value.cost
+          ? _self.cost
           : cost // ignore: cast_nullable_to_non_nullable
               as double?,
       estimatedDuration: freezed == estimatedDuration
-          ? _value.estimatedDuration
+          ? _self.estimatedDuration
           : estimatedDuration // ignore: cast_nullable_to_non_nullable
               as Duration?,
       images: null == images
-          ? _value._images
+          ? _self.images
           : images // ignore: cast_nullable_to_non_nullable
               as List<String>,
       tags: null == tags
-          ? _value._tags
+          ? _self.tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<String>,
       localTips: null == localTips
-          ? _value._localTips
+          ? _self.localTips
           : localTips // ignore: cast_nullable_to_non_nullable
               as List<String>,
       bookingUrl: freezed == bookingUrl
-          ? _value.bookingUrl
+          ? _self.bookingUrl
           : bookingUrl // ignore: cast_nullable_to_non_nullable
               as String?,
       requiresBooking: null == requiresBooking
-          ? _value.requiresBooking
+          ? _self.requiresBooking
           : requiresBooking // ignore: cast_nullable_to_non_nullable
               as bool,
       openingHours: freezed == openingHours
-          ? _value.openingHours
+          ? _self.openingHours
           : openingHours // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [PlaceActivity].
+extension PlaceActivityPatterns on PlaceActivity {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_PlaceActivity value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PlaceActivity() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_PlaceActivity value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PlaceActivity():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_PlaceActivity value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PlaceActivity() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String name,
+            RecommendationCategory category,
+            String? description,
+            String? location,
+            double? latitude,
+            double? longitude,
+            double rating,
+            int reviewCount,
+            String? priceLevel,
+            double? cost,
+            Duration? estimatedDuration,
+            List<String> images,
+            List<String> tags,
+            List<String> localTips,
+            String? bookingUrl,
+            bool requiresBooking,
+            String? openingHours)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _PlaceActivity() when $default != null:
+        return $default(
+            _that.id,
+            _that.name,
+            _that.category,
+            _that.description,
+            _that.location,
+            _that.latitude,
+            _that.longitude,
+            _that.rating,
+            _that.reviewCount,
+            _that.priceLevel,
+            _that.cost,
+            _that.estimatedDuration,
+            _that.images,
+            _that.tags,
+            _that.localTips,
+            _that.bookingUrl,
+            _that.requiresBooking,
+            _that.openingHours);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String name,
+            RecommendationCategory category,
+            String? description,
+            String? location,
+            double? latitude,
+            double? longitude,
+            double rating,
+            int reviewCount,
+            String? priceLevel,
+            double? cost,
+            Duration? estimatedDuration,
+            List<String> images,
+            List<String> tags,
+            List<String> localTips,
+            String? bookingUrl,
+            bool requiresBooking,
+            String? openingHours)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PlaceActivity():
+        return $default(
+            _that.id,
+            _that.name,
+            _that.category,
+            _that.description,
+            _that.location,
+            _that.latitude,
+            _that.longitude,
+            _that.rating,
+            _that.reviewCount,
+            _that.priceLevel,
+            _that.cost,
+            _that.estimatedDuration,
+            _that.images,
+            _that.tags,
+            _that.localTips,
+            _that.bookingUrl,
+            _that.requiresBooking,
+            _that.openingHours);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String name,
+            RecommendationCategory category,
+            String? description,
+            String? location,
+            double? latitude,
+            double? longitude,
+            double rating,
+            int reviewCount,
+            String? priceLevel,
+            double? cost,
+            Duration? estimatedDuration,
+            List<String> images,
+            List<String> tags,
+            List<String> localTips,
+            String? bookingUrl,
+            bool requiresBooking,
+            String? openingHours)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _PlaceActivity() when $default != null:
+        return $default(
+            _that.id,
+            _that.name,
+            _that.category,
+            _that.description,
+            _that.location,
+            _that.latitude,
+            _that.longitude,
+            _that.rating,
+            _that.reviewCount,
+            _that.priceLevel,
+            _that.cost,
+            _that.estimatedDuration,
+            _that.images,
+            _that.tags,
+            _that.localTips,
+            _that.bookingUrl,
+            _that.requiresBooking,
+            _that.openingHours);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$PlaceActivityImpl extends _PlaceActivity {
-  const _$PlaceActivityImpl(
+class _PlaceActivity extends PlaceActivity {
+  const _PlaceActivity(
       {required this.id,
       required this.name,
       required this.category,
@@ -351,9 +539,8 @@ class _$PlaceActivityImpl extends _PlaceActivity {
         _tags = tags,
         _localTips = localTips,
         super._();
-
-  factory _$PlaceActivityImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PlaceActivityImplFromJson(json);
+  factory _PlaceActivity.fromJson(Map<String, dynamic> json) =>
+      _$PlaceActivityFromJson(json);
 
   @override
   final String id;
@@ -416,16 +603,26 @@ class _$PlaceActivityImpl extends _PlaceActivity {
   @override
   final String? openingHours;
 
+  /// Create a copy of PlaceActivity
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'PlaceActivity(id: $id, name: $name, category: $category, description: $description, location: $location, latitude: $latitude, longitude: $longitude, rating: $rating, reviewCount: $reviewCount, priceLevel: $priceLevel, cost: $cost, estimatedDuration: $estimatedDuration, images: $images, tags: $tags, localTips: $localTips, bookingUrl: $bookingUrl, requiresBooking: $requiresBooking, openingHours: $openingHours)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$PlaceActivityCopyWith<_PlaceActivity> get copyWith =>
+      __$PlaceActivityCopyWithImpl<_PlaceActivity>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$PlaceActivityToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$PlaceActivityImpl &&
+            other is _PlaceActivity &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.category, category) ||
@@ -481,88 +678,148 @@ class _$PlaceActivityImpl extends _PlaceActivity {
       requiresBooking,
       openingHours);
 
-  /// Create a copy of PlaceActivity
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$PlaceActivityImplCopyWith<_$PlaceActivityImpl> get copyWith =>
-      __$$PlaceActivityImplCopyWithImpl<_$PlaceActivityImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PlaceActivityImplToJson(
-      this,
-    );
+  String toString() {
+    return 'PlaceActivity(id: $id, name: $name, category: $category, description: $description, location: $location, latitude: $latitude, longitude: $longitude, rating: $rating, reviewCount: $reviewCount, priceLevel: $priceLevel, cost: $cost, estimatedDuration: $estimatedDuration, images: $images, tags: $tags, localTips: $localTips, bookingUrl: $bookingUrl, requiresBooking: $requiresBooking, openingHours: $openingHours)';
   }
 }
 
-abstract class _PlaceActivity extends PlaceActivity {
-  const factory _PlaceActivity(
-      {required final String id,
-      required final String name,
-      required final RecommendationCategory category,
-      final String? description,
-      final String? location,
-      final double? latitude,
-      final double? longitude,
-      final double rating,
-      final int reviewCount,
-      final String? priceLevel,
-      final double? cost,
-      final Duration? estimatedDuration,
-      final List<String> images,
-      final List<String> tags,
-      final List<String> localTips,
-      final String? bookingUrl,
-      final bool requiresBooking,
-      final String? openingHours}) = _$PlaceActivityImpl;
-  const _PlaceActivity._() : super._();
+/// @nodoc
+abstract mixin class _$PlaceActivityCopyWith<$Res>
+    implements $PlaceActivityCopyWith<$Res> {
+  factory _$PlaceActivityCopyWith(
+          _PlaceActivity value, $Res Function(_PlaceActivity) _then) =
+      __$PlaceActivityCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      RecommendationCategory category,
+      String? description,
+      String? location,
+      double? latitude,
+      double? longitude,
+      double rating,
+      int reviewCount,
+      String? priceLevel,
+      double? cost,
+      Duration? estimatedDuration,
+      List<String> images,
+      List<String> tags,
+      List<String> localTips,
+      String? bookingUrl,
+      bool requiresBooking,
+      String? openingHours});
+}
 
-  factory _PlaceActivity.fromJson(Map<String, dynamic> json) =
-      _$PlaceActivityImpl.fromJson;
+/// @nodoc
+class __$PlaceActivityCopyWithImpl<$Res>
+    implements _$PlaceActivityCopyWith<$Res> {
+  __$PlaceActivityCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get name;
-  @override
-  RecommendationCategory get category;
-  @override
-  String? get description;
-  @override
-  String? get location;
-  @override
-  double? get latitude;
-  @override
-  double? get longitude;
-  @override
-  double get rating;
-  @override
-  int get reviewCount;
-  @override
-  String? get priceLevel;
-  @override
-  double? get cost;
-  @override
-  Duration? get estimatedDuration;
-  @override
-  List<String> get images;
-  @override
-  List<String> get tags;
-  @override
-  List<String> get localTips;
-  @override
-  String? get bookingUrl;
-  @override
-  bool get requiresBooking;
-  @override
-  String? get openingHours;
+  final _PlaceActivity _self;
+  final $Res Function(_PlaceActivity) _then;
 
   /// Create a copy of PlaceActivity
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$PlaceActivityImplCopyWith<_$PlaceActivityImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? category = null,
+    Object? description = freezed,
+    Object? location = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? rating = null,
+    Object? reviewCount = null,
+    Object? priceLevel = freezed,
+    Object? cost = freezed,
+    Object? estimatedDuration = freezed,
+    Object? images = null,
+    Object? tags = null,
+    Object? localTips = null,
+    Object? bookingUrl = freezed,
+    Object? requiresBooking = null,
+    Object? openingHours = freezed,
+  }) {
+    return _then(_PlaceActivity(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as RecommendationCategory,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      location: freezed == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      rating: null == rating
+          ? _self.rating
+          : rating // ignore: cast_nullable_to_non_nullable
+              as double,
+      reviewCount: null == reviewCount
+          ? _self.reviewCount
+          : reviewCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      priceLevel: freezed == priceLevel
+          ? _self.priceLevel
+          : priceLevel // ignore: cast_nullable_to_non_nullable
+              as String?,
+      cost: freezed == cost
+          ? _self.cost
+          : cost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      estimatedDuration: freezed == estimatedDuration
+          ? _self.estimatedDuration
+          : estimatedDuration // ignore: cast_nullable_to_non_nullable
+              as Duration?,
+      images: null == images
+          ? _self._images
+          : images // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      tags: null == tags
+          ? _self._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      localTips: null == localTips
+          ? _self._localTips
+          : localTips // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      bookingUrl: freezed == bookingUrl
+          ? _self.bookingUrl
+          : bookingUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      requiresBooking: null == requiresBooking
+          ? _self.requiresBooking
+          : requiresBooking // ignore: cast_nullable_to_non_nullable
+              as bool,
+      openingHours: freezed == openingHours
+          ? _self.openingHours
+          : openingHours // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
 }
+
+// dart format on

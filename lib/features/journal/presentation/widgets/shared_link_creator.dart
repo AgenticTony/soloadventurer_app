@@ -205,11 +205,11 @@ class _SharedLinkCreatorState extends ConsumerState<SharedLinkCreator> {
               TextField(
                 controller: _expirationController,
                 readOnly: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Expiration Date',
                   hintText: 'Select expiration date',
-                  prefixIcon: const Icon(Icons.calendar_today),
-                  border: const OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.calendar_today),
+                  border: OutlineInputBorder(),
                 ),
                 onTap: _selectExpirationDate,
               ),

@@ -49,22 +49,19 @@ class SyncErrorCategorizerImpl implements SyncErrorCategorizer {
         'Network connection issue. Please check your internet connection.',
     SyncErrorType.authentication:
         'Authentication failed. Please sign in again.',
-    SyncErrorType.server:
-        'Server error. Our team has been notified.',
+    SyncErrorType.server: 'Server error. Our team has been notified.',
     SyncErrorType.validation:
         'Invalid data. Some information couldn\'t be validated.',
     SyncErrorType.conflict:
         'Sync conflict detected. This data was modified elsewhere.',
     SyncErrorType.timeout:
         'Request timed out. The server took too long to respond.',
-    SyncErrorType.notFound:
-        'Data not found. The item may have been deleted.',
+    SyncErrorType.notFound: 'Data not found. The item may have been deleted.',
     SyncErrorType.rateLimited:
         'Too many requests. Please wait a moment before trying again.',
     SyncErrorType.quotaExceeded:
         'Storage quota exceeded. Please free up some space.',
-    SyncErrorType.unknown:
-        'An unexpected error occurred.',
+    SyncErrorType.unknown: 'An unexpected error occurred.',
   };
 
   /// Actionable suggestions for each error type
@@ -140,14 +137,12 @@ class SyncErrorCategorizerImpl implements SyncErrorCategorizer {
 
   @override
   String getUserMessage(SyncErrorType type) {
-    return _userMessages[type] ??
-        _userMessages[SyncErrorType.unknown]!;
+    return _userMessages[type] ?? _userMessages[SyncErrorType.unknown]!;
   }
 
   @override
   String getSuggestion(SyncErrorType type) {
-    return _suggestions[type] ??
-        _suggestions[SyncErrorType.unknown]!;
+    return _suggestions[type] ?? _suggestions[SyncErrorType.unknown]!;
   }
 
   @override
@@ -157,8 +152,7 @@ class SyncErrorCategorizerImpl implements SyncErrorCategorizer {
 
   @override
   SyncErrorSeverity getSeverity(SyncErrorType type) {
-    return _severities[type] ??
-        _severities[SyncErrorType.unknown]!;
+    return _severities[type] ?? _severities[SyncErrorType.unknown]!;
   }
 
   @override

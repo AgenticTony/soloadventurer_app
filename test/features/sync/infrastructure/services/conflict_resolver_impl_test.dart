@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/conflict_info.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/conflict_resolution.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/entity_version.dart';
-import 'package:solo_adventurer_app/features/sync/infrastructure/services/conflict_resolver_impl.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_resolution.dart';
+import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
+import 'package:soloadventurer/features/sync/infrastructure/services/conflict_resolver_impl.dart';
 
 void main() {
   group('ConflictResolverImpl', () {
@@ -51,8 +51,8 @@ void main() {
           severity: ConflictSeverity.medium,
           localVersion: localVersion,
           remoteVersion: remoteVersion,
-          localData: {'name': 'Local Trip', 'duration': 5},
-          remoteData: {'name': 'Remote Trip', 'duration': 7},
+          localData: const {'name': 'Local Trip', 'duration': 5},
+          remoteData: const {'name': 'Remote Trip', 'duration': 7},
           description: 'Local is newer',
           detectedAt: now,
         );
@@ -95,8 +95,8 @@ void main() {
           severity: ConflictSeverity.medium,
           localVersion: localVersion,
           remoteVersion: remoteVersion,
-          localData: {'name': 'Local Trip', 'duration': 5},
-          remoteData: {'name': 'Remote Trip', 'duration': 7},
+          localData: const {'name': 'Local Trip', 'duration': 5},
+          remoteData: const {'name': 'Remote Trip', 'duration': 7},
           description: 'Remote is newer',
           detectedAt: now,
         );
@@ -138,8 +138,8 @@ void main() {
           severity: ConflictSeverity.medium,
           localVersion: localVersion,
           remoteVersion: remoteVersion,
-          localData: {'name': 'Local Trip'},
-          remoteData: {'name': 'Remote Trip'},
+          localData: const {'name': 'Local Trip'},
+          remoteData: const {'name': 'Remote Trip'},
           description: 'Same timestamp',
           detectedAt: now,
         );
@@ -216,8 +216,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip', 'duration': 5},
-          remoteData: {'name': 'Remote Trip', 'duration': 7},
+          localData: const {'name': 'Local Trip', 'duration': 5},
+          remoteData: const {'name': 'Remote Trip', 'duration': 7},
           description: 'Manual choice',
           detectedAt: now,
         );
@@ -258,8 +258,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip', 'duration': 5},
-          remoteData: {'name': 'Remote Trip', 'duration': 7},
+          localData: const {'name': 'Local Trip', 'duration': 5},
+          remoteData: const {'name': 'Remote Trip', 'duration': 7},
           description: 'Manual choice',
           detectedAt: now,
         );
@@ -300,8 +300,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip', 'duration': 5},
-          remoteData: {'name': 'Remote Trip', 'duration': 7},
+          localData: const {'name': 'Local Trip', 'duration': 5},
+          remoteData: const {'name': 'Remote Trip', 'duration': 7},
           description: 'Manual merge',
           detectedAt: now,
         );
@@ -348,8 +348,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip'},
-          remoteData: {'name': 'Remote Trip'},
+          localData: const {'name': 'Local Trip'},
+          remoteData: const {'name': 'Remote Trip'},
           description: 'Manual merge',
           detectedAt: now,
         );
@@ -389,8 +389,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip', 'duration': 5},
-          remoteData: {'location': 'Paris', 'budget': 1000},
+          localData: const {'name': 'Local Trip', 'duration': 5},
+          remoteData: const {'location': 'Paris', 'budget': 1000},
           description: 'Non-overlapping data',
           detectedAt: now,
         );
@@ -436,8 +436,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Same Name', 'duration': 5},
-          remoteData: {'name': 'Same Name', 'location': 'Paris'},
+          localData: const {'name': 'Same Name', 'duration': 5},
+          remoteData: const {'name': 'Same Name', 'location': 'Paris'},
           description: 'Same values',
           detectedAt: now,
         );
@@ -476,8 +476,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Name', 'duration': 5},
-          remoteData: {'name': 'Remote Name', 'location': 'Paris'},
+          localData: const {'name': 'Local Name', 'duration': 5},
+          remoteData: const {'name': 'Remote Name', 'location': 'Paris'},
           description: 'Conflicting values',
           detectedAt: now,
         );
@@ -516,8 +516,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'budget': 500, 'duration': 5},
-          remoteData: {'budget': 1000, 'location': 'Paris'},
+          localData: const {'budget': 500, 'duration': 5},
+          remoteData: const {'budget': 1000, 'location': 'Paris'},
           description: 'Protected field conflict',
           detectedAt: now,
         );
@@ -559,7 +559,7 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip'},
+          localData: const {'name': 'Local Trip'},
           description: 'Missing remote data',
           detectedAt: now,
         );
@@ -572,7 +572,8 @@ void main() {
     });
 
     group('Strategy Recommendation', () {
-      test('should recommend last-write-wins for auto-resolvable conflicts', () {
+      test('should recommend last-write-wins for auto-resolvable conflicts',
+          () {
         final now = DateTime.utc(2024, 1, 1, 12, 0, 0);
         final conflict = ConflictInfo(
           conflictId: 'conflict-1',
@@ -632,8 +633,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local Trip'},
-          remoteData: {'location': 'Paris'},
+          localData: const {'name': 'Local Trip'},
+          remoteData: const {'location': 'Paris'},
           description: 'Can merge',
           detectedAt: now,
         );
@@ -670,8 +671,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local', 'duration': 5},
-          remoteData: {'name': 'Remote', 'duration': 7},
+          localData: const {'name': 'Local', 'duration': 5},
+          remoteData: const {'name': 'Remote', 'duration': 7},
           description: 'Complex conflict',
           detectedAt: now,
         );
@@ -786,8 +787,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local'},
-          remoteData: {'location': 'Paris'},
+          localData: const {'name': 'Local'},
+          remoteData: const {'location': 'Paris'},
           description: 'Non-overlapping',
           detectedAt: now,
         );
@@ -819,8 +820,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'budget': 500},
-          remoteData: {'budget': 1000},
+          localData: const {'budget': 500},
+          remoteData: const {'budget': 1000},
           description: 'Protected conflict',
           detectedAt: now,
         );
@@ -859,7 +860,7 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local'},
+          localData: const {'name': 'Local'},
           description: 'Missing remote data',
           detectedAt: now,
         );
@@ -894,8 +895,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local 1'},
-          remoteData: {'name': 'Remote 1'},
+          localData: const {'name': 'Local 1'},
+          remoteData: const {'name': 'Remote 1'},
           description: 'Conflict 1',
           detectedAt: now,
         );
@@ -922,8 +923,8 @@ void main() {
             updatedAt: now.add(const Duration(minutes: 5)),
             createdAt: now,
           ),
-          localData: {'name': 'Local 2'},
-          remoteData: {'name': 'Remote 2'},
+          localData: const {'name': 'Local 2'},
+          remoteData: const {'name': 'Remote 2'},
           description: 'Conflict 2',
           detectedAt: now,
         );
@@ -964,8 +965,8 @@ void main() {
             updatedAt: now,
             createdAt: now,
           ),
-          localData: {'name': 'Local'},
-          remoteData: {'name': 'Remote'},
+          localData: const {'name': 'Local'},
+          remoteData: const {'name': 'Remote'},
           description: 'Valid',
           detectedAt: now,
         );
@@ -1058,7 +1059,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           strategy: ConflictResolutionStrategy.lastWriteWins,
-          resolvedData: {},
+          resolvedData: const {},
           resolvedVersion: EntityVersion.initial(
             entityId: 'entity-1',
             entityType: 'trip',
@@ -1081,15 +1082,15 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           strategy: ConflictResolutionStrategy.automaticMerge,
-          resolvedData: {'a': 1, 'b': 2, 'c': 3},
+          resolvedData: const {'a': 1, 'b': 2, 'c': 3},
           resolvedVersion: EntityVersion.initial(
             entityId: 'entity-1',
             entityType: 'trip',
             deviceId: 'device-1',
           ),
           isMerged: true,
-          localFieldsUsed: ['a', 'b'],
-          remoteFieldsUsed: ['c'],
+          localFieldsUsed: const ['a', 'b'],
+          remoteFieldsUsed: const ['c'],
           resolvedAt: DateTime.now(),
         );
 
@@ -1107,14 +1108,14 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           strategy: ConflictResolutionStrategy.manual,
-          resolvedData: {'custom': 'data'},
+          resolvedData: const {'custom': 'data'},
           resolvedVersion: EntityVersion.initial(
             entityId: 'entity-1',
             entityType: 'trip',
             deviceId: 'device-1',
           ),
           isMerged: true,
-          userProvidedData: {'custom': 'data'},
+          userProvidedData: const {'custom': 'data'},
           resolvedAt: DateTime.now(),
         );
 

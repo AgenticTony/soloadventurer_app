@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
-import 'package:vm_service/vm_service_io.dart';
+import 'package:vm_service/vm_service_io.dart' show vmServiceConnectUri;
+import 'package:vm_service/vm_service.dart' show VmService;
 
 /// Memory usage snapshot at a point in time
 class MemorySnapshot {
@@ -103,12 +104,10 @@ class MemoryStatistics {
   });
 
   /// Current heap usage in MB
-  double get currentHeapUsageMB =>
-      currentHeapUsageBytes / (1024 * 1024);
+  double get currentHeapUsageMB => currentHeapUsageBytes / (1024 * 1024);
 
   /// Average heap usage in MB
-  double get averageHeapUsageMB =>
-      averageHeapUsageBytes / (1024 * 1024);
+  double get averageHeapUsageMB => averageHeapUsageBytes / (1024 * 1024);
 
   /// Peak heap usage in MB
   double get peakHeapUsageMB => peakHeapUsageBytes / (1024 * 1024);
@@ -342,13 +341,11 @@ class MemoryProfiler {
     final totalHeap =
         _snapshots.fold<int>(0, (sum, s) => sum + s.heapUsageBytes);
     final avgHeap = totalHeap ~/ _snapshots.length;
-    final peakHeap = _snapshots
-            .map((s) => s.heapUsageBytes)
-            .reduce((a, b) => a > b ? a : b);
+    final peakHeap =
+        _snapshots.map((s) => s.heapUsageBytes).reduce((a, b) => a > b ? a : b);
 
     final currentRSS = _snapshots.last.rssBytes;
-    final totalRSS =
-        _snapshots.fold<int>(0, (sum, s) => sum + s.rssBytes);
+    final totalRSS = _snapshots.fold<int>(0, (sum, s) => sum + s.rssBytes);
     final avgRSS = totalRSS ~/ _snapshots.length;
     final peakRSS =
         _snapshots.map((s) => s.rssBytes).reduce((a, b) => a > b ? a : b);
@@ -362,14 +359,12 @@ class MemoryProfiler {
       final firstHalf = _snapshots.sublist(0, midPoint);
       final secondHalf = _snapshots.sublist(midPoint);
 
-      final firstHalfAvg = firstHalf
-              .map((s) => s.heapUsageBytes)
-              .reduce((a, b) => a + b) /
-          firstHalf.length;
-      final secondHalfAvg = secondHalf
-              .map((s) => s.heapUsageBytes)
-              .reduce((a, b) => a + b) /
-          secondHalf.length;
+      final firstHalfAvg =
+          firstHalf.map((s) => s.heapUsageBytes).reduce((a, b) => a + b) /
+              firstHalf.length;
+      final secondHalfAvg =
+          secondHalf.map((s) => s.heapUsageBytes).reduce((a, b) => a + b) /
+              secondHalf.length;
 
       final change = (secondHalfAvg - firstHalfAvg) / firstHalfAvg;
 
@@ -466,8 +461,7 @@ class MemoryProfiler {
     buffer.writeln(
         '  Heap: ${(heapDiff / (1024 * 1024)).toStringAsFixed(2)} MB '
         '(${heapDiff >= 0 ? '+' : ''}${(heapDiff / (1024 * 1024)).toStringAsFixed(2)})');
-    buffer.writeln(
-        '  RSS: ${(rssDiff / (1024 * 1024)).toStringAsFixed(2)} MB '
+    buffer.writeln('  RSS: ${(rssDiff / (1024 * 1024)).toStringAsFixed(2)} MB '
         '(${rssDiff >= 0 ? '+' : ''}${(rssDiff / (1024 * 1024)).toStringAsFixed(2)})');
 
     if (kDebugMode) {

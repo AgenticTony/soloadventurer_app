@@ -40,7 +40,6 @@ class TravelNoteOperation
   factory TravelNoteOperation.fromJson(Map<String, dynamic> json) =>
       _$TravelNoteOperationFromJson(json);
 
-  const TravelNoteOperation._();
 
   /// Create a text note
   factory TravelNoteOperation.text({
@@ -135,4 +134,29 @@ class TravelNoteOperation
         if (lastError != null) 'lastError': lastError,
         'maxRetries': maxRetries,
       };
+
+  @override
+  QueueableOperation withAttemptMetadata({
+    DateTime? lastAttempt,
+    int? attemptCount,
+    String? lastError,
+  }) {
+    return copyWith(
+      lastAttempt: lastAttempt ?? this.lastAttempt,
+      attemptCount: attemptCount ?? this.attemptCount,
+      lastError: lastError ?? this.lastError,
+    );
+  }
+
+  @override
+  QueueableOperation resetForRetry() {
+    return copyWith(
+      lastAttempt: null,
+      attemptCount: 0,
+      lastError: null,
+    );
+  }
+
+  // Private constructor for freezed getters
+  const TravelNoteOperation._();
 }

@@ -14,7 +14,7 @@ class CacheUsageExample {
   static Future<void> basicUsageExample() async {
     // Create cache manager
     final cacheManager = CacheManager<String, String>(
-      config: CacheManagerConfig(
+      config: const CacheManagerConfig(
         memoryConfig: MemoryCacheConfig(maxSize: 100),
         diskConfig: DiskCacheConfig(maxCacheSize: 50 * 1024 * 1024),
       ),
@@ -170,14 +170,19 @@ class CacheUsageExample {
 
     // Get combined statistics
     final stats = cacheManager.getStats();
-    print('Overall hit rate: ${(stats.overallHitRate * 100).toStringAsFixed(1)}%');
-    print('Memory cache: ${(stats.memoryCacheHitPercent * 100).toStringAsFixed(1)}%');
-    print('Disk cache: ${(stats.diskCacheHitPercent * 100).toStringAsFixed(1)}%');
-    print('Network: ${(stats.networkRequestPercent * 100).toStringAsFixed(1)}%');
+    print(
+        'Overall hit rate: ${(stats.overallHitRate * 100).toStringAsFixed(1)}%');
+    print(
+        'Memory cache: ${(stats.memoryCacheHitPercent * 100).toStringAsFixed(1)}%');
+    print(
+        'Disk cache: ${(stats.diskCacheHitPercent * 100).toStringAsFixed(1)}%');
+    print(
+        'Network: ${(stats.networkRequestPercent * 100).toStringAsFixed(1)}%');
 
     // Get individual layer statistics
     final memoryStats = cacheManager.getMemoryStats();
-    print('Memory hit rate: ${(memoryStats.hitRate * 100).toStringAsFixed(1)}%');
+    print(
+        'Memory hit rate: ${(memoryStats.hitRate * 100).toStringAsFixed(1)}%');
     print('Memory evictions: ${memoryStats.evictionCount}');
 
     final diskStats = cacheManager.getDiskStats();
@@ -254,14 +259,14 @@ class ActivityCacheManager {
 
   ActivityCacheManager() {
     _manager = CacheManager<String, Map<String, dynamic>>(
-      config: CacheManagerConfig(
+      config: const CacheManagerConfig(
         memoryConfig: MemoryCacheConfig(
           maxSize: 100,
-          defaultTtl: const Duration(minutes: 5),
+          defaultTtl: Duration(minutes: 5),
         ),
         diskConfig: DiskCacheConfig(
           maxCacheSize: 50 * 1024 * 1024,
-          defaultTtl: const Duration(hours: 24),
+          defaultTtl: Duration(hours: 24),
         ),
       ),
     );

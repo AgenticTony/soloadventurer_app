@@ -9,9 +9,9 @@ class ExampleBasicMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final marker = MapMarker(
+    const marker = MapMarker(
       id: 'marker-1',
-      position: const LatLng(37.7749, -122.4194),
+      position: LatLng(37.7749, -122.4194),
       title: 'San Francisco',
       type: MarkerType.trip,
     );
@@ -39,9 +39,9 @@ class ExampleMarkerWithTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final marker = MapMarker(
+    const marker = MapMarker(
       id: 'marker-2',
-      position: const LatLng(37.7749, -122.4194),
+      position: LatLng(37.7749, -122.4194),
       title: 'Golden Gate Bridge',
       description: 'Famous suspension bridge',
       type: MarkerType.poi,
@@ -72,33 +72,33 @@ class ExampleMarkerTypes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final markers = [
-      MapMarker(
+      const MapMarker(
         id: 'trip',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'Trip',
         type: MarkerType.trip,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'activity',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'Activity',
         type: MarkerType.activity,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'photo',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'Photo',
         type: MarkerType.photo,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'accommodation',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'Hotel',
         type: MarkerType.accommodation,
       ),
-      MapMarker(
+      const MapMarker(
         id: 'restaurant',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         title: 'Restaurant',
         type: MarkerType.restaurant,
       ),
@@ -150,7 +150,9 @@ class ExampleBasicCluster extends StatelessWidget {
           cluster: cluster,
           onTap: () {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Cluster with ${cluster.markerCount} markers tapped!')),
+              SnackBar(
+                  content: Text(
+                      'Cluster with ${cluster.markerCount} markers tapped!')),
             );
           },
         ),
@@ -166,9 +168,9 @@ class ExampleClusterSizes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final clusters = [
-      MapCluster(
+      const MapCluster(
         id: 'small',
-        position: const LatLng(0, 0),
+        position: LatLng(0, 0),
         markerCount: 5,
         markerIds: ['1', '2', '3', '4', '5'],
       ),
@@ -211,7 +213,8 @@ class ExampleClusterSizes extends StatelessWidget {
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Cluster: ${clusters[index].markerCount} markers'),
+                      content: Text(
+                          'Cluster: ${clusters[index].markerCount} markers'),
                     ),
                   );
                 },
@@ -240,7 +243,7 @@ class ExampleClusterWithTypes extends StatelessWidget {
       position: const LatLng(37.7749, -122.4194),
       markerCount: 15,
       markerIds: List.generate(15, (i) => 'marker-$i'),
-      markerTypes: [
+      markerTypes: const [
         MarkerType.trip,
         MarkerType.activity,
         MarkerType.photo,
@@ -275,9 +278,9 @@ class ExampleConvenienceConstructors extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final marker = MapMarker(
+    const marker = MapMarker(
       id: 'trip-1',
-      position: const LatLng(37.7749, -122.4194),
+      position: LatLng(37.7749, -122.4194),
       title: 'Trip to Paris',
       type: MarkerType.trip,
     );
@@ -297,19 +300,23 @@ class ExampleConvenienceConstructors extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Small Marker:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Small Marker:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             MapMarkerWidget.small(marker: marker),
             const SizedBox(height: 24),
-            const Text('Large Marker with Title:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Large Marker with Title:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             MapMarkerWidget.large(marker: marker, onTap: () {}),
             const SizedBox(height: 24),
-            const Text('Small Cluster:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Small Cluster:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             MapClusterWidget.small(cluster: cluster),
             const SizedBox(height: 24),
-            const Text('Large Cluster:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Large Cluster:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             MapClusterWidget.large(cluster: cluster),
           ],

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/core/widgets/widgets.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
+import 'package:soloadventurer/features/sync/presentation/providers/sync_providers.dart' hide syncStatusProvider;
+import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/loading_view.dart';
 
@@ -28,6 +31,15 @@ class ProfileSettingsScreen extends ConsumerWidget {
       );
     }
 
+    final profile = state.profile;
+    if (profile == null) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile Settings'),
@@ -45,14 +57,14 @@ class ProfileSettingsScreen extends ConsumerWidget {
                   SwitchListTile(
                     title: const Text('Public Profile'),
                     subtitle: Text(
-                      state.profile!.isPublic
+                      profile.isPublic
                           ? 'Your profile is visible to everyone'
                           : 'Your profile is private',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
-                    value: state.profile!.isPublic,
+                    value: profile.isPublic,
                     onChanged: (value) {
                       ref
                           .read(profileUIProvider('current').notifier)
@@ -110,18 +122,17 @@ class ProfileSettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (state.hasError) ...[
+              if (state.hasError)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    state.error!,
+                    state.error ?? 'An error occurred',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.error,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-              ],
             ],
           );
         },
@@ -183,12 +194,10 @@ class ProfileSettingsScreen extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           syncStatusText,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(
-                                color: _getSyncColor(context, ref),
-                              ),
+                          style:
+                              Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: _getSyncColor(context, ref),
+                                  ),
                         ),
                       ),
                       if (pendingCount > 0)
@@ -198,9 +207,8 @@ class ProfileSettingsScreen extends ConsumerWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primaryContainer,
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -222,9 +230,8 @@ class ProfileSettingsScreen extends ConsumerWidget {
                     Text(
                       'Last sync: ${_formatSyncTime(lastSyncTime)}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],
@@ -279,15 +286,15 @@ class ProfileSettingsScreen extends ConsumerWidget {
     }
 
     switch (status) {
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return Icons.check_circle;
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return Icons.error;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return Icons.sync;
-      case SyncStatus.pending:
+      case SyncOperationStatus.pending:
         return Icons.pending;
-      case SyncStatus.idle:
+      case SyncOperationStatus.idle:
       default:
         return Icons.cloud_done;
     }

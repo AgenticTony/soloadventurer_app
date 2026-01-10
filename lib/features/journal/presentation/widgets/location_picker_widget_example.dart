@@ -100,13 +100,13 @@ class _LocationPickerExampleScreenState
                     style: TextStyle(fontSize: 12),
                   ),
                   const SizedBox(height: 16),
-                  Row(
+                  const Row(
                     children: [
-                      const LocationPickerButton(
+                      LocationPickerButton(
                         label: 'Add Location',
                       ),
-                      const SizedBox(width: 16),
-                      const LocationPickerButton(
+                      SizedBox(width: 16),
+                      LocationPickerButton(
                         currentLocationName: 'Paris, France',
                       ),
                     ],

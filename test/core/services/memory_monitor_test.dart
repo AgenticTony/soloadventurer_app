@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/core/services/memory_monitor.dart';
 
@@ -13,9 +11,7 @@ void main() {
 
       expect(snapshot.memoryUsageBytes, equals(100 * 1024 * 1024));
       expect(snapshot.memoryUsageMB, equals(100.0));
-      expect(
-          snapshot.timestamp,
-          equals(DateTime(2026, 1, 4, 12, 0, 0)));
+      expect(snapshot.timestamp, equals(DateTime(2026, 1, 4, 12, 0, 0)));
     });
 
     test('should convert to JSON correctly', () {
@@ -28,9 +24,7 @@ void main() {
 
       expect(json['memoryUsageBytes'], equals(150 * 1024 * 1024));
       expect(json['memoryUsageMB'], equals(150.0));
-      expect(
-          json['timestamp'],
-          equals('2026-01-04T12:00:00.000'));
+      expect(json['timestamp'], equals('2026-01-04T12:00:00.000'));
     });
 
     test('should create from JSON correctly', () {
@@ -44,9 +38,7 @@ void main() {
 
       expect(snapshot.memoryUsageBytes, equals(120 * 1024 * 1024));
       expect(snapshot.memoryUsageMB, equals(120.0));
-      expect(
-          snapshot.timestamp,
-          equals(DateTime(2026, 1, 4, 12, 0, 0)));
+      expect(snapshot.timestamp, equals(DateTime(2026, 1, 4, 12, 0, 0)));
     });
 
     test('should format toString correctly', () {
@@ -110,9 +102,7 @@ void main() {
       expect(json['level'], equals('warning'));
       expect(json['currentUsageBytes'], equals(160 * 1024 * 1024));
       expect(json['thresholdBytes'], equals(150 * 1024 * 1024));
-      expect(
-          json['timestamp'],
-          equals('2026-01-04T12:00:00.000'));
+      expect(json['timestamp'], equals('2026-01-04T12:00:00.000'));
       expect(json['message'], equals('WARNING: Memory usage high'));
     });
 
@@ -142,7 +132,7 @@ void main() {
         peakUsageBytes: 180 * 1024 * 1024,
         lowestUsageBytes: 120 * 1024 * 1024,
         snapshotCount: 50,
-        startTime: now.subtract(Duration(minutes: 5)),
+        startTime: now.subtract(const Duration(minutes: 5)),
         endTime: now,
         trend: MemoryTrend.increasing,
         trendPercentage: 15.5,
@@ -167,7 +157,7 @@ void main() {
         peakUsageBytes: 180 * 1024 * 1024,
         lowestUsageBytes: 120 * 1024 * 1024,
         snapshotCount: 50,
-        startTime: now.subtract(Duration(minutes: 5)),
+        startTime: now.subtract(const Duration(minutes: 5)),
         endTime: now,
         trend: MemoryTrend.stable,
         trendPercentage: 2.5,
@@ -193,7 +183,7 @@ void main() {
         peakUsageBytes: 180 * 1024 * 1024,
         lowestUsageBytes: 120 * 1024 * 1024,
         snapshotCount: 50,
-        startTime: now.subtract(Duration(minutes: 5)),
+        startTime: now.subtract(const Duration(minutes: 5)),
         endTime: now,
         trend: MemoryTrend.increasing,
         trendPercentage: 15.5,
@@ -213,19 +203,13 @@ void main() {
 
   group('MemoryMonitorConfig', () {
     test('should create default config correctly', () {
-      final config = const MemoryMonitorConfig();
+      const config = MemoryMonitorConfig();
 
-      expect(
-          config.warningThresholdBytes,
-          equals(150 * 1024 * 1024));
+      expect(config.warningThresholdBytes, equals(150 * 1024 * 1024));
       expect(config.warningThresholdMB, equals(150.0));
-      expect(
-          config.criticalThresholdBytes,
-          equals(180 * 1024 * 1024));
+      expect(config.criticalThresholdBytes, equals(180 * 1024 * 1024));
       expect(config.criticalThresholdMB, equals(180.0));
-      expect(
-          config.monitoringInterval,
-          equals(Duration(seconds: 5)));
+      expect(config.monitoringInterval, equals(const Duration(seconds: 5)));
       expect(config.maxHistorySize, equals(100));
       expect(config.enabled, equals(true));
       expect(config.enableTrendAnalysis, equals(true));
@@ -233,58 +217,40 @@ void main() {
     });
 
     test('should copy with modified values', () {
-      final config = const MemoryMonitorConfig(
+      const config = MemoryMonitorConfig(
         warningThresholdBytes: 150 * 1024 * 1024,
         criticalThresholdBytes: 180 * 1024 * 1024,
       );
 
       final modified = config.copyWith(
         warningThresholdBytes: 100 * 1024 * 1024,
-        monitoringInterval: Duration(seconds: 10),
+        monitoringInterval: const Duration(seconds: 10),
       );
 
-      expect(
-          modified.warningThresholdBytes,
-          equals(100 * 1024 * 1024));
-      expect(
-          modified.criticalThresholdBytes,
-          equals(180 * 1024 * 1024));
-      expect(
-          modified.monitoringInterval,
-          equals(Duration(seconds: 10)));
+      expect(modified.warningThresholdBytes, equals(100 * 1024 * 1024));
+      expect(modified.criticalThresholdBytes, equals(180 * 1024 * 1024));
+      expect(modified.monitoringInterval, equals(const Duration(seconds: 10)));
     });
 
     test('should create low-end device config', () {
       final config = MemoryMonitorConfig.forLowMemoryDevice();
 
-      expect(
-          config.warningThresholdBytes,
-          equals(100 * 1024 * 1024));
+      expect(config.warningThresholdBytes, equals(100 * 1024 * 1024));
       expect(config.warningThresholdMB, equals(100.0));
-      expect(
-          config.criticalThresholdBytes,
-          equals(120 * 1024 * 1024));
+      expect(config.criticalThresholdBytes, equals(120 * 1024 * 1024));
       expect(config.criticalThresholdMB, equals(120.0));
-      expect(
-          config.monitoringInterval,
-          equals(Duration(seconds: 10)));
+      expect(config.monitoringInterval, equals(const Duration(seconds: 10)));
       expect(config.maxHistorySize, equals(50));
     });
 
     test('should create high-end device config', () {
       final config = MemoryMonitorConfig.forHighMemoryDevice();
 
-      expect(
-          config.warningThresholdBytes,
-          equals(250 * 1024 * 1024));
+      expect(config.warningThresholdBytes, equals(250 * 1024 * 1024));
       expect(config.warningThresholdMB, equals(250.0));
-      expect(
-          config.criticalThresholdBytes,
-          equals(300 * 1024 * 1024));
+      expect(config.criticalThresholdBytes, equals(300 * 1024 * 1024));
       expect(config.criticalThresholdMB, equals(300.0));
-      expect(
-          config.monitoringInterval,
-          equals(Duration(seconds: 3)));
+      expect(config.monitoringInterval, equals(const Duration(seconds: 3)));
       expect(config.maxHistorySize, equals(200));
     });
   });
@@ -388,10 +354,10 @@ void main() {
       expect(stats.snapshotCount, greaterThan(0));
 
       // Validate statistics consistency
-      expect(stats.peakUsageBytes,
-          greaterThanOrEqualTo(stats.currentUsageBytes));
-      expect(stats.lowestUsageBytes,
-          lessThanOrEqualTo(stats.currentUsageBytes));
+      expect(
+          stats.peakUsageBytes, greaterThanOrEqualTo(stats.currentUsageBytes));
+      expect(
+          stats.lowestUsageBytes, lessThanOrEqualTo(stats.currentUsageBytes));
 
       await MemoryMonitor.dispose();
     });
@@ -427,8 +393,7 @@ void main() {
         onAlert: (alert) {},
       );
 
-      expect(
-          MemoryMonitor.instance.config.monitoringInterval.inSeconds,
+      expect(MemoryMonitor.instance.config.monitoringInterval.inSeconds,
           equals(2));
 
       // Update configuration
@@ -438,8 +403,7 @@ void main() {
         ),
       );
 
-      expect(
-          MemoryMonitor.instance.config.monitoringInterval.inSeconds,
+      expect(MemoryMonitor.instance.config.monitoringInterval.inSeconds,
           equals(5));
 
       await MemoryMonitor.dispose();
@@ -468,8 +432,7 @@ void main() {
       expect(lastAlert, isNotNull);
 
       final currentLevel = MemoryMonitor.getCurrentAlertLevel();
-      expect(
-          [MemoryAlertLevel.warning, MemoryAlertLevel.critical],
+      expect([MemoryAlertLevel.warning, MemoryAlertLevel.critical],
           contains(currentLevel));
 
       await MemoryMonitor.dispose();
@@ -505,9 +468,9 @@ void main() {
 
       expect(
           () => MemoryMonitor.initialize(
-            config: const MemoryMonitorConfig(),
-            onAlert: (alert) {},
-          ),
+                config: const MemoryMonitorConfig(),
+                onAlert: (alert) {},
+              ),
           throwsA(isA<StateError>()));
 
       await MemoryMonitor.dispose();
@@ -516,8 +479,7 @@ void main() {
     test('should throw when accessing methods before initialization', () {
       expect(() => MemoryMonitor.instance, throwsA(isA<StateError>()));
       expect(() => MemoryMonitor.getHistory(), throwsA(isA<StateError>()));
-      expect(
-          () => MemoryMonitor.getCurrentAlertLevel(),
+      expect(() => MemoryMonitor.getCurrentAlertLevel(),
           throwsA(isA<StateError>()));
     });
 

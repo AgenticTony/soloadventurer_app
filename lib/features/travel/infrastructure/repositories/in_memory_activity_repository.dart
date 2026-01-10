@@ -1,8 +1,7 @@
 import '../../domain/models/activity.dart';
 import '../../domain/repositories/activity_repository.dart';
-import '../../../core/models/paginated_data.dart';
-import '../../../core/models/page_info.dart';
-import '../../../core/repositories/paginated_repository_mixin.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 
 /// In-memory implementation of ActivityRepository for testing and development
 ///
@@ -11,7 +10,8 @@ import '../../../core/repositories/paginated_repository_mixin.dart';
 ///
 /// For production, replace with an implementation that uses a database
 /// or remote API.
-class InMemoryActivityRepository with PaginatedRepositoryMixin
+class InMemoryActivityRepository
+    with PaginatedRepositoryMixin
     implements ActivityRepository {
   final Map<String, Activity> _activities = {};
   int _idCounter = 1;
@@ -84,9 +84,8 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
     final hasNextPage = endIndex < filteredActivities.length;
 
     // Generate next cursor
-    final nextCursor = hasNextPage
-        ? generateOffsetCursor(offset + validatedPageSize)
-        : null;
+    final nextCursor =
+        hasNextPage ? generateOffsetCursor(offset + validatedPageSize) : null;
 
     // Create page info
     final pageInfo = createCursorPageInfo(
@@ -297,12 +296,14 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
         .where((activity) =>
             activity.userId == userId &&
             (tripId == null || activity.tripId == tripId) &&
-            (activity.title
-                    .toLowerCase()
-                    .contains(query.toLowerCase()) ||
-                activity.description?.toLowerCase().contains(query.toLowerCase()) ==
+            (activity.title.toLowerCase().contains(query.toLowerCase()) ||
+                activity.description
+                        ?.toLowerCase()
+                        .contains(query.toLowerCase()) ==
                     true ||
-                activity.locationName?.toLowerCase().contains(query.toLowerCase()) ==
+                activity.locationName
+                        ?.toLowerCase()
+                        .contains(query.toLowerCase()) ==
                     true ||
                 activity.address?.toLowerCase().contains(query.toLowerCase()) ==
                     true))
@@ -321,9 +322,7 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
       final paginatedResults = startIndex < sortedResults.length
           ? sortedResults.sublist(
               startIndex,
-              endIndex > sortedResults.length
-                  ? sortedResults.length
-                  : endIndex,
+              endIndex > sortedResults.length ? sortedResults.length : endIndex,
             )
           : <Activity>[];
 
@@ -351,9 +350,7 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
       final paginatedResults = startIndex < sortedResults.length
           ? sortedResults.sublist(
               startIndex,
-              endIndex > sortedResults.length
-                  ? sortedResults.length
-                  : endIndex,
+              endIndex > sortedResults.length ? sortedResults.length : endIndex,
             )
           : <Activity>[];
 
@@ -408,8 +405,8 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
         .toList();
 
     // Sort by startDateTime ascending
-    final sortedActivities =
-        _sortActivities(filteredActivities, 'startDateTime', SortOrder.ascending);
+    final sortedActivities = _sortActivities(
+        filteredActivities, 'startDateTime', SortOrder.ascending);
 
     // Apply pagination
     final offset = parseOffsetCursor(cursor) ?? 0;
@@ -537,8 +534,8 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
     required String userId,
     Map<String, dynamic>? filters,
   }) async {
-    var activities = _activities.values
-        .where((activity) => activity.userId == userId);
+    var activities =
+        _activities.values.where((activity) => activity.userId == userId);
 
     if (tripId != null) {
       activities = activities.where((activity) => activity.tripId == tripId);
@@ -546,12 +543,12 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
 
     if (filters != null) {
       if (filters.containsKey('isCompleted')) {
-        activities = activities.where(
-            (activity) => activity.isCompleted == (filters['isCompleted'] as bool));
+        activities = activities.where((activity) =>
+            activity.isCompleted == (filters['isCompleted'] as bool));
       }
       if (filters.containsKey('category')) {
-        activities = activities.where(
-            (activity) => activity.category == filters['category'] as ActivityCategory);
+        activities = activities.where((activity) =>
+            activity.category == filters['category'] as ActivityCategory);
       }
     }
 
@@ -605,8 +602,7 @@ class InMemoryActivityRepository with PaginatedRepositoryMixin
       int comparison;
       switch (field) {
         case 'title':
-          comparison =
-              a.title.toLowerCase().compareTo(b.title.toLowerCase());
+          comparison = a.title.toLowerCase().compareTo(b.title.toLowerCase());
           break;
         case 'category':
           comparison = a.category.name.compareTo(b.category.name);

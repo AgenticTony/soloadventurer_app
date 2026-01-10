@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-import 'package:soloadventurer/core/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/monitoring/monitoring_service.dart';
 
 /// A utility class for measuring and logging performance metrics in the app.
 class PerformanceMetrics {

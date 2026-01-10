@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:aws_cloudwatch/aws_cloudwatch.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:aws_cloudwatch/aws_cloudwatch.dart'; // Temporarily disabled due to dependency conflicts
 import '../logging/token_audit_logger.dart';
 import '../../domain/entities/security_alert.dart';
 import '../../domain/repositories/alert_repository.dart';
@@ -28,27 +27,28 @@ class AlertConfig {
   static const int revocationThreshold = 1;
 }
 
-/// Provider for CloudWatch client
-@riverpod
-CloudWatch cloudWatchClient(CloudWatchClientRef ref) {
-  return CloudWatch(
-    awsAccessKey: dotenv.env['AWS_ACCESS_KEY_ID'] ?? '',
-    awsSecretKey: dotenv.env['AWS_SECRET_ACCESS_KEY'] ?? '',
-    region: dotenv.env['AWS_REGION'] ?? 'us-east-1',
-    groupName: 'SoloAdventurer/TokenSecurity',
-    streamName: 'SecurityAlerts',
-  );
-}
+// Temporarily disabled due to dependency conflicts
+// /// Provider for CloudWatch client
+// @riverpod
+// CloudWatch cloudWatchClient(CloudWatchClientRef ref) {
+//   return CloudWatch(
+//     awsAccessKey: dotenv.env['AWS_ACCESS_KEY_ID'] ?? '',
+//     awsSecretKey: dotenv.env['AWS_SECRET_ACCESS_KEY'] ?? '',
+//     region: dotenv.env['AWS_REGION'] ?? 'us-east-1',
+//     groupName: 'SoloAdventurer/TokenSecurity',
+//     streamName: 'SecurityAlerts',
+//   );
+// }
 
 /// Manager responsible for handling security alerts and notifications
 @riverpod
 class AlertManager extends _$AlertManager implements AlertRepository {
-  late final CloudWatch _cloudWatch;
+  // late final CloudWatch _cloudWatch; // Temporarily disabled due to dependency conflicts
   bool _isInitialized = false;
 
   @override
   FutureOr<void> build() async {
-    _cloudWatch = ref.watch(cloudWatchClientProvider);
+    // _cloudWatch = ref.watch(cloudWatchClientProvider); // Temporarily disabled
 
     if (!_isInitialized) {
       await _initialize();
@@ -91,12 +91,16 @@ class AlertManager extends _$AlertManager implements AlertRepository {
         'details': alert.toJson(),
       };
 
-      await _cloudWatch.log(logMessage.toString());
+      // CloudWatch temporarily disabled - just log locally
+      // await _cloudWatch.log(logMessage.toString());
 
       ref.read(tokenAuditLoggerProvider).logTokenEvent(
             event: 'security_alert_sent',
             status: 'warning',
-            metadata: alert.toJson(),
+            metadata: {
+              ...alert.toJson(),
+              'cloudwatch_disabled': true,
+            },
           );
     } catch (e, stack) {
       ref.read(tokenAuditLoggerProvider).logError(
@@ -119,12 +123,16 @@ class AlertManager extends _$AlertManager implements AlertRepository {
         'message': 'This is a test alert from the Flutter app',
       };
 
-      await _cloudWatch.log(testMessage.toString());
+      // CloudWatch temporarily disabled - just log locally
+      // await _cloudWatch.log(testMessage.toString());
 
       ref.read(tokenAuditLoggerProvider).logTokenEvent(
         event: 'test_alert_sent',
         status: 'info',
-        metadata: {'message': 'Test alert sent successfully'},
+        metadata: {
+          'message': 'Test alert logged locally (CloudWatch disabled)',
+          'cloudwatch_disabled': true,
+        },
       );
     } catch (e, stack) {
       ref.read(tokenAuditLoggerProvider).logError(

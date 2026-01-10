@@ -6,8 +6,8 @@ part of 'security_alert.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SecurityAlertImpl _$$SecurityAlertImplFromJson(Map<String, dynamic> json) =>
-    _$SecurityAlertImpl(
+_SecurityAlert _$SecurityAlertFromJson(Map<String, dynamic> json) =>
+    _SecurityAlert(
       type: $enumDecode(_$AlertTypeEnumMap, json['type']),
       severity: $enumDecode(_$AlertSeverityEnumMap, json['severity']),
       message: json['message'] as String,
@@ -16,7 +16,7 @@ _$SecurityAlertImpl _$$SecurityAlertImplFromJson(Map<String, dynamic> json) =>
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
 
-Map<String, dynamic> _$$SecurityAlertImplToJson(_$SecurityAlertImpl instance) =>
+Map<String, dynamic> _$SecurityAlertToJson(_SecurityAlert instance) =>
     <String, dynamic>{
       'type': _$AlertTypeEnumMap[instance.type]!,
       'severity': _$AlertSeverityEnumMap[instance.severity]!,

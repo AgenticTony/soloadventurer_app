@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,107 +9,60 @@ part of 'security_alert.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SecurityAlert _$SecurityAlertFromJson(Map<String, dynamic> json) {
-  return _SecurityAlert.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SecurityAlert {
-  AlertType get type => throw _privateConstructorUsedError;
-  AlertSeverity get severity => throw _privateConstructorUsedError;
-  String get message => throw _privateConstructorUsedError;
-  DateTime get timestamp => throw _privateConstructorUsedError;
-  String get userId => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
-
-  /// Serializes this SecurityAlert to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  AlertType get type;
+  AlertSeverity get severity;
+  String get message;
+  DateTime get timestamp;
+  String get userId;
+  Map<String, dynamic>? get metadata;
 
   /// Create a copy of SecurityAlert
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $SecurityAlertCopyWith<SecurityAlert> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $SecurityAlertCopyWith<$Res> {
-  factory $SecurityAlertCopyWith(
-          SecurityAlert value, $Res Function(SecurityAlert) then) =
-      _$SecurityAlertCopyWithImpl<$Res, SecurityAlert>;
-  @useResult
-  $Res call(
-      {AlertType type,
-      AlertSeverity severity,
-      String message,
-      DateTime timestamp,
-      String userId,
-      Map<String, dynamic>? metadata});
-}
-
-/// @nodoc
-class _$SecurityAlertCopyWithImpl<$Res, $Val extends SecurityAlert>
-    implements $SecurityAlertCopyWith<$Res> {
-  _$SecurityAlertCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of SecurityAlert
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $SecurityAlertCopyWith<SecurityAlert> get copyWith =>
+      _$SecurityAlertCopyWithImpl<SecurityAlert>(
+          this as SecurityAlert, _$identity);
+
+  /// Serializes this SecurityAlert to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? type = null,
-    Object? severity = null,
-    Object? message = null,
-    Object? timestamp = null,
-    Object? userId = null,
-    Object? metadata = freezed,
-  }) {
-    return _then(_value.copyWith(
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as AlertType,
-      severity: null == severity
-          ? _value.severity
-          : severity // ignore: cast_nullable_to_non_nullable
-              as AlertSeverity,
-      message: null == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-      timestamp: null == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      metadata: freezed == metadata
-          ? _value.metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SecurityAlert &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.severity, severity) ||
+                other.severity == severity) &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.timestamp, timestamp) ||
+                other.timestamp == timestamp) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            const DeepCollectionEquality().equals(other.metadata, metadata));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, type, severity, message,
+      timestamp, userId, const DeepCollectionEquality().hash(metadata));
+
+  @override
+  String toString() {
+    return 'SecurityAlert(type: $type, severity: $severity, message: $message, timestamp: $timestamp, userId: $userId, metadata: $metadata)';
   }
 }
 
 /// @nodoc
-abstract class _$$SecurityAlertImplCopyWith<$Res>
-    implements $SecurityAlertCopyWith<$Res> {
-  factory _$$SecurityAlertImplCopyWith(
-          _$SecurityAlertImpl value, $Res Function(_$SecurityAlertImpl) then) =
-      __$$SecurityAlertImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $SecurityAlertCopyWith<$Res> {
+  factory $SecurityAlertCopyWith(
+          SecurityAlert value, $Res Function(SecurityAlert) _then) =
+      _$SecurityAlertCopyWithImpl;
   @useResult
   $Res call(
       {AlertType type,
@@ -121,12 +74,12 @@ abstract class _$$SecurityAlertImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$SecurityAlertImplCopyWithImpl<$Res>
-    extends _$SecurityAlertCopyWithImpl<$Res, _$SecurityAlertImpl>
-    implements _$$SecurityAlertImplCopyWith<$Res> {
-  __$$SecurityAlertImplCopyWithImpl(
-      _$SecurityAlertImpl _value, $Res Function(_$SecurityAlertImpl) _then)
-      : super(_value, _then);
+class _$SecurityAlertCopyWithImpl<$Res>
+    implements $SecurityAlertCopyWith<$Res> {
+  _$SecurityAlertCopyWithImpl(this._self, this._then);
+
+  final SecurityAlert _self;
+  final $Res Function(SecurityAlert) _then;
 
   /// Create a copy of SecurityAlert
   /// with the given fields replaced by the non-null parameter values.
@@ -140,39 +93,205 @@ class __$$SecurityAlertImplCopyWithImpl<$Res>
     Object? userId = null,
     Object? metadata = freezed,
   }) {
-    return _then(_$SecurityAlertImpl(
+    return _then(_self.copyWith(
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as AlertType,
       severity: null == severity
-          ? _value.severity
+          ? _self.severity
           : severity // ignore: cast_nullable_to_non_nullable
               as AlertSeverity,
       message: null == message
-          ? _value.message
+          ? _self.message
           : message // ignore: cast_nullable_to_non_nullable
               as String,
       timestamp: null == timestamp
-          ? _value.timestamp
+          ? _self.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime,
       userId: null == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
       metadata: freezed == metadata
-          ? _value._metadata
+          ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [SecurityAlert].
+extension SecurityAlertPatterns on SecurityAlert {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SecurityAlert value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SecurityAlert() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SecurityAlert value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SecurityAlert():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SecurityAlert value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SecurityAlert() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(AlertType type, AlertSeverity severity, String message,
+            DateTime timestamp, String userId, Map<String, dynamic>? metadata)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SecurityAlert() when $default != null:
+        return $default(_that.type, _that.severity, _that.message,
+            _that.timestamp, _that.userId, _that.metadata);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(AlertType type, AlertSeverity severity, String message,
+            DateTime timestamp, String userId, Map<String, dynamic>? metadata)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SecurityAlert():
+        return $default(_that.type, _that.severity, _that.message,
+            _that.timestamp, _that.userId, _that.metadata);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(AlertType type, AlertSeverity severity, String message,
+            DateTime timestamp, String userId, Map<String, dynamic>? metadata)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SecurityAlert() when $default != null:
+        return $default(_that.type, _that.severity, _that.message,
+            _that.timestamp, _that.userId, _that.metadata);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$SecurityAlertImpl implements _SecurityAlert {
-  const _$SecurityAlertImpl(
+class _SecurityAlert implements SecurityAlert {
+  const _SecurityAlert(
       {required this.type,
       required this.severity,
       required this.message,
@@ -180,9 +299,8 @@ class _$SecurityAlertImpl implements _SecurityAlert {
       required this.userId,
       final Map<String, dynamic>? metadata})
       : _metadata = metadata;
-
-  factory _$SecurityAlertImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SecurityAlertImplFromJson(json);
+  factory _SecurityAlert.fromJson(Map<String, dynamic> json) =>
+      _$SecurityAlertFromJson(json);
 
   @override
   final AlertType type;
@@ -204,16 +322,26 @@ class _$SecurityAlertImpl implements _SecurityAlert {
     return EqualUnmodifiableMapView(value);
   }
 
+  /// Create a copy of SecurityAlert
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SecurityAlert(type: $type, severity: $severity, message: $message, timestamp: $timestamp, userId: $userId, metadata: $metadata)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SecurityAlertCopyWith<_SecurityAlert> get copyWith =>
+      __$SecurityAlertCopyWithImpl<_SecurityAlert>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SecurityAlertToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SecurityAlertImpl &&
+            other is _SecurityAlert &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.severity, severity) ||
                 other.severity == severity) &&
@@ -229,51 +357,76 @@ class _$SecurityAlertImpl implements _SecurityAlert {
   int get hashCode => Object.hash(runtimeType, type, severity, message,
       timestamp, userId, const DeepCollectionEquality().hash(_metadata));
 
-  /// Create a copy of SecurityAlert
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SecurityAlertImplCopyWith<_$SecurityAlertImpl> get copyWith =>
-      __$$SecurityAlertImplCopyWithImpl<_$SecurityAlertImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SecurityAlertImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SecurityAlert(type: $type, severity: $severity, message: $message, timestamp: $timestamp, userId: $userId, metadata: $metadata)';
   }
 }
 
-abstract class _SecurityAlert implements SecurityAlert {
-  const factory _SecurityAlert(
-      {required final AlertType type,
-      required final AlertSeverity severity,
-      required final String message,
-      required final DateTime timestamp,
-      required final String userId,
-      final Map<String, dynamic>? metadata}) = _$SecurityAlertImpl;
+/// @nodoc
+abstract mixin class _$SecurityAlertCopyWith<$Res>
+    implements $SecurityAlertCopyWith<$Res> {
+  factory _$SecurityAlertCopyWith(
+          _SecurityAlert value, $Res Function(_SecurityAlert) _then) =
+      __$SecurityAlertCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {AlertType type,
+      AlertSeverity severity,
+      String message,
+      DateTime timestamp,
+      String userId,
+      Map<String, dynamic>? metadata});
+}
 
-  factory _SecurityAlert.fromJson(Map<String, dynamic> json) =
-      _$SecurityAlertImpl.fromJson;
+/// @nodoc
+class __$SecurityAlertCopyWithImpl<$Res>
+    implements _$SecurityAlertCopyWith<$Res> {
+  __$SecurityAlertCopyWithImpl(this._self, this._then);
 
-  @override
-  AlertType get type;
-  @override
-  AlertSeverity get severity;
-  @override
-  String get message;
-  @override
-  DateTime get timestamp;
-  @override
-  String get userId;
-  @override
-  Map<String, dynamic>? get metadata;
+  final _SecurityAlert _self;
+  final $Res Function(_SecurityAlert) _then;
 
   /// Create a copy of SecurityAlert
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SecurityAlertImplCopyWith<_$SecurityAlertImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? type = null,
+    Object? severity = null,
+    Object? message = null,
+    Object? timestamp = null,
+    Object? userId = null,
+    Object? metadata = freezed,
+  }) {
+    return _then(_SecurityAlert(
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as AlertType,
+      severity: null == severity
+          ? _self.severity
+          : severity // ignore: cast_nullable_to_non_nullable
+              as AlertSeverity,
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
+      timestamp: null == timestamp
+          ? _self.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      metadata: freezed == metadata
+          ? _self._metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+    ));
+  }
 }
+
+// dart format on

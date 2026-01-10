@@ -4,5 +4,4 @@ class PerformanceRoutes {
   static const benchmark = '/performance-benchmark';
 
   /// Private constructor to prevent instantiation
-  const PerformanceRoutes._();
 }

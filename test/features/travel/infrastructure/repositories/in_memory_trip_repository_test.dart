@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/core/models/paginated_data.dart';
 import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 import 'package:soloadventurer/features/travel/domain/repositories/trip_repository.dart';
@@ -115,7 +114,8 @@ void main() {
 
         expect(result.items.length, greaterThan(0));
         expect(
-          result.items.any((trip) => trip.destination.contains('Destination 1')),
+          result.items
+              .any((trip) => trip.destination.contains('Destination 1')),
           isTrue,
         );
       });

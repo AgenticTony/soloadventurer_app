@@ -243,7 +243,7 @@ class SyncErrorToast {
       SnackBar(
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               color: Colors.white,
               size: 20,
@@ -370,15 +370,12 @@ class SyncErrorToast {
 
   /// Gets summary text for multiple errors
   static String _getSummaryText(List<SyncError> errors) {
-    final highSeverity = errors
-        .where((e) => e.severity == SyncErrorSeverity.high)
-        .length;
-    final mediumSeverity = errors
-        .where((e) => e.severity == SyncErrorSeverity.medium)
-        .length;
-    final lowSeverity = errors
-        .where((e) => e.severity == SyncErrorSeverity.low)
-        .length;
+    final highSeverity =
+        errors.where((e) => e.severity == SyncErrorSeverity.high).length;
+    final mediumSeverity =
+        errors.where((e) => e.severity == SyncErrorSeverity.medium).length;
+    final lowSeverity =
+        errors.where((e) => e.severity == SyncErrorSeverity.low).length;
 
     if (highSeverity > 0) {
       return '$highSeverity high severity error${highSeverity > 1 ? 's' : ''}';

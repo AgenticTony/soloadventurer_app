@@ -97,7 +97,8 @@ class SharedPrefsSyncQueuePersistence implements SyncQueuePersistence {
             continue;
           }
 
-          final operationMap = jsonDecode(operationJson) as Map<String, dynamic>;
+          final operationMap =
+              jsonDecode(operationJson) as Map<String, dynamic>;
           final operation = SyncOperation.fromJson(operationMap);
           operations.add(operation);
         } catch (e, stackTrace) {
@@ -258,7 +259,8 @@ class SharedPrefsSyncQueuePersistence implements SyncQueuePersistence {
       // Get and update the operations list
       final operationIds = _prefs.getStringList(_operationsListKey);
       if (operationIds != null) {
-        final updatedIds = operationIds.where((id) => !corruptedIds.contains(id)).toList();
+        final updatedIds =
+            operationIds.where((id) => !corruptedIds.contains(id)).toList();
         await _prefs.setStringList(_operationsListKey, updatedIds);
       }
 

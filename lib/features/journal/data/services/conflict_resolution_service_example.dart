@@ -117,8 +117,8 @@ class ConflictResolutionServiceExample {
       title: 'My Local Title',
       content: 'Content edited offline',
       entryDate: DateTime.now(),
-      createdAt: DateTime.now().subtract(Duration(days: 1)),
-      updatedAt: DateTime.now().subtract(Duration(seconds: 30)),
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      updatedAt: DateTime.now().subtract(const Duration(seconds: 30)),
     );
 
     final remoteEntry = JournalEntryModel(
@@ -127,8 +127,8 @@ class ConflictResolutionServiceExample {
       title: 'My Remote Title',
       content: 'Content edited online',
       entryDate: DateTime.now(),
-      createdAt: DateTime.now().subtract(Duration(days: 1)),
-      updatedAt: DateTime.now().subtract(Duration(seconds: 20)),
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      updatedAt: DateTime.now().subtract(const Duration(seconds: 20)),
     );
 
     // Detect conflict
@@ -300,8 +300,8 @@ class ConflictResolutionServiceExample {
     print('Trip conflicts: ${tripConflicts.length}');
 
     // Get conflicts by severity
-    final criticalConflicts =
-        await _conflictService.getConflictsBySeverity(ConflictSeverity.critical);
+    final criticalConflicts = await _conflictService
+        .getConflictsBySeverity(ConflictSeverity.critical);
     final highConflicts =
         await _conflictService.getConflictsBySeverity(ConflictSeverity.high);
     print('Critical conflicts: ${criticalConflicts.length}');
@@ -349,9 +349,11 @@ class ConflictResolutionServiceExample {
     }
 
     // Step 3: Group by severity
-    final medium = remaining.where((c) => c.severity == ConflictSeverity.medium);
+    final medium =
+        remaining.where((c) => c.severity == ConflictSeverity.medium);
     final high = remaining.where((c) => c.severity == ConflictSeverity.high);
-    final critical = remaining.where((c) => c.severity == ConflictSeverity.critical);
+    final critical =
+        remaining.where((c) => c.severity == ConflictSeverity.critical);
 
     print('Remaining conflicts:');
     print('  Medium: ${medium.length}');
@@ -397,14 +399,14 @@ class ConflictResolutionServiceExample {
 class ConflictResolutionUIExample extends StatelessWidget {
   final ConflictResolutionService conflictService;
 
-  const ConflictResolutionUIExample({required this.conflictService});
+  const ConflictResolutionUIExample({super.key, required this.conflictService});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         ExampleConflictListScreen(conflictService: conflictService),
-        ExampleConflictResolutionDialog(),
+        const ExampleConflictResolutionDialog(),
         ExampleConflictStatisticsCard(conflictService: conflictService),
       ],
     );
@@ -415,7 +417,7 @@ class ConflictResolutionUIExample extends StatelessWidget {
 class ExampleConflictListScreen extends StatelessWidget {
   final ConflictResolutionService conflictService;
 
-  const ExampleConflictListScreen({required this.conflictService});
+  const ExampleConflictListScreen({super.key, required this.conflictService});
 
   @override
   Widget build(BuildContext context) {
@@ -423,13 +425,13 @@ class ExampleConflictListScreen extends StatelessWidget {
       future: conflictService.getPendingConflicts(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final conflicts = snapshot.data!;
 
         if (conflicts.isEmpty) {
-          return Center(
+          return const Center(
             child: Text('No pending conflicts'),
           );
         }
@@ -448,7 +450,7 @@ class ExampleConflictListScreen extends StatelessWidget {
 
                 if (result.success) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Conflict resolved')),
+                    const SnackBar(content: Text('Conflict resolved')),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -477,6 +479,7 @@ class ConflictCard extends StatelessWidget {
   final VoidCallback onIgnore;
 
   const ConflictCard({
+    super.key,
     required this.conflict,
     required this.onResolve,
     required this.onIgnore,
@@ -485,9 +488,9 @@ class ConflictCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -497,7 +500,7 @@ class ConflictCard extends StatelessWidget {
                   _getSeverityIcon(conflict.severity),
                   color: _getSeverityColor(conflict.severity),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     conflict.entityType,
@@ -510,41 +513,44 @@ class ConflictCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(conflict.reason),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             if (conflict.fieldConflicts.isNotEmpty) ...[
               Text('Field conflicts:',
                   style: Theme.of(context).textTheme.labelLarge),
               ...conflict.fieldConflicts.map(
                 (fc) => Padding(
-                  padding: EdgeInsets.only(left: 16, top: 4),
+                  padding: const EdgeInsets.only(left: 16, top: 4),
                   child: Text(
                     '${fc.fieldName}: local="${fc.localValue}" remote="${fc.remoteValue}"',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
             ],
             Wrap(
               spacing: 8,
               children: [
                 ElevatedButton(
-                  onPressed: () => onResolve(ConflictResolutionStrategy.localWins),
-                  child: Text('Keep Local'),
+                  onPressed: () =>
+                      onResolve(ConflictResolutionStrategy.localWins),
+                  child: const Text('Keep Local'),
                 ),
                 ElevatedButton(
-                  onPressed: () => onResolve(ConflictResolutionStrategy.remoteWins),
-                  child: Text('Keep Remote'),
+                  onPressed: () =>
+                      onResolve(ConflictResolutionStrategy.remoteWins),
+                  child: const Text('Keep Remote'),
                 ),
                 ElevatedButton(
-                  onPressed: () => onResolve(ConflictResolutionStrategy.mostRecent),
-                  child: Text('Most Recent'),
+                  onPressed: () =>
+                      onResolve(ConflictResolutionStrategy.mostRecent),
+                  child: const Text('Most Recent'),
                 ),
                 TextButton(
                   onPressed: onIgnore,
-                  child: Text('Ignore'),
+                  child: const Text('Ignore'),
                 ),
               ],
             ),
@@ -583,7 +589,7 @@ class ConflictCard extends StatelessWidget {
 
 /// Example: Conflict resolution dialog
 class ExampleConflictResolutionDialog extends StatefulWidget {
-  const ExampleConflictResolutionDialog();
+  const ExampleConflictResolutionDialog({super.key});
 
   @override
   _ExampleConflictResolutionDialogState createState() =>
@@ -597,32 +603,32 @@ class _ExampleConflictResolutionDialogState
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Resolve Conflict'),
+      title: const Text('Resolve Conflict'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('This entry was modified on multiple devices.'),
-          SizedBox(height: 16),
-          Text('Which version would you like to keep?'),
-          SizedBox(height: 16),
+          const Text('This entry was modified on multiple devices.'),
+          const SizedBox(height: 16),
+          const Text('Which version would you like to keep?'),
+          const SizedBox(height: 16),
           RadioListTile<ConflictResolutionStrategy>(
-            title: Text('Local version (your changes)'),
-            subtitle: Text('Keep the version edited on this device'),
+            title: const Text('Local version (your changes)'),
+            subtitle: const Text('Keep the version edited on this device'),
             value: ConflictResolutionStrategy.localWins,
             groupValue: _selectedStrategy,
             onChanged: (value) => setState(() => _selectedStrategy = value),
           ),
           RadioListTile<ConflictResolutionStrategy>(
-            title: Text('Remote version (server changes)'),
-            subtitle: Text('Keep the version from the server'),
+            title: const Text('Remote version (server changes)'),
+            subtitle: const Text('Keep the version from the server'),
             value: ConflictResolutionStrategy.remoteWins,
             groupValue: _selectedStrategy,
             onChanged: (value) => setState(() => _selectedStrategy = value),
           ),
           RadioListTile<ConflictResolutionStrategy>(
-            title: Text('Most recent'),
-            subtitle: Text('Keep the most recently edited version'),
+            title: const Text('Most recent'),
+            subtitle: const Text('Keep the most recently edited version'),
             value: ConflictResolutionStrategy.mostRecent,
             groupValue: _selectedStrategy,
             onChanged: (value) => setState(() => _selectedStrategy = value),
@@ -632,13 +638,13 @@ class _ExampleConflictResolutionDialogState
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: _selectedStrategy != null
               ? () => Navigator.pop(context, _selectedStrategy)
               : null,
-          child: Text('Resolve'),
+          child: const Text('Resolve'),
         ),
       ],
     );
@@ -649,7 +655,8 @@ class _ExampleConflictResolutionDialogState
 class ExampleConflictStatisticsCard extends StatelessWidget {
   final ConflictResolutionService conflictService;
 
-  const ExampleConflictStatisticsCard({required this.conflictService});
+  const ExampleConflictStatisticsCard(
+      {super.key, required this.conflictService});
 
   @override
   Widget build(BuildContext context) {
@@ -657,7 +664,7 @@ class ExampleConflictStatisticsCard extends StatelessWidget {
       future: conflictService.getStatistics(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Card(
+          return const Card(
             child: Padding(
               padding: EdgeInsets.all(16),
               child: CircularProgressIndicator(),
@@ -669,13 +676,13 @@ class ExampleConflictStatisticsCard extends StatelessWidget {
 
         return Card(
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Conflict Statistics',
                     style: Theme.of(context).textTheme.titleLarge),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 _StatRow('Total conflicts', '${stats.totalConflicts}'),
                 _StatRow('Resolved', '${stats.resolvedConflicts}'),
                 _StatRow('Pending', '${stats.pendingConflicts}'),
@@ -703,13 +710,15 @@ class _StatRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: Theme.of(context).textTheme.bodyMedium),
           Text(value,
-              style: Theme.of(context).textTheme.bodyMedium
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
                   ?.copyWith(fontWeight: FontWeight.bold)),
         ],
       ),

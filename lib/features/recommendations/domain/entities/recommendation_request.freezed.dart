@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,47 +9,87 @@ part of 'recommendation_request.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-RecommendationRequest _$RecommendationRequestFromJson(
-    Map<String, dynamic> json) {
-  return _RecommendationRequest.fromJson(json);
-}
 
 /// @nodoc
 mixin _$RecommendationRequest {
-  String get itineraryId => throw _privateConstructorUsedError;
-  Destination get destination => throw _privateConstructorUsedError;
-  DateRange get tripDates => throw _privateConstructorUsedError;
-  Set<TravelInterest> get interests => throw _privateConstructorUsedError;
-  HotelLocation? get hotelLocation => throw _privateConstructorUsedError;
-  BudgetRange? get budget => throw _privateConstructorUsedError;
-  Set<RecommendationCategory>? get categories =>
-      throw _privateConstructorUsedError;
-  Set<WeatherContext>? get weatherPreference =>
-      throw _privateConstructorUsedError;
-  DistanceFromHotel? get maxDistance => throw _privateConstructorUsedError;
-  int get limit => throw _privateConstructorUsedError;
-  bool get excludeItineraryItems => throw _privateConstructorUsedError;
-
-  /// Serializes this RecommendationRequest to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get itineraryId;
+  Destination get destination;
+  DateRange get tripDates;
+  Set<TravelInterest> get interests;
+  HotelLocation? get hotelLocation;
+  BudgetRange? get budget;
+  Set<RecommendationCategory>? get categories;
+  Set<WeatherContext>? get weatherPreference;
+  DistanceFromHotel? get maxDistance;
+  int get limit;
+  bool get excludeItineraryItems;
 
   /// Create a copy of RecommendationRequest
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $RecommendationRequestCopyWith<RecommendationRequest> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$RecommendationRequestCopyWithImpl<RecommendationRequest>(
+          this as RecommendationRequest, _$identity);
+
+  /// Serializes this RecommendationRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is RecommendationRequest &&
+            (identical(other.itineraryId, itineraryId) ||
+                other.itineraryId == itineraryId) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
+            (identical(other.tripDates, tripDates) ||
+                other.tripDates == tripDates) &&
+            const DeepCollectionEquality().equals(other.interests, interests) &&
+            (identical(other.hotelLocation, hotelLocation) ||
+                other.hotelLocation == hotelLocation) &&
+            (identical(other.budget, budget) || other.budget == budget) &&
+            const DeepCollectionEquality()
+                .equals(other.categories, categories) &&
+            const DeepCollectionEquality()
+                .equals(other.weatherPreference, weatherPreference) &&
+            (identical(other.maxDistance, maxDistance) ||
+                other.maxDistance == maxDistance) &&
+            (identical(other.limit, limit) || other.limit == limit) &&
+            (identical(other.excludeItineraryItems, excludeItineraryItems) ||
+                other.excludeItineraryItems == excludeItineraryItems));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      itineraryId,
+      destination,
+      tripDates,
+      const DeepCollectionEquality().hash(interests),
+      hotelLocation,
+      budget,
+      const DeepCollectionEquality().hash(categories),
+      const DeepCollectionEquality().hash(weatherPreference),
+      maxDistance,
+      limit,
+      excludeItineraryItems);
+
+  @override
+  String toString() {
+    return 'RecommendationRequest(itineraryId: $itineraryId, destination: $destination, tripDates: $tripDates, interests: $interests, hotelLocation: $hotelLocation, budget: $budget, categories: $categories, weatherPreference: $weatherPreference, maxDistance: $maxDistance, limit: $limit, excludeItineraryItems: $excludeItineraryItems)';
+  }
 }
 
 /// @nodoc
-abstract class $RecommendationRequestCopyWith<$Res> {
+abstract mixin class $RecommendationRequestCopyWith<$Res> {
   factory $RecommendationRequestCopyWith(RecommendationRequest value,
-          $Res Function(RecommendationRequest) then) =
-      _$RecommendationRequestCopyWithImpl<$Res, RecommendationRequest>;
+          $Res Function(RecommendationRequest) _then) =
+      _$RecommendationRequestCopyWithImpl;
   @useResult
   $Res call(
       {String itineraryId,
@@ -71,15 +111,12 @@ abstract class $RecommendationRequestCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$RecommendationRequestCopyWithImpl<$Res,
-        $Val extends RecommendationRequest>
+class _$RecommendationRequestCopyWithImpl<$Res>
     implements $RecommendationRequestCopyWith<$Res> {
-  _$RecommendationRequestCopyWithImpl(this._value, this._then);
+  _$RecommendationRequestCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final RecommendationRequest _self;
+  final $Res Function(RecommendationRequest) _then;
 
   /// Create a copy of RecommendationRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -98,52 +135,52 @@ class _$RecommendationRequestCopyWithImpl<$Res,
     Object? limit = null,
     Object? excludeItineraryItems = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       itineraryId: null == itineraryId
-          ? _value.itineraryId
+          ? _self.itineraryId
           : itineraryId // ignore: cast_nullable_to_non_nullable
               as String,
       destination: null == destination
-          ? _value.destination
+          ? _self.destination
           : destination // ignore: cast_nullable_to_non_nullable
               as Destination,
       tripDates: null == tripDates
-          ? _value.tripDates
+          ? _self.tripDates
           : tripDates // ignore: cast_nullable_to_non_nullable
               as DateRange,
       interests: null == interests
-          ? _value.interests
+          ? _self.interests
           : interests // ignore: cast_nullable_to_non_nullable
               as Set<TravelInterest>,
       hotelLocation: freezed == hotelLocation
-          ? _value.hotelLocation
+          ? _self.hotelLocation
           : hotelLocation // ignore: cast_nullable_to_non_nullable
               as HotelLocation?,
       budget: freezed == budget
-          ? _value.budget
+          ? _self.budget
           : budget // ignore: cast_nullable_to_non_nullable
               as BudgetRange?,
       categories: freezed == categories
-          ? _value.categories
+          ? _self.categories
           : categories // ignore: cast_nullable_to_non_nullable
               as Set<RecommendationCategory>?,
       weatherPreference: freezed == weatherPreference
-          ? _value.weatherPreference
+          ? _self.weatherPreference
           : weatherPreference // ignore: cast_nullable_to_non_nullable
               as Set<WeatherContext>?,
       maxDistance: freezed == maxDistance
-          ? _value.maxDistance
+          ? _self.maxDistance
           : maxDistance // ignore: cast_nullable_to_non_nullable
               as DistanceFromHotel?,
       limit: null == limit
-          ? _value.limit
+          ? _self.limit
           : limit // ignore: cast_nullable_to_non_nullable
               as int,
       excludeItineraryItems: null == excludeItineraryItems
-          ? _value.excludeItineraryItems
+          ? _self.excludeItineraryItems
           : excludeItineraryItems // ignore: cast_nullable_to_non_nullable
               as bool,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of RecommendationRequest
@@ -151,8 +188,8 @@ class _$RecommendationRequestCopyWithImpl<$Res,
   @override
   @pragma('vm:prefer-inline')
   $DestinationCopyWith<$Res> get destination {
-    return $DestinationCopyWith<$Res>(_value.destination, (value) {
-      return _then(_value.copyWith(destination: value) as $Val);
+    return $DestinationCopyWith<$Res>(_self.destination, (value) {
+      return _then(_self.copyWith(destination: value));
     });
   }
 
@@ -161,8 +198,8 @@ class _$RecommendationRequestCopyWithImpl<$Res,
   @override
   @pragma('vm:prefer-inline')
   $DateRangeCopyWith<$Res> get tripDates {
-    return $DateRangeCopyWith<$Res>(_value.tripDates, (value) {
-      return _then(_value.copyWith(tripDates: value) as $Val);
+    return $DateRangeCopyWith<$Res>(_self.tripDates, (value) {
+      return _then(_self.copyWith(tripDates: value));
     });
   }
 
@@ -171,12 +208,12 @@ class _$RecommendationRequestCopyWithImpl<$Res,
   @override
   @pragma('vm:prefer-inline')
   $HotelLocationCopyWith<$Res>? get hotelLocation {
-    if (_value.hotelLocation == null) {
+    if (_self.hotelLocation == null) {
       return null;
     }
 
-    return $HotelLocationCopyWith<$Res>(_value.hotelLocation!, (value) {
-      return _then(_value.copyWith(hotelLocation: value) as $Val);
+    return $HotelLocationCopyWith<$Res>(_self.hotelLocation!, (value) {
+      return _then(_self.copyWith(hotelLocation: value));
     });
   }
 
@@ -185,127 +222,246 @@ class _$RecommendationRequestCopyWithImpl<$Res,
   @override
   @pragma('vm:prefer-inline')
   $BudgetRangeCopyWith<$Res>? get budget {
-    if (_value.budget == null) {
+    if (_self.budget == null) {
       return null;
     }
 
-    return $BudgetRangeCopyWith<$Res>(_value.budget!, (value) {
-      return _then(_value.copyWith(budget: value) as $Val);
+    return $BudgetRangeCopyWith<$Res>(_self.budget!, (value) {
+      return _then(_self.copyWith(budget: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$RecommendationRequestImplCopyWith<$Res>
-    implements $RecommendationRequestCopyWith<$Res> {
-  factory _$$RecommendationRequestImplCopyWith(
-          _$RecommendationRequestImpl value,
-          $Res Function(_$RecommendationRequestImpl) then) =
-      __$$RecommendationRequestImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String itineraryId,
-      Destination destination,
-      DateRange tripDates,
-      Set<TravelInterest> interests,
-      HotelLocation? hotelLocation,
-      BudgetRange? budget,
-      Set<RecommendationCategory>? categories,
-      Set<WeatherContext>? weatherPreference,
-      DistanceFromHotel? maxDistance,
-      int limit,
-      bool excludeItineraryItems});
+/// Adds pattern-matching-related methods to [RecommendationRequest].
+extension RecommendationRequestPatterns on RecommendationRequest {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $DestinationCopyWith<$Res> get destination;
-  @override
-  $DateRangeCopyWith<$Res> get tripDates;
-  @override
-  $HotelLocationCopyWith<$Res>? get hotelLocation;
-  @override
-  $BudgetRangeCopyWith<$Res>? get budget;
-}
-
-/// @nodoc
-class __$$RecommendationRequestImplCopyWithImpl<$Res>
-    extends _$RecommendationRequestCopyWithImpl<$Res,
-        _$RecommendationRequestImpl>
-    implements _$$RecommendationRequestImplCopyWith<$Res> {
-  __$$RecommendationRequestImplCopyWithImpl(_$RecommendationRequestImpl _value,
-      $Res Function(_$RecommendationRequestImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of RecommendationRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? itineraryId = null,
-    Object? destination = null,
-    Object? tripDates = null,
-    Object? interests = null,
-    Object? hotelLocation = freezed,
-    Object? budget = freezed,
-    Object? categories = freezed,
-    Object? weatherPreference = freezed,
-    Object? maxDistance = freezed,
-    Object? limit = null,
-    Object? excludeItineraryItems = null,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_RecommendationRequest value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$RecommendationRequestImpl(
-      itineraryId: null == itineraryId
-          ? _value.itineraryId
-          : itineraryId // ignore: cast_nullable_to_non_nullable
-              as String,
-      destination: null == destination
-          ? _value.destination
-          : destination // ignore: cast_nullable_to_non_nullable
-              as Destination,
-      tripDates: null == tripDates
-          ? _value.tripDates
-          : tripDates // ignore: cast_nullable_to_non_nullable
-              as DateRange,
-      interests: null == interests
-          ? _value._interests
-          : interests // ignore: cast_nullable_to_non_nullable
-              as Set<TravelInterest>,
-      hotelLocation: freezed == hotelLocation
-          ? _value.hotelLocation
-          : hotelLocation // ignore: cast_nullable_to_non_nullable
-              as HotelLocation?,
-      budget: freezed == budget
-          ? _value.budget
-          : budget // ignore: cast_nullable_to_non_nullable
-              as BudgetRange?,
-      categories: freezed == categories
-          ? _value._categories
-          : categories // ignore: cast_nullable_to_non_nullable
-              as Set<RecommendationCategory>?,
-      weatherPreference: freezed == weatherPreference
-          ? _value._weatherPreference
-          : weatherPreference // ignore: cast_nullable_to_non_nullable
-              as Set<WeatherContext>?,
-      maxDistance: freezed == maxDistance
-          ? _value.maxDistance
-          : maxDistance // ignore: cast_nullable_to_non_nullable
-              as DistanceFromHotel?,
-      limit: null == limit
-          ? _value.limit
-          : limit // ignore: cast_nullable_to_non_nullable
-              as int,
-      excludeItineraryItems: null == excludeItineraryItems
-          ? _value.excludeItineraryItems
-          : excludeItineraryItems // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _RecommendationRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_RecommendationRequest value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecommendationRequest():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_RecommendationRequest value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecommendationRequest() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String itineraryId,
+            Destination destination,
+            DateRange tripDates,
+            Set<TravelInterest> interests,
+            HotelLocation? hotelLocation,
+            BudgetRange? budget,
+            Set<RecommendationCategory>? categories,
+            Set<WeatherContext>? weatherPreference,
+            DistanceFromHotel? maxDistance,
+            int limit,
+            bool excludeItineraryItems)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _RecommendationRequest() when $default != null:
+        return $default(
+            _that.itineraryId,
+            _that.destination,
+            _that.tripDates,
+            _that.interests,
+            _that.hotelLocation,
+            _that.budget,
+            _that.categories,
+            _that.weatherPreference,
+            _that.maxDistance,
+            _that.limit,
+            _that.excludeItineraryItems);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String itineraryId,
+            Destination destination,
+            DateRange tripDates,
+            Set<TravelInterest> interests,
+            HotelLocation? hotelLocation,
+            BudgetRange? budget,
+            Set<RecommendationCategory>? categories,
+            Set<WeatherContext>? weatherPreference,
+            DistanceFromHotel? maxDistance,
+            int limit,
+            bool excludeItineraryItems)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecommendationRequest():
+        return $default(
+            _that.itineraryId,
+            _that.destination,
+            _that.tripDates,
+            _that.interests,
+            _that.hotelLocation,
+            _that.budget,
+            _that.categories,
+            _that.weatherPreference,
+            _that.maxDistance,
+            _that.limit,
+            _that.excludeItineraryItems);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String itineraryId,
+            Destination destination,
+            DateRange tripDates,
+            Set<TravelInterest> interests,
+            HotelLocation? hotelLocation,
+            BudgetRange? budget,
+            Set<RecommendationCategory>? categories,
+            Set<WeatherContext>? weatherPreference,
+            DistanceFromHotel? maxDistance,
+            int limit,
+            bool excludeItineraryItems)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _RecommendationRequest() when $default != null:
+        return $default(
+            _that.itineraryId,
+            _that.destination,
+            _that.tripDates,
+            _that.interests,
+            _that.hotelLocation,
+            _that.budget,
+            _that.categories,
+            _that.weatherPreference,
+            _that.maxDistance,
+            _that.limit,
+            _that.excludeItineraryItems);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$RecommendationRequestImpl extends _RecommendationRequest {
-  const _$RecommendationRequestImpl(
+class _RecommendationRequest extends RecommendationRequest {
+  const _RecommendationRequest(
       {required this.itineraryId,
       required this.destination,
       required this.tripDates,
@@ -321,9 +477,8 @@ class _$RecommendationRequestImpl extends _RecommendationRequest {
         _categories = categories,
         _weatherPreference = weatherPreference,
         super._();
-
-  factory _$RecommendationRequestImpl.fromJson(Map<String, dynamic> json) =>
-      _$$RecommendationRequestImplFromJson(json);
+  factory _RecommendationRequest.fromJson(Map<String, dynamic> json) =>
+      _$RecommendationRequestFromJson(json);
 
   @override
   final String itineraryId;
@@ -373,16 +528,27 @@ class _$RecommendationRequestImpl extends _RecommendationRequest {
   @JsonKey()
   final bool excludeItineraryItems;
 
+  /// Create a copy of RecommendationRequest
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'RecommendationRequest(itineraryId: $itineraryId, destination: $destination, tripDates: $tripDates, interests: $interests, hotelLocation: $hotelLocation, budget: $budget, categories: $categories, weatherPreference: $weatherPreference, maxDistance: $maxDistance, limit: $limit, excludeItineraryItems: $excludeItineraryItems)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$RecommendationRequestCopyWith<_RecommendationRequest> get copyWith =>
+      __$RecommendationRequestCopyWithImpl<_RecommendationRequest>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$RecommendationRequestToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$RecommendationRequestImpl &&
+            other is _RecommendationRequest &&
             (identical(other.itineraryId, itineraryId) ||
                 other.itineraryId == itineraryId) &&
             (identical(other.destination, destination) ||
@@ -421,225 +587,188 @@ class _$RecommendationRequestImpl extends _RecommendationRequest {
       limit,
       excludeItineraryItems);
 
-  /// Create a copy of RecommendationRequest
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$RecommendationRequestImplCopyWith<_$RecommendationRequestImpl>
-      get copyWith => __$$RecommendationRequestImplCopyWithImpl<
-          _$RecommendationRequestImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$RecommendationRequestImplToJson(
-      this,
-    );
+  String toString() {
+    return 'RecommendationRequest(itineraryId: $itineraryId, destination: $destination, tripDates: $tripDates, interests: $interests, hotelLocation: $hotelLocation, budget: $budget, categories: $categories, weatherPreference: $weatherPreference, maxDistance: $maxDistance, limit: $limit, excludeItineraryItems: $excludeItineraryItems)';
   }
 }
 
-abstract class _RecommendationRequest extends RecommendationRequest {
-  const factory _RecommendationRequest(
-      {required final String itineraryId,
-      required final Destination destination,
-      required final DateRange tripDates,
-      required final Set<TravelInterest> interests,
-      final HotelLocation? hotelLocation,
-      final BudgetRange? budget,
-      final Set<RecommendationCategory>? categories,
-      final Set<WeatherContext>? weatherPreference,
-      final DistanceFromHotel? maxDistance,
-      final int limit,
-      final bool excludeItineraryItems}) = _$RecommendationRequestImpl;
-  const _RecommendationRequest._() : super._();
+/// @nodoc
+abstract mixin class _$RecommendationRequestCopyWith<$Res>
+    implements $RecommendationRequestCopyWith<$Res> {
+  factory _$RecommendationRequestCopyWith(_RecommendationRequest value,
+          $Res Function(_RecommendationRequest) _then) =
+      __$RecommendationRequestCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String itineraryId,
+      Destination destination,
+      DateRange tripDates,
+      Set<TravelInterest> interests,
+      HotelLocation? hotelLocation,
+      BudgetRange? budget,
+      Set<RecommendationCategory>? categories,
+      Set<WeatherContext>? weatherPreference,
+      DistanceFromHotel? maxDistance,
+      int limit,
+      bool excludeItineraryItems});
 
-  factory _RecommendationRequest.fromJson(Map<String, dynamic> json) =
-      _$RecommendationRequestImpl.fromJson;
+  @override
+  $DestinationCopyWith<$Res> get destination;
+  @override
+  $DateRangeCopyWith<$Res> get tripDates;
+  @override
+  $HotelLocationCopyWith<$Res>? get hotelLocation;
+  @override
+  $BudgetRangeCopyWith<$Res>? get budget;
+}
 
-  @override
-  String get itineraryId;
-  @override
-  Destination get destination;
-  @override
-  DateRange get tripDates;
-  @override
-  Set<TravelInterest> get interests;
-  @override
-  HotelLocation? get hotelLocation;
-  @override
-  BudgetRange? get budget;
-  @override
-  Set<RecommendationCategory>? get categories;
-  @override
-  Set<WeatherContext>? get weatherPreference;
-  @override
-  DistanceFromHotel? get maxDistance;
-  @override
-  int get limit;
-  @override
-  bool get excludeItineraryItems;
+/// @nodoc
+class __$RecommendationRequestCopyWithImpl<$Res>
+    implements _$RecommendationRequestCopyWith<$Res> {
+  __$RecommendationRequestCopyWithImpl(this._self, this._then);
+
+  final _RecommendationRequest _self;
+  final $Res Function(_RecommendationRequest) _then;
 
   /// Create a copy of RecommendationRequest
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$RecommendationRequestImplCopyWith<_$RecommendationRequestImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? itineraryId = null,
+    Object? destination = null,
+    Object? tripDates = null,
+    Object? interests = null,
+    Object? hotelLocation = freezed,
+    Object? budget = freezed,
+    Object? categories = freezed,
+    Object? weatherPreference = freezed,
+    Object? maxDistance = freezed,
+    Object? limit = null,
+    Object? excludeItineraryItems = null,
+  }) {
+    return _then(_RecommendationRequest(
+      itineraryId: null == itineraryId
+          ? _self.itineraryId
+          : itineraryId // ignore: cast_nullable_to_non_nullable
+              as String,
+      destination: null == destination
+          ? _self.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as Destination,
+      tripDates: null == tripDates
+          ? _self.tripDates
+          : tripDates // ignore: cast_nullable_to_non_nullable
+              as DateRange,
+      interests: null == interests
+          ? _self._interests
+          : interests // ignore: cast_nullable_to_non_nullable
+              as Set<TravelInterest>,
+      hotelLocation: freezed == hotelLocation
+          ? _self.hotelLocation
+          : hotelLocation // ignore: cast_nullable_to_non_nullable
+              as HotelLocation?,
+      budget: freezed == budget
+          ? _self.budget
+          : budget // ignore: cast_nullable_to_non_nullable
+              as BudgetRange?,
+      categories: freezed == categories
+          ? _self._categories
+          : categories // ignore: cast_nullable_to_non_nullable
+              as Set<RecommendationCategory>?,
+      weatherPreference: freezed == weatherPreference
+          ? _self._weatherPreference
+          : weatherPreference // ignore: cast_nullable_to_non_nullable
+              as Set<WeatherContext>?,
+      maxDistance: freezed == maxDistance
+          ? _self.maxDistance
+          : maxDistance // ignore: cast_nullable_to_non_nullable
+              as DistanceFromHotel?,
+      limit: null == limit
+          ? _self.limit
+          : limit // ignore: cast_nullable_to_non_nullable
+              as int,
+      excludeItineraryItems: null == excludeItineraryItems
+          ? _self.excludeItineraryItems
+          : excludeItineraryItems // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 
-HotelLocation _$HotelLocationFromJson(Map<String, dynamic> json) {
-  return _HotelLocation.fromJson(json);
+  /// Create a copy of RecommendationRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DestinationCopyWith<$Res> get destination {
+    return $DestinationCopyWith<$Res>(_self.destination, (value) {
+      return _then(_self.copyWith(destination: value));
+    });
+  }
+
+  /// Create a copy of RecommendationRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DateRangeCopyWith<$Res> get tripDates {
+    return $DateRangeCopyWith<$Res>(_self.tripDates, (value) {
+      return _then(_self.copyWith(tripDates: value));
+    });
+  }
+
+  /// Create a copy of RecommendationRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $HotelLocationCopyWith<$Res>? get hotelLocation {
+    if (_self.hotelLocation == null) {
+      return null;
+    }
+
+    return $HotelLocationCopyWith<$Res>(_self.hotelLocation!, (value) {
+      return _then(_self.copyWith(hotelLocation: value));
+    });
+  }
+
+  /// Create a copy of RecommendationRequest
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $BudgetRangeCopyWith<$Res>? get budget {
+    if (_self.budget == null) {
+      return null;
+    }
+
+    return $BudgetRangeCopyWith<$Res>(_self.budget!, (value) {
+      return _then(_self.copyWith(budget: value));
+    });
+  }
 }
 
 /// @nodoc
 mixin _$HotelLocation {
-  String get name => throw _privateConstructorUsedError;
-  String? get address => throw _privateConstructorUsedError;
-  double get latitude => throw _privateConstructorUsedError;
-  double get longitude => throw _privateConstructorUsedError;
-
-  /// Serializes this HotelLocation to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get name;
+  String? get address;
+  double get latitude;
+  double get longitude;
 
   /// Create a copy of HotelLocation
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $HotelLocationCopyWith<HotelLocation> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+      _$HotelLocationCopyWithImpl<HotelLocation>(
+          this as HotelLocation, _$identity);
 
-/// @nodoc
-abstract class $HotelLocationCopyWith<$Res> {
-  factory $HotelLocationCopyWith(
-          HotelLocation value, $Res Function(HotelLocation) then) =
-      _$HotelLocationCopyWithImpl<$Res, HotelLocation>;
-  @useResult
-  $Res call({String name, String? address, double latitude, double longitude});
-}
-
-/// @nodoc
-class _$HotelLocationCopyWithImpl<$Res, $Val extends HotelLocation>
-    implements $HotelLocationCopyWith<$Res> {
-  _$HotelLocationCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of HotelLocation
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? address = freezed,
-    Object? latitude = null,
-    Object? longitude = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      address: freezed == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String?,
-      latitude: null == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      longitude: null == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double,
-    ) as $Val);
-  }
-}
-
-/// @nodoc
-abstract class _$$HotelLocationImplCopyWith<$Res>
-    implements $HotelLocationCopyWith<$Res> {
-  factory _$$HotelLocationImplCopyWith(
-          _$HotelLocationImpl value, $Res Function(_$HotelLocationImpl) then) =
-      __$$HotelLocationImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call({String name, String? address, double latitude, double longitude});
-}
-
-/// @nodoc
-class __$$HotelLocationImplCopyWithImpl<$Res>
-    extends _$HotelLocationCopyWithImpl<$Res, _$HotelLocationImpl>
-    implements _$$HotelLocationImplCopyWith<$Res> {
-  __$$HotelLocationImplCopyWithImpl(
-      _$HotelLocationImpl _value, $Res Function(_$HotelLocationImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of HotelLocation
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? name = null,
-    Object? address = freezed,
-    Object? latitude = null,
-    Object? longitude = null,
-  }) {
-    return _then(_$HotelLocationImpl(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      address: freezed == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String?,
-      latitude: null == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      longitude: null == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double,
-    ));
-  }
-}
-
-/// @nodoc
-@JsonSerializable()
-class _$HotelLocationImpl extends _HotelLocation {
-  const _$HotelLocationImpl(
-      {required this.name,
-      this.address,
-      required this.latitude,
-      required this.longitude})
-      : super._();
-
-  factory _$HotelLocationImpl.fromJson(Map<String, dynamic> json) =>
-      _$$HotelLocationImplFromJson(json);
-
-  @override
-  final String name;
-  @override
-  final String? address;
-  @override
-  final double latitude;
-  @override
-  final double longitude;
-
-  @override
-  String toString() {
-    return 'HotelLocation(name: $name, address: $address, latitude: $latitude, longitude: $longitude)';
-  }
+  /// Serializes this HotelLocation to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$HotelLocationImpl &&
+            other is HotelLocation &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.latitude, latitude) ||
@@ -653,187 +782,356 @@ class _$HotelLocationImpl extends _HotelLocation {
   int get hashCode =>
       Object.hash(runtimeType, name, address, latitude, longitude);
 
-  /// Create a copy of HotelLocation
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$HotelLocationImplCopyWith<_$HotelLocationImpl> get copyWith =>
-      __$$HotelLocationImplCopyWithImpl<_$HotelLocationImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$HotelLocationImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _HotelLocation extends HotelLocation {
-  const factory _HotelLocation(
-      {required final String name,
-      final String? address,
-      required final double latitude,
-      required final double longitude}) = _$HotelLocationImpl;
-  const _HotelLocation._() : super._();
-
-  factory _HotelLocation.fromJson(Map<String, dynamic> json) =
-      _$HotelLocationImpl.fromJson;
-
-  @override
-  String get name;
-  @override
-  String? get address;
-  @override
-  double get latitude;
-  @override
-  double get longitude;
-
-  /// Create a copy of HotelLocation
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$HotelLocationImplCopyWith<_$HotelLocationImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-BudgetRange _$BudgetRangeFromJson(Map<String, dynamic> json) {
-  return _BudgetRange.fromJson(json);
-}
-
-/// @nodoc
-mixin _$BudgetRange {
-  double? get min => throw _privateConstructorUsedError;
-  double? get max => throw _privateConstructorUsedError;
-  String get currency => throw _privateConstructorUsedError;
-
-  /// Serializes this BudgetRange to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of BudgetRange
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $BudgetRangeCopyWith<BudgetRange> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $BudgetRangeCopyWith<$Res> {
-  factory $BudgetRangeCopyWith(
-          BudgetRange value, $Res Function(BudgetRange) then) =
-      _$BudgetRangeCopyWithImpl<$Res, BudgetRange>;
-  @useResult
-  $Res call({double? min, double? max, String currency});
-}
-
-/// @nodoc
-class _$BudgetRangeCopyWithImpl<$Res, $Val extends BudgetRange>
-    implements $BudgetRangeCopyWith<$Res> {
-  _$BudgetRangeCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of BudgetRange
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? min = freezed,
-    Object? max = freezed,
-    Object? currency = null,
-  }) {
-    return _then(_value.copyWith(
-      min: freezed == min
-          ? _value.min
-          : min // ignore: cast_nullable_to_non_nullable
-              as double?,
-      max: freezed == max
-          ? _value.max
-          : max // ignore: cast_nullable_to_non_nullable
-              as double?,
-      currency: null == currency
-          ? _value.currency
-          : currency // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  String toString() {
+    return 'HotelLocation(name: $name, address: $address, latitude: $latitude, longitude: $longitude)';
   }
 }
 
 /// @nodoc
-abstract class _$$BudgetRangeImplCopyWith<$Res>
-    implements $BudgetRangeCopyWith<$Res> {
-  factory _$$BudgetRangeImplCopyWith(
-          _$BudgetRangeImpl value, $Res Function(_$BudgetRangeImpl) then) =
-      __$$BudgetRangeImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $HotelLocationCopyWith<$Res> {
+  factory $HotelLocationCopyWith(
+          HotelLocation value, $Res Function(HotelLocation) _then) =
+      _$HotelLocationCopyWithImpl;
   @useResult
-  $Res call({double? min, double? max, String currency});
+  $Res call({String name, String? address, double latitude, double longitude});
 }
 
 /// @nodoc
-class __$$BudgetRangeImplCopyWithImpl<$Res>
-    extends _$BudgetRangeCopyWithImpl<$Res, _$BudgetRangeImpl>
-    implements _$$BudgetRangeImplCopyWith<$Res> {
-  __$$BudgetRangeImplCopyWithImpl(
-      _$BudgetRangeImpl _value, $Res Function(_$BudgetRangeImpl) _then)
-      : super(_value, _then);
+class _$HotelLocationCopyWithImpl<$Res>
+    implements $HotelLocationCopyWith<$Res> {
+  _$HotelLocationCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of BudgetRange
+  final HotelLocation _self;
+  final $Res Function(HotelLocation) _then;
+
+  /// Create a copy of HotelLocation
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? min = freezed,
-    Object? max = freezed,
-    Object? currency = null,
+    Object? name = null,
+    Object? address = freezed,
+    Object? latitude = null,
+    Object? longitude = null,
   }) {
-    return _then(_$BudgetRangeImpl(
-      min: freezed == min
-          ? _value.min
-          : min // ignore: cast_nullable_to_non_nullable
-              as double?,
-      max: freezed == max
-          ? _value.max
-          : max // ignore: cast_nullable_to_non_nullable
-              as double?,
-      currency: null == currency
-          ? _value.currency
-          : currency // ignore: cast_nullable_to_non_nullable
+    return _then(_self.copyWith(
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
               as String,
+      address: freezed == address
+          ? _self.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      latitude: null == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [HotelLocation].
+extension HotelLocationPatterns on HotelLocation {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_HotelLocation value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HotelLocation() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_HotelLocation value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HotelLocation():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_HotelLocation value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HotelLocation() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String name, String? address, double latitude, double longitude)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _HotelLocation() when $default != null:
+        return $default(
+            _that.name, _that.address, _that.latitude, _that.longitude);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String name, String? address, double latitude, double longitude)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HotelLocation():
+        return $default(
+            _that.name, _that.address, _that.latitude, _that.longitude);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String name, String? address, double latitude, double longitude)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _HotelLocation() when $default != null:
+        return $default(
+            _that.name, _that.address, _that.latitude, _that.longitude);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$BudgetRangeImpl extends _BudgetRange {
-  const _$BudgetRangeImpl({this.min, this.max, this.currency = 'USD'})
-      : super._();
-
-  factory _$BudgetRangeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BudgetRangeImplFromJson(json);
-
-  @override
-  final double? min;
-  @override
-  final double? max;
-  @override
-  @JsonKey()
-  final String currency;
+class _HotelLocation implements HotelLocation {
+  const _HotelLocation(
+      {required this.name,
+      this.address,
+      required this.latitude,
+      required this.longitude});
+  factory _HotelLocation.fromJson(Map<String, dynamic> json) =>
+      _$HotelLocationFromJson(json);
 
   @override
-  String toString() {
-    return 'BudgetRange(min: $min, max: $max, currency: $currency)';
+  final String name;
+  @override
+  final String? address;
+  @override
+  final double latitude;
+  @override
+  final double longitude;
+
+  /// Create a copy of HotelLocation
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$HotelLocationCopyWith<_HotelLocation> get copyWith =>
+      __$HotelLocationCopyWithImpl<_HotelLocation>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$HotelLocationToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$BudgetRangeImpl &&
+            other is _HotelLocation &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.address, address) || other.address == address) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, name, address, latitude, longitude);
+
+  @override
+  String toString() {
+    return 'HotelLocation(name: $name, address: $address, latitude: $latitude, longitude: $longitude)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$HotelLocationCopyWith<$Res>
+    implements $HotelLocationCopyWith<$Res> {
+  factory _$HotelLocationCopyWith(
+          _HotelLocation value, $Res Function(_HotelLocation) _then) =
+      __$HotelLocationCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String name, String? address, double latitude, double longitude});
+}
+
+/// @nodoc
+class __$HotelLocationCopyWithImpl<$Res>
+    implements _$HotelLocationCopyWith<$Res> {
+  __$HotelLocationCopyWithImpl(this._self, this._then);
+
+  final _HotelLocation _self;
+  final $Res Function(_HotelLocation) _then;
+
+  /// Create a copy of HotelLocation
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? name = null,
+    Object? address = freezed,
+    Object? latitude = null,
+    Object? longitude = null,
+  }) {
+    return _then(_HotelLocation(
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      address: freezed == address
+          ? _self.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      latitude: null == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double,
+      longitude: null == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double,
+    ));
+  }
+}
+
+/// @nodoc
+mixin _$BudgetRange {
+  double? get min;
+  double? get max;
+  String get currency;
+
+  /// Create a copy of BudgetRange
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $BudgetRangeCopyWith<BudgetRange> get copyWith =>
+      _$BudgetRangeCopyWithImpl<BudgetRange>(this as BudgetRange, _$identity);
+
+  /// Serializes this BudgetRange to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is BudgetRange &&
             (identical(other.min, min) || other.min == min) &&
             (identical(other.max, max) || other.max == max) &&
             (identical(other.currency, currency) ||
@@ -844,43 +1142,304 @@ class _$BudgetRangeImpl extends _BudgetRange {
   @override
   int get hashCode => Object.hash(runtimeType, min, max, currency);
 
-  /// Create a copy of BudgetRange
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$BudgetRangeImplCopyWith<_$BudgetRangeImpl> get copyWith =>
-      __$$BudgetRangeImplCopyWithImpl<_$BudgetRangeImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BudgetRangeImplToJson(
-      this,
-    );
+  String toString() {
+    return 'BudgetRange(min: $min, max: $max, currency: $currency)';
   }
 }
 
-abstract class _BudgetRange extends BudgetRange {
-  const factory _BudgetRange(
-      {final double? min,
-      final double? max,
-      final String currency}) = _$BudgetRangeImpl;
-  const _BudgetRange._() : super._();
+/// @nodoc
+abstract mixin class $BudgetRangeCopyWith<$Res> {
+  factory $BudgetRangeCopyWith(
+          BudgetRange value, $Res Function(BudgetRange) _then) =
+      _$BudgetRangeCopyWithImpl;
+  @useResult
+  $Res call({double? min, double? max, String currency});
+}
 
-  factory _BudgetRange.fromJson(Map<String, dynamic> json) =
-      _$BudgetRangeImpl.fromJson;
+/// @nodoc
+class _$BudgetRangeCopyWithImpl<$Res> implements $BudgetRangeCopyWith<$Res> {
+  _$BudgetRangeCopyWithImpl(this._self, this._then);
+
+  final BudgetRange _self;
+  final $Res Function(BudgetRange) _then;
+
+  /// Create a copy of BudgetRange
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? min = freezed,
+    Object? max = freezed,
+    Object? currency = null,
+  }) {
+    return _then(_self.copyWith(
+      min: freezed == min
+          ? _self.min
+          : min // ignore: cast_nullable_to_non_nullable
+              as double?,
+      max: freezed == max
+          ? _self.max
+          : max // ignore: cast_nullable_to_non_nullable
+              as double?,
+      currency: null == currency
+          ? _self.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [BudgetRange].
+extension BudgetRangePatterns on BudgetRange {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_BudgetRange value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BudgetRange() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_BudgetRange value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BudgetRange():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_BudgetRange value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BudgetRange() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(double? min, double? max, String currency)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _BudgetRange() when $default != null:
+        return $default(_that.min, _that.max, _that.currency);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(double? min, double? max, String currency) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BudgetRange():
+        return $default(_that.min, _that.max, _that.currency);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(double? min, double? max, String currency)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _BudgetRange() when $default != null:
+        return $default(_that.min, _that.max, _that.currency);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _BudgetRange extends BudgetRange {
+  const _BudgetRange({this.min, this.max, this.currency = 'USD'}) : super._();
+  factory _BudgetRange.fromJson(Map<String, dynamic> json) =>
+      _$BudgetRangeFromJson(json);
 
   @override
-  double? get min;
+  final double? min;
   @override
-  double? get max;
+  final double? max;
   @override
-  String get currency;
+  @JsonKey()
+  final String currency;
 
   /// Create a copy of BudgetRange
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$BudgetRangeImplCopyWith<_$BudgetRangeImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$BudgetRangeCopyWith<_BudgetRange> get copyWith =>
+      __$BudgetRangeCopyWithImpl<_BudgetRange>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$BudgetRangeToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _BudgetRange &&
+            (identical(other.min, min) || other.min == min) &&
+            (identical(other.max, max) || other.max == max) &&
+            (identical(other.currency, currency) ||
+                other.currency == currency));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, min, max, currency);
+
+  @override
+  String toString() {
+    return 'BudgetRange(min: $min, max: $max, currency: $currency)';
+  }
 }
+
+/// @nodoc
+abstract mixin class _$BudgetRangeCopyWith<$Res>
+    implements $BudgetRangeCopyWith<$Res> {
+  factory _$BudgetRangeCopyWith(
+          _BudgetRange value, $Res Function(_BudgetRange) _then) =
+      __$BudgetRangeCopyWithImpl;
+  @override
+  @useResult
+  $Res call({double? min, double? max, String currency});
+}
+
+/// @nodoc
+class __$BudgetRangeCopyWithImpl<$Res> implements _$BudgetRangeCopyWith<$Res> {
+  __$BudgetRangeCopyWithImpl(this._self, this._then);
+
+  final _BudgetRange _self;
+  final $Res Function(_BudgetRange) _then;
+
+  /// Create a copy of BudgetRange
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? min = freezed,
+    Object? max = freezed,
+    Object? currency = null,
+  }) {
+    return _then(_BudgetRange(
+      min: freezed == min
+          ? _self.min
+          : min // ignore: cast_nullable_to_non_nullable
+              as double?,
+      max: freezed == max
+          ? _self.max
+          : max // ignore: cast_nullable_to_non_nullable
+              as double?,
+      currency: null == currency
+          ? _self.currency
+          : currency // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+// dart format on

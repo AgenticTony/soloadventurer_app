@@ -6,7 +6,8 @@ import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
 
-class MockTokenExpirationTracker extends Mock implements TokenExpirationTracker {}
+class MockTokenExpirationTracker extends Mock
+    implements TokenExpirationTracker {}
 
 void main() {
   late MockTokenExpirationTracker mockTracker;
@@ -41,7 +42,7 @@ void main() {
 
     test('should start monitoring session', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act
       scheduler.start(session);
@@ -54,7 +55,7 @@ void main() {
 
     test('should stop monitoring session', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -68,7 +69,7 @@ void main() {
 
     test('should pause and resume monitoring', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act - Pause
@@ -83,14 +84,15 @@ void main() {
       scheduler.resume();
 
       // Assert - Resumed
-      verify(() => mockTracker.startTracking(session)).called(2); // Once in start(), once in resume()
+      verify(() => mockTracker.startTracking(session))
+          .called(2); // Once in start(), once in resume()
       expect(scheduler.status, TokenRefreshSchedulerStatus.running);
       expect(scheduler.isRunning, isTrue);
     });
 
     test('should not pause when not running', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
       scheduler.stop();
 
@@ -98,13 +100,14 @@ void main() {
       scheduler.pause();
 
       // Assert
-      verify(() => mockTracker.stopTracking()).called(1); // Only from stop(), not from pause()
+      verify(() => mockTracker.stopTracking())
+          .called(1); // Only from stop(), not from pause()
       expect(scheduler.status, TokenRefreshSchedulerStatus.stopped);
     });
 
     test('should not resume when not paused', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act - try to resume without starting
       scheduler.resume();
@@ -116,7 +119,7 @@ void main() {
 
     test('should not resume when paused but no session', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
       scheduler.pause();
 
@@ -134,7 +137,7 @@ void main() {
   group('TokenRefreshScheduler - App Lifecycle', () {
     test('should pause when app goes to background', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -147,7 +150,7 @@ void main() {
 
     test('should pause when app becomes inactive', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -160,7 +163,7 @@ void main() {
 
     test('should pause when app becomes hidden', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -173,7 +176,7 @@ void main() {
 
     test('should resume when app returns to foreground', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       final expirationResult = TokenExpirationResult.valid(
         expirationTime: DateTime.now().add(const Duration(hours: 1)),
         timeUntilExpiration: const Duration(hours: 1),
@@ -189,13 +192,14 @@ void main() {
 
       // Assert
       verify(() => mockTracker.checkExpiration(session)).called(1);
-      verify(() => mockTracker.startTracking(session)).called(2); // start() + resume()
+      verify(() => mockTracker.startTracking(session))
+          .called(2); // start() + resume()
       expect(scheduler.status, TokenRefreshSchedulerStatus.running);
     });
 
     test('should stop when app is detached', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -208,7 +212,8 @@ void main() {
 
     test('should handle app resume when token is expired', () {
       // Arrange
-      final session = _createTestSession(expiresIn: const Duration(hours: -1)); // Expired
+      final session =
+          _createTestSession(expiresIn: const Duration(hours: -1)); // Expired
       final expirationResult = TokenExpirationResult.expired(
         expirationTime: DateTime.now().subtract(const Duration(hours: 1)),
       );
@@ -222,13 +227,15 @@ void main() {
 
       // Assert
       verify(() => mockTracker.checkExpiration(session)).called(1);
-      verify(() => mockTracker.startTracking(session)).called(2); // Should still resume
+      verify(() => mockTracker.startTracking(session))
+          .called(2); // Should still resume
       expect(scheduler.status, TokenRefreshSchedulerStatus.running);
     });
 
     test('should handle app resume when token should refresh', () {
       // Arrange
-      final session = _createTestSession(expiresIn: const Duration(minutes: 10));
+      final session =
+          _createTestSession(expiresIn: const Duration(minutes: 10));
       final expirationResult = TokenExpirationResult.shouldRefreshNow(
         expirationTime: DateTime.now().add(const Duration(minutes: 10)),
         timeUntilExpiration: const Duration(minutes: 10),
@@ -249,8 +256,7 @@ void main() {
 
     test('should handle app resume with no session', () {
       // Arrange - scheduler stopped with no session
-      when(() => mockTracker.checkExpiration(any()))
-          .thenReturn(null);
+      when(() => mockTracker.checkExpiration(any())).thenReturn(null);
 
       // Act
       scheduler.didChangeAppLifecycleState(AppLifecycleState.resumed);
@@ -264,8 +270,10 @@ void main() {
   group('TokenRefreshScheduler - Session Management', () {
     test('should update session while running', () {
       // Arrange
-      final oldSession = _createTestSession(expiresIn: Duration(hours: 1));
-      final newSession = _createTestSession(expiresIn: Duration(hours: 2));
+      final oldSession =
+          _createTestSession(expiresIn: const Duration(hours: 1));
+      final newSession =
+          _createTestSession(expiresIn: const Duration(hours: 2));
 
       scheduler.start(oldSession);
 
@@ -278,8 +286,10 @@ void main() {
 
     test('should update session while paused', () {
       // Arrange
-      final oldSession = _createTestSession(expiresIn: Duration(hours: 1));
-      final newSession = _createTestSession(expiresIn: Duration(hours: 2));
+      final oldSession =
+          _createTestSession(expiresIn: const Duration(hours: 1));
+      final newSession =
+          _createTestSession(expiresIn: const Duration(hours: 2));
 
       scheduler.start(oldSession);
       scheduler.pause();
@@ -295,7 +305,7 @@ void main() {
 
     test('should check expiration for current session', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       final expirationResult = TokenExpirationResult.valid(
         expirationTime: DateTime.now().add(const Duration(hours: 1)),
         timeUntilExpiration: const Duration(hours: 1),
@@ -330,7 +340,7 @@ void main() {
   group('TokenRefreshScheduler - Edge Cases', () {
     test('should handle multiple start calls', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act
       scheduler.start(session);
@@ -343,7 +353,7 @@ void main() {
 
     test('should handle multiple stop calls', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -357,7 +367,7 @@ void main() {
 
     test('should handle start after stop', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act
       scheduler.start(session);
@@ -382,7 +392,7 @@ void main() {
 
     test('should handle rapid lifecycle state changes', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       final expirationResult = TokenExpirationResult.valid(
         expirationTime: DateTime.now().add(const Duration(hours: 1)),
         timeUntilExpiration: const Duration(hours: 1),
@@ -405,7 +415,7 @@ void main() {
 
     test('should handle disposal', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -418,7 +428,7 @@ void main() {
 
     test('should handle reset', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
       scheduler.start(session);
 
       // Act
@@ -433,7 +443,7 @@ void main() {
   group('TokenRefreshScheduler - WidgetsBindingObserver', () {
     testWidgets('should register and unregister observer', (tester) async {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act
       scheduler.start(session);
@@ -445,7 +455,7 @@ void main() {
 
     test('should handle multiple start-stop cycles', () {
       // Arrange
-      final session = _createTestSession(expiresIn: Duration(hours: 1));
+      final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act - multiple cycles
       for (int i = 0; i < 3; i++) {

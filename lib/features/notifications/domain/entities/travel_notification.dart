@@ -130,7 +130,6 @@ enum NotificationActionType {
 /// Represents a travel notification
 @freezed
 abstract class TravelNotification with _$TravelNotification {
-  const TravelNotification._();
 
   const factory TravelNotification({
     required String id,
@@ -204,6 +203,9 @@ abstract class TravelNotification with _$TravelNotification {
         return '📅';
     }
   }
+
+  // Private constructor for freezed getters
+  const TravelNotification._();
 }
 
 /// Extension to provide display names for notification types

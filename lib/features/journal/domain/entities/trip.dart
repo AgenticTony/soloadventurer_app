@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'shared_link.dart'; // For SyncStatus enum
 
 /// Represents a trip that organizes journal entries
 class Trip extends Equatable {
@@ -116,51 +117,5 @@ class Trip extends Equatable {
       return DateTime.now().difference(startDate);
     }
     return endDate!.difference(startDate);
-  }
-}
-
-/// Sync status for offline support
-enum SyncStatus {
-  /// Entity is synced with server
-  synced,
-
-  /// Entity has pending changes to sync
-  pending,
-
-  /// Entity has a conflict that needs resolution
-  conflict,
-
-  /// Entity only exists offline
-  offlineOnly,
-}
-
-/// Extension to convert SyncStatus to/from string
-extension SyncStatusExtension on SyncStatus {
-  String get value {
-    switch (this) {
-      case SyncStatus.synced:
-        return 'synced';
-      case SyncStatus.pending:
-        return 'pending';
-      case SyncStatus.conflict:
-        return 'conflict';
-      case SyncStatus.offlineOnly:
-        return 'offline_only';
-    }
-  }
-
-  static SyncStatus fromString(String value) {
-    switch (value) {
-      case 'synced':
-        return SyncStatus.synced;
-      case 'pending':
-        return SyncStatus.pending;
-      case 'conflict':
-        return SyncStatus.conflict;
-      case 'offline_only':
-        return SyncStatus.offlineOnly;
-      default:
-        throw ArgumentError('Invalid SyncStatus value: $value');
-    }
   }
 }

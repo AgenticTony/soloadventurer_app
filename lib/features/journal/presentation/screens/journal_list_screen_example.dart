@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
-import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_list_provider.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/journal_list_screen.dart';
 
@@ -66,7 +63,8 @@ class JournalListExampleMenu extends StatelessWidget {
           const SizedBox(height: 16),
           _ExampleCard(
             title: 'Basic Navigation',
-            description: 'Navigate to the journal list screen with default settings',
+            description:
+                'Navigate to the journal list screen with default settings',
             icon: Icons.list,
             onTap: () {
               Navigator.push(
@@ -230,7 +228,8 @@ class Example2_StateMonitoring extends ConsumerWidget {
             _StateRow('Loading', listState.isLoading.toString()),
             _StateRow('Has Entries', listState.hasEntries.toString()),
             _StateRow('Total Entries', '${listState.entries.length}'),
-            _StateRow('Organization Mode', listState.organizationMode.toString()),
+            _StateRow(
+                'Organization Mode', listState.organizationMode.toString()),
             _StateRow('Group Count', '${listState.groupCount}'),
             if (listState.error != null) ...[
               const SizedBox(height: 8),
@@ -363,15 +362,15 @@ class _HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.home, size: 64),
-          const SizedBox(height: 16),
-          const Text('Home Screen', style: TextStyle(fontSize: 24)),
-          const SizedBox(height: 8),
-          const Text('Navigate to Journal tab to see entries'),
+          Icon(Icons.home, size: 64),
+          SizedBox(height: 16),
+          Text('Home Screen', style: TextStyle(fontSize: 24)),
+          SizedBox(height: 8),
+          Text('Navigate to Journal tab to see entries'),
         ],
       ),
     );
@@ -383,13 +382,13 @@ class _ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.person, size: 64),
-          const SizedBox(height: 16),
-          const Text('Profile Screen', style: TextStyle(fontSize: 24)),
+          Icon(Icons.person, size: 64),
+          SizedBox(height: 16),
+          Text('Profile Screen', style: TextStyle(fontSize: 24)),
         ],
       ),
     );
@@ -424,7 +423,7 @@ class Example4_ProviderSetup extends ConsumerWidget {
             'The JournalListScreen requires the following providers to be set up:',
           ),
           const SizedBox(height: 16),
-          _CodeBlock('''
+          const _CodeBlock('''
 // 1. Journal Repository Provider (in journal_entry_providers.dart)
 final journalRepositoryProvider = Provider<JournalRepository>((ref) {
   // Return your repository implementation

@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/core/services/thumbnail_service.dart';
 
@@ -206,7 +204,7 @@ void main() {
       });
 
       test('should format size correctly', () {
-        final stats = ThumbnailCacheStats(
+        const stats = ThumbnailCacheStats(
           size: 1536, // 1.5 KB
           count: 1,
           isInitialized: true,
@@ -259,9 +257,9 @@ void main() {
         // but we can verify that the same URL produces the same thumbnail path
         // by checking the hasThumbnail method behavior
 
-        final url1 = 'https://example.com/test.jpg';
-        final url2 = 'https://example.com/test.jpg';
-        final url3 = 'https://example.com/other.jpg';
+        const url1 = 'https://example.com/test.jpg';
+        const url2 = 'https://example.com/test.jpg';
+        const url3 = 'https://example.com/other.jpg';
 
         // Same URLs should produce the same existence result
         final exists1 = await ThumbnailService.hasThumbnail(url1);
@@ -274,7 +272,7 @@ void main() {
 
       test('should generate different keys for different sizes', () {
         // Different sizes should produce different cache keys
-        final url = 'https://example.com/test.jpg';
+        const url = 'https://example.com/test.jpg';
 
         // We can't directly verify cache keys, but the behavior
         // should be that hasThumbnail returns false for different sizes
@@ -299,7 +297,7 @@ void main() {
         // This would require a mock HTTP server to provide test images
         // For now, we test the API and error handling
 
-        final url = 'https://example.com/test-image.jpg';
+        const url = 'https://example.com/test-image.jpg';
 
         // Check if thumbnail exists (should be false)
         final existsBefore = await ThumbnailService.hasThumbnail(url);

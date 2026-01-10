@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_history_entry.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_status.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_error.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_history_entry.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_error.dart';
 
 void main() {
   group('SyncHistoryEntry', () {
@@ -15,10 +15,12 @@ void main() {
         );
 
         expect(entry.id, 'test-id');
-        expect(entry.status, SyncStatus.syncing);
+        expect(entry.status, SyncOperationStatus.syncing);
         expect(entry.isManual, isTrue);
         expect(entry.connectionType, 'wifi');
-        expect(entry.startedAt.isAfter(now.subtract(const Duration(seconds: 1))), isTrue);
+        expect(
+            entry.startedAt.isAfter(now.subtract(const Duration(seconds: 1))),
+            isTrue);
         expect(entry.completedAt, isNull);
         expect(entry.successCount, 0);
         expect(entry.failureCount, 0);
@@ -38,7 +40,7 @@ void main() {
         );
 
         expect(entry.id, 'test-id');
-        expect(entry.status, SyncStatus.success);
+        expect(entry.status, SyncOperationStatus.success);
         expect(entry.isManual, isFalse);
         expect(entry.connectionType, 'mobile');
         expect(entry.startedAt, startedAt);
@@ -71,7 +73,7 @@ void main() {
         );
 
         expect(entry.id, 'test-id');
-        expect(entry.status, SyncStatus.failed);
+        expect(entry.status, SyncOperationStatus.failed);
         expect(entry.isManual, isTrue);
         expect(entry.startedAt, startedAt);
         expect(entry.completedAt, isNotNull);
@@ -89,14 +91,15 @@ void main() {
         expect(entry.duration, isNull);
       });
 
-      test('duration returns correct duration when completedAt is set', () async {
+      test('duration returns correct duration when completedAt is set',
+          () async {
         final startedAt = DateTime.now();
         await Future.delayed(const Duration(milliseconds: 100));
         final completedAt = DateTime.now();
 
         final entry = SyncHistoryEntry(
           id: 'test-id',
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           startedAt: startedAt,
           completedAt: completedAt,
         );
@@ -113,7 +116,7 @@ void main() {
       test('successRate returns correct percentage', () {
         final entry = SyncHistoryEntry(
           id: 'test-id',
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           startedAt: DateTime.now(),
           completedAt: DateTime.now(),
           successCount: 8,
@@ -127,12 +130,12 @@ void main() {
       test('isSuccessful returns true only for success status', () {
         final successEntry = SyncHistoryEntry(
           id: 'test-1',
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           startedAt: DateTime.now(),
         );
         final failedEntry = SyncHistoryEntry(
           id: 'test-2',
-          status: SyncStatus.failed,
+          status: SyncOperationStatus.failed,
           startedAt: DateTime.now(),
         );
 
@@ -143,12 +146,12 @@ void main() {
       test('isFailed returns true only for failed status', () {
         final successEntry = SyncHistoryEntry(
           id: 'test-1',
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           startedAt: DateTime.now(),
         );
         final failedEntry = SyncHistoryEntry(
           id: 'test-2',
-          status: SyncStatus.failed,
+          status: SyncOperationStatus.failed,
           startedAt: DateTime.now(),
         );
 
@@ -159,12 +162,12 @@ void main() {
       test('isInProgress returns true only for syncing status', () {
         final syncingEntry = SyncHistoryEntry(
           id: 'test-1',
-          status: SyncStatus.syncing,
+          status: SyncOperationStatus.syncing,
           startedAt: DateTime.now(),
         );
         final successEntry = SyncHistoryEntry(
           id: 'test-2',
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           startedAt: DateTime.now(),
         );
 
@@ -177,12 +180,12 @@ void main() {
       test('creates copy with updated fields', () {
         final original = SyncHistoryEntry.start(id: 'test-id');
         final updated = original.copyWith(
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           successCount: 5,
         );
 
         expect(updated.id, original.id);
-        expect(updated.status, SyncStatus.success);
+        expect(updated.status, SyncOperationStatus.success);
         expect(updated.successCount, 5);
         expect(updated.startedAt, original.startedAt);
       });
@@ -199,7 +202,7 @@ void main() {
 
         final original = SyncHistoryEntry(
           id: 'test-id',
-          status: SyncStatus.failed,
+          status: SyncOperationStatus.failed,
           startedAt: DateTime.now(),
           error: error,
         );
@@ -225,7 +228,7 @@ void main() {
 
         final original = SyncHistoryEntry(
           id: 'test-id',
-          status: SyncStatus.failed,
+          status: SyncOperationStatus.failed,
           startedAt: startedAt,
           completedAt: completedAt,
           successCount: 5,

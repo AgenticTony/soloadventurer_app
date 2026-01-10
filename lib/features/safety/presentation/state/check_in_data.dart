@@ -7,7 +7,6 @@ part 'check_in_data.g.dart';
 /// Data class for check-in state
 @freezed
 class CheckInData with _$CheckInData {
-  const CheckInData._();
 
   const factory CheckInData({
     @Default([]) List<CheckIn> checkIns,
@@ -18,6 +17,12 @@ class CheckInData with _$CheckInData {
   factory CheckInData.fromJson(Map<String, dynamic> json) =>
       _$CheckInDataFromJson(json);
 
+  // Private constructor for freezed
+  const CheckInData._();
+}
+
+/// Extension on [CheckInData] for computed properties
+extension CheckInDataExtension on CheckInData {
   /// Whether there are any upcoming check-ins
   bool get hasUpcomingCheckIns => upcomingCheckIns.isNotEmpty;
 

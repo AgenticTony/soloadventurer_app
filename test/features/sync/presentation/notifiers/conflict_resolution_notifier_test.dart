@@ -106,8 +106,8 @@ void main() {
       expect(
         notifier.state.value,
         isA<ConflictResolutionState>()
-            .having((s) => s.activeConflict?.entityId, 'activeConflict.entityId',
-                conflict.entityId)
+            .having((s) => s.activeConflict?.entityId,
+                'activeConflict.entityId', conflict.entityId)
             .having((s) => s.isResolving, 'isResolving', true),
       );
     });
@@ -330,8 +330,7 @@ void main() {
         conflicts: anyNamed('conflicts'),
       )).thenAnswer((_) async => batchResult);
 
-      when(mockSyncService.enqueueOperation(any))
-          .thenAnswer((_) async => true);
+      when(mockSyncService.enqueueOperation(any)).thenAnswer((_) async => true);
 
       when(mockSyncService.processQueue())
           .thenAnswer((_) async => SyncResult.success());
@@ -345,7 +344,8 @@ void main() {
     test('should auto-resolve conflicts', () async {
       final conflict = _createTestConflict();
 
-      when(mockConflictResolver.canMergeAutomatically(conflict: anyNamed('conflict')))
+      when(mockConflictResolver.canMergeAutomatically(
+              conflict: anyNamed('conflict')))
           .thenReturn(true);
 
       final resolution = _createTestResolution(conflict: conflict);
@@ -358,8 +358,7 @@ void main() {
         conflicts: anyNamed('conflicts'),
       )).thenAnswer((_) async => batchResult);
 
-      when(mockSyncService.enqueueOperation(any))
-          .thenAnswer((_) async => true);
+      when(mockSyncService.enqueueOperation(any)).thenAnswer((_) async => true);
 
       when(mockSyncService.processQueue())
           .thenAnswer((_) async => SyncResult.success());
@@ -374,7 +373,8 @@ void main() {
     test('should skip auto-resolve when no conflicts are resolvable', () async {
       final conflict = _createTestConflict();
 
-      when(mockConflictResolver.canMergeAutomatically(conflict: anyNamed('conflict')))
+      when(mockConflictResolver.canMergeAutomatically(
+              conflict: anyNamed('conflict')))
           .thenReturn(false);
 
       await notifier.autoResolveConflicts([conflict]);
@@ -414,8 +414,8 @@ ConflictInfo _createTestConflict({String entityId = 'test-entity-1'}) {
       deviceId: 'device-2',
       dataHash: 'hash-remote',
     ),
-    localData: {'name': 'Local Trip'},
-    remoteData: {'name': 'Remote Trip'},
+    localData: const {'name': 'Local Trip'},
+    remoteData: const {'name': 'Remote Trip'},
     detectedAt: now,
   );
 }

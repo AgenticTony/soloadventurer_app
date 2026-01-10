@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/map_marker.dart';
 
@@ -209,7 +210,7 @@ class MapMarkerClusteringService {
     final List<MapCluster> clusters = [];
     final List<MapMarker> unclustered = [];
     final Set<String> clusteredIds = {};
-    final Distance distance = Distance();
+    const Distance distance = Distance();
 
     // Sort markers by importance (optional optimization)
     final sortedMarkers = List<MapMarker>.from(markers);
@@ -274,7 +275,7 @@ class MapMarkerClusteringService {
     final List<MapCluster> clusters = [];
     final List<MapMarker> unclustered = [];
     final Map<String, List<MapMarker>> gridCells = {};
-    final Distance distance = Distance();
+    const Distance distance = Distance();
 
     // Calculate grid boundaries
     double minLat = double.infinity;
@@ -291,10 +292,10 @@ class MapMarkerClusteringService {
 
     // Assign markers to grid cells
     for (final marker in markers) {
-      final cellX = ((marker.position.latitude - minLat) / _params.gridCellSize)
-          .floor();
-      final cellY = ((marker.position.longitude - minLng) / _params.gridCellSize)
-          .floor();
+      final cellX =
+          ((marker.position.latitude - minLat) / _params.gridCellSize).floor();
+      final cellY =
+          ((marker.position.longitude - minLng) / _params.gridCellSize).floor();
       final cellKey = '${cellX}_$cellY';
 
       gridCells.putIfAbsent(cellKey, () => []).add(marker);
@@ -523,8 +524,8 @@ class MapMarkerClusteringService {
     final newIds = newMarkers.map((m) => m.id).toSet();
 
     final remainingClusters = previousResult.clusters
-        .where((cluster) =>
-            !cluster.markerIds.every((id) => newIds.contains(id)))
+        .where(
+            (cluster) => !cluster.markerIds.every((id) => newIds.contains(id)))
         .toList();
 
     final remainingUnclustered = previousResult.unclusteredMarkers
@@ -537,7 +538,10 @@ class MapMarkerClusteringService {
     // Combine results
     return ClusteringResult(
       clusters: [...remainingClusters, ...newResult.clusters],
-      unclusteredMarkers: [...remainingUnclustered, ...newResult.unclusteredMarkers],
+      unclusteredMarkers: [
+        ...remainingUnclustered,
+        ...newResult.unclusteredMarkers
+      ],
       totalMarkers: remainingClusters.fold<int>(
             0,
             (sum, c) => sum + c.markerCount,
@@ -565,7 +569,8 @@ class MapMarkerClusteringService {
     ClusteringResult result, {
     int maxVisibleItems = 50,
   }) {
-    final totalItems = result.clusters.length + result.unclusteredMarkers.length;
+    final totalItems =
+        result.clusters.length + result.unclusteredMarkers.length;
 
     // If already under limit, return as-is
     if (totalItems <= maxVisibleItems) {
@@ -655,6 +660,8 @@ class MapMarkerClusteringService {
         return 6.0;
       case MarkerType.restaurant:
         return 5.0;
+      case MarkerType.shopping:
+        return 4.5;
       case MarkerType.transport:
         return 4.0;
       case MarkerType.poi:

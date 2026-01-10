@@ -329,8 +329,7 @@ class _AuthRetryButtonState extends ConsumerState<AuthRetryButton> {
           if (widget.config.showCountdown &&
               _remainingSeconds > 0 &&
               !_isMaxAttemptsReached) ...[
-            if (widget.config.showAttemptCounter)
-              const SizedBox(height: 8),
+            if (widget.config.showAttemptCounter) const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -355,8 +354,7 @@ class _AuthRetryButtonState extends ConsumerState<AuthRetryButton> {
           if (_remainingSeconds == 0 &&
               _currentAttempt > 0 &&
               !_isMaxAttemptsReached) ...[
-            if (widget.config.showAttemptCounter)
-              const SizedBox(height: 8),
+            if (widget.config.showAttemptCounter) const SizedBox(height: 8),
             Text(
               'Ready to retry',
               style: theme.textTheme.bodySmall?.copyWith(
@@ -475,16 +473,17 @@ class _AuthRetryButtonAutomaticState
       children: [
         // Main action button
         ElevatedButton(
-          onPressed: (isRefreshing || _remainingSeconds > 0 || maxAttemptsReached)
-              ? null
-              : () {
-                  if (hasFailed) {
-                    // Trigger retry via refresh service
-                    widget.refreshService.refreshToken().catchError((_) {});
-                  } else {
-                    widget.onManualRetry?.call();
-                  }
-                },
+          onPressed:
+              (isRefreshing || _remainingSeconds > 0 || maxAttemptsReached)
+                  ? null
+                  : () {
+                      if (hasFailed) {
+                        // Trigger retry via refresh service
+                        widget.refreshService.refreshToken().catchError((_) {});
+                      } else {
+                        widget.onManualRetry?.call();
+                      }
+                    },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
           ),

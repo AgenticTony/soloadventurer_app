@@ -135,8 +135,7 @@ class VirtualListPerformanceTracker extends StatefulWidget {
 }
 
 class _VirtualListPerformanceTrackerState
-    extends State<VirtualListPerformanceTracker>
-    with WidgetsBindingObserver {
+    extends State<VirtualListPerformanceTracker> with WidgetsBindingObserver {
   /// Timestamp when the widget was first built
   DateTime? _buildStartTime;
 
@@ -159,7 +158,7 @@ class _VirtualListPerformanceTrackerState
   DateTime? _lastFrameTime;
 
   /// Whether metrics have been reported
-  bool _hasReportedMetrics = false;
+  final bool _hasReportedMetrics = false;
 
   /// Current performance metrics
   VirtualListPerformanceMetrics? _currentMetrics;
@@ -250,10 +249,8 @@ class _VirtualListPerformanceTrackerState
     if (!widget.enabled || _buildStartTime == null) return;
 
     // Calculate initial render time if not already set
-    if (_initialRenderTimeMs == null) {
-      _initialRenderTimeMs =
-          DateTime.now().difference(_buildStartTime!).inMilliseconds;
-    }
+    _initialRenderTimeMs ??=
+        DateTime.now().difference(_buildStartTime!).inMilliseconds;
 
     // Calculate average FPS
     final avgFrameTime = _frameTimes.isNotEmpty
@@ -398,9 +395,7 @@ class _PerformanceOverlayState extends State<_PerformanceOverlay> {
                       ),
                     ),
                   Icon(
-                    _isExpanded
-                        ? Icons.expand_less
-                        : Icons.expand_more,
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
                     size: 16,
                   ),
                 ],

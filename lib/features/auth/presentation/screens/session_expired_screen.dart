@@ -70,7 +70,8 @@ class SessionExpiredScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.2),
@@ -131,14 +132,10 @@ class SessionExpiredScreen extends ConsumerWidget {
   }
 
   void _navigateToLogin(BuildContext context, WidgetRef ref) {
-    ref
-        .read(authNavigationProvider.notifier)
-        .navigateTo(AuthRoutes.login);
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.login);
   }
 
   void _navigateToHome(BuildContext context, WidgetRef ref) {
-    ref
-        .read(authNavigationProvider.notifier)
-        .navigateTo(AuthRoutes.home);
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.home);
   }
 }

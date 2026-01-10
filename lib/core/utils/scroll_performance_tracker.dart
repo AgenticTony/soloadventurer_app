@@ -192,7 +192,8 @@ class ScrollPerformanceTracker {
     // Only report if scroll duration exceeds minimum
     if (scrollDuration.inMilliseconds >= minScrollDurationMs) {
       final pixelsScrolled = (_endScrollPosition - _startScrollPosition).abs();
-      final avgVelocity = pixelsScrolled / (scrollDuration.inMilliseconds / 1000);
+      final avgVelocity =
+          pixelsScrolled / (scrollDuration.inMilliseconds / 1000);
 
       final frameMetrics = _frameTracker.metrics;
 
@@ -293,13 +294,13 @@ class _FrameTracker {
 
   _FrameMetrics get metrics {
     final avgFrameTime = _frameTimes.isNotEmpty
-        ? _frameTimes
-            .map((d) => d.inMicroseconds)
-            .reduce((a, b) => a + b) / _frameTimes.length
+        ? _frameTimes.map((d) => d.inMicroseconds).reduce((a, b) => a + b) /
+            _frameTimes.length
         : 16667;
 
     final avgFPS = avgFrameTime > 0 ? 1000000 / avgFrameTime : 60.0;
-    final jankyPercentage = _totalFrames > 0 ? (_jankyFrames / _totalFrames * 100) : 0.0;
+    final jankyPercentage =
+        _totalFrames > 0 ? (_jankyFrames / _totalFrames * 100) : 0.0;
 
     return _FrameMetrics(
       totalFrames: _totalFrames,

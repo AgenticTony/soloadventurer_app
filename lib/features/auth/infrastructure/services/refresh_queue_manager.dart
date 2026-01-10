@@ -128,7 +128,8 @@ class RefreshQueueManager {
   /// an error. Throws if the request times out after 30 seconds.
   Future<QueuedRefreshResult> enqueueRefresh() async {
     final startTime = DateTime.now();
-    debugPrint('RefreshQueueManager: Enqueueing refresh request (queue length: ${_queue.length})');
+    debugPrint(
+        'RefreshQueueManager: Enqueueing refresh request (queue length: ${_queue.length})');
 
     // Create a completer for this request
     final completer = Completer<QueuedRefreshResult>();
@@ -146,21 +147,24 @@ class RefreshQueueManager {
       debugPrint('RefreshQueueManager: Starting refresh operation');
       _performRefresh();
     } else {
-      debugPrint('RefreshQueueManager: Refresh already in progress, request queued');
+      debugPrint(
+          'RefreshQueueManager: Refresh already in progress, request queued');
     }
 
     // Set up timeout for this request
-    final timeoutFuture = Future.delayed(queueTimeout).then((_) {
+    Timer? timeoutTimer;
+    timeoutTimer = Timer(queueTimeout, () {
       if (!completer.isCompleted) {
         final queueTime = DateTime.now().difference(startTime).inMilliseconds;
-        debugPrint('RefreshQueueManager: Request timed out after ${queueTime}ms');
+        debugPrint(
+            'RefreshQueueManager: Request timed out after ${queueTime}ms');
         completer.complete(QueuedRefreshResult.timeout(queueTimeMs: queueTime));
       }
     });
 
     // Wait for either completion or timeout
     final result = await completer.future;
-    timeoutFuture.cancel(); // Cancel timeout timer
+    timeoutTimer.cancel(); // Cancel timeout timer
 
     // Remove from queue
     _queue.remove(request);
@@ -176,7 +180,8 @@ class RefreshQueueManager {
       // Perform the actual refresh
       final session = await _refreshService.refreshToken();
 
-      debugPrint('RefreshQueueManager: Refresh successful, resolving ${_queue.length} queued requests');
+      debugPrint(
+          'RefreshQueueManager: Refresh successful, resolving ${_queue.length} queued requests');
 
       // Resolve all queued requests with the same result
       final now = DateTime.now();
@@ -247,7 +252,8 @@ class RefreshQueueManager {
   ///
   /// This will resolve all pending requests with a timeout error.
   void clearQueue() {
-    debugPrint('RefreshQueueManager: Clearing queue (${_queue.length} requests)');
+    debugPrint(
+        'RefreshQueueManager: Clearing queue (${_queue.length} requests)');
 
     final now = DateTime.now();
     for (final request in _queue) {

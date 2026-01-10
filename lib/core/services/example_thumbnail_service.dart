@@ -14,7 +14,7 @@ class ThumbnailServiceExamples {
     debugPrint('\n=== Example 1: Basic Thumbnail Generation ===\n');
 
     // Sample photo URL
-    final photoUrl = 'https://example.com/photo.jpg';
+    const photoUrl = 'https://example.com/photo.jpg';
 
     try {
       // Generate a medium-sized thumbnail (300x300)
@@ -39,7 +39,8 @@ class ThumbnailServiceExamples {
       );
 
       debugPrint('Photo thumbnail URL: ${photo.thumbnailUrl}');
-      debugPrint('Photo display URL: ${photo.displayUrl}'); // Falls back to thumbnail
+      debugPrint(
+          'Photo display URL: ${photo.displayUrl}'); // Falls back to thumbnail
     } catch (e) {
       debugPrint('Error generating thumbnail: $e');
     }
@@ -129,7 +130,7 @@ class ThumbnailServiceExamples {
   static Future<void> example4_CheckThumbnailExistence() async {
     debugPrint('\n=== Example 4: Check Thumbnail Existence ===\n');
 
-    final photoUrl = 'https://example.com/photo.jpg';
+    const photoUrl = 'https://example.com/photo.jpg';
 
     try {
       // Check if thumbnail exists
@@ -173,7 +174,7 @@ class ThumbnailServiceExamples {
   static Future<void> example5_CustomThumbnailDimensions() async {
     debugPrint('\n=== Example 5: Custom Thumbnail Dimensions ===\n');
 
-    final photoUrl = 'https://example.com/photo.jpg';
+    const photoUrl = 'https://example.com/photo.jpg';
 
     try {
       // Generate a wide thumbnail for list items
@@ -237,7 +238,8 @@ class ThumbnailServiceExamples {
 
       // Step 2: Generate thumbnails in batch for photos that need them
       if (photosNeedingThumbnails.isNotEmpty) {
-        final imageUrls = photosNeedingThumbnails.map((p) => p.imageUrl).toList();
+        final imageUrls =
+            photosNeedingThumbnails.map((p) => p.imageUrl).toList();
 
         final thumbnails = await ThumbnailService.generateBatch(
           imageUrls: imageUrls,
@@ -283,29 +285,33 @@ class ThumbnailServiceExamples {
 
     // Scenario: Loading 500 photos in a gallery
 
-    final photoCount = 500;
-    final avgOriginalSize = 1.0; // 1 MB per photo
-    final avgThumbnailSize = 0.05; // 50 KB per thumbnail
+    const photoCount = 500;
+    const avgOriginalSize = 1.0; // 1 MB per photo
+    const avgThumbnailSize = 0.05; // 50 KB per thumbnail
 
-    final originalMemory = photoCount * avgOriginalSize;
-    final thumbnailMemory = photoCount * avgThumbnailSize;
+    const originalMemory = photoCount * avgOriginalSize;
+    const thumbnailMemory = photoCount * avgThumbnailSize;
 
     debugPrint('Memory Comparison for $photoCount photos:');
     debugPrint('  - Original images: ${originalMemory.toStringAsFixed(1)} MB');
     debugPrint('  - With thumbnails: ${thumbnailMemory.toStringAsFixed(1)} MB');
-    debugPrint('  - Memory saved: ${(originalMemory - thumbnailMemory).toStringAsFixed(1)} MB');
-    debugPrint('  - Reduction: ${((1 - thumbnailMemory / originalMemory) * 100).toStringAsFixed(1)}%');
+    debugPrint(
+        '  - Memory saved: ${(originalMemory - thumbnailMemory).toStringAsFixed(1)} MB');
+    debugPrint(
+        '  - Reduction: ${((1 - thumbnailMemory / originalMemory) * 100).toStringAsFixed(1)}%');
 
     // With LazyLoadImage, only visible photos are loaded
-    final visiblePhotos = 30; // Typical 3x10 grid on screen
-    final actualMemory = visiblePhotos * avgThumbnailSize;
+    const visiblePhotos = 30; // Typical 3x10 grid on screen
+    const actualMemory = visiblePhotos * avgThumbnailSize;
 
     debugPrint('\nWith LazyLoadImage (only visible photos loaded):');
     debugPrint('  - Visible photos: $visiblePhotos');
     debugPrint('  - Actual memory: ${actualMemory.toStringAsFixed(1)} MB');
-    debugPrint('  - Total reduction: ${((1 - actualMemory / originalMemory) * 100).toStringAsFixed(1)}%');
+    debugPrint(
+        '  - Total reduction: ${((1 - actualMemory / originalMemory) * 100).toStringAsFixed(1)}%');
 
-    debugPrint('\n✅ This demonstrates why thumbnails + lazy loading is critical for large photo galleries!');
+    debugPrint(
+        '\n✅ This demonstrates why thumbnails + lazy loading is critical for large photo galleries!');
   }
 
   /// Example 8: Thumbnail Size Selection Guide
@@ -314,7 +320,7 @@ class ThumbnailServiceExamples {
   static Future<void> example8_ThumbnailSizeSelection() async {
     debugPrint('\n=== Example 8: Thumbnail Size Selection Guide ===\n');
 
-    final photoUrl = 'https://example.com/photo.jpg';
+    const photoUrl = 'https://example.com/photo.jpg';
 
     try {
       debugPrint('Generating different thumbnail sizes for comparison...\n');
@@ -370,7 +376,8 @@ class ThumbnailServiceExamples {
       debugPrint('  - Generation time: ${largeDuration.inMilliseconds}ms');
       debugPrint('  - Path: $largePath');
 
-      debugPrint('\n💡 Tip: Use the smallest size that meets your needs for optimal performance!');
+      debugPrint(
+          '\n💡 Tip: Use the smallest size that meets your needs for optimal performance!');
     } catch (e) {
       debugPrint('Error generating size comparison: $e');
     }

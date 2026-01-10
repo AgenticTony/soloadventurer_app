@@ -1,7 +1,7 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -109,14 +109,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   String _getUserId() {
     if (_cognitoUser == null) {
       throw AuthException(
-        message: 'No authenticated user',
+        'No authenticated user',
         type: AuthErrorType.unauthorized,
       );
     }
     final username = _cognitoUser?.username;
     if (username == null || username.isEmpty) {
       throw AuthException(
-        message: 'Invalid user ID',
+        'Invalid user ID',
         type: AuthErrorType.unauthorized,
       );
     }
@@ -195,13 +195,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         } catch (e) {
           debugPrint('Failed to refresh session: $e');
           throw AuthException(
-            message: 'Session expired. Please sign in again.',
+            'Session expired. Please sign in again.',
             type: AuthErrorType.tokenExpired,
           );
         }
       } else {
         throw AuthException(
-          message: 'No valid session. Please sign in.',
+          'No valid session. Please sign in.',
           type: AuthErrorType.unauthorized,
         );
       }
@@ -261,13 +261,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return (user, true); // true indicates verification is needed
     } on CognitoClientException catch (e) {
       throw AuthException(
-        message:
-            'Registration failed: ${e.message ?? 'An unknown error occurred'}',
+        'Registration failed: ${e.message ?? 'An unknown error occurred'}',
         type: AuthErrorType.unknown,
       );
     } catch (e) {
       throw AuthException(
-        message: 'Registration failed: ${e.toString()}',
+        'Registration failed: ${e.toString()}',
         type: AuthErrorType.unknown,
       );
     }
@@ -282,7 +281,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Check if the authentication method is supported
       if (!_supportedAuthMethods.contains('USER_PASSWORD_AUTH')) {
         throw AuthException(
-          message: 'Unsupported authentication method',
+          'Unsupported authentication method',
           type: AuthErrorType.unknown,
         );
       }
@@ -291,7 +290,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final authResult = await _handlePasswordAuth(email, password);
       if (authResult == null) {
         throw AuthException(
-          message: 'Authentication failed',
+          'Authentication failed',
           type: AuthErrorType.unknown,
         );
       }
@@ -303,7 +302,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (accessToken == null) {
         throw AuthException(
-          message: 'Failed to get access token',
+          'Failed to get access token',
           type: AuthErrorType.invalidToken,
         );
       }
@@ -314,34 +313,33 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('notauthorizedexception')) {
         throw AuthException(
-          message: 'Invalid email or password',
+          'Invalid email or password',
           type: AuthErrorType.invalidCredentials,
         );
       } else if (errorMessage.contains('usernotconfirmedexception')) {
         throw AuthException(
-          message:
-              'Email not verified. Please check your email for verification instructions.',
+          'Email not verified. Please check your email for verification instructions.',
           type: AuthErrorType.emailNotVerified,
         );
       } else if (errorMessage.contains('passwordresetrequiredexception')) {
         throw AuthException(
-          message: 'Password reset required. Please reset your password.',
+          'Password reset required. Please reset your password.',
           type: AuthErrorType.passwordResetRequired,
         );
       } else if (errorMessage.contains('usernotfoundexception')) {
         throw AuthException(
-          message: 'No account found with this email address',
+          'No account found with this email address',
           type: AuthErrorType.userNotFound,
         );
       } else {
         throw AuthException(
-          message: 'Authentication failed: ${e.message}',
+          'Authentication failed: ${e.message}',
           type: AuthErrorType.unknown,
         );
       }
     } catch (e) {
       throw AuthException(
-        message: 'Authentication failed: $e',
+        'Authentication failed: $e',
         type: AuthErrorType.unknown,
       );
     }
@@ -361,7 +359,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (session == null) {
         throw AuthException(
-          message: 'Failed to authenticate user',
+          'Failed to authenticate user',
           type: AuthErrorType.unknown,
         );
       }
@@ -372,17 +370,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('mfarequired')) {
         throw AuthException(
-          message: 'MFA authentication required',
+          'MFA authentication required',
           type: AuthErrorType.mfaRequired,
         );
       } else if (errorMessage.contains('smsmfarequired')) {
         throw AuthException(
-          message: 'SMS MFA authentication required',
+          'SMS MFA authentication required',
           type: AuthErrorType.smsMfaRequired,
         );
       } else if (errorMessage.contains('newpasswordrequired')) {
         throw AuthException(
-          message: 'New password required',
+          'New password required',
           type: AuthErrorType.newPasswordRequired,
         );
       }
@@ -399,7 +397,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<UserModel> _getUserInfo() async {
     if (_cognitoUser == null || _session == null) {
       throw AuthException(
-        message: 'No active session',
+        'No active session',
         type: AuthErrorType.notAuthorized,
       );
     }
@@ -490,7 +488,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
     } on CognitoUserException catch (e) {
       throw AuthException(
-        message: 'Failed to get current user: ${e.message}',
+        'Failed to get current user: ${e.message}',
         type: AuthErrorType.unknown,
       );
     } catch (e) {
@@ -518,7 +516,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       if (_cognitoUser == null || _session == null) {
         throw AuthException(
-          message: 'No authenticated user',
+          'No authenticated user',
           type: AuthErrorType.unauthorized,
         );
       }
@@ -526,7 +524,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final refreshToken = _session!.getRefreshToken();
       if (refreshToken == null) {
         throw AuthException(
-          message: 'No refresh token available',
+          'No refresh token available',
           type: AuthErrorType.invalidToken,
         );
       }
@@ -534,7 +532,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _session = await _cognitoUser!.refreshSession(refreshToken);
       if (_session == null) {
         throw AuthException(
-          message: 'Failed to refresh session',
+          'Failed to refresh session',
           type: AuthErrorType.tokenExpired,
         );
       }
@@ -550,7 +548,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       debugPrint('Token refresh error: $e');
       throw AuthException(
-        message: 'Failed to refresh token: ${e.toString()}',
+        'Failed to refresh token: ${e.toString()}',
         type: AuthErrorType.unknown,
       );
     }
@@ -561,7 +559,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       if (_cognitoUser == null) {
         throw AuthException(
-          message: 'No user to verify',
+          'No user to verify',
           type: AuthErrorType.userNotFound,
         );
       }
@@ -572,22 +570,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('expiredcode')) {
         throw AuthException(
-          message: 'Verification code has expired',
+          'Verification code has expired',
           type: AuthErrorType.codeExpired,
         );
       } else if (errorMessage.contains('codemismatch')) {
         throw AuthException(
-          message: 'Invalid verification code',
+          'Invalid verification code',
           type: AuthErrorType.invalidCode,
         );
       } else if (errorMessage.contains('notauthorized')) {
         throw AuthException(
-          message: 'Email already verified',
+          'Email already verified',
           type: AuthErrorType.notAuthorized,
         );
       }
       throw AuthException(
-        message: 'Failed to verify email: ${e.message}',
+        'Failed to verify email: ${e.message}',
         type: AuthErrorType.unknown,
       );
     }
@@ -598,7 +596,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       if (_cognitoUser == null) {
         throw AuthException(
-          message: 'No user to verify',
+          'No user to verify',
           type: AuthErrorType.userNotFound,
         );
       }
@@ -609,12 +607,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('limitexceeded')) {
         throw AuthException(
-          message: 'Too many attempts. Please try again later',
+          'Too many attempts. Please try again later',
           type: AuthErrorType.limitExceeded,
         );
       }
       throw AuthException(
-        message: 'Failed to resend verification email: ${e.message}',
+        'Failed to resend verification email: ${e.message}',
         type: AuthErrorType.unknown,
       );
     }
@@ -634,7 +632,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     // Cognito allows between 5-20 attempts per hour
     if (_failedAttempts >= 5) {
       throw AuthException(
-        message: 'Too many password reset attempts. Please try again later.',
+        'Too many password reset attempts. Please try again later.',
         type: AuthErrorType.limitExceeded,
       );
     }
@@ -655,17 +653,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('limitexceededexception')) {
         throw AuthException(
-          message: 'Too many password reset attempts. Please try again later.',
+          'Too many password reset attempts. Please try again later.',
           type: AuthErrorType.limitExceeded,
         );
       } else if (errorMessage.contains('usernotfoundexception')) {
         throw AuthException(
-          message: 'No account found with this email address.',
+          'No account found with this email address.',
           type: AuthErrorType.userNotFound,
         );
       } else {
         throw AuthException(
-          message: 'Failed to initiate password reset: ${e.message}',
+          'Failed to initiate password reset: ${e.message}',
           type: AuthErrorType.unknown,
         );
       }
@@ -674,7 +672,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       _failedAttempts++;
       _lastFailedAttempt = now;
       throw AuthException(
-        message: 'Failed to initiate password reset: $e',
+        'Failed to initiate password reset: $e',
         type: AuthErrorType.unknown,
       );
     }
@@ -693,7 +691,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final result = await _cognitoUser!.confirmPassword(code, newPassword);
       if (!result) {
         throw AuthException(
-          message: 'Failed to reset password',
+          'Failed to reset password',
           type: AuthErrorType.resetFailed,
         );
       }
@@ -702,28 +700,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('codemismatchexception')) {
         throw AuthException(
-          message: 'Invalid verification code. Please try again.',
+          'Invalid verification code. Please try again.',
           type: AuthErrorType.invalidCode,
         );
       } else if (errorMessage.contains('expiredcodexception')) {
         throw AuthException(
-          message: 'Verification code has expired. Please request a new code.',
+          'Verification code has expired. Please request a new code.',
           type: AuthErrorType.codeExpired,
         );
       } else if (errorMessage.contains('invalidpasswordexception')) {
         throw AuthException(
-          message: 'Password does not meet requirements: ${e.message}',
+          'Password does not meet requirements: ${e.message}',
           type: AuthErrorType.invalidPassword,
         );
       } else {
         throw AuthException(
-          message: 'Failed to reset password: ${e.message}',
+          'Failed to reset password: ${e.message}',
           type: AuthErrorType.resetFailed,
         );
       }
     } catch (e) {
       throw AuthException(
-        message: 'Failed to reset password: $e',
+        'Failed to reset password: $e',
         type: AuthErrorType.unknown,
       );
     }
@@ -745,7 +743,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (!success) {
         throw AuthException(
-          message: 'Failed to set password',
+          'Failed to set password',
           type: AuthErrorType.adminSetPasswordError,
         );
       }
@@ -754,28 +752,28 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('usernotfoundexception')) {
         throw AuthException(
-          message: 'User not found',
+          'User not found',
           type: AuthErrorType.userNotFound,
         );
       } else if (errorMessage.contains('invalidpasswordexception')) {
         throw AuthException(
-          message: 'Password does not meet requirements: ${e.message}',
+          'Password does not meet requirements: ${e.message}',
           type: AuthErrorType.invalidPassword,
         );
       } else if (errorMessage.contains('notauthorizedexception')) {
         throw AuthException(
-          message: 'Not authorized to perform this action',
+          'Not authorized to perform this action',
           type: AuthErrorType.notAuthorized,
         );
       } else {
         throw AuthException(
-          message: 'Failed to set password: ${e.message}',
+          'Failed to set password: ${e.message}',
           type: AuthErrorType.adminSetPasswordError,
         );
       }
     } catch (e) {
       throw AuthException(
-        message: 'Failed to set password: $e',
+        'Failed to set password: $e',
         type: AuthErrorType.unknown,
       );
     }
@@ -795,23 +793,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('usernotfoundexception')) {
         throw AuthException(
-          message: 'User not found',
+          'User not found',
           type: AuthErrorType.userNotFound,
         );
       } else if (errorMessage.contains('notauthorizedexception')) {
         throw AuthException(
-          message: 'Not authorized to perform this action',
+          'Not authorized to perform this action',
           type: AuthErrorType.notAuthorized,
         );
       } else {
         throw AuthException(
-          message: 'Failed to reset password: ${e.message}',
+          'Failed to reset password: ${e.message}',
           type: AuthErrorType.adminResetPasswordError,
         );
       }
     } catch (e) {
       throw AuthException(
-        message: 'Failed to reset password: $e',
+        'Failed to reset password: $e',
         type: AuthErrorType.unknown,
       );
     }
@@ -831,17 +829,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       if (errorMessage.contains('limitexceeded')) {
         throw AuthException(
-          message: 'Too many attempts. Please try again later',
+          'Too many attempts. Please try again later',
           type: AuthErrorType.limitExceeded,
         );
       } else if (errorMessage.contains('usernotfound')) {
         throw AuthException(
-          message: 'No account found with this email',
+          'No account found with this email',
           type: AuthErrorType.userNotFound,
         );
       }
       throw AuthException(
-        message: 'Failed to send password reset email: ${e.message}',
+        'Failed to send password reset email: ${e.message}',
         type: AuthErrorType.unknown,
       );
     }
@@ -869,7 +867,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
     } catch (e) {
-      throw ServerException(
+      throw const ServerException(
         message: 'Network error during token refresh',
         statusCode: 500,
       );
@@ -896,7 +894,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
     } catch (e) {
-      throw ServerException(
+      throw const ServerException(
         message: 'Network error during authentication',
         statusCode: 500,
       );

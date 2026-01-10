@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../services/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/monitoring/monitoring_service.dart';
 
 /// Global error handler for catching and reporting unhandled exceptions
 class GlobalErrorHandler {

@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
 
 /// Remote data source interface for trip operations
@@ -21,7 +21,8 @@ abstract class TripRemoteDataSource {
   /// Gets trips within a date range
   ///
   /// Throws [ServerException] if retrieval fails
-  Future<List<TripModel>> getTripsByDateRange(DateTime startDate, DateTime endDate);
+  Future<List<TripModel>> getTripsByDateRange(
+      DateTime startDate, DateTime endDate);
 
   /// Gets ongoing trips (where end_date is null or in the future)
   ///

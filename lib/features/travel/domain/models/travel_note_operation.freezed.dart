@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,164 +9,99 @@ part of 'travel_note_operation.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-TravelNoteOperation _$TravelNoteOperationFromJson(Map<String, dynamic> json) {
-  return _TravelNoteOperation.fromJson(json);
-}
 
 /// @nodoc
 mixin _$TravelNoteOperation {
-  String get id => throw _privateConstructorUsedError;
-  String get tripId => throw _privateConstructorUsedError;
-  NoteType get noteType => throw _privateConstructorUsedError;
-  Map<String, dynamic> get content => throw _privateConstructorUsedError;
-  int get priority => throw _privateConstructorUsedError;
-  String? get locationName => throw _privateConstructorUsedError;
-  double? get latitude => throw _privateConstructorUsedError;
-  double? get longitude => throw _privateConstructorUsedError;
-  DateTime? get timestamp =>
-      throw _privateConstructorUsedError; // Retry metadata
-  DateTime? get createdAt => throw _privateConstructorUsedError;
-  DateTime? get lastAttempt => throw _privateConstructorUsedError;
-  int get attemptCount => throw _privateConstructorUsedError;
-  String? get lastError => throw _privateConstructorUsedError;
-  int get maxRetries => throw _privateConstructorUsedError;
-
-  /// Serializes this TravelNoteOperation to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get tripId;
+  NoteType get noteType;
+  Map<String, dynamic> get content;
+  int get priority;
+  String? get locationName;
+  double? get latitude;
+  double? get longitude;
+  DateTime? get timestamp; // Retry metadata
+  DateTime? get createdAt;
+  DateTime? get lastAttempt;
+  int get attemptCount;
+  String? get lastError;
+  int get maxRetries;
 
   /// Create a copy of TravelNoteOperation
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $TravelNoteOperationCopyWith<TravelNoteOperation> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $TravelNoteOperationCopyWith<$Res> {
-  factory $TravelNoteOperationCopyWith(
-          TravelNoteOperation value, $Res Function(TravelNoteOperation) then) =
-      _$TravelNoteOperationCopyWithImpl<$Res, TravelNoteOperation>;
-  @useResult
-  $Res call(
-      {String id,
-      String tripId,
-      NoteType noteType,
-      Map<String, dynamic> content,
-      int priority,
-      String? locationName,
-      double? latitude,
-      double? longitude,
-      DateTime? timestamp,
-      DateTime? createdAt,
-      DateTime? lastAttempt,
-      int attemptCount,
-      String? lastError,
-      int maxRetries});
-}
-
-/// @nodoc
-class _$TravelNoteOperationCopyWithImpl<$Res, $Val extends TravelNoteOperation>
-    implements $TravelNoteOperationCopyWith<$Res> {
-  _$TravelNoteOperationCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of TravelNoteOperation
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $TravelNoteOperationCopyWith<TravelNoteOperation> get copyWith =>
+      _$TravelNoteOperationCopyWithImpl<TravelNoteOperation>(
+          this as TravelNoteOperation, _$identity);
+
+  /// Serializes this TravelNoteOperation to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? tripId = null,
-    Object? noteType = null,
-    Object? content = null,
-    Object? priority = null,
-    Object? locationName = freezed,
-    Object? latitude = freezed,
-    Object? longitude = freezed,
-    Object? timestamp = freezed,
-    Object? createdAt = freezed,
-    Object? lastAttempt = freezed,
-    Object? attemptCount = null,
-    Object? lastError = freezed,
-    Object? maxRetries = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      tripId: null == tripId
-          ? _value.tripId
-          : tripId // ignore: cast_nullable_to_non_nullable
-              as String,
-      noteType: null == noteType
-          ? _value.noteType
-          : noteType // ignore: cast_nullable_to_non_nullable
-              as NoteType,
-      content: null == content
-          ? _value.content
-          : content // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-      priority: null == priority
-          ? _value.priority
-          : priority // ignore: cast_nullable_to_non_nullable
-              as int,
-      locationName: freezed == locationName
-          ? _value.locationName
-          : locationName // ignore: cast_nullable_to_non_nullable
-              as String?,
-      latitude: freezed == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      longitude: freezed == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      timestamp: freezed == timestamp
-          ? _value.timestamp
-          : timestamp // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      createdAt: freezed == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      lastAttempt: freezed == lastAttempt
-          ? _value.lastAttempt
-          : lastAttempt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      attemptCount: null == attemptCount
-          ? _value.attemptCount
-          : attemptCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      lastError: freezed == lastError
-          ? _value.lastError
-          : lastError // ignore: cast_nullable_to_non_nullable
-              as String?,
-      maxRetries: null == maxRetries
-          ? _value.maxRetries
-          : maxRetries // ignore: cast_nullable_to_non_nullable
-              as int,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is TravelNoteOperation &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.tripId, tripId) || other.tripId == tripId) &&
+            (identical(other.noteType, noteType) ||
+                other.noteType == noteType) &&
+            const DeepCollectionEquality().equals(other.content, content) &&
+            (identical(other.priority, priority) ||
+                other.priority == priority) &&
+            (identical(other.locationName, locationName) ||
+                other.locationName == locationName) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
+            (identical(other.timestamp, timestamp) ||
+                other.timestamp == timestamp) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.lastAttempt, lastAttempt) ||
+                other.lastAttempt == lastAttempt) &&
+            (identical(other.attemptCount, attemptCount) ||
+                other.attemptCount == attemptCount) &&
+            (identical(other.lastError, lastError) ||
+                other.lastError == lastError) &&
+            (identical(other.maxRetries, maxRetries) ||
+                other.maxRetries == maxRetries));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      tripId,
+      noteType,
+      const DeepCollectionEquality().hash(content),
+      priority,
+      locationName,
+      latitude,
+      longitude,
+      timestamp,
+      createdAt,
+      lastAttempt,
+      attemptCount,
+      lastError,
+      maxRetries);
+
+  @override
+  String toString() {
+    return 'TravelNoteOperation(id: $id, tripId: $tripId, noteType: $noteType, content: $content, priority: $priority, locationName: $locationName, latitude: $latitude, longitude: $longitude, timestamp: $timestamp, createdAt: $createdAt, lastAttempt: $lastAttempt, attemptCount: $attemptCount, lastError: $lastError, maxRetries: $maxRetries)';
   }
 }
 
 /// @nodoc
-abstract class _$$TravelNoteOperationImplCopyWith<$Res>
-    implements $TravelNoteOperationCopyWith<$Res> {
-  factory _$$TravelNoteOperationImplCopyWith(_$TravelNoteOperationImpl value,
-          $Res Function(_$TravelNoteOperationImpl) then) =
-      __$$TravelNoteOperationImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $TravelNoteOperationCopyWith<$Res> {
+  factory $TravelNoteOperationCopyWith(
+          TravelNoteOperation value, $Res Function(TravelNoteOperation) _then) =
+      _$TravelNoteOperationCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -186,12 +121,12 @@ abstract class _$$TravelNoteOperationImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$TravelNoteOperationImplCopyWithImpl<$Res>
-    extends _$TravelNoteOperationCopyWithImpl<$Res, _$TravelNoteOperationImpl>
-    implements _$$TravelNoteOperationImplCopyWith<$Res> {
-  __$$TravelNoteOperationImplCopyWithImpl(_$TravelNoteOperationImpl _value,
-      $Res Function(_$TravelNoteOperationImpl) _then)
-      : super(_value, _then);
+class _$TravelNoteOperationCopyWithImpl<$Res>
+    implements $TravelNoteOperationCopyWith<$Res> {
+  _$TravelNoteOperationCopyWithImpl(this._self, this._then);
+
+  final TravelNoteOperation _self;
+  final $Res Function(TravelNoteOperation) _then;
 
   /// Create a copy of TravelNoteOperation
   /// with the given fields replaced by the non-null parameter values.
@@ -213,71 +148,315 @@ class __$$TravelNoteOperationImplCopyWithImpl<$Res>
     Object? lastError = freezed,
     Object? maxRetries = null,
   }) {
-    return _then(_$TravelNoteOperationImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       tripId: null == tripId
-          ? _value.tripId
+          ? _self.tripId
           : tripId // ignore: cast_nullable_to_non_nullable
               as String,
       noteType: null == noteType
-          ? _value.noteType
+          ? _self.noteType
           : noteType // ignore: cast_nullable_to_non_nullable
               as NoteType,
       content: null == content
-          ? _value._content
+          ? _self.content
           : content // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
       priority: null == priority
-          ? _value.priority
+          ? _self.priority
           : priority // ignore: cast_nullable_to_non_nullable
               as int,
       locationName: freezed == locationName
-          ? _value.locationName
+          ? _self.locationName
           : locationName // ignore: cast_nullable_to_non_nullable
               as String?,
       latitude: freezed == latitude
-          ? _value.latitude
+          ? _self.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
               as double?,
       longitude: freezed == longitude
-          ? _value.longitude
+          ? _self.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double?,
       timestamp: freezed == timestamp
-          ? _value.timestamp
+          ? _self.timestamp
           : timestamp // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       createdAt: freezed == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       lastAttempt: freezed == lastAttempt
-          ? _value.lastAttempt
+          ? _self.lastAttempt
           : lastAttempt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       attemptCount: null == attemptCount
-          ? _value.attemptCount
+          ? _self.attemptCount
           : attemptCount // ignore: cast_nullable_to_non_nullable
               as int,
       lastError: freezed == lastError
-          ? _value.lastError
+          ? _self.lastError
           : lastError // ignore: cast_nullable_to_non_nullable
               as String?,
       maxRetries: null == maxRetries
-          ? _value.maxRetries
+          ? _self.maxRetries
           : maxRetries // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [TravelNoteOperation].
+extension TravelNoteOperationPatterns on TravelNoteOperation {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_TravelNoteOperation value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TravelNoteOperation() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_TravelNoteOperation value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelNoteOperation():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_TravelNoteOperation value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelNoteOperation() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String tripId,
+            NoteType noteType,
+            Map<String, dynamic> content,
+            int priority,
+            String? locationName,
+            double? latitude,
+            double? longitude,
+            DateTime? timestamp,
+            DateTime? createdAt,
+            DateTime? lastAttempt,
+            int attemptCount,
+            String? lastError,
+            int maxRetries)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TravelNoteOperation() when $default != null:
+        return $default(
+            _that.id,
+            _that.tripId,
+            _that.noteType,
+            _that.content,
+            _that.priority,
+            _that.locationName,
+            _that.latitude,
+            _that.longitude,
+            _that.timestamp,
+            _that.createdAt,
+            _that.lastAttempt,
+            _that.attemptCount,
+            _that.lastError,
+            _that.maxRetries);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String tripId,
+            NoteType noteType,
+            Map<String, dynamic> content,
+            int priority,
+            String? locationName,
+            double? latitude,
+            double? longitude,
+            DateTime? timestamp,
+            DateTime? createdAt,
+            DateTime? lastAttempt,
+            int attemptCount,
+            String? lastError,
+            int maxRetries)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelNoteOperation():
+        return $default(
+            _that.id,
+            _that.tripId,
+            _that.noteType,
+            _that.content,
+            _that.priority,
+            _that.locationName,
+            _that.latitude,
+            _that.longitude,
+            _that.timestamp,
+            _that.createdAt,
+            _that.lastAttempt,
+            _that.attemptCount,
+            _that.lastError,
+            _that.maxRetries);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String tripId,
+            NoteType noteType,
+            Map<String, dynamic> content,
+            int priority,
+            String? locationName,
+            double? latitude,
+            double? longitude,
+            DateTime? timestamp,
+            DateTime? createdAt,
+            DateTime? lastAttempt,
+            int attemptCount,
+            String? lastError,
+            int maxRetries)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TravelNoteOperation() when $default != null:
+        return $default(
+            _that.id,
+            _that.tripId,
+            _that.noteType,
+            _that.content,
+            _that.priority,
+            _that.locationName,
+            _that.latitude,
+            _that.longitude,
+            _that.timestamp,
+            _that.createdAt,
+            _that.lastAttempt,
+            _that.attemptCount,
+            _that.lastError,
+            _that.maxRetries);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$TravelNoteOperationImpl extends _TravelNoteOperation {
-  const _$TravelNoteOperationImpl(
+class _TravelNoteOperation extends TravelNoteOperation {
+  const _TravelNoteOperation(
       {required this.id,
       required this.tripId,
       required this.noteType,
@@ -294,9 +473,8 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
       this.maxRetries = 3})
       : _content = content,
         super._();
-
-  factory _$TravelNoteOperationImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TravelNoteOperationImplFromJson(json);
+  factory _TravelNoteOperation.fromJson(Map<String, dynamic> json) =>
+      _$TravelNoteOperationFromJson(json);
 
   @override
   final String id;
@@ -336,16 +514,27 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
   @JsonKey()
   final int maxRetries;
 
+  /// Create a copy of TravelNoteOperation
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'TravelNoteOperation(id: $id, tripId: $tripId, noteType: $noteType, content: $content, priority: $priority, locationName: $locationName, latitude: $latitude, longitude: $longitude, timestamp: $timestamp, createdAt: $createdAt, lastAttempt: $lastAttempt, attemptCount: $attemptCount, lastError: $lastError, maxRetries: $maxRetries)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$TravelNoteOperationCopyWith<_TravelNoteOperation> get copyWith =>
+      __$TravelNoteOperationCopyWithImpl<_TravelNoteOperation>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$TravelNoteOperationToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TravelNoteOperationImpl &&
+            other is _TravelNoteOperation &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.tripId, tripId) || other.tripId == tripId) &&
             (identical(other.noteType, noteType) ||
@@ -392,77 +581,124 @@ class _$TravelNoteOperationImpl extends _TravelNoteOperation {
       lastError,
       maxRetries);
 
-  /// Create a copy of TravelNoteOperation
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$TravelNoteOperationImplCopyWith<_$TravelNoteOperationImpl> get copyWith =>
-      __$$TravelNoteOperationImplCopyWithImpl<_$TravelNoteOperationImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$TravelNoteOperationImplToJson(
-      this,
-    );
+  String toString() {
+    return 'TravelNoteOperation(id: $id, tripId: $tripId, noteType: $noteType, content: $content, priority: $priority, locationName: $locationName, latitude: $latitude, longitude: $longitude, timestamp: $timestamp, createdAt: $createdAt, lastAttempt: $lastAttempt, attemptCount: $attemptCount, lastError: $lastError, maxRetries: $maxRetries)';
   }
 }
 
-abstract class _TravelNoteOperation extends TravelNoteOperation {
-  const factory _TravelNoteOperation(
-      {required final String id,
-      required final String tripId,
-      required final NoteType noteType,
-      required final Map<String, dynamic> content,
-      required final int priority,
-      final String? locationName,
-      final double? latitude,
-      final double? longitude,
-      final DateTime? timestamp,
-      final DateTime? createdAt,
-      final DateTime? lastAttempt,
-      final int attemptCount,
-      final String? lastError,
-      final int maxRetries}) = _$TravelNoteOperationImpl;
-  const _TravelNoteOperation._() : super._();
+/// @nodoc
+abstract mixin class _$TravelNoteOperationCopyWith<$Res>
+    implements $TravelNoteOperationCopyWith<$Res> {
+  factory _$TravelNoteOperationCopyWith(_TravelNoteOperation value,
+          $Res Function(_TravelNoteOperation) _then) =
+      __$TravelNoteOperationCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String tripId,
+      NoteType noteType,
+      Map<String, dynamic> content,
+      int priority,
+      String? locationName,
+      double? latitude,
+      double? longitude,
+      DateTime? timestamp,
+      DateTime? createdAt,
+      DateTime? lastAttempt,
+      int attemptCount,
+      String? lastError,
+      int maxRetries});
+}
 
-  factory _TravelNoteOperation.fromJson(Map<String, dynamic> json) =
-      _$TravelNoteOperationImpl.fromJson;
+/// @nodoc
+class __$TravelNoteOperationCopyWithImpl<$Res>
+    implements _$TravelNoteOperationCopyWith<$Res> {
+  __$TravelNoteOperationCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get tripId;
-  @override
-  NoteType get noteType;
-  @override
-  Map<String, dynamic> get content;
-  @override
-  int get priority;
-  @override
-  String? get locationName;
-  @override
-  double? get latitude;
-  @override
-  double? get longitude;
-  @override
-  DateTime? get timestamp; // Retry metadata
-  @override
-  DateTime? get createdAt;
-  @override
-  DateTime? get lastAttempt;
-  @override
-  int get attemptCount;
-  @override
-  String? get lastError;
-  @override
-  int get maxRetries;
+  final _TravelNoteOperation _self;
+  final $Res Function(_TravelNoteOperation) _then;
 
   /// Create a copy of TravelNoteOperation
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TravelNoteOperationImplCopyWith<_$TravelNoteOperationImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? tripId = null,
+    Object? noteType = null,
+    Object? content = null,
+    Object? priority = null,
+    Object? locationName = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? timestamp = freezed,
+    Object? createdAt = freezed,
+    Object? lastAttempt = freezed,
+    Object? attemptCount = null,
+    Object? lastError = freezed,
+    Object? maxRetries = null,
+  }) {
+    return _then(_TravelNoteOperation(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      tripId: null == tripId
+          ? _self.tripId
+          : tripId // ignore: cast_nullable_to_non_nullable
+              as String,
+      noteType: null == noteType
+          ? _self.noteType
+          : noteType // ignore: cast_nullable_to_non_nullable
+              as NoteType,
+      content: null == content
+          ? _self._content
+          : content // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      priority: null == priority
+          ? _self.priority
+          : priority // ignore: cast_nullable_to_non_nullable
+              as int,
+      locationName: freezed == locationName
+          ? _self.locationName
+          : locationName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      timestamp: freezed == timestamp
+          ? _self.timestamp
+          : timestamp // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      createdAt: freezed == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      lastAttempt: freezed == lastAttempt
+          ? _self.lastAttempt
+          : lastAttempt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      attemptCount: null == attemptCount
+          ? _self.attemptCount
+          : attemptCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastError: freezed == lastError
+          ? _self.lastError
+          : lastError // ignore: cast_nullable_to_non_nullable
+              as String?,
+      maxRetries: null == maxRetries
+          ? _self.maxRetries
+          : maxRetries // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 }
+
+// dart format on

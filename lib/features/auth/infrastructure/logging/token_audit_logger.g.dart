@@ -6,24 +6,50 @@ part of 'token_audit_logger.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tokenAuditLoggerHash() => r'4e6398ef4b2a71f698502b732f4c45a36afa19ff';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provides comprehensive audit logging for token operations
+
+@ProviderFor(tokenAuditLogger)
+final tokenAuditLoggerProvider = TokenAuditLoggerProvider._();
 
 /// Provides comprehensive audit logging for token operations
-///
-/// Copied from [tokenAuditLogger].
-@ProviderFor(tokenAuditLogger)
-final tokenAuditLoggerProvider = AutoDisposeProvider<LoggingService>.internal(
-  tokenAuditLogger,
-  name: r'tokenAuditLoggerProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$tokenAuditLoggerHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef TokenAuditLoggerRef = AutoDisposeProviderRef<LoggingService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class TokenAuditLoggerProvider
+    extends $FunctionalProvider<LoggingService, LoggingService, LoggingService>
+    with $Provider<LoggingService> {
+  /// Provides comprehensive audit logging for token operations
+  TokenAuditLoggerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tokenAuditLoggerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tokenAuditLoggerHash();
+
+  @$internal
+  @override
+  $ProviderElement<LoggingService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  LoggingService create(Ref ref) {
+    return tokenAuditLogger(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(LoggingService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<LoggingService>(value),
+    );
+  }
+}
+
+String _$tokenAuditLoggerHash() => r'4e6398ef4b2a71f698502b732f4c45a36afa19ff';

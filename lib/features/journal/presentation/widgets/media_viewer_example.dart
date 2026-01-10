@@ -56,7 +56,8 @@ class MediaViewerExample extends StatelessWidget {
                     mediaItems: sampleMediaItems,
                     initialIndex: 0,
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -75,7 +76,8 @@ class MediaViewerExample extends StatelessWidget {
                     mediaItems: sampleMediaItems,
                     initialIndex: 1,
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -90,12 +92,13 @@ class MediaViewerExample extends StatelessWidget {
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      MediaViewer(
+                      const MediaViewer(
                     mediaItems: sampleMediaItems,
                     initialIndex: 0,
                     config: MediaViewerConfig.minimal,
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -110,12 +113,13 @@ class MediaViewerExample extends StatelessWidget {
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      MediaViewer(
+                      const MediaViewer(
                     mediaItems: sampleMediaItems,
                     initialIndex: 0,
                     config: MediaViewerConfig.immersive,
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -137,7 +141,8 @@ class MediaViewerExample extends StatelessWidget {
                       debugPrint('Changed to media at index: $index');
                     },
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -152,14 +157,15 @@ class MediaViewerExample extends StatelessWidget {
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      MediaViewer(
+                      const MediaViewer(
                     mediaItems: sampleMediaItems,
                     initialIndex: 0,
-                    config: const MediaViewerConfig(
+                    config: MediaViewerConfig(
                       backgroundColor: Colors.white,
                     ),
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -172,15 +178,16 @@ class MediaViewerExample extends StatelessWidget {
             description: 'Open viewer from a gallery tap',
             onTap: () {
               // Simulating opening from a gallery
-              final tappedIndex = 0;
+              const tappedIndex = 0;
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      MediaViewer(
+                      const MediaViewer(
                     mediaItems: sampleMediaItems,
                     initialIndex: tappedIndex,
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),
@@ -289,7 +296,8 @@ class MediaGalleryIntegrationExample extends StatelessWidget {
                     mediaItems: MediaViewerExample.sampleMediaItems,
                     initialIndex: index,
                   ),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  transitionsBuilder:
+                      (context, animation, secondaryAnimation, child) {
                     return FadeTransition(opacity: animation, child: child);
                   },
                 ),

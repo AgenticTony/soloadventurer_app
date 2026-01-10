@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'virtual_list_view.dart';
 
 /// Cache for storing aspect ratios to avoid recalculating them
 ///
@@ -58,15 +60,14 @@ class _VariableAspectRatioDelegate extends SliverGridDelegate {
 
   @override
   SliverGridLayout getLayout(SliverConstraints constraints) {
+    // Calculate the number of columns
+    final int crossAxisCount = this.crossAxisCount;
+
     // Calculate the available cross-axis width for all columns
     final double crossAxisExtent = constraints.crossAxisExtent;
     final double usableCrossAxisExtent =
         crossAxisExtent - (crossAxisCount - 1) * crossAxisSpacing;
     final double childCrossAxisExtent = usableCrossAxisExtent / crossAxisCount;
-
-    // Calculate the number of rows based on item count
-    // This will be recalculated based on actual child count in the delegate
-    final int crossAxisCount = this.crossAxisCount;
 
     return _SliverGridGridLayoutWithVariableAspectRatio(
       crossAxisCount: crossAxisCount,
@@ -94,7 +95,7 @@ class _SliverGridGridLayoutWithVariableAspectRatio extends SliverGridLayout {
   final double mainAxisSpacing;
   final double Function(int index) getAspectRatio;
 
-  _SliverGridGridLayoutWithVariableAspectRatio({
+  const _SliverGridGridLayoutWithVariableAspectRatio({
     required this.crossAxisCount,
     required this.childCrossAxisExtent,
     required this.crossAxisSpacing,
@@ -108,6 +109,10 @@ class _SliverGridGridLayoutWithVariableAspectRatio extends SliverGridLayout {
   }
 
   @override
+  double computeMaxScrollOffset(int childCount) {
+    return getMaxScrollOffset(childCount);
+  }
+
   double getMaxScrollOffset(int childCount) {
     if (childCount == 0) return 0.0;
 
@@ -160,7 +165,8 @@ class _SliverGridGridLayoutWithVariableAspectRatio extends SliverGridLayout {
     }
 
     // Calculate cross-axis position (horizontal position)
-    final double crossAxisOffset = col * (childCrossAxisExtent + crossAxisSpacing);
+    final double crossAxisOffset =
+        col * (childCrossAxisExtent + crossAxisSpacing);
 
     return SliverGridGeometry(
       scrollOffset: mainAxisOffset,
@@ -355,7 +361,8 @@ class VirtualGridView<T> extends StatelessWidget {
   ///
   /// For optimal performance, the aspect ratios should be cached or pre-calculated.
   /// When this is null, [childAspectRatio] is used for all items.
-  final double Function(BuildContext context, int index, T item)? itemAspectRatioBuilder;
+  final double Function(BuildContext context, int index, T item)?
+      itemAspectRatioBuilder;
 
   /// Creates a generic virtual grid view with efficient rendering
   const VirtualGridView({
@@ -411,11 +418,9 @@ class VirtualGridView<T> extends StatelessWidget {
       controller: controller,
       physics: physics,
       slivers: [
-        if (header != null)
-          SliverToBoxAdapter(child: header!),
+        if (header != null) SliverToBoxAdapter(child: header!),
         grid,
-        if (footer != null)
-          SliverToBoxAdapter(child: footer!),
+        if (footer != null) SliverToBoxAdapter(child: footer!),
       ],
     );
   }
@@ -437,7 +442,6 @@ class VirtualGridView<T> extends StatelessWidget {
       physics: physics,
       padding: padding,
       gridDelegate: _buildGridDelegate(context),
-      prototypeItem: prototypeItem,
       itemCount: itemCount,
       itemBuilder: itemBuilder,
     );

@@ -35,10 +35,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(LazyLoadImage),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(LazyLoadImage),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       expect(container.constraints?.minWidth, 200);
@@ -76,10 +78,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(LazyLoadImage),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(LazyLoadImage),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       expect(container.constraints?.minWidth, 100);
@@ -101,10 +105,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(LazyLoadImage),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(LazyLoadImage),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       expect(container.constraints?.minHeight, 200);
@@ -125,10 +131,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(LazyLoadImage),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(LazyLoadImage),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       expect(container.constraints?.minWidth, 48);
@@ -151,7 +159,7 @@ void main() {
                   key: ValueKey('image_$index'),
                   imageUrl: imageUrls[index],
                   height: 100,
-                  placeholder: _TestPlaceholder(),
+                  placeholder: const _TestPlaceholder(),
                 );
               },
             ),
@@ -181,7 +189,7 @@ void main() {
                 return LazyLoadImage.photo(
                   key: ValueKey('photo_$index'),
                   imageUrl: imageUrls[index],
-                  placeholder: _TestPlaceholder(),
+                  placeholder: const _TestPlaceholder(),
                 );
               },
             ),
@@ -252,7 +260,8 @@ void main() {
     testWidgets('works with ValueKey in list', (tester) async {
       final photos = List.generate(
         5,
-        (index) => {'id': 'photo_$index', 'url': 'https://example.com/$index.jpg'},
+        (index) =>
+            {'id': 'photo_$index', 'url': 'https://example.com/$index.jpg'},
       );
 
       await tester.pumpWidget(
@@ -264,7 +273,7 @@ void main() {
                 return LazyLoadImage.photo(
                   key: ValueKey(photos[index]['id']),
                   imageUrl: photos[index]['url'] as String,
-                  placeholder: _TestPlaceholder(),
+                  placeholder: const _TestPlaceholder(),
                 );
               },
             ),
@@ -297,7 +306,7 @@ void main() {
                     child: LazyLoadImage(
                       key: ValueKey('image_$index'),
                       imageUrl: imageUrls[index],
-                      placeholder: _TestPlaceholder(),
+                      placeholder: const _TestPlaceholder(),
                     ),
                   );
                 },
@@ -336,7 +345,7 @@ void main() {
                     child: LazyLoadImage(
                       key: ValueKey('image_$index'),
                       imageUrl: imageUrls[index],
-                      placeholder: _TestPlaceholder(),
+                      placeholder: const _TestPlaceholder(),
                     ),
                   );
                 },
@@ -358,7 +367,7 @@ void main() {
               body: LazyLoadImage(
                 imageUrl: 'https://example.com/test.jpg',
                 errorWidget: (context, url, error) => const _TestErrorWidget(),
-                placeholder: _TestPlaceholder(),
+                placeholder: const _TestPlaceholder(),
               ),
             ),
           ),
@@ -379,7 +388,7 @@ class _TestPlaceholder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey[300],
-      child: const Center(child: Text('Loading...'));
+      child: const Center(child: Text('Loading...')),
     );
   }
 }
@@ -392,7 +401,7 @@ class _TestErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.red[100],
-      child: const Center(child: Text('Error'));
+      child: const Center(child: Text('Error')),
     );
   }
 }

@@ -1,5 +1,4 @@
-import 'dart:ui';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 /// Configuration for image caching and loading
@@ -186,9 +185,9 @@ class ImageCacheManager {
 
     try {
       final futures = urls.map((url) => precacheImage(
-        CachedNetworkImageProvider(url),
-        _getCurrentContext(),
-      ));
+            CachedNetworkImageProvider(url),
+            _getCurrentContext(),
+          ));
 
       await Future.wait(futures, eagerError: false);
     } catch (e) {
@@ -203,7 +202,8 @@ class ImageCacheManager {
   ) async {
     if (!_config.enablePreloading) return;
 
-    final startIndex = (currentIndex - _config.preloadRadius).clamp(0, urls.length);
+    final startIndex =
+        (currentIndex - _config.preloadRadius).clamp(0, urls.length);
     final endIndex =
         (currentIndex + _config.preloadRadius).clamp(0, urls.length);
 
@@ -334,7 +334,8 @@ class ImageCacheManager {
 
   BuildContext _getCurrentContext() {
     if (_currentContext == null) {
-      throw Exception('ImageCacheManager context not set. Call setContext() first.');
+      throw Exception(
+          'ImageCacheManager context not set. Call setContext() first.');
     }
     return _currentContext!;
   }
@@ -370,8 +371,7 @@ class ImageCacheStats {
   double get memoryUsagePercent =>
       (currentMemoryCacheSize / maxMemoryCacheSize * 100);
 
-  double get countUsagePercent =>
-      (currentMemoryCount / maxMemoryCount * 100);
+  double get countUsagePercent => (currentMemoryCount / maxMemoryCount * 100);
 
   @override
   String toString() {

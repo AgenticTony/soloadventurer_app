@@ -17,8 +17,8 @@ class SyncServiceImpl implements SyncService {
   final List<SyncOperation> _queue = [];
 
   /// Stream controllers for state updates
-  final StreamController<SyncStatus> _statusController =
-      StreamController<SyncStatus>.broadcast();
+  final StreamController<SyncOperationStatus> _statusController =
+      StreamController<SyncOperationStatus>.broadcast();
   final StreamController<List<SyncOperation>> _queueController =
       StreamController<List<SyncOperation>>.broadcast();
 
@@ -35,7 +35,7 @@ class SyncServiceImpl implements SyncService {
   StreamSubscription<bool>? _networkOnlineSubscription;
 
   /// Current sync status
-  SyncStatus _status = SyncStatus.idle;
+  SyncOperationStatus _status = SyncOperationStatus.idle;
 
   /// Whether processing is currently paused
   bool _isPaused = false;
@@ -56,7 +56,7 @@ class SyncServiceImpl implements SyncService {
   String? _currentHistoryEntryId;
 
   /// Whether this is a manual sync operation
-  bool _isManualSync = false;
+  final bool _isManualSync = false;
 
   /// Whether persistence is enabled
   bool get _persistenceEnabled => _persistence != null;
@@ -77,10 +77,10 @@ class SyncServiceImpl implements SyncService {
   bool get isProcessing => _isProcessing;
 
   @override
-  SyncStatus get status => _status;
+  SyncOperationStatus get status => _status;
 
   @override
-  Stream<SyncStatus> get statusStream => _statusController.stream;
+  Stream<SyncOperationStatus> get statusStream => _statusController.stream;
 
   @override
   Stream<List<SyncOperation>> get queueStream => _queueController.stream;
@@ -127,9 +127,10 @@ class SyncServiceImpl implements SyncService {
         });
 
         _notifyQueueChanged();
-        _updateStatus(SyncStatus.pending);
+        _updateStatus(SyncOperationStatus.pending);
 
-        debugPrint('SyncService: Loaded ${_queue.length} operations from persistence');
+        debugPrint(
+            'SyncService: Loaded ${_queue.length} operations from persistence');
 
         // Auto-process if enabled
         if (_config.autoProcess && !_isPaused) {
@@ -155,7 +156,8 @@ class SyncServiceImpl implements SyncService {
           debugPrint('SyncService: Network connection restored');
           // Trigger sync processing when coming back online
           if (_queue.isNotEmpty && !_isPaused && _config.autoProcess) {
-            debugPrint('SyncService: Auto-triggering sync due to connection restoration');
+            debugPrint(
+                'SyncService: Auto-triggering sync due to connection restoration');
             _scheduleProcessing();
           }
         },
@@ -203,8 +205,8 @@ class SyncServiceImpl implements SyncService {
     _notifyQueueChanged();
 
     // Update status to pending if queue was empty
-    if (_status == SyncStatus.idle) {
-      _updateStatus(SyncStatus.pending);
+    if (_status == SyncOperationStatus.idle) {
+      _updateStatus(SyncOperationStatus.pending);
     }
 
     // Auto-process if enabled
@@ -268,8 +270,8 @@ class SyncServiceImpl implements SyncService {
 
     _notifyQueueChanged();
 
-    if (_status == SyncStatus.pending) {
-      _updateStatus(SyncStatus.idle);
+    if (_status == SyncOperationStatus.pending) {
+      _updateStatus(SyncOperationStatus.idle);
     }
 
     debugPrint('SyncService: Cleared $count operations from queue');
@@ -295,13 +297,13 @@ class SyncServiceImpl implements SyncService {
 
     if (_queue.isEmpty) {
       debugPrint('SyncService: Queue is empty');
-      _updateStatus(SyncStatus.idle);
+      _updateStatus(SyncOperationStatus.idle);
       return SyncResult.success();
     }
 
     _processingLock = true;
     _isProcessing = true;
-    _updateStatus(SyncStatus.syncing);
+    _updateStatus(SyncOperationStatus.syncing);
 
     // Create history entry for this sync operation
     final entryId = 'sync_${DateTime.now().millisecondsSinceEpoch}';
@@ -324,7 +326,8 @@ class SyncServiceImpl implements SyncService {
     String? lastErrorCode;
 
     try {
-      debugPrint('SyncService: Starting queue processing (${_queue.length} operations)');
+      debugPrint(
+          'SyncService: Starting queue processing (${_queue.length} operations)');
 
       // Process operations in FIFO order (already sorted by priority)
       while (_queue.isNotEmpty && !_isPaused) {
@@ -334,7 +337,8 @@ class SyncServiceImpl implements SyncService {
           // Put it back in the queue
           _queue.insert(0, operation);
 
-          debugPrint('SyncService: Operation ${operation.id} not ready for retry yet, '
+          debugPrint(
+              'SyncService: Operation ${operation.id} not ready for retry yet, '
               'will retry at ${operation.nextRetryAt?.toIso8601String()}');
 
           // Calculate delay until next retry and schedule processing
@@ -367,7 +371,8 @@ class SyncServiceImpl implements SyncService {
             // Re-queue for retry if applicable
             if (operation.shouldRetry(_config.maxRetryAttempts)) {
               final nextRetryCount = operation.retryCount + 1;
-              final nextRetryAt = _backoff.calculateNextRetryTime(nextRetryCount);
+              final nextRetryAt =
+                  _backoff.calculateNextRetryTime(nextRetryCount);
 
               final retryOp = operation.copyWith(
                 retryCount: nextRetryCount,
@@ -378,7 +383,8 @@ class SyncServiceImpl implements SyncService {
               debugPrint('SyncService: Re-queueing operation ${operation.id} '
                   '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
             } else {
-              debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+              debugPrint(
+                  'SyncService: Operation ${operation.id} exceeded max retry attempts '
                   '(${operation.retryCount}/${_config.maxRetryAttempts})');
             }
           }
@@ -387,7 +393,8 @@ class SyncServiceImpl implements SyncService {
           lastError = e.toString();
           lastErrorCode = 'OPERATION_ERROR';
 
-          debugPrint('SyncService: Error processing operation ${operation.id}: $e');
+          debugPrint(
+              'SyncService: Error processing operation ${operation.id}: $e');
           debugPrint(stackTrace.toString());
 
           // Re-queue for retry if applicable
@@ -404,7 +411,8 @@ class SyncServiceImpl implements SyncService {
             debugPrint('SyncService: Re-queueing operation ${operation.id} '
                 '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
           } else {
-            debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+            debugPrint(
+                'SyncService: Operation ${operation.id} exceeded max retry attempts '
                 '(${operation.retryCount}/${_config.maxRetryAttempts})');
           }
         }
@@ -417,9 +425,9 @@ class SyncServiceImpl implements SyncService {
         lastErrorCode ??= 'PARTIAL_FAILURE';
 
         if (_queue.isNotEmpty) {
-          _updateStatus(SyncStatus.pending);
+          _updateStatus(SyncOperationStatus.pending);
         } else {
-          _updateStatus(SyncStatus.failed);
+          _updateStatus(SyncOperationStatus.failed);
         }
 
         // Complete history entry
@@ -438,7 +446,7 @@ class SyncServiceImpl implements SyncService {
           failureCount: failureCount,
         );
       } else {
-        _updateStatus(SyncStatus.success);
+        _updateStatus(SyncOperationStatus.success);
 
         // Complete history entry
         await _completeHistoryEntry(
@@ -457,7 +465,7 @@ class SyncServiceImpl implements SyncService {
       debugPrint('SyncService: Fatal error during queue processing: $e');
       debugPrint(stackTrace.toString());
 
-      _updateStatus(SyncStatus.failed);
+      _updateStatus(SyncOperationStatus.failed);
 
       final totalCount = successCount + failureCount;
 
@@ -502,13 +510,13 @@ class SyncServiceImpl implements SyncService {
     }
 
     if (_queue.isEmpty) {
-      _updateStatus(SyncStatus.idle);
+      _updateStatus(SyncOperationStatus.idle);
       return SyncResult.success();
     }
 
     _processingLock = true;
     _isProcessing = true;
-    _updateStatus(SyncStatus.syncing);
+    _updateStatus(SyncOperationStatus.syncing);
 
     final batchSize = maxBatchSize ?? _config.maxBatchSize;
 
@@ -545,7 +553,8 @@ class SyncServiceImpl implements SyncService {
     String? lastErrorCode;
 
     try {
-      debugPrint('SyncService: Processing batch of ${operationsToProcess.length} operations');
+      debugPrint(
+          'SyncService: Processing batch of ${operationsToProcess.length} operations');
 
       for (final operation in operationsToProcess) {
         try {
@@ -559,7 +568,8 @@ class SyncServiceImpl implements SyncService {
             // Re-queue for retry if applicable
             if (operation.shouldRetry(_config.maxRetryAttempts)) {
               final nextRetryCount = operation.retryCount + 1;
-              final nextRetryAt = _backoff.calculateNextRetryTime(nextRetryCount);
+              final nextRetryAt =
+                  _backoff.calculateNextRetryTime(nextRetryCount);
 
               final retryOp = operation.copyWith(
                 retryCount: nextRetryCount,
@@ -570,7 +580,8 @@ class SyncServiceImpl implements SyncService {
               debugPrint('SyncService: Re-queueing operation ${operation.id} '
                   '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
             } else {
-              debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+              debugPrint(
+                  'SyncService: Operation ${operation.id} exceeded max retry attempts '
                   '(${operation.retryCount}/${_config.maxRetryAttempts})');
             }
           }
@@ -593,7 +604,8 @@ class SyncServiceImpl implements SyncService {
             debugPrint('SyncService: Re-queueing operation ${operation.id} '
                 '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
           } else {
-            debugPrint('SyncService: Operation ${operation.id} exceeded max retry attempts '
+            debugPrint(
+                'SyncService: Operation ${operation.id} exceeded max retry attempts '
                 '(${operation.retryCount}/${_config.maxRetryAttempts})');
           }
         }
@@ -616,7 +628,9 @@ class SyncServiceImpl implements SyncService {
         lastError ??= 'Some operations failed';
         lastErrorCode ??= 'PARTIAL_FAILURE';
 
-        _updateStatus(_queue.isEmpty ? SyncStatus.failed : SyncStatus.pending);
+        _updateStatus(_queue.isEmpty
+            ? SyncOperationStatus.failed
+            : SyncOperationStatus.pending);
 
         return SyncResult.failure(
           lastError,
@@ -625,14 +639,16 @@ class SyncServiceImpl implements SyncService {
           failureCount: failureCount,
         );
       } else {
-        _updateStatus(_queue.isEmpty ? SyncStatus.success : SyncStatus.pending);
+        _updateStatus(_queue.isEmpty
+            ? SyncOperationStatus.success
+            : SyncOperationStatus.pending);
         return SyncResult.success(
           successCount: successCount,
           failureCount: failureCount,
         );
       }
     } catch (e) {
-      _updateStatus(SyncStatus.failed);
+      _updateStatus(SyncOperationStatus.failed);
 
       return SyncResult.failure(
         'Batch processing failed: ${e.toString()}',
@@ -752,7 +768,8 @@ class SyncServiceImpl implements SyncService {
 
     // Mock success (in real implementation, this would make API calls)
     // Simulate occasional failures for testing
-    final shouldFail = operation.retryCount == 0 && false; // Set to true to test failures
+    final shouldFail =
+        operation.retryCount == 0 && false; // Set to true to test failures
 
     if (shouldFail) {
       debugPrint('SyncService: Operation ${operation.id} failed (simulated)');
@@ -764,7 +781,7 @@ class SyncServiceImpl implements SyncService {
   }
 
   /// Update sync status and notify listeners
-  void _updateStatus(SyncStatus newStatus) {
+  void _updateStatus(SyncOperationStatus newStatus) {
     if (_status != newStatus) {
       _status = newStatus;
       _statusController.add(_status);
@@ -816,7 +833,8 @@ class SyncServiceImpl implements SyncService {
       if (isSuccess) {
         updatedEntry = SyncHistoryEntry.success(
           id: _currentHistoryEntryId!,
-          startedAt: DateTime.now(), // Will be updated when we add startedAt tracking
+          startedAt:
+              DateTime.now(), // Will be updated when we add startedAt tracking
           successCount: successCount,
           failureCount: failureCount,
           totalCount: totalCount,
@@ -839,7 +857,8 @@ class SyncServiceImpl implements SyncService {
 
         updatedEntry = SyncHistoryEntry.failure(
           id: _currentHistoryEntryId!,
-          startedAt: DateTime.now(), // Will be updated when we add startedAt tracking
+          startedAt:
+              DateTime.now(), // Will be updated when we add startedAt tracking
           successCount: successCount,
           failureCount: failureCount,
           totalCount: totalCount,

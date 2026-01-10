@@ -311,7 +311,7 @@ void main() {
         id: 'empty-cluster',
         position: const LatLng(37.7749, -122.4194),
         markerCount: 0,
-        markerIds: [],
+        markerIds: const [],
       );
 
       await tester.pumpWidget(

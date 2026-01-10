@@ -1,5 +1,4 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Enhanced error widget for failed image loads with retry functionality.
@@ -92,7 +91,7 @@ class ImageErrorWidget extends StatelessWidget {
   /// )
   /// ```
   const ImageErrorWidget.withRetry({
-    super.key,
+    Key? key,
     required dynamic error,
     required String imageUrl,
     double? width,
@@ -131,7 +130,7 @@ class ImageErrorWidget extends StatelessWidget {
   /// )
   /// ```
   const ImageErrorWidget.compact({
-    super.key,
+    Key? key,
     required dynamic error,
     required String imageUrl,
     double size = 48.0,
@@ -153,12 +152,12 @@ class ImageErrorWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<ConnectivityResult>(
+    return FutureBuilder<List<ConnectivityResult>>(
       future: detectOfflineStatus ? Connectivity().checkConnectivity() : null,
       builder: (context, snapshot) {
         final isOffline = detectOfflineStatus &&
             snapshot.connectionState == ConnectionState.done &&
-            snapshot.data == ConnectivityResult.none;
+            (snapshot.data?.isEmpty ?? true);
 
         return _buildErrorContent(context, isOffline);
       },
@@ -356,7 +355,8 @@ class ImageErrorClassifier {
 
     if (errorString.contains('timeout') || errorString.contains('deadline')) {
       return ImageErrorClassifier._(ImageErrorType.timeout);
-    } else if (errorString.contains('404') || errorString.contains('not found')) {
+    } else if (errorString.contains('404') ||
+        errorString.contains('not found')) {
       return ImageErrorClassifier._(ImageErrorType.notFound);
     } else if (errorString.contains('permission') ||
         errorString.contains('unauthorized') ||

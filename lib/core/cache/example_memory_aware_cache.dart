@@ -50,12 +50,12 @@ class MemoryAwareCacheExample {
   static Future<void> customThresholdsExample() async {
     // Create cache manager with custom configuration
     final cacheManager = MemoryAwareCacheManager<String, String>(
-      config: MemoryAwareCacheConfig(
+      config: const MemoryAwareCacheConfig(
         // Lower baseline for memory-constrained devices
         baselineMemoryBytes: 150 * 1024 * 1024, // 150 MB
 
         // Check memory more frequently
-        monitoringInterval: const Duration(seconds: 3),
+        monitoringInterval: Duration(seconds: 3),
 
         // Custom cache sizes for each pressure level
         maxCacheSizeAtNoPressure: 200,
@@ -136,7 +136,7 @@ class MemoryAwareCacheExample {
   /// instead of relying on automatic monitoring.
   static Future<void> manualPressureCheckExample() async {
     final cacheManager = MemoryAwareCacheManager<String, String>(
-      config: MemoryAwareCacheConfig(
+      config: const MemoryAwareCacheConfig(
         // Disable automatic monitoring
         autoResize: false,
       ),
@@ -187,14 +187,17 @@ class MemoryAwareCacheExample {
     // Get memory cache statistics
     final memoryStats = cacheManager.getMemoryStats();
     if (kDebugMode) {
-      debugPrint('Memory cache hit rate: ${(memoryStats.hitRate * 100).toStringAsFixed(1)}%');
-      debugPrint('Memory cache size: ${memoryStats.currentSize}/${memoryStats.maxSize}');
+      debugPrint(
+          'Memory cache hit rate: ${(memoryStats.hitRate * 100).toStringAsFixed(1)}%');
+      debugPrint(
+          'Memory cache size: ${memoryStats.currentSize}/${memoryStats.maxSize}');
     }
 
     // Get memory-aware statistics
     final memoryAwareStats = cacheManager.getMemoryAwareStats();
     if (kDebugMode) {
-      debugPrint('Total memory adjustments: ${memoryAwareStats.totalAdjustments}');
+      debugPrint(
+          'Total memory adjustments: ${memoryAwareStats.totalAdjustments}');
       debugPrint('Total items evicted: ${memoryAwareStats.totalItemsEvicted}');
       debugPrint('Current pressure: ${memoryAwareStats.currentPressure.name}');
     }
@@ -209,7 +212,7 @@ class MemoryAwareCacheExample {
   static Future<void> imageCachingExample() async {
     // Create memory-aware cache for images
     final imageCache = MemoryAwareCacheManager<String, List<int>>(
-      config: MemoryAwareCacheConfig(
+      config: const MemoryAwareCacheConfig(
         // Higher baseline for image-heavy apps
         baselineMemoryBytes: 300 * 1024 * 1024, // 300 MB
 
@@ -221,7 +224,7 @@ class MemoryAwareCacheExample {
         maxCacheSizeAtCriticalPressure: 20,
 
         // Check memory every 5 seconds
-        monitoringInterval: const Duration(seconds: 5),
+        monitoringInterval: Duration(seconds: 5),
       ),
     );
 
@@ -271,7 +274,7 @@ class MemoryAwareCacheExample {
     // Only prefetch if memory is healthy
     if (pressure == MemoryPressure.none || pressure == MemoryPressure.low) {
       // Prefetch next 20 items
-      final keysToPrefetch = List.generate(20, (i) => 'item_${i}');
+      final keysToPrefetch = List.generate(20, (i) => 'item_$i');
 
       await cacheManager.prefetch(
         keysToPrefetch,
@@ -285,7 +288,8 @@ class MemoryAwareCacheExample {
       }
     } else {
       if (kDebugMode) {
-        debugPrint('Skipping prefetch due to memory pressure: ${pressure.name}');
+        debugPrint(
+            'Skipping prefetch due to memory pressure: ${pressure.name}');
       }
     }
 
@@ -298,7 +302,7 @@ class MemoryAwareCacheExample {
   /// for proactive memory management.
   static Future<void> forceAdjustmentExample() async {
     final cacheManager = MemoryAwareCacheManager<String, String>(
-      config: MemoryAwareCacheConfig(
+      config: const MemoryAwareCacheConfig(
         // Disable automatic resizing
         autoResize: false,
       ),

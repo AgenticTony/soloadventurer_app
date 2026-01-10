@@ -129,16 +129,16 @@ class ExampleVirtualListWithHeaderFooter extends StatelessWidget {
       appBar: AppBar(title: const Text('With Header/Footer')),
       body: VirtualListView<String>(
         itemCount: items.length,
-        header: Column(
+        header: const Column(
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
               child: Text(
                 'Trip Items',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
-            const Divider(),
+            Divider(),
           ],
         ),
         footer: const Padding(
@@ -198,7 +198,8 @@ class ExampleVirtualListHorizontal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = List.generate(20, (i) => Colors.primaries[i % Colors.primaries.length]);
+    final colors =
+        List.generate(20, (i) => Colors.primaries[i % Colors.primaries.length]);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Horizontal List')),
@@ -217,7 +218,8 @@ class ExampleVirtualListHorizontal extends StatelessWidget {
             child: Center(
               child: Text(
                 'Color $index',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           );

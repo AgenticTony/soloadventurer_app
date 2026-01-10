@@ -102,9 +102,9 @@ class OfflineIndicatorExampleScreen extends ConsumerWidget {
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 16),
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             OfflineIndicator(
                               config: OfflineIndicatorConfig.compact(
                                 offlineIcon: Icons.signal_wifi_off,
@@ -166,7 +166,7 @@ class TypicalAppScreen extends ConsumerWidget {
           ),
           // Other app bar actions...
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: Icon(Icons.settings),
             onPressed: null,
           ),
         ],

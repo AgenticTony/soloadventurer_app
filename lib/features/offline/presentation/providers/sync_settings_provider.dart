@@ -1,27 +1,31 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/foundation.dart';
 
-/// Sync settings preferences
-class SyncSettings {
-  /// Whether sync is enabled
-  final bool syncEnabled;
+part 'sync_settings_provider.g.dart';
 
-  /// Whether to sync only on WiFi
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier<SyncSettings> to Notifier<SyncSettingsData>
+/// - Dependencies injected via ref.watch() in build() method
+/// - build() returns SyncSettingsData not AsyncValue
+/// - Constructor auto-load moved to build() method
+/// - SharedPreferences persistence in mutation methods
+
+/// Sync settings preferences
+class SyncSettingsData {
+  final bool syncEnabled;
   final bool syncOnlyOnWifi;
 
-  /// Created a new [SyncSettings] instance
-  const SyncSettings({
+  const SyncSettingsData({
     this.syncEnabled = true,
     this.syncOnlyOnWifi = false,
   });
 
-  /// Creates a copy with updated fields
-  SyncSettings copyWith({
+  SyncSettingsData copyWith({
     bool? syncEnabled,
     bool? syncOnlyOnWifi,
   }) {
-    return SyncSettings(
+    return SyncSettingsData(
       syncEnabled: syncEnabled ?? this.syncEnabled,
       syncOnlyOnWifi: syncOnlyOnWifi ?? this.syncOnlyOnWifi,
     );
@@ -30,7 +34,7 @@ class SyncSettings {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SyncSettings &&
+      other is SyncSettingsData &&
           runtimeType == other.runtimeType &&
           syncEnabled == other.syncEnabled &&
           syncOnlyOnWifi == other.syncOnlyOnWifi;
@@ -40,99 +44,92 @@ class SyncSettings {
 }
 
 /// Notifier for sync settings
-class SyncSettingsNotifier extends StateNotifier<SyncSettings> {
-  /// SharedPreferences instance
-  final SharedPreferences _prefs;
-
-  /// Key for sync enabled preference
+///
+/// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
+@riverpod
+class SyncSettings extends _$SyncSettings {
   static const String _syncEnabledKey = 'sync_enabled';
-
-  /// Key for WiFi-only sync preference
   static const String _syncOnlyOnWifiKey = 'sync_only_on_wifi';
 
-  /// Creates a new [SyncSettingsNotifier]
-  SyncSettingsNotifier(this._prefs) : super(const SyncSettings()) {
-    _loadSettings();
+  @override
+  SyncSettingsData build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    _loadSettings(prefs);
+    return const SyncSettingsData();
   }
 
-  /// Loads settings from SharedPreferences
-  void _loadSettings() {
+  void _loadSettings(SharedPreferences prefs) {
     try {
-      final syncEnabled = _prefs.getBool(_syncEnabledKey) ?? true;
-      final syncOnlyOnWifi = _prefs.getBool(_syncOnlyOnWifiKey) ?? false;
+      final syncEnabled = prefs.getBool(_syncEnabledKey) ?? true;
+      final syncOnlyOnWifi = prefs.getBool(_syncOnlyOnWifiKey) ?? false;
 
-      state = SyncSettings(
+      state = SyncSettingsData(
         syncEnabled: syncEnabled,
         syncOnlyOnWifi: syncOnlyOnWifi,
       );
 
       debugPrint(
-          '📱 SyncSettings loaded: enabled=$syncEnabled, wifiOnly=$syncOnlyOnWifi');
+          'SyncSettings loaded: enabled=$syncEnabled, wifiOnly=$syncOnlyOnWifi');
     } catch (e) {
-      debugPrint('❌ Error loading sync settings: $e');
-      // Keep default values
+      debugPrint('Error loading sync settings: $e');
     }
   }
 
-  /// Updates sync enabled setting
   Future<void> setSyncEnabled(bool value) async {
+    final prefs = ref.read(sharedPreferencesProvider);
     try {
-      await _prefs.setBool(_syncEnabledKey, value);
+      await prefs.setBool(_syncEnabledKey, value);
       state = state.copyWith(syncEnabled: value);
-      debugPrint('📱 Sync enabled updated: $value');
+      debugPrint('Sync enabled updated: $value');
     } catch (e) {
-      debugPrint('❌ Error updating sync enabled: $e');
+      debugPrint('Error updating sync enabled: $e');
       rethrow;
     }
   }
 
-  /// Updates sync only on WiFi setting
   Future<void> setSyncOnlyOnWifi(bool value) async {
+    final prefs = ref.read(sharedPreferencesProvider);
     try {
-      await _prefs.setBool(_syncOnlyOnWifiKey, value);
+      await prefs.setBool(_syncOnlyOnWifiKey, value);
       state = state.copyWith(syncOnlyOnWifi: value);
-      debugPrint('📱 Sync WiFi-only updated: $value');
+      debugPrint('Sync WiFi-only updated: $value');
     } catch (e) {
-      debugPrint('❌ Error updating sync WiFi-only: $e');
+      debugPrint('Error updating sync WiFi-only: $e');
       rethrow;
     }
   }
 
-  /// Resets all settings to defaults
   Future<void> resetToDefaults() async {
+    final prefs = ref.read(sharedPreferencesProvider);
     try {
-      await _prefs.remove(_syncEnabledKey);
-      await _prefs.remove(_syncOnlyOnWifiKey);
-      state = const SyncSettings();
-      debugPrint('📱 Sync settings reset to defaults');
+      await prefs.remove(_syncEnabledKey);
+      await prefs.remove(_syncOnlyOnWifiKey);
+      state = const SyncSettingsData();
+      debugPrint('Sync settings reset to defaults');
     } catch (e) {
-      debugPrint('❌ Error resetting sync settings: $e');
+      debugPrint('Error resetting sync settings: $e');
       rethrow;
     }
   }
 }
 
 /// Provider for SharedPreferences instance
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+@riverpod
+SharedPreferences sharedPreferences(Ref ref) {
   throw UnimplementedError(
     'SharedPreferencesProvider must be overridden in main app initialization. '
     'Use ProviderScope with overrides to provide SharedPreferences instance.',
   );
-});
-
-/// Provider for sync settings
-final syncSettingsProvider =
-    StateNotifierProvider<SyncSettingsNotifier, SyncSettings>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return SyncSettingsNotifier(prefs);
-});
+}
 
 /// Provider for sync enabled boolean (for easy access)
-final syncEnabledProvider = Provider<bool>((ref) {
+@riverpod
+bool syncEnabled(Ref ref) {
   return ref.watch(syncSettingsProvider).syncEnabled;
-});
+}
 
 /// Provider for WiFi-only sync boolean (for easy access)
-final syncOnlyOnWifiProvider = Provider<bool>((ref) {
+@riverpod
+bool syncOnlyOnWifi(Ref ref) {
   return ref.watch(syncSettingsProvider).syncOnlyOnWifi;
-});
+}

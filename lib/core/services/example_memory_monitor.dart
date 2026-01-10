@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/services/services.dart';
 
@@ -10,7 +11,7 @@ class ExampleBasicMemoryMonitoring {
 
     await MemoryMonitor.initialize(
       config: const MemoryMonitorConfig(
-        warningThresholdBytes: 150 * 1024 * 1024,  // 150 MB
+        warningThresholdBytes: 150 * 1024 * 1024, // 150 MB
         criticalThresholdBytes: 180 * 1024 * 1024, // 180 MB
         monitoringInterval: Duration(seconds: 5),
       ),
@@ -89,7 +90,8 @@ class ExampleMemoryStatistics {
     debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     debugPrint('Snapshots: ${stats.snapshotCount}');
     debugPrint('Duration: ${stats.monitoringDuration.inMinutes} minutes');
-    debugPrint('Trend: ${stats.trend.name} (${stats.trendPercentage.toStringAsFixed(1)}%)');
+    debugPrint(
+        'Trend: ${stats.trend.name} (${stats.trendPercentage.toStringAsFixed(1)}%)');
 
     // Display trend analysis
     debugPrint('\n🔍 Trend Analysis:');
@@ -128,8 +130,10 @@ class ExampleDeviceSpecificConfiguration {
         : MemoryMonitorConfig.forHighMemoryDevice();
 
     debugPrint('Device: ${isLowMemoryDevice ? "Low-End" : "High-End"}');
-    debugPrint('Warning Threshold: ${config.warningThresholdMB.toStringAsFixed(0)} MB');
-    debugPrint('Critical Threshold: ${config.criticalThresholdMB.toStringAsFixed(0)} MB');
+    debugPrint(
+        'Warning Threshold: ${config.warningThresholdMB.toStringAsFixed(0)} MB');
+    debugPrint(
+        'Critical Threshold: ${config.criticalThresholdMB.toStringAsFixed(0)} MB');
     debugPrint('Monitoring Interval: ${config.monitoringInterval.inSeconds}s');
     debugPrint('Max History: ${config.maxHistorySize} snapshots\n');
 
@@ -168,7 +172,7 @@ class ExampleAutomaticCacheManagement {
 
     await MemoryMonitor.initialize(
       config: const MemoryMonitorConfig(
-        warningThresholdBytes: 120 * 1024 * 1024,  // 120 MB
+        warningThresholdBytes: 120 * 1024 * 1024, // 120 MB
         criticalThresholdBytes: 150 * 1024 * 1024, // 150 MB
       ),
       onAlert: (alert) {
@@ -255,14 +259,17 @@ class ExampleMemoryLeakDetection {
 
       if (stats.trend == MemoryTrend.increasing) {
         if (stats.trendPercentage > 30) {
-          debugPrint('  ❌ SEVERE: Memory increased by ${stats.trendPercentage.toStringAsFixed(1)}%!');
+          debugPrint(
+              '  ❌ SEVERE: Memory increased by ${stats.trendPercentage.toStringAsFixed(1)}%!');
           debugPrint('  ❌ CRITICAL MEMORY LEAK DETECTED!');
           await _dumpMemoryHistory();
         } else if (stats.trendPercentage > 15) {
-          debugPrint('  ⚠️  WARNING: Memory increased by ${stats.trendPercentage.toStringAsFixed(1)}%');
+          debugPrint(
+              '  ⚠️  WARNING: Memory increased by ${stats.trendPercentage.toStringAsFixed(1)}%');
           debugPrint('  ⚠️  Possible memory leak');
         } else {
-          debugPrint('  ℹ️  Memory is slightly increasing (${stats.trendPercentage.toStringAsFixed(1)}%)');
+          debugPrint(
+              '  ℹ️  Memory is slightly increasing (${stats.trendPercentage.toStringAsFixed(1)}%)');
         }
       } else if (stats.trend == MemoryTrend.decreasing) {
         debugPrint('  ✅ Memory usage is decreasing. Good!');
@@ -341,18 +348,21 @@ class ExampleRealTimeMemoryDashboard {
     debugPrint('Status: $alertIcon ${alertLevel.name.toUpperCase()}');
     debugPrint(
         'Memory: ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB (${snapshot.memoryUsageBytes} bytes)');
-    debugPrint(
-        'Time: ${snapshot.timestamp.toIso8601String()}');
+    debugPrint('Time: ${snapshot.timestamp.toIso8601String()}');
 
     // Show threshold indicators
     final config = MemoryMonitor.instance.config;
     final warningPercent =
-        (snapshot.memoryUsageBytes / config.warningThresholdBytes * 100).clamp(0, 100);
+        (snapshot.memoryUsageBytes / config.warningThresholdBytes * 100)
+            .clamp(0, 100);
     final criticalPercent =
-        (snapshot.memoryUsageBytes / config.criticalThresholdBytes * 100).clamp(0, 100);
+        (snapshot.memoryUsageBytes / config.criticalThresholdBytes * 100)
+            .clamp(0, 100);
 
-    debugPrint('Warning: ${warningPercent.toStringAsFixed(0)}% of ${config.warningThresholdMB.toStringAsFixed(0)} MB');
-    debugPrint('Critical: ${criticalPercent.toStringAsFixed(0)}% of ${config.criticalThresholdMB.toStringAsFixed(0)} MB');
+    debugPrint(
+        'Warning: ${warningPercent.toStringAsFixed(0)}% of ${config.warningThresholdMB.toStringAsFixed(0)} MB');
+    debugPrint(
+        'Critical: ${criticalPercent.toStringAsFixed(0)}% of ${config.criticalThresholdMB.toStringAsFixed(0)} MB');
 
     debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
   }
@@ -405,16 +415,20 @@ class ExampleMemoryHistoryAnalysis {
       final totalMemory =
           history.fold<int>(0, (sum, s) => sum + s.memoryUsageBytes);
       final avgMemory = totalMemory / history.length;
-      final maxMemory =
-          history.map((s) => s.memoryUsageBytes).reduce((a, b) => a > b ? a : b);
-      final minMemory =
-          history.map((s) => s.memoryUsageBytes).reduce((a, b) => a < b ? a : b);
+      final maxMemory = history
+          .map((s) => s.memoryUsageBytes)
+          .reduce((a, b) => a > b ? a : b);
+      final minMemory = history
+          .map((s) => s.memoryUsageBytes)
+          .reduce((a, b) => a < b ? a : b);
 
       debugPrint('\n📊 History Statistics:');
       debugPrint('  Total snapshots: ${history.length}');
-      debugPrint('  Average: ${(avgMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Average: ${(avgMemory / 1024 / 1024).toStringAsFixed(2)} MB');
       debugPrint('  Peak: ${(maxMemory / 1024 / 1024).toStringAsFixed(2)} MB');
-      debugPrint('  Lowest: ${(minMemory / 1024 / 1024).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Lowest: ${(minMemory / 1024 / 1024).toStringAsFixed(2)} MB');
       debugPrint(
           '  Range: ${((maxMemory - minMemory) / 1024 / 1024).toStringAsFixed(2)} MB');
     }
@@ -487,9 +501,12 @@ class ExampleDynamicConfiguration {
   void _displayCurrentConfig() {
     final config = MemoryMonitor.instance.config;
     debugPrint('📋 Current Configuration:');
-    debugPrint('  Warning threshold: ${config.warningThresholdMB.toStringAsFixed(0)} MB');
-    debugPrint('  Critical threshold: ${config.criticalThresholdMB.toStringAsFixed(0)} MB');
-    debugPrint('  Monitoring interval: ${config.monitoringInterval.inSeconds}s');
+    debugPrint(
+        '  Warning threshold: ${config.warningThresholdMB.toStringAsFixed(0)} MB');
+    debugPrint(
+        '  Critical threshold: ${config.criticalThresholdMB.toStringAsFixed(0)} MB');
+    debugPrint(
+        '  Monitoring interval: ${config.monitoringInterval.inSeconds}s');
     debugPrint('  Max history: ${config.maxHistorySize}');
     debugPrint('  Trend analysis: ${config.enableTrendAnalysis}');
   }

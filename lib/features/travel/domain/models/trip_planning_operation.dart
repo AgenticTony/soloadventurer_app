@@ -41,6 +41,7 @@ class TripPlanningOperation
 
   const TripPlanningOperation._();
 
+
   /// Create a new trip planning operation
   factory TripPlanningOperation.create({
     required String tripName,
@@ -133,4 +134,26 @@ class TripPlanningOperation
         if (lastError != null) 'lastError': lastError,
         'maxRetries': maxRetries,
       };
+
+  @override
+  QueueableOperation withAttemptMetadata({
+    DateTime? lastAttempt,
+    int? attemptCount,
+    String? lastError,
+  }) {
+    return copyWith(
+      lastAttempt: lastAttempt ?? this.lastAttempt,
+      attemptCount: attemptCount ?? this.attemptCount,
+      lastError: lastError ?? this.lastError,
+    );
+  }
+
+  @override
+  QueueableOperation resetForRetry() {
+    return copyWith(
+      lastAttempt: null,
+      attemptCount: 0,
+      lastError: null,
+    );
+  }
 }

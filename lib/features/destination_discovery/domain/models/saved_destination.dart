@@ -53,6 +53,8 @@ class SavedDestination with _$SavedDestination {
     required DateTime updatedAt,
   }) = _SavedDestination;
 
+  SavedDestination._();
+
   factory SavedDestination.fromJson(Map<String, dynamic> json) =>
       _$SavedDestinationFromJson(json);
 

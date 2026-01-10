@@ -215,15 +215,15 @@ class _SyncActivityTile extends StatelessWidget {
     Color color;
 
     switch (entry.status) {
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         icon = Icons.check_circle;
         color = Colors.green;
         break;
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         icon = Icons.error;
         color = Colors.red;
         break;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         icon = Icons.sync;
         color = Colors.blue;
         break;
@@ -247,20 +247,20 @@ class _SyncActivityTile extends StatelessWidget {
     final buffer = StringBuffer();
 
     switch (entry.status) {
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         buffer.write('${entry.successCount} items synced');
         if (entry.failureCount > 0) {
           buffer.write(', ${entry.failureCount} failed');
         }
         break;
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         if (entry.error != null) {
           buffer.write(entry.error!.userMessage);
         } else {
           buffer.write('${entry.failureCount} items failed to sync');
         }
         break;
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         buffer.write('Syncing in progress...');
         break;
       default:

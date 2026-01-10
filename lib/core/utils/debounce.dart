@@ -288,7 +288,7 @@ class SimpleDebouncer {
       input: DateTime.now().toIso8601String(),
       action: () async {
         action();
-        return null;
+        return;
       },
     );
   }

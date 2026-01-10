@@ -187,7 +187,8 @@ class ExampleInfiniteScrollCustomWidgets extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.shopping_basket_outlined, size: 64, color: Colors.grey),
+              Icon(Icons.shopping_basket_outlined,
+                  size: 64, color: Colors.grey),
               SizedBox(height: 16),
               Text('No products found', style: TextStyle(fontSize: 16)),
               SizedBox(height: 8),
@@ -255,7 +256,8 @@ class ExampleInfiniteScrollWithHeaderFooter extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.blue[50],
-            border: const Border(bottom: BorderSide(color: Colors.grey, width: 1)),
+            border:
+                const Border(bottom: BorderSide(color: Colors.grey, width: 1)),
           ),
           child: const Row(
             children: [
@@ -330,7 +332,8 @@ class ExampleInfiniteScrollPreloadThreshold extends StatelessWidget {
               children: [
                 Text(
                   item,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 const Text('Article preview text goes here...'),

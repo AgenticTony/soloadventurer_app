@@ -1,5 +1,5 @@
-/// Sync status enumeration representing the current state of synchronization
-enum SyncStatus {
+/// Sync operation status enumeration representing the current state of synchronization
+enum SyncOperationStatus {
   /// Idle - No sync activity, ready to sync
   idle,
 
@@ -16,33 +16,33 @@ enum SyncStatus {
   pending,
 }
 
-/// Extension on SyncStatus for utility methods
-extension SyncStatusExtension on SyncStatus {
+/// Extension on SyncOperationStatus for utility methods
+extension SyncOperationStatusExtension on SyncOperationStatus {
   /// Whether this status represents an active sync operation
-  bool get isActive => this == SyncStatus.syncing;
+  bool get isActive => this == SyncOperationStatus.syncing;
 
   /// Whether this status represents a completed sync
   bool get isCompleted =>
-      this == SyncStatus.success || this == SyncStatus.failed;
+      this == SyncOperationStatus.success || this == SyncOperationStatus.failed;
 
   /// Whether this status represents an error state
-  bool get isError => this == SyncStatus.failed;
+  bool get isError => this == SyncOperationStatus.failed;
 
   /// Whether sync is available (not currently syncing)
-  bool get canSync => this != SyncStatus.syncing;
+  bool get canSync => this != SyncOperationStatus.syncing;
 
   /// User-friendly display name
   String get displayName {
     switch (this) {
-      case SyncStatus.idle:
+      case SyncOperationStatus.idle:
         return 'Ready';
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return 'Syncing...';
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return 'Synced';
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return 'Sync Failed';
-      case SyncStatus.pending:
+      case SyncOperationStatus.pending:
         return 'Pending';
     }
   }
@@ -50,15 +50,15 @@ extension SyncStatusExtension on SyncStatus {
   /// Icon code point for Material Icons
   int get iconCodePoint {
     switch (this) {
-      case SyncStatus.idle:
+      case SyncOperationStatus.idle:
         return 0xe24e; // sync
-      case SyncStatus.syncing:
+      case SyncOperationStatus.syncing:
         return 0xe625; // sync (animated)
-      case SyncStatus.success:
+      case SyncOperationStatus.success:
         return 0xe876; // check_circle
-      case SyncStatus.failed:
+      case SyncOperationStatus.failed:
         return 0xe000; // error
-      case SyncStatus.pending:
+      case SyncOperationStatus.pending:
         return 0xe923; // schedule
     }
   }

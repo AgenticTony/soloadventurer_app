@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -245,7 +244,8 @@ class ThumbnailService {
             results[url] = thumbnailPath;
           } catch (e) {
             if (kDebugMode) {
-              debugPrint('ThumbnailService: Failed to generate thumbnail for $url: $e');
+              debugPrint(
+                  'ThumbnailService: Failed to generate thumbnail for $url: $e');
             }
             results[url] = url; // Fallback to original URL
           }
@@ -380,12 +380,11 @@ class ThumbnailService {
     final scaledHeight = image.height * scale;
 
     // Draw the scaled image
-    final paint = Paint()
-      ..filterQuality = FilterQuality.medium;
+    final paint = Paint()..filterQuality = ui.FilterQuality.medium;
     canvas.drawImageRect(
       image,
-      Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
-      Rect.fromLTWH(
+      ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+      ui.Rect.fromLTWH(
         0,
         0,
         scaledWidth.toDouble(),
@@ -439,7 +438,8 @@ class ThumbnailService {
     }
 
     if (kDebugMode) {
-      debugPrint('ThumbnailService: Cache size exceeds limit (${_formatBytes(cacheSize)}), cleaning up');
+      debugPrint(
+          'ThumbnailService: Cache size exceeds limit (${_formatBytes(cacheSize)}), cleaning up');
     }
 
     try {
@@ -460,7 +460,8 @@ class ThumbnailService {
 
       // Delete oldest files until cache is under the limit
       int currentSize = cacheSize;
-      final targetSize = (maxCacheSize * 0.8).toInt(); // Clean up to 80% of limit
+      final targetSize =
+          (maxCacheSize * 0.8).toInt(); // Clean up to 80% of limit
 
       for (final file in files) {
         if (currentSize <= targetSize) {
@@ -478,7 +479,8 @@ class ThumbnailService {
 
       if (kDebugMode) {
         final newSize = await _getCacheSize();
-        debugPrint('ThumbnailService: Cache cleanup complete. New size: ${_formatBytes(newSize)}');
+        debugPrint(
+            'ThumbnailService: Cache cleanup complete. New size: ${_formatBytes(newSize)}');
       }
     } catch (e) {
       if (kDebugMode) {

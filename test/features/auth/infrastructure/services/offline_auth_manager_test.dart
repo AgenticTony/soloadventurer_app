@@ -8,8 +8,11 @@ import 'package:soloadventurer/features/auth/infrastructure/services/token_refre
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
+
 class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
+
 class MockTokenRefreshService extends Mock implements TokenRefreshService {}
+
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
@@ -40,8 +43,8 @@ void main() {
         .thenAnswer((_) async => true);
 
     // Setup default token expiration (recent)
-    when(() => mockLocalDataSource.getTokenExpiration())
-        .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+    when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+        (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
     // Setup default isTokenExpired (false)
     when(() => mockLocalDataSource.isTokenExpired())
@@ -65,7 +68,9 @@ void main() {
   });
 
   group('OfflineAuthManager - Initialization', () {
-    test('should initialize with online state when network is connected and has cached credentials', () async {
+    test(
+        'should initialize with online state when network is connected and has cached credentials',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.connected);
@@ -82,7 +87,9 @@ void main() {
       expect(offlineAuthManager.currentState, OfflineAuthState.online);
     });
 
-    test('should initialize with offlineWithCache state when network is disconnected but has cached credentials', () async {
+    test(
+        'should initialize with offlineWithCache state when network is disconnected but has cached credentials',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
@@ -90,8 +97,8 @@ void main() {
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
 
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 2)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 2)));
 
       // Act
       await offlineAuthManager.initialize();
@@ -99,10 +106,13 @@ void main() {
       // Assert
       expect(offlineAuthManager.isOffline, isTrue);
       expect(offlineAuthManager.hasCachedData, isTrue);
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
     });
 
-    test('should initialize with offlineWithoutCache state when network is disconnected and no cached credentials', () async {
+    test(
+        'should initialize with offlineWithoutCache state when network is disconnected and no cached credentials',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
@@ -116,7 +126,8 @@ void main() {
       // Assert
       expect(offlineAuthManager.isOffline, isTrue);
       expect(offlineAuthManager.hasCachedData, isFalse);
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithoutCache);
+      expect(offlineAuthManager.currentState,
+          OfflineAuthState.offlineWithoutCache);
     });
 
     test('should not initialize twice', () async {
@@ -151,7 +162,9 @@ void main() {
       await subscription.cancel();
     });
 
-    test('should consider cached credentials valid if expired less than 7 days ago', () async {
+    test(
+        'should consider cached credentials valid if expired less than 7 days ago',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
@@ -160,17 +173,20 @@ void main() {
           .thenAnswer((_) async => true);
 
       // Token expired 3 days ago (within 7 day limit)
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(days: 3)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(days: 3)));
 
       // Act
       await offlineAuthManager.initialize();
 
       // Assert
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
     });
 
-    test('should consider cached credentials invalid if expired more than 7 days ago', () async {
+    test(
+        'should consider cached credentials invalid if expired more than 7 days ago',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
@@ -179,19 +195,22 @@ void main() {
           .thenAnswer((_) async => true);
 
       // Token expired 10 days ago (beyond 7 day limit)
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(days: 10)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(days: 10)));
 
       // Act
       await offlineAuthManager.initialize();
 
       // Assert
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithoutCache);
+      expect(offlineAuthManager.currentState,
+          OfflineAuthState.offlineWithoutCache);
     });
   });
 
   group('OfflineAuthManager - Connectivity Monitoring', () {
-    test('should transition to offlineWithCache when losing connection with cached credentials', () async {
+    test(
+        'should transition to offlineWithCache when losing connection with cached credentials',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.connected);
@@ -199,8 +218,8 @@ void main() {
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
 
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
       expect(offlineAuthManager.currentState, OfflineAuthState.online);
@@ -214,7 +233,8 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Assert
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
       expect(states.last.state, OfflineAuthState.offlineWithCache);
 
       await subscription.cancel();
@@ -228,11 +248,12 @@ void main() {
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
 
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
 
       final states = <OfflineAuthResult>[];
       final subscription = offlineAuthManager.onStateChanged.listen(states.add);
@@ -310,7 +331,8 @@ void main() {
       // Arrange
       final recentData = {
         'user_id': '123',
-        'cached_at': DateTime.now().subtract(const Duration(hours: 1)).toIso8601String(),
+        'cached_at':
+            DateTime.now().subtract(const Duration(hours: 1)).toIso8601String(),
       };
 
       when(() => mockLocalDataSource.getUserData())
@@ -325,11 +347,14 @@ void main() {
       expect(info.lastCachedAt, isNotNull);
     });
 
-    test('should mark cached data as not fresh if older than 24 hours', () async {
+    test('should mark cached data as not fresh if older than 24 hours',
+        () async {
       // Arrange
       final oldData = {
         'user_id': '123',
-        'cached_at': DateTime.now().subtract(const Duration(hours: 25)).toIso8601String(),
+        'cached_at': DateTime.now()
+            .subtract(const Duration(hours: 25))
+            .toIso8601String(),
       };
 
       when(() => mockLocalDataSource.getUserData())
@@ -367,18 +392,20 @@ void main() {
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
 
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
 
       final states = <OfflineAuthResult>[];
       final subscription = offlineAuthManager.onStateChanged.listen(states.add);
 
       // Act - Simulate reconnection
       connectivityStreamController.add(NetworkStatus.connected);
-      await Future.delayed(const Duration(milliseconds: 1500)); // Wait for sync delay
+      await Future.delayed(
+          const Duration(milliseconds: 1500)); // Wait for sync delay
 
       // Assert
       expect(offlineAuthManager.currentState, OfflineAuthState.online);
@@ -430,8 +457,8 @@ void main() {
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
 
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
       connectivityStreamController.add(NetworkStatus.connected);
@@ -458,7 +485,8 @@ void main() {
       offlineAuthManager.updateState(OfflineAuthState.offlineWithCache);
 
       // Assert
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
       expect(states.last.state, OfflineAuthState.offlineWithCache);
       expect(states.last.success, isTrue);
 
@@ -554,7 +582,8 @@ void main() {
       offlineAuthManager.reset();
 
       // Assert
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithoutCache);
+      expect(offlineAuthManager.currentState,
+          OfflineAuthState.offlineWithoutCache);
     });
   });
 
@@ -628,8 +657,8 @@ void main() {
       when(() => mockLocalDataSource.isTokenExpired())
           .thenAnswer((_) async => true);
 
-      when(() => mockTokenRefreshService.refreshToken())
-          .thenAnswer((_) async => Future.delayed(const Duration(milliseconds: 10)));
+      when(() => mockTokenRefreshService.refreshToken()).thenAnswer(
+          (_) async => Future.delayed(const Duration(milliseconds: 10)));
 
       // Act
       final result = await offlineAuthManager.syncWithServer();
@@ -938,8 +967,11 @@ void main() {
       final now = DateTime.now();
 
       // Assert
-      expect(progress.timestamp.isBefore(now.add(const Duration(seconds: 1))), isTrue);
-      expect(progress.timestamp.isAfter(now.subtract(const Duration(seconds: 1))), isTrue);
+      expect(progress.timestamp.isBefore(now.add(const Duration(seconds: 1))),
+          isTrue);
+      expect(
+          progress.timestamp.isAfter(now.subtract(const Duration(seconds: 1))),
+          isTrue);
     });
 
     test('should use provided timestamp', () {

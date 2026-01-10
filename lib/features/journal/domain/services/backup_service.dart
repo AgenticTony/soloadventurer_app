@@ -1,9 +1,3 @@
-import 'dart:typed_data';
-import '../entities/journal_entry.dart';
-import '../entities/trip.dart';
-import '../entities/media_item.dart';
-import '../entities/tag.dart';
-
 /// Configuration for backup operations
 class BackupConfig {
   /// Whether to include media files (photos/videos)
@@ -276,7 +270,9 @@ class BackupResult {
   /// Get file size in human-readable format
   String get fileSizeReadable {
     if (fileSize < 1024) return '$fileSize B';
-    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    if (fileSize < 1024 * 1024) {
+      return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    }
     if (fileSize < 1024 * 1024 * 1024) {
       return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
@@ -574,7 +570,9 @@ class BackupInfo {
   /// Get file size in human-readable format
   String get fileSizeReadable {
     if (fileSize < 1024) return '$fileSize B';
-    if (fileSize < 1024 * 1024) return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    if (fileSize < 1024 * 1024) {
+      return '${(fileSize / 1024).toStringAsFixed(1)} KB';
+    }
     if (fileSize < 1024 * 1024 * 1024) {
       return '${(fileSize / (1024 * 1024)).toStringAsFixed(1)} MB';
     }
@@ -603,7 +601,8 @@ class BackupException implements Exception {
   String toString() => 'BackupException: $message (code: $code)';
 
   /// Create exception for backup creation failure
-  factory BackupException.backupCreationFailed(String message, [dynamic error]) {
+  factory BackupException.backupCreationFailed(String message,
+      [dynamic error]) {
     return BackupException(
       message: message,
       code: BackupErrorCode.backupCreationFailed,
@@ -652,8 +651,8 @@ class BackupException implements Exception {
     required int availableBytes,
   }) {
     return BackupException(
-      message: 'Insufficient storage space. Required: ${requiredBytes} bytes, '
-          'Available: ${availableBytes} bytes',
+      message: 'Insufficient storage space. Required: $requiredBytes bytes, '
+          'Available: $availableBytes bytes',
       code: BackupErrorCode.insufficientStorage,
     );
   }

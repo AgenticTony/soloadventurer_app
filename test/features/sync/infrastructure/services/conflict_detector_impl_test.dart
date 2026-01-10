@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/entity_version.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/conflict_info.dart';
-import 'package:solo_adventurer_app/features/sync/domain/services/conflict_detector.dart';
-import 'package:solo_adventurer_app/features/sync/infrastructure/services/conflict_detector_impl.dart';
+import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
+import 'package:soloadventurer/features/sync/domain/services/conflict_detector.dart';
+import 'package:soloadventurer/features/sync/infrastructure/services/conflict_detector_impl.dart';
 
 void main() {
   group('ConflictDetectorImpl', () {
@@ -30,7 +30,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(seconds: 5)),
           deviceId: 'device-A',
           dataHash: 'hash-new',
         );
@@ -69,7 +69,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(seconds: 5)),
           deviceId: 'device-B',
           dataHash: 'hash-new',
         );
@@ -85,7 +85,8 @@ void main() {
         expect(conflict.canAutoResolve, true);
       });
 
-      test('should detect conflict when same version has different content', () async {
+      test('should detect conflict when same version has different content',
+          () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
@@ -99,7 +100,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(milliseconds: 500)),
+          lastModified: baseTime.add(const Duration(milliseconds: 500)),
           deviceId: 'device-B',
           dataHash: 'hash-B',
         );
@@ -120,7 +121,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(seconds: 10)),
+          lastModified: baseTime.add(const Duration(seconds: 10)),
           deviceId: 'device-A',
           dataHash: 'hash-A',
         );
@@ -129,7 +130,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 3,
-          lastModified: baseTime.add(Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(seconds: 5)),
           deviceId: 'device-B',
           dataHash: 'hash-B',
         );
@@ -161,7 +162,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(milliseconds: 500)),
+          lastModified: baseTime.add(const Duration(milliseconds: 500)),
           deviceId: 'device-B',
           dataHash: 'hash-B',
         );
@@ -187,7 +188,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 3,
-          lastModified: baseTime.add(Duration(seconds: 10)),
+          lastModified: baseTime.add(const Duration(seconds: 10)),
           deviceId: 'device-B',
         );
 
@@ -232,7 +233,7 @@ void main() {
             entityId: 'entity-1',
             entityType: 'trip',
             version: 2,
-            lastModified: baseTime.add(Duration(milliseconds: 500)),
+            lastModified: baseTime.add(const Duration(milliseconds: 500)),
             deviceId: 'device-B',
             dataHash: 'hash-A2',
           ),
@@ -240,7 +241,7 @@ void main() {
             entityId: 'entity-2',
             entityType: 'trip',
             version: 2,
-            lastModified: baseTime.add(Duration(seconds: 5)),
+            lastModified: baseTime.add(const Duration(seconds: 5)),
             deviceId: 'device-B',
           ),
           EntityVersion(
@@ -268,7 +269,7 @@ void main() {
             entityId: 'entity-1',
             entityType: 'trip',
             version: 2,
-            lastModified: baseTime.add(Duration(seconds: 5)),
+            lastModified: baseTime.add(const Duration(seconds: 5)),
             deviceId: 'device-A',
           ),
         ];
@@ -300,7 +301,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 5,
-          lastModified: baseTime.add(Duration(minutes: 5)),
+          lastModified: baseTime.add(const Duration(minutes: 5)),
           deviceId: 'device-A',
         );
 
@@ -334,7 +335,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(milliseconds: 100)),
+          lastModified: baseTime.add(const Duration(milliseconds: 100)),
           deviceId: 'device-B',
           dataHash: 'hash-B',
         );
@@ -354,7 +355,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 5,
-          lastModified: baseTime.add(Duration(minutes: 5)),
+          lastModified: baseTime.add(const Duration(minutes: 5)),
           deviceId: 'device-A',
         );
 
@@ -375,7 +376,8 @@ void main() {
         expect(conflict.description, contains('are newer'));
       });
 
-      test('should generate appropriate description for concurrent edits', () async {
+      test('should generate appropriate description for concurrent edits',
+          () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
@@ -389,7 +391,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(milliseconds: 500)),
+          lastModified: baseTime.add(const Duration(milliseconds: 500)),
           deviceId: 'device-B',
           dataHash: 'hash-B',
         );
@@ -448,7 +450,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 1,
-          lastModified: baseTime.add(Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(seconds: 5)),
           deviceId: deviceId,
         );
 
@@ -492,7 +494,8 @@ void main() {
         expect(conflict, isNull);
       });
 
-      test('should not detect conflict when same version and content', () async {
+      test('should not detect conflict when same version and content',
+          () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
@@ -506,7 +509,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(Duration(milliseconds: 500)),
+          lastModified: baseTime.add(const Duration(milliseconds: 500)),
           deviceId: 'other-device',
           dataHash: 'same-hash',
         );
@@ -567,9 +570,18 @@ void main() {
       });
 
       test('should compare data equality correctly', () {
-        final data1 = {'key': 'value', 'nested': {'a': 1}};
-        final data2 = {'key': 'value', 'nested': {'a': 1}};
-        final data3 = {'key': 'value', 'nested': {'a': 2}};
+        final data1 = {
+          'key': 'value',
+          'nested': {'a': 1}
+        };
+        final data2 = {
+          'key': 'value',
+          'nested': {'a': 1}
+        };
+        final data3 = {
+          'key': 'value',
+          'nested': {'a': 2}
+        };
 
         expect(ContentHasher.areDataEqual(data1, data2), true);
         expect(ContentHasher.areDataEqual(data1, data3), false);

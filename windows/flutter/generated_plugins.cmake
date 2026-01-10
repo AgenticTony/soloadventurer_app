@@ -3,14 +3,21 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  app_links
   connectivity_plus
   file_selector_windows
   flutter_secure_storage_windows
   geolocator_windows
   platform_device_id_windows
+  printing
+  sentry_flutter
+  share_plus
+  url_launcher_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  flutter_local_notifications_windows
+  jni
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

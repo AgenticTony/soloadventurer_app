@@ -22,7 +22,8 @@ class TripDetailScreen extends ConsumerWidget {
               ? _buildError(context, detailState.error!, ref)
               : detailState.trip == null
                   ? const Center(child: Text('Trip not found'))
-                  : _buildContent(context, detailState.trip!, detailState.entryCount, ref),
+                  : _buildContent(
+                      context, detailState.trip!, detailState.entryCount, ref),
     );
   }
 
@@ -51,7 +52,8 @@ class TripDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, trip, int entryCount, WidgetRef ref) {
+  Widget _buildContent(
+      BuildContext context, trip, int entryCount, WidgetRef ref) {
     final dateFormat = DateFormat('MMM dd, yyyy');
     final theme = Theme.of(context);
 
@@ -100,7 +102,9 @@ class TripDetailScreen extends ConsumerWidget {
 
                 if (result != null) {
                   // Reload trip details
-                  ref.read(tripDetailProvider(tripId).notifier).loadTrip(tripId);
+                  ref
+                      .read(tripDetailProvider(tripId).notifier)
+                      .loadTrip(tripId);
                 }
               },
             ),
@@ -195,7 +199,8 @@ class TripDetailScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Description section
-                if (trip.description != null && trip.description!.isNotEmpty) ...[
+                if (trip.description != null &&
+                    trip.description!.isNotEmpty) ...[
                   _buildSection(
                     context,
                     icon: Icons.description,
@@ -249,7 +254,8 @@ class TripDetailScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TripOverviewScreen(tripId: trip.id),
+                          builder: (context) =>
+                              TripOverviewScreen(tripId: trip.id),
                         ),
                       );
                     },
@@ -269,7 +275,8 @@ class TripDetailScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => TripOverviewScreen(tripId: trip.id),
+                          builder: (context) =>
+                              TripOverviewScreen(tripId: trip.id),
                         ),
                       );
                     },
@@ -388,7 +395,9 @@ class TripDetailScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              final success = await ref.read(tripDetailProvider(tripId).notifier).deleteTrip();
+              final success = await ref
+                  .read(tripDetailProvider(tripId).notifier)
+                  .deleteTrip();
               if (success && context.mounted) {
                 Navigator.pop(context); // Go back to trip list
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -407,7 +416,8 @@ class TripDetailScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDateRange(DateTime startDate, DateTime? endDate, DateFormat format) {
+  String _formatDateRange(
+      DateTime startDate, DateTime? endDate, DateFormat format) {
     final start = format.format(startDate);
     if (endDate == null) {
       return '$start - Present';

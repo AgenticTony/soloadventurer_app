@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/core/services/services.dart';
@@ -159,7 +158,8 @@ class BasicCompressionExample extends StatefulWidget {
   const BasicCompressionExample({super.key});
 
   @override
-  State<BasicCompressionExample> createState() => _BasicCompressionExampleState();
+  State<BasicCompressionExample> createState() =>
+      _BasicCompressionExampleState();
 }
 
 class _BasicCompressionExampleState extends State<BasicCompressionExample> {
@@ -186,7 +186,8 @@ class _BasicCompressionExampleState extends State<BasicCompressionExample> {
               child: const Text('Compress Image'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -259,7 +260,8 @@ class _CompressBytesExampleState extends State<CompressBytesExample> {
               child: const Text('Compress Bytes'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -308,7 +310,8 @@ class BatchCompressionExample extends StatefulWidget {
   const BatchCompressionExample({super.key});
 
   @override
-  State<BatchCompressionExample> createState() => _BatchCompressionExampleState();
+  State<BatchCompressionExample> createState() =>
+      _BatchCompressionExampleState();
 }
 
 class _BatchCompressionExampleState extends State<BatchCompressionExample> {
@@ -335,7 +338,8 @@ class _BatchCompressionExampleState extends State<BatchCompressionExample> {
               child: const Text('Compress Batch'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -436,7 +440,8 @@ class _UseCasePresetsExampleState extends State<UseCasePresetsExample> {
               child: const Text('Thumbnail (75%, 200x200)'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -451,7 +456,8 @@ class _UseCasePresetsExampleState extends State<UseCasePresetsExample> {
 
       // Get recommended settings
       final quality = ImageCompressionService.getQualityForUseCase(useCase);
-      final dimensions = ImageCompressionService.getDimensionsForUseCase(useCase);
+      final dimensions =
+          ImageCompressionService.getDimensionsForUseCase(useCase);
 
       // Compress with use case settings
       final result = await ImageCompressionService.compressFile(
@@ -482,7 +488,8 @@ class FormatConversionExample extends StatefulWidget {
   const FormatConversionExample({super.key});
 
   @override
-  State<FormatConversionExample> createState() => _FormatConversionExampleState();
+  State<FormatConversionExample> createState() =>
+      _FormatConversionExampleState();
 }
 
 class _FormatConversionExampleState extends State<FormatConversionExample> {
@@ -519,7 +526,8 @@ class _FormatConversionExampleState extends State<FormatConversionExample> {
               child: const Text('Convert to WebP'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -561,7 +569,8 @@ class CustomParametersExample extends StatefulWidget {
   const CustomParametersExample({super.key});
 
   @override
-  State<CustomParametersExample> createState() => _CustomParametersExampleState();
+  State<CustomParametersExample> createState() =>
+      _CustomParametersExampleState();
 }
 
 class _CustomParametersExampleState extends State<CustomParametersExample> {
@@ -618,7 +627,8 @@ class _CustomParametersExampleState extends State<CustomParametersExample> {
               child: const Text('Compress'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -686,7 +696,8 @@ class _ErrorHandlingExampleState extends State<ErrorHandlingExample> {
               child: const Text('Demonstrate Error Handling'),
             ),
             const SizedBox(height: 20),
-            const Text('Result:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Result:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(_result),
           ],
@@ -735,7 +746,8 @@ class CompressionStatsExample extends StatefulWidget {
   const CompressionStatsExample({super.key});
 
   @override
-  State<CompressionStatsExample> createState() => _CompressionStatsExampleState();
+  State<CompressionStatsExample> createState() =>
+      _CompressionStatsExampleState();
 }
 
 class _CompressionStatsExampleState extends State<CompressionStatsExample> {
@@ -762,7 +774,8 @@ class _CompressionStatsExampleState extends State<CompressionStatsExample> {
               child: const Text('Compress & Show Statistics'),
             ),
             const SizedBox(height: 20),
-            const Text('Statistics:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text('Statistics:',
+                style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Expanded(
               child: SingleChildScrollView(
@@ -799,9 +812,10 @@ class _CompressionStatsExampleState extends State<CompressionStatsExample> {
         (sum, r) => sum + r.compressedSize,
       );
       final avgSavings = results.fold<double>(
-        0,
-        (sum, r) => sum + r.savingsPercentage,
-      ) / results.length;
+            0,
+            (sum, r) => sum + r.savingsPercentage,
+          ) /
+          results.length;
       final maxSavings = results
           .map((r) => r.savingsPercentage)
           .reduce((a, b) => a > b ? a : b);
@@ -827,10 +841,10 @@ Compression Ratio: ${(totalCompressed / totalOriginal).toStringAsFixed(2)}x
 
 Detailed Results:
 ${results.asMap().entries.map((entry) {
-  final i = entry.key;
-  final r = entry.value;
-  return 'Image ${i + 1}: ${r.formattedOriginalSize} → ${r.formattedCompressedSize} (${r.savingsPercentage.toStringAsFixed(1)}%)';
-}).join('\n')}
+          final i = entry.key;
+          final r = entry.value;
+          return 'Image ${i + 1}: ${r.formattedOriginalSize} → ${r.formattedCompressedSize} (${r.savingsPercentage.toStringAsFixed(1)}%)';
+        }).join('\n')}
 ''';
       });
     } catch (e) {

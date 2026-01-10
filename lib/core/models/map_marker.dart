@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:latlong2/latlong.dart';
 
+// Type alias for backward compatibility
+typedef MapMarkerType = MarkerType;
+
 /// Map marker model for clustering
 ///
 /// Represents a single point of interest on a map with location data
@@ -176,6 +179,9 @@ enum MarkerType {
 
   /// Point of interest marker
   poi,
+
+  /// Shopping/market marker
+  shopping,
 }
 
 /// Map cluster model for grouped markers
@@ -239,14 +245,12 @@ class MapCluster extends Equatable {
       center = LatLng(avgLat, avgLng);
     } else {
       // Simple average center
-      final avgLat = markers
-              .map((m) => m.position.latitude)
-              .reduce((a, b) => a + b) /
-          markers.length;
-      final avgLng = markers
-              .map((m) => m.position.longitude)
-              .reduce((a, b) => a + b) /
-          markers.length;
+      final avgLat =
+          markers.map((m) => m.position.latitude).reduce((a, b) => a + b) /
+              markers.length;
+      final avgLng =
+          markers.map((m) => m.position.longitude).reduce((a, b) => a + b) /
+              markers.length;
       center = LatLng(avgLat, avgLng);
     }
 
@@ -276,6 +280,8 @@ class MapCluster extends Equatable {
       case MarkerType.transport:
         return 1.5;
       case MarkerType.poi:
+        return 2.0;
+      case MarkerType.shopping:
         return 2.0;
       case MarkerType.defaultType:
         return 1.0;

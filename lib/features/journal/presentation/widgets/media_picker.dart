@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -61,7 +60,7 @@ class PickedMediaFile {
 
   @override
   String toString() =>
-      'PickedMediaFile($mediaType, $fileName, ${formattedFileSize})';
+      'PickedMediaFile($mediaType, $fileName, $formattedFileSize)';
 }
 
 /// Configuration for media picker behavior
@@ -290,8 +289,10 @@ class _MediaPickerState extends ConsumerState<MediaPicker> {
     if (files.isEmpty) return;
 
     // Check max items limit
-    if (widget.config.maxItems != null && files.length > widget.config.maxItems!) {
-      _showError('You can only select ${widget.config.maxItems} items at a time');
+    if (widget.config.maxItems != null &&
+        files.length > widget.config.maxItems!) {
+      _showError(
+          'You can only select ${widget.config.maxItems} items at a time');
       return;
     }
 
@@ -311,9 +312,8 @@ class _MediaPickerState extends ConsumerState<MediaPicker> {
 
       // Determine media type
       final mimeType = file.mimeType ?? '';
-      final mediaType = mimeType.startsWith('video')
-          ? MediaType.video
-          : MediaType.photo;
+      final mediaType =
+          mimeType.startsWith('video') ? MediaType.video : MediaType.photo;
 
       pickedFiles.add(PickedMediaFile(
         file: File(file.path),
@@ -354,8 +354,8 @@ class _MediaPickerState extends ConsumerState<MediaPicker> {
     List<PickedMediaFile> files,
   ) async {
     List<PickedMediaFile> compressedFiles = [];
-    final imageCompressor = MediaCompression();
-    final videoCompressor = VideoCompression();
+    const imageCompressor = MediaCompression();
+    const videoCompressor = VideoCompression();
 
     for (final file in files) {
       if (file.isPhoto && widget.config.compressImages) {

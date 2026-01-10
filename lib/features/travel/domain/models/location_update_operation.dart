@@ -27,7 +27,6 @@ class LocationUpdateOperation
   factory LocationUpdateOperation.fromJson(Map<String, dynamic> json) =>
       _$LocationUpdateOperationFromJson(json);
 
-  const LocationUpdateOperation._();
 
   /// Create a new location update operation
   factory LocationUpdateOperation.create({
@@ -81,4 +80,29 @@ class LocationUpdateOperation
         if (lastError != null) 'lastError': lastError,
         'maxRetries': maxRetries,
       };
+
+  @override
+  QueueableOperation withAttemptMetadata({
+    DateTime? lastAttempt,
+    int? attemptCount,
+    String? lastError,
+  }) {
+    return copyWith(
+      lastAttempt: lastAttempt ?? this.lastAttempt,
+      attemptCount: attemptCount ?? this.attemptCount,
+      lastError: lastError ?? this.lastError,
+    );
+  }
+
+  @override
+  QueueableOperation resetForRetry() {
+    return copyWith(
+      lastAttempt: null,
+      attemptCount: 0,
+      lastError: null,
+    );
+  }
+
+  // Private constructor for freezed getters
+  const LocationUpdateOperation._();
 }

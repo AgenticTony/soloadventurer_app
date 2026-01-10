@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,167 +9,116 @@ part of 'trip.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Trip _$TripFromJson(Map<String, dynamic> json) {
-  return _Trip.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Trip {
-  String get id => throw _privateConstructorUsedError;
-  String get userId => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  DateTime get startDate => throw _privateConstructorUsedError;
-  DateTime get endDate => throw _privateConstructorUsedError;
-  String get destination => throw _privateConstructorUsedError;
-  double? get latitude => throw _privateConstructorUsedError;
-  double? get longitude => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
-  int get budget => throw _privateConstructorUsedError;
-  String? get coverImageUrl => throw _privateConstructorUsedError;
-  List<String>? get travelCompanionIds => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime get updatedAt => throw _privateConstructorUsedError;
+  String get id;
+  String get userId;
+  String get title;
+  String? get description;
+  DateTime get startDate;
+  DateTime get endDate;
+  String get destination;
+  double? get latitude;
+  double? get longitude;
+  String get status;
+  int get budget;
+  String? get coverImageUrl;
+  List<String>? get travelCompanionIds;
+  DateTime get createdAt;
+  DateTime get updatedAt;
 
-  /// Serializes this Trip to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  /// List of destination IDs from the destination discovery feature
+  List<String> get destinationIds;
+
+  /// Optional notes for each destination (keyed by destination ID)
+  Map<String, String> get destinationNotes;
+
+  /// Whether this trip was created from destination discovery
+  bool get isFromDiscovery;
 
   /// Create a copy of Trip
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $TripCopyWith<Trip> get copyWith => throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $TripCopyWith<$Res> {
-  factory $TripCopyWith(Trip value, $Res Function(Trip) then) =
-      _$TripCopyWithImpl<$Res, Trip>;
-  @useResult
-  $Res call(
-      {String id,
-      String userId,
-      String title,
-      String? description,
-      DateTime startDate,
-      DateTime endDate,
-      String destination,
-      double? latitude,
-      double? longitude,
-      String status,
-      int budget,
-      String? coverImageUrl,
-      List<String>? travelCompanionIds,
-      DateTime createdAt,
-      DateTime updatedAt});
-}
-
-/// @nodoc
-class _$TripCopyWithImpl<$Res, $Val extends Trip>
-    implements $TripCopyWith<$Res> {
-  _$TripCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of Trip
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $TripCopyWith<Trip> get copyWith =>
+      _$TripCopyWithImpl<Trip>(this as Trip, _$identity);
+
+  /// Serializes this Trip to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? title = null,
-    Object? description = freezed,
-    Object? startDate = null,
-    Object? endDate = null,
-    Object? destination = null,
-    Object? latitude = freezed,
-    Object? longitude = freezed,
-    Object? status = null,
-    Object? budget = null,
-    Object? coverImageUrl = freezed,
-    Object? travelCompanionIds = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      startDate: null == startDate
-          ? _value.startDate
-          : startDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      endDate: null == endDate
-          ? _value.endDate
-          : endDate // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      destination: null == destination
-          ? _value.destination
-          : destination // ignore: cast_nullable_to_non_nullable
-              as String,
-      latitude: freezed == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      longitude: freezed == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double?,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      budget: null == budget
-          ? _value.budget
-          : budget // ignore: cast_nullable_to_non_nullable
-              as int,
-      coverImageUrl: freezed == coverImageUrl
-          ? _value.coverImageUrl
-          : coverImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-      travelCompanionIds: freezed == travelCompanionIds
-          ? _value.travelCompanionIds
-          : travelCompanionIds // ignore: cast_nullable_to_non_nullable
-              as List<String>?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Trip &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.startDate, startDate) ||
+                other.startDate == startDate) &&
+            (identical(other.endDate, endDate) || other.endDate == endDate) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.budget, budget) || other.budget == budget) &&
+            (identical(other.coverImageUrl, coverImageUrl) ||
+                other.coverImageUrl == coverImageUrl) &&
+            const DeepCollectionEquality()
+                .equals(other.travelCompanionIds, travelCompanionIds) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality()
+                .equals(other.destinationIds, destinationIds) &&
+            const DeepCollectionEquality()
+                .equals(other.destinationNotes, destinationNotes) &&
+            (identical(other.isFromDiscovery, isFromDiscovery) ||
+                other.isFromDiscovery == isFromDiscovery));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      title,
+      description,
+      startDate,
+      endDate,
+      destination,
+      latitude,
+      longitude,
+      status,
+      budget,
+      coverImageUrl,
+      const DeepCollectionEquality().hash(travelCompanionIds),
+      createdAt,
+      updatedAt,
+      const DeepCollectionEquality().hash(destinationIds),
+      const DeepCollectionEquality().hash(destinationNotes),
+      isFromDiscovery);
+
+  @override
+  String toString() {
+    return 'Trip(id: $id, userId: $userId, title: $title, description: $description, startDate: $startDate, endDate: $endDate, destination: $destination, latitude: $latitude, longitude: $longitude, status: $status, budget: $budget, coverImageUrl: $coverImageUrl, travelCompanionIds: $travelCompanionIds, createdAt: $createdAt, updatedAt: $updatedAt, destinationIds: $destinationIds, destinationNotes: $destinationNotes, isFromDiscovery: $isFromDiscovery)';
   }
 }
 
 /// @nodoc
-abstract class _$$TripImplCopyWith<$Res> implements $TripCopyWith<$Res> {
-  factory _$$TripImplCopyWith(
-          _$TripImpl value, $Res Function(_$TripImpl) then) =
-      __$$TripImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $TripCopyWith<$Res> {
+  factory $TripCopyWith(Trip value, $Res Function(Trip) _then) =
+      _$TripCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -186,15 +135,18 @@ abstract class _$$TripImplCopyWith<$Res> implements $TripCopyWith<$Res> {
       String? coverImageUrl,
       List<String>? travelCompanionIds,
       DateTime createdAt,
-      DateTime updatedAt});
+      DateTime updatedAt,
+      List<String> destinationIds,
+      Map<String, String> destinationNotes,
+      bool isFromDiscovery});
 }
 
 /// @nodoc
-class __$$TripImplCopyWithImpl<$Res>
-    extends _$TripCopyWithImpl<$Res, _$TripImpl>
-    implements _$$TripImplCopyWith<$Res> {
-  __$$TripImplCopyWithImpl(_$TripImpl _value, $Res Function(_$TripImpl) _then)
-      : super(_value, _then);
+class _$TripCopyWithImpl<$Res> implements $TripCopyWith<$Res> {
+  _$TripCopyWithImpl(this._self, this._then);
+
+  final Trip _self;
+  final $Res Function(Trip) _then;
 
   /// Create a copy of Trip
   /// with the given fields replaced by the non-null parameter values.
@@ -216,76 +168,359 @@ class __$$TripImplCopyWithImpl<$Res>
     Object? travelCompanionIds = freezed,
     Object? createdAt = null,
     Object? updatedAt = null,
+    Object? destinationIds = null,
+    Object? destinationNotes = null,
+    Object? isFromDiscovery = null,
   }) {
-    return _then(_$TripImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       userId: null == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       description: freezed == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
       startDate: null == startDate
-          ? _value.startDate
+          ? _self.startDate
           : startDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
       endDate: null == endDate
-          ? _value.endDate
+          ? _self.endDate
           : endDate // ignore: cast_nullable_to_non_nullable
               as DateTime,
       destination: null == destination
-          ? _value.destination
+          ? _self.destination
           : destination // ignore: cast_nullable_to_non_nullable
               as String,
       latitude: freezed == latitude
-          ? _value.latitude
+          ? _self.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
               as double?,
       longitude: freezed == longitude
-          ? _value.longitude
+          ? _self.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
               as double?,
       status: null == status
-          ? _value.status
+          ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
       budget: null == budget
-          ? _value.budget
+          ? _self.budget
           : budget // ignore: cast_nullable_to_non_nullable
               as int,
       coverImageUrl: freezed == coverImageUrl
-          ? _value.coverImageUrl
+          ? _self.coverImageUrl
           : coverImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
       travelCompanionIds: freezed == travelCompanionIds
-          ? _value._travelCompanionIds
+          ? _self.travelCompanionIds
           : travelCompanionIds // ignore: cast_nullable_to_non_nullable
               as List<String>?,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updatedAt: null == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      destinationIds: null == destinationIds
+          ? _self.destinationIds
+          : destinationIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      destinationNotes: null == destinationNotes
+          ? _self.destinationNotes
+          : destinationNotes // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      isFromDiscovery: null == isFromDiscovery
+          ? _self.isFromDiscovery
+          : isFromDiscovery // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [Trip].
+extension TripPatterns on Trip {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Trip value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Trip() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Trip value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Trip():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Trip value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Trip() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            String title,
+            String? description,
+            DateTime startDate,
+            DateTime endDate,
+            String destination,
+            double? latitude,
+            double? longitude,
+            String status,
+            int budget,
+            String? coverImageUrl,
+            List<String>? travelCompanionIds,
+            DateTime createdAt,
+            DateTime updatedAt,
+            List<String> destinationIds,
+            Map<String, String> destinationNotes,
+            bool isFromDiscovery)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Trip() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.title,
+            _that.description,
+            _that.startDate,
+            _that.endDate,
+            _that.destination,
+            _that.latitude,
+            _that.longitude,
+            _that.status,
+            _that.budget,
+            _that.coverImageUrl,
+            _that.travelCompanionIds,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.destinationIds,
+            _that.destinationNotes,
+            _that.isFromDiscovery);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            String title,
+            String? description,
+            DateTime startDate,
+            DateTime endDate,
+            String destination,
+            double? latitude,
+            double? longitude,
+            String status,
+            int budget,
+            String? coverImageUrl,
+            List<String>? travelCompanionIds,
+            DateTime createdAt,
+            DateTime updatedAt,
+            List<String> destinationIds,
+            Map<String, String> destinationNotes,
+            bool isFromDiscovery)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Trip():
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.title,
+            _that.description,
+            _that.startDate,
+            _that.endDate,
+            _that.destination,
+            _that.latitude,
+            _that.longitude,
+            _that.status,
+            _that.budget,
+            _that.coverImageUrl,
+            _that.travelCompanionIds,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.destinationIds,
+            _that.destinationNotes,
+            _that.isFromDiscovery);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String userId,
+            String title,
+            String? description,
+            DateTime startDate,
+            DateTime endDate,
+            String destination,
+            double? latitude,
+            double? longitude,
+            String status,
+            int budget,
+            String? coverImageUrl,
+            List<String>? travelCompanionIds,
+            DateTime createdAt,
+            DateTime updatedAt,
+            List<String> destinationIds,
+            Map<String, String> destinationNotes,
+            bool isFromDiscovery)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Trip() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.title,
+            _that.description,
+            _that.startDate,
+            _that.endDate,
+            _that.destination,
+            _that.latitude,
+            _that.longitude,
+            _that.status,
+            _that.budget,
+            _that.coverImageUrl,
+            _that.travelCompanionIds,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.destinationIds,
+            _that.destinationNotes,
+            _that.isFromDiscovery);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$TripImpl implements _Trip {
-  const _$TripImpl(
+class _Trip implements Trip {
+  const _Trip(
       {required this.id,
       required this.userId,
       required this.title,
@@ -300,11 +535,14 @@ class _$TripImpl implements _Trip {
       this.coverImageUrl,
       final List<String>? travelCompanionIds,
       required this.createdAt,
-      required this.updatedAt})
-      : _travelCompanionIds = travelCompanionIds;
-
-  factory _$TripImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TripImplFromJson(json);
+      required this.updatedAt,
+      final List<String> destinationIds = const [],
+      final Map<String, String> destinationNotes = const {},
+      this.isFromDiscovery = false})
+      : _travelCompanionIds = travelCompanionIds,
+        _destinationIds = destinationIds,
+        _destinationNotes = destinationNotes;
+  factory _Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
 
   @override
   final String id;
@@ -346,16 +584,55 @@ class _$TripImpl implements _Trip {
   @override
   final DateTime updatedAt;
 
+  /// List of destination IDs from the destination discovery feature
+  final List<String> _destinationIds;
+
+  /// List of destination IDs from the destination discovery feature
   @override
-  String toString() {
-    return 'Trip(id: $id, userId: $userId, title: $title, description: $description, startDate: $startDate, endDate: $endDate, destination: $destination, latitude: $latitude, longitude: $longitude, status: $status, budget: $budget, coverImageUrl: $coverImageUrl, travelCompanionIds: $travelCompanionIds, createdAt: $createdAt, updatedAt: $updatedAt)';
+  @JsonKey()
+  List<String> get destinationIds {
+    if (_destinationIds is EqualUnmodifiableListView) return _destinationIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_destinationIds);
+  }
+
+  /// Optional notes for each destination (keyed by destination ID)
+  final Map<String, String> _destinationNotes;
+
+  /// Optional notes for each destination (keyed by destination ID)
+  @override
+  @JsonKey()
+  Map<String, String> get destinationNotes {
+    if (_destinationNotes is EqualUnmodifiableMapView) return _destinationNotes;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_destinationNotes);
+  }
+
+  /// Whether this trip was created from destination discovery
+  @override
+  @JsonKey()
+  final bool isFromDiscovery;
+
+  /// Create a copy of Trip
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$TripCopyWith<_Trip> get copyWith =>
+      __$TripCopyWithImpl<_Trip>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$TripToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TripImpl &&
+            other is _Trip &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.title, title) || other.title == title) &&
@@ -379,7 +656,13 @@ class _$TripImpl implements _Trip {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality()
+                .equals(other._destinationIds, _destinationIds) &&
+            const DeepCollectionEquality()
+                .equals(other._destinationNotes, _destinationNotes) &&
+            (identical(other.isFromDiscovery, isFromDiscovery) ||
+                other.isFromDiscovery == isFromDiscovery));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -400,79 +683,150 @@ class _$TripImpl implements _Trip {
       coverImageUrl,
       const DeepCollectionEquality().hash(_travelCompanionIds),
       createdAt,
-      updatedAt);
-
-  /// Create a copy of Trip
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @override
-  @pragma('vm:prefer-inline')
-  _$$TripImplCopyWith<_$TripImpl> get copyWith =>
-      __$$TripImplCopyWithImpl<_$TripImpl>(this, _$identity);
+      updatedAt,
+      const DeepCollectionEquality().hash(_destinationIds),
+      const DeepCollectionEquality().hash(_destinationNotes),
+      isFromDiscovery);
 
   @override
-  Map<String, dynamic> toJson() {
-    return _$$TripImplToJson(
-      this,
-    );
+  String toString() {
+    return 'Trip(id: $id, userId: $userId, title: $title, description: $description, startDate: $startDate, endDate: $endDate, destination: $destination, latitude: $latitude, longitude: $longitude, status: $status, budget: $budget, coverImageUrl: $coverImageUrl, travelCompanionIds: $travelCompanionIds, createdAt: $createdAt, updatedAt: $updatedAt, destinationIds: $destinationIds, destinationNotes: $destinationNotes, isFromDiscovery: $isFromDiscovery)';
   }
 }
 
-abstract class _Trip implements Trip {
-  const factory _Trip(
-      {required final String id,
-      required final String userId,
-      required final String title,
-      final String? description,
-      required final DateTime startDate,
-      required final DateTime endDate,
-      required final String destination,
-      final double? latitude,
-      final double? longitude,
-      required final String status,
-      required final int budget,
-      final String? coverImageUrl,
-      final List<String>? travelCompanionIds,
-      required final DateTime createdAt,
-      required final DateTime updatedAt}) = _$TripImpl;
+/// @nodoc
+abstract mixin class _$TripCopyWith<$Res> implements $TripCopyWith<$Res> {
+  factory _$TripCopyWith(_Trip value, $Res Function(_Trip) _then) =
+      __$TripCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String userId,
+      String title,
+      String? description,
+      DateTime startDate,
+      DateTime endDate,
+      String destination,
+      double? latitude,
+      double? longitude,
+      String status,
+      int budget,
+      String? coverImageUrl,
+      List<String>? travelCompanionIds,
+      DateTime createdAt,
+      DateTime updatedAt,
+      List<String> destinationIds,
+      Map<String, String> destinationNotes,
+      bool isFromDiscovery});
+}
 
-  factory _Trip.fromJson(Map<String, dynamic> json) = _$TripImpl.fromJson;
+/// @nodoc
+class __$TripCopyWithImpl<$Res> implements _$TripCopyWith<$Res> {
+  __$TripCopyWithImpl(this._self, this._then);
 
-  @override
-  String get id;
-  @override
-  String get userId;
-  @override
-  String get title;
-  @override
-  String? get description;
-  @override
-  DateTime get startDate;
-  @override
-  DateTime get endDate;
-  @override
-  String get destination;
-  @override
-  double? get latitude;
-  @override
-  double? get longitude;
-  @override
-  String get status;
-  @override
-  int get budget;
-  @override
-  String? get coverImageUrl;
-  @override
-  List<String>? get travelCompanionIds;
-  @override
-  DateTime get createdAt;
-  @override
-  DateTime get updatedAt;
+  final _Trip _self;
+  final $Res Function(_Trip) _then;
 
   /// Create a copy of Trip
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TripImplCopyWith<_$TripImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? userId = null,
+    Object? title = null,
+    Object? description = freezed,
+    Object? startDate = null,
+    Object? endDate = null,
+    Object? destination = null,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? status = null,
+    Object? budget = null,
+    Object? coverImageUrl = freezed,
+    Object? travelCompanionIds = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = null,
+    Object? destinationIds = null,
+    Object? destinationNotes = null,
+    Object? isFromDiscovery = null,
+  }) {
+    return _then(_Trip(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String?,
+      startDate: null == startDate
+          ? _self.startDate
+          : startDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      endDate: null == endDate
+          ? _self.endDate
+          : endDate // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      destination: null == destination
+          ? _self.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as String,
+      latitude: freezed == latitude
+          ? _self.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _self.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      budget: null == budget
+          ? _self.budget
+          : budget // ignore: cast_nullable_to_non_nullable
+              as int,
+      coverImageUrl: freezed == coverImageUrl
+          ? _self.coverImageUrl
+          : coverImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+      travelCompanionIds: freezed == travelCompanionIds
+          ? _self._travelCompanionIds
+          : travelCompanionIds // ignore: cast_nullable_to_non_nullable
+              as List<String>?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: null == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      destinationIds: null == destinationIds
+          ? _self._destinationIds
+          : destinationIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      destinationNotes: null == destinationNotes
+          ? _self._destinationNotes
+          : destinationNotes // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
+      isFromDiscovery: null == isFromDiscovery
+          ? _self.isFromDiscovery
+          : isFromDiscovery // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
 }
+
+// dart format on

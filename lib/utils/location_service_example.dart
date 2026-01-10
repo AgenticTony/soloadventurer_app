@@ -143,10 +143,11 @@ class _LocationServiceExampleState extends State<LocationServiceExample> {
     _locationSubscription = _locationService
         .getLocationUpdates(LocationCaptureConfig.forTravelJournal)
         .listen(
-          (location) {
+      (location) {
         setState(() {
           _currentLocation = location;
-          _statusMessage = 'Location updated: ${location.latitude}, ${location.longitude}';
+          _statusMessage =
+              'Location updated: ${location.latitude}, ${location.longitude}';
         });
       },
       onError: (error) {
@@ -190,7 +191,7 @@ class _LocationServiceExampleState extends State<LocationServiceExample> {
 
     setState(() {
       _statusMessage =
-      'Distance to San Francisco: ${(distance / 1000).toStringAsFixed(2)} km';
+          'Distance to San Francisco: ${(distance / 1000).toStringAsFixed(2)} km';
     });
   }
 
@@ -265,10 +266,10 @@ class _LocationServiceExampleState extends State<LocationServiceExample> {
               onPressed: _isLoading ? null : _captureCurrentLocation,
               child: _isLoading
                   ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Text('Capture Current Location (Best for Travel)'),
             ),
             const SizedBox(height: 8),
@@ -501,10 +502,10 @@ class _JournalLocationExampleState extends State<JournalLocationExample> {
               onPressed: _isCapturing ? null : _captureLocation,
               icon: _isCapturing
                   ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : const Icon(Icons.my_location),
               label: Text(_isCapturing ? 'Capturing...' : 'Capture Location'),
             ),

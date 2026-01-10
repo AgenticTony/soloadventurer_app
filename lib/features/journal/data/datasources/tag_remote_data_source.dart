@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';
 
 /// Remote data source interface for tag operations

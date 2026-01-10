@@ -6,9 +6,9 @@ part of 'trip_planning_operation.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TripPlanningOperationImpl _$$TripPlanningOperationImplFromJson(
+_TripPlanningOperation _$TripPlanningOperationFromJson(
         Map<String, dynamic> json) =>
-    _$TripPlanningOperationImpl(
+    _TripPlanningOperation(
       id: json['id'] as String,
       tripId: json['tripId'] as String,
       planningType:
@@ -32,8 +32,8 @@ _$TripPlanningOperationImpl _$$TripPlanningOperationImplFromJson(
       maxRetries: (json['maxRetries'] as num?)?.toInt() ?? 3,
     );
 
-Map<String, dynamic> _$$TripPlanningOperationImplToJson(
-        _$TripPlanningOperationImpl instance) =>
+Map<String, dynamic> _$TripPlanningOperationToJson(
+        _TripPlanningOperation instance) =>
     <String, dynamic>{
       'id': instance.id,
       'tripId': instance.tripId,

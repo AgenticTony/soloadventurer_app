@@ -1,7 +1,3 @@
-import 'package:soloadventurer/features/travel/domain/models/activity.dart';
-import 'package:soloadventurer/features/travel/domain/models/photo.dart';
-import 'package:soloadventurer/features/travel/domain/models/trip.dart';
-
 /// Test data generators for performance testing with large datasets
 ///
 /// This library provides utilities for generating large amounts of test data
@@ -37,6 +33,10 @@ import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 /// );
 /// ```
 library;
+
+import 'package:soloadventurer/features/travel/domain/models/activity.dart';
+import 'package:soloadventurer/features/travel/domain/models/photo.dart';
+import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 
 /// Generator for performance test data
 class TestDataGenerator {
@@ -120,7 +120,7 @@ class TestDataGenerator {
     String? userId,
   }) {
     final user = userId ?? defaultUserId;
-    final tripId = defaultTripId;
+    const tripId = defaultTripId;
 
     final trip = Trip(
       id: tripId,
@@ -253,7 +253,7 @@ class TestDataGenerator {
         count,
         (index) {
           final random = _RandomSeeded(index: index + allActivities.length);
-          final offset = 0.01; // ~1km radius
+          const offset = 0.01; // ~1km radius
           final lat = centerLat + (random.nextDouble() * 2 - 1) * offset;
           final lon = centerLon + (random.nextDouble() * 2 - 1) * offset;
 
@@ -303,8 +303,8 @@ class TestDataGenerator {
       (index) {
         final random = _RandomSeeded(index: index);
         final ratio = ratios[index % ratios.length];
-        final baseSize = 1920;
-        final width = baseSize;
+        const baseSize = 1920;
+        const width = baseSize;
         final height = (baseSize / ratio).round();
 
         return Photo(
@@ -336,7 +336,7 @@ class TestDataGenerator {
   }) {
     final random = _RandomSeeded(index: index);
 
-    final categories = ActivityCategory.values;
+    const categories = ActivityCategory.values;
     final category = categories[index % categories.length];
 
     final locations = [
@@ -446,7 +446,7 @@ class TestDataGenerator {
   }
 
   static ActivityCategory _getRandomCategory(_RandomSeeded random) {
-    final categories = ActivityCategory.values;
+    const categories = ActivityCategory.values;
     return categories[random.nextInt(categories.length)];
   }
 

@@ -7,7 +7,7 @@
 ///
 /// ### Generate Large Trip Lists
 /// ```dart
-/// import 'package:soloadventurer_test/utils/performance/performance_test_utils.dart';
+/// import 'package:soloadventurer/test/utils/performance/performance_test_utils.dart';
 ///
 /// // Generate 500 trips for list rendering tests
 /// final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);

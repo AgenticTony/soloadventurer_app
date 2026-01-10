@@ -1,3 +1,4 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'dart:async';
 import 'dart:io';
 import 'package:archive/archive.dart';
@@ -15,7 +16,7 @@ import '../../domain/repositories/journal_repository.dart';
 import '../../domain/repositories/trip_repository.dart';
 import '../../domain/repositories/tag_repository.dart';
 import '../../domain/services/backup_service.dart';
-import '../../../core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// Implementation of [BackupService] using local file system
 class BackupServiceImpl implements BackupService {
@@ -85,8 +86,7 @@ class BackupServiceImpl implements BackupService {
       // Generate backup filename
       final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
       final filename = config.customFilename ?? 'backup_$timestamp';
-      final backupPath =
-          outputPath ?? path.join(backupDir, '$filename.zip');
+      final backupPath = outputPath ?? path.join(backupDir, '$filename.zip');
 
       onProgress?.call(const BackupProgress(
         stage: BackupStage.gatheringData,
@@ -170,7 +170,8 @@ class BackupServiceImpl implements BackupService {
             final mediaFile = File(media.localPath);
             if (await mediaFile.exists()) {
               final bytes = await mediaFile.readAsBytes();
-              final archiveFile = ArchiveFile(media.localPath, bytes.length, bytes);
+              final archiveFile =
+                  ArchiveFile(media.localPath, bytes.length, bytes);
               mediaArchive.addFile(archiveFile);
               mediaCount++;
 
@@ -206,7 +207,8 @@ class BackupServiceImpl implements BackupService {
       // Add metadata file
       final metadataJson = _encodeJson(backupData);
       final metadataBytes = const Utf8Encoder().convert(metadataJson);
-      archive.addFile(ArchiveFile('metadata.json', metadataBytes.length, metadataBytes));
+      archive.addFile(
+          ArchiveFile('metadata.json', metadataBytes.length, metadataBytes));
 
       // Add media archive if any
       if (mediaData != null) {
@@ -214,7 +216,8 @@ class BackupServiceImpl implements BackupService {
       }
 
       // Compress archive
-      final zipData = ZipEncoder().encode(archive, level: config.compressionLevel);
+      final zipData =
+          ZipEncoder().encode(archive, level: config.compressionLevel);
 
       onProgress?.call(const BackupProgress(
         stage: BackupStage.compressingData,
@@ -338,7 +341,8 @@ class BackupServiceImpl implements BackupService {
       // Validate backup file exists
       final backupFile = File(backupPath);
       if (!await backupFile.exists()) {
-        throw BackupException.invalidBackupFile('Backup file not found: $backupPath');
+        throw BackupException.invalidBackupFile(
+            'Backup file not found: $backupPath');
       }
 
       // Create pre-restore backup if requested
@@ -421,7 +425,8 @@ class BackupServiceImpl implements BackupService {
         ),
       );
 
-      final metadataJson = String.fromCharCodes(metadataFile.content as List<int>);
+      final metadataJson =
+          String.fromCharCodes(metadataFile.content as List<int>);
       final metadata = _decodeJson(metadataJson) as Map<String, dynamic>;
 
       // Check if entities should be restored
@@ -473,7 +478,8 @@ class BackupServiceImpl implements BackupService {
             final entry = _jsonToEntry(entryJson);
 
             // Handle conflict resolution
-            final existingEntry = await _journalRepository.getEntryById(entry.id);
+            final existingEntry =
+                await _journalRepository.getEntryById(entry.id);
 
             if (existingEntry != null) {
               conflictCount++;
@@ -481,7 +487,8 @@ class BackupServiceImpl implements BackupService {
               bool shouldRestore = false;
               switch (config.conflictResolution) {
                 case ConflictResolution.keepNewest:
-                  shouldRestore = entry.updatedAt.isAfter(existingEntry.updatedAt);
+                  shouldRestore =
+                      entry.updatedAt.isAfter(existingEntry.updatedAt);
                   break;
                 case ConflictResolution.keepBackup:
                   shouldRestore = true;

@@ -116,16 +116,16 @@ class LocationCaptureWidget extends ConsumerWidget {
                     onPressed: creationState.isCapturingLocation
                         ? null
                         : () {
-                      ref
-                          .read(journalEntryCreationProvider.notifier)
-                          .captureCurrentLocation();
-                    },
+                            ref
+                                .read(journalEntryCreationProvider.notifier)
+                                .captureCurrentLocation();
+                          },
                     icon: creationState.isCapturingLocation
                         ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
                         : const Icon(Icons.refresh),
                     label: Text(
                       creationState.isCapturingLocation
@@ -429,55 +429,54 @@ class LocationCaptureButton extends ConsumerWidget {
     return IconButton(
       icon: creationState.isCapturingLocation
           ? const SizedBox(
-        width: 20,
-        height: 20,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      )
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
           : Icon(
-        hasLocation
-            ? capturedIcon ?? Icons.location_on
-            : uncapturedIcon ?? Icons.location_on_outlined,
-        color: hasLocation ? theme.colorScheme.primary : null,
-      ),
+              hasLocation
+                  ? capturedIcon ?? Icons.location_on
+                  : uncapturedIcon ?? Icons.location_on_outlined,
+              color: hasLocation ? theme.colorScheme.primary : null,
+            ),
       onPressed: creationState.isCapturingLocation
           ? null
           : () {
-        if (hasLocation) {
-          // Show confirmation dialog
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Remove Location?'),
-              content: const Text(
-                'Do you want to remove the location from this journal entry?',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    ref
-                        .read(journalEntryCreationProvider.notifier)
-                        .clearLocation();
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Remove'),
-                ),
-              ],
-            ),
-          );
-        } else {
-          // Capture location
-          ref
-              .read(journalEntryCreationProvider.notifier)
-              .captureCurrentLocation();
-        }
-      },
-      tooltip: hasLocation
-          ? 'Remove location'
-          : label ?? 'Add current location',
+              if (hasLocation) {
+                // Show confirmation dialog
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Remove Location?'),
+                    content: const Text(
+                      'Do you want to remove the location from this journal entry?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          ref
+                              .read(journalEntryCreationProvider.notifier)
+                              .clearLocation();
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Remove'),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // Capture location
+                ref
+                    .read(journalEntryCreationProvider.notifier)
+                    .captureCurrentLocation();
+              }
+            },
+      tooltip:
+          hasLocation ? 'Remove location' : label ?? 'Add current location',
     );
   }
 }

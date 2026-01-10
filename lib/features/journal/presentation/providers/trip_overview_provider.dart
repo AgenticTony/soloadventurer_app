@@ -1,7 +1,9 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
-import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
+import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
+
+part 'trip_overview_provider.g.dart';
 
 // ============================================================================
 // Trip Overview State
@@ -52,28 +54,35 @@ class TripOverviewState {
   bool get hasContent => entries.isNotEmpty || mediaItems.isNotEmpty;
 
   /// Entries sorted by date (newest first)
-  List<JournalEntry> get sortedEntries => entries.toList()
-    ..sort((a, b) => b.entryDate.compareTo(a.entryDate));
+  List<JournalEntry> get sortedEntries =>
+      entries.toList()..sort((a, b) => b.entryDate.compareTo(a.entryDate));
 
   /// Media items sorted by created date (newest first)
-  List<MediaItem> get sortedMedia => mediaItems.toList()
-    ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  List<MediaItem> get sortedMedia =>
+      mediaItems.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 }
 
 // ============================================================================
-// Trip Overview Notifier
+// Trip Overview Notifier (Riverpod 3.0)
 // ============================================================================
 
 /// Notifier for managing trip overview state
-class TripOverviewNotifier extends StateNotifier<TripOverviewState> {
-  final JournalRepository _repository;
-  String _currentTripId = '';
-
-  TripOverviewNotifier(this._repository) : super(const TripOverviewState());
+/// MIGRATION: StateNotifier → Notifier pattern with family parameter
+/// - tripId is passed as a parameter to the build() method (family provider)
+/// - Dependencies accessed via ref.watch() in methods
+/// - Automatic provider generation via @riverpod annotation
+/// Usage: ref.watch(tripOverviewProvider(tripId))
+@riverpod
+class TripOverview extends _$TripOverview {
+  @override
+  TripOverviewState build(String tripId) {
+    // Note: We don't call loadTripContent() here to avoid issues during build
+    return const TripOverviewState();
+  }
 
   /// Loads all entries and media for a trip
   Future<void> loadTripContent(String tripId) async {
-    _currentTripId = tripId;
+    final repository = ref.watch(journalRepositoryProvider);
     state = state.copyWith(
       isLoadingEntries: true,
       isLoadingMedia: true,
@@ -83,8 +92,8 @@ class TripOverviewNotifier extends StateNotifier<TripOverviewState> {
     try {
       // Load entries and media in parallel
       final results = await Future.wait([
-        _repository.getEntriesByTrip(tripId),
-        _repository.getMediaForTrip(tripId),
+        repository.getEntriesByTrip(tripId),
+        repository.getMediaForTrip(tripId),
       ]);
 
       final entries = results[0] as List<JournalEntry>;
@@ -106,9 +115,8 @@ class TripOverviewNotifier extends StateNotifier<TripOverviewState> {
   }
 
   /// Reloads the current trip content
-  Future<void> refresh() async {
-    if (_currentTripId.isEmpty) return;
-    await loadTripContent(_currentTripId);
+  Future<void> refresh(String tripId) async {
+    await loadTripContent(tripId);
   }
 
   /// Clears any error state
@@ -116,22 +124,3 @@ class TripOverviewNotifier extends StateNotifier<TripOverviewState> {
     state = state.copyWith(error: null);
   }
 }
-
-// ============================================================================
-// Providers
-// ============================================================================
-
-/// Provides the journal repository
-final journalRepositoryProvider = Provider<JournalRepository>((ref) {
-  // This should be overridden in the main app with the actual implementation
-  throw UnimplementedError('JournalRepository not implemented');
-});
-
-/// Provider for trip overview state (family provider for different trip IDs)
-final tripOverviewProvider = StateNotifierProvider.family<TripOverviewNotifier, TripOverviewState, String>((ref, tripId) {
-  final repository = ref.watch(journalRepositoryProvider);
-  final notifier = TripOverviewNotifier(repository);
-  // Load the trip content immediately
-  Future.microtask(() => notifier.loadTripContent(tripId));
-  return notifier;
-});

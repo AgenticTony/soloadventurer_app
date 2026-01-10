@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/auth_retry_button.dart';
-import 'package:soloadventurer/features/auth/infrastructure/services/auth_error_handler.dart';
 
 /// Screen displayed when network connectivity issues occur
 ///
@@ -42,7 +41,7 @@ class _NetworkErrorScreenState extends ConsumerState<NetworkErrorScreen> {
   Timer? _networkCheckTimer;
 
   /// Whether network is currently available
-  bool _isNetworkAvailable = false;
+  final bool _isNetworkAvailable = false;
 
   @override
   void initState() {
@@ -137,7 +136,8 @@ class _NetworkErrorScreenState extends ConsumerState<NetworkErrorScreen> {
 
                 // Network status indicator
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
                     color: _isNetworkAvailable
                         ? theme.colorScheme.primaryContainer
@@ -156,7 +156,9 @@ class _NetworkErrorScreenState extends ConsumerState<NetworkErrorScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        _isNetworkAvailable ? 'Network Connected' : 'No Connection',
+                        _isNetworkAvailable
+                            ? 'Network Connected'
+                            : 'No Connection',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: _isNetworkAvailable
                               ? theme.colorScheme.onPrimaryContainer
@@ -228,7 +230,8 @@ class _NetworkErrorScreenState extends ConsumerState<NetworkErrorScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.2),

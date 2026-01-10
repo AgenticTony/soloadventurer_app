@@ -1,9 +1,65 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'destination.dart';
-
 part 'destination_filter.freezed.dart';
 part 'destination_filter.g.dart';
+
+/// Budget level for travel destinations
+enum FilterBudgetLevel {
+  /// Budget-friendly options (<$50/day)
+  @JsonValue('budget')
+  budget,
+
+  /// Economy options ($50-100/day)
+  @JsonValue('economy')
+  economy,
+
+  /// Mid-range options ($100-200/day)
+  @JsonValue('mid_range')
+  midRange,
+
+  /// Premium options ($200-400/day)
+  @JsonValue('premium')
+  premium,
+
+  /// Luxury options ($400-800/day)
+  @JsonValue('luxury')
+  luxury,
+
+  /// Ultra-luxury options (>$800/day)
+  @JsonValue('ultra_luxury')
+  ultraLuxury,
+}
+
+/// Activity level for travel destinations
+enum FilterActivityLevel {
+  /// Relaxed pace, minimal physical activity
+  @JsonValue('relaxed')
+  relaxed,
+
+  /// Light physical activity, easy walks
+  @JsonValue('light')
+  light,
+
+  /// Moderate activity, some walking/hiking
+  @JsonValue('moderate')
+  moderate,
+
+  /// Active lifestyle, regular physical activities
+  @JsonValue('active')
+  active,
+
+  /// Intense activities, challenging adventures
+  @JsonValue('intense')
+  intense,
+
+  /// Extreme activities, expert-level adventures
+  @JsonValue('extreme')
+  extreme,
+}
+
+// Type aliases for backward compatibility
+typedef BudgetLevel = FilterBudgetLevel;
+typedef ActivityLevel = FilterActivityLevel;
 
 /// Filter options for destination search
 ///
@@ -68,6 +124,8 @@ class DestinationFilter with _$DestinationFilter {
     /// Used for pagination, defaults to 20
     @Default(20) int limit,
   }) = _DestinationFilter;
+
+  DestinationFilter._();
 
   factory DestinationFilter.fromJson(Map<String, dynamic> json) =>
       _$DestinationFilterFromJson(json);

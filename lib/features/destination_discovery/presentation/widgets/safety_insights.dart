@@ -154,10 +154,11 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
     final categoryIcon = _getCategoryIcon(widget.insight.category);
 
     return Semantics(
-      label: '${widget.insight.category} safety information, ${widget.insight.severity} severity',
+      label:
+          '${widget.insight.category} safety information, ${widget.insight.severity} severity',
       value: _isExpanded ? 'Expanded' : 'Collapsed',
-      hint: 'Double tap to ${_isExpanded ? "collapse" : "expand"} safety details',
-      expandable: true,
+      hint:
+          'Double tap to ${_isExpanded ? "collapse" : "expand"} safety details',
       child: Card(
         elevation: 1,
         shape: RoundedRectangleBorder(
@@ -176,7 +177,7 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
                   _isExpanded = !_isExpanded;
                 });
               },
-              borderRadius: BorderRadius.vertical(
+              borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(12),
               ),
               child: Padding(
@@ -265,7 +266,7 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: severityColor.withOpacity(0.05),
-        borderRadius: BorderRadius.vertical(
+        borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(12),
         ),
       ),

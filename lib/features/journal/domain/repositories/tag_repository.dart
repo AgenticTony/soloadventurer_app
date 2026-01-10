@@ -1,6 +1,6 @@
 import 'package:soloadventurer/core/error/failures.dart';
 import 'package:soloadventurer/features/journal/domain/entities/tag.dart';
-import 'package:dartz/dartz.dart';
+import 'package:fpdart/fpdart.dart';
 
 /// Repository interface for tag operations
 abstract class TagRepository {

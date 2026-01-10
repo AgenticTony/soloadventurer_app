@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:soloadventurer/features/auth/domain/entities/user.dart';
-import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
@@ -290,12 +287,14 @@ class OfflineAuthManager {
   OfflineAuthState get currentState => _currentState;
 
   /// Whether the device is currently offline
-  bool get isOffline => _currentState == OfflineAuthState.offlineWithCache ||
-                       _currentState == OfflineAuthState.offlineWithoutCache;
+  bool get isOffline =>
+      _currentState == OfflineAuthState.offlineWithCache ||
+      _currentState == OfflineAuthState.offlineWithoutCache;
 
   /// Whether the device is currently online
-  bool get isOnline => _currentState == OfflineAuthState.online ||
-                     _currentState == OfflineAuthState.needsSync;
+  bool get isOnline =>
+      _currentState == OfflineAuthState.online ||
+      _currentState == OfflineAuthState.needsSync;
 
   /// Whether cached data is available
   bool get hasCachedData => _currentState == OfflineAuthState.offlineWithCache;
@@ -321,14 +320,17 @@ class OfflineAuthManager {
     try {
       // Check initial network status
       _lastNetworkStatus = await _connectivityService.checkConnectivity();
-      debugPrint('OfflineAuthManager: Initial network status: $_lastNetworkStatus');
+      debugPrint(
+          'OfflineAuthManager: Initial network status: $_lastNetworkStatus');
 
       // Determine if we have cached credentials
       final hasCachedCredentials = await _hasCachedCredentials();
-      debugPrint('OfflineAuthManager: Has cached credentials: $hasCachedCredentials');
+      debugPrint(
+          'OfflineAuthManager: Has cached credentials: $hasCachedCredentials');
 
       // Set initial state
-      _currentState = _determineInitialState(_lastNetworkStatus, hasCachedCredentials);
+      _currentState =
+          _determineInitialState(_lastNetworkStatus, hasCachedCredentials);
       debugPrint('OfflineAuthManager: Initial state: $_currentState');
 
       // Emit initial state
@@ -372,7 +374,8 @@ class OfflineAuthManager {
         try {
           cachedAt = DateTime.parse(cachedAtStr);
         } catch (e) {
-          debugPrint('OfflineAuthManager: Failed to parse cached_at timestamp: $e');
+          debugPrint(
+              'OfflineAuthManager: Failed to parse cached_at timestamp: $e');
         }
       }
 
@@ -443,7 +446,7 @@ class OfflineAuthManager {
       // Allow offline access if access token expired less than 7 days ago
       // (refresh token should still be valid)
       final daysSinceExpiration = DateTime.now().difference(expiration).inDays;
-      final maxOfflineDays = 7;
+      const maxOfflineDays = 7;
 
       final isValid = daysSinceExpiration <= maxOfflineDays;
 
@@ -475,7 +478,8 @@ class OfflineAuthManager {
   void _startConnectivityMonitoring() {
     debugPrint('OfflineAuthManager: Starting connectivity monitoring');
 
-    _connectivitySubscription = _connectivityService.onConnectivityChanged.listen(
+    _connectivitySubscription =
+        _connectivityService.onConnectivityChanged.listen(
       _onConnectivityChanged,
       onError: (error) {
         debugPrint('OfflineAuthManager: Connectivity monitoring error: $error');
@@ -485,7 +489,8 @@ class OfflineAuthManager {
 
   /// Handles network connectivity changes
   void _onConnectivityChanged(NetworkStatus newStatus) {
-    debugPrint('OfflineAuthManager: Connectivity changed from $_lastNetworkStatus to $newStatus');
+    debugPrint(
+        'OfflineAuthManager: Connectivity changed from $_lastNetworkStatus to $newStatus');
 
     if (newStatus == _lastNetworkStatus) {
       debugPrint('OfflineAuthManager: Network status unchanged, skipping');
@@ -498,7 +503,8 @@ class OfflineAuthManager {
     final newState = _handleConnectivityChange(newStatus);
 
     if (newState != _currentState) {
-      debugPrint('OfflineAuthManager: State changing from $_currentState to $newState');
+      debugPrint(
+          'OfflineAuthManager: State changing from $_currentState to $newState');
       _currentState = newState;
       _emitState(OfflineAuthResult.success(state: newState));
 
@@ -608,7 +614,7 @@ class OfflineAuthManager {
 
           try {
             // Refresh the token using TokenRefreshService
-            await _tokenRefreshService!.refreshToken();
+            await _tokenRefreshService.refreshToken();
 
             debugPrint('OfflineAuthManager: Token refreshed successfully');
 
@@ -624,11 +630,13 @@ class OfflineAuthManager {
             // The user might still be able to access cached data
           }
         } else {
-          debugPrint('OfflineAuthManager: Token is still valid, skipping refresh');
+          debugPrint(
+              'OfflineAuthManager: Token is still valid, skipping refresh');
           _emitSyncProgress(SyncProgress.refreshingToken(progress: 40));
         }
       } else {
-        debugPrint('OfflineAuthManager: TokenRefreshService not available, skipping token refresh');
+        debugPrint(
+            'OfflineAuthManager: TokenRefreshService not available, skipping token refresh');
       }
 
       // Step 2: Sync user data from server
@@ -639,7 +647,7 @@ class OfflineAuthManager {
 
         try {
           // Get current user from server
-          final user = await _authRepository!.getCurrentUser();
+          final user = await _authRepository.getCurrentUser();
 
           if (user != null) {
             debugPrint('OfflineAuthManager: User data fetched: ${user.email}');
@@ -669,7 +677,8 @@ class OfflineAuthManager {
           // Cached data might still be available
         }
       } else {
-        debugPrint('OfflineAuthManager: AuthRepository not available, skipping user data sync');
+        debugPrint(
+            'OfflineAuthManager: AuthRepository not available, skipping user data sync');
       }
 
       // Step 3: Sync pending changes (placeholder for future implementation)
@@ -714,7 +723,8 @@ class OfflineAuthManager {
   /// This method can be used to force a state change, for example
   /// after a successful login or logout.
   void updateState(OfflineAuthState newState) {
-    debugPrint('OfflineAuthManager: Manual state update from $_currentState to $newState');
+    debugPrint(
+        'OfflineAuthManager: Manual state update from $_currentState to $newState');
 
     if (newState != _currentState) {
       _currentState = newState;

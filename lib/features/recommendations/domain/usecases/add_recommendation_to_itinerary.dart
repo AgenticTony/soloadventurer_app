@@ -42,6 +42,7 @@ class AddRecommendationToItinerary {
     final metadata = recommendation.metadata;
 
     return ItineraryItem.activity(
+      id: 'rec-${DateTime.now().millisecondsSinceEpoch}',
       time: metadata.suggestedTime.toDateTime(scheduledAt),
       name: activity.name,
       description: activity.description,

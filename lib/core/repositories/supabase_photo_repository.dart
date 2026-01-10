@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/travel/domain/models/photo.dart';
 import '../../features/travel/domain/repositories/photo_repository.dart';
 import '../models/paginated_data.dart';
-import '../models/page_info.dart';
 import 'paginated_repository_mixin.dart';
 
 /// Supabase implementation of PhotoRepository with cursor-based pagination
@@ -51,15 +50,15 @@ import 'paginated_repository_mixin.dart';
 ///
 /// **Note:** This is a placeholder implementation. Actual Supabase queries
 /// will be added when the supabase_flutter package is integrated into the project.
-class SupabasePhotoRepository with PaginatedRepositoryMixin
+class SupabasePhotoRepository
+    with PaginatedRepositoryMixin
     implements PhotoRepository {
   final SupabaseClient _client;
 
   /// Creates a new SupabasePhotoRepository
   ///
   /// The [client] parameter should be an initialized SupabaseClient instance.
-  SupabasePhotoRepository({required SupabaseClient client})
-      : _client = client;
+  SupabasePhotoRepository({required SupabaseClient client}) : _client = client;
 
   @override
   Future<PaginatedData<Photo>> getPhotosCursor({
@@ -82,10 +81,7 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
 
     // Build Supabase query
     // Assuming photos table has a userId foreign key or join table
-    var query = _client
-        .from('photos')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('photos').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -94,7 +90,8 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
 
     // Add additional filters
     if (filters != null) {
-      if (filters.containsKey('hasLocation') && filters['hasLocation'] == true) {
+      if (filters.containsKey('hasLocation') &&
+          filters['hasLocation'] == true) {
         query = query.not('latitude', 'is', null).not('longitude', 'is', null);
       }
       if (filters.containsKey('startDate')) {
@@ -105,7 +102,8 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
       }
       if (filters.containsKey('search')) {
         final searchQuery = filters['search'] as String;
-        query = query.or('caption.ilike.%$searchQuery%,location.ilike.%$searchQuery%');
+        query = query
+            .or('caption.ilike.%$searchQuery%,location.ilike.%$searchQuery%');
       }
     }
 
@@ -113,16 +111,17 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
     if (lastId != null && lastSortValue != null) {
       final sortField = _mapSortField(sortBy);
       if (sortOrder == SortOrder.ascending) {
-        query = query
-            .or('$sortField.gt.$lastSortValue,$sortField.eq.$lastSortValue and id.gt.$lastId');
+        query = query.or(
+            '$sortField.gt.$lastSortValue,$sortField.eq.$lastSortValue and id.gt.$lastId');
       } else {
-        query = query
-            .or('$sortField.lt.$lastSortValue,$sortField.eq.$lastSortValue and id.lt.$lastId');
+        query = query.or(
+            '$sortField.lt.$lastSortValue,$sortField.eq.$lastSortValue and id.lt.$lastId');
       }
     }
 
     // Add ordering
-    query = query.order(_mapSortField(sortBy), ascending: sortOrder == SortOrder.ascending);
+    query = query.order(_mapSortField(sortBy),
+        ascending: sortOrder == SortOrder.ascending);
 
     // Add pagination with limit
     query = query.limit(validatedPageSize);
@@ -187,10 +186,7 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
     final offset = (page - 1) * validatedPageSize;
 
     // Build Supabase query
-    var query = _client
-        .from('photos')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('photos').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -199,7 +195,8 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
 
     // Add additional filters
     if (filters != null) {
-      if (filters.containsKey('hasLocation') && filters['hasLocation'] == true) {
+      if (filters.containsKey('hasLocation') &&
+          filters['hasLocation'] == true) {
         query = query.not('latitude', 'is', null).not('longitude', 'is', null);
       }
       if (filters.containsKey('startDate')) {
@@ -215,7 +212,8 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
     final totalItems = countResponse.count ?? 0;
 
     // Add ordering
-    query = query.order(_mapSortField(sortBy), ascending: sortOrder == SortOrder.ascending);
+    query = query.order(_mapSortField(sortBy),
+        ascending: sortOrder == SortOrder.ascending);
 
     // Add offset and limit
     query = query.range(offset, offset + validatedPageSize - 1);
@@ -312,19 +310,15 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
         .single()
         .catchError((_) => null);
 
-    if (response == null) return null;
-
-    return _mapToPhoto(response as Map<String, dynamic>);
+    return _mapToPhoto(response);
   }
 
   @override
   Future<List<Photo>> getPhotosByIds({required List<String> photoIds}) async {
     if (photoIds.isEmpty) return [];
 
-    final response = await _client
-        .from('photos')
-        .select()
-        .inFilter('id', photoIds);
+    final response =
+        await _client.from('photos').select().inFilter('id', photoIds);
 
     final photosData = response as List<dynamic>;
     return photosData
@@ -336,13 +330,10 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
   Future<Photo> createPhoto({required Photo photo}) async {
     final data = _mapToDatabase(photo);
 
-    final response = await _client
-        .from('photos')
-        .insert(data)
-        .select()
-        .single();
+    final response =
+        await _client.from('photos').insert(data).select().single();
 
-    return _mapToPhoto(response as Map<String, dynamic>);
+    return _mapToPhoto(response);
   }
 
   @override
@@ -359,7 +350,7 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
         .select()
         .single();
 
-    return _mapToPhoto(response as Map<String, dynamic>);
+    return _mapToPhoto(response);
   }
 
   @override
@@ -400,10 +391,7 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
     final offset = (currentPage - 1) * validatedPageSize;
 
     // Build search query using ILIKE
-    var queryBuilder = _client
-        .from('photos')
-        .select()
-        .eq('userId', userId);
+    var queryBuilder = _client.from('photos').select().eq('userId', userId);
 
     if (tripId != null) {
       queryBuilder = queryBuilder.eq('tripId', tripId);
@@ -487,17 +475,15 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
     required String userId,
     Map<String, dynamic>? filters,
   }) async {
-    var query = _client
-        .from('photos')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('photos').select().eq('userId', userId);
 
     if (tripId != null) {
       query = query.eq('tripId', tripId);
     }
 
     if (filters != null) {
-      if (filters.containsKey('hasLocation') && filters['hasLocation'] == true) {
+      if (filters.containsKey('hasLocation') &&
+          filters['hasLocation'] == true) {
         query = query.not('latitude', 'is', null).not('longitude', 'is', null);
       }
     }
@@ -510,11 +496,8 @@ class SupabasePhotoRepository with PaginatedRepositoryMixin
   Future<int> bulkDeletePhotos({required List<String> photoIds}) async {
     if (photoIds.isEmpty) return 0;
 
-    final response = await _client
-        .from('photos')
-        .delete()
-        .inFilter('id', photoIds)
-        .select();
+    final response =
+        await _client.from('photos').delete().inFilter('id', photoIds).select();
 
     return (response as List<dynamic>).length;
   }

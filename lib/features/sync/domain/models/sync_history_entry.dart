@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'sync_status.dart';
 import 'sync_error.dart';
@@ -8,7 +9,7 @@ class SyncHistoryEntry extends Equatable {
   final String id;
 
   /// Status of this sync operation
-  final SyncStatus status;
+  final SyncOperationStatus status;
 
   /// Timestamp when the sync operation started
   final DateTime startedAt;
@@ -47,13 +48,13 @@ class SyncHistoryEntry extends Equatable {
   }
 
   /// Whether this entry represents a successful sync
-  bool get isSuccessful => status == SyncStatus.success;
+  bool get isSuccessful => status == SyncOperationStatus.success;
 
   /// Whether this entry represents a failed sync
-  bool get isFailed => status == SyncStatus.failed;
+  bool get isFailed => status == SyncOperationStatus.failed;
 
   /// Whether this entry represents a sync that's still in progress
-  bool get isInProgress => status == SyncStatus.syncing;
+  bool get isInProgress => status == SyncOperationStatus.syncing;
 
   const SyncHistoryEntry({
     required this.id,
@@ -71,7 +72,7 @@ class SyncHistoryEntry extends Equatable {
   /// Creates a copy of this entry with the given fields replaced
   SyncHistoryEntry copyWith({
     String? id,
-    SyncStatus? status,
+    SyncOperationStatus? status,
     DateTime? startedAt,
     DateTime? completedAt,
     int? successCount,
@@ -104,7 +105,7 @@ class SyncHistoryEntry extends Equatable {
   }) {
     return SyncHistoryEntry(
       id: id,
-      status: SyncStatus.syncing,
+      status: SyncOperationStatus.syncing,
       startedAt: DateTime.now(),
       isManual: isManual,
       connectionType: connectionType,
@@ -123,7 +124,7 @@ class SyncHistoryEntry extends Equatable {
   }) {
     return SyncHistoryEntry(
       id: id,
-      status: SyncStatus.success,
+      status: SyncOperationStatus.success,
       startedAt: startedAt,
       completedAt: DateTime.now(),
       successCount: successCount,
@@ -147,7 +148,7 @@ class SyncHistoryEntry extends Equatable {
   }) {
     return SyncHistoryEntry(
       id: id,
-      status: SyncStatus.failed,
+      status: SyncOperationStatus.failed,
       startedAt: startedAt,
       completedAt: DateTime.now(),
       successCount: successCount,
@@ -212,9 +213,9 @@ class SyncHistoryEntry extends Equatable {
       final statusString = json['status'] as String?;
       if (statusString == null) return null;
 
-      final status = SyncStatus.values.firstWhere(
+      final status = SyncOperationStatus.values.firstWhere(
         (s) => s.name == statusString,
-        orElse: () => SyncStatus.idle,
+        orElse: () => SyncOperationStatus.idle,
       );
 
       // Parse error if present
@@ -252,7 +253,7 @@ class SyncHistoryEntry extends Equatable {
   /// Serialize entry list to JSON string
   static String toJsonString(List<SyncHistoryEntry> entries) {
     final jsonList = entries.map((e) => e.toJson()).toList();
-    return const _JsonEncoder().convert(jsonList);
+    return const JsonEncoder.withIndent('  ').convert(jsonList);
   }
 
   /// Deserialize entry list from JSON string
@@ -260,7 +261,7 @@ class SyncHistoryEntry extends Equatable {
   /// Returns empty list if string is invalid or JSON is malformed
   static List<SyncHistoryEntry> fromJsonString(String jsonString) {
     try {
-      final dynamic decoded = const _JsonDecoder().convert(jsonString);
+      final dynamic decoded = const JsonDecoder().convert(jsonString);
       if (decoded is! List) return [];
 
       final entries = <SyncHistoryEntry>[];
@@ -277,14 +278,4 @@ class SyncHistoryEntry extends Equatable {
       return [];
     }
   }
-}
-
-/// Custom JSON encoder with indentation for better readability
-class _JsonEncoder extends JsonEncoder {
-  const _JsonEncoder() : super.withIndent('  ');
-}
-
-/// Custom JSON decoder
-class _JsonDecoder extends JsonDecoder {
-  const _JsonDecoder();
 }

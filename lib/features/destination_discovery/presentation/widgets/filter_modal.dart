@@ -98,15 +98,29 @@ class _FilterModalState extends ConsumerState<FilterModal> {
     });
   }
 
+  /// Calculate the number of active filters
+  int _calculateActiveFilterCount(DestinationFilter filter) {
+    int count = 0;
+    if (filter.searchQuery != null && filter.searchQuery!.isNotEmpty) count++;
+    if (filter.budgetLevel != null) count++;
+    if (filter.minSafetyScore != null) count++;
+    if (filter.minSoloSuitabilityScore != null) count++;
+    if (filter.activityLevel != null) count++;
+    if (filter.countryCode != null) count++;
+    if (filter.region != null) count++;
+    if (filter.tags != null && filter.tags!.isNotEmpty) count++;
+    return count;
+  }
+
   /// Update budget level filter
-  void _updateBudgetLevel(BudgetLevel? level) {
+  void _updateBudgetLevel(FilterBudgetLevel? level) {
     setState(() {
       _tempFilter = _tempFilter!.copyWith(budgetLevel: level);
     });
   }
 
   /// Update activity level filter
-  void _updateActivityLevel(ActivityLevel? level) {
+  void _updateActivityLevel(FilterActivityLevel? level) {
     setState(() {
       _tempFilter = _tempFilter!.copyWith(activityLevel: level);
     });
@@ -199,7 +213,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 // Budget level section
-                _BudgetLevelSection(
+                _FilterBudgetLevelSection(
                   selectedLevel: currentFilter.budgetLevel,
                   onLevelChanged: _updateBudgetLevel,
                 ),
@@ -223,7 +237,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
                 const SizedBox(height: 24),
 
                 // Activity level section
-                _ActivityLevelSection(
+                _FilterActivityLevelSection(
                   selectedLevel: currentFilter.activityLevel,
                   onLevelChanged: _updateActivityLevel,
                 ),
@@ -309,7 +323,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
               ),
               if (filter.hasActiveFilters)
                 Text(
-                  '${filter.activeFilterCount} active',
+                  '${_calculateActiveFilterCount(filter)} active',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -372,11 +386,11 @@ class _FilterModalState extends ConsumerState<FilterModal> {
 }
 
 /// Budget level filter section
-class _BudgetLevelSection extends StatelessWidget {
-  final BudgetLevel? selectedLevel;
-  final ValueChanged<BudgetLevel?> onLevelChanged;
+class _FilterBudgetLevelSection extends StatelessWidget {
+  final FilterBudgetLevel? selectedLevel;
+  final ValueChanged<FilterBudgetLevel?> onLevelChanged;
 
-  const _BudgetLevelSection({
+  const _FilterBudgetLevelSection({
     required this.selectedLevel,
     required this.onLevelChanged,
   });
@@ -398,7 +412,7 @@ class _BudgetLevelSection extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: BudgetLevel.values.map((level) {
+          children: FilterBudgetLevel.values.map((level) {
             final isSelected = selectedLevel == level;
             return FilterChip(
               label: Row(
@@ -422,25 +436,37 @@ class _BudgetLevelSection extends StatelessWidget {
     );
   }
 
-  String _getBudgetLabel(BudgetLevel level) {
+  String _getBudgetLabel(FilterBudgetLevel level) {
     switch (level) {
-      case BudgetLevel.budget:
+      case FilterBudgetLevel.budget:
         return 'Budget';
-      case BudgetLevel.moderate:
-        return 'Moderate';
-      case BudgetLevel.expensive:
+      case FilterBudgetLevel.economy:
+        return 'Economy';
+      case FilterBudgetLevel.midRange:
+        return 'Mid-Range';
+      case FilterBudgetLevel.premium:
+        return 'Premium';
+      case FilterBudgetLevel.luxury:
         return 'Luxury';
+      case FilterBudgetLevel.ultraLuxury:
+        return 'Ultra Luxury';
     }
   }
 
-  IconData _getBudgetIcon(BudgetLevel level) {
+  IconData _getBudgetIcon(FilterBudgetLevel level) {
     switch (level) {
-      case BudgetLevel.budget:
+      case FilterBudgetLevel.budget:
         return Icons.attach_money;
-      case BudgetLevel.moderate:
+      case FilterBudgetLevel.economy:
+        return Icons.account_balance_wallet;
+      case FilterBudgetLevel.midRange:
         return Icons.money;
-      case BudgetLevel.expensive:
-        return Icons.trending_up;
+      case FilterBudgetLevel.premium:
+        return Icons.stars;
+      case FilterBudgetLevel.luxury:
+        return Icons.diamond;
+      case FilterBudgetLevel.ultraLuxury:
+        return Icons.emoji_events;
     }
   }
 }
@@ -540,7 +566,8 @@ class _SoloSuitabilitySection extends StatelessWidget {
     return Semantics(
       label: 'Solo suitability score filter',
       value: '${minScore.toStringAsFixed(1)} out of 10',
-      hint: 'Adjust slider to set minimum solo suitability score for destinations',
+      hint:
+          'Adjust slider to set minimum solo suitability score for destinations',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -610,11 +637,11 @@ class _SoloSuitabilitySection extends StatelessWidget {
 }
 
 /// Activity level filter section
-class _ActivityLevelSection extends StatelessWidget {
-  final ActivityLevel? selectedLevel;
-  final ValueChanged<ActivityLevel?> onLevelChanged;
+class _FilterActivityLevelSection extends StatelessWidget {
+  final FilterActivityLevel? selectedLevel;
+  final ValueChanged<FilterActivityLevel?> onLevelChanged;
 
-  const _ActivityLevelSection({
+  const _FilterActivityLevelSection({
     required this.selectedLevel,
     required this.onLevelChanged,
   });
@@ -636,7 +663,7 @@ class _ActivityLevelSection extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: ActivityLevel.values.map((level) {
+          children: FilterActivityLevel.values.map((level) {
             final isSelected = selectedLevel == level;
             return FilterChip(
               label: Row(
@@ -660,25 +687,37 @@ class _ActivityLevelSection extends StatelessWidget {
     );
   }
 
-  String _getActivityLabel(ActivityLevel level) {
+  String _getActivityLabel(FilterActivityLevel level) {
     switch (level) {
-      case ActivityLevel.relaxed:
+      case FilterActivityLevel.relaxed:
         return 'Relaxed';
-      case ActivityLevel.moderate:
+      case FilterActivityLevel.light:
+        return 'Light';
+      case FilterActivityLevel.moderate:
         return 'Moderate';
-      case ActivityLevel.adventurous:
-        return 'Adventurous';
+      case FilterActivityLevel.active:
+        return 'Active';
+      case FilterActivityLevel.intense:
+        return 'Intense';
+      case FilterActivityLevel.extreme:
+        return 'Extreme';
     }
   }
 
-  IconData _getActivityIcon(ActivityLevel level) {
+  IconData _getActivityIcon(FilterActivityLevel level) {
     switch (level) {
-      case ActivityLevel.relaxed:
+      case FilterActivityLevel.relaxed:
         return Icons.self_improvement;
-      case ActivityLevel.moderate:
+      case FilterActivityLevel.light:
         return Icons.directions_walk;
-      case ActivityLevel.adventurous:
+      case FilterActivityLevel.moderate:
         return Icons.hiking;
+      case FilterActivityLevel.active:
+        return Icons.terrain;
+      case FilterActivityLevel.intense:
+        return Icons.fire_mode;
+      case FilterActivityLevel.extreme:
+        return Icons.warning;
     }
   }
 }
@@ -712,13 +751,13 @@ class _LocationSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         TextField(
-          decoration: InputDecoration(
+          controller: TextEditingController(text: countryCode),
+          decoration: const InputDecoration(
             labelText: 'Country Code (e.g., JP, US, TH)',
-            prefixIcon: const Icon(Icons.public),
-            border: const OutlineInputBorder(),
+            prefixIcon: Icon(Icons.public),
+            border: OutlineInputBorder(),
             isDense: true,
           ),
-          initialValue: countryCode,
           textCapitalization: TextCapitalization.characters,
           onChanged: (value) {
             onCountryCodeChanged(value.isEmpty ? null : value.toUpperCase());
@@ -726,13 +765,13 @@ class _LocationSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         TextField(
-          decoration: InputDecoration(
+          controller: TextEditingController(text: region),
+          decoration: const InputDecoration(
             labelText: 'Region (e.g., Tokyo, California)',
-            prefixIcon: const Icon(Icons.location_city),
-            border: const OutlineInputBorder(),
+            prefixIcon: Icon(Icons.location_city),
+            border: OutlineInputBorder(),
             isDense: true,
           ),
-          initialValue: region,
           onChanged: (value) {
             onRegionChanged(value.isEmpty ? null : value);
           },
@@ -814,11 +853,11 @@ class _HiddenGemsSection extends StatelessWidget {
     final theme = Theme.of(context);
 
     return SwitchListTile(
-      title: Row(
+      title: const Row(
         children: [
-          const Icon(Icons.diamond, size: 20),
-          const SizedBox(width: 8),
-          const Text('Hidden Gems Only'),
+          Icon(Icons.diamond, size: 20),
+          SizedBox(width: 8),
+          Text('Hidden Gems Only'),
         ],
       ),
       subtitle: Text(
@@ -829,7 +868,7 @@ class _HiddenGemsSection extends StatelessWidget {
       ),
       value: isEnabled,
       onChanged: (_) => onToggled(),
-      activeColor: Colors.amber.shade700,
+      activeThumbColor: Colors.amber.shade700,
     );
   }
 }
@@ -859,11 +898,11 @@ class _SortOrderSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<DestinationSortOrder>(
-          value: selectedOrder,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
+          initialValue: selectedOrder,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
             isDense: true,
-            prefixIcon: const Icon(Icons.sort),
+            prefixIcon: Icon(Icons.sort),
           ),
           items: DestinationSortOrder.values.map((order) {
             return DropdownMenuItem(

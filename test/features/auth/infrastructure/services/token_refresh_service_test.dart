@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -55,7 +54,8 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
       });
@@ -99,9 +99,10 @@ void main() {
 
     test('should handle auth exception and throw', () async {
       // Arrange
-      final error = const AuthException('Refresh failed', code: 'REFRESH_ERROR');
+      const error = AuthException('Refresh failed', code: 'REFRESH_ERROR');
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenThrow(error);
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenThrow(error);
 
       // Act & Assert
       expect(
@@ -133,7 +134,8 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
       });
@@ -166,7 +168,8 @@ void main() {
       );
 
       int callCount = 0;
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         callCount++;
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
@@ -221,7 +224,7 @@ void main() {
   group('TokenRefreshService - Exponential Backoff', () {
     test('should retry with exponential backoff on retryable error', () async {
       // Arrange
-      final networkError = const AuthException(
+      const networkError = AuthException(
         'Network error',
         code: 'NETWORK_ERROR',
       );
@@ -260,7 +263,7 @@ void main() {
       // This tests the private method indirectly through the retry behavior
       // Expected backoff: 1s, 2s, 4s, 8s, 16s, 32s max
 
-      final error = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const error = AuthException('Network error', code: 'NETWORK_ERROR');
       final newSession = AuthSession(
         accessToken: 'new_access_token',
         idToken: 'new_id_token',
@@ -285,7 +288,7 @@ void main() {
 
     test('should not retry on non-retryable errors', () async {
       // Arrange
-      final credentialError = const AuthException(
+      const credentialError = AuthException(
         'Invalid credentials',
         code: 'INVALID_CREDENTIALS',
       );
@@ -312,7 +315,7 @@ void main() {
 
     test('should retry on network timeout errors', () async {
       // Arrange
-      final timeoutError = const AuthException(
+      const timeoutError = AuthException(
         'Request timeout',
         code: 'network_timeout',
       );
@@ -338,7 +341,7 @@ void main() {
 
     test('should exhaust max retry attempts', () async {
       // Arrange
-      final error = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const error = AuthException('Network error', code: 'NETWORK_ERROR');
 
       when(() => mockAuthRepository.performBasicTokenRefresh())
           .thenThrow(error);
@@ -356,7 +359,7 @@ void main() {
     test('should return max retries exceeded error after all attempts fail',
         () async {
       // Arrange
-      final error = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const error = AuthException('Network error', code: 'NETWORK_ERROR');
 
       when(() => mockAuthRepository.performBasicTokenRefresh())
           .thenThrow(error);
@@ -430,9 +433,10 @@ void main() {
 
     test('should emit failure status on failed refresh', () async {
       // Arrange
-      final error = const AuthException('Refresh failed', code: 'REFRESH_ERROR');
+      const error = AuthException('Refresh failed', code: 'REFRESH_ERROR');
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenThrow(error);
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenThrow(error);
 
       final statusEvents = <TokenRefreshResult>[];
       final subscription = refreshService.statusStream.listen(statusEvents.add);
@@ -453,7 +457,7 @@ void main() {
 
     test('should emit multiple in-progress events during retries', () async {
       // Arrange
-      final error = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const error = AuthException('Network error', code: 'NETWORK_ERROR');
 
       when(() => mockAuthRepository.performBasicTokenRefresh())
           .thenThrow(error)
@@ -486,7 +490,7 @@ void main() {
 
     test('should include attempt number in status events', () async {
       // Arrange
-      final error = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const error = AuthException('Network error', code: 'NETWORK_ERROR');
 
       when(() => mockAuthRepository.performBasicTokenRefresh())
           .thenThrow(error)
@@ -513,7 +517,7 @@ void main() {
 
     test('should include total delay in status events', () async {
       // Arrange
-      final error = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const error = AuthException('Network error', code: 'NETWORK_ERROR');
 
       when(() => mockAuthRepository.performBasicTokenRefresh())
           .thenThrow(error)
@@ -577,7 +581,8 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
       });
@@ -607,7 +612,8 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
       });
@@ -660,7 +666,8 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
       });
@@ -685,7 +692,8 @@ void main() {
         expiresAt: DateTime.now().add(const Duration(hours: 1)),
       );
 
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         await Future.delayed(const Duration(milliseconds: 100));
         return newSession;
       });
@@ -786,7 +794,8 @@ void main() {
 
     test('should handle concurrent calls with different error types', () async {
       // Arrange
-      final networkError = const AuthException('Network error', code: 'NETWORK_ERROR');
+      const networkError =
+          AuthException('Network error', code: 'NETWORK_ERROR');
       final newSession = AuthSession(
         accessToken: 'new_access_token',
         idToken: 'new_id_token',
@@ -816,7 +825,7 @@ void main() {
   group('TokenRefreshService - Error Classification', () {
     test('should not retry on INVALID_CREDENTIALS', () async {
       // Arrange
-      final error = const AuthException(
+      const error = AuthException(
         'Invalid credentials',
         code: 'INVALID_CREDENTIALS',
       );
@@ -835,7 +844,7 @@ void main() {
 
     test('should not retry on USER_NOT_FOUND', () async {
       // Arrange
-      final error = const AuthException(
+      const error = AuthException(
         'User not found',
         code: 'USER_NOT_FOUND',
       );
@@ -854,7 +863,7 @@ void main() {
 
     test('should not retry on EMAIL_NOT_VERIFIED', () async {
       // Arrange
-      final error = const AuthException(
+      const error = AuthException(
         'Email not verified',
         code: 'EMAIL_NOT_VERIFIED',
       );
@@ -873,7 +882,7 @@ void main() {
 
     test('should retry on unknown error codes', () async {
       // Arrange
-      final error = const AuthException(
+      const error = AuthException(
         'Unknown error',
         code: 'UNKNOWN_ERROR',
       );
@@ -899,7 +908,7 @@ void main() {
 
     test('should retry on error with null code', () async {
       // Arrange
-      final error = const AuthException('Some error');
+      const error = AuthException('Some error');
 
       final newSession = AuthSession(
         accessToken: 'new_access_token',
@@ -948,7 +957,7 @@ void main() {
 
     test('should create failure result correctly', () {
       // Arrange
-      final error = const AuthException('Refresh failed', code: 'REFRESH_ERROR');
+      const error = AuthException('Refresh failed', code: 'REFRESH_ERROR');
 
       // Act
       final result = TokenRefreshResult.failure(
@@ -1017,7 +1026,8 @@ void main() {
     test('should have correct enum values', () {
       // Assert
       expect(TokenRefreshStatus.values.length, equals(4));
-      expect(TokenRefreshStatus.values, contains(TokenRefreshStatus.inProgress));
+      expect(
+          TokenRefreshStatus.values, contains(TokenRefreshStatus.inProgress));
       expect(TokenRefreshStatus.values, contains(TokenRefreshStatus.success));
       expect(TokenRefreshStatus.values, contains(TokenRefreshStatus.failure));
       expect(TokenRefreshStatus.values, contains(TokenRefreshStatus.cancelled));

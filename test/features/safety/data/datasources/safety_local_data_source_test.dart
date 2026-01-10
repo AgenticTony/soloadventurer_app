@@ -612,8 +612,9 @@ void main() {
 
   group('SafetyLocalDataSourceImpl - Safety Status', () {
     final testStatus = SafetyStatusModel(
+      id: 'test-status-id',
       userId: testUserId,
-      status: SafetyStatusType.safe,
+      statusType: SafetyStatusType.safe,
       timestamp: testDateTime,
     );
 

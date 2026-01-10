@@ -6,15 +6,14 @@ part of 'auth_session.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AuthSessionImpl _$$AuthSessionImplFromJson(Map<String, dynamic> json) =>
-    _$AuthSessionImpl(
+_AuthSession _$AuthSessionFromJson(Map<String, dynamic> json) => _AuthSession(
       accessToken: json['accessToken'] as String,
       idToken: json['idToken'] as String,
       refreshToken: json['refreshToken'] as String,
       expiresAt: DateTime.parse(json['expiresAt'] as String),
     );
 
-Map<String, dynamic> _$$AuthSessionImplToJson(_$AuthSessionImpl instance) =>
+Map<String, dynamic> _$AuthSessionToJson(_AuthSession instance) =>
     <String, dynamic>{
       'accessToken': instance.accessToken,
       'idToken': instance.idToken,

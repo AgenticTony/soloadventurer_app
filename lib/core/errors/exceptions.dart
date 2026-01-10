@@ -1,3 +1,28 @@
+/// Types of authentication errors
+enum AuthErrorType {
+  invalidCredentials,
+  userNotFound,
+  userNotConfirmed,
+  networkError,
+  tokenExpired,
+  invalidToken,
+  unauthorized,
+  unknown,
+  mfaRequired,
+  smsMfaRequired,
+  newPasswordRequired,
+  passwordResetRequired,
+  emailNotVerified,
+  limitExceeded,
+  notAuthorized,
+  invalidCode,
+  codeExpired,
+  invalidPassword,
+  resetFailed,
+  adminSetPasswordError,
+  adminResetPasswordError,
+}
+
 /// Base exception class for application-specific exceptions
 abstract class AppException implements Exception {
   /// Message describing the exception
@@ -109,10 +134,14 @@ class ValidationException extends AppException {
 
 /// Exception thrown when there is a server error (500, 501, 502, 503)
 class ServerException extends AppException {
-  /// Creates a new [ServerException] with the given [message] and optional [code]
+  /// HTTP status code
+  final int? statusCode;
+
+  /// Creates a new [ServerException] with the given [message], optional [code], and optional [statusCode]
   const ServerException({
     required super.message,
     String? code,
+    this.statusCode,
   }) : super(code: code ?? 'server_error');
 }
 
@@ -130,12 +159,16 @@ class AuthException extends AppException {
   /// The original error that caused this exception
   final Object? originalError;
 
-  /// Creates a new [AuthException] with the given [message], optional [originalError], and optional [code]
+  /// The type of authentication error
+  final AuthErrorType? type;
+
+  /// Creates a new [AuthException] with the given [message], optional [originalError], optional [type], and optional [code]
   const AuthException(
     String message, {
     this.originalError,
-    String? code,
-  }) : super(message: message, code: code);
+    this.type,
+    super.code,
+  }) : super(message: message);
 }
 
 /// Exception thrown when there is a cache error
@@ -217,4 +250,76 @@ class ExifException extends AppException {
     required super.message,
     String? code,
   }) : super(code: code ?? 'exif_error');
+}
+
+/// Exception thrown when a database operation fails
+class DatabaseException extends AppException {
+  /// Creates a new [DatabaseException] with the given [message] and optional [code]
+  const DatabaseException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'database_error');
+}
+
+/// Exception thrown when there is a repository/data layer error
+class RepositoryException extends AppException {
+  /// Creates a new [RepositoryException] with the given [message] and optional [code]
+  const RepositoryException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'repository_error');
+}
+
+/// Exception thrown when storage operations fail
+class StorageException extends AppException {
+  /// Creates a new [StorageException] with the given [message] and optional [code]
+  const StorageException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'storage_error');
+}
+
+/// Exception thrown when data operations fail
+class DataException extends AppException {
+  /// Creates a new [DataException] with the given [message] and optional [code]
+  const DataException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'data_error');
+}
+
+/// Exception thrown when permission is denied
+class PermissionException extends AppException {
+  /// Creates a new [PermissionException] with the given [message] and optional [code]
+  const PermissionException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'permission_denied');
+}
+
+/// Exception thrown when configuration is invalid
+class ConfigurationException extends AppException {
+  /// Creates a new [ConfigurationException] with the given [message] and optional [code]
+  const ConfigurationException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'configuration_error');
+}
+
+/// Exception thrown when business logic validation fails
+class BusinessException extends AppException {
+  /// Creates a new [BusinessException] with the given [message] and optional [code]
+  const BusinessException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'business_logic_error');
+}
+
+/// Exception thrown when network operations fail (general network errors)
+class NetworkException extends AppException {
+  /// Creates a new [NetworkException] with the given [message] and optional [code]
+  const NetworkException({
+    required super.message,
+    String? code,
+  }) : super(code: code ?? 'network_error');
 }

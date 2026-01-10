@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
@@ -12,8 +11,11 @@ import 'package:soloadventurer/features/core/domain/services/connectivity_servic
 import 'package:soloadventurer/core/errors/exceptions.dart';
 
 class MockConnectivityService extends Mock implements ConnectivityService {}
+
 class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
+
 class MockAuthRepository extends Mock implements AuthRepository {}
+
 class MockTokenRefreshService extends Mock implements TokenRefreshService {}
 
 /// Integration tests for offline authentication behavior and sync on reconnect
@@ -83,25 +85,30 @@ void main() {
       expect(offlineAuthManager.isOffline, isFalse);
     });
 
-    test('should initialize as offline with cache when disconnected with valid session', () async {
+    test(
+        'should initialize as offline with cache when disconnected with valid session',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       // Act
       await offlineAuthManager.initialize();
 
       // Assert
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithCache));
       expect(offlineAuthManager.isOffline, isTrue);
       expect(offlineAuthManager.hasCachedData, isTrue);
     });
 
-    test('should initialize as offline without cache when disconnected with invalid session', () async {
+    test(
+        'should initialize as offline without cache when disconnected with invalid session',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
@@ -112,7 +119,8 @@ void main() {
       await offlineAuthManager.initialize();
 
       // Assert
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithoutCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithoutCache));
       expect(offlineAuthManager.isOffline, isTrue);
       expect(offlineAuthManager.hasCachedData, isFalse);
     });
@@ -123,8 +131,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.connected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
       expect(offlineAuthManager.currentState, equals(OfflineAuthState.online));
@@ -134,40 +142,46 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Assert
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithCache));
     });
 
-    test('should transition from offline to needsSync on reconnection', () async {
+    test('should transition from offline to needsSync on reconnection',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithCache));
 
       // Act - Simulate reconnection
       connectivityController.add(NetworkStatus.connected);
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Assert
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.needsSync));
+      expect(
+          offlineAuthManager.currentState, equals(OfflineAuthState.needsSync));
     });
 
-    test('should emit state change events on connectivity transitions', () async {
+    test('should emit state change events on connectivity transitions',
+        () async {
       // Arrange
       when(() => mockConnectivityService.checkConnectivity())
           .thenAnswer((_) async => NetworkStatus.connected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       final stateChanges = <OfflineAuthResult>[];
-      final subscription = offlineAuthManager.onStateChanged.listen(stateChanges.add);
+      final subscription =
+          offlineAuthManager.onStateChanged.listen(stateChanges.add);
 
       await offlineAuthManager.initialize();
 
@@ -178,7 +192,8 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 50));
 
       // Assert
-      expect(stateChanges.length, greaterThanOrEqualTo(3)); // online -> offline -> needsSync
+      expect(stateChanges.length,
+          greaterThanOrEqualTo(3)); // online -> offline -> needsSync
       expect(stateChanges[0].state, equals(OfflineAuthState.online));
       expect(stateChanges[1].state, equals(OfflineAuthState.offlineWithCache));
       expect(stateChanges[2].state, equals(OfflineAuthState.needsSync));
@@ -222,7 +237,8 @@ void main() {
       expect(result.isFresh, isTrue); // Cache is fresh (< 24 hours)
     });
 
-    test('should mark cached data as not fresh when older than 24 hours', () async {
+    test('should mark cached data as not fresh when older than 24 hours',
+        () async {
       // Arrange
       final oldCachedUserData = {
         'id': 'user123',
@@ -230,7 +246,9 @@ void main() {
         'username': 'testuser',
         'created_at': DateTime.now().toIso8601String(),
         'last_login_at': DateTime.now().toIso8601String(),
-        'cached_at': DateTime.now().subtract(const Duration(hours: 25)).toIso8601String(),
+        'cached_at': DateTime.now()
+            .subtract(const Duration(hours: 25))
+            .toIso8601String(),
       };
 
       when(() => mockLocalDataSource.getUserData())
@@ -288,7 +306,8 @@ void main() {
         'email': 'test@example.com',
         'username': 'testuser',
         'created_at': DateTime.now().toIso8601String(),
-        'cached_at': DateTime.now().subtract(const Duration(hours: 2)).toIso8601String(),
+        'cached_at':
+            DateTime.now().subtract(const Duration(hours: 2)).toIso8601String(),
       };
 
       when(() => mockLocalDataSource.getUserData())
@@ -311,8 +330,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
 
@@ -364,34 +383,37 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
     });
 
     test('should trigger sync when reconnecting', () async {
       // Arrange
       await offlineAuthManager.initialize();
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithCache));
 
       // Set up mocks for sync
       when(() => mockLocalDataSource.isTokenExpired())
           .thenAnswer((_) async => false);
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
       final syncProgressEvents = <SyncProgress>[];
-      final subscription = offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
+      final subscription =
+          offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
 
       // Act - Reconnect
       connectivityController.add(NetworkStatus.connected);
-      await Future.delayed(const Duration(seconds: 2)); // Wait for sync to complete
+      await Future.delayed(
+          const Duration(seconds: 2)); // Wait for sync to complete
 
       // Assert
       expect(syncProgressEvents.isNotEmpty, isTrue);
@@ -411,23 +433,25 @@ void main() {
           .thenAnswer((_) async {});
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
       final syncProgressEvents = <SyncProgress>[];
-      final subscription = offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
+      final subscription =
+          offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
 
       // Act - Reconnect
       connectivityController.add(NetworkStatus.connected);
       await Future.delayed(const Duration(seconds: 2));
 
       // Assert
-      expect(syncProgressEvents.any((e) => e.step == SyncStep.refreshingToken), isTrue);
+      expect(syncProgressEvents.any((e) => e.step == SyncStep.refreshingToken),
+          isTrue);
       verify(() => mockTokenRefreshService.refreshToken()).called(1);
 
       await subscription.cancel();
@@ -453,14 +477,16 @@ void main() {
           .thenAnswer((_) async {});
 
       final syncProgressEvents = <SyncProgress>[];
-      final subscription = offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
+      final subscription =
+          offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
 
       // Act - Reconnect
       connectivityController.add(NetworkStatus.connected);
       await Future.delayed(const Duration(seconds: 2));
 
       // Assert
-      expect(syncProgressEvents.any((e) => e.step == SyncStep.syncingUserData), isTrue);
+      expect(syncProgressEvents.any((e) => e.step == SyncStep.syncingUserData),
+          isTrue);
       verify(() => mockAuthRepository.getCurrentUser()).called(1);
       verify(() => mockLocalDataSource.cacheUserData(any())).called(1);
 
@@ -477,7 +503,8 @@ void main() {
           .thenThrow(const AuthException.network('Network error'));
 
       final syncProgressEvents = <SyncProgress>[];
-      final subscription = offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
+      final subscription =
+          offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
 
       // Act - Reconnect
       connectivityController.add(NetworkStatus.connected);
@@ -485,7 +512,8 @@ void main() {
 
       // Assert
       expect(syncProgressEvents.any((e) => e.step == SyncStep.failed), isTrue);
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithoutCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithoutCache));
 
       await subscription.cancel();
     });
@@ -496,8 +524,7 @@ void main() {
 
       when(() => mockLocalDataSource.isTokenExpired())
           .thenAnswer((_) async => false);
-      when(() => mockAuthRepository.getCurrentUser())
-          .thenAnswer((_) async {
+      when(() => mockAuthRepository.getCurrentUser()).thenAnswer((_) async {
         await Future.delayed(const Duration(seconds: 1)); // Simulate slow sync
         return User(
           id: 'user123',
@@ -517,7 +544,8 @@ void main() {
       final result = await offlineAuthManager.syncWithServer();
 
       // Assert
-      expect(result.success, isTrue); // Should return success without duplicate sync
+      expect(result.success,
+          isTrue); // Should return success without duplicate sync
       expect(offlineAuthManager.isSyncing, isTrue);
     });
 
@@ -529,16 +557,17 @@ void main() {
           .thenAnswer((_) async => false);
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
       final syncProgressEvents = <SyncProgress>[];
-      final subscription = offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
+      final subscription =
+          offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
 
       // Act - Reconnect
       connectivityController.add(NetworkStatus.connected);
@@ -561,11 +590,12 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
     });
 
-    test('should attempt token refresh on reconnection if token expired', () async {
+    test('should attempt token refresh on reconnection if token expired',
+        () async {
       // Arrange
       await offlineAuthManager.initialize();
 
@@ -575,11 +605,11 @@ void main() {
           .thenAnswer((_) async {});
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
@@ -601,16 +631,17 @@ void main() {
           .thenThrow(const AuthException.network('Token refresh failed'));
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
       final syncProgressEvents = <SyncProgress>[];
-      final subscription = offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
+      final subscription =
+          offlineAuthManager.onSyncProgress.listen(syncProgressEvents.add);
 
       // Act - Reconnect
       connectivityController.add(NetworkStatus.connected);
@@ -618,7 +649,8 @@ void main() {
 
       // Assert
       verify(() => mockTokenRefreshService.refreshToken()).called(1);
-      expect(syncProgressEvents.any((e) => e.step == SyncStep.syncingUserData), isTrue);
+      expect(syncProgressEvents.any((e) => e.step == SyncStep.syncingUserData),
+          isTrue);
       expect(syncProgressEvents.last.step, equals(SyncStep.completed));
 
       await subscription.cancel();
@@ -632,11 +664,11 @@ void main() {
           .thenAnswer((_) async => false); // Token is valid
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
@@ -656,8 +688,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.connected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
 
@@ -665,13 +697,13 @@ void main() {
           .thenAnswer((_) async => false);
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
-      when(() => mockLocalDataSource.cacheUserData(any())
-      ).thenAnswer((_) async {});
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
+      when(() => mockLocalDataSource.cacheUserData(any()))
+          .thenAnswer((_) async {});
 
       // Act - Rapid transitions
       for (int i = 0; i < 3; i++) {
@@ -700,8 +732,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await managerWithoutRefresh.initialize();
 
@@ -709,11 +741,11 @@ void main() {
           .thenAnswer((_) async => true);
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
@@ -723,7 +755,8 @@ void main() {
 
       // Assert - Should still sync user data even without token refresh service
       verify(() => mockAuthRepository.getCurrentUser()).called(1);
-      expect(managerWithoutRefresh.currentState, equals(OfflineAuthState.online));
+      expect(
+          managerWithoutRefresh.currentState, equals(OfflineAuthState.online));
 
       managerWithoutRefresh.dispose();
     });
@@ -741,8 +774,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await managerWithoutRepo.initialize();
 
@@ -773,7 +806,8 @@ void main() {
       );
 
       // State should be offline without cache after failure
-      expect(offlineAuthManager.currentState, equals(OfflineAuthState.offlineWithoutCache));
+      expect(offlineAuthManager.currentState,
+          equals(OfflineAuthState.offlineWithoutCache));
     });
 
     test('should not sync when offline', () async {
@@ -782,8 +816,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.disconnected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
 
@@ -802,7 +836,9 @@ void main() {
         'email': 'test@example.com',
         'username': 'testuser',
         'created_at': DateTime.now().toIso8601String(),
-        'cached_at': DateTime.now().subtract(const Duration(hours: 12)).toIso8601String(),
+        'cached_at': DateTime.now()
+            .subtract(const Duration(hours: 12))
+            .toIso8601String(),
       };
 
       when(() => mockConnectivityService.checkConnectivity())
@@ -851,8 +887,8 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.connected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
 
@@ -861,7 +897,8 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Assert - State should reflect offline with cache for UI indicator
-      expect(offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
+      expect(
+          offlineAuthManager.currentState, OfflineAuthState.offlineWithCache);
       expect(offlineAuthManager.hasCachedData, isTrue);
 
       // Act - Reconnect
@@ -869,11 +906,11 @@ void main() {
           .thenAnswer((_) async => false);
       when(() => mockAuthRepository.getCurrentUser())
           .thenAnswer((_) async => User(
-            id: 'user123',
-            email: 'test@example.com',
-            username: 'testuser',
-            createdAt: DateTime.now(),
-          ));
+                id: 'user123',
+                email: 'test@example.com',
+                username: 'testuser',
+                createdAt: DateTime.now(),
+              ));
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
 
@@ -890,13 +927,14 @@ void main() {
           .thenAnswer((_) async => NetworkStatus.connected);
       when(() => mockLocalDataSource.hasValidSession())
           .thenAnswer((_) async => true);
-      when(() => mockLocalDataSource.getTokenExpiration())
-          .thenAnswer((_) async => DateTime.now().subtract(const Duration(hours: 1)));
+      when(() => mockLocalDataSource.getTokenExpiration()).thenAnswer(
+          (_) async => DateTime.now().subtract(const Duration(hours: 1)));
 
       await offlineAuthManager.initialize();
 
       final stateChanges = <OfflineAuthResult>[];
-      final subscription = offlineAuthManager.onStateChanged.listen(stateChanges.add);
+      final subscription =
+          offlineAuthManager.onStateChanged.listen(stateChanges.add);
 
       // Act - Go offline
       connectivityController.add(NetworkStatus.disconnected);
@@ -907,7 +945,8 @@ void main() {
       expect(stateChanges.last.timestamp, isNotNull);
 
       // Verify timestamp is recent (within last second)
-      final timeSinceTransition = DateTime.now().difference(stateChanges.last.timestamp);
+      final timeSinceTransition =
+          DateTime.now().difference(stateChanges.last.timestamp);
       expect(timeSinceTransition.inSeconds, lessThanOrEqualTo(1));
 
       await subscription.cancel();

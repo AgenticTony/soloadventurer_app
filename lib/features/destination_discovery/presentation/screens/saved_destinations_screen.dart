@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import '../../domain/models/saved_destination.dart';
 import '../../domain/models/destination.dart';
 import '../../application/providers/saved_destinations_provider.dart';
 import '../widgets/add_to_trip_flow.dart';
-import '../widgets/destination_card.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
 import '../utils/error_handler.dart';
@@ -37,7 +36,8 @@ class SavedDestinationsScreen extends ConsumerStatefulWidget {
       _SavedDestinationsScreenState();
 }
 
-class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScreen>
+class _SavedDestinationsScreenState
+    extends ConsumerState<SavedDestinationsScreen>
     with SingleTickerProviderStateMixin {
   /// Tab controller for wishlist/trip tabs
   late TabController _tabController;
@@ -202,7 +202,8 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
     );
 
     if (result != null && mounted) {
-      final savedNotifier = ref.read(savedDestinationsProvider(userId).notifier);
+      final savedNotifier =
+          ref.read(savedDestinationsProvider(userId).notifier);
       try {
         await savedNotifier.updateNotes(savedDest.destination.id, result);
 
@@ -237,7 +238,8 @@ class _SavedDestinationsScreenState extends ConsumerState<SavedDestinationsScree
 
     // Apply tab filter
     if (saveTypeFilter != null) {
-      filtered = filtered.where((item) => item.saveType == saveTypeFilter).toList();
+      filtered =
+          filtered.where((item) => item.saveType == saveTypeFilter).toList();
     } else {
       // Show only trip items in second tab
       filtered = filtered.where((item) => item.isTrip).toList();
@@ -620,7 +622,8 @@ class _SavedDestinationCard extends StatelessWidget {
                         child: Icon(
                           Icons.place,
                           size: 64,
-                          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+                          color: theme.colorScheme.onSurfaceVariant
+                              .withOpacity(0.3),
                         ),
                       );
                     },

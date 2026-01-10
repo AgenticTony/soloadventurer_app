@@ -32,7 +32,10 @@ void main() {
           overall: 9.0,
         ),
         budgetLevel: BudgetLevel.moderate,
-        activityLevels: const [ActivityLevel.moderate, ActivityLevel.adventurous],
+        activityLevels: const [
+          ActivityLevel.moderate,
+          ActivityLevel.adventurous
+        ],
         tags: const ['urban', 'cultural', 'food'],
         images: const [
           'https://example.com/tokyo1.jpg',

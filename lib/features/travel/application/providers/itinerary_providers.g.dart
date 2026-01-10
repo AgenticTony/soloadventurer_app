@@ -6,430 +6,288 @@ part of 'itinerary_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itinerariesHash() => r'42f718cf502d290192c096df1c99cbcf8f9206ba';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// Provider for watching all itineraries
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for ItineraryNotifier - manages itinerary state
+///
+/// Use this provider to watch itinerary state and perform actions.
 ///
 /// Example:
 /// dart
-/// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
+/// // Watch the state
+/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
 ///
+/// // Perform actions
+/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
+///     .toggleItemCompletion('item-');
 ///
-/// Copied from [itineraries].
-@ProviderFor(itineraries)
-const itinerariesProvider = ItinerariesFamily();
 
-/// Provider for watching all itineraries
+@ProviderFor(ItineraryNotifier)
+final itineraryProvider = ItineraryNotifierFamily._();
+
+/// Provider for ItineraryNotifier - manages itinerary state
 ///
-/// Example:
-/// dart
-/// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
-///
-///
-/// Copied from [itineraries].
-class ItinerariesFamily extends Family<AsyncValue<List<ItineraryListState>>> {
-  /// Provider for watching all itineraries
-  ///
-  /// Example:
-  /// dart
-  /// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
-  ///
-  ///
-  /// Copied from [itineraries].
-  const ItinerariesFamily();
-
-  /// Provider for watching all itineraries
-  ///
-  /// Example:
-  /// dart
-  /// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
-  ///
-  ///
-  /// Copied from [itineraries].
-  ItinerariesProvider call(
-    String? userId,
-  ) {
-    return ItinerariesProvider(
-      userId,
-    );
-  }
-
-  @override
-  ItinerariesProvider getProviderOverride(
-    covariant ItinerariesProvider provider,
-  ) {
-    return call(
-      provider.userId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'itinerariesProvider';
-}
-
-/// Provider for watching all itineraries
+/// Use this provider to watch itinerary state and perform actions.
 ///
 /// Example:
 /// dart
-/// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
+/// // Watch the state
+/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
 ///
+/// // Perform actions
+/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
+///     .toggleItemCompletion('item-');
 ///
-/// Copied from [itineraries].
-class ItinerariesProvider
-    extends AutoDisposeFutureProvider<List<ItineraryListState>> {
-  /// Provider for watching all itineraries
+final class ItineraryNotifierProvider
+    extends $AsyncNotifierProvider<ItineraryNotifier, Itinerary> {
+  /// Provider for ItineraryNotifier - manages itinerary state
+  ///
+  /// Use this provider to watch itinerary state and perform actions.
   ///
   /// Example:
   /// dart
-  /// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
+  /// // Watch the state
+  /// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
   ///
+  /// // Perform actions
+  /// ref.read(itineraryNotifierProvider('itinerary-').notifier)
+  ///     .toggleItemCompletion('item-');
   ///
-  /// Copied from [itineraries].
-  ItinerariesProvider(
-    String? userId,
-  ) : this._internal(
-          (ref) => itineraries(
-            ref as ItinerariesRef,
-            userId,
-          ),
-          from: itinerariesProvider,
-          name: r'itinerariesProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$itinerariesHash,
-          dependencies: ItinerariesFamily._dependencies,
-          allTransitiveDependencies:
-              ItinerariesFamily._allTransitiveDependencies,
-          userId: userId,
+  ItineraryNotifierProvider._(
+      {required ItineraryNotifierFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
+          name: r'itineraryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  ItinerariesProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.userId,
-  }) : super.internal();
-
-  final String? userId;
+  @override
+  String debugGetCreateSourceHash() => _$itineraryNotifierHash();
 
   @override
-  Override overrideWith(
-    FutureOr<List<ItineraryListState>> Function(ItinerariesRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: ItinerariesProvider._internal(
-        (ref) => create(ref as ItinerariesRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        userId: userId,
-      ),
-    );
+  String toString() {
+    return r'itineraryProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  AutoDisposeFutureProviderElement<List<ItineraryListState>> createElement() {
-    return _ItinerariesProviderElement(this);
-  }
+  ItineraryNotifier create() => ItineraryNotifier();
 
   @override
   bool operator ==(Object other) {
-    return other is ItinerariesProvider && other.userId == userId;
+    return other is ItineraryNotifierProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, userId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin ItinerariesRef on AutoDisposeFutureProviderRef<List<ItineraryListState>> {
-  /// The parameter `userId` of this provider.
-  String? get userId;
-}
-
-class _ItinerariesProviderElement
-    extends AutoDisposeFutureProviderElement<List<ItineraryListState>>
-    with ItinerariesRef {
-  _ItinerariesProviderElement(super.provider);
-
-  @override
-  String? get userId => (origin as ItinerariesProvider).userId;
 }
 
 String _$itineraryNotifierHash() => r'caff6253c205288079ce9ed274fb7c484f35a13f';
 
-abstract class _$ItineraryNotifier
-    extends BuildlessAutoDisposeAsyncNotifier<Itinerary> {
-  late final String itineraryId;
+/// Provider for ItineraryNotifier - manages itinerary state
+///
+/// Use this provider to watch itinerary state and perform actions.
+///
+/// Example:
+/// dart
+/// // Watch the state
+/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
+///
+/// // Perform actions
+/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
+///     .toggleItemCompletion('item-');
+///
+
+final class ItineraryNotifierFamily extends $Family
+    with
+        $ClassFamilyOverride<ItineraryNotifier, AsyncValue<Itinerary>,
+            Itinerary, FutureOr<Itinerary>, String> {
+  ItineraryNotifierFamily._()
+      : super(
+          retry: null,
+          name: r'itineraryProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Provider for ItineraryNotifier - manages itinerary state
+  ///
+  /// Use this provider to watch itinerary state and perform actions.
+  ///
+  /// Example:
+  /// dart
+  /// // Watch the state
+  /// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
+  ///
+  /// // Perform actions
+  /// ref.read(itineraryNotifierProvider('itinerary-').notifier)
+  ///     .toggleItemCompletion('item-');
+  ///
+
+  ItineraryNotifierProvider call(
+    String itineraryId,
+  ) =>
+      ItineraryNotifierProvider._(argument: itineraryId, from: this);
+
+  @override
+  String toString() => r'itineraryProvider';
+}
+
+/// Provider for ItineraryNotifier - manages itinerary state
+///
+/// Use this provider to watch itinerary state and perform actions.
+///
+/// Example:
+/// dart
+/// // Watch the state
+/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
+///
+/// // Perform actions
+/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
+///     .toggleItemCompletion('item-');
+///
+
+abstract class _$ItineraryNotifier extends $AsyncNotifier<Itinerary> {
+  late final _$args = ref.$arg as String;
+  String get itineraryId => _$args;
 
   FutureOr<Itinerary> build(
     String itineraryId,
   );
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<Itinerary>, Itinerary>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<Itinerary>, Itinerary>,
+        AsyncValue<Itinerary>,
+        Object?,
+        Object?>;
+    element.handleCreate(
+        ref,
+        () => build(
+              _$args,
+            ));
+  }
 }
 
-/// Provider for ItineraryNotifier - manages itinerary state
-///
-/// Use this provider to watch itinerary state and perform actions.
+/// Provider for watching all itineraries
 ///
 /// Example:
 /// dart
-/// // Watch the state
-/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
+/// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
 ///
-/// // Perform actions
-/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
-///     .toggleItemCompletion('item-');
-///
-///
-/// Copied from [ItineraryNotifier].
-@ProviderFor(ItineraryNotifier)
-const itineraryNotifierProvider = ItineraryNotifierFamily();
 
-/// Provider for ItineraryNotifier - manages itinerary state
-///
-/// Use this provider to watch itinerary state and perform actions.
+@ProviderFor(itineraries)
+final itinerariesProvider = ItinerariesFamily._();
+
+/// Provider for watching all itineraries
 ///
 /// Example:
 /// dart
-/// // Watch the state
-/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
+/// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
 ///
-/// // Perform actions
-/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
-///     .toggleItemCompletion('item-');
-///
-///
-/// Copied from [ItineraryNotifier].
-class ItineraryNotifierFamily extends Family<AsyncValue<Itinerary>> {
-  /// Provider for ItineraryNotifier - manages itinerary state
-  ///
-  /// Use this provider to watch itinerary state and perform actions.
+
+final class ItinerariesProvider extends $FunctionalProvider<
+        AsyncValue<List<ItineraryListState>>,
+        List<ItineraryListState>,
+        FutureOr<List<ItineraryListState>>>
+    with
+        $FutureModifier<List<ItineraryListState>>,
+        $FutureProvider<List<ItineraryListState>> {
+  /// Provider for watching all itineraries
   ///
   /// Example:
   /// dart
-  /// // Watch the state
-  /// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
+  /// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
   ///
-  /// // Perform actions
-  /// ref.read(itineraryNotifierProvider('itinerary-').notifier)
-  ///     .toggleItemCompletion('item-');
-  ///
-  ///
-  /// Copied from [ItineraryNotifier].
-  const ItineraryNotifierFamily();
-
-  /// Provider for ItineraryNotifier - manages itinerary state
-  ///
-  /// Use this provider to watch itinerary state and perform actions.
-  ///
-  /// Example:
-  /// dart
-  /// // Watch the state
-  /// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
-  ///
-  /// // Perform actions
-  /// ref.read(itineraryNotifierProvider('itinerary-').notifier)
-  ///     .toggleItemCompletion('item-');
-  ///
-  ///
-  /// Copied from [ItineraryNotifier].
-  ItineraryNotifierProvider call(
-    String itineraryId,
-  ) {
-    return ItineraryNotifierProvider(
-      itineraryId,
-    );
-  }
-
-  @override
-  ItineraryNotifierProvider getProviderOverride(
-    covariant ItineraryNotifierProvider provider,
-  ) {
-    return call(
-      provider.itineraryId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'itineraryNotifierProvider';
-}
-
-/// Provider for ItineraryNotifier - manages itinerary state
-///
-/// Use this provider to watch itinerary state and perform actions.
-///
-/// Example:
-/// dart
-/// // Watch the state
-/// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
-///
-/// // Perform actions
-/// ref.read(itineraryNotifierProvider('itinerary-').notifier)
-///     .toggleItemCompletion('item-');
-///
-///
-/// Copied from [ItineraryNotifier].
-class ItineraryNotifierProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<ItineraryNotifier, Itinerary> {
-  /// Provider for ItineraryNotifier - manages itinerary state
-  ///
-  /// Use this provider to watch itinerary state and perform actions.
-  ///
-  /// Example:
-  /// dart
-  /// // Watch the state
-  /// final state = ref.watch(itineraryNotifierProvider('itinerary-'));
-  ///
-  /// // Perform actions
-  /// ref.read(itineraryNotifierProvider('itinerary-').notifier)
-  ///     .toggleItemCompletion('item-');
-  ///
-  ///
-  /// Copied from [ItineraryNotifier].
-  ItineraryNotifierProvider(
-    String itineraryId,
-  ) : this._internal(
-          () => ItineraryNotifier()..itineraryId = itineraryId,
-          from: itineraryNotifierProvider,
-          name: r'itineraryNotifierProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$itineraryNotifierHash,
-          dependencies: ItineraryNotifierFamily._dependencies,
-          allTransitiveDependencies:
-              ItineraryNotifierFamily._allTransitiveDependencies,
-          itineraryId: itineraryId,
+  ItinerariesProvider._(
+      {required ItinerariesFamily super.from, required String? super.argument})
+      : super(
+          retry: null,
+          name: r'itinerariesProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  ItineraryNotifierProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.itineraryId,
-  }) : super.internal();
-
-  final String itineraryId;
+  @override
+  String debugGetCreateSourceHash() => _$itinerariesHash();
 
   @override
-  FutureOr<Itinerary> runNotifierBuild(
-    covariant ItineraryNotifier notifier,
-  ) {
-    return notifier.build(
-      itineraryId,
-    );
+  String toString() {
+    return r'itinerariesProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  Override overrideWith(ItineraryNotifier Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: ItineraryNotifierProvider._internal(
-        () => create()..itineraryId = itineraryId,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        itineraryId: itineraryId,
-      ),
-    );
-  }
+  $FutureProviderElement<List<ItineraryListState>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<ItineraryNotifier, Itinerary>
-      createElement() {
-    return _ItineraryNotifierProviderElement(this);
+  FutureOr<List<ItineraryListState>> create(Ref ref) {
+    final argument = this.argument as String?;
+    return itineraries(
+      ref,
+      argument,
+    );
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ItineraryNotifierProvider &&
-        other.itineraryId == itineraryId;
+    return other is ItinerariesProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, itineraryId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin ItineraryNotifierRef on AutoDisposeAsyncNotifierProviderRef<Itinerary> {
-  /// The parameter `itineraryId` of this provider.
-  String get itineraryId;
-}
+String _$itinerariesHash() => r'42f718cf502d290192c096df1c99cbcf8f9206ba';
 
-class _ItineraryNotifierProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<ItineraryNotifier,
-        Itinerary> with ItineraryNotifierRef {
-  _ItineraryNotifierProviderElement(super.provider);
+/// Provider for watching all itineraries
+///
+/// Example:
+/// dart
+/// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
+///
+
+final class ItinerariesFamily extends $Family
+    with
+        $FunctionalFamilyOverride<FutureOr<List<ItineraryListState>>, String?> {
+  ItinerariesFamily._()
+      : super(
+          retry: null,
+          name: r'itinerariesProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Provider for watching all itineraries
+  ///
+  /// Example:
+  /// dart
+  /// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
+  ///
+
+  ItinerariesProvider call(
+    String? userId,
+  ) =>
+      ItinerariesProvider._(argument: userId, from: this);
 
   @override
-  String get itineraryId => (origin as ItineraryNotifierProvider).itineraryId;
+  String toString() => r'itinerariesProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

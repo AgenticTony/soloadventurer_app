@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_history_entry.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_status.dart';
-import 'package:solo_adventurer_app/features/sync/domain/services/sync_history_service.dart';
-import 'package:solo_adventurer_app/features/sync/infrastructure/services/sync_history_service_impl.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_history_entry.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_error.dart';
+import 'package:soloadventurer/features/sync/infrastructure/services/sync_history_service_impl.dart';
 
 void main() {
   group('SyncHistoryServiceImpl', () {
@@ -27,7 +27,7 @@ void main() {
         expect(historyService.entries.first.id, 'test-1');
       });
 
-      test('returns entries in reverse chronological order', () async {
+      test('returns entries in reverse insertion order', () async {
         final entry1 = SyncHistoryEntry.start(
           id: 'test-1',
         );
@@ -39,18 +39,22 @@ void main() {
         await Future.delayed(const Duration(milliseconds: 10));
         await historyService.addEntry(entry2);
 
+        // Entries are stored in insertion order (most recently added first)
         expect(historyService.entries.first.id, 'test-2');
         expect(historyService.entries.last.id, 'test-1');
       });
 
       test('removes oldest entry when at max capacity', () async {
+        // Add 12 entries (test-0 through test-11)
         for (var i = 0; i < 12; i++) {
           final entry = SyncHistoryEntry.start(id: 'test-$i');
           await historyService.addEntry(entry);
         }
 
+        // With maxEntries=10, the first 2 entries (test-0, test-1) should be removed
         expect(historyService.entryCount, 10);
-        expect(historyService.entries.last.id, 'test-9');
+        // Entries are in insertion order: [test-11, test-10, ..., test-2]
+        expect(historyService.entries.last.id, 'test-2');
         expect(historyService.entries.first.id, 'test-11');
       });
 
@@ -60,7 +64,7 @@ void main() {
 
         final updated = SyncHistoryEntry(
           id: 'test-1',
-          status: SyncStatus.success,
+          status: SyncOperationStatus.success,
           startedAt: original.startedAt,
           completedAt: DateTime.now(),
           successCount: 10,
@@ -71,7 +75,7 @@ void main() {
         final result = await historyService.updateEntry('test-1', updated);
 
         expect(result, isTrue);
-        expect(historyService.entries.first.status, SyncStatus.success);
+        expect(historyService.entries.first.status, SyncOperationStatus.success);
       });
 
       test('updateEntry returns false for non-existent entry', () async {
@@ -124,6 +128,7 @@ void main() {
               severity: SyncErrorSeverity.high,
               technicalMessage: 'Error',
               userMessage: 'Error',
+              suggestion: 'Try again later',
               occurredAt: DateTime.now(),
             ),
           ),
@@ -141,8 +146,8 @@ void main() {
       });
 
       test('getEntriesByStatus filters correctly', () {
-        final successEntries = historyService.getEntriesByStatus(SyncStatus.success);
-        final failedEntries = historyService.getEntriesByStatus(SyncStatus.failed);
+        final successEntries = historyService.getEntriesByStatus(SyncOperationStatus.success);
+        final failedEntries = historyService.getEntriesByStatus(SyncOperationStatus.failed);
 
         expect(successEntries, hasLength(2));
         expect(failedEntries, hasLength(1));
@@ -159,15 +164,20 @@ void main() {
       test('getAutomaticSyncs returns only automatic syncs', () {
         final auto = historyService.getAutomaticSyncs();
 
-        expect(auto, hasLength(1));
-        expect(auto.first.id, 'auto-1');
+        // Both failed-1 (default isManual=false) and auto-1 (isManual=false) are automatic
+        expect(auto, hasLength(2));
+        expect(auto.any((e) => e.id == 'failed-1'), isTrue);
+        expect(auto.any((e) => e.id == 'auto-1'), isTrue);
       });
 
       test('getLatestEntries returns specified count', () {
         final latest = historyService.getLatestEntries(2);
 
         expect(latest, hasLength(2));
-        expect(latest.first.id, 'success-1');
+        // getLatestEntries returns the first N entries (most recently added)
+        // Entries were added in order: success-1, failed-1, auto-1
+        // So the list is: [auto-1, failed-1, success-1]
+        expect(latest.first.id, 'auto-1');
         expect(latest.last.id, 'failed-1');
       });
     });
@@ -207,6 +217,7 @@ void main() {
               severity: SyncErrorSeverity.high,
               technicalMessage: 'Error',
               userMessage: 'Error',
+              suggestion: 'Try again later',
               occurredAt: DateTime.now(),
             ),
           ),
@@ -278,15 +289,16 @@ void main() {
               severity: SyncErrorSeverity.high,
               technicalMessage: 'Error',
               userMessage: 'Error',
+              suggestion: 'Try again later',
               occurredAt: DateTime.now(),
             ),
           ),
         );
 
-        final deleted = await historyService.deleteEntriesByStatus(SyncStatus.failed);
+        final deleted = await historyService.deleteEntriesByStatus(SyncOperationStatus.failed);
 
         expect(deleted, 1);
-        expect(historyService.getEntriesByStatus(SyncStatus.failed), isEmpty);
+        expect(historyService.getEntriesByStatus(SyncOperationStatus.failed), isEmpty);
       });
 
       test('clearHistory removes all entries', () async {
@@ -317,7 +329,7 @@ void main() {
       });
 
       test('importFromJson adds entries', () async {
-        final json = '''
+        const json = '''
           [
             {
               "id": "imported-1",
@@ -379,6 +391,7 @@ void main() {
           historyService.dispose();
           historyService.dispose();
         }, returnsNormally);
+      });
     });
   });
 }

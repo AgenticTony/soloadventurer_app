@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/core/services/data_unload_strategy.dart';
-import 'package:soloadventurer/core/services/memory_monitor.dart';
 
 /// Example 1: Basic Registration and Tracking
 ///
@@ -196,7 +195,8 @@ class _Example3VisibilityBasedUnloadingState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Example 3: Visibility-Based Unloading')),
+      appBar:
+          AppBar(title: const Text('Example 3: Visibility-Based Unloading')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -298,7 +298,8 @@ class Example5StatisticsMonitoring extends StatefulWidget {
       _Example5StatisticsMonitoringState();
 }
 
-class _Example5StatisticsMonitoringState extends State<Example5StatisticsMonitoring> {
+class _Example5StatisticsMonitoringState
+    extends State<Example5StatisticsMonitoring> {
   String _stats = 'No statistics yet';
 
   void _loadStatistics() {

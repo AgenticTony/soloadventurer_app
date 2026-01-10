@@ -135,7 +135,8 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
   }
 
   /// Builds the header with stats and actions
-  Widget _buildHeader(BuildContext context, ThemeData theme, List<SyncError> displayErrors) {
+  Widget _buildHeader(
+      BuildContext context, ThemeData theme, List<SyncError> displayErrors) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -181,7 +182,8 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
               runSpacing: 8,
               children: [
                 // Retry all retryable errors
-                if (widget.onRetryAll != null && _hasRetryableErrors(displayErrors))
+                if (widget.onRetryAll != null &&
+                    _hasRetryableErrors(displayErrors))
                   FilledButton.tonalIcon(
                     onPressed: widget.onRetryAll,
                     icon: const Icon(Icons.refresh, size: 18),
@@ -205,20 +207,19 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
 
   /// Builds the severity breakdown bar
   Widget _buildSeverityBreakdown(ThemeData theme) {
-    final highCount = widget.errors
-        .where((e) => e.severity == SyncErrorSeverity.high)
-        .length;
+    final highCount =
+        widget.errors.where((e) => e.severity == SyncErrorSeverity.high).length;
     final mediumCount = widget.errors
         .where((e) => e.severity == SyncErrorSeverity.medium)
         .length;
-    final lowCount = widget.errors
-        .where((e) => e.severity == SyncErrorSeverity.low)
-        .length;
+    final lowCount =
+        widget.errors.where((e) => e.severity == SyncErrorSeverity.low).length;
 
     return Row(
       children: [
         if (highCount > 0)
-          _buildSeverityBadge(theme, 'High', highCount, theme.colorScheme.error),
+          _buildSeverityBadge(
+              theme, 'High', highCount, theme.colorScheme.error),
         if (mediumCount > 0) ...[
           if (highCount > 0) const SizedBox(width: 8),
           _buildSeverityBadge(theme, 'Med', mediumCount, Colors.deepOrange),
@@ -232,7 +233,8 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
   }
 
   /// Builds a severity badge
-  Widget _buildSeverityBadge(ThemeData theme, String label, int count, Color color) {
+  Widget _buildSeverityBadge(
+      ThemeData theme, String label, int count, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -257,7 +259,7 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
         border: Border(
           bottom: BorderSide(
             color: theme.dividerColor.withOpacity(0.5),
@@ -314,12 +316,14 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
           // Sort option
           DropdownButton<ErrorSortOption>(
             value: _sortOption,
-            items: ErrorSortOption.values.map(
-              (option) => DropdownMenuItem(
-                value: option,
-                child: Text(_getSortDisplayName(option)),
-              ),
-            ).toList(),
+            items: ErrorSortOption.values
+                .map(
+                  (option) => DropdownMenuItem(
+                    value: option,
+                    child: Text(_getSortDisplayName(option)),
+                  ),
+                )
+                .toList(),
             onChanged: (value) {
               if (value != null) {
                 setState(() => _sortOption = value);
@@ -356,7 +360,8 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
 
     // Apply filters
     if (_selectedSeverity != null) {
-      filtered = filtered.where((e) => e.severity == _selectedSeverity).toList();
+      filtered =
+          filtered.where((e) => e.severity == _selectedSeverity).toList();
     }
     if (_selectedType != null) {
       filtered = filtered.where((e) => e.type == _selectedType).toList();
@@ -371,8 +376,8 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
         filtered.sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
         break;
       case ErrorSortOption.severity:
-        filtered.sort((a, b) => _severityOrder(b.severity)
-            .compareTo(_severityOrder(a.severity)));
+        filtered.sort((a, b) =>
+            _severityOrder(b.severity).compareTo(_severityOrder(a.severity)));
         break;
       case ErrorSortOption.type:
         filtered.sort((a, b) => a.type.name.compareTo(b.type.name));
@@ -403,7 +408,8 @@ class _SyncErrorListViewState extends State<SyncErrorListView> {
   Color _getHighestSeverityColor(ThemeData theme) {
     if (widget.errors.any((e) => e.severity == SyncErrorSeverity.high)) {
       return theme.colorScheme.error;
-    } else if (widget.errors.any((e) => e.severity == SyncErrorSeverity.medium)) {
+    } else if (widget.errors
+        .any((e) => e.severity == SyncErrorSeverity.medium)) {
       return Colors.deepOrange;
     }
     return Colors.orange;

@@ -1,5 +1,6 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:sqflite/sqflite.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 import 'package:soloadventurer/features/journal/data/datasources/database_helper.dart';
 import 'package:soloadventurer/features/journal/data/datasources/tag_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';
@@ -26,7 +27,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
 
       return tag;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to create tag: $e',
       );
     }
@@ -51,10 +52,10 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
       }
 
       return tag;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update tag: $e',
       );
     }
@@ -75,7 +76,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
 
       return _mapToTag(maps.first);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get tag: $e',
       );
     }
@@ -93,7 +94,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
 
       return maps.map(_mapToTag).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get tags: $e',
       );
     }
@@ -113,7 +114,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
 
       return maps.map(_mapToTag).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get tags by sync status: $e',
       );
     }
@@ -135,10 +136,10 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
       );
 
       return await updateTag(updatedTag);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update sync status: $e',
       );
     }
@@ -155,7 +156,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
         whereArgs: [tagId],
       );
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to delete tag: $e',
       );
     }
@@ -176,10 +177,10 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
       );
 
       return await updateTag(updatedTag);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to increment usage count: $e',
       );
     }
@@ -201,10 +202,10 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
       );
 
       return await updateTag(updatedTag);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to decrement usage count: $e',
       );
     }
@@ -216,7 +217,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
       final db = await _databaseHelper.database;
       await db.delete(DatabaseHelper.tableTags);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to clear all tags: $e',
       );
     }

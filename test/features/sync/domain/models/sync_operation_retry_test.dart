@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/sync/domain/entities/sync_entity_type.dart';
-import 'package:solo_adventurer/features/sync/domain/models/sync_operation.dart';
+import 'package:soloadventurer/features/sync/domain/entities/sync_entity_type.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_operation.dart';
 
 void main() {
   group('SyncOperation - Retry Logic', () {
@@ -10,7 +10,7 @@ void main() {
       operation = SyncOperation.create(
         id: 'test-op-1',
         entityType: SyncEntityType.trip,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
     });
 
@@ -22,16 +22,20 @@ void main() {
       });
 
       test('should return false when retry count reaches default max', () {
-        expect(operation.copyWith(retryCount: 5).shouldRetry(), false); // 5 is not < 5
-        expect(operation.copyWith(retryCount: 6).shouldRetry(), false); // 6 is not < 5
+        expect(operation.copyWith(retryCount: 5).shouldRetry(),
+            false); // 5 is not < 5
+        expect(operation.copyWith(retryCount: 6).shouldRetry(),
+            false); // 6 is not < 5
       });
 
       test('should respect custom max attempts', () {
         expect(operation.shouldRetry(3), true); // 0 < 3
         expect(operation.copyWith(retryCount: 1).shouldRetry(3), true); // 1 < 3
         expect(operation.copyWith(retryCount: 2).shouldRetry(3), true); // 2 < 3
-        expect(operation.copyWith(retryCount: 3).shouldRetry(3), false); // 3 is not < 3
-        expect(operation.copyWith(retryCount: 4).shouldRetry(3), false); // 4 is not < 3
+        expect(operation.copyWith(retryCount: 3).shouldRetry(3),
+            false); // 3 is not < 3
+        expect(operation.copyWith(retryCount: 4).shouldRetry(3),
+            false); // 4 is not < 3
       });
 
       test('should handle edge cases', () {
@@ -69,7 +73,8 @@ void main() {
         final op = operation.copyWith(nextRetryAt: now);
 
         // Should be true or very close to true
-        expect(op.isReadyForRetry || op.timeUntilRetry!.inMilliseconds < 100, true);
+        expect(op.isReadyForRetry || op.timeUntilRetry!.inMilliseconds < 100,
+            true);
       });
     });
 
@@ -85,7 +90,8 @@ void main() {
         expect(opWithPastRetry.timeUntilRetry, Duration.zero);
       });
 
-      test('should return positive duration when retry time is in the future', () {
+      test('should return positive duration when retry time is in the future',
+          () {
         final futureTime = DateTime.now().add(const Duration(seconds: 30));
         final opWithFutureRetry = operation.copyWith(nextRetryAt: futureTime);
 
@@ -96,7 +102,8 @@ void main() {
       });
 
       test('should be accurate for short delays', () {
-        final futureTime = DateTime.now().add(const Duration(milliseconds: 500));
+        final futureTime =
+            DateTime.now().add(const Duration(milliseconds: 500));
         final op = operation.copyWith(nextRetryAt: futureTime);
 
         final remaining = op.timeUntilRetry;
@@ -278,14 +285,16 @@ void main() {
         expect(op1.hashCode, equals(op2.hashCode));
       });
 
-      test('should consider operations different with different retry counts', () {
+      test('should consider operations different with different retry counts',
+          () {
         final op1 = operation.copyWith(retryCount: 1);
         final op2 = operation.copyWith(retryCount: 2);
 
         expect(op1, isNot(equals(op2)));
       });
 
-      test('should consider operations different with different nextRetryAt', () {
+      test('should consider operations different with different nextRetryAt',
+          () {
         final nextRetry1 = DateTime(2026, 1, 5, 14, 30);
         final nextRetry2 = DateTime(2026, 1, 5, 15, 30);
         final op1 = operation.copyWith(nextRetryAt: nextRetry1);
@@ -294,7 +303,8 @@ void main() {
         expect(op1, isNot(equals(op2)));
       });
 
-      test('should consider operations different when one has null nextRetryAt', () {
+      test('should consider operations different when one has null nextRetryAt',
+          () {
         final nextRetry = DateTime(2026, 1, 5, 14, 30);
         final op1 = operation.copyWith(nextRetryAt: nextRetry);
         final op2 = operation.copyWith(nextRetryAt: null);

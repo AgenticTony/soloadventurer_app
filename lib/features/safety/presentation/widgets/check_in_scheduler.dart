@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/check_in.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
+import '../state/trusted_contacts_state.dart';
 
 /// Callback type for when a check-in is scheduled
 typedef CheckInScheduledCallback = void Function({
@@ -121,7 +122,7 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final trustedContactsState = ref.watch(trustedContactsNotifierProvider);
+    final trustedContactsState = ref.watch(trustedContactsProvider);
 
     return Form(
       key: _formKey,

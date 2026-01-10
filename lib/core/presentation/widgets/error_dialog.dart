@@ -109,7 +109,7 @@ class ErrorDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceVariant,
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -138,57 +138,63 @@ class ErrorDialog extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (error.technicalMessage != null) ...[
-            Text(
-              'Message:',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            SelectableText(
-              error.technicalMessage!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
-                  ),
-            ),
-            const SizedBox(height: 8),
-          ],
-          if (error.context != null && error.context!.isNotEmpty) ...[
-            Text(
-              'Context:',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 4),
-            SelectableText(
-              error.context.toString(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
-                  ),
-            ),
-          ],
-          if (error.id != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              'Error ID: ${error.id}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    fontFamily: 'monospace',
-                  ),
-            ),
-          ],
-        ],
-      ),
-    )
-    ],
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withOpacity(0.5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (error.technicalMessage != null) ...[
+                Text(
+                  'Message:',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                SelectableText(
+                  error.technicalMessage!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontFamily: 'monospace',
+                      ),
+                ),
+                const SizedBox(height: 8),
+              ],
+              if (error.context != null && error.context!.isNotEmpty) ...[
+                Text(
+                  'Context:',
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                SelectableText(
+                  error.context.toString(),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontFamily: 'monospace',
+                      ),
+                ),
+              ],
+              ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Error ID: ${error.id}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.5),
+                        fontFamily: 'monospace',
+                      ),
+                ),
+              ],
+            ],
+          ),
+        )
+      ],
     );
   }
 
@@ -298,7 +304,7 @@ class _ActionButton extends StatelessWidget {
     return Material(
       color: isPrimary
           ? colorScheme.primary.withOpacity(0.1)
-          : colorScheme.surfaceVariant,
+          : colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onTap,
@@ -329,7 +335,8 @@ class _ActionButton extends StatelessWidget {
                     Text(
                       label,
                       style: theme.textTheme.labelLarge?.copyWith(
-                        fontWeight: isPrimary ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            isPrimary ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                     if (description != null)

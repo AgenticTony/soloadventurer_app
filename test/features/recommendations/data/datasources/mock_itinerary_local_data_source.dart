@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/itinerary_local_data_source.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary_item.dart';

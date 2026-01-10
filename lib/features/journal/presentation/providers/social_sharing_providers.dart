@@ -9,7 +9,7 @@ part 'social_sharing_providers.g.dart';
 
 /// Provider for the social sharing service
 @Riverpod(keepAlive: true)
-SocialSharingService socialSharingService(SocialSharingServiceRef ref) {
+SocialSharingService socialSharingService(Ref ref) {
   return SocialSharingServiceImpl();
 }
 
@@ -19,7 +19,7 @@ class SocialSharingState {
   final SocialSharingStatus status;
 
   /// Share result if available
-  final ShareResult? result;
+  final JournalShareResult? result;
 
   /// Error message if share failed
   final String? error;
@@ -59,7 +59,7 @@ class SocialSharingState {
   /// Copy with method
   SocialSharingState copyWith({
     SocialSharingStatus? status,
-    ShareResult? result,
+    JournalShareResult? result,
     String? error,
     DateTime? startedAt,
     DateTime? completedAt,
@@ -297,7 +297,9 @@ class SocialSharingNotifier extends _$SocialSharingNotifier {
   void clearError() {
     state = state.copyWith(
       error: null,
-      status: state.result != null ? SocialSharingStatus.success : SocialSharingStatus.idle,
+      status: state.result != null
+          ? SocialSharingStatus.success
+          : SocialSharingStatus.idle,
     );
   }
 }
@@ -305,7 +307,7 @@ class SocialSharingNotifier extends _$SocialSharingNotifier {
 /// Provider for share configuration of an entry
 @riverpod
 ShareConfig entryShareConfig(
-  EntryShareConfigRef ref,
+  Ref ref,
   JournalEntry entry, {
   List<String>? customHashtags,
   String? messageTemplate,
@@ -327,7 +329,7 @@ ShareConfig entryShareConfig(
 /// Provider for share configuration of a media item
 @riverpod
 ShareConfig mediaShareConfig(
-  MediaShareConfigRef ref,
+  Ref ref,
   MediaItem media, {
   JournalEntry? entry,
   List<String>? customHashtags,
@@ -345,7 +347,7 @@ ShareConfig mediaShareConfig(
 /// Provider for share configuration of a trip
 @riverpod
 ShareConfig tripShareConfig(
-  TripShareConfigRef ref,
+  Ref ref,
   Trip trip, {
   int entryCount = 0,
   List<String>? customHashtags,
@@ -362,7 +364,7 @@ ShareConfig tripShareConfig(
 
 /// Provider for available share platforms
 @riverpod
-Future<List<SharePlatform>> availableSharePlatforms(AvailableSharePlatformsRef ref) async {
+Future<List<SharePlatform>> availableSharePlatforms(Ref ref) async {
   final service = ref.watch(socialSharingServiceProvider);
   return service.getAvailablePlatforms();
 }

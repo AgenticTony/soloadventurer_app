@@ -6,8 +6,7 @@ part of 'journal.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$JournalImpl _$$JournalImplFromJson(Map<String, dynamic> json) =>
-    _$JournalImpl(
+_Journal _$JournalFromJson(Map<String, dynamic> json) => _Journal(
       id: json['id'] as String,
       tripId: json['tripId'] as String,
       userId: json['userId'] as String,
@@ -26,8 +25,7 @@ _$JournalImpl _$$JournalImplFromJson(Map<String, dynamic> json) =>
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$JournalImplToJson(_$JournalImpl instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$JournalToJson(_Journal instance) => <String, dynamic>{
       'id': instance.id,
       'tripId': instance.tripId,
       'userId': instance.userId,

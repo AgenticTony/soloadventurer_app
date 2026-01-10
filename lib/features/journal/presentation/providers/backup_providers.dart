@@ -13,7 +13,7 @@ part 'backup_providers.g.dart';
 
 /// Provider for the backup service
 @Riverpod(keepAlive: true)
-BackupService backupService(BackupServiceRef ref) {
+BackupService backupService(Ref ref) {
   final journalRepository = ref.watch(journalRepositoryProvider);
   final tripRepository = ref.watch(tripRepositoryProvider);
   final tagRepository = ref.watch(tagRepositoryProvider);
@@ -383,7 +383,7 @@ class RestoreNotifier extends _$RestoreNotifier {
 
 /// Provider for available backups list
 @riverpod
-Future<List<BackupInfo>> availableBackups(AvailableBackupsRef ref) async {
+Future<List<BackupInfo>> availableBackups(Ref ref) async {
   final service = ref.watch(backupServiceProvider);
   return await service.getAvailableBackups();
 }
@@ -391,7 +391,7 @@ Future<List<BackupInfo>> availableBackups(AvailableBackupsRef ref) async {
 /// Provider for estimated backup size
 @riverpod
 Future<int> estimatedBackupSize(
-  EstimatedBackupSizeRef ref, {
+  Ref ref, {
   bool includeMedia = true,
 }) async {
   final service = ref.watch(backupServiceProvider);
@@ -400,14 +400,14 @@ Future<int> estimatedBackupSize(
 
 /// Provider for backup directory path
 @riverpod
-Future<String> backupDirectoryPath(BackupDirectoryPathRef ref) async {
+Future<String> backupDirectoryPath(Ref ref) async {
   final service = ref.watch(backupServiceProvider);
   return await service.getBackupDirectory();
 }
 
 /// Family provider for getting info about a specific backup
 @riverpod
-Future<BackupInfo> backupInfo(BackupInfoRef ref, String backupPath) async {
+Future<BackupInfo> backupInfo(Ref ref, String backupPath) async {
   final service = ref.watch(backupServiceProvider);
   return await service.getBackupInfo(backupPath);
 }

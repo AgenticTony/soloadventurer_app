@@ -22,7 +22,8 @@ void main() {
       );
 
       expect(find.text('No photos yet'), findsOneWidget);
-      expect(find.text('Add photos to your trip to see them here'), findsOneWidget);
+      expect(find.text('Add photos to your trip to see them here'),
+          findsOneWidget);
     });
 
     testWidgets('renders loading state', (tester) async {

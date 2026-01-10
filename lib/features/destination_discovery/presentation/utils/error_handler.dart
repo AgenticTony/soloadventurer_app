@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// Utility class for handling errors in the destination discovery feature.
 ///
@@ -149,11 +149,13 @@ class DestinationErrorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final errorMessage = customMessage ?? DestinationErrorHandler.getErrorMessage(error);
+    final errorMessage =
+        customMessage ?? DestinationErrorHandler.getErrorMessage(error);
     final errorTitle = DestinationErrorHandler.getErrorTitle(error);
     final errorIcon = DestinationErrorHandler.getErrorIcon(error);
     final actionLabel = DestinationErrorHandler.getActionLabel(error);
-    final secondaryActionLabel = DestinationErrorHandler.getSecondaryActionLabel(error);
+    final secondaryActionLabel =
+        DestinationErrorHandler.getSecondaryActionLabel(error);
     final isNetworkError = DestinationErrorHandler.isNetworkError(error);
 
     return Center(

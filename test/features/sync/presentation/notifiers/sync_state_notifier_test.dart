@@ -6,26 +6,28 @@ import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 import 'package:soloadventurer/features/sync/domain/services/sync_service.dart';
 import 'package:soloadventurer/features/sync/presentation/notifiers/sync_state_notifier.dart';
 import 'package:soloadventurer/features/sync/presentation/state/sync_state.dart';
-import 'package:soloadventurer/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+
+import 'sync_state_notifier_test.mocks.dart';
 
 @GenerateMocks([SyncService, LoggingService])
-import 'sync_state_notifier_test.mocks.dart';
 
 void main() {
   late MockSyncService mockSyncService;
   late MockLoggingService mockLogger;
-  late StreamController<SyncStatus> statusController;
+  late StreamController<SyncOperationStatus> statusController;
   late StreamController<List<dynamic>> queueController;
 
   setUp(() {
     mockSyncService = MockSyncService();
     mockLogger = MockLoggingService();
-    statusController = StreamController<SyncStatus>.broadcast();
+    statusController = StreamController<SyncOperationStatus>.broadcast();
     queueController = StreamController<List<dynamic>>.broadcast();
 
     // Setup mock service defaults
-    when(mockSyncService.status).thenReturn(SyncStatus.idle);
-    when(mockSyncService.statusStream).thenAnswer((_) => statusController.stream);
+    when(mockSyncService.status).thenReturn(SyncOperationStatus.idle);
+    when(mockSyncService.statusStream)
+        .thenAnswer((_) => statusController.stream);
     when(mockSyncService.queueStream).thenAnswer((_) => queueController.stream);
     when(mockSyncService.queueSize).thenReturn(0);
     when(mockSyncService.isProcessing).thenReturn(false);
@@ -44,7 +46,7 @@ void main() {
           logger: mockLogger,
         );
 
-        expect(notifier.state.status, SyncStatus.idle);
+        expect(notifier.state.status, SyncOperationStatus.idle);
         expect(notifier.state.queueSize, 0);
         expect(notifier.state.isProcessing, false);
 
@@ -52,7 +54,7 @@ void main() {
       });
 
       test('initializes with current service state', () {
-        when(mockSyncService.status).thenReturn(SyncStatus.syncing);
+        when(mockSyncService.status).thenReturn(SyncOperationStatus.syncing);
         when(mockSyncService.queueSize).thenReturn(5);
         when(mockSyncService.isProcessing).thenReturn(true);
 
@@ -61,7 +63,7 @@ void main() {
           logger: mockLogger,
         );
 
-        expect(notifier.state.status, SyncStatus.syncing);
+        expect(notifier.state.status, SyncOperationStatus.syncing);
         expect(notifier.state.queueSize, 5);
         expect(notifier.state.isProcessing, true);
 
@@ -104,11 +106,11 @@ void main() {
           logger: mockLogger,
         );
 
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
 
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.syncing);
+        expect(notifier.state.status, SyncOperationStatus.syncing);
         expect(notifier.state.isProcessing, true);
         expect(notifier.state.isSyncing, true);
         expect(notifier.state.lastStatusChangeAt, isNotNull);
@@ -122,14 +124,14 @@ void main() {
           logger: mockLogger,
         );
 
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
 
         when(mockSyncService.queueSize).thenReturn(0);
-        statusController.add(SyncStatus.success);
+        statusController.add(SyncOperationStatus.success);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.success);
+        expect(notifier.state.status, SyncOperationStatus.success);
         expect(notifier.state.isProcessing, false);
         expect(notifier.state.wasLastSyncSuccessful, true);
         expect(notifier.state.lastSuccessfulSyncAt, isNotNull);
@@ -144,14 +146,14 @@ void main() {
           logger: mockLogger,
         );
 
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
 
         when(mockSyncService.queueSize).thenReturn(3);
-        statusController.add(SyncStatus.failed);
+        statusController.add(SyncOperationStatus.failed);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.failed);
+        expect(notifier.state.status, SyncOperationStatus.failed);
         expect(notifier.state.isProcessing, false);
         expect(notifier.state.didLastSyncFail, true);
         expect(notifier.state.lastError, isNotNull);
@@ -166,10 +168,10 @@ void main() {
           logger: mockLogger,
         );
 
-        statusController.add(SyncStatus.pending);
+        statusController.add(SyncOperationStatus.pending);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.pending);
+        expect(notifier.state.status, SyncOperationStatus.pending);
         expect(notifier.state.lastStatusChangeAt, isNotNull);
 
         notifier.dispose();
@@ -195,7 +197,7 @@ void main() {
 
       test('clears pending operations when queue empties', () async {
         when(mockSyncService.queueSize).thenReturn(5);
-        when(mockSyncService.status).thenReturn(SyncStatus.pending);
+        when(mockSyncService.status).thenReturn(SyncOperationStatus.pending);
 
         final notifier = SyncStateNotifier(
           syncService: mockSyncService,
@@ -203,7 +205,7 @@ void main() {
         );
 
         // Start with pending status
-        expect(notifier.state.status, SyncStatus.pending);
+        expect(notifier.state.status, SyncOperationStatus.pending);
 
         // Clear queue
         when(mockSyncService.queueSize).thenReturn(0);
@@ -216,18 +218,19 @@ void main() {
         notifier.dispose();
       });
 
-      test('updates to pending status when queue has items and status is idle', () async {
+      test('updates to pending status when queue has items and status is idle',
+          () async {
         final notifier = SyncStateNotifier(
           syncService: mockSyncService,
           logger: mockLogger,
         );
 
-        expect(notifier.state.status, SyncStatus.idle);
+        expect(notifier.state.status, SyncOperationStatus.idle);
 
         queueController.add([1, 2, 3]);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.pending);
+        expect(notifier.state.status, SyncOperationStatus.pending);
         expect(notifier.state.queueSize, 3);
 
         notifier.dispose();
@@ -236,7 +239,7 @@ void main() {
 
     group('refresh', () {
       test('refreshes state from current service state', () async {
-        when(mockSyncService.status).thenReturn(SyncStatus.syncing);
+        when(mockSyncService.status).thenReturn(SyncOperationStatus.syncing);
         when(mockSyncService.queueSize).thenReturn(7);
         when(mockSyncService.isProcessing).thenReturn(true);
 
@@ -246,7 +249,7 @@ void main() {
         );
 
         // Change service state
-        when(mockSyncService.status).thenReturn(SyncStatus.success);
+        when(mockSyncService.status).thenReturn(SyncOperationStatus.success);
         when(mockSyncService.queueSize).thenReturn(0);
         when(mockSyncService.isProcessing).thenReturn(false);
 
@@ -254,7 +257,7 @@ void main() {
         notifier.refresh();
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.success);
+        expect(notifier.state.status, SyncOperationStatus.success);
         expect(notifier.state.queueSize, 0);
         expect(notifier.state.isProcessing, false);
 
@@ -269,14 +272,14 @@ void main() {
           logger: mockLogger,
         );
 
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.syncing);
+        expect(notifier.state.status, SyncOperationStatus.syncing);
 
         notifier.reset();
 
-        expect(notifier.state.status, SyncStatus.idle);
+        expect(notifier.state.status, SyncOperationStatus.idle);
         expect(notifier.state.queueSize, 0);
         expect(notifier.state.isProcessing, false);
 
@@ -297,13 +300,13 @@ void main() {
         final subscription1 = notifier.stream.listen(states1.add);
         final subscription2 = notifier.stream.listen(states2.add);
 
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
 
         expect(states1.length, greaterThan(0));
         expect(states2.length, greaterThan(0));
-        expect(states1.last.status, SyncStatus.syncing);
-        expect(states2.last.status, SyncStatus.syncing);
+        expect(states1.last.status, SyncOperationStatus.syncing);
+        expect(states2.last.status, SyncOperationStatus.syncing);
 
         await subscription1.cancel();
         await subscription2.cancel();
@@ -371,26 +374,26 @@ void main() {
         );
 
         // Initial state
-        expect(notifier.state.status, SyncStatus.idle);
+        expect(notifier.state.status, SyncOperationStatus.idle);
 
         // Queue changes
         queueController.add([1, 2, 3]);
         await Future.delayed(const Duration(milliseconds: 10));
         expect(notifier.state.queueSize, 3);
-        expect(notifier.state.status, SyncStatus.pending);
+        expect(notifier.state.status, SyncOperationStatus.pending);
 
         // Sync starts
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
-        expect(notifier.state.status, SyncStatus.syncing);
+        expect(notifier.state.status, SyncOperationStatus.syncing);
         expect(notifier.state.isProcessing, true);
 
         // Sync succeeds
         when(mockSyncService.queueSize).thenReturn(0);
-        statusController.add(SyncStatus.success);
+        statusController.add(SyncOperationStatus.success);
         queueController.add([]);
         await Future.delayed(const Duration(milliseconds: 10));
-        expect(notifier.state.status, SyncStatus.success);
+        expect(notifier.state.status, SyncOperationStatus.success);
         expect(notifier.state.queueSize, 0);
         expect(notifier.state.isProcessing, false);
 
@@ -404,31 +407,31 @@ void main() {
         );
 
         // Sync starts
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
 
         // Sync fails
         when(mockSyncService.queueSize).thenReturn(5);
-        statusController.add(SyncStatus.failed);
+        statusController.add(SyncOperationStatus.failed);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.failed);
+        expect(notifier.state.status, SyncOperationStatus.failed);
         expect(notifier.state.lastError, isNotNull);
         expect(notifier.state.didLastSyncFail, true);
 
         // Retry
-        statusController.add(SyncStatus.syncing);
+        statusController.add(SyncOperationStatus.syncing);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.syncing);
+        expect(notifier.state.status, SyncOperationStatus.syncing);
         expect(notifier.state.isProcessing, true);
 
         // Success on retry
         when(mockSyncService.queueSize).thenReturn(0);
-        statusController.add(SyncStatus.success);
+        statusController.add(SyncOperationStatus.success);
         await Future.delayed(const Duration(milliseconds: 10));
 
-        expect(notifier.state.status, SyncStatus.success);
+        expect(notifier.state.status, SyncOperationStatus.success);
         expect(notifier.state.wasLastSyncSuccessful, true);
         expect(notifier.state.lastError, isNull);
 

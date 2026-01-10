@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/destination_discovery/presentation/screens/screens.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
 import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
 
 /// Destination discovery route names
@@ -26,7 +26,6 @@ class DestinationDiscoveryRoutes {
   static const savedDestinations = '/destinations/saved';
 
   /// Private constructor to prevent instantiation
-  const DestinationDiscoveryRoutes._();
 }
 
 /// Route handler for destination discovery screens
@@ -104,15 +103,18 @@ class DestinationDiscoveryRouter {
 
     // Handle /destinations/detail/:id pattern
     if (path.startsWith('${DestinationDiscoveryRoutes.destinationDetail}/')) {
-      final destinationId = path.substring('${DestinationDiscoveryRoutes.destinationDetail}/'.length);
+      final destinationId = path
+          .substring('${DestinationDiscoveryRoutes.destinationDetail}/'.length);
       if (destinationId.isEmpty) {
         return _errorRoute(settings, 'Invalid destination ID');
       }
       screen = DestinationDetailScreen(destinationId: destinationId);
     }
     // Handle /destinations/curated-lists/detail/:id pattern
-    else if (path.startsWith('${DestinationDiscoveryRoutes.curatedListDetail}/')) {
-      final listId = path.substring('${DestinationDiscoveryRoutes.curatedListDetail}/'.length);
+    else if (path
+        .startsWith('${DestinationDiscoveryRoutes.curatedListDetail}/')) {
+      final listId = path
+          .substring('${DestinationDiscoveryRoutes.curatedListDetail}/'.length);
       if (listId.isEmpty) {
         return _errorRoute(settings, 'Invalid curated list ID');
       }
@@ -123,33 +125,27 @@ class DestinationDiscoveryRouter {
       // Parse query parameters for filters
       final filter = _parseFilterQueryParams(queryParameters);
       screen = DestinationDiscoveryScreen(initialFilter: filter);
-    }
-    else if (path == DestinationDiscoveryRoutes.destinationDetail) {
+    } else if (path == DestinationDiscoveryRoutes.destinationDetail) {
       // Legacy support for arguments-based navigation
       final destinationId = settings.arguments as String?;
       if (destinationId == null) {
         return _errorRoute(settings, 'Missing destination ID');
       }
       screen = DestinationDetailScreen(destinationId: destinationId);
-    }
-    else if (path == DestinationDiscoveryRoutes.recommendations) {
+    } else if (path == DestinationDiscoveryRoutes.recommendations) {
       screen = const RecommendationsScreen();
-    }
-    else if (path == DestinationDiscoveryRoutes.curatedLists) {
+    } else if (path == DestinationDiscoveryRoutes.curatedLists) {
       screen = const CuratedListsScreen();
-    }
-    else if (path == DestinationDiscoveryRoutes.curatedListDetail) {
+    } else if (path == DestinationDiscoveryRoutes.curatedListDetail) {
       // Legacy support for arguments-based navigation
       final listId = settings.arguments as String?;
       if (listId == null) {
         return _errorRoute(settings, 'Missing curated list ID');
       }
       screen = CuratedListDetailScreen(listId: listId);
-    }
-    else if (path == DestinationDiscoveryRoutes.savedDestinations) {
+    } else if (path == DestinationDiscoveryRoutes.savedDestinations) {
       screen = const SavedDestinationsScreen();
-    }
-    else {
+    } else {
       return null;
     }
 
@@ -207,11 +203,16 @@ class DestinationDiscoveryRouter {
       searchQuery: params['q'],
       budgetLevel: _parseBudgetLevel(params['budget']),
       minSafetyScore: _parseDoubleParam(params['minSafety'], 1, 10),
-      minSoloSuitabilityScore: _parseDoubleParam(params['minSoloSuitability'], 1, 10),
+      minSoloSuitabilityScore:
+          _parseDoubleParam(params['minSoloSuitability'], 1, 10),
       activityLevel: _parseActivityLevel(params['activity']),
       countryCode: params['country'],
       region: params['region'],
-      tags: params['tags']?.split(',').map((tag) => tag.trim()).where((tag) => tag.isNotEmpty).toList(),
+      tags: params['tags']
+          ?.split(',')
+          .map((tag) => tag.trim())
+          .where((tag) => tag.isNotEmpty)
+          .toList(),
       hiddenGemsOnly: params['hiddenGems']?.toLowerCase() == 'true',
       sortBy: _parseSortOrder(params['sortBy']),
     );
@@ -311,7 +312,8 @@ class DestinationDiscoveryRouter {
   }
 
   /// Create an error route for invalid deep links
-  static Route<dynamic> _errorRoute(RouteSettings settings, String errorMessage) {
+  static Route<dynamic> _errorRoute(
+      RouteSettings settings, String errorMessage) {
     return PageRouteBuilder(
       settings: settings,
       pageBuilder: (context, animation, secondaryAnimation) => _ErrorScreen(
@@ -327,7 +329,6 @@ class DestinationDiscoveryRouter {
   }
 
   /// Private constructor to prevent instantiation
-  const DestinationDiscoveryRouter._();
 }
 
 /// Error screen for invalid deep links

@@ -1,16 +1,12 @@
-import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../domain/entities/journal_entry.dart';
 import '../../domain/entities/media_item.dart';
 import '../../domain/entities/trip.dart';
 import '../../domain/services/social_sharing_service.dart';
-import '../../../core/errors/exceptions.dart';
 
 // Import for UploadStatus enum
-import '../../domain/entities/media_item.dart' show UploadStatus;
 
 /// Implementation of social sharing service
 class SocialSharingServiceImpl implements SocialSharingService {
@@ -36,7 +32,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
   };
 
   @override
-  Future<ShareResult> shareEntry(
+  Future<JournalShareResult> shareEntry(
     JournalEntry entry, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
@@ -66,7 +62,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
       // Perform share based on platform
       if (platform == SharePlatform.clipboard) {
         await copyToClipboard(truncatedText);
-        return ShareResult.success(
+        return JournalShareResult.success(
           platform: platform,
           contentType: ShareableType.journalEntry,
           format: ShareFormat.text,
@@ -99,14 +95,14 @@ class SocialSharingServiceImpl implements SocialSharingService {
         subject: shareConfig.title,
       );
 
-      return ShareResult.success(
+      return JournalShareResult.success(
         platform: platform,
         contentType: ShareableType.journalEntry,
         format: files.isEmpty ? ShareFormat.text : ShareFormat.rich,
         itemCount: 1,
       );
     } catch (e) {
-      return ShareResult.failure(
+      return JournalShareResult.failure(
         platform: platform,
         contentType: ShareableType.journalEntry,
         errorMessage: e.toString(),
@@ -115,7 +111,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
   }
 
   @override
-  Future<ShareResult> shareMedia(
+  Future<JournalShareResult> shareMedia(
     MediaItem media, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
@@ -132,7 +128,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
       // Get the media file
       final xFile = await _getXFileFromMedia(media);
       if (xFile == null) {
-        return ShareResult.failure(
+        return JournalShareResult.failure(
           platform: platform,
           contentType: ShareableType.mediaItem,
           errorMessage: 'Media file not available',
@@ -154,7 +150,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
       // Share based on platform
       if (platform == SharePlatform.clipboard) {
         await copyToClipboard(truncatedText);
-        return ShareResult.success(
+        return JournalShareResult.success(
           platform: platform,
           contentType: ShareableType.mediaItem,
           format: ShareFormat.text,
@@ -169,13 +165,13 @@ class SocialSharingServiceImpl implements SocialSharingService {
         subject: shareConfig.title,
       );
 
-      return ShareResult.success(
+      return JournalShareResult.success(
         platform: platform,
         contentType: ShareableType.mediaItem,
         format: media.isVideo ? ShareFormat.video : ShareFormat.image,
       );
     } catch (e) {
-      return ShareResult.failure(
+      return JournalShareResult.failure(
         platform: platform,
         contentType: ShareableType.mediaItem,
         errorMessage: e.toString(),
@@ -184,7 +180,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
   }
 
   @override
-  Future<ShareResult> shareTrip(
+  Future<JournalShareResult> shareTrip(
     Trip trip, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
@@ -209,7 +205,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
       // Share based on platform
       if (platform == SharePlatform.clipboard) {
         await copyToClipboard(truncatedText);
-        return ShareResult.success(
+        return JournalShareResult.success(
           platform: platform,
           contentType: ShareableType.trip,
           format: ShareFormat.text,
@@ -223,14 +219,14 @@ class SocialSharingServiceImpl implements SocialSharingService {
         subject: shareConfig.title,
       );
 
-      return ShareResult.success(
+      return JournalShareResult.success(
         platform: platform,
         contentType: ShareableType.trip,
         format: ShareFormat.text,
         itemCount: entryCount,
       );
     } catch (e) {
-      return ShareResult.failure(
+      return JournalShareResult.failure(
         platform: platform,
         contentType: ShareableType.trip,
         errorMessage: e.toString(),
@@ -239,14 +235,14 @@ class SocialSharingServiceImpl implements SocialSharingService {
   }
 
   @override
-  Future<ShareResult> shareMultipleEntries(
+  Future<JournalShareResult> shareMultipleEntries(
     List<JournalEntry> entries, {
     SharePlatform platform = SharePlatform.generic,
     ShareConfig? config,
   }) async {
     try {
       if (entries.isEmpty) {
-        return ShareResult.failure(
+        return JournalShareResult.failure(
           platform: platform,
           contentType: ShareableType.multipleEntries,
           errorMessage: 'No entries to share',
@@ -265,7 +261,8 @@ class SocialSharingServiceImpl implements SocialSharingService {
       final buffer = StringBuffer();
       buffer.writeln(shareConfig.title);
       buffer.writeln('📝 ${entries.length} journal entries');
-      buffer.writeln('📅 ${DateFormat('MMM yyyy').format(firstEntry.entryDate)}');
+      buffer
+          .writeln('📅 ${DateFormat('MMM yyyy').format(firstEntry.entryDate)}');
       if (shareConfig.url != null) {
         buffer.write(shareConfig.url);
       }
@@ -276,7 +273,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
       // Share based on platform
       if (platform == SharePlatform.clipboard) {
         await copyToClipboard(truncatedText);
-        return ShareResult.success(
+        return JournalShareResult.success(
           platform: platform,
           contentType: ShareableType.multipleEntries,
           format: ShareFormat.text,
@@ -290,14 +287,14 @@ class SocialSharingServiceImpl implements SocialSharingService {
         subject: shareConfig.title,
       );
 
-      return ShareResult.success(
+      return JournalShareResult.success(
         platform: platform,
         contentType: ShareableType.multipleEntries,
         format: ShareFormat.text,
         itemCount: entries.length,
       );
     } catch (e) {
-      return ShareResult.failure(
+      return JournalShareResult.failure(
         platform: platform,
         contentType: ShareableType.multipleEntries,
         errorMessage: e.toString(),
@@ -377,7 +374,8 @@ class SocialSharingServiceImpl implements SocialSharingService {
     List<String>? customHashtags,
     String? messageTemplate,
   }) {
-    final hashtags = customHashtags ?? [...defaultHashtags, trip.name.toLowerCase().replaceAll(' ', '')];
+    final hashtags = customHashtags ??
+        [...defaultHashtags, trip.name.toLowerCase().replaceAll(' ', '')];
 
     final text = entryCount > 0
         ? '📝 $entryCount journal entries from ${trip.name}'
@@ -451,7 +449,8 @@ class SocialSharingServiceImpl implements SocialSharingService {
 
   /// Truncate text to fit platform limits
   String _truncateTextForPlatform(String text, SharePlatform platform) {
-    final maxLength = maxTextLengths[platform] ?? maxTextLengths[SharePlatform.generic]!;
+    final maxLength =
+        maxTextLengths[platform] ?? maxTextLengths[SharePlatform.generic]!;
 
     if (text.length <= maxLength) {
       return text;

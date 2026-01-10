@@ -5,7 +5,6 @@ import 'package:soloadventurer/features/auth/presentation/screens/signup_screen.
 import 'package:soloadventurer/features/auth/presentation/screens/verify_email_screen.dart';
 import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/routes/profile_routes.dart';
-import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/confirm_password_reset_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/screens/profile_screen.dart';
@@ -14,6 +13,9 @@ import 'package:soloadventurer/features/profile/presentation/screens/profile_set
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/pages/cloudwatch_test_page.dart';
 import 'package:soloadventurer/features/destination_discovery/presentation/routes/destination_discovery_routes.dart';
+import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
+import 'package:soloadventurer/features/performance/presentation/routes/performance_routes.dart';
+import 'package:soloadventurer/features/performance/presentation/screens/performance_benchmark_screen.dart';
 
 /// App router for handling navigation
 class AppRouter {

@@ -189,7 +189,7 @@ class _ColorPicker extends StatelessWidget {
               ),
             ),
             child: isSelected
-                ? Icon(
+                ? const Icon(
                     Icons.check,
                     color: Colors.white,
                     size: 24,

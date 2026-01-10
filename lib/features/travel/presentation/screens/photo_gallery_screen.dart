@@ -32,7 +32,7 @@ class PhotoGalleryScreen extends ConsumerWidget {
 
     // Parse cursor (page number)
     final page = cursor == null ? 1 : int.parse(cursor);
-    final itemsPerPage = 20;
+    const itemsPerPage = 20;
 
     // Generate mock photos with varied aspect ratios
     final photos = List.generate(
@@ -62,10 +62,15 @@ class PhotoGalleryScreen extends ConsumerWidget {
         return Photo(
           id: '${page}_$i',
           imageUrl: 'https://picsum.photos/$width/$height?random=${page}_$i',
-          thumbnailUrl: 'https://picsum.photos/150/${(height * 150 / width).toInt()}?random=${page}_$i',
-          caption: i % 3 == 0 ? 'Photo caption ${(page - 1) * itemsPerPage + i + 1}' : null,
+          thumbnailUrl:
+              'https://picsum.photos/150/${(height * 150 / width).toInt()}?random=${page}_$i',
+          caption: i % 3 == 0
+              ? 'Photo caption ${(page - 1) * itemsPerPage + i + 1}'
+              : null,
           tripId: 'trip123',
-          location: i % 2 == 0 ? 'Location ${(page - 1) * itemsPerPage + i + 1}' : null,
+          location: i % 2 == 0
+              ? 'Location ${(page - 1) * itemsPerPage + i + 1}'
+              : null,
           latitude: i % 2 == 0 ? 40.7128 + (i * 0.01) : null,
           longitude: i % 2 == 0 ? -74.0060 + (i * 0.01) : null,
           takenAt: DateTime.now().subtract(Duration(days: i)),

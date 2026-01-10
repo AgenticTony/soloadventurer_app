@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:solo_adventurer/core/monitoring/performance/performance_monitor.dart';
-import 'package:solo_adventurer/core/monitoring/performance/memory_profiler.dart';
+import 'package:soloadventurer/core/monitoring/performance/performance_monitor.dart';
+import 'package:soloadventurer/core/monitoring/performance/memory_profiler.dart';
 
 /// Utility class for tracking app startup performance
 ///
@@ -25,6 +25,8 @@ import 'package:solo_adventurer/core/monitoring/performance/memory_profiler.dart
 /// ```
 class AppStartTracker {
   static DateTime? _startTime;
+  static DateTime? _endTime;
+  static bool _isCompleted = false;
   static final Map<String, DateTime> _phaseStartTimes = {};
 
   /// Start tracking app startup time
@@ -51,7 +53,8 @@ class AppStartTracker {
     }
 
     if (kDebugMode) {
-      debugPrint('AppStartTracker: Started tracking at ${_startTime!.toIso8601String()}');
+      debugPrint(
+          'AppStartTracker: Started tracking at ${_startTime!.toIso8601String()}');
     }
   }
 
@@ -63,7 +66,8 @@ class AppStartTracker {
   static void completeStartup() {
     if (_startTime == null) {
       if (kDebugMode) {
-        debugPrint('AppStartTracker: Startup not started, call trackAppStart() first');
+        debugPrint(
+            'AppStartTracker: Startup not started, call trackAppStart() first');
       }
       return;
     }
@@ -127,7 +131,8 @@ class AppStartTracker {
 
       // Add breakdown
       if (duration.inSeconds >= 1) {
-        debugPrint('  (${duration.inSeconds}s ${duration.inMilliseconds % 1000}ms)');
+        debugPrint(
+            '  (${duration.inSeconds}s ${duration.inMilliseconds % 1000}ms)');
       }
 
       // Log memory usage after startup if available

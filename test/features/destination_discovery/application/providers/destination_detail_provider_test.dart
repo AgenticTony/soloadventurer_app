@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:solo_adventurer/features/destination_discovery/application/providers/destination_detail_provider.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination_filter.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/destination_detail_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
+import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
 
 // Mock classes
 class MockDestinationRepository extends Mock implements DestinationRepository {}
@@ -21,7 +21,7 @@ void main() {
     location: (lat: 35.6762, lng: 139.6503),
     safetyScore: 8.5,
     soloSuitabilityScore: 8.0,
-    soloSuitabilityFactors: SoloSuitabilityFactors(
+    soloSuitabilityFactors: const SoloSuitabilityFactors(
       safety: 8.5,
       nightlife: 7.0,
       walkability: 9.0,
@@ -48,7 +48,7 @@ void main() {
       location: (lat: 35.0116, lng: 135.7681),
       safetyScore: 9.0,
       soloSuitabilityScore: 8.5,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 9.0,
         nightlife: 6.0,
         walkability: 8.5,
@@ -73,7 +73,7 @@ void main() {
       location: (lat: 34.6937, lng: 135.5023),
       safetyScore: 8.0,
       soloSuitabilityScore: 7.5,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 8.0,
         nightlife: 8.0,
         walkability: 7.5,
@@ -100,18 +100,21 @@ void main() {
 
   group('DestinationDetailNotifier', () {
     group('initial state', () {
-      test('should start with initial state and auto-load destination', () async {
+      test('should start with initial state and auto-load destination',
+          () async {
         // The notifier auto-loads on creation, so we need to mock the repository
         when(() => mockRepository.getDestinationById(any()))
             .thenAnswer((_) async => testDestination);
 
         // Create a new notifier to test auto-load
-        final newNotifier = DestinationDetailNotifier(mockRepository, testDestinationId);
+        final newNotifier =
+            DestinationDetailNotifier(mockRepository, testDestinationId);
 
         // Wait for auto-load to complete
         await Future.delayed(const Duration(milliseconds: 100));
 
-        verify(() => mockRepository.getDestinationById(testDestinationId)).called(1);
+        verify(() => mockRepository.getDestinationById(testDestinationId))
+            .called(1);
       });
     });
 
@@ -122,7 +125,8 @@ void main() {
 
         await notifier.loadDestination();
 
-        verify(() => mockRepository.getDestinationById(testDestinationId)).called(1);
+        verify(() => mockRepository.getDestinationById(testDestinationId))
+            .called(1);
         expect(notifier.state.value, isNotNull);
         expect(notifier.state.value!.destination?.id, testDestinationId);
         expect(notifier.state.value!.destination?.name, 'Tokyo');
@@ -152,7 +156,8 @@ void main() {
 
         await notifier.refresh();
 
-        verify(() => mockRepository.getDestinationById(testDestinationId)).called(1);
+        verify(() => mockRepository.getDestinationById(testDestinationId))
+            .called(1);
         expect(notifier.state.value!.destination?.name, 'Tokyo');
       });
 
@@ -228,7 +233,8 @@ void main() {
         // Should exclude current destination
         expect(notifier.state.value!.relatedDestinations.length, 2);
         expect(
-          notifier.state.value!.relatedDestinations.any((d) => d.id == testDestinationId),
+          notifier.state.value!.relatedDestinations
+              .any((d) => d.id == testDestinationId),
           isFalse,
         );
       });
@@ -249,7 +255,7 @@ void main() {
             location: (lat: 35.0, lng: 139.0),
             safetyScore: 8.0,
             soloSuitabilityScore: 7.5,
-            soloSuitabilityFactors: SoloSuitabilityFactors(
+            soloSuitabilityFactors: const SoloSuitabilityFactors(
               safety: 8.0,
               nightlife: 7.0,
               walkability: 8.0,
@@ -296,7 +302,8 @@ void main() {
         when(() => mockRepository.searchDestinations(any()))
             .thenThrow(Exception('Network error'));
 
-        expect(() async => await notifier.loadRelatedDestinations(), throwsException);
+        expect(() async => await notifier.loadRelatedDestinations(),
+            throwsException);
       });
     });
 
@@ -308,7 +315,7 @@ void main() {
         await notifier.loadDestination();
 
         // Custom filter
-        final customFilter = DestinationFilter(
+        const customFilter = DestinationFilter(
           budgetLevel: BudgetLevel.budget,
           tags: ['food'],
         );
@@ -329,14 +336,15 @@ void main() {
             .thenAnswer((_) async => testDestination);
         await notifier.loadDestination();
 
-        final customFilter = const DestinationFilter();
+        const customFilter = DestinationFilter();
         when(() => mockRepository.searchDestinations(any()))
             .thenAnswer((_) async => [testDestination, ...relatedDestinations]);
 
         await notifier.loadRelatedDestinationsWithFilter(customFilter);
 
         expect(
-          notifier.state.value!.relatedDestinations.any((d) => d.id == testDestinationId),
+          notifier.state.value!.relatedDestinations
+              .any((d) => d.id == testDestinationId),
           isFalse,
         );
       });
@@ -344,7 +352,8 @@ void main() {
       test('should do nothing when no destination is loaded', () async {
         notifier.clear();
 
-        await notifier.loadRelatedDestinationsWithFilter(const DestinationFilter());
+        await notifier
+            .loadRelatedDestinationsWithFilter(const DestinationFilter());
 
         verifyNever(() => mockRepository.searchDestinations(any()));
       });
@@ -359,7 +368,8 @@ void main() {
             .thenThrow(Exception('Network error'));
 
         expect(
-          () async => await notifier.loadRelatedDestinationsWithFilter(const DestinationFilter()),
+          () async => await notifier
+              .loadRelatedDestinationsWithFilter(const DestinationFilter()),
           throwsException,
         );
       });

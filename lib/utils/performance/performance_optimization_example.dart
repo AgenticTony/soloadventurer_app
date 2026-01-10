@@ -58,7 +58,8 @@ class Example2_ImagePreloading extends StatefulWidget {
   const Example2_ImagePreloading({super.key});
 
   @override
-  State<Example2_ImagePreloading> createState() => _Example2_ImagePreloadingState();
+  State<Example2_ImagePreloading> createState() =>
+      _Example2_ImagePreloadingState();
 }
 
 class _Example2_ImagePreloadingState extends State<Example2_ImagePreloading> {
@@ -88,7 +89,7 @@ class _Example2_ImagePreloadingState extends State<Example2_ImagePreloading> {
   void _onScroll() {
     // Calculate current visible index
     final pixels = _scrollController.position.pixels;
-    final itemHeight = 120.0; // Approximate height
+    const itemHeight = 120.0; // Approximate height
     final newIndex = (pixels / itemHeight).floor();
 
     if (newIndex != _currentIndex) {
@@ -141,7 +142,8 @@ class Example3_CacheStatistics extends StatefulWidget {
   const Example3_CacheStatistics({super.key});
 
   @override
-  State<Example3_CacheStatistics> createState() => _Example3_CacheStatisticsState();
+  State<Example3_CacheStatistics> createState() =>
+      _Example3_CacheStatisticsState();
 }
 
 class _Example3_CacheStatisticsState extends State<Example3_CacheStatistics> {
@@ -220,10 +222,12 @@ class Example4_PaginatedList extends ConsumerStatefulWidget {
   const Example4_PaginatedList({super.key});
 
   @override
-  ConsumerState<Example4_PaginatedList> createState() => _Example4_PaginatedListState();
+  ConsumerState<Example4_PaginatedList> createState() =>
+      _Example4_PaginatedListState();
 }
 
-class _Example4_PaginatedListState extends ConsumerState<Example4_PaginatedList> {
+class _Example4_PaginatedListState
+    extends ConsumerState<Example4_PaginatedList> {
   // This would use the OptimizedJournalListNotifier from the actual implementation
   late final OptimizedJournalListNotifier _notifier;
 
@@ -369,7 +373,8 @@ class _Example5_QueryCachingState extends State<Example5_QueryCaching> {
                     Text('Total Queries: ${_stats!.totalRequests}'),
                     Text('Cache Hits: ${_stats!.totalHits}'),
                     Text('Cache Misses: ${_stats!.totalMisses}'),
-                    Text('Hit Rate: ${(_stats!.hitRate * 100).toStringAsFixed(1)}%'),
+                    Text(
+                        'Hit Rate: ${(_stats!.hitRate * 100).toStringAsFixed(1)}%'),
                   ],
                 ),
               ),
@@ -444,7 +449,7 @@ class Example6_CustomPagination extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
               onPressed: () {
-                final customConfig = PaginationConfig(
+                const customConfig = PaginationConfig(
                   pageSize: 30,
                   enableAutoPagination: true,
                   threshold: 8,
@@ -531,7 +536,8 @@ class Example8_FieldSelection extends StatelessWidget {
     );
   }
 
-  Widget _buildFieldSection(String title, List<String> fields, String description) {
+  Widget _buildFieldSection(
+      String title, List<String> fields, String description) {
     return ExpansionTile(
       title: Text(title),
       subtitle: Text(description),
@@ -550,7 +556,8 @@ class Example8_FieldSelection extends StatelessWidget {
                   )),
               const SizedBox(height: 16),
               Text('Supabase select:\n${fields.join(', ')}',
-                  style: const TextStyle(fontFamily: 'monospace', fontSize: 12)),
+                  style:
+                      const TextStyle(fontFamily: 'monospace', fontSize: 12)),
             ],
           ),
         ),

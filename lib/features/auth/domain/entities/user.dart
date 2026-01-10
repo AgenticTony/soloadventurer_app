@@ -97,6 +97,52 @@ class User extends Equatable {
   /// Whether this user is not empty (authenticated)
   bool get isNotEmpty => !isEmpty;
 
+  /// Creates a User from JSON
+  ///
+  /// Note: This is a convenience method for testing and example purposes.
+  /// In production, DTOs should handle JSON serialization.
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'] as String,
+      email: json['email'] as String,
+      username: json['username'] as String,
+      createdAt: json['createdAt'] is String
+          ? DateTime.parse(json['createdAt'] as String)
+          : json['createdAt'] as DateTime,
+      lastLoginAt: json['lastLoginAt'] != null
+          ? (json['lastLoginAt'] is String
+              ? DateTime.parse(json['lastLoginAt'] as String)
+              : json['lastLoginAt'] as DateTime?)
+          : null,
+      accessToken: json['accessToken'] as String?,
+      idToken: json['idToken'] as String?,
+      refreshToken: json['refreshToken'] as String?,
+      tokenExpiresAt: json['tokenExpiresAt'] != null
+          ? (json['tokenExpiresAt'] is String
+              ? DateTime.parse(json['tokenExpiresAt'] as String)
+              : json['tokenExpiresAt'] as DateTime?)
+          : null,
+    );
+  }
+
+  /// Converts User to JSON
+  ///
+  /// Note: This is a convenience method for testing and example purposes.
+  /// In production, DTOs should handle JSON serialization.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'username': username,
+      'createdAt': createdAt.toIso8601String(),
+      'lastLoginAt': lastLoginAt?.toIso8601String(),
+      'accessToken': accessToken,
+      'idToken': idToken,
+      'refreshToken': refreshToken,
+      'tokenExpiresAt': tokenExpiresAt?.toIso8601String(),
+    };
+  }
+
   /// Whether the user has valid tokens
   bool get hasValidTokens =>
       accessToken != null &&

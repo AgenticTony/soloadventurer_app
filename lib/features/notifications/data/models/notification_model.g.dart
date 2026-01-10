@@ -6,9 +6,8 @@ part of 'notification_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$NotificationModelImpl _$$NotificationModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$NotificationModelImpl(
+_NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) =>
+    _NotificationModel(
       id: json['id'] as String,
       type: $enumDecode(_$NotificationTypeEnumMap, json['type']),
       category: $enumDecode(_$NotificationCategoryEnumMap, json['category']),
@@ -36,8 +35,7 @@ _$NotificationModelImpl _$$NotificationModelImplFromJson(
       isOngoing: json['isOngoing'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$NotificationModelImplToJson(
-        _$NotificationModelImpl instance) =>
+Map<String, dynamic> _$NotificationModelToJson(_NotificationModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': _$NotificationTypeEnumMap[instance.type]!,

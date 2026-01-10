@@ -6,8 +6,8 @@ part of 'safety_status.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SafetyStatusImpl _$$SafetyStatusImplFromJson(Map<String, dynamic> json) =>
-    _$SafetyStatusImpl(
+_SafetyStatus _$SafetyStatusFromJson(Map<String, dynamic> json) =>
+    _SafetyStatus(
       id: json['id'] as String,
       userId: json['userId'] as String,
       status: $enumDecode(_$SafetyStatusTypeEnumMap, json['status']),
@@ -26,7 +26,7 @@ _$SafetyStatusImpl _$$SafetyStatusImplFromJson(Map<String, dynamic> json) =>
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
 
-Map<String, dynamic> _$$SafetyStatusImplToJson(_$SafetyStatusImpl instance) =>
+Map<String, dynamic> _$SafetyStatusToJson(_SafetyStatus instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,
@@ -48,9 +48,9 @@ const _$SafetyStatusTypeEnumMap = {
   SafetyStatusType.unknown: 'unknown',
 };
 
-_$SafetyStatusLocationImpl _$$SafetyStatusLocationImplFromJson(
+_SafetyStatusLocation _$SafetyStatusLocationFromJson(
         Map<String, dynamic> json) =>
-    _$SafetyStatusLocationImpl(
+    _SafetyStatusLocation(
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       accuracy: (json['accuracy'] as num?)?.toDouble(),
@@ -60,8 +60,8 @@ _$SafetyStatusLocationImpl _$$SafetyStatusLocationImplFromJson(
       timestamp: DateTime.parse(json['timestamp'] as String),
     );
 
-Map<String, dynamic> _$$SafetyStatusLocationImplToJson(
-        _$SafetyStatusLocationImpl instance) =>
+Map<String, dynamic> _$SafetyStatusLocationToJson(
+        _SafetyStatusLocation instance) =>
     <String, dynamic>{
       'latitude': instance.latitude,
       'longitude': instance.longitude,

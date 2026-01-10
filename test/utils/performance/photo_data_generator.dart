@@ -126,8 +126,7 @@ class PhotoDataGenerator {
   }) {
     return List.generate(
       photoCount,
-      (index) =>
-          'https://picsum.photos/800/600?random=${tripId}-$index',
+      (index) => 'https://picsum.photos/800/600?random=$tripId-$index',
     );
   }
 
@@ -177,7 +176,7 @@ class PhotoDataGenerator {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
     return baseUrls.map((url) {
       final separator = url.contains('?') ? '&' : '?';
-      return '$separator''v=$timestamp';
+      return '$separator' 'v=$timestamp';
     }).toList();
   }
 

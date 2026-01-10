@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/core/models/paginated_data.dart';
-import 'package:solo_adventurer/core/models/page_info.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/models/page_info.dart';
 
 /// Sample model for testing pagination
 class TestModel {

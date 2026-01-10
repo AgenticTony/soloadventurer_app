@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:soloadventurer/core/models/map_marker.dart';
 import 'package:soloadventurer/features/travel/presentation/screens/trip_map_screen.dart';
 
@@ -359,7 +358,8 @@ class ExamplePerformanceTestMapScreen extends StatelessWidget {
       for (int i = 0; i < 50; i++) {
         final lat = cityLat + (random % 2000 - 1000) / 100000.0;
         final lng = cityLng + (random % 2000 - 1000) / 100000.0;
-        final type = MapMarkerType.values[markerId % MapMarkerType.values.length];
+        final type =
+            MapMarkerType.values[markerId % MapMarkerType.values.length];
 
         markers.add(MapMarker(
           id: 'marker_$markerId',
@@ -390,13 +390,15 @@ class ExampleCustomConfigMapScreen extends StatefulWidget {
       _ExampleCustomConfigMapScreenState();
 }
 
-class _ExampleCustomConfigMapScreenState extends State<ExampleCustomConfigMapScreen> {
+class _ExampleCustomConfigMapScreenState
+    extends State<ExampleCustomConfigMapScreen> {
   // This would normally be in TripMapScreen, but shown here for demonstration
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
       overrides: [
-        tripMapMarkersProvider.overrideWithValue(ExampleTripMapScreen._sfMarkers),
+        tripMapMarkersProvider
+            .overrideWithValue(ExampleTripMapScreen._sfMarkers),
       ],
       child: const TripMapScreen(),
     );

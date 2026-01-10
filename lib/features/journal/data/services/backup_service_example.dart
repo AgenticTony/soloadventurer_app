@@ -21,7 +21,8 @@ class Example1_BasicBackup extends ConsumerWidget {
             if (backupState.isBackingUp) ...[
               const CircularProgressIndicator(),
               const SizedBox(height: 16),
-              Text('Progress: ${(backupState.progress * 100).toStringAsFixed(1)}%'),
+              Text(
+                  'Progress: ${(backupState.progress * 100).toStringAsFixed(1)}%'),
               if (backupState.stage != null)
                 Text('Stage: ${backupState.stage}'),
             ] else if (backupState.isSuccess) ...[
@@ -48,7 +49,9 @@ class Example1_BasicBackup extends ConsumerWidget {
             ] else ...[
               ElevatedButton(
                 onPressed: () async {
-                  await ref.read(backupNotifierProvider.notifier).createBackup();
+                  await ref
+                      .read(backupNotifierProvider.notifier)
+                      .createBackup();
                 },
                 child: const Text('Create Backup'),
               ),
@@ -118,7 +121,9 @@ class _Example2_EncryptedBackupState
             ElevatedButton(
               onPressed: _passwordController.text.length >= 8
                   ? () async {
-                      await ref.read(backupNotifierProvider.notifier).createBackup(
+                      await ref
+                          .read(backupNotifierProvider.notifier)
+                          .createBackup(
                             config: BackupConfig(
                               includeMedia: _includeMedia,
                               encrypt: true,
@@ -188,7 +193,8 @@ class Example3_RestoreBackup extends ConsumerWidget {
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
                                   child: const Text('Cancel'),
                                 ),
                                 ElevatedButton(
@@ -258,11 +264,13 @@ class Example5_StateMonitoring extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text('Status: ${backupState.status}'),
-            Text('Progress: ${(backupState.progress * 100).toStringAsFixed(1)}%'),
+            Text(
+                'Progress: ${(backupState.progress * 100).toStringAsFixed(1)}%'),
             if (backupState.stage != null) Text('Stage: ${backupState.stage}'),
             if (backupState.currentItem != null)
               Text('Item: ${backupState.currentItem}'),
-            Text('Processed: ${backupState.processedItems}/${backupState.totalItems}'),
+            Text(
+                'Processed: ${backupState.processedItems}/${backupState.totalItems}'),
             if (backupState.result != null) ...[
               Text('Path: ${backupState.result!.backupPath}'),
               Text('Size: ${backupState.result!.fileSizeReadable}'),
@@ -276,14 +284,18 @@ class Example5_StateMonitoring extends ConsumerWidget {
             ),
             const SizedBox(height: 8),
             Text('Status: ${restoreState.status}'),
-            Text('Progress: ${(restoreState.progress * 100).toStringAsFixed(1)}%'),
-            if (restoreState.stage != null) Text('Stage: ${restoreState.stage}'),
+            Text(
+                'Progress: ${(restoreState.progress * 100).toStringAsFixed(1)}%'),
+            if (restoreState.stage != null)
+              Text('Stage: ${restoreState.stage}'),
             if (restoreState.result != null) ...[
-              Text('Restored: ${restoreState.result!.totalItemsRestored} items'),
+              Text(
+                  'Restored: ${restoreState.result!.totalItemsRestored} items'),
               Text('Conflicts: ${restoreState.result!.conflictCount}'),
               Text('Skipped: ${restoreState.result!.skippedCount}'),
             ],
-            if (restoreState.error != null) Text('Error: ${restoreState.error}'),
+            if (restoreState.error != null)
+              Text('Error: ${restoreState.error}'),
           ],
         ),
       ),
@@ -297,8 +309,10 @@ class Example6_BackupEstimation extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sizeWithMedia = ref.watch(estimatedBackupSizeProvider(includeMedia: true));
-    final sizeWithoutMedia = ref.watch(estimatedBackupSizeProvider(includeMedia: false));
+    final sizeWithMedia =
+        ref.watch(estimatedBackupSizeProvider(includeMedia: true));
+    final sizeWithoutMedia =
+        ref.watch(estimatedBackupSizeProvider(includeMedia: false));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Backup Size Estimation')),
@@ -415,11 +429,13 @@ class _Example7_ConflictResolutionState
             const SizedBox(height: 16),
             ListTile(
               title: const Text('Keep Newest'),
-              subtitle: const Text('Keep the version with the most recent update'),
+              subtitle:
+                  const Text('Keep the version with the most recent update'),
               leading: Radio<ConflictResolution>(
                 value: ConflictResolution.keepNewest,
                 groupValue: _selectedStrategy,
-                onChanged: (value) => setState(() => _selectedStrategy = value!),
+                onChanged: (value) =>
+                    setState(() => _selectedStrategy = value!),
               ),
             ),
             ListTile(
@@ -428,7 +444,8 @@ class _Example7_ConflictResolutionState
               leading: Radio<ConflictResolution>(
                 value: ConflictResolution.keepExisting,
                 groupValue: _selectedStrategy,
-                onChanged: (value) => setState(() => _selectedStrategy = value!),
+                onChanged: (value) =>
+                    setState(() => _selectedStrategy = value!),
               ),
             ),
             ListTile(
@@ -437,7 +454,8 @@ class _Example7_ConflictResolutionState
               leading: Radio<ConflictResolution>(
                 value: ConflictResolution.keepBackup,
                 groupValue: _selectedStrategy,
-                onChanged: (value) => setState(() => _selectedStrategy = value!),
+                onChanged: (value) =>
+                    setState(() => _selectedStrategy = value!),
               ),
             ),
             ListTile(
@@ -446,7 +464,8 @@ class _Example7_ConflictResolutionState
               leading: Radio<ConflictResolution>(
                 value: ConflictResolution.keepBoth,
                 groupValue: _selectedStrategy,
-                onChanged: (value) => setState(() => _selectedStrategy = value!),
+                onChanged: (value) =>
+                    setState(() => _selectedStrategy = value!),
               ),
             ),
             const SizedBox(height: 24),
@@ -486,9 +505,9 @@ class Example8_PreRestoreBackup extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            SwitchListTile(
-              title: const Text('Create Pre-Restore Backup'),
-              subtitle: const Text('Recommended for safety'),
+            const SwitchListTile(
+              title: Text('Create Pre-Restore Backup'),
+              subtitle: Text('Recommended for safety'),
               value: true,
               onChanged: null,
             ),
@@ -497,7 +516,7 @@ class Example8_PreRestoreBackup extends ConsumerWidget {
               onPressed: () async {
                 await ref.read(restoreNotifierProvider.notifier).restoreBackup(
                       backupPath: '/path/to/backup.zip',
-                      config: RestoreConfig(
+                      config: const RestoreConfig(
                         backupBeforeRestore: true,
                         mode: RestoreMode.merge,
                         conflictResolution: ConflictResolution.keepNewest,

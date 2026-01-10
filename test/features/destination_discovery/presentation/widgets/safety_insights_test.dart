@@ -11,7 +11,7 @@ void main() {
 
     setUp(() {
       testInsights = [
-        SafetyInsight(
+        const SafetyInsight(
           category: 'theft',
           description: 'Petty theft can occur in tourist areas.',
           severity: 'low',
@@ -21,7 +21,7 @@ void main() {
             'Avoid displaying expensive items',
           ],
         ),
-        SafetyInsight(
+        const SafetyInsight(
           category: 'transportation',
           description: 'Public transport is generally safe but can be crowded.',
           severity: 'medium',
@@ -31,7 +31,7 @@ void main() {
             'Keep tickets and passes safe',
           ],
         ),
-        SafetyInsight(
+        const SafetyInsight(
           category: 'nightlife',
           description: 'Nightlife areas can be risky for solo travelers.',
           severity: 'high',
@@ -56,9 +56,13 @@ void main() {
           ),
         );
 
-        expect(find.text('Petty theft can occur in tourist areas.'), findsOneWidget);
-        expect(find.text('Public transport is generally safe but can be crowded.'), findsOneWidget);
-        expect(find.text('Nightlife areas can be risky for solo travelers.'), findsOneWidget);
+        expect(find.text('Petty theft can occur in tourist areas.'),
+            findsOneWidget);
+        expect(
+            find.text('Public transport is generally safe but can be crowded.'),
+            findsOneWidget);
+        expect(find.text('Nightlife areas can be risky for solo travelers.'),
+            findsOneWidget);
       });
 
       testWidgets('renders insight categories', (WidgetTester tester) async {
@@ -89,7 +93,8 @@ void main() {
         expect(find.text('Avoid displaying expensive items'), findsOneWidget);
       });
 
-      testWidgets('renders custom title when provided', (WidgetTester tester) async {
+      testWidgets('renders custom title when provided',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -119,7 +124,8 @@ void main() {
     });
 
     group('Icons', () {
-      testWidgets('shows icons when showIcons is true', (WidgetTester tester) async {
+      testWidgets('shows icons when showIcons is true',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -136,7 +142,8 @@ void main() {
         expect(find.byIcon(Icons.local_bar), findsOneWidget);
       });
 
-      testWidgets('hides icons when showIcons is false', (WidgetTester tester) async {
+      testWidgets('hides icons when showIcons is false',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -156,19 +163,19 @@ void main() {
       testWidgets('uses contextual icons for different categories',
           (WidgetTester tester) async {
         final insightsWithCategories = [
-          SafetyInsight(
+          const SafetyInsight(
             category: 'scams',
             description: 'Test',
             severity: 'low',
             tips: [],
           ),
-          SafetyInsight(
+          const SafetyInsight(
             category: 'natural',
             description: 'Test',
             severity: 'low',
             tips: [],
           ),
-          SafetyInsight(
+          const SafetyInsight(
             category: 'health',
             description: 'Test',
             severity: 'low',
@@ -252,7 +259,8 @@ void main() {
     });
 
     group('Expand/Collapse', () {
-      testWidgets('insights are collapsed by default', (WidgetTester tester) async {
+      testWidgets('insights are collapsed by default',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(

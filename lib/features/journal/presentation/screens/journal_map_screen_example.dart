@@ -160,7 +160,7 @@ class _FullMapDemoScreenState extends ConsumerState<_FullMapDemoScreen> {
           if (mapState.hasMarkers)
             Container(
               padding: const EdgeInsets.all(12),
-              color: Theme.of(context).colorScheme.surfaceVariant,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -188,8 +188,8 @@ class _FullMapDemoScreenState extends ConsumerState<_FullMapDemoScreen> {
             ),
 
           // Map screen
-          Expanded(
-            child: const JournalMapScreen(),
+          const Expanded(
+            child: JournalMapScreen(),
           ),
         ],
       ),
@@ -300,7 +300,8 @@ class MainNavigationExample extends ConsumerStatefulWidget {
   const MainNavigationExample({super.key});
 
   @override
-  ConsumerState<MainNavigationExample> createState() => _MainNavigationExampleState();
+  ConsumerState<MainNavigationExample> createState() =>
+      _MainNavigationExampleState();
 }
 
 class _MainNavigationExampleState extends ConsumerState<MainNavigationExample> {

@@ -1,10 +1,16 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/utils/location_service.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+
+// Generated file
+part 'journal_entry_providers.g.dart';
 
 /// State for journal entry creation
 class JournalEntryCreationState {
@@ -53,7 +59,7 @@ class JournalEntryCreationState {
   const JournalEntryCreationState({
     this.title = '',
     this.content = '',
-    DateTime? entryDate,
+    required this.entryDate,
     this.tripId,
     this.mood,
     this.locationName,
@@ -64,7 +70,7 @@ class JournalEntryCreationState {
     this.isSaving = false,
     this.isCapturingLocation = false,
     this.error,
-  }) : entryDate = entryDate ?? DateTime.now();
+  });
 
   JournalEntryCreationState copyWith({
     String? title,
@@ -100,16 +106,20 @@ class JournalEntryCreationState {
 }
 
 /// Notifier for managing journal entry creation state
-class JournalEntryCreationNotifier
-    extends StateNotifier<JournalEntryCreationState> {
-  final Ref _ref;
-  final JournalRepository _repository;
-  final LocationService _locationService;
-  static final _uuid = const Uuid();
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class JournalEntryCreation extends _$JournalEntryCreation {
+  final LocationService _locationService = LocationService.instance;
+  static const _uuid = Uuid();
 
-  JournalEntryCreationNotifier(this._ref, this._repository)
-      : _locationService = LocationService.instance,
-        super(const JournalEntryCreationState());
+  @override
+  JournalEntryCreationState build() {
+    // Dependencies are accessed via ref.watch in build method
+    // No constructor parameters needed - they're accessed via ref
+    return JournalEntryCreationState(entryDate: DateTime.now());
+  }
 
   /// Update the title
   void updateTitle(String title) {
@@ -169,7 +179,8 @@ class JournalEntryCreationNotifier
       if (!location.hasAcceptableAccuracy()) {
         state = state.copyWith(
           isCapturingLocation: false,
-          error: 'Location accuracy is poor. Please try again or move to an open area.',
+          error:
+              'Location accuracy is poor. Please try again or move to an open area.',
         );
         return;
       }
@@ -213,7 +224,7 @@ class JournalEntryCreationNotifier
 
   /// Clear all fields
   void clear() {
-    state = const JournalEntryCreationState();
+    state = JournalEntryCreationState(entryDate: DateTime.now());
   }
 
   /// Clear error
@@ -225,7 +236,16 @@ class JournalEntryCreationNotifier
 
   /// Create a journal entry entity from the current state
   JournalEntry createEntry() {
-    final user = _ref.read(currentUserProvider);
+    // Access the current user from auth state
+    final authState = ref.read(authProvider);
+    final User? user;
+
+    if (authState is AsyncData<AuthState>) {
+      user = authState.value.user;
+    } else {
+      throw StateError('User must be authenticated to create entries');
+    }
+
     if (user == null) {
       throw StateError('User must be authenticated to create entries');
     }
@@ -264,8 +284,11 @@ class JournalEntryCreationNotifier
       // Create the entry
       final entry = createEntry();
 
+      // Get repository via ref.watch
+      final repository = ref.read(journalRepositoryProvider);
+
       // Save via repository
-      await _repository.createEntry(entry);
+      await repository.createEntry(entry);
 
       // Success
       state = state.copyWith(isSaving: false);
@@ -296,36 +319,32 @@ class JournalEntryCreationNotifier
   }
 }
 
-/// Provider for journal entry creation
-final journalEntryCreationProvider =
-    StateNotifierProvider<JournalEntryCreationNotifier, JournalEntryCreationState>(
-  (ref) {
-    final repository = ref.watch(journalRepositoryProvider);
-    return JournalEntryCreationNotifier(ref, repository);
-  },
-);
-
 /// Provider for Journal Repository
 /// This should be overridden in the DI layer to provide the actual implementation
-final journalRepositoryProvider = Provider<JournalRepository>((ref) {
+@riverpod
+JournalRepository journalRepository(Ref ref) {
   throw UnimplementedError(
     'JournalRepository must be overridden in the DI layer',
   );
-});
+}
 
-/// Provider for form validation state
-final journalEntryFormValidatorProvider = Provider<bool>((ref) {
-  return ref.watch(journalEntryCreationProvider).isValid;
-});
+/// Class for save button state
+class SaveButtonState {
+  final bool enabled;
+  final bool isLoading;
+
+  const SaveButtonState({
+    required this.enabled,
+    required this.isLoading,
+  });
+}
 
 /// Provider for save button state
-final journalEntrySaveButtonProvider = Provider<{
-  bool enabled;
-  bool isLoading;
-}>((ref) {
+@riverpod
+SaveButtonState journalEntrySaveButton(Ref ref) {
   final creationState = ref.watch(journalEntryCreationProvider);
-  return (
+  return SaveButtonState(
     enabled: creationState.isValid && !creationState.isSaving,
     isLoading: creationState.isSaving,
   );
-});
+}

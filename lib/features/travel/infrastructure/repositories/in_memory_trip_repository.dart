@@ -1,8 +1,7 @@
 import '../../domain/models/trip.dart';
 import '../../domain/repositories/trip_repository.dart';
-import '../../../core/models/paginated_data.dart';
-import '../../../core/models/page_info.dart';
-import '../../../core/repositories/paginated_repository_mixin.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 
 /// In-memory implementation of TripRepository for testing and development
 ///
@@ -11,7 +10,8 @@ import '../../../core/repositories/paginated_repository_mixin.dart';
 ///
 /// For production, replace with an implementation that uses a database
 /// or remote API.
-class InMemoryTripRepository with PaginatedRepositoryMixin
+class InMemoryTripRepository
+    with PaginatedRepositoryMixin
     implements TripRepository {
   final Map<String, Trip> _trips = {};
   int _idCounter = 1;
@@ -32,9 +32,8 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
     final offset = parseOffsetCursor(cursor) ?? 0;
 
     // Filter trips by user and additional filters
-    var filteredTrips = _trips.values
-        .where((trip) => trip.userId == userId)
-        .toList();
+    var filteredTrips =
+        _trips.values.where((trip) => trip.userId == userId).toList();
 
     // Apply additional filters
     if (filters != null) {
@@ -45,10 +44,9 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
       }
       if (filters.containsKey('destination')) {
         filteredTrips = filteredTrips
-            .where((trip) =>
-                trip.destination
-                    .toLowerCase()
-                    .contains((filters['destination'] as String).toLowerCase()))
+            .where((trip) => trip.destination
+                .toLowerCase()
+                .contains((filters['destination'] as String).toLowerCase()))
             .toList();
       }
     }
@@ -70,9 +68,8 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
     final hasNextPage = endIndex < filteredTrips.length;
 
     // Generate next cursor
-    final nextCursor = hasNextPage
-        ? generateOffsetCursor(offset + validatedPageSize)
-        : null;
+    final nextCursor =
+        hasNextPage ? generateOffsetCursor(offset + validatedPageSize) : null;
 
     // Create page info
     final pageInfo = createCursorPageInfo(
@@ -81,7 +78,8 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
       itemsCount: paginatedTrips.length,
       hasNextPage: hasNextPage,
       nextCursor: nextCursor,
-      previousCursor: offset > 0 ? generateOffsetCursor(offset - validatedPageSize) : null,
+      previousCursor:
+          offset > 0 ? generateOffsetCursor(offset - validatedPageSize) : null,
     );
 
     return PaginatedData<Trip>(
@@ -106,9 +104,8 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
     final offset = (page - 1) * validatedPageSize;
 
     // Filter trips by user and additional filters
-    var filteredTrips = _trips.values
-        .where((trip) => trip.userId == userId)
-        .toList();
+    var filteredTrips =
+        _trips.values.where((trip) => trip.userId == userId).toList();
 
     // Apply additional filters
     if (filters != null) {
@@ -162,9 +159,8 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
     );
 
     // Convert to metadata
-    final metadataList = fullTrips.items
-        .map((trip) => TripMetadata.fromTrip(trip))
-        .toList();
+    final metadataList =
+        fullTrips.items.map((trip) => TripMetadata.fromTrip(trip)).toList();
 
     return PaginatedData<TripMetadata>(
       items: metadataList,
@@ -243,13 +239,12 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
             (trip.title.toLowerCase().contains(query.toLowerCase()) ||
                 trip.description?.toLowerCase().contains(query.toLowerCase()) ==
                     true ||
-                trip.destination
-                    .toLowerCase()
-                    .contains(query.toLowerCase())))
+                trip.destination.toLowerCase().contains(query.toLowerCase())))
         .toList();
 
     // Sort by createdAt descending
-    final sortedResults = _sortTrips(searchResults, 'createdAt', SortOrder.descending);
+    final sortedResults =
+        _sortTrips(searchResults, 'createdAt', SortOrder.descending);
 
     // Apply pagination based on whether cursor or page is provided
     if (cursor != null) {
@@ -260,16 +255,13 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
       final paginatedResults = startIndex < sortedResults.length
           ? sortedResults.sublist(
               startIndex,
-              endIndex > sortedResults.length
-                  ? sortedResults.length
-                  : endIndex,
+              endIndex > sortedResults.length ? sortedResults.length : endIndex,
             )
           : <Trip>[];
 
       final hasNextPage = endIndex < sortedResults.length;
-      final nextCursor = hasNextPage
-          ? generateOffsetCursor(offset + validatedPageSize)
-          : null;
+      final nextCursor =
+          hasNextPage ? generateOffsetCursor(offset + validatedPageSize) : null;
 
       final pageInfo = createCursorPageInfo(
         currentCursor: cursor,
@@ -291,9 +283,7 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
       final paginatedResults = startIndex < sortedResults.length
           ? sortedResults.sublist(
               startIndex,
-              endIndex > sortedResults.length
-                  ? sortedResults.length
-                  : endIndex,
+              endIndex > sortedResults.length ? sortedResults.length : endIndex,
             )
           : <Trip>[];
 
@@ -320,7 +310,8 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
 
     if (filters != null) {
       if (filters.containsKey('status')) {
-        trips = trips.where((trip) => trip.status == filters['status'] as String);
+        trips =
+            trips.where((trip) => trip.status == filters['status'] as String);
       }
     }
 
@@ -339,12 +330,14 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
     final filteredTrips = _trips.values
         .where((trip) =>
             trip.userId == userId &&
-            trip.startDate.isAfter(startDate.subtract(const Duration(days: 1))) &&
+            trip.startDate
+                .isAfter(startDate.subtract(const Duration(days: 1))) &&
             trip.endDate.isBefore(endDate.add(const Duration(days: 1))))
         .toList();
 
     // Sort by startDate ascending
-    final sortedTrips = _sortTrips(filteredTrips, 'startDate', SortOrder.ascending);
+    final sortedTrips =
+        _sortTrips(filteredTrips, 'startDate', SortOrder.ascending);
 
     // Apply pagination
     final offset = parseOffsetCursor(cursor) ?? 0;
@@ -387,8 +380,9 @@ class InMemoryTripRepository with PaginatedRepositoryMixin
           comparison = a.title.toLowerCase().compareTo(b.title.toLowerCase());
           break;
         case 'destination':
-          comparison =
-              a.destination.toLowerCase().compareTo(b.destination.toLowerCase());
+          comparison = a.destination
+              .toLowerCase()
+              .compareTo(b.destination.toLowerCase());
           break;
         case 'startDate':
           comparison = a.startDate.compareTo(b.startDate);

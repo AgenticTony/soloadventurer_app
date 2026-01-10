@@ -6,9 +6,8 @@ part of 'travel_preference.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TravelPreferenceImpl _$$TravelPreferenceImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TravelPreferenceImpl(
+_TravelPreference _$TravelPreferenceFromJson(Map<String, dynamic> json) =>
+    _TravelPreference(
       id: json['id'] as String,
       userId: json['userId'] as String,
       travelStyles: (json['travelStyles'] as List<dynamic>)
@@ -35,8 +34,7 @@ _$TravelPreferenceImpl _$$TravelPreferenceImplFromJson(
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$TravelPreferenceImplToJson(
-        _$TravelPreferenceImpl instance) =>
+Map<String, dynamic> _$TravelPreferenceToJson(_TravelPreference instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

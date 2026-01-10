@@ -6,9 +6,9 @@ part of 'notification_preferences_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$NotificationPreferencesModelImpl _$$NotificationPreferencesModelImplFromJson(
+_NotificationPreferencesModel _$NotificationPreferencesModelFromJson(
         Map<String, dynamic> json) =>
-    _$NotificationPreferencesModelImpl(
+    _NotificationPreferencesModel(
       flightCheckInReminders: json['flightCheckInReminders'] as bool? ?? true,
       flightDelaysAndCancellations:
           json['flightDelaysAndCancellations'] as bool? ?? true,
@@ -45,8 +45,8 @@ _$NotificationPreferencesModelImpl _$$NotificationPreferencesModelImplFromJson(
       userId: json['userId'] as String?,
     );
 
-Map<String, dynamic> _$$NotificationPreferencesModelImplToJson(
-        _$NotificationPreferencesModelImpl instance) =>
+Map<String, dynamic> _$NotificationPreferencesModelToJson(
+        _NotificationPreferencesModel instance) =>
     <String, dynamic>{
       'flightCheckInReminders': instance.flightCheckInReminders,
       'flightDelaysAndCancellations': instance.flightDelaysAndCancellations,

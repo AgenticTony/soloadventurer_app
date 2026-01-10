@@ -374,9 +374,8 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
       memCacheWidth: widget.width != null
           ? (widget.width! ~/ 4).toInt() // Thumbnail at 1/4 resolution
           : null,
-      memCacheHeight: widget.height != null
-          ? (widget.height! ~/ 4).toInt()
-          : null,
+      memCacheHeight:
+          widget.height != null ? (widget.height! ~/ 4).toInt() : null,
     );
   }
 
@@ -430,8 +429,8 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
   Widget _buildErrorWidget(dynamic error) {
     // Check if error is retryable
     final classifier = ImageErrorClassifier.classify(error);
-    final canRetry = classifier.isRetryable() &&
-        _retryCount < widget.maxRetryCount;
+    final canRetry =
+        classifier.isRetryable() && _retryCount < widget.maxRetryCount;
 
     // Use enhanced error handling if enabled
     if (widget.useEnhancedErrorHandling) {

@@ -166,10 +166,10 @@ class ConflictInfo extends Equatable {
       conflictId: json['conflictId'] as String,
       entityId: json['entityId'] as String,
       entityType: json['entityType'] as String,
-      conflictType: ConflictType.values
-          .firstWhere((e) => e.name == json['conflictType']),
-      severity: ConflictSeverity.values
-          .firstWhere((e) => e.name == json['severity']),
+      conflictType:
+          ConflictType.values.firstWhere((e) => e.name == json['conflictType']),
+      severity:
+          ConflictSeverity.values.firstWhere((e) => e.name == json['severity']),
       localVersion: EntityVersion.fromJson(json['localVersion']),
       remoteVersion: EntityVersion.fromJson(json['remoteVersion']),
       localData: json['localData'] as Map<String, dynamic>?,
@@ -249,10 +249,10 @@ class ConflictDetectionResult extends Equatable {
       conflicts.where((c) => c.severity == ConflictSeverity.low).toList();
 
   @override
-  List<Object?> get props => [hasConflicts, conflicts, entitiesChecked, noConflictCount];
+  List<Object?> get props =>
+      [hasConflicts, conflicts, entitiesChecked, noConflictCount];
 
   @override
-  String toString() =>
-      'ConflictDetectionResult(hasConflicts: $hasConflicts, '
+  String toString() => 'ConflictDetectionResult(hasConflicts: $hasConflicts, '
       'conflictCount: $conflictCount, entitiesChecked: $entitiesChecked)';
 }

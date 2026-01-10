@@ -1,4 +1,5 @@
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/database_helper.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';

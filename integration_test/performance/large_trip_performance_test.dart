@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:solo_adventurer/core/monitoring/performance/memory_profiler.dart';
-import 'package:solo_adventurer/core/monitoring/performance/performance_monitor.dart';
-import 'package:solo_adventurer/core/monitoring/performance/performance_metrics.dart';
-import 'package:solo_adventurer/features/travel/domain/models/activity.dart';
-import 'package:solo_adventurer/features/travel/domain/models/photo.dart';
-import 'package:solo_adventurer/features/travel/domain/models/trip.dart';
-import 'package:solo_adventurer/features/travel/infrastructure/repositories/in_memory_activity_repository.dart';
-import 'package:solo_adventurer/features/travel/infrastructure/repositories/in_memory_trip_repository.dart';
+import 'package:soloadventurer/core/monitoring/performance/memory_profiler.dart';
+import 'package:soloadventurer/core/monitoring/performance/performance_monitor.dart';
+import 'package:soloadventurer/core/monitoring/performance/performance_metrics.dart';
+import 'package:soloadventurer/features/travel/domain/models/activity.dart';
+import 'package:soloadventurer/features/travel/domain/models/photo.dart';
+import 'package:soloadventurer/features/travel/domain/models/trip.dart';
+import 'package:soloadventurer/features/travel/infrastructure/repositories/in_memory_activity_repository.dart';
+import 'package:soloadventurer/features/travel/infrastructure/repositories/in_memory_trip_repository.dart';
 import 'test_data_generators.dart';
 
 /// Integration tests for large trip performance
@@ -50,8 +50,8 @@ void main() {
     });
 
     tearDown(() async {
-      await tripRepository.clear();
-      await activityRepository.clear();
+      tripRepository.clear();
+      activityRepository.clear();
       await PerformanceMonitor.dispose();
       container.dispose();
     });
@@ -202,7 +202,7 @@ void main() {
       stopwatch.start();
 
       // Query activities with pagination
-      var cursor: String? = null;
+      String? cursor;
       var totalActivities = 0;
       var pageCount = 0;
 
@@ -267,7 +267,7 @@ void main() {
 
       // Test pagination performance
       final paginationTimings = <int>[];
-      var cursor: String? = null;
+      String? cursor;
       var pageCount = 0;
 
       final stopwatch = Stopwatch()..start();
@@ -347,7 +347,7 @@ void main() {
       );
 
       // Force multiple page loads
-      var cursor: String? = null;
+      String? cursor;
       for (var i = 0; i < 5; i++) {
         final result = await activityRepository.getActivitiesCursor(
           tripId: TestDataGenerator.defaultTripId,
@@ -488,9 +488,6 @@ void main() {
       // Capture metrics
       final initialMetrics = await PerformanceMonitor.getCurrentMetrics();
 
-      expect(initialMetrics, isNotNull,
-          reason: 'Should be able to capture initial metrics');
-
       // Perform operations and track metrics
       await activityRepository.getActivitiesCursor(
         tripId: 'monitor-test',
@@ -500,9 +497,7 @@ void main() {
 
       final finalMetrics = await PerformanceMonitor.getCurrentMetrics();
 
-      expect(finalMetrics, isNotNull,
-          reason: 'Should be able to capture final metrics');
-      expect(finalMetrics!.totalNetworkRequests, greaterThanOrEqualTo(0),
+      expect(finalMetrics.totalNetworkRequests, greaterThanOrEqualTo(0),
           reason: 'Should track network requests');
 
       // Log baseline metrics
@@ -527,7 +522,7 @@ void main() {
       final stopwatch = Stopwatch()..start();
 
       // Generate photos with different aspect ratios
-      final photos = TestDataGenerator.generatePhotosWithAspectRatios(
+      final photos = TestDataGenerator.generatePhotosWithAspectRations(
         tripId: 'grid-test',
         count: 500,
       );

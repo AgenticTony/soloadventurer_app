@@ -74,7 +74,8 @@ class TripOverviewMenu extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const TripOverviewScreen(tripId: tripId),
+                  builder: (context) =>
+                      const TripOverviewScreen(tripId: tripId),
                 ),
               );
             },
@@ -138,7 +139,8 @@ class ProviderScopeExample extends ConsumerStatefulWidget {
   const ProviderScopeExample({super.key});
 
   @override
-  ConsumerState<ProviderScopeExample> createState() => _ProviderScopeExampleState();
+  ConsumerState<ProviderScopeExample> createState() =>
+      _ProviderScopeExampleState();
 }
 
 class _ProviderScopeExampleState extends ConsumerState<ProviderScopeExample> {
@@ -198,7 +200,8 @@ class _ProviderScopeExampleState extends ConsumerState<ProviderScopeExample> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TripOverviewScreen(tripId: selectedTripId!),
+                    builder: (context) =>
+                        TripOverviewScreen(tripId: selectedTripId!),
                   ),
                 );
               },
@@ -264,7 +267,7 @@ class NavigationExample extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Assuming you have a trip object
-    final tripId = 'example-trip-id';
+    const tripId = 'example-trip-id';
 
     return Scaffold(
       appBar: AppBar(
@@ -281,7 +284,8 @@ class NavigationExample extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TripOverviewScreen(tripId: tripId),
+                    builder: (context) =>
+                        const TripOverviewScreen(tripId: tripId),
                   ),
                 );
               },
@@ -334,7 +338,9 @@ class StateMonitoringExample extends ConsumerWidget {
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          ref.read(tripOverviewProvider(tripId).notifier).clearError();
+                          ref
+                              .read(tripOverviewProvider(tripId).notifier)
+                              .clearError();
                         },
                         child: const Text('Clear Error'),
                       ),

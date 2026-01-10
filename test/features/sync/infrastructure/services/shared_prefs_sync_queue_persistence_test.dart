@@ -25,7 +25,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
@@ -46,7 +46,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       when(mockPrefs.getStringList('sync_queue_operations'))
@@ -145,10 +145,8 @@ void main() {
       // Arrange
       when(mockPrefs.getStringList('sync_queue_operations'))
           .thenReturn(['op1', 'op2']);
-      when(mockPrefs.getString('sync_queue_op_op1'))
-          .thenReturn('invalid json');
-      when(mockPrefs.getString('sync_queue_op_op2'))
-          .thenReturn(null);
+      when(mockPrefs.getString('sync_queue_op_op1')).thenReturn('invalid json');
+      when(mockPrefs.getString('sync_queue_op_op2')).thenReturn(null);
       when(mockPrefs.remove(any)).thenAnswer((_) async => true);
       when(mockPrefs.setStringList(any, any)).thenAnswer((_) async => true);
 

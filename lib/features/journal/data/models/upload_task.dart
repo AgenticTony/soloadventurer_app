@@ -1,89 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../domain/entities/media_item.dart';
 
-/// Upload status for media items
-enum UploadStatus {
-  /// Task is queued and waiting to be uploaded
-  queued,
-
-  /// Upload is in progress
-  uploading,
-
-  /// Upload completed successfully
-  completed,
-
-  /// Upload failed and will retry
-  failed,
-
-  /// Upload failed permanently and won't retry
-  permanentFailure,
-
-  /// Upload was paused
-  paused,
-
-  /// Upload was cancelled
-  cancelled,
-}
-
-/// Extension for UploadStatus with helper methods
-extension UploadStatusExtension on UploadStatus {
-  /// String representation of the status
-  String toValue() {
-    switch (this) {
-      case UploadStatus.queued:
-        return 'queued';
-      case UploadStatus.uploading:
-        return 'uploading';
-      case UploadStatus.completed:
-        return 'completed';
-      case UploadStatus.failed:
-        return 'failed';
-      case UploadStatus.permanentFailure:
-        return 'permanent_failure';
-      case UploadStatus.paused:
-        return 'paused';
-      case UploadStatus.cancelled:
-        return 'cancelled';
-    }
-  }
-
-  /// Convert from string
-  static UploadStatus fromValue(String value) {
-    switch (value) {
-      case 'queued':
-        return UploadStatus.queued;
-      case 'uploading':
-        return UploadStatus.uploading;
-      case 'completed':
-        return UploadStatus.completed;
-      case 'failed':
-        return UploadStatus.failed;
-      case 'permanent_failure':
-        return UploadStatus.permanentFailure;
-      case 'paused':
-        return UploadStatus.paused;
-      case 'cancelled':
-        return UploadStatus.cancelled;
-      default:
-        return UploadStatus.queued;
-    }
-  }
-
-  /// Whether the upload is in a terminal state
-  bool get isTerminal =>
-      this == UploadStatus.completed ||
-      this == UploadStatus.permanentFailure ||
-      this == UploadStatus.cancelled;
-
-  /// Whether the upload can be retried
-  bool get canRetry =>
-      this == UploadStatus.failed || this == UploadStatus.paused;
-
-  /// Whether the upload is active
-  bool get isActive =>
-      this == UploadStatus.queued || this == UploadStatus.uploading;
-}
-
 /// Represents a media upload task in the queue
 class UploadTask extends Equatable {
   /// Unique identifier for the task
@@ -210,9 +127,9 @@ class UploadTask extends Equatable {
     return {
       'id': id,
       'file_path': filePath,
-      'media_type': mediaType.toValue(),
+      'media_type': mediaType.value,
       'journal_entry_id': journalEntryId,
-      'status': status.toValue(),
+      'status': status.value,
       'progress': progress,
       'retry_count': retryCount,
       'max_retries': maxRetries,
@@ -234,9 +151,9 @@ class UploadTask extends Equatable {
     return UploadTask(
       id: json['id'] as String,
       filePath: json['file_path'] as String,
-      mediaType: MediaTypeExtension.fromValue(json['media_type'] as String),
+      mediaType: MediaTypeExtension.fromString(json['media_type'] as String),
       journalEntryId: json['journal_entry_id'] as String?,
-      status: UploadStatusExtension.fromValue(json['status'] as String),
+      status: UploadStatusExtension.fromString(json['status'] as String),
       progress: json['progress'] as int? ?? 0,
       retryCount: json['retry_count'] as int? ?? 0,
       maxRetries: json['max_retries'] as int? ?? 3,

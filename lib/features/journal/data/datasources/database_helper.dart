@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 
 /// Helper class for managing SQLite database operations
 class DatabaseHelper {
@@ -207,7 +207,7 @@ class DatabaseHelper {
       // Create indexes for better query performance
       await _createIndexes(db);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to create database tables: $e',
       );
     }
@@ -256,7 +256,7 @@ class DatabaseHelper {
         CREATE INDEX idx_entry_tags_tag_id ON $tableEntryTags($colTagId)
       ''');
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to create database indexes: $e',
       );
     }
@@ -288,7 +288,7 @@ class DatabaseHelper {
       await db.delete(tableTags);
       await db.delete(tableTrips);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to clear database: $e',
       );
     }
@@ -302,7 +302,7 @@ class DatabaseHelper {
       await databaseFactory.deleteDatabase(path);
       _database = null;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to delete database: $e',
       );
     }

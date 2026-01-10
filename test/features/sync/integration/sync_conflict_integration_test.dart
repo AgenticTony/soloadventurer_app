@@ -29,7 +29,8 @@ class MockBackendServer {
 
   Map<String, dynamic>? getRemoteData(String entityId) => _remoteData[entityId];
 
-  void updateRemoteData(String entityId, EntityVersion version, Map<String, dynamic> data) {
+  void updateRemoteData(
+      String entityId, EntityVersion version, Map<String, dynamic> data) {
     _remoteVersions[entityId] = version;
     _remoteData[entityId] = data;
   }
@@ -54,8 +55,8 @@ void main() {
 
     // Setup default mock responses
     when(mockPersistence.loadQueue()).thenAnswer((_) async => []);
-    when(mockPersistence.saveQueue(any)).thenAnswer((_) async =>
-        SyncQueuePersistenceResult.success(operationCount: 0));
+    when(mockPersistence.saveQueue(any)).thenAnswer(
+        (_) async => SyncQueuePersistenceResult.success(operationCount: 0));
   });
 
   tearDown(() async {
@@ -63,7 +64,8 @@ void main() {
   });
 
   group('Integration Tests - Simultaneous Edit Conflict Scenarios', () {
-    test('should detect conflict when two devices edit same entity simultaneously',
+    test(
+        'should detect conflict when two devices edit same entity simultaneously',
         () async {
       // Arrange
       conflictDetector = ConflictDetectorImpl(
@@ -111,7 +113,8 @@ void main() {
       expect(conflict.remoteVersion.deviceId, 'device-b');
     });
 
-    test('should resolve simultaneous edit conflict with last-write-wins', () async {
+    test('should resolve simultaneous edit conflict with last-write-wins',
+        () async {
       // Arrange
       conflictResolver = ConflictResolverImpl(
         config: ConflictResolutionConfig(
@@ -145,8 +148,8 @@ void main() {
         severity: ConflictSeverity.medium,
         localVersion: localVersion,
         remoteVersion: remoteVersion,
-        localData: {'title': 'Paris Trip (Device A)'},
-        remoteData: {'title': 'Paris Trip (Device B)'},
+        localData: const {'title': 'Paris Trip (Device A)'},
+        remoteData: const {'title': 'Paris Trip (Device B)'},
         description: 'Conflict detected',
         detectedAt: DateTime.now().toUtc(),
       );
@@ -196,7 +199,8 @@ void main() {
       expect(conflict, isNull);
     });
 
-    test('should auto-merge conflicts with non-overlapping field changes', () async {
+    test('should auto-merge conflicts with non-overlapping field changes',
+        () async {
       // Arrange
       conflictResolver = ConflictResolverImpl(
         config: ConflictResolutionConfig(deviceId: 'device-a'),
@@ -222,11 +226,11 @@ void main() {
           lastModified: DateTime.now().toUtc(),
           deviceId: 'device-b',
         ),
-        localData: {
+        localData: const {
           'title': 'Paris Trip',
           'notes': 'Added by device A',
         },
-        remoteData: {
+        remoteData: const {
           'title': 'Paris Trip',
           'budget': 5000,
         },
@@ -235,7 +239,8 @@ void main() {
       );
 
       // Act
-      final resolution = await conflictResolver.resolveWithAutomaticMerge(conflict);
+      final resolution =
+          await conflictResolver.resolveWithAutomaticMerge(conflict);
 
       // Assert
       expect(resolution.isSuccessful, isTrue);
@@ -246,7 +251,8 @@ void main() {
       expect(resolution.mergeResult?.conflictedFields, isEmpty);
     });
 
-    test('should handle batch conflict detection for multiple entities', () async {
+    test('should handle batch conflict detection for multiple entities',
+        () async {
       // Arrange
       conflictDetector = ConflictDetectorImpl(
         config: ConflictDetectionConfig(deviceId: 'device-a'),
@@ -281,7 +287,8 @@ void main() {
           entityId: 'trip-2',
           entityType: 'trip',
           version: 1,
-          lastModified: DateTime.now().toUtc().subtract(const Duration(hours: 1)),
+          lastModified:
+              DateTime.now().toUtc().subtract(const Duration(hours: 1)),
           deviceId: 'device-b',
         ),
       ];
@@ -301,7 +308,8 @@ void main() {
   });
 
   group('Integration Tests - Offline-Then-Online Sync Scenarios', () {
-    test('should queue operations while offline and sync when back online', () async {
+    test('should queue operations while offline and sync when back online',
+        () async {
       // Arrange
       final connectivityController = StreamController<bool>();
       when(mockNetworkConnectivity.onOnline)
@@ -338,26 +346,28 @@ void main() {
 
       // Assert
       verify(mockNetworkConnectivity.onOnline).called(greaterThanOrEqualTo(1));
-      expect(syncService.status, anyOf(SyncStatus.success, SyncStatus.idle, SyncStatus.pending));
+      expect(syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle, SyncOperationStatus.pending));
 
       await connectivityController.close();
-      await syncService.dispose();
+      syncService.dispose();
     });
 
-    test('should persist operations across app restart while offline', () async {
+    test('should persist operations across app restart while offline',
+        () async {
       // Arrange
       final operations = [
         SyncOperation.create(
           id: 'op-1',
           entityType: SyncEntityType.trip,
           entityId: 'trip-1',
-          data: {'title': 'Offline Trip 1'},
+          data: const {'title': 'Offline Trip 1'},
         ),
         SyncOperation.create(
           id: 'op-2',
           entityType: SyncEntityType.trip,
           entityId: 'trip-2',
-          data: {'title': 'Offline Trip 2'},
+          data: const {'title': 'Offline Trip 2'},
         ),
       ];
 
@@ -375,11 +385,11 @@ void main() {
       expect(syncService.queueSize, 2);
       expect(syncService.queue[0].entityId, 'trip-1');
       expect(syncService.queue[1].entityId, 'trip-2');
-      expect(syncService.status, SyncStatus.pending);
+      expect(syncService.status, SyncOperationStatus.pending);
 
       verify(mockPersistence.loadQueue()).called(1);
 
-      await syncService.dispose();
+      syncService.dispose();
     });
 
     test('should handle conflict when syncing offline changes', () async {
@@ -393,7 +403,8 @@ void main() {
         entityId: 'trip-123',
         entityType: 'trip',
         version: 2,
-        lastModified: DateTime.now().toUtc().subtract(const Duration(minutes: 10)),
+        lastModified:
+            DateTime.now().toUtc().subtract(const Duration(minutes: 10)),
         deviceId: 'device-a',
         dataHash: 'offline-hash',
       );
@@ -403,7 +414,8 @@ void main() {
         entityId: 'trip-123',
         entityType: 'trip',
         version: 3,
-        lastModified: DateTime.now().toUtc().subtract(const Duration(minutes: 5)),
+        lastModified:
+            DateTime.now().toUtc().subtract(const Duration(minutes: 5)),
         deviceId: 'device-b',
         dataHash: 'remote-hash',
       );
@@ -424,7 +436,8 @@ void main() {
       expect(conflict.remoteVersion.version, 3);
     });
 
-    test('should handle multiple offline edits syncing on different devices', () async {
+    test('should handle multiple offline edits syncing on different devices',
+        () async {
       // Arrange
       final connectivityController = StreamController<bool>();
       when(mockNetworkConnectivity.onOnline)
@@ -442,7 +455,7 @@ void main() {
           id: 'op-a1',
           entityType: SyncEntityType.trip,
           entityId: 'trip-1',
-          data: {'title': 'Device A Offline Edit'},
+          data: const {'title': 'Device A Offline Edit'},
         ),
       );
 
@@ -456,7 +469,7 @@ void main() {
       expect(syncServiceA.queueSize, lessThanOrEqualTo(1));
 
       await connectivityController.close();
-      await syncServiceA.dispose();
+      syncServiceA.dispose();
     });
   });
 
@@ -473,7 +486,7 @@ void main() {
         id: 'op-retry',
         entityType: SyncEntityType.trip,
         entityId: 'trip-1',
-        data: {'title': 'Retry Test'},
+        data: const {'title': 'Retry Test'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -489,10 +502,11 @@ void main() {
       final queueAfter = syncService.queue;
       expect(queueAfter.length, lessThanOrEqualTo(queueBefore.length));
 
-      await syncService.dispose();
+      syncService.dispose();
     });
 
-    test('should handle network interruption during batch processing', () async {
+    test('should handle network interruption during batch processing',
+        () async {
       // Arrange
       final syncService = SyncServiceImpl(
         persistence: mockPersistence,
@@ -523,7 +537,7 @@ void main() {
       expect(result, isNotNull);
       expect(syncService.queueSize, lessThanOrEqualTo(10));
 
-      await syncService.dispose();
+      syncService.dispose();
     });
 
     test('should maintain queue order after network interruption', () async {
@@ -537,7 +551,7 @@ void main() {
         id: 'op-high',
         entityType: SyncEntityType.trip,
         entityId: 'trip-high',
-        data: {'title': 'High Priority'},
+        data: const {'title': 'High Priority'},
         priority: 10,
       );
 
@@ -545,7 +559,7 @@ void main() {
         id: 'op-low',
         entityType: SyncEntityType.travelNote,
         entityId: 'note-low',
-        data: {'content': 'Low Priority'},
+        data: const {'content': 'Low Priority'},
         priority: 1,
       );
 
@@ -566,7 +580,7 @@ void main() {
         expect(syncService.queue.first.priority, lessThanOrEqualTo(10));
       }
 
-      await syncService.dispose();
+      syncService.dispose();
     });
 
     test('should recover from network error and continue processing', () async {
@@ -598,7 +612,7 @@ void main() {
       expect(result, isNotNull);
       expect(syncService.queueSize, lessThanOrEqualTo(3));
 
-      await syncService.dispose();
+      syncService.dispose();
     });
   });
 
@@ -631,7 +645,7 @@ void main() {
       expect(versionB!.deviceId, 'device-a');
       expect(dataB?['title'], 'Shared Trip');
 
-      await syncServiceA.dispose();
+      syncServiceA.dispose();
     });
 
     test('should detect version conflict between two devices', () async {
@@ -696,11 +710,11 @@ void main() {
           lastModified: DateTime.now().toUtc(),
           deviceId: 'device-b',
         ),
-        localData: {
+        localData: const {
           'title': 'Paris Trip',
           'accommodation': 'Hotel A',
         },
-        remoteData: {
+        remoteData: const {
           'title': 'Paris Trip',
           'transport': 'Flight B',
         },
@@ -709,7 +723,8 @@ void main() {
       );
 
       // Act
-      final resolution = await conflictResolver.resolveWithAutomaticMerge(conflict);
+      final resolution =
+          await conflictResolver.resolveWithAutomaticMerge(conflict);
 
       // Assert
       expect(resolution.isSuccessful, isTrue);
@@ -729,7 +744,8 @@ void main() {
         entityId: 'trip-1',
         entityType: 'trip',
         version: 2,
-        lastModified: DateTime.now().toUtc().subtract(const Duration(minutes: 10)),
+        lastModified:
+            DateTime.now().toUtc().subtract(const Duration(minutes: 10)),
         deviceId: 'device-a',
       );
 
@@ -738,7 +754,8 @@ void main() {
         entityId: 'trip-1',
         entityType: 'trip',
         version: 3,
-        lastModified: DateTime.now().toUtc().subtract(const Duration(minutes: 5)),
+        lastModified:
+            DateTime.now().toUtc().subtract(const Duration(minutes: 5)),
         deviceId: 'device-b',
       );
 
@@ -770,7 +787,8 @@ void main() {
       expect(conflictAC!.conflictType, ConflictType.remoteNewer);
     });
 
-    test('should prioritize by version number in multi-device scenario', () async {
+    test('should prioritize by version number in multi-device scenario',
+        () async {
       // Arrange
       conflictResolver = ConflictResolverImpl(
         config: ConflictResolutionConfig(
@@ -799,8 +817,8 @@ void main() {
           lastModified: DateTime.now().toUtc(),
           deviceId: 'device-b',
         ),
-        localData: {'title': 'Version 2'},
-        remoteData: {'title': 'Version 5'},
+        localData: const {'title': 'Version 2'},
+        remoteData: const {'title': 'Version 5'},
         description: 'Version conflict',
         detectedAt: DateTime.now().toUtc(),
       );
@@ -900,8 +918,8 @@ void main() {
             lastModified: DateTime.now().toUtc(),
             deviceId: 'device-b',
           ),
-          localData: {'title': 'Trip 1'},
-          remoteData: {'title': 'Trip 1 Updated'},
+          localData: const {'title': 'Trip 1'},
+          remoteData: const {'title': 'Trip 1 Updated'},
           description: 'Batch conflict 1',
           detectedAt: DateTime.now().toUtc(),
         ),
@@ -925,8 +943,8 @@ void main() {
             lastModified: DateTime.now().toUtc(),
             deviceId: 'device-b',
           ),
-          localData: {'title': 'Trip 2'},
-          remoteData: {'title': 'Trip 2 Updated'},
+          localData: const {'title': 'Trip 2'},
+          remoteData: const {'title': 'Trip 2 Updated'},
           description: 'Batch conflict 2',
           detectedAt: DateTime.now().toUtc(),
         ),
@@ -974,11 +992,11 @@ void main() {
           lastModified: DateTime.now().toUtc(),
           deviceId: 'device-b',
         ),
-        localData: {
+        localData: const {
           'title': 'Important Local Edit',
           'budget': 1000,
         },
-        remoteData: {
+        remoteData: const {
           'title': 'Important Remote Edit',
           'budget': 2000,
         },
@@ -1026,11 +1044,11 @@ void main() {
           lastModified: DateTime.now().toUtc(),
           deviceId: 'device-b',
         ),
-        localData: {
+        localData: const {
           'title': 'Local Title',
           'budget': 1000,
         },
-        remoteData: {
+        remoteData: const {
           'title': 'Remote Title',
           'days': 7,
         },

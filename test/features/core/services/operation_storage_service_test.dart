@@ -5,9 +5,8 @@ import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
-import 'package:soloadventurer/features/auth/infrastructure/providers/secure_storage_provider.dart';
-import 'package:soloadventurer/features/core/providers/operation_queue_provider.dart';
 import 'package:soloadventurer/features/core/services/operation_queue.dart';
+import 'package:soloadventurer/features/core/services/operation_storage_service.dart';
 
 @GenerateMocks([SharedPreferences, FlutterSecureStorage])
 import 'operation_storage_service_test.mocks.dart';

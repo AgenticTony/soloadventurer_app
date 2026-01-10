@@ -95,7 +95,8 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
               const SizedBox(height: 20),
 
               // Media inclusion option (for entries)
-              if (widget.contentType == ShareableType.journalEntry && widget.entry != null)
+              if (widget.contentType == ShareableType.journalEntry &&
+                  widget.entry != null)
                 _buildMediaOption(context, theme),
 
               const SizedBox(height: 20),
@@ -395,9 +396,7 @@ class _PlatformButton extends StatelessWidget {
               : theme.colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : Colors.transparent,
+            color: isSelected ? theme.colorScheme.primary : Colors.transparent,
             width: 2,
           ),
         ),

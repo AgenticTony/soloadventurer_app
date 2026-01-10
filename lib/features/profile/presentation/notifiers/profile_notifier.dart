@@ -1,3 +1,4 @@
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/usecases/get_current_profile_use_case.dart';
 import '../../domain/usecases/update_profile_use_case.dart';
@@ -5,30 +6,38 @@ import '../../domain/usecases/manage_avatar_use_case.dart';
 import '../../domain/usecases/delete_profile_use_case.dart';
 import '../state/profile_state.dart';
 import '../../domain/entities/profile_state.dart';
+import '../providers/profile_providers.dart';
 import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 
-class ProfileNotifier extends StateNotifier<ProfileState> {
-  final GetCurrentProfileUseCase _getCurrentProfile;
-  final UpdateProfileUseCase _updateProfile;
-  final ManageAvatarUseCase _manageAvatar;
-  final DeleteProfileUseCase _deleteProfile;
-  final ProfileDomainState _domainState;
-  final StateNotifierProviderRef _ref;
+part 'profile_notifier.g.dart';
 
-  ProfileNotifier({
-    required GetCurrentProfileUseCase getCurrentProfile,
-    required UpdateProfileUseCase updateProfile,
-    required ManageAvatarUseCase manageAvatar,
-    required DeleteProfileUseCase deleteProfile,
-    required ProfileDomainState domainState,
-    required StateNotifierProviderRef ref,
-  })  : _getCurrentProfile = getCurrentProfile,
-        _updateProfile = updateProfile,
-        _manageAvatar = manageAvatar,
-        _deleteProfile = deleteProfile,
-        _domainState = domainState,
-        _ref = ref,
-        super(ProfileState(profile: domainState.profile));
+/// Notifier for managing profile state and user interactions
+///
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier to @riverpod Notifier
+/// - Dependencies injected via ref.watch() in build() method
+/// - Removed _ref field (use ref directly in methods)
+/// - Initialization logic moved from constructor to build() method
+///
+/// Maps domain state to presentation state and handles user profile operations.
+@riverpod
+class Profile extends _$Profile {
+  /// Initialize the notifier with dependencies
+  ///
+  /// Riverpod 3.0: build() replaces constructor for initialization
+  @override
+  ProfileState build() {
+    // Get dependencies via ref.watch()
+    final getCurrentProfile = ref.watch(getCurrentProfileUseCaseProvider);
+    final updateProfile = ref.watch(updateProfileUseCaseProvider);
+    final manageAvatar = ref.watch(manageAvatarUseCaseProvider);
+    final deleteProfile = ref.watch(deleteProfileUseCaseProvider);
+
+    // Note: ProfileDomainState is obtained from auth state
+    // We'll initialize with empty state and load profile later
+
+    return const ProfileState();
+  }
 
   /// Maps domain state to presentation state, initializing UI-specific fields
   ProfileState _mapDomainState(ProfileDomainState domainState) {
@@ -46,11 +55,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> loadProfile() async {
     if (state.isLoading) return;
 
-    final authState = _ref.read(authNotifierProvider);
-    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
-    final user = authState.valueOrNull?.user;
+    // Get auth state
+    final authStateAsync = ref.read(authStateProvider);
+    final authState = authStateAsync.value;
 
-    if (!isAuthenticated || user == null) {
+    if (authState == null || !authState.isAuthenticated || authState.user == null) {
       state = state.copyWith(
         isLoading: false,
         error: 'Not authenticated',
@@ -58,9 +67,12 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
+    final user = authState.user!;
+    final getCurrentProfile = ref.read(getCurrentProfileUseCaseProvider);
+
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final profile = await _getCurrentProfile();
+      final profile = await getCurrentProfile();
       state = state.copyWith(
         isLoading: false,
         profile: profile,
@@ -79,11 +91,20 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
-    final authState = _ref.read(authNotifierProvider);
-    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
-    final user = authState.valueOrNull?.user;
+    final currentProfile = state.profile;
+    if (currentProfile == null) {
+      state = state.copyWith(
+        isUpdating: false,
+        error: 'Profile not loaded',
+      );
+      return;
+    }
 
-    if (!isAuthenticated || user == null) {
+    // Get auth state
+    final authStateAsync = ref.read(authStateProvider);
+    final authState = authStateAsync.value;
+
+    if (authState == null || !authState.isAuthenticated || authState.user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -91,14 +112,17 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
+    final user = authState.user!;
+    final updateProfile = ref.read(updateProfileUseCaseProvider);
+
     state = state.copyWith(isUpdating: true, error: null);
     try {
-      final updatedProfile = await _updateProfile(
-        state.profile!.copyWith(
+      final updatedProfile = await updateProfile(
+        currentProfile.copyWith(
           displayName:
-              changes['displayName'] as String? ?? state.profile!.displayName,
-          bio: changes['bio'] as String? ?? state.profile!.bio,
-          isPublic: changes['isPublic'] as bool? ?? state.profile!.isPublic,
+              changes['displayName'] as String? ?? currentProfile.displayName,
+          bio: changes['bio'] as String? ?? currentProfile.bio,
+          isPublic: changes['isPublic'] as bool? ?? currentProfile.isPublic,
         ),
       );
       state = state.copyWith(
@@ -119,11 +143,20 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> uploadAvatar(String filePath) async {
     if (state.isUploading || !state.isInitialized) return;
 
-    final authState = _ref.read(authNotifierProvider);
-    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
-    final user = authState.valueOrNull?.user;
+    final currentProfile = state.profile;
+    if (currentProfile == null) {
+      state = state.copyWith(
+        isUploading: false,
+        error: 'Profile not loaded',
+      );
+      return;
+    }
 
-    if (!isAuthenticated || user == null) {
+    // Get auth state
+    final authStateAsync = ref.read(authStateProvider);
+    final authState = authStateAsync.value;
+
+    if (authState == null || !authState.isAuthenticated || authState.user == null) {
       state = state.copyWith(
         isUploading: false,
         error: 'Not authenticated',
@@ -131,15 +164,18 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
+    final user = authState.user!;
+    final manageAvatar = ref.read(manageAvatarUseCaseProvider);
+
     state = state.copyWith(isUploading: true, error: null);
     try {
-      final avatarUrl = await _manageAvatar.uploadAvatar(
+      final avatarUrl = await manageAvatar.uploadAvatar(
         user.id,
         filePath,
       );
       state = state.copyWith(
         isUploading: false,
-        profile: state.profile!.copyWith(avatarUrl: avatarUrl),
+        profile: currentProfile.copyWith(avatarUrl: avatarUrl),
       );
     } catch (e) {
       state = state.copyWith(
@@ -152,11 +188,20 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> removeAvatar() async {
     if (state.isUpdating || !state.isInitialized) return;
 
-    final authState = _ref.read(authNotifierProvider);
-    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
-    final user = authState.valueOrNull?.user;
+    final currentProfile = state.profile;
+    if (currentProfile == null) {
+      state = state.copyWith(
+        isUpdating: false,
+        error: 'Profile not loaded',
+      );
+      return;
+    }
 
-    if (!isAuthenticated || user == null) {
+    // Get auth state
+    final authStateAsync = ref.read(authStateProvider);
+    final authState = authStateAsync.value;
+
+    if (authState == null || !authState.isAuthenticated || authState.user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -164,12 +209,15 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
+    final user = authState.user!;
+    final manageAvatar = ref.read(manageAvatarUseCaseProvider);
+
     state = state.copyWith(isUpdating: true, error: null);
     try {
-      await _manageAvatar.removeAvatar(user.id);
+      await manageAvatar.removeAvatar(user.id);
       state = state.copyWith(
         isUpdating: false,
-        profile: state.profile!.copyWith(avatarUrl: null),
+        profile: currentProfile.copyWith(avatarUrl: null),
       );
     } catch (e) {
       state = state.copyWith(
@@ -182,11 +230,11 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> deleteProfile() async {
     if (state.isUpdating || !state.isInitialized) return;
 
-    final authState = _ref.read(authNotifierProvider);
-    final isAuthenticated = authState.valueOrNull?.isAuthenticated ?? false;
-    final user = authState.valueOrNull?.user;
+    // Get auth state
+    final authStateAsync = ref.read(authStateProvider);
+    final authState = authStateAsync.value;
 
-    if (!isAuthenticated || user == null) {
+    if (authState == null || !authState.isAuthenticated || authState.user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -194,9 +242,12 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       return;
     }
 
+    final user = authState.user!;
+    final deleteProfile = ref.read(deleteProfileUseCaseProvider);
+
     state = state.copyWith(isUpdating: true, error: null);
     try {
-      await _deleteProfile(user.id);
+      await deleteProfile(user.id);
       state = const ProfileState();
     } catch (e) {
       state = state.copyWith(

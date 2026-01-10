@@ -74,7 +74,7 @@ class TripScreensExample extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CreateTripScreen(tripId: tripId),
+                  builder: (context) => const CreateTripScreen(tripId: tripId),
                 ),
               );
             },
@@ -200,9 +200,9 @@ class HomeDashboardWithTripsExample extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'Trip Name', // Replace with actual trip name
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),

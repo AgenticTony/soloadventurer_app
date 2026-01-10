@@ -98,21 +98,21 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       userId,
       () => FixedSizeQueue<DateTime>(_loginAttemptThreshold),
     );
-    _loginAttemptHistory[userId]!.add(loginAttemptTime);
+    final loginAttempts = _loginAttemptHistory[userId];
+    if (loginAttempts != null) {
+      loginAttempts.add(loginAttemptTime);
 
-    if (_loginAttemptHistory[userId]!.length == _loginAttemptThreshold) {
-      _tokenAuditLogger.logTokenEvent(
-        event: 'suspicious_login_attempts',
-        status: 'high',
-        metadata: {
-          'user_id': userId,
-          'attempts': _loginAttemptThreshold,
-          'timeframe': _loginAttemptHistory[userId]!
-              .first
-              .difference(_loginAttemptHistory[userId]!.last)
-              .inMinutes,
-        },
-      );
+      if (loginAttempts.length == _loginAttemptThreshold) {
+        _tokenAuditLogger.logTokenEvent(
+          event: 'suspicious_login_attempts',
+          status: 'high',
+          metadata: {
+            'user_id': userId,
+            'attempts': _loginAttemptThreshold,
+            'timeframe': loginAttempts.first.difference(loginAttempts.last).inMinutes,
+          },
+        );
+      }
     }
 
     // Track location changes with time and coordinates
@@ -128,7 +128,8 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       timestamp: loginAttemptTime,
     );
 
-    final locations = _locationHistory[userId]!;
+    final locations = _locationHistory[userId];
+    if (locations == null) return;
 
     // Check for impossible travel speeds if we have previous locations
     if (locations.isNotEmpty) {
@@ -208,9 +209,12 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       tokenId,
       () => FixedSizeQueue<DateTime>(_tokenRefreshThreshold),
     );
-    _tokenRefreshHistory[tokenId]!.add(refreshTime);
+    final tokenRefreshes = _tokenRefreshHistory[tokenId];
+    if (tokenRefreshes == null) return;
 
-    final refreshesInWindow = _tokenRefreshHistory[tokenId]!
+    tokenRefreshes.add(refreshTime);
+
+    final refreshesInWindow = tokenRefreshes
         .where(
             (time) => refreshTime.difference(time).abs() <= _tokenRefreshWindow)
         .length;
@@ -229,20 +233,20 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
     }
 
     // Track concurrent usage
-    _concurrentUsageHistory.update(
+    final currentUsage = _concurrentUsageHistory.update(
       tokenId,
       (value) => value + 1,
       ifAbsent: () => 1,
     );
 
-    if (_concurrentUsageHistory[tokenId]! >= _concurrentUsageThreshold) {
+    if (currentUsage >= _concurrentUsageThreshold) {
       _tokenAuditLogger.logTokenEvent(
         event: 'concurrent_token_usage',
         status: 'high', // Reduced from critical for multi-device scenarios
         metadata: {
           'user_id': userId,
           'token_id': tokenId,
-          'concurrent_uses': _concurrentUsageHistory[tokenId],
+          'concurrent_uses': currentUsage,
         },
       );
 
@@ -253,7 +257,7 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
         dimensions: {
           'UserId': userId,
           'TokenId': tokenId,
-          'ConcurrentUses': _concurrentUsageHistory[tokenId].toString(),
+          'ConcurrentUses': currentUsage.toString(),
         },
       );
     }
@@ -270,9 +274,12 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       userId,
       () => FixedSizeQueue<DateTime>(_requestRateThreshold),
     );
-    _requestRateHistory[userId]!.add(requestTime);
+    final requestHistory = _requestRateHistory[userId];
+    if (requestHistory == null) return;
 
-    final requestsInWindow = _requestRateHistory[userId]!
+    requestHistory.add(requestTime);
+
+    final requestsInWindow = requestHistory
         .where(
             (time) => requestTime.difference(time).abs() <= _rateLimitDuration)
         .length;
@@ -298,9 +305,12 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
         userId,
         () => FixedSizeQueue<DateTime>(_sensitiveEndpointThreshold),
       );
-      _sensitiveEndpointHistory[userId]!.add(requestTime);
+      final sensitiveHistory = _sensitiveEndpointHistory[userId];
+      if (sensitiveHistory == null) return;
 
-      final sensitiveAccessesInWindow = _sensitiveEndpointHistory[userId]!
+      sensitiveHistory.add(requestTime);
+
+      final sensitiveAccessesInWindow = sensitiveHistory
           .where((time) =>
               requestTime.difference(time).abs() <= _sensitiveEndpointWindow)
           .length;

@@ -6,9 +6,8 @@ part of 'safety_status_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SafetyStatusModelImpl _$$SafetyStatusModelImplFromJson(
-        Map<String, dynamic> json) =>
-    _$SafetyStatusModelImpl(
+_SafetyStatusModel _$SafetyStatusModelFromJson(Map<String, dynamic> json) =>
+    _SafetyStatusModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
       statusType: $enumDecode(_$SafetyStatusTypeEnumMap, json['statusType']),
@@ -27,8 +26,7 @@ _$SafetyStatusModelImpl _$$SafetyStatusModelImplFromJson(
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
 
-Map<String, dynamic> _$$SafetyStatusModelImplToJson(
-        _$SafetyStatusModelImpl instance) =>
+Map<String, dynamic> _$SafetyStatusModelToJson(_SafetyStatusModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

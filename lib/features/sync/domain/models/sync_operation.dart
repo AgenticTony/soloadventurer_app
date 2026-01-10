@@ -221,8 +221,7 @@ class SyncOperation extends Equatable {
       ];
 
   @override
-  String toString() =>
-      'SyncOperation(id: $id, entityType: $entityType, '
+  String toString() => 'SyncOperation(id: $id, entityType: $entityType, '
       'operationType: $operationType, entityId: $entityId, '
       'createdAt: $createdAt, retryCount: $retryCount, '
       'nextRetryAt: $nextRetryAt, priority: $priority)';
@@ -249,8 +248,8 @@ class SyncOperation extends Equatable {
   factory SyncOperation.fromJson(Map<String, dynamic> json) {
     return SyncOperation(
       id: json['id'] as String,
-      entityType: SyncEntityType.values
-          .firstWhere((e) => e.name == json['entityType']),
+      entityType:
+          SyncEntityType.values.firstWhere((e) => e.name == json['entityType']),
       operationType: SyncOperationType.values
           .firstWhere((e) => e.name == json['operationType']),
       entityId: json['entityId'] as String?,
@@ -292,8 +291,9 @@ class SyncOperationBatch extends Equatable {
   /// Creates a batch from a list of operations
   factory SyncOperationBatch.fromOperations(List<SyncOperation> ops) {
     final batchId = 'batch_${DateTime.now().millisecondsSinceEpoch}';
-    final maxPriority =
-        ops.isEmpty ? 0 : ops.map((op) => op.priority).reduce((a, b) => a > b ? a : b);
+    final maxPriority = ops.isEmpty
+        ? 0
+        : ops.map((op) => op.priority).reduce((a, b) => a > b ? a : b);
 
     return SyncOperationBatch(
       id: batchId,
@@ -314,7 +314,6 @@ class SyncOperationBatch extends Equatable {
   List<Object?> get props => [id, operations, createdAt, priority];
 
   @override
-  String toString() =>
-      'SyncOperationBatch(id: $id, size: $size, '
+  String toString() => 'SyncOperationBatch(id: $id, size: $size, '
       'entityTypes: $entityTypes, priority: $priority)';
 }

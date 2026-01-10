@@ -146,9 +146,12 @@ class CuratedListDto {
       id: id,
       name: name,
       description: description ?? '',
-      type: type != null ? _parseCuratedListType(type!) : CuratedListType.custom,
+      type:
+          type != null ? _parseCuratedListType(type!) : CuratedListType.custom,
       destinations: destinations != null
-          ? DestinationDto.fromJsonList(destinations!).map((dto) => dto.toDomain()).toList()
+          ? DestinationDto.fromJsonList(destinations!)
+              .map((dto) => dto.toDomain())
+              .toList()
           : [],
       coverImageUrl: coverImageUrl,
       images: images ?? [],
@@ -165,15 +168,11 @@ class CuratedListDto {
       recommendedDuration: recommendedDuration,
       viewCount: viewCount ?? 0,
       saveCount: saveCount ?? 0,
-      createdAt: createdAt != null
-          ? DateTime.parse(createdAt!)
-          : DateTime.now(),
-      updatedAt: updatedAt != null
-          ? DateTime.parse(updatedAt!)
-          : DateTime.now(),
-      publishedAt: publishedAt != null
-          ? DateTime.parse(publishedAt!)
-          : null,
+      createdAt:
+          createdAt != null ? DateTime.parse(createdAt!) : DateTime.now(),
+      updatedAt:
+          updatedAt != null ? DateTime.parse(updatedAt!) : DateTime.now(),
+      publishedAt: publishedAt != null ? DateTime.parse(publishedAt!) : null,
       isPublished: isPublished ?? false,
     );
   }

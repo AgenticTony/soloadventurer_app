@@ -6,24 +6,49 @@ part of 'location_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$locationServiceHash() => r'4f72933a79fccd7f9342da6d8ccd8559f44054c9';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for the location service implementation
+
+@ProviderFor(locationService)
+final locationServiceProvider = LocationServiceProvider._();
 
 /// Provider for the location service implementation
-///
-/// Copied from [locationService].
-@ProviderFor(locationService)
-final locationServiceProvider = AutoDisposeProvider<LocationService>.internal(
-  locationService,
-  name: r'locationServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$locationServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef LocationServiceRef = AutoDisposeProviderRef<LocationService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class LocationServiceProvider extends $FunctionalProvider<LocationService,
+    LocationService, LocationService> with $Provider<LocationService> {
+  /// Provider for the location service implementation
+  LocationServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'locationServiceProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$locationServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<LocationService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  LocationService create(Ref ref) {
+    return locationService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(LocationService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<LocationService>(value),
+    );
+  }
+}
+
+String _$locationServiceHash() => r'4f72933a79fccd7f9342da6d8ccd8559f44054c9';

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_error.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_error.dart';
 
 void main() {
   group('SyncError', () {
@@ -274,7 +274,7 @@ void main() {
           retryCount: 2,
           isRetryable: true,
           occurredAt: occurredAt,
-          details: {'key': 'value'},
+          details: const {'key': 'value'},
         );
 
         final json = error.toJson();
@@ -349,7 +349,7 @@ void main() {
           retryCount: 1,
           isRetryable: false,
           occurredAt: DateTime.now(),
-          details: {'field': 'value'},
+          details: const {'field': 'value'},
         );
 
         final json = original.toJson();

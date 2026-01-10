@@ -6,49 +6,103 @@ part of 'missed_checkin_detector_impl.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for MissedCheckInDetectorImpl
+
+@ProviderFor(missedCheckInDetectorImpl)
+final missedCheckInDetectorImplProvider = MissedCheckInDetectorImplProvider._();
+
+/// Provider for MissedCheckInDetectorImpl
+
+final class MissedCheckInDetectorImplProvider extends $FunctionalProvider<
+    MissedCheckInDetector,
+    MissedCheckInDetector,
+    MissedCheckInDetector> with $Provider<MissedCheckInDetector> {
+  /// Provider for MissedCheckInDetectorImpl
+  MissedCheckInDetectorImplProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'missedCheckInDetectorImplProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$missedCheckInDetectorImplHash();
+
+  @$internal
+  @override
+  $ProviderElement<MissedCheckInDetector> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  MissedCheckInDetector create(Ref ref) {
+    return missedCheckInDetectorImpl(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MissedCheckInDetector value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MissedCheckInDetector>(value),
+    );
+  }
+}
+
 String _$missedCheckInDetectorImplHash() =>
     r'da602ed511e2fdd5705607cbc3831bcad0ef28b9';
 
-/// Provider for MissedCheckInDetectorImpl
-///
-/// Copied from [missedCheckInDetectorImpl].
-@ProviderFor(missedCheckInDetectorImpl)
-final missedCheckInDetectorImplProvider =
-    AutoDisposeProvider<MissedCheckInDetector>.internal(
-  missedCheckInDetectorImpl,
-  name: r'missedCheckInDetectorImplProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$missedCheckInDetectorImplHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef MissedCheckInDetectorImplRef
-    = AutoDisposeProviderRef<MissedCheckInDetector>;
-String _$missedCheckInDetectorOverrideHash() =>
-    r'e1b5f45eb419c17abb73efd84fbd7da1a9b03265';
-
 /// Provider override for MissedCheckInDetector interface
-///
-/// Copied from [missedCheckInDetectorOverride].
+
 @ProviderFor(missedCheckInDetectorOverride)
 final missedCheckInDetectorOverrideProvider =
-    AutoDisposeProvider<MissedCheckInDetector>.internal(
-  missedCheckInDetectorOverride,
-  name: r'missedCheckInDetectorOverrideProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$missedCheckInDetectorOverrideHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+    MissedCheckInDetectorOverrideProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef MissedCheckInDetectorOverrideRef
-    = AutoDisposeProviderRef<MissedCheckInDetector>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+/// Provider override for MissedCheckInDetector interface
+
+final class MissedCheckInDetectorOverrideProvider extends $FunctionalProvider<
+    MissedCheckInDetector,
+    MissedCheckInDetector,
+    MissedCheckInDetector> with $Provider<MissedCheckInDetector> {
+  /// Provider override for MissedCheckInDetector interface
+  MissedCheckInDetectorOverrideProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'missedCheckInDetectorOverrideProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$missedCheckInDetectorOverrideHash();
+
+  @$internal
+  @override
+  $ProviderElement<MissedCheckInDetector> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  MissedCheckInDetector create(Ref ref) {
+    return missedCheckInDetectorOverride(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MissedCheckInDetector value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MissedCheckInDetector>(value),
+    );
+  }
+}
+
+String _$missedCheckInDetectorOverrideHash() =>
+    r'e1b5f45eb419c17abb73efd84fbd7da1a9b03265';

@@ -152,17 +152,21 @@ class CuratedList with _$CuratedList {
     @Default(true) bool isPublished,
   }) = _CuratedList;
 
+  CuratedList._();
+
   factory CuratedList.fromJson(Map<String, dynamic> json) =>
       _$CuratedListFromJson(json);
 
   /// Returns true if the curated list has a cover image
-  bool get hasCoverImage => coverImageUrl != null && coverImageUrl!.trim().isNotEmpty;
+  bool get hasCoverImage =>
+      coverImageUrl != null && coverImageUrl!.trim().isNotEmpty;
 
   /// Returns true if the curated list has additional gallery images
   bool get hasGalleryImages => images != null && images!.isNotEmpty;
 
   /// Returns true if the curated list has curator information
-  bool get hasCuratorInfo => curatorName != null && curatorName!.trim().isNotEmpty;
+  bool get hasCuratorInfo =>
+      curatorName != null && curatorName!.trim().isNotEmpty;
 
   /// Returns true if this is a popular/featured list
   bool get isPopular => isFeatured || viewCount > 1000 || saveCount > 100;
@@ -216,7 +220,8 @@ class CuratedList with _$CuratedList {
   }
 
   /// Returns true if safety scores are available for this list
-  bool get hasSafetyScores => averageSafetyScore != null && averageSafetyScore! > 0;
+  bool get hasSafetyScores =>
+      averageSafetyScore != null && averageSafetyScore! > 0;
 
   /// Returns true if solo suitability scores are available for this list
   bool get hasSoloSuitabilityScores =>

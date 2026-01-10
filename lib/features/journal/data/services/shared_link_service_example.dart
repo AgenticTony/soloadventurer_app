@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/shared_link_providers.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/shared_link_creator.dart';
-import 'package:soloadventurer/features/journal/presentation/widgets/shared_link_manager.dart';
+import 'package:soloadventurer/features/journal/presentation/widgets/shared_link_manager.dart' hide SharedLinkCreator;
 import 'package:soloadventurer/features/journal/presentation/widgets/public_trip_viewer.dart';
 
 /// Examples demonstrating the Shared Links feature
@@ -245,7 +245,7 @@ class Example1_PublicLink extends ConsumerWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => SharedLinkCreator(
+                    builder: (_) => const SharedLinkCreator(
                       tripId: 'demo-trip-1',
                       tripName: 'Summer Vacation 2024',
                     ),
@@ -537,7 +537,7 @@ class Example4_FullOptionsLink extends ConsumerWidget {
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (_) => SharedLinkCreator(
+                      builder: (_) => const SharedLinkCreator(
                         tripId: 'demo-trip-4',
                         tripName: 'Adventure Trip',
                       ),
@@ -790,7 +790,7 @@ class Example8_LinkManager extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Example 8: Link Manager')),
-      body: SharedLinkManager(
+      body: const SharedLinkManager(
         tripId: 'demo-trip-manager',
         tripName: 'European Adventure',
       ),
@@ -924,9 +924,10 @@ class Example10_StateManagement extends ConsumerWidget {
             const SizedBox(height: 32),
             FilledButton(
               onPressed: () {
-                final notifier = ref.read(createSharedLinkNotifierProvider.notifier);
+                final notifier =
+                    ref.read(createSharedLinkNotifierProvider.notifier);
                 notifier.createLink(
-                  CreateSharedLinkConfig(tripId: 'demo-state-trip'),
+                  const CreateSharedLinkConfig(tripId: 'demo-state-trip'),
                 );
               },
               child: const Text('Create Link (Watch State Changes)'),

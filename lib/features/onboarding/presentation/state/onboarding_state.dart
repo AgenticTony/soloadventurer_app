@@ -56,7 +56,6 @@ sealed class OnboardingState with _$OnboardingState {
     String? details,
   }) = OnboardingError;
 
-  const OnboardingState._();
 
   /// Whether the form is in initial state
   bool get isInitial => this is OnboardingInitial;
@@ -87,4 +86,7 @@ sealed class OnboardingState with _$OnboardingState {
         OnboardingSuccess(:final itinerary) => itinerary,
         _ => null,
       };
+
+  // Private constructor for freezed getters
+  const OnboardingState._();
 }

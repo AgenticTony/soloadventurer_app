@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
-import 'conflict_resolution_dialog.dart';
-import 'conflict_comparison_view.dart';
 
 /// Widget for displaying a list of sync conflicts
 ///
@@ -190,7 +188,8 @@ class _ConflictCard extends StatelessWidget {
                   _buildDetailChip(
                     context,
                     icon: Icons.numbers,
-                    label: 'v${conflict.localVersion.version} / v${conflict.remoteVersion.version}',
+                    label:
+                        'v${conflict.localVersion.version} / v${conflict.remoteVersion.version}',
                   ),
                   const SizedBox(width: 8),
                   _buildDetailChip(

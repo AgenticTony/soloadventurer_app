@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,42 +9,80 @@ part of 'itinerary.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-Itinerary _$ItineraryFromJson(Map<String, dynamic> json) {
-  return _Itinerary.fromJson(json);
-}
 
 /// @nodoc
 mixin _$Itinerary {
-  String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  Destination get destination => throw _privateConstructorUsedError;
-  DateRange get dateRange => throw _privateConstructorUsedError;
-  List<ItineraryItem> get items => throw _privateConstructorUsedError;
-  bool get isStarter => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
-  String? get userId => throw _privateConstructorUsedError;
-  String? get coverImageUrl => throw _privateConstructorUsedError;
-
-  /// Serializes this Itinerary to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get name;
+  Destination get destination;
+  DateRange get dateRange;
+  List<ItineraryItem> get items;
+  bool get isStarter;
+  DateTime get createdAt;
+  DateTime? get updatedAt;
+  String? get userId;
+  String? get coverImageUrl;
 
   /// Create a copy of Itinerary
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $ItineraryCopyWith<Itinerary> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$ItineraryCopyWithImpl<Itinerary>(this as Itinerary, _$identity);
+
+  /// Serializes this Itinerary to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is Itinerary &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
+            (identical(other.dateRange, dateRange) ||
+                other.dateRange == dateRange) &&
+            const DeepCollectionEquality().equals(other.items, items) &&
+            (identical(other.isStarter, isStarter) ||
+                other.isStarter == isStarter) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.coverImageUrl, coverImageUrl) ||
+                other.coverImageUrl == coverImageUrl));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      destination,
+      dateRange,
+      const DeepCollectionEquality().hash(items),
+      isStarter,
+      createdAt,
+      updatedAt,
+      userId,
+      coverImageUrl);
+
+  @override
+  String toString() {
+    return 'Itinerary(id: $id, name: $name, destination: $destination, dateRange: $dateRange, items: $items, isStarter: $isStarter, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, coverImageUrl: $coverImageUrl)';
+  }
 }
 
 /// @nodoc
-abstract class $ItineraryCopyWith<$Res> {
-  factory $ItineraryCopyWith(Itinerary value, $Res Function(Itinerary) then) =
-      _$ItineraryCopyWithImpl<$Res, Itinerary>;
+abstract mixin class $ItineraryCopyWith<$Res> {
+  factory $ItineraryCopyWith(Itinerary value, $Res Function(Itinerary) _then) =
+      _$ItineraryCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -63,14 +101,11 @@ abstract class $ItineraryCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$ItineraryCopyWithImpl<$Res, $Val extends Itinerary>
-    implements $ItineraryCopyWith<$Res> {
-  _$ItineraryCopyWithImpl(this._value, this._then);
+class _$ItineraryCopyWithImpl<$Res> implements $ItineraryCopyWith<$Res> {
+  _$ItineraryCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final Itinerary _self;
+  final $Res Function(Itinerary) _then;
 
   /// Create a copy of Itinerary
   /// with the given fields replaced by the non-null parameter values.
@@ -88,48 +123,48 @@ class _$ItineraryCopyWithImpl<$Res, $Val extends Itinerary>
     Object? userId = freezed,
     Object? coverImageUrl = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       destination: null == destination
-          ? _value.destination
+          ? _self.destination
           : destination // ignore: cast_nullable_to_non_nullable
               as Destination,
       dateRange: null == dateRange
-          ? _value.dateRange
+          ? _self.dateRange
           : dateRange // ignore: cast_nullable_to_non_nullable
               as DateRange,
       items: null == items
-          ? _value.items
+          ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<ItineraryItem>,
       isStarter: null == isStarter
-          ? _value.isStarter
+          ? _self.isStarter
           : isStarter // ignore: cast_nullable_to_non_nullable
               as bool,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updatedAt: freezed == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       userId: freezed == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String?,
       coverImageUrl: freezed == coverImageUrl
-          ? _value.coverImageUrl
+          ? _self.coverImageUrl
           : coverImageUrl // ignore: cast_nullable_to_non_nullable
               as String?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of Itinerary
@@ -137,8 +172,8 @@ class _$ItineraryCopyWithImpl<$Res, $Val extends Itinerary>
   @override
   @pragma('vm:prefer-inline')
   $DestinationCopyWith<$Res> get destination {
-    return $DestinationCopyWith<$Res>(_value.destination, (value) {
-      return _then(_value.copyWith(destination: value) as $Val);
+    return $DestinationCopyWith<$Res>(_self.destination, (value) {
+      return _then(_self.copyWith(destination: value));
     });
   }
 
@@ -147,111 +182,236 @@ class _$ItineraryCopyWithImpl<$Res, $Val extends Itinerary>
   @override
   @pragma('vm:prefer-inline')
   $DateRangeCopyWith<$Res> get dateRange {
-    return $DateRangeCopyWith<$Res>(_value.dateRange, (value) {
-      return _then(_value.copyWith(dateRange: value) as $Val);
+    return $DateRangeCopyWith<$Res>(_self.dateRange, (value) {
+      return _then(_self.copyWith(dateRange: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$ItineraryImplCopyWith<$Res>
-    implements $ItineraryCopyWith<$Res> {
-  factory _$$ItineraryImplCopyWith(
-          _$ItineraryImpl value, $Res Function(_$ItineraryImpl) then) =
-      __$$ItineraryImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String name,
-      Destination destination,
-      DateRange dateRange,
-      List<ItineraryItem> items,
-      bool isStarter,
-      DateTime createdAt,
-      DateTime? updatedAt,
-      String? userId,
-      String? coverImageUrl});
+/// Adds pattern-matching-related methods to [Itinerary].
+extension ItineraryPatterns on Itinerary {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $DestinationCopyWith<$Res> get destination;
-  @override
-  $DateRangeCopyWith<$Res> get dateRange;
-}
-
-/// @nodoc
-class __$$ItineraryImplCopyWithImpl<$Res>
-    extends _$ItineraryCopyWithImpl<$Res, _$ItineraryImpl>
-    implements _$$ItineraryImplCopyWith<$Res> {
-  __$$ItineraryImplCopyWithImpl(
-      _$ItineraryImpl _value, $Res Function(_$ItineraryImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of Itinerary
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? name = null,
-    Object? destination = null,
-    Object? dateRange = null,
-    Object? items = null,
-    Object? isStarter = null,
-    Object? createdAt = null,
-    Object? updatedAt = freezed,
-    Object? userId = freezed,
-    Object? coverImageUrl = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_Itinerary value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$ItineraryImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      destination: null == destination
-          ? _value.destination
-          : destination // ignore: cast_nullable_to_non_nullable
-              as Destination,
-      dateRange: null == dateRange
-          ? _value.dateRange
-          : dateRange // ignore: cast_nullable_to_non_nullable
-              as DateRange,
-      items: null == items
-          ? _value._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<ItineraryItem>,
-      isStarter: null == isStarter
-          ? _value.isStarter
-          : isStarter // ignore: cast_nullable_to_non_nullable
-              as bool,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      coverImageUrl: freezed == coverImageUrl
-          ? _value.coverImageUrl
-          : coverImageUrl // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _Itinerary() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_Itinerary value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Itinerary():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_Itinerary value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Itinerary() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String name,
+            Destination destination,
+            DateRange dateRange,
+            List<ItineraryItem> items,
+            bool isStarter,
+            DateTime createdAt,
+            DateTime? updatedAt,
+            String? userId,
+            String? coverImageUrl)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _Itinerary() when $default != null:
+        return $default(
+            _that.id,
+            _that.name,
+            _that.destination,
+            _that.dateRange,
+            _that.items,
+            _that.isStarter,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.userId,
+            _that.coverImageUrl);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String name,
+            Destination destination,
+            DateRange dateRange,
+            List<ItineraryItem> items,
+            bool isStarter,
+            DateTime createdAt,
+            DateTime? updatedAt,
+            String? userId,
+            String? coverImageUrl)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Itinerary():
+        return $default(
+            _that.id,
+            _that.name,
+            _that.destination,
+            _that.dateRange,
+            _that.items,
+            _that.isStarter,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.userId,
+            _that.coverImageUrl);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String name,
+            Destination destination,
+            DateRange dateRange,
+            List<ItineraryItem> items,
+            bool isStarter,
+            DateTime createdAt,
+            DateTime? updatedAt,
+            String? userId,
+            String? coverImageUrl)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _Itinerary() when $default != null:
+        return $default(
+            _that.id,
+            _that.name,
+            _that.destination,
+            _that.dateRange,
+            _that.items,
+            _that.isStarter,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.userId,
+            _that.coverImageUrl);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryImpl extends _Itinerary {
-  const _$ItineraryImpl(
+class _Itinerary extends Itinerary {
+  const _Itinerary(
       {required this.id,
       required this.name,
       required this.destination,
@@ -264,9 +424,8 @@ class _$ItineraryImpl extends _Itinerary {
       this.coverImageUrl})
       : _items = items,
         super._();
-
-  factory _$ItineraryImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ItineraryImplFromJson(json);
+  factory _Itinerary.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryFromJson(json);
 
   @override
   final String id;
@@ -296,16 +455,26 @@ class _$ItineraryImpl extends _Itinerary {
   @override
   final String? coverImageUrl;
 
+  /// Create a copy of Itinerary
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'Itinerary(id: $id, name: $name, destination: $destination, dateRange: $dateRange, items: $items, isStarter: $isStarter, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, coverImageUrl: $coverImageUrl)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ItineraryCopyWith<_Itinerary> get copyWith =>
+      __$ItineraryCopyWithImpl<_Itinerary>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryImpl &&
+            other is _Itinerary &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.destination, destination) ||
@@ -339,64 +508,124 @@ class _$ItineraryImpl extends _Itinerary {
       userId,
       coverImageUrl);
 
-  /// Create a copy of Itinerary
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryImplCopyWith<_$ItineraryImpl> get copyWith =>
-      __$$ItineraryImplCopyWithImpl<_$ItineraryImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryImplToJson(
-      this,
-    );
+  String toString() {
+    return 'Itinerary(id: $id, name: $name, destination: $destination, dateRange: $dateRange, items: $items, isStarter: $isStarter, createdAt: $createdAt, updatedAt: $updatedAt, userId: $userId, coverImageUrl: $coverImageUrl)';
   }
 }
 
-abstract class _Itinerary extends Itinerary {
-  const factory _Itinerary(
-      {required final String id,
-      required final String name,
-      required final Destination destination,
-      required final DateRange dateRange,
-      required final List<ItineraryItem> items,
-      final bool isStarter,
-      required final DateTime createdAt,
-      final DateTime? updatedAt,
-      final String? userId,
-      final String? coverImageUrl}) = _$ItineraryImpl;
-  const _Itinerary._() : super._();
+/// @nodoc
+abstract mixin class _$ItineraryCopyWith<$Res>
+    implements $ItineraryCopyWith<$Res> {
+  factory _$ItineraryCopyWith(
+          _Itinerary value, $Res Function(_Itinerary) _then) =
+      __$ItineraryCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String name,
+      Destination destination,
+      DateRange dateRange,
+      List<ItineraryItem> items,
+      bool isStarter,
+      DateTime createdAt,
+      DateTime? updatedAt,
+      String? userId,
+      String? coverImageUrl});
 
-  factory _Itinerary.fromJson(Map<String, dynamic> json) =
-      _$ItineraryImpl.fromJson;
+  @override
+  $DestinationCopyWith<$Res> get destination;
+  @override
+  $DateRangeCopyWith<$Res> get dateRange;
+}
 
-  @override
-  String get id;
-  @override
-  String get name;
-  @override
-  Destination get destination;
-  @override
-  DateRange get dateRange;
-  @override
-  List<ItineraryItem> get items;
-  @override
-  bool get isStarter;
-  @override
-  DateTime get createdAt;
-  @override
-  DateTime? get updatedAt;
-  @override
-  String? get userId;
-  @override
-  String? get coverImageUrl;
+/// @nodoc
+class __$ItineraryCopyWithImpl<$Res> implements _$ItineraryCopyWith<$Res> {
+  __$ItineraryCopyWithImpl(this._self, this._then);
+
+  final _Itinerary _self;
+  final $Res Function(_Itinerary) _then;
 
   /// Create a copy of Itinerary
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryImplCopyWith<_$ItineraryImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? name = null,
+    Object? destination = null,
+    Object? dateRange = null,
+    Object? items = null,
+    Object? isStarter = null,
+    Object? createdAt = null,
+    Object? updatedAt = freezed,
+    Object? userId = freezed,
+    Object? coverImageUrl = freezed,
+  }) {
+    return _then(_Itinerary(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      destination: null == destination
+          ? _self.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as Destination,
+      dateRange: null == dateRange
+          ? _self.dateRange
+          : dateRange // ignore: cast_nullable_to_non_nullable
+              as DateRange,
+      items: null == items
+          ? _self._items
+          : items // ignore: cast_nullable_to_non_nullable
+              as List<ItineraryItem>,
+      isStarter: null == isStarter
+          ? _self.isStarter
+          : isStarter // ignore: cast_nullable_to_non_nullable
+              as bool,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      userId: freezed == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      coverImageUrl: freezed == coverImageUrl
+          ? _self.coverImageUrl
+          : coverImageUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
+    ));
+  }
+
+  /// Create a copy of Itinerary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DestinationCopyWith<$Res> get destination {
+    return $DestinationCopyWith<$Res>(_self.destination, (value) {
+      return _then(_self.copyWith(destination: value));
+    });
+  }
+
+  /// Create a copy of Itinerary
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DateRangeCopyWith<$Res> get dateRange {
+    return $DateRangeCopyWith<$Res>(_self.dateRange, (value) {
+      return _then(_self.copyWith(dateRange: value));
+    });
+  }
 }
+
+// dart format on

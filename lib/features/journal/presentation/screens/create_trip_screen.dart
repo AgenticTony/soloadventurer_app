@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
 
 /// Screen for creating or editing a trip
@@ -146,7 +145,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
 
             // End date
             InkWell(
-              onTap: () => _selectEndDate(context, formState.endDate, formState.startDate),
+              onTap: () => _selectEndDate(
+                  context, formState.endDate, formState.startDate),
               child: InputDecorator(
                 decoration: InputDecoration(
                   labelText: 'End Date (Optional)',
@@ -156,7 +156,9 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                       ? IconButton(
                           icon: const Icon(Icons.clear),
                           onPressed: () {
-                            ref.read(tripFormProvider.notifier).updateEndDate(null);
+                            ref
+                                .read(tripFormProvider.notifier)
+                                .updateEndDate(null);
                           },
                         )
                       : null,
@@ -208,7 +210,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               validator: (value) {
                 if (value != null && value.trim().isNotEmpty) {
                   // Basic URL validation
-                  if (!value.startsWith('http://') && !value.startsWith('https://')) {
+                  if (!value.startsWith('http://') &&
+                      !value.startsWith('https://')) {
                     return 'Please enter a valid URL';
                   }
                 }
@@ -231,7 +234,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
               onChanged: (value) {
                 ref.read(tripFormProvider.notifier).updatePublic(value);
               },
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
 
             const SizedBox(height: 16),
@@ -281,7 +285,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     );
   }
 
-  Future<void> _selectStartDate(BuildContext context, DateTime currentDate) async {
+  Future<void> _selectStartDate(
+      BuildContext context, DateTime currentDate) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: currentDate,
@@ -294,7 +299,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     }
   }
 
-  Future<void> _selectEndDate(BuildContext context, DateTime? currentDate, DateTime startDate) async {
+  Future<void> _selectEndDate(
+      BuildContext context, DateTime? currentDate, DateTime startDate) async {
     final picked = await showDatePicker(
       context: context,
       initialDate: currentDate ?? startDate,
@@ -320,7 +326,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.tripId != null ? 'Trip updated!' : 'Trip created!'),
+          content:
+              Text(widget.tripId != null ? 'Trip updated!' : 'Trip created!'),
           backgroundColor: Colors.green,
         ),
       );

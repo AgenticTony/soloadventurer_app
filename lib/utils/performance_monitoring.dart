@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/core/monitoring/monitoring_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/monitoring/monitoring_service.dart';
 import 'package:soloadventurer/utils/performance_metrics.dart';
 
 /// Performance thresholds for different operations in milliseconds

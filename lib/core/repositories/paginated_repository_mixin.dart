@@ -196,7 +196,7 @@ class PaginationParams {
     this.sortBy,
     this.sortOrder = SortOrder.descending,
     this.filters,
-  })  : cursor = null;
+  }) : cursor = null;
 
   /// Copy with method for creating modified params
   PaginationParams copyWith({

@@ -26,7 +26,7 @@ void main() {
       test('saves valid state to SharedPreferences', () async {
         final now = DateTime.now();
         final state = SyncState(
-          status: SyncStatus.syncing,
+          status: SyncOperationStatus.syncing,
           queueSize: 5,
           isProcessing: true,
           lastStatusChangeAt: now,
@@ -37,19 +37,17 @@ void main() {
           hasPendingOperations: true,
         );
 
-        when(mockPrefs.setString(stateKey, any))
-            .thenAnswer((_) async => true);
+        when(mockPrefs.setString(stateKey, any)).thenAnswer((_) async => true);
 
         final result = await persistence.saveState(state);
 
         expect(result.success, true);
         expect(result.error, isNull);
-        verify(mockPrefs.setString(stateKey, argThat(isNotEmpty)))
-            .called(1);
+        verify(mockPrefs.setString(stateKey, argThat(isNotEmpty))).called(1);
       });
 
       test('returns failure result when save fails', () async {
-        final state = SyncState(status: SyncStatus.idle);
+        const state = SyncState(status: SyncOperationStatus.idle);
 
         when(mockPrefs.setString(stateKey, any))
             .thenThrow(Exception('Save failed'));
@@ -64,7 +62,7 @@ void main() {
       test('serializes state with all fields', () async {
         final now = DateTime.now();
         final state = SyncState(
-          status: SyncStatus.failed,
+          status: SyncOperationStatus.failed,
           queueSize: 3,
           isProcessing: false,
           lastStatusChangeAt: now,
@@ -76,8 +74,7 @@ void main() {
         );
 
         String? capturedJson;
-        when(mockPrefs.setString(stateKey, any))
-            .thenAnswer((realInvocation) {
+        when(mockPrefs.setString(stateKey, any)).thenAnswer((realInvocation) {
           capturedJson = realInvocation.positionalArguments[1] as String;
           return Future.value(true);
         });
@@ -95,7 +92,7 @@ void main() {
       test('loads valid state from SharedPreferences', () async {
         final now = DateTime.now();
         final originalState = SyncState(
-          status: SyncStatus.failed,
+          status: SyncOperationStatus.failed,
           queueSize: 3,
           isProcessing: false,
           lastStatusChangeAt: now,
@@ -112,7 +109,7 @@ void main() {
         final loadedState = await persistence.loadState();
 
         expect(loadedState, isNotNull);
-        expect(loadedState!.status, SyncStatus.failed);
+        expect(loadedState!.status, SyncOperationStatus.failed);
         expect(loadedState.queueSize, 3);
         expect(loadedState.hasPendingOperations, true);
         expect(loadedState.lastError, 'Network timeout');
@@ -168,8 +165,7 @@ void main() {
       });
 
       test('returns failure result when clear fails', () async {
-        when(mockPrefs.remove(stateKey))
-            .thenThrow(Exception('Clear failed'));
+        when(mockPrefs.remove(stateKey)).thenThrow(Exception('Clear failed'));
 
         final result = await persistence.clearState();
 
@@ -219,7 +215,7 @@ void main() {
       test('state persists and restores correctly', () async {
         final now = DateTime.now();
         final original = SyncState(
-          status: SyncStatus.syncing,
+          status: SyncOperationStatus.syncing,
           queueSize: 10,
           isProcessing: true,
           lastStatusChangeAt: now,
@@ -231,8 +227,7 @@ void main() {
         );
 
         // Setup save
-        when(mockPrefs.setString(stateKey, any))
-            .thenAnswer((_) async => true);
+        when(mockPrefs.setString(stateKey, any)).thenAnswer((_) async => true);
 
         // Setup load
         when(mockPrefs.getString(stateKey)).thenAnswer((_) {
@@ -257,11 +252,11 @@ void main() {
 
       test('all status values persist correctly', () async {
         final statuses = [
-          SyncStatus.idle,
-          SyncStatus.syncing,
-          SyncStatus.success,
-          SyncStatus.failed,
-          SyncStatus.pending,
+          SyncOperationStatus.idle,
+          SyncOperationStatus.syncing,
+          SyncOperationStatus.success,
+          SyncOperationStatus.failed,
+          SyncOperationStatus.pending,
         ];
 
         for (final status in statuses) {

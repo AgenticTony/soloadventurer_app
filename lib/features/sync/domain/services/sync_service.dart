@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import '../models/sync_operation.dart';
 import '../models/sync_status.dart';
 import '../entities/sync_entity_type.dart';
@@ -101,10 +100,10 @@ abstract class SyncService {
   bool get isProcessing;
 
   /// Current sync status
-  SyncStatus get status;
+  SyncOperationStatus get status;
 
   /// Stream of sync status changes
-  Stream<SyncStatus> get statusStream;
+  Stream<SyncOperationStatus> get statusStream;
 
   /// Stream of queue changes
   Stream<List<SyncOperation>> get queueStream;
@@ -155,7 +154,8 @@ abstract class SyncService {
   List<SyncOperation> getOperationsByType(SyncEntityType entityType);
 
   /// Get operations by operation type (create, update, delete)
-  List<SyncOperation> getOperationsByOperationType(SyncOperationType operationType);
+  List<SyncOperation> getOperationsByOperationType(
+      SyncOperationType operationType);
 
   /// Get operations pending for a specific entity
   List<SyncOperation> getOperationsForEntity(String entityId);

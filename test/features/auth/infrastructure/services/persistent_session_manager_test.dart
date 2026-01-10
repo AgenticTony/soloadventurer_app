@@ -29,11 +29,11 @@ void main() {
     test('should save session with all tokens and expiration', () async {
       // Arrange
       when(() => mockLocalDataSource.saveAuthData(
-        any(),
-        any(),
-        expiresAt: any(named: 'expiresAt'),
-        idToken: any(named: 'idToken'),
-      )).thenAnswer((_) async {});
+            any(),
+            any(),
+            expiresAt: any(named: 'expiresAt'),
+            idToken: any(named: 'idToken'),
+          )).thenAnswer((_) async {});
 
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
@@ -43,25 +43,25 @@ void main() {
 
       // Assert
       verify(() => mockLocalDataSource.saveAuthData(
-        testSession.accessToken,
-        testSession.refreshToken,
-        expiresAt: testSession.expiresAt,
-        idToken: testSession.idToken,
-      )).called(1);
+            testSession.accessToken,
+            testSession.refreshToken,
+            expiresAt: testSession.expiresAt,
+            idToken: testSession.idToken,
+          )).called(1);
 
       verify(() => mockLocalDataSource.cacheUserData(
-        argThat(isA<Map<String, dynamic>>()),
-      )).called(1);
+            argThat(isA<Map<String, dynamic>>()),
+          )).called(1);
     });
 
     test('should throw AuthException when save fails', () async {
       // Arrange
       when(() => mockLocalDataSource.saveAuthData(
-        any(),
-        any(),
-        expiresAt: any(named: 'expiresAt'),
-        idToken: any(named: 'idToken'),
-      )).thenThrow(Exception('Storage error'));
+            any(),
+            any(),
+            expiresAt: any(named: 'expiresAt'),
+            idToken: any(named: 'idToken'),
+          )).thenThrow(Exception('Storage error'));
 
       // Act & Assert
       expect(
@@ -77,11 +77,11 @@ void main() {
     test('should include session version in cached data', () async {
       // Arrange
       when(() => mockLocalDataSource.saveAuthData(
-        any(),
-        any(),
-        expiresAt: any(named: 'expiresAt'),
-        idToken: any(named: 'idToken'),
-      )).thenAnswer((_) async {});
+            any(),
+            any(),
+            expiresAt: any(named: 'expiresAt'),
+            idToken: any(named: 'idToken'),
+          )).thenAnswer((_) async {});
 
       when(() => mockLocalDataSource.cacheUserData(any()))
           .thenAnswer((_) async {});
@@ -91,13 +91,13 @@ void main() {
 
       // Assert
       verify(() => mockLocalDataSource.cacheUserData(
-        argThat(
-          allOf([
-            containsPair('version', '1.0'),
-            containsPair('saved_at', isA<String>()),
-          ]),
-        ),
-      )).called(1);
+            argThat(
+              allOf([
+                containsPair('version', '1.0'),
+                containsPair('saved_at', isA<String>()),
+              ]),
+            ),
+          )).called(1);
     });
   });
 
@@ -316,8 +316,7 @@ void main() {
   group('PersistentSessionManager - clearSession', () {
     test('should clear session data', () async {
       // Arrange
-      when(() => mockLocalDataSource.clearAuthData())
-          .thenAnswer((_) async {});
+      when(() => mockLocalDataSource.clearAuthData()).thenAnswer((_) async {});
 
       // Act
       await sessionManager.clearSession();
@@ -646,7 +645,8 @@ void main() {
       expect(result.timeSinceExpiration, isNull);
     });
 
-    test('should return canRefresh for session expired less than 24 hours ago', () async {
+    test('should return canRefresh for session expired less than 24 hours ago',
+        () async {
       // Arrange
       when(() => mockLocalDataSource.getAuthToken())
           .thenAnswer((_) async => recentlyExpiredSession.accessToken);
@@ -668,7 +668,9 @@ void main() {
       expect(result.timeSinceExpiration!.inHours, lessThan(13));
     });
 
-    test('should return reauthenticate for session expired more than 24 hours ago', () async {
+    test(
+        'should return reauthenticate for session expired more than 24 hours ago',
+        () async {
       // Arrange
       when(() => mockLocalDataSource.getAuthToken())
           .thenAnswer((_) async => longExpiredSession.accessToken);
@@ -758,7 +760,8 @@ void main() {
         accessToken: 'test_access_token',
         idToken: 'test_id_token',
         refreshToken: 'test_refresh_token',
-        expiresAt: DateTime.now().subtract(const Duration(hours: 24, seconds: 1)),
+        expiresAt:
+            DateTime.now().subtract(const Duration(hours: 24, seconds: 1)),
       );
 
       when(() => mockLocalDataSource.getAuthToken())
@@ -779,7 +782,8 @@ void main() {
       expect(result.timeSinceExpiration, isNotNull);
     });
 
-    test('should handle corrupted session data (missing access token)', () async {
+    test('should handle corrupted session data (missing access token)',
+        () async {
       // Arrange
       when(() => mockLocalDataSource.getAuthToken())
           .thenAnswer((_) async => null);

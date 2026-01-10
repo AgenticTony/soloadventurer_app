@@ -14,7 +14,6 @@ part 'onboarding_data.g.dart';
 /// It serves as input for generating a personalized starter itinerary.
 @freezed
 class OnboardingData with _$OnboardingData {
-  const OnboardingData._();
 
   /// Creates complete onboarding data
   ///
@@ -89,4 +88,7 @@ class OnboardingData with _$OnboardingData {
     return "$name's trip to ${destination.formattedLocation} "
         '(${dateRange.formatted}) - $interestsStr$interestsSuffix';
   }
+
+  // Private constructor for freezed getters
+  const OnboardingData._();
 }

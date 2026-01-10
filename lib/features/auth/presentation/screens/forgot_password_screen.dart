@@ -66,7 +66,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             error: (error, stack) => _buildForm(context, isLoading: false),
             data: (authState) => _buildForm(context, isLoading: false),
           ),
-        ],
+        ),
       ),
     );
   }

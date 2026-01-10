@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/core/error/failures.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/recommendation_local_data_source.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';
 
 /// Modal sheet for scheduling a recommendation

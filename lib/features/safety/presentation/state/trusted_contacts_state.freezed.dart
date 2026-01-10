@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,58 +9,105 @@ part of 'trusted_contacts_state.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$TrustedContactsState {
   /// Loading indicator - always a field on State
-  bool get isLoading => throw _privateConstructorUsedError;
+  bool get isLoading;
 
   /// Whether an add operation is in progress
-  bool get isAdding => throw _privateConstructorUsedError;
+  bool get isAdding;
 
   /// Whether an update operation is in progress
-  bool get isUpdating => throw _privateConstructorUsedError;
+  bool get isUpdating;
 
   /// Whether a remove operation is in progress
-  bool get isRemoving => throw _privateConstructorUsedError;
+  bool get isRemoving;
 
   /// List of all trusted contacts
-  List<TrustedContact> get contacts => throw _privateConstructorUsedError;
+  List<TrustedContact> get contacts;
 
   /// Currently selected contact (for editing/viewing)
-  TrustedContact? get selectedContact => throw _privateConstructorUsedError;
+  TrustedContact? get selectedContact;
 
   /// Error message - always a field on State
-  String? get error => throw _privateConstructorUsedError;
+  String? get error;
 
   /// Whether there are any trusted contacts (was a getter, now a field)
-  bool get hasContacts => throw _privateConstructorUsedError;
+  bool get hasContacts;
 
   /// Whether operations are in progress (was a getter, now a field)
-  bool get isProcessing => throw _privateConstructorUsedError;
+  bool get isProcessing;
 
   /// Count of contacts receiving emergency alerts (was a getter, now a field)
-  int get emergencyContactsCount => throw _privateConstructorUsedError;
+  int get emergencyContactsCount;
 
   /// Count of contacts with location sharing enabled (was a getter, now a field)
-  int get locationSharingCount => throw _privateConstructorUsedError;
+  int get locationSharingCount;
 
   /// Create a copy of TrustedContactsState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $TrustedContactsStateCopyWith<TrustedContactsState> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$TrustedContactsStateCopyWithImpl<TrustedContactsState>(
+          this as TrustedContactsState, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is TrustedContactsState &&
+            (identical(other.isLoading, isLoading) ||
+                other.isLoading == isLoading) &&
+            (identical(other.isAdding, isAdding) ||
+                other.isAdding == isAdding) &&
+            (identical(other.isUpdating, isUpdating) ||
+                other.isUpdating == isUpdating) &&
+            (identical(other.isRemoving, isRemoving) ||
+                other.isRemoving == isRemoving) &&
+            const DeepCollectionEquality().equals(other.contacts, contacts) &&
+            (identical(other.selectedContact, selectedContact) ||
+                other.selectedContact == selectedContact) &&
+            (identical(other.error, error) || other.error == error) &&
+            (identical(other.hasContacts, hasContacts) ||
+                other.hasContacts == hasContacts) &&
+            (identical(other.isProcessing, isProcessing) ||
+                other.isProcessing == isProcessing) &&
+            (identical(other.emergencyContactsCount, emergencyContactsCount) ||
+                other.emergencyContactsCount == emergencyContactsCount) &&
+            (identical(other.locationSharingCount, locationSharingCount) ||
+                other.locationSharingCount == locationSharingCount));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      isLoading,
+      isAdding,
+      isUpdating,
+      isRemoving,
+      const DeepCollectionEquality().hash(contacts),
+      selectedContact,
+      error,
+      hasContacts,
+      isProcessing,
+      emergencyContactsCount,
+      locationSharingCount);
+
+  @override
+  String toString() {
+    return 'TrustedContactsState(isLoading: $isLoading, isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, error: $error, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
+  }
 }
 
 /// @nodoc
-abstract class $TrustedContactsStateCopyWith<$Res> {
+abstract mixin class $TrustedContactsStateCopyWith<$Res> {
   factory $TrustedContactsStateCopyWith(TrustedContactsState value,
-          $Res Function(TrustedContactsState) then) =
-      _$TrustedContactsStateCopyWithImpl<$Res, TrustedContactsState>;
+          $Res Function(TrustedContactsState) _then) =
+      _$TrustedContactsStateCopyWithImpl;
   @useResult
   $Res call(
       {bool isLoading,
@@ -79,15 +126,12 @@ abstract class $TrustedContactsStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$TrustedContactsStateCopyWithImpl<$Res,
-        $Val extends TrustedContactsState>
+class _$TrustedContactsStateCopyWithImpl<$Res>
     implements $TrustedContactsStateCopyWith<$Res> {
-  _$TrustedContactsStateCopyWithImpl(this._value, this._then);
+  _$TrustedContactsStateCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final TrustedContactsState _self;
+  final $Res Function(TrustedContactsState) _then;
 
   /// Create a copy of TrustedContactsState
   /// with the given fields replaced by the non-null parameter values.
@@ -106,52 +150,52 @@ class _$TrustedContactsStateCopyWithImpl<$Res,
     Object? emergencyContactsCount = null,
     Object? locationSharingCount = null,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       isLoading: null == isLoading
-          ? _value.isLoading
+          ? _self.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
               as bool,
       isAdding: null == isAdding
-          ? _value.isAdding
+          ? _self.isAdding
           : isAdding // ignore: cast_nullable_to_non_nullable
               as bool,
       isUpdating: null == isUpdating
-          ? _value.isUpdating
+          ? _self.isUpdating
           : isUpdating // ignore: cast_nullable_to_non_nullable
               as bool,
       isRemoving: null == isRemoving
-          ? _value.isRemoving
+          ? _self.isRemoving
           : isRemoving // ignore: cast_nullable_to_non_nullable
               as bool,
       contacts: null == contacts
-          ? _value.contacts
+          ? _self.contacts
           : contacts // ignore: cast_nullable_to_non_nullable
               as List<TrustedContact>,
       selectedContact: freezed == selectedContact
-          ? _value.selectedContact
+          ? _self.selectedContact
           : selectedContact // ignore: cast_nullable_to_non_nullable
               as TrustedContact?,
       error: freezed == error
-          ? _value.error
+          ? _self.error
           : error // ignore: cast_nullable_to_non_nullable
               as String?,
       hasContacts: null == hasContacts
-          ? _value.hasContacts
+          ? _self.hasContacts
           : hasContacts // ignore: cast_nullable_to_non_nullable
               as bool,
       isProcessing: null == isProcessing
-          ? _value.isProcessing
+          ? _self.isProcessing
           : isProcessing // ignore: cast_nullable_to_non_nullable
               as bool,
       emergencyContactsCount: null == emergencyContactsCount
-          ? _value.emergencyContactsCount
+          ? _self.emergencyContactsCount
           : emergencyContactsCount // ignore: cast_nullable_to_non_nullable
               as int,
       locationSharingCount: null == locationSharingCount
-          ? _value.locationSharingCount
+          ? _self.locationSharingCount
           : locationSharingCount // ignore: cast_nullable_to_non_nullable
               as int,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of TrustedContactsState
@@ -159,119 +203,246 @@ class _$TrustedContactsStateCopyWithImpl<$Res,
   @override
   @pragma('vm:prefer-inline')
   $TrustedContactCopyWith<$Res>? get selectedContact {
-    if (_value.selectedContact == null) {
+    if (_self.selectedContact == null) {
       return null;
     }
 
-    return $TrustedContactCopyWith<$Res>(_value.selectedContact!, (value) {
-      return _then(_value.copyWith(selectedContact: value) as $Val);
+    return $TrustedContactCopyWith<$Res>(_self.selectedContact!, (value) {
+      return _then(_self.copyWith(selectedContact: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$TrustedContactsStateImplCopyWith<$Res>
-    implements $TrustedContactsStateCopyWith<$Res> {
-  factory _$$TrustedContactsStateImplCopyWith(_$TrustedContactsStateImpl value,
-          $Res Function(_$TrustedContactsStateImpl) then) =
-      __$$TrustedContactsStateImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {bool isLoading,
-      bool isAdding,
-      bool isUpdating,
-      bool isRemoving,
-      List<TrustedContact> contacts,
-      TrustedContact? selectedContact,
-      String? error,
-      bool hasContacts,
-      bool isProcessing,
-      int emergencyContactsCount,
-      int locationSharingCount});
+/// Adds pattern-matching-related methods to [TrustedContactsState].
+extension TrustedContactsStatePatterns on TrustedContactsState {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $TrustedContactCopyWith<$Res>? get selectedContact;
-}
-
-/// @nodoc
-class __$$TrustedContactsStateImplCopyWithImpl<$Res>
-    extends _$TrustedContactsStateCopyWithImpl<$Res, _$TrustedContactsStateImpl>
-    implements _$$TrustedContactsStateImplCopyWith<$Res> {
-  __$$TrustedContactsStateImplCopyWithImpl(_$TrustedContactsStateImpl _value,
-      $Res Function(_$TrustedContactsStateImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of TrustedContactsState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? isLoading = null,
-    Object? isAdding = null,
-    Object? isUpdating = null,
-    Object? isRemoving = null,
-    Object? contacts = null,
-    Object? selectedContact = freezed,
-    Object? error = freezed,
-    Object? hasContacts = null,
-    Object? isProcessing = null,
-    Object? emergencyContactsCount = null,
-    Object? locationSharingCount = null,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_TrustedContactsState value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$TrustedContactsStateImpl(
-      isLoading: null == isLoading
-          ? _value.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isAdding: null == isAdding
-          ? _value.isAdding
-          : isAdding // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isUpdating: null == isUpdating
-          ? _value.isUpdating
-          : isUpdating // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isRemoving: null == isRemoving
-          ? _value.isRemoving
-          : isRemoving // ignore: cast_nullable_to_non_nullable
-              as bool,
-      contacts: null == contacts
-          ? _value._contacts
-          : contacts // ignore: cast_nullable_to_non_nullable
-              as List<TrustedContact>,
-      selectedContact: freezed == selectedContact
-          ? _value.selectedContact
-          : selectedContact // ignore: cast_nullable_to_non_nullable
-              as TrustedContact?,
-      error: freezed == error
-          ? _value.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as String?,
-      hasContacts: null == hasContacts
-          ? _value.hasContacts
-          : hasContacts // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isProcessing: null == isProcessing
-          ? _value.isProcessing
-          : isProcessing // ignore: cast_nullable_to_non_nullable
-              as bool,
-      emergencyContactsCount: null == emergencyContactsCount
-          ? _value.emergencyContactsCount
-          : emergencyContactsCount // ignore: cast_nullable_to_non_nullable
-              as int,
-      locationSharingCount: null == locationSharingCount
-          ? _value.locationSharingCount
-          : locationSharingCount // ignore: cast_nullable_to_non_nullable
-              as int,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _TrustedContactsState() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_TrustedContactsState value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TrustedContactsState():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_TrustedContactsState value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TrustedContactsState() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            bool isLoading,
+            bool isAdding,
+            bool isUpdating,
+            bool isRemoving,
+            List<TrustedContact> contacts,
+            TrustedContact? selectedContact,
+            String? error,
+            bool hasContacts,
+            bool isProcessing,
+            int emergencyContactsCount,
+            int locationSharingCount)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _TrustedContactsState() when $default != null:
+        return $default(
+            _that.isLoading,
+            _that.isAdding,
+            _that.isUpdating,
+            _that.isRemoving,
+            _that.contacts,
+            _that.selectedContact,
+            _that.error,
+            _that.hasContacts,
+            _that.isProcessing,
+            _that.emergencyContactsCount,
+            _that.locationSharingCount);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            bool isLoading,
+            bool isAdding,
+            bool isUpdating,
+            bool isRemoving,
+            List<TrustedContact> contacts,
+            TrustedContact? selectedContact,
+            String? error,
+            bool hasContacts,
+            bool isProcessing,
+            int emergencyContactsCount,
+            int locationSharingCount)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TrustedContactsState():
+        return $default(
+            _that.isLoading,
+            _that.isAdding,
+            _that.isUpdating,
+            _that.isRemoving,
+            _that.contacts,
+            _that.selectedContact,
+            _that.error,
+            _that.hasContacts,
+            _that.isProcessing,
+            _that.emergencyContactsCount,
+            _that.locationSharingCount);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            bool isLoading,
+            bool isAdding,
+            bool isUpdating,
+            bool isRemoving,
+            List<TrustedContact> contacts,
+            TrustedContact? selectedContact,
+            String? error,
+            bool hasContacts,
+            bool isProcessing,
+            int emergencyContactsCount,
+            int locationSharingCount)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _TrustedContactsState() when $default != null:
+        return $default(
+            _that.isLoading,
+            _that.isAdding,
+            _that.isUpdating,
+            _that.isRemoving,
+            _that.contacts,
+            _that.selectedContact,
+            _that.error,
+            _that.hasContacts,
+            _that.isProcessing,
+            _that.emergencyContactsCount,
+            _that.locationSharingCount);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 
-class _$TrustedContactsStateImpl extends _TrustedContactsState {
-  const _$TrustedContactsStateImpl(
+class _TrustedContactsState implements TrustedContactsState {
+  const _TrustedContactsState(
       {this.isLoading = false,
       this.isAdding = false,
       this.isUpdating = false,
@@ -283,8 +454,7 @@ class _$TrustedContactsStateImpl extends _TrustedContactsState {
       this.isProcessing = false,
       this.emergencyContactsCount = 0,
       this.locationSharingCount = 0})
-      : _contacts = contacts,
-        super._();
+      : _contacts = contacts;
 
   /// Loading indicator - always a field on State
   @override
@@ -346,16 +516,20 @@ class _$TrustedContactsStateImpl extends _TrustedContactsState {
   @JsonKey()
   final int locationSharingCount;
 
+  /// Create a copy of TrustedContactsState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'TrustedContactsState(isLoading: $isLoading, isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, error: $error, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$TrustedContactsStateCopyWith<_TrustedContactsState> get copyWith =>
+      __$TrustedContactsStateCopyWithImpl<_TrustedContactsState>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$TrustedContactsStateImpl &&
+            other is _TrustedContactsState &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.isAdding, isAdding) ||
@@ -393,80 +567,123 @@ class _$TrustedContactsStateImpl extends _TrustedContactsState {
       emergencyContactsCount,
       locationSharingCount);
 
+  @override
+  String toString() {
+    return 'TrustedContactsState(isLoading: $isLoading, isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, error: $error, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$TrustedContactsStateCopyWith<$Res>
+    implements $TrustedContactsStateCopyWith<$Res> {
+  factory _$TrustedContactsStateCopyWith(_TrustedContactsState value,
+          $Res Function(_TrustedContactsState) _then) =
+      __$TrustedContactsStateCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {bool isLoading,
+      bool isAdding,
+      bool isUpdating,
+      bool isRemoving,
+      List<TrustedContact> contacts,
+      TrustedContact? selectedContact,
+      String? error,
+      bool hasContacts,
+      bool isProcessing,
+      int emergencyContactsCount,
+      int locationSharingCount});
+
+  @override
+  $TrustedContactCopyWith<$Res>? get selectedContact;
+}
+
+/// @nodoc
+class __$TrustedContactsStateCopyWithImpl<$Res>
+    implements _$TrustedContactsStateCopyWith<$Res> {
+  __$TrustedContactsStateCopyWithImpl(this._self, this._then);
+
+  final _TrustedContactsState _self;
+  final $Res Function(_TrustedContactsState) _then;
+
   /// Create a copy of TrustedContactsState
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$TrustedContactsStateImplCopyWith<_$TrustedContactsStateImpl>
-      get copyWith =>
-          __$$TrustedContactsStateImplCopyWithImpl<_$TrustedContactsStateImpl>(
-              this, _$identity);
-}
-
-abstract class _TrustedContactsState extends TrustedContactsState {
-  const factory _TrustedContactsState(
-      {final bool isLoading,
-      final bool isAdding,
-      final bool isUpdating,
-      final bool isRemoving,
-      final List<TrustedContact> contacts,
-      final TrustedContact? selectedContact,
-      final String? error,
-      final bool hasContacts,
-      final bool isProcessing,
-      final int emergencyContactsCount,
-      final int locationSharingCount}) = _$TrustedContactsStateImpl;
-  const _TrustedContactsState._() : super._();
-
-  /// Loading indicator - always a field on State
-  @override
-  bool get isLoading;
-
-  /// Whether an add operation is in progress
-  @override
-  bool get isAdding;
-
-  /// Whether an update operation is in progress
-  @override
-  bool get isUpdating;
-
-  /// Whether a remove operation is in progress
-  @override
-  bool get isRemoving;
-
-  /// List of all trusted contacts
-  @override
-  List<TrustedContact> get contacts;
-
-  /// Currently selected contact (for editing/viewing)
-  @override
-  TrustedContact? get selectedContact;
-
-  /// Error message - always a field on State
-  @override
-  String? get error;
-
-  /// Whether there are any trusted contacts (was a getter, now a field)
-  @override
-  bool get hasContacts;
-
-  /// Whether operations are in progress (was a getter, now a field)
-  @override
-  bool get isProcessing;
-
-  /// Count of contacts receiving emergency alerts (was a getter, now a field)
-  @override
-  int get emergencyContactsCount;
-
-  /// Count of contacts with location sharing enabled (was a getter, now a field)
-  @override
-  int get locationSharingCount;
+  $Res call({
+    Object? isLoading = null,
+    Object? isAdding = null,
+    Object? isUpdating = null,
+    Object? isRemoving = null,
+    Object? contacts = null,
+    Object? selectedContact = freezed,
+    Object? error = freezed,
+    Object? hasContacts = null,
+    Object? isProcessing = null,
+    Object? emergencyContactsCount = null,
+    Object? locationSharingCount = null,
+  }) {
+    return _then(_TrustedContactsState(
+      isLoading: null == isLoading
+          ? _self.isLoading
+          : isLoading // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isAdding: null == isAdding
+          ? _self.isAdding
+          : isAdding // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isUpdating: null == isUpdating
+          ? _self.isUpdating
+          : isUpdating // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isRemoving: null == isRemoving
+          ? _self.isRemoving
+          : isRemoving // ignore: cast_nullable_to_non_nullable
+              as bool,
+      contacts: null == contacts
+          ? _self._contacts
+          : contacts // ignore: cast_nullable_to_non_nullable
+              as List<TrustedContact>,
+      selectedContact: freezed == selectedContact
+          ? _self.selectedContact
+          : selectedContact // ignore: cast_nullable_to_non_nullable
+              as TrustedContact?,
+      error: freezed == error
+          ? _self.error
+          : error // ignore: cast_nullable_to_non_nullable
+              as String?,
+      hasContacts: null == hasContacts
+          ? _self.hasContacts
+          : hasContacts // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isProcessing: null == isProcessing
+          ? _self.isProcessing
+          : isProcessing // ignore: cast_nullable_to_non_nullable
+              as bool,
+      emergencyContactsCount: null == emergencyContactsCount
+          ? _self.emergencyContactsCount
+          : emergencyContactsCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      locationSharingCount: null == locationSharingCount
+          ? _self.locationSharingCount
+          : locationSharingCount // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
 
   /// Create a copy of TrustedContactsState
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$TrustedContactsStateImplCopyWith<_$TrustedContactsStateImpl>
-      get copyWith => throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $TrustedContactCopyWith<$Res>? get selectedContact {
+    if (_self.selectedContact == null) {
+      return null;
+    }
+
+    return $TrustedContactCopyWith<$Res>(_self.selectedContact!, (value) {
+      return _then(_self.copyWith(selectedContact: value));
+    });
+  }
 }
+
+// dart format on

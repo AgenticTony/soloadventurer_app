@@ -179,9 +179,7 @@ class TimelineItem extends StatelessWidget {
     final theme = Theme.of(context);
 
     // Strip HTML tags for preview
-    final plainText = entry.content
-        .replaceAll(RegExp(r'<[^>]*>'), '')
-        .trim();
+    final plainText = entry.content.replaceAll(RegExp(r'<[^>]*>'), '').trim();
 
     final maxLines = showFullContent ? null : 3;
 
@@ -211,7 +209,7 @@ class TimelineItem extends StatelessWidget {
               size: 60,
             ),
           );
-        }).toList(),
+        }),
         if (remainingCount > 0)
           Container(
             width: 60,
@@ -312,22 +310,19 @@ class _MediaThumbnail extends StatelessWidget {
       child: Stack(
         children: [
           // Image
-          if (media.storagePath != null)
-            Image.network(
-              media.storagePath!,
-              width: size,
-              height: size,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return _buildPlaceholder(context);
-              },
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return _buildLoadingIndicator(context);
-              },
-            )
-          else
-            _buildPlaceholder(context),
+          Image.network(
+            media.storagePath,
+            width: size,
+            height: size,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildPlaceholder(context);
+            },
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return _buildLoadingIndicator(context);
+            },
+          ),
 
           // Video indicator
           if (media.mediaType == MediaType.video)

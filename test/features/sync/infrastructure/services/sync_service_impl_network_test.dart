@@ -23,17 +23,18 @@ void main() {
   });
 
   tearDown(() async {
-    await syncService.dispose();
+    syncService.dispose();
   });
 
   group('SyncServiceImpl - Network Connectivity Integration', () {
     test('should initialize with network connectivity monitoring', () {
       // Assert
       expect(syncService.queue, isEmpty);
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
     });
 
-    test('should trigger sync when network comes online with operations in queue',
+    test(
+        'should trigger sync when network comes online with operations in queue',
         () async {
       // Arrange
       final connectivityController = StreamController<bool>();
@@ -45,14 +46,14 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
 
       // Reset status from pending to idle to verify transition
       // (operations are auto-processed when autoProcess is enabled)
-      await syncService.pauseProcessing();
+      syncService.pauseProcessing();
 
       // Act
       connectivityController.add(true);
@@ -99,11 +100,11 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
-      await syncService.pauseProcessing();
+      syncService.pauseProcessing();
 
       // Act
       connectivityController.add(true);
@@ -127,7 +128,7 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -156,7 +157,7 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -173,7 +174,8 @@ void main() {
   });
 
   group('SyncServiceImpl - Network Connectivity with Auto-Process', () {
-    test('should respect autoProcess config when network comes online', () async {
+    test('should respect autoProcess config when network comes online',
+        () async {
       // Arrange
       final connectivityController = StreamController<bool>();
 
@@ -187,7 +189,7 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -217,7 +219,7 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -242,22 +244,22 @@ void main() {
           .thenAnswer((_) => connectivityController.stream);
 
       // Act
-      await syncService.dispose();
+      syncService.dispose();
 
       // Emit event after dispose
       connectivityController.add(true);
       await Future.delayed(const Duration(milliseconds: 100));
 
       // Assert - Should not crash and stream should be cancelled
-      expect(syncService.status, SyncStatus.idle);
+      expect(syncService.status, SyncOperationStatus.idle);
 
       await connectivityController.close();
     });
 
     test('should handle multiple dispose calls gracefully', () async {
       // Act & Assert - Should not throw
-      await syncService.dispose();
-      await syncService.dispose();
+      syncService.dispose();
+      syncService.dispose();
       expect(() => syncService.dispose(), returnsNormally);
     });
   });
@@ -306,7 +308,7 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-high',
         operationType: SyncOperationType.create,
-        data: {'name': 'High Priority Trip'},
+        data: const {'name': 'High Priority Trip'},
         priority: 10,
       );
 
@@ -314,7 +316,7 @@ void main() {
         entityType: SyncEntityType.travelNote,
         entityId: 'note-low',
         operationType: SyncOperationType.create,
-        data: {'content': 'Low Priority Note'},
+        data: const {'content': 'Low Priority Note'},
         priority: 1,
       );
 
@@ -352,7 +354,7 @@ void main() {
         entityType: SyncEntityType.trip,
         entityId: 'trip-123',
         operationType: SyncOperationType.create,
-        data: {'name': 'Test Trip'},
+        data: const {'name': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);

@@ -4,18 +4,18 @@ import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 import 'package:soloadventurer/features/sync/presentation/widgets/sync_status_icon.dart';
 
 void main() {
-  group('SyncStatusIcon', () {
+  group('SyncOperationStatusIcon', () {
     testWidgets('renders icon for each status', (tester) async {
-      for (final status in SyncStatus.values) {
+      for (final status in SyncOperationStatus.values) {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SyncStatusIcon(status: status),
+              body: SyncOperationStatusIcon(status: status),
             ),
           ),
         );
 
-        expect(find.byType(SyncStatusIcon), findsOneWidget);
+        expect(find.byType(SyncOperationStatusIcon), findsOneWidget);
         expect(find.byType(Icon), findsOneWidget);
       }
     });
@@ -24,15 +24,15 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusIcon(
-              status: SyncStatus.syncing,
+            body: SyncOperationStatusIcon(
+              status: SyncOperationStatus.syncing,
               showLabel: true,
             ),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusIcon), findsOneWidget);
+      expect(find.byType(SyncOperationStatusIcon), findsOneWidget);
       expect(find.byType(Icon), findsOneWidget);
       expect(find.text('Syncing...'), findsOneWidget);
     });
@@ -43,8 +43,8 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusIcon(
-              status: SyncStatus.success,
+            body: SyncOperationStatusIcon(
+              status: SyncOperationStatus.success,
               showLabel: true,
               customLabel: customLabel,
             ),
@@ -53,7 +53,7 @@ void main() {
       );
 
       expect(find.text(customLabel), findsOneWidget);
-      expect(find.text(SyncStatus.success.displayName), findsNothing);
+      expect(find.text(SyncOperationStatus.success.displayName), findsNothing);
     });
 
     testWidgets('renders with background when withBackground is true',
@@ -61,15 +61,15 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusIcon(
-              status: SyncStatus.success,
+            body: SyncOperationStatusIcon(
+              status: SyncOperationStatus.success,
               withBackground: true,
             ),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusIcon), findsOneWidget);
+      expect(find.byType(SyncOperationStatusIcon), findsOneWidget);
       expect(find.byType(Container), findsOneWidget);
     });
 
@@ -79,8 +79,8 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusIcon(
-              status: SyncStatus.success,
+            body: SyncOperationStatusIcon(
+              status: SyncOperationStatus.success,
               size: customSize,
             ),
           ),
@@ -93,18 +93,18 @@ void main() {
 
     testWidgets('shows correct icon for each status', (tester) async {
       final expectedIcons = {
-        SyncStatus.idle: Icons.sync,
-        SyncStatus.syncing: Icons.sync,
-        SyncStatus.success: Icons.check_circle,
-        SyncStatus.failed: Icons.error,
-        SyncStatus.pending: Icons.schedule,
+        SyncOperationStatus.idle: Icons.sync,
+        SyncOperationStatus.syncing: Icons.sync,
+        SyncOperationStatus.success: Icons.check_circle,
+        SyncOperationStatus.failed: Icons.error,
+        SyncOperationStatus.pending: Icons.schedule,
       };
 
       for (final entry in expectedIcons.entries) {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SyncStatusIcon(status: entry.key),
+              body: SyncOperationStatusIcon(status: entry.key),
             ),
           ),
         );
@@ -115,18 +115,18 @@ void main() {
     });
   });
 
-  group('SyncStatusIndicator', () {
+  group('SyncOperationStatusIndicator', () {
     testWidgets('renders indicator for each status', (tester) async {
-      for (final status in SyncStatus.values) {
+      for (final status in SyncOperationStatus.values) {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SyncStatusIndicator(status: status),
+              body: SyncOperationStatusIndicator(status: status),
             ),
           ),
         );
 
-        expect(find.byType(SyncStatusIndicator), findsOneWidget);
+        expect(find.byType(SyncOperationStatusIndicator), findsOneWidget);
         expect(find.byType(Container), findsOneWidget);
       }
     });
@@ -135,10 +135,10 @@ void main() {
       const customSize = 20.0;
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
-            body: SyncStatusIndicator(
-              status: SyncStatus.success,
+            body: SyncOperationStatusIndicator(
+              status: SyncOperationStatus.success,
               size: customSize,
             ),
           ),
@@ -146,10 +146,12 @@ void main() {
       );
 
       final container = tester.widget<Container>(
-        find.descendant(
-          of: find.byType(SyncStatusIndicator),
-          matching: find.byType(Container),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncOperationStatusIndicator),
+              matching: find.byType(Container),
+            )
+            .first,
       );
 
       final decoration = container.decoration as BoxDecoration;
@@ -160,8 +162,8 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SyncStatusIndicator(
-              status: SyncStatus.syncing,
+            body: SyncOperationStatusIndicator(
+              status: SyncOperationStatus.syncing,
               animateWhenSyncing: false,
             ),
           ),
@@ -169,27 +171,29 @@ void main() {
       );
 
       // Should render without animation
-      expect(find.byType(SyncStatusIndicator), findsOneWidget);
+      expect(find.byType(SyncOperationStatusIndicator), findsOneWidget);
       expect(find.byType(Container), findsOneWidget);
     });
 
     testWidgets('shows correct color for each status', (tester) async {
       final theme = ThemeData();
 
-      for (final status in SyncStatus.values) {
+      for (final status in SyncOperationStatus.values) {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SyncStatusIndicator(status: status),
+              body: SyncOperationStatusIndicator(status: status),
             ),
           ),
         );
 
         final container = tester.widget<Container>(
-          find.descendant(
-            of: find.byType(SyncStatusIndicator),
-            matching: find.byType(Container),
-          ).first,
+          find
+              .descendant(
+                of: find.byType(SyncOperationStatusIndicator),
+                matching: find.byType(Container),
+              )
+              .first,
         );
 
         final decoration = container.decoration as BoxDecoration;
@@ -198,23 +202,23 @@ void main() {
     });
   });
 
-  group('SyncStatusIcon integration', () {
+  group('SyncOperationStatusIcon integration', () {
     testWidgets('works with Row layout', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
             body: Row(
               children: [
-                SyncStatusIcon(status: SyncStatus.success),
-                SyncStatusIcon(status: SyncStatus.syncing),
-                SyncStatusIcon(status: SyncStatus.failed),
+                SyncOperationStatusIcon(status: SyncOperationStatus.success),
+                SyncOperationStatusIcon(status: SyncOperationStatus.syncing),
+                SyncOperationStatusIcon(status: SyncOperationStatus.failed),
               ],
             ),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusIcon), findsNWidgets(3));
+      expect(find.byType(SyncOperationStatusIcon), findsNWidgets(3));
     });
 
     testWidgets('works with Column layout', (tester) async {
@@ -223,15 +227,15 @@ void main() {
           home: Scaffold(
             body: Column(
               children: [
-                SyncStatusIcon(status: SyncStatus.idle),
-                SyncStatusIcon(status: SyncStatus.pending),
+                SyncOperationStatusIcon(status: SyncOperationStatus.idle),
+                SyncOperationStatusIcon(status: SyncOperationStatus.pending),
               ],
             ),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusIcon), findsNWidgets(2));
+      expect(find.byType(SyncOperationStatusIcon), findsNWidgets(2));
     });
 
     testWidgets('handles theme changes', (tester) async {
@@ -242,24 +246,24 @@ void main() {
         MaterialApp(
           theme: lightTheme,
           home: const Scaffold(
-            body: SyncStatusIcon(status: SyncStatus.success),
+            body: SyncOperationStatusIcon(status: SyncOperationStatus.success),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusIcon), findsOneWidget);
+      expect(find.byType(SyncOperationStatusIcon), findsOneWidget);
 
       // Change to dark theme
       await tester.pumpWidget(
         MaterialApp(
           theme: darkTheme,
           home: const Scaffold(
-            body: SyncStatusIcon(status: SyncStatus.success),
+            body: SyncOperationStatusIcon(status: SyncOperationStatus.success),
           ),
         ),
       );
 
-      expect(find.byType(SyncStatusIcon), findsOneWidget);
+      expect(find.byType(SyncOperationStatusIcon), findsOneWidget);
     });
   });
 }

@@ -168,7 +168,8 @@ class SyncError extends Equatable {
         type: SyncErrorType.network,
         severity: SyncErrorSeverity.medium,
         technicalMessage: exception.toString(),
-        userMessage: 'Network connection issue. Please check your internet connection.',
+        userMessage:
+            'Network connection issue. Please check your internet connection.',
         suggestion: 'Check your WiFi or mobile data connection and try again.',
         entityType: entityType,
         entityId: entityId,
@@ -188,7 +189,8 @@ class SyncError extends Equatable {
         severity: SyncErrorSeverity.low,
         technicalMessage: exception.toString(),
         userMessage: 'Request timed out. The server took too long to respond.',
-        suggestion: 'The server may be busy. Your request will be retried automatically.',
+        suggestion:
+            'The server may be busy. Your request will be retried automatically.',
         entityType: entityType,
         entityId: entityId,
         operationType: operationType,
@@ -207,7 +209,8 @@ class SyncError extends Equatable {
         severity: SyncErrorSeverity.high,
         technicalMessage: exception.toString(),
         userMessage: 'Authentication failed. Please sign in again.',
-        suggestion: 'Your session may have expired. Please sign out and sign back in.',
+        suggestion:
+            'Your session may have expired. Please sign out and sign back in.',
         statusCode: 401,
         entityType: entityType,
         entityId: entityId,
@@ -226,7 +229,8 @@ class SyncError extends Equatable {
         type: SyncErrorType.authentication,
         severity: SyncErrorSeverity.high,
         technicalMessage: exception.toString(),
-        userMessage: 'Access denied. You don\'t have permission to perform this action.',
+        userMessage:
+            'Access denied. You don\'t have permission to perform this action.',
         suggestion: 'If you believe this is an error, please contact support.',
         statusCode: 403,
         entityType: entityType,
@@ -246,8 +250,10 @@ class SyncError extends Equatable {
         type: SyncErrorType.notFound,
         severity: SyncErrorSeverity.high,
         technicalMessage: exception.toString(),
-        userMessage: 'Data not found. The item you\'re trying to sync may have been deleted.',
-        suggestion: 'Refresh your data to ensure you have the latest information.',
+        userMessage:
+            'Data not found. The item you\'re trying to sync may have been deleted.',
+        suggestion:
+            'Refresh your data to ensure you have the latest information.',
         statusCode: 404,
         entityType: entityType,
         entityId: entityId,
@@ -266,8 +272,10 @@ class SyncError extends Equatable {
         type: SyncErrorType.conflict,
         severity: SyncErrorSeverity.medium,
         technicalMessage: exception.toString(),
-        userMessage: 'Sync conflict detected. This data was modified elsewhere.',
-        suggestion: 'Please review the changes and choose which version to keep.',
+        userMessage:
+            'Sync conflict detected. This data was modified elsewhere.',
+        suggestion:
+            'Please review the changes and choose which version to keep.',
         statusCode: 409,
         entityType: entityType,
         entityId: entityId,
@@ -287,7 +295,8 @@ class SyncError extends Equatable {
         severity: SyncErrorSeverity.high,
         technicalMessage: exception.toString(),
         userMessage: 'Invalid data. Some information couldn\'t be validated.',
-        suggestion: 'Please check your input and try again. Contact support if the issue persists.',
+        suggestion:
+            'Please check your input and try again. Contact support if the issue persists.',
         statusCode: 422,
         entityType: entityType,
         entityId: entityId,
@@ -305,8 +314,10 @@ class SyncError extends Equatable {
         type: SyncErrorType.rateLimited,
         severity: SyncErrorSeverity.medium,
         technicalMessage: exception.toString(),
-        userMessage: 'Too many requests. Please wait a moment before trying again.',
-        suggestion: 'You\'re making requests too frequently. Please wait and try again later.',
+        userMessage:
+            'Too many requests. Please wait a moment before trying again.',
+        suggestion:
+            'You\'re making requests too frequently. Please wait and try again later.',
         statusCode: 429,
         entityType: entityType,
         entityId: entityId,
@@ -326,7 +337,8 @@ class SyncError extends Equatable {
         severity: SyncErrorSeverity.high,
         technicalMessage: exception.toString(),
         userMessage: 'Storage quota exceeded. Please free up some space.',
-        suggestion: 'Delete old trips or upgrade your account to increase storage.',
+        suggestion:
+            'Delete old trips or upgrade your account to increase storage.',
         statusCode: 507,
         entityType: entityType,
         entityId: entityId,
@@ -347,7 +359,8 @@ class SyncError extends Equatable {
         severity: SyncErrorSeverity.medium,
         technicalMessage: exception.toString(),
         userMessage: 'Server error. Our team has been notified.',
-        suggestion: 'This is usually temporary. Please try again in a few minutes.',
+        suggestion:
+            'This is usually temporary. Please try again in a few minutes.',
         entityType: entityType,
         entityId: entityId,
         operationType: operationType,
@@ -431,8 +444,7 @@ class SyncError extends Equatable {
   factory SyncError.fromJson(Map<String, dynamic> json) {
     return SyncError(
       errorId: json['errorId'] as String,
-      type: SyncErrorType.values
-          .firstWhere((e) => e.name == json['type']),
+      type: SyncErrorType.values.firstWhere((e) => e.name == json['type']),
       severity: SyncErrorSeverity.values
           .firstWhere((e) => e.name == json['severity']),
       code: json['code'] as String?,

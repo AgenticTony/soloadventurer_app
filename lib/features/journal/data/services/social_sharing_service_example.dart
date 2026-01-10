@@ -115,8 +115,7 @@ class _Example2CustomConfigurationState
           const SizedBox(height: 20),
 
           // Configuration options
-          Text('Share Options',
-              style: Theme.of(context).textTheme.titleLarge),
+          Text('Share Options', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
 
           SwitchListTile(
@@ -139,8 +138,7 @@ class _Example2CustomConfigurationState
           const SizedBox(height: 20),
 
           // Share buttons for different platforms
-          Text('Share To',
-              style: Theme.of(context).textTheme.titleLarge),
+          Text('Share To', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
 
           Wrap(
@@ -731,8 +729,8 @@ class _Example7CustomShareSheetState
             child: ElevatedButton(
               onPressed: _selectedPlatform != null
                   ? () async {
-                      final notifier = ref.read(
-                          socialSharingNotifierProvider.notifier);
+                      final notifier =
+                          ref.read(socialSharingNotifierProvider.notifier);
                       await notifier.shareEntry(
                         entry: entry,
                         platform: _selectedPlatform!,
@@ -800,7 +798,8 @@ class _Example7CustomShareSheetState
       id: '1',
       userId: 'user1',
       title: 'Mountain Hiking Adventure',
-      content: 'Reached the summit today! The view was absolutely breathtaking.',
+      content:
+          'Reached the summit today! The view was absolutely breathtaking.',
       mood: 'accomplished',
       locationName: 'Rocky Mountains, Colorado',
       entryDate: DateTime.now(),

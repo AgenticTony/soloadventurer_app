@@ -1,5 +1,5 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:equatable/equatable.dart';
-import 'trip.dart';
 
 /// Represents a journal entry with rich text content
 class JournalEntry extends Equatable {

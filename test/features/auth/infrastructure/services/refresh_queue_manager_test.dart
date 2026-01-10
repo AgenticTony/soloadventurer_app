@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -134,9 +133,10 @@ void main() {
   });
 
   group('RefreshQueueManager - Error Handling', () {
-    test('should handle refresh failure and resolve all queued requests', () async {
+    test('should handle refresh failure and resolve all queued requests',
+        () async {
       // Arrange
-      final error = const AuthException('Refresh failed', code: 'REFRESH_ERROR');
+      const error = AuthException('Refresh failed', code: 'REFRESH_ERROR');
 
       when(() => mockRefreshService.refreshToken()).thenThrow(error);
 
@@ -169,14 +169,15 @@ void main() {
       // Assert
       expect(result.success, isFalse);
       expect(result.error, isNotNull);
-      expect(result.error!.code, isNull); // Wrapped exception doesn't have a code
+      expect(
+          result.error!.code, isNull); // Wrapped exception doesn't have a code
       expect(result.timedOut, isFalse);
     });
 
     test('should reset isRefreshing flag after error', () async {
       // Arrange
-      when(() => mockRefreshService.refreshToken())
-          .thenThrow(const AuthException('Refresh failed', code: 'REFRESH_ERROR'));
+      when(() => mockRefreshService.refreshToken()).thenThrow(
+          const AuthException('Refresh failed', code: 'REFRESH_ERROR'));
 
       // Act
       await queueManager.enqueueRefresh();
@@ -187,7 +188,7 @@ void main() {
 
     test('should process new requests after previous failure', () async {
       // Arrange
-      final error = const AuthException('Refresh failed', code: 'REFRESH_ERROR');
+      const error = AuthException('Refresh failed', code: 'REFRESH_ERROR');
       final newSession = AuthSession(
         accessToken: 'new_access_token',
         idToken: 'new_id_token',
@@ -477,7 +478,7 @@ void main() {
 
     test('should create failure result correctly', () {
       // Arrange
-      final error = const AuthException('Refresh failed', code: 'REFRESH_ERROR');
+      const error = AuthException('Refresh failed', code: 'REFRESH_ERROR');
 
       // Act
       final result = QueuedRefreshResult.failure(

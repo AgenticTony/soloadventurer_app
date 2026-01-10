@@ -13,7 +13,6 @@ part 'itinerary.g.dart';
 /// a customized itinerary created by the user.
 @freezed
 abstract class Itinerary with _$Itinerary {
-  const Itinerary._();
 
   /// Creates a complete itinerary
   ///
@@ -127,4 +126,7 @@ abstract class Itinerary with _$Itinerary {
     if (items.isEmpty) return false;
     return items.every((item) => item.isCompleted);
   }
+
+  // Private constructor for freezed getters
+  const Itinerary._();
 }

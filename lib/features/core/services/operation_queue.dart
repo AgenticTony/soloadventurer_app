@@ -6,6 +6,7 @@ import '../providers/connectivity_provider.dart';
 import '../../auth/domain/services/token_manager.dart';
 import 'operation_storage_service.dart';
 import 'retry_strategy.dart';
+// Import operation types for deserialization
 import '../../travel/domain/models/trip_planning_operation.dart';
 import '../../travel/domain/models/travel_note_operation.dart';
 import '../../travel/domain/models/location_update_operation.dart';
@@ -211,6 +212,63 @@ abstract class QueueableOperation {
   /// };
   /// ```
   Map<String, dynamic> toJson();
+
+  /// Creates a copy of this operation with updated attempt metadata.
+  ///
+  /// This is used by the operation queue to track retry attempts.
+  /// Implementations should return a new instance with the provided
+  /// metadata fields updated.
+  ///
+  /// ## Parameters
+  /// - [lastAttempt]: Timestamp of the most recent execution attempt
+  /// - [attemptCount]: Total number of execution attempts (incremented)
+  /// - [lastError]: Error message from the most recent failed attempt
+  ///
+  /// ## Example
+  /// ```dart
+  /// @override
+  /// QueueableOperation withAttemptMetadata({
+  ///   DateTime? lastAttempt,
+  /// int? attemptCount,
+  /// String? lastError,
+  /// }) {
+  ///   return MyOperation(
+  ///     id: id,
+  ///     type: type,
+  ///     // ... other fields unchanged
+  ///     lastAttempt: lastAttempt ?? this.lastAttempt,
+  ///     attemptCount: attemptCount ?? this.attemptCount,
+  ///     lastError: lastError ?? this.lastError,
+  ///   );
+  /// }
+  /// ```
+  QueueableOperation withAttemptMetadata({
+    DateTime? lastAttempt,
+    int? attemptCount,
+    String? lastError,
+  });
+
+  /// Resets attempt metadata for retrying a failed operation.
+  ///
+  /// This is used when moving a failed operation back to the pending queue.
+  /// Implementations should return a new instance with attempt metadata
+  /// reset to initial values.
+  ///
+  /// ## Example
+  /// ```dart
+  /// @override
+  /// QueueableOperation resetForRetry() {
+  ///   return MyOperation(
+  ///     id: id,
+  ///     type: type,
+  ///     // ... other fields unchanged
+  ///     lastAttempt: null,
+  ///     attemptCount: 0,
+  ///     lastError: null,
+  ///   );
+  /// }
+  /// ```
+  QueueableOperation resetForRetry();
 }
 
 /// A persistent priority queue for managing offline-capable operations.
@@ -491,29 +549,11 @@ class OperationQueue extends _$OperationQueue {
     QueueableOperation operation,
     String? error,
   ) {
-    // Use type checking and copyWith to update metadata
-    if (operation is TripPlanningOperation) {
-      return operation.copyWith(
-        lastAttempt: DateTime.now(),
-        attemptCount: operation.attemptCount + 1,
-        lastError: error,
-      );
-    } else if (operation is TravelNoteOperation) {
-      return operation.copyWith(
-        lastAttempt: DateTime.now(),
-        attemptCount: operation.attemptCount + 1,
-        lastError: error,
-      );
-    } else if (operation is LocationUpdateOperation) {
-      return operation.copyWith(
-        lastAttempt: DateTime.now(),
-        attemptCount: operation.attemptCount + 1,
-        lastError: error,
-      );
-    }
-
-    // Fallback: return operation as-is if type is unknown
-    return operation;
+    return operation.withAttemptMetadata(
+      lastAttempt: DateTime.now(),
+      attemptCount: operation.attemptCount + 1,
+      lastError: error,
+    );
   }
 
   bool _canProcess(QueueableOperation operation) {
@@ -1002,28 +1042,6 @@ class OperationQueue extends _$OperationQueue {
 
   /// Reset attempt metadata for retrying a failed operation
   QueueableOperation _resetAttemptMetadata(QueueableOperation operation) {
-    // Use type checking and copyWith to reset metadata
-    if (operation is TripPlanningOperation) {
-      return operation.copyWith(
-        lastAttempt: null,
-        attemptCount: 0,
-        lastError: null,
-      );
-    } else if (operation is TravelNoteOperation) {
-      return operation.copyWith(
-        lastAttempt: null,
-        attemptCount: 0,
-        lastError: null,
-      );
-    } else if (operation is LocationUpdateOperation) {
-      return operation.copyWith(
-        lastAttempt: null,
-        attemptCount: 0,
-        lastError: null,
-      );
-    }
-
-    // Fallback: return operation as-is if type is unknown
-    return operation;
+    return operation.resetForRetry();
   }
 }

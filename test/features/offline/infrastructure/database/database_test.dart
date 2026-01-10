@@ -1,12 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/sync_queue_dao.dart';
-import 'package:path/path.dart' as p;
 
 void main() {
   late AppDatabase database;

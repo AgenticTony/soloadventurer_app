@@ -121,7 +121,7 @@ void main() {
     group('presets', () {
       test('should have optimizedForTravel preset with correct values', () {
         // Assert
-        final config = ImageCompressionConfig.optimizedForTravel;
+        const config = ImageCompressionConfig.optimizedForTravel;
         expect(config.maxWidth, equals(1920));
         expect(config.maxHeight, equals(1920));
         expect(config.quality, equals(85));
@@ -131,7 +131,7 @@ void main() {
 
       test('should have highQuality preset with correct values', () {
         // Assert
-        final config = ImageCompressionConfig.highQuality;
+        const config = ImageCompressionConfig.highQuality;
         expect(config.maxWidth, equals(2560));
         expect(config.maxHeight, equals(2560));
         expect(config.quality, equals(95));
@@ -141,7 +141,7 @@ void main() {
 
       test('should have aggressive preset with correct values', () {
         // Assert
-        final config = ImageCompressionConfig.aggressive;
+        const config = ImageCompressionConfig.aggressive;
         expect(config.maxWidth, equals(1280));
         expect(config.maxHeight, equals(1280));
         expect(config.quality, equals(70));
@@ -151,9 +151,11 @@ void main() {
     });
 
     group('validate', () {
-      test('should throw InvalidImageException when quality is out of range (negative)', () {
+      test(
+          'should throw InvalidImageException when quality is out of range (negative)',
+          () {
         // Arrange
-        final config = ImageCompressionConfig(quality: -1);
+        const config = ImageCompressionConfig(quality: -1);
 
         // Act & Assert
         expect(
@@ -163,9 +165,11 @@ void main() {
         );
       });
 
-      test('should throw InvalidImageException when quality is out of range (> 100)', () {
+      test(
+          'should throw InvalidImageException when quality is out of range (> 100)',
+          () {
         // Arrange
-        final config = ImageCompressionConfig(quality: 101);
+        const config = ImageCompressionConfig(quality: 101);
 
         // Act & Assert
         expect(
@@ -175,9 +179,10 @@ void main() {
         );
       });
 
-      test('should throw InvalidImageException when maxWidth is less than 1', () {
+      test('should throw InvalidImageException when maxWidth is less than 1',
+          () {
         // Arrange
-        final config = ImageCompressionConfig(maxWidth: 0);
+        const config = ImageCompressionConfig(maxWidth: 0);
 
         // Act & Assert
         expect(
@@ -187,9 +192,10 @@ void main() {
         );
       });
 
-      test('should throw InvalidImageException when maxHeight is less than 1', () {
+      test('should throw InvalidImageException when maxHeight is less than 1',
+          () {
         // Arrange
-        final config = ImageCompressionConfig(maxHeight: 0);
+        const config = ImageCompressionConfig(maxHeight: 0);
 
         // Act & Assert
         expect(
@@ -199,9 +205,10 @@ void main() {
         );
       });
 
-      test('should throw InvalidImageException when targetSize is less than 1', () {
+      test('should throw InvalidImageException when targetSize is less than 1',
+          () {
         // Arrange
-        final config = ImageCompressionConfig(targetSize: 0);
+        const config = ImageCompressionConfig(targetSize: 0);
 
         // Act & Assert
         expect(
@@ -213,7 +220,7 @@ void main() {
 
       test('should not throw when all values are valid', () {
         // Arrange
-        final config = ImageCompressionConfig(
+        const config = ImageCompressionConfig(
           maxWidth: 1920,
           maxHeight: 1080,
           quality: 85,
@@ -228,7 +235,7 @@ void main() {
     group('copyWith', () {
       test('should create copy with modified maxWidth', () {
         // Arrange
-        final config = ImageCompressionConfig(maxWidth: 1920);
+        const config = ImageCompressionConfig(maxWidth: 1920);
 
         // Act
         final copy = config.copyWith(maxWidth: 2560);
@@ -240,7 +247,7 @@ void main() {
 
       test('should create copy with multiple modified fields', () {
         // Arrange
-        final config = ImageCompressionConfig(
+        const config = ImageCompressionConfig(
           maxWidth: 1920,
           quality: 85,
         );
@@ -262,7 +269,7 @@ void main() {
 
       test('should preserve original values when no parameters provided', () {
         // Arrange
-        final config = ImageCompressionConfig(
+        const config = ImageCompressionConfig(
           maxWidth: 1920,
           quality: 85,
         );
@@ -308,8 +315,10 @@ void main() {
 
       test('should increase estimate with higher quality', () {
         // Act
-        final lowQuality = MediaCompression.estimateCompressedSize(1920, 1080, 50);
-        final highQuality = MediaCompression.estimateCompressedSize(1920, 1080, 95);
+        final lowQuality =
+            MediaCompression.estimateCompressedSize(1920, 1080, 50);
+        final highQuality =
+            MediaCompression.estimateCompressedSize(1920, 1080, 95);
 
         // Assert
         expect(highQuality, greaterThan(lowQuality));
@@ -318,7 +327,8 @@ void main() {
       test('should increase estimate with larger dimensions', () {
         // Act
         final smallSize = MediaCompression.estimateCompressedSize(640, 480, 85);
-        final largeSize = MediaCompression.estimateCompressedSize(3840, 2160, 85);
+        final largeSize =
+            MediaCompression.estimateCompressedSize(3840, 2160, 85);
 
         // Assert
         expect(largeSize, greaterThan(smallSize));
@@ -412,7 +422,9 @@ void main() {
         );
       });
 
-      test('should throw UnsupportedImageFormatException for unsupported format', () {
+      test(
+          'should throw UnsupportedImageFormatException for unsupported format',
+          () {
         // Arrange
         final file = File('/tmp/test.bmp'); // BMP not supported
 
@@ -468,7 +480,8 @@ void main() {
         // Requires mocking
       });
 
-      test('should default originalSize to bytes length when not provided', () async {
+      test('should default originalSize to bytes length when not provided',
+          () async {
         // Requires mocking
       });
     });
@@ -521,7 +534,8 @@ void main() {
       // Test aspect ratio preservation
     });
 
-    test('should not maintain aspect ratio when maintainAspect is false', () async {
+    test('should not maintain aspect ratio when maintainAspect is false',
+        () async {
       // Test without aspect ratio preservation
     });
 
@@ -533,7 +547,8 @@ void main() {
       // Test maxHeight constraint
     });
 
-    test('should resize to both maxWidth and maxHeight when both exceeded', () async {
+    test('should resize to both maxWidth and maxHeight when both exceeded',
+        () async {
       // Test both constraints
     });
 
@@ -543,11 +558,13 @@ void main() {
   });
 
   group('Image Compression Performance', () {
-    test('should complete compression within reasonable time for small images', () async {
+    test('should complete compression within reasonable time for small images',
+        () async {
       // Test compression speed for < 1 MB images
     });
 
-    test('should complete compression within reasonable time for large images', () async {
+    test('should complete compression within reasonable time for large images',
+        () async {
       // Test compression speed for > 10 MB images
     });
 

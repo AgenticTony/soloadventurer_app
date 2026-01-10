@@ -58,9 +58,8 @@ class ExifData {
   bool get hasLocation => latitude != null && longitude != null;
 
   /// Whether date/time data is available
-  bool get hasDateTime => dateTime != null ||
-      dateTimeDigitized != null ||
-      dateTimeOriginal != null;
+  bool get hasDateTime =>
+      dateTime != null || dateTimeDigitized != null || dateTimeOriginal != null;
 
   /// Best available date/time (prioritizes dateTimeOriginal, then dateTimeDigitized, then dateTime)
   DateTime? get bestDateTime =>
@@ -425,22 +424,22 @@ class ExifUtils {
 
     // Extract camera info
     if (config.extractCameraInfo) {
-      make = tags['Make']?.printable?.toString();
-      model = tags['Model']?.printable?.toString();
-      orientation = tags['Orientation']?.values?.first as int?;
-      flash = tags['Flash']?.printable?.toString();
+      make = tags['Make']?.printable.toString();
+      model = tags['Model']?.printable.toString();
+      orientation = tags['Orientation']?.values.first as int?;
+      flash = tags['Flash']?.printable.toString();
       focalLength = _convertRationalToDouble(tags['FocalLength']?.values);
-      isoSpeed = tags['ISOSpeedRatings']?.values?.first as int?;
+      isoSpeed = tags['ISOSpeedRatings']?.values.first as int?;
       exposureTime = _convertRationalToDouble(tags['ExposureTime']?.values);
       fNumber = _convertRationalToDouble(tags['FNumber']?.values);
     }
 
     // Extract dimensions
     if (config.extractDimensions) {
-      imageWidth = tags['PixelXDimension']?.values?.first as int? ??
-          tags['ExifImageWidth']?.values?.first as int?;
-      imageHeight = tags['PixelYDimension']?.values?.first as int? ??
-          tags['ExifImageHeight']?.values?.first as int?;
+      imageWidth = tags['PixelXDimension']?.values.first as int? ??
+          tags['ExifImageWidth']?.values.first as int?;
+      imageHeight = tags['PixelYDimension']?.values.first as int? ??
+          tags['ExifImageHeight']?.values.first as int?;
     }
 
     return ExifData(
@@ -468,7 +467,7 @@ class ExifUtils {
     if (tag == null) return null;
 
     final values = tag.values;
-    if (values == null || values.isEmpty) return null;
+    if (values.isEmpty) return null;
 
     try {
       // GPS coordinates are stored as [degrees, minutes, seconds]
@@ -519,7 +518,6 @@ class ExifUtils {
     if (tag == null) return null;
 
     final dateString = tag.printable;
-    if (dateString == null) return null;
 
     try {
       // EXIF date format is typically "YYYY:MM:DD HH:MM:SS"

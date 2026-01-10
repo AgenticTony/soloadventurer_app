@@ -7,7 +7,7 @@ void main() {
   group('ZoomAwareClusteringManager', () {
     test('should initialize with default parameters', () {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
@@ -72,12 +72,14 @@ void main() {
       expect(paramsZoom15.clusterRadius, 30);
     });
 
-    test('should produce different clusters at different zoom levels', () async {
+    test('should produce different clusters at different zoom levels',
+        () async {
       final markers = List.generate(
         100,
         (i) => MapMarker(
           id: 'marker-$i',
-          position: LatLng(37.7749 + (i % 20) * 0.0005, -122.4194 + (i ~/ 20) * 0.0005),
+          position: LatLng(
+              37.7749 + (i % 20) * 0.0005, -122.4194 + (i ~/ 20) * 0.0005),
         ),
       );
 
@@ -96,10 +98,12 @@ void main() {
       final resultZoom15 = manager.currentResult!;
 
       // Zoomed out should have more aggressive clustering
-      expect(resultZoom5.clusters.length, lessThanOrEqualTo(resultZoom15.clusters.length));
+      expect(resultZoom5.clusters.length,
+          lessThanOrEqualTo(resultZoom15.clusters.length));
 
       // Zoomed out should have higher efficiency
-      expect(resultZoom5.efficiency, greaterThanOrEqualTo(resultZoom15.efficiency));
+      expect(resultZoom5.efficiency,
+          greaterThanOrEqualTo(resultZoom15.efficiency));
     });
 
     test('should debounce re-clustering', () async {
@@ -162,8 +166,8 @@ void main() {
 
       // Set bounds to only include San Francisco
       final sfBounds = LatLngBounds(
-        southwest: LatLng(37.4, -122.5),
-        northeast: LatLng(37.8, -122.0),
+        southwest: const LatLng(37.4, -122.5),
+        northeast: const LatLng(37.8, -122.0),
       );
 
       manager.updateMapBounds(sfBounds);
@@ -345,7 +349,7 @@ void main() {
 
     test('should create high-density configuration', () {
       final markers = [
-        MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
+        const MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
       ];
 
       final manager = ClusteringManagerFactories.forHighDensity(
@@ -360,7 +364,7 @@ void main() {
 
     test('should create low-density configuration', () {
       final markers = [
-        MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
+        const MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
       ];
 
       final manager = ClusteringManagerFactories.forLowDensity(
@@ -374,7 +378,7 @@ void main() {
 
     test('should create performance-optimized configuration', () {
       final markers = [
-        MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
+        const MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
       ];
 
       final manager = ClusteringManagerFactories.forPerformance(
@@ -452,7 +456,8 @@ void main() {
         100,
         (i) => MapMarker(
           id: 'marker-$i',
-          position: LatLng(37.7749 + (i % 20) * 0.0005, -122.4194 + (i ~/ 20) * 0.0005),
+          position: LatLng(
+              37.7749 + (i % 20) * 0.0005, -122.4194 + (i ~/ 20) * 0.0005),
         ),
       );
 
@@ -481,7 +486,7 @@ void main() {
 
     test('should dispose properly', () {
       final markers = [
-        MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
+        const MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
       ];
 
       final manager = ZoomAwareClusteringManager(

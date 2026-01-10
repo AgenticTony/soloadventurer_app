@@ -7,12 +7,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 import 'package:workmanager/workmanager.dart';
-import '../../../core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import '../../domain/entities/media_item.dart';
 import '../../domain/services/media_upload_service.dart';
 import '../models/upload_task.dart';
-import '../../../utils/media_compression.dart';
-import '../../../utils/video_compression.dart';
 
 /// Implementation of [MediaUploadService] with background support
 class MediaUploadServiceImpl extends MediaUploadService {
@@ -107,7 +105,8 @@ class MediaUploadServiceImpl extends MediaUploadService {
       fileSize: fileSize,
       createdAt: DateTime.now(),
       priority: priority ?? _config.defaultPriority,
-      compressBeforeUpload: config?.enableCompression ?? _config.enableCompression,
+      compressBeforeUpload:
+          config?.enableCompression ?? _config.enableCompression,
     );
 
     _queue.add(task);
@@ -348,7 +347,9 @@ class MediaUploadServiceImpl extends MediaUploadService {
 
     // Resume pending uploads
     final pendingTasks = _queue.where(
-      (task) => task.status == UploadStatus.queued || task.status == UploadStatus.failed,
+      (task) =>
+          task.status == UploadStatus.queued ||
+          task.status == UploadStatus.failed,
     );
 
     if (pendingTasks.isNotEmpty) {
@@ -419,9 +420,8 @@ class MediaUploadServiceImpl extends MediaUploadService {
     }
 
     // Determine bucket based on media type
-    final bucket = task.mediaType == MediaType.photo
-        ? 'journal-photos'
-        : 'journal-videos';
+    final bucket =
+        task.mediaType == MediaType.photo ? 'journal-photos' : 'journal-videos';
 
     final userId = _client.auth.currentUser?.id;
     if (userId == null) {
@@ -438,7 +438,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
     final response = await _client.storage.from(bucket).upload(
           storagePath,
           file,
-          fileOptions: FileOptions(
+          fileOptions: const FileOptions(
             cacheControl: '3600',
             upsert: false,
           ),
@@ -483,12 +483,11 @@ class MediaUploadServiceImpl extends MediaUploadService {
     if (shouldRetry) {
       // Calculate exponential backoff delay
       final delay = Duration(
-        milliseconds: (_config.retryDelay.inMilliseconds *
-                (1 << task.retryCount))
-            .clamp(
-              _config.retryDelay.inMilliseconds,
-              _config.maxRetryDelay.inMilliseconds,
-            ),
+        milliseconds:
+            (_config.retryDelay.inMilliseconds * (1 << task.retryCount)).clamp(
+          _config.retryDelay.inMilliseconds,
+          _config.maxRetryDelay.inMilliseconds,
+        ),
       );
 
       final retryTime = DateTime.now().add(delay);

@@ -187,14 +187,14 @@ class OfflineIndicator extends ConsumerStatefulWidget {
     String message = 'You\'re offline',
     VoidCallback? onShow,
     VoidCallback? onHide,
-  }) : config = OfflineIndicatorConfig(
+  })  : config = OfflineIndicatorConfig(
           message: message,
           mode: OfflineIndicatorMode.banner,
         ),
-       position = OfflineIndicatorPosition.topLeft,
-       offset = Offset.zero,
-       onShow = onShow,
-       onHide = onHide;
+        position = OfflineIndicatorPosition.topLeft,
+        offset = Offset.zero,
+        onShow = onShow,
+        onHide = onHide;
 
   /// Convenience constructor for badge mode
   const OfflineIndicator.badge({
@@ -203,11 +203,11 @@ class OfflineIndicator extends ConsumerStatefulWidget {
     Offset offset = const Offset(16, 16),
     VoidCallback? onShow,
     VoidCallback? onHide,
-  }) : config = OfflineIndicatorConfig.badge(),
-       position = position,
-       offset = offset,
-       onShow = onShow,
-       onHide = onHide;
+  })  : config = const OfflineIndicatorConfig.badge(),
+        position = position,
+        offset = offset,
+        onShow = onShow,
+        onHide = onHide;
 
   /// Convenience constructor for status bar mode
   const OfflineIndicator.statusBar({
@@ -215,13 +215,13 @@ class OfflineIndicator extends ConsumerStatefulWidget {
     String message = 'No connection',
     VoidCallback? onShow,
     VoidCallback? onHide,
-  }) : config = OfflineIndicatorConfig.statusBar(
+  })  : config = OfflineIndicatorConfig.statusBar(
           message: message,
         ),
-       position = OfflineIndicatorPosition.topLeft,
-       offset = Offset.zero,
-       onShow = onShow,
-       onHide = onHide;
+        position = OfflineIndicatorPosition.topLeft,
+        offset = Offset.zero,
+        onShow = onShow,
+        onHide = onHide;
 
   /// Convenience constructor for snackbar mode
   const OfflineIndicator.snackbar({
@@ -230,14 +230,14 @@ class OfflineIndicator extends ConsumerStatefulWidget {
     Duration? autoDismissDuration,
     VoidCallback? onShow,
     VoidCallback? onHide,
-  }) : config = OfflineIndicatorConfig.snackbar(
+  })  : config = OfflineIndicatorConfig.snackbar(
           message: message,
           autoDismissDuration: autoDismissDuration,
         ),
-       position = OfflineIndicatorPosition.topLeft,
-       offset = Offset.zero,
-       onShow = onShow,
-       onHide = onHide;
+        position = OfflineIndicatorPosition.topLeft,
+        offset = Offset.zero,
+        onShow = onShow,
+        onHide = onHide;
 
   @override
   ConsumerState<OfflineIndicator> createState() => _OfflineIndicatorState();
@@ -392,7 +392,8 @@ class _OfflineIndicatorState extends ConsumerState<OfflineIndicator>
     return indicator;
   }
 
-  Widget _buildIndicator(Color backgroundColor, Color textColor, ThemeData theme) {
+  Widget _buildIndicator(
+      Color backgroundColor, Color textColor, ThemeData theme) {
     final icon = Icon(
       widget.config.icon,
       color: textColor,
@@ -429,8 +430,7 @@ class _OfflineIndicatorState extends ConsumerState<OfflineIndicator>
                   icon,
                   const SizedBox(width: 12),
                 ],
-                if (widget.config.showMessage)
-                  Expanded(child: message),
+                if (widget.config.showMessage) Expanded(child: message),
                 if (widget.config.showDismissButton)
                   IconButton(
                     icon: Icon(Icons.close, color: textColor, size: 20),

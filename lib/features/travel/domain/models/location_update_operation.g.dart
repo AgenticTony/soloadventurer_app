@@ -6,9 +6,9 @@ part of 'location_update_operation.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LocationUpdateOperationImpl _$$LocationUpdateOperationImplFromJson(
+_LocationUpdateOperation _$LocationUpdateOperationFromJson(
         Map<String, dynamic> json) =>
-    _$LocationUpdateOperationImpl(
+    _LocationUpdateOperation(
       id: json['id'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
@@ -25,8 +25,8 @@ _$LocationUpdateOperationImpl _$$LocationUpdateOperationImplFromJson(
       maxRetries: (json['maxRetries'] as num?)?.toInt() ?? 3,
     );
 
-Map<String, dynamic> _$$LocationUpdateOperationImplToJson(
-        _$LocationUpdateOperationImpl instance) =>
+Map<String, dynamic> _$LocationUpdateOperationToJson(
+        _LocationUpdateOperation instance) =>
     <String, dynamic>{
       'id': instance.id,
       'latitude': instance.latitude,

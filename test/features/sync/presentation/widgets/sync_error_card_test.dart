@@ -393,7 +393,7 @@ void main() {
         userMessage: 'User-friendly message',
         suggestion: 'Try again',
         occurredAt: DateTime.now(),
-        details: {'key1': 'value1', 'key2': 'value2'},
+        details: const {'key1': 'value1', 'key2': 'value2'},
       );
 
       await tester.pumpWidget(

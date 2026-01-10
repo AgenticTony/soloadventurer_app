@@ -11,7 +11,7 @@ void main() {
 
     setUp(() {
       testActivities = [
-        Activity(
+        const Activity(
           id: '1',
           name: 'Hiking',
           description: 'Explore scenic mountain trails',
@@ -19,7 +19,7 @@ void main() {
           soloFriendly: true,
           costLevel: 'free',
         ),
-        Activity(
+        const Activity(
           id: '2',
           name: 'Food Tour',
           description: 'Taste local cuisine',
@@ -27,7 +27,7 @@ void main() {
           soloFriendly: true,
           costLevel: 'medium',
         ),
-        Activity(
+        const Activity(
           id: '3',
           name: 'Museum Visit',
           description: 'Discover cultural history',
@@ -157,7 +157,8 @@ void main() {
         expect(find.text('Free'), findsNothing);
       });
 
-      testWidgets('renders solo-friendly indicator', (WidgetTester tester) async {
+      testWidgets('renders solo-friendly indicator',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -170,7 +171,8 @@ void main() {
         expect(find.text('Solo Friendly'), findsWidgets);
       });
 
-      testWidgets('renders custom title when provided', (WidgetTester tester) async {
+      testWidgets('renders custom title when provided',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -215,7 +217,8 @@ void main() {
     });
 
     group('Layouts', () {
-      testWidgets('renders list layout by default', (WidgetTester tester) async {
+      testWidgets('renders list layout by default',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -230,7 +233,8 @@ void main() {
         expect(find.byType(ListView), findsOneWidget);
       });
 
-      testWidgets('renders grid layout when specified', (WidgetTester tester) async {
+      testWidgets('renders grid layout when specified',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -245,7 +249,8 @@ void main() {
         expect(find.byType(GridView), findsOneWidget);
       });
 
-      testWidgets('uses custom grid cross axis count', (WidgetTester tester) async {
+      testWidgets('uses custom grid cross axis count',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -263,7 +268,8 @@ void main() {
         );
 
         // The delegate should be a SliverGridDelegateWithFixedCrossAxisCount
-        expect(gridView.gridDelegate, isA<SliverGridDelegateWithFixedCrossAxisCount>());
+        expect(gridView.gridDelegate,
+            isA<SliverGridDelegateWithFixedCrossAxisCount>());
       });
 
       testWidgets('renders horizontal layout when specified',
@@ -462,7 +468,7 @@ void main() {
 
       testWidgets('shows default icon for unknown categories',
           (WidgetTester tester) async {
-        final unknownCategoryActivity = Activity(
+        const unknownCategoryActivity = Activity(
           id: '4',
           name: 'Unknown Activity',
           category: 'unknown',
@@ -470,7 +476,7 @@ void main() {
         );
 
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ActivityList(activities: [unknownCategoryActivity]),
             ),
@@ -482,7 +488,8 @@ void main() {
     });
 
     group('Accessibility', () {
-      testWidgets('activities have semantic labels', (WidgetTester tester) async {
+      testWidgets('activities have semantic labels',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(

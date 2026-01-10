@@ -1,7 +1,7 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
-import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 
 /// Card widget for displaying journal entry information
 class JournalEntryCard extends StatelessWidget {
@@ -230,7 +230,8 @@ class _MoodIndicator extends StatelessWidget {
     final lowerMood = mood.toLowerCase();
     if (lowerMood.contains('happy') || lowerMood.contains('joy')) {
       return '😊';
-    } else if (lowerMood.contains('excited') || lowerMood.contains('adventurous')) {
+    } else if (lowerMood.contains('excited') ||
+        lowerMood.contains('adventurous')) {
       return '🤩';
     } else if (lowerMood.contains('calm') || lowerMood.contains('peaceful')) {
       return '😌';

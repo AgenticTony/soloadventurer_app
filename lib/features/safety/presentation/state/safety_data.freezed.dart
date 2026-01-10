@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,53 +9,84 @@ part of 'safety_data.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SafetyData _$SafetyDataFromJson(Map<String, dynamic> json) {
-  return _SafetyData.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SafetyData {
   /// Current safety status of the user
-  SafetyStatus? get currentStatus => throw _privateConstructorUsedError;
+  SafetyStatus? get currentStatus;
 
   /// List of trusted contacts
-  List<TrustedContact> get contacts => throw _privateConstructorUsedError;
+  List<TrustedContact> get contacts;
 
   /// List of recent check-ins
-  List<CheckIn> get checkIns => throw _privateConstructorUsedError;
+  List<CheckIn> get checkIns;
 
   /// List of recent safety alerts
-  List<SafetyAlert> get recentAlerts => throw _privateConstructorUsedError;
+  List<SafetyAlert> get recentAlerts;
 
   /// List of active (unresolved) safety alerts
-  List<SafetyAlert> get activeAlerts => throw _privateConstructorUsedError;
+  List<SafetyAlert> get activeAlerts;
 
   /// Currently selected check-in (for viewing)
-  CheckIn? get selectedCheckIn => throw _privateConstructorUsedError;
+  CheckIn? get selectedCheckIn;
 
   /// Currently selected alert (for viewing)
-  SafetyAlert? get selectedAlert => throw _privateConstructorUsedError;
-
-  /// Serializes this SafetyData to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  SafetyAlert? get selectedAlert;
 
   /// Create a copy of SafetyData
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $SafetyDataCopyWith<SafetyData> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$SafetyDataCopyWithImpl<SafetyData>(this as SafetyData, _$identity);
+
+  /// Serializes this SafetyData to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SafetyData &&
+            (identical(other.currentStatus, currentStatus) ||
+                other.currentStatus == currentStatus) &&
+            const DeepCollectionEquality().equals(other.contacts, contacts) &&
+            const DeepCollectionEquality().equals(other.checkIns, checkIns) &&
+            const DeepCollectionEquality()
+                .equals(other.recentAlerts, recentAlerts) &&
+            const DeepCollectionEquality()
+                .equals(other.activeAlerts, activeAlerts) &&
+            (identical(other.selectedCheckIn, selectedCheckIn) ||
+                other.selectedCheckIn == selectedCheckIn) &&
+            (identical(other.selectedAlert, selectedAlert) ||
+                other.selectedAlert == selectedAlert));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      currentStatus,
+      const DeepCollectionEquality().hash(contacts),
+      const DeepCollectionEquality().hash(checkIns),
+      const DeepCollectionEquality().hash(recentAlerts),
+      const DeepCollectionEquality().hash(activeAlerts),
+      selectedCheckIn,
+      selectedAlert);
+
+  @override
+  String toString() {
+    return 'SafetyData(currentStatus: $currentStatus, contacts: $contacts, checkIns: $checkIns, recentAlerts: $recentAlerts, activeAlerts: $activeAlerts, selectedCheckIn: $selectedCheckIn, selectedAlert: $selectedAlert)';
+  }
 }
 
 /// @nodoc
-abstract class $SafetyDataCopyWith<$Res> {
+abstract mixin class $SafetyDataCopyWith<$Res> {
   factory $SafetyDataCopyWith(
-          SafetyData value, $Res Function(SafetyData) then) =
-      _$SafetyDataCopyWithImpl<$Res, SafetyData>;
+          SafetyData value, $Res Function(SafetyData) _then) =
+      _$SafetyDataCopyWithImpl;
   @useResult
   $Res call(
       {SafetyStatus? currentStatus,
@@ -72,14 +103,11 @@ abstract class $SafetyDataCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SafetyDataCopyWithImpl<$Res, $Val extends SafetyData>
-    implements $SafetyDataCopyWith<$Res> {
-  _$SafetyDataCopyWithImpl(this._value, this._then);
+class _$SafetyDataCopyWithImpl<$Res> implements $SafetyDataCopyWith<$Res> {
+  _$SafetyDataCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SafetyData _self;
+  final $Res Function(SafetyData) _then;
 
   /// Create a copy of SafetyData
   /// with the given fields replaced by the non-null parameter values.
@@ -94,36 +122,36 @@ class _$SafetyDataCopyWithImpl<$Res, $Val extends SafetyData>
     Object? selectedCheckIn = freezed,
     Object? selectedAlert = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       currentStatus: freezed == currentStatus
-          ? _value.currentStatus
+          ? _self.currentStatus
           : currentStatus // ignore: cast_nullable_to_non_nullable
               as SafetyStatus?,
       contacts: null == contacts
-          ? _value.contacts
+          ? _self.contacts
           : contacts // ignore: cast_nullable_to_non_nullable
               as List<TrustedContact>,
       checkIns: null == checkIns
-          ? _value.checkIns
+          ? _self.checkIns
           : checkIns // ignore: cast_nullable_to_non_nullable
               as List<CheckIn>,
       recentAlerts: null == recentAlerts
-          ? _value.recentAlerts
+          ? _self.recentAlerts
           : recentAlerts // ignore: cast_nullable_to_non_nullable
               as List<SafetyAlert>,
       activeAlerts: null == activeAlerts
-          ? _value.activeAlerts
+          ? _self.activeAlerts
           : activeAlerts // ignore: cast_nullable_to_non_nullable
               as List<SafetyAlert>,
       selectedCheckIn: freezed == selectedCheckIn
-          ? _value.selectedCheckIn
+          ? _self.selectedCheckIn
           : selectedCheckIn // ignore: cast_nullable_to_non_nullable
               as CheckIn?,
       selectedAlert: freezed == selectedAlert
-          ? _value.selectedAlert
+          ? _self.selectedAlert
           : selectedAlert // ignore: cast_nullable_to_non_nullable
               as SafetyAlert?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of SafetyData
@@ -131,12 +159,12 @@ class _$SafetyDataCopyWithImpl<$Res, $Val extends SafetyData>
   @override
   @pragma('vm:prefer-inline')
   $SafetyStatusCopyWith<$Res>? get currentStatus {
-    if (_value.currentStatus == null) {
+    if (_self.currentStatus == null) {
       return null;
     }
 
-    return $SafetyStatusCopyWith<$Res>(_value.currentStatus!, (value) {
-      return _then(_value.copyWith(currentStatus: value) as $Val);
+    return $SafetyStatusCopyWith<$Res>(_self.currentStatus!, (value) {
+      return _then(_self.copyWith(currentStatus: value));
     });
   }
 
@@ -145,12 +173,12 @@ class _$SafetyDataCopyWithImpl<$Res, $Val extends SafetyData>
   @override
   @pragma('vm:prefer-inline')
   $CheckInCopyWith<$Res>? get selectedCheckIn {
-    if (_value.selectedCheckIn == null) {
+    if (_self.selectedCheckIn == null) {
       return null;
     }
 
-    return $CheckInCopyWith<$Res>(_value.selectedCheckIn!, (value) {
-      return _then(_value.copyWith(selectedCheckIn: value) as $Val);
+    return $CheckInCopyWith<$Res>(_self.selectedCheckIn!, (value) {
+      return _then(_self.copyWith(selectedCheckIn: value));
     });
   }
 
@@ -159,99 +187,222 @@ class _$SafetyDataCopyWithImpl<$Res, $Val extends SafetyData>
   @override
   @pragma('vm:prefer-inline')
   $SafetyAlertCopyWith<$Res>? get selectedAlert {
-    if (_value.selectedAlert == null) {
+    if (_self.selectedAlert == null) {
       return null;
     }
 
-    return $SafetyAlertCopyWith<$Res>(_value.selectedAlert!, (value) {
-      return _then(_value.copyWith(selectedAlert: value) as $Val);
+    return $SafetyAlertCopyWith<$Res>(_self.selectedAlert!, (value) {
+      return _then(_self.copyWith(selectedAlert: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$SafetyDataImplCopyWith<$Res>
-    implements $SafetyDataCopyWith<$Res> {
-  factory _$$SafetyDataImplCopyWith(
-          _$SafetyDataImpl value, $Res Function(_$SafetyDataImpl) then) =
-      __$$SafetyDataImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {SafetyStatus? currentStatus,
-      List<TrustedContact> contacts,
-      List<CheckIn> checkIns,
-      List<SafetyAlert> recentAlerts,
-      List<SafetyAlert> activeAlerts,
-      CheckIn? selectedCheckIn,
-      SafetyAlert? selectedAlert});
+/// Adds pattern-matching-related methods to [SafetyData].
+extension SafetyDataPatterns on SafetyData {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $SafetyStatusCopyWith<$Res>? get currentStatus;
-  @override
-  $CheckInCopyWith<$Res>? get selectedCheckIn;
-  @override
-  $SafetyAlertCopyWith<$Res>? get selectedAlert;
-}
-
-/// @nodoc
-class __$$SafetyDataImplCopyWithImpl<$Res>
-    extends _$SafetyDataCopyWithImpl<$Res, _$SafetyDataImpl>
-    implements _$$SafetyDataImplCopyWith<$Res> {
-  __$$SafetyDataImplCopyWithImpl(
-      _$SafetyDataImpl _value, $Res Function(_$SafetyDataImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of SafetyData
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? currentStatus = freezed,
-    Object? contacts = null,
-    Object? checkIns = null,
-    Object? recentAlerts = null,
-    Object? activeAlerts = null,
-    Object? selectedCheckIn = freezed,
-    Object? selectedAlert = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SafetyData value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$SafetyDataImpl(
-      currentStatus: freezed == currentStatus
-          ? _value.currentStatus
-          : currentStatus // ignore: cast_nullable_to_non_nullable
-              as SafetyStatus?,
-      contacts: null == contacts
-          ? _value._contacts
-          : contacts // ignore: cast_nullable_to_non_nullable
-              as List<TrustedContact>,
-      checkIns: null == checkIns
-          ? _value._checkIns
-          : checkIns // ignore: cast_nullable_to_non_nullable
-              as List<CheckIn>,
-      recentAlerts: null == recentAlerts
-          ? _value._recentAlerts
-          : recentAlerts // ignore: cast_nullable_to_non_nullable
-              as List<SafetyAlert>,
-      activeAlerts: null == activeAlerts
-          ? _value._activeAlerts
-          : activeAlerts // ignore: cast_nullable_to_non_nullable
-              as List<SafetyAlert>,
-      selectedCheckIn: freezed == selectedCheckIn
-          ? _value.selectedCheckIn
-          : selectedCheckIn // ignore: cast_nullable_to_non_nullable
-              as CheckIn?,
-      selectedAlert: freezed == selectedAlert
-          ? _value.selectedAlert
-          : selectedAlert // ignore: cast_nullable_to_non_nullable
-              as SafetyAlert?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _SafetyData() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SafetyData value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyData():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SafetyData value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyData() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            SafetyStatus? currentStatus,
+            List<TrustedContact> contacts,
+            List<CheckIn> checkIns,
+            List<SafetyAlert> recentAlerts,
+            List<SafetyAlert> activeAlerts,
+            CheckIn? selectedCheckIn,
+            SafetyAlert? selectedAlert)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyData() when $default != null:
+        return $default(
+            _that.currentStatus,
+            _that.contacts,
+            _that.checkIns,
+            _that.recentAlerts,
+            _that.activeAlerts,
+            _that.selectedCheckIn,
+            _that.selectedAlert);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            SafetyStatus? currentStatus,
+            List<TrustedContact> contacts,
+            List<CheckIn> checkIns,
+            List<SafetyAlert> recentAlerts,
+            List<SafetyAlert> activeAlerts,
+            CheckIn? selectedCheckIn,
+            SafetyAlert? selectedAlert)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyData():
+        return $default(
+            _that.currentStatus,
+            _that.contacts,
+            _that.checkIns,
+            _that.recentAlerts,
+            _that.activeAlerts,
+            _that.selectedCheckIn,
+            _that.selectedAlert);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            SafetyStatus? currentStatus,
+            List<TrustedContact> contacts,
+            List<CheckIn> checkIns,
+            List<SafetyAlert> recentAlerts,
+            List<SafetyAlert> activeAlerts,
+            CheckIn? selectedCheckIn,
+            SafetyAlert? selectedAlert)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyData() when $default != null:
+        return $default(
+            _that.currentStatus,
+            _that.contacts,
+            _that.checkIns,
+            _that.recentAlerts,
+            _that.activeAlerts,
+            _that.selectedCheckIn,
+            _that.selectedAlert);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$SafetyDataImpl extends _SafetyData {
-  const _$SafetyDataImpl(
+class _SafetyData extends SafetyData {
+  const _SafetyData(
       {this.currentStatus,
       final List<TrustedContact> contacts = const [],
       final List<CheckIn> checkIns = const [],
@@ -264,9 +415,8 @@ class _$SafetyDataImpl extends _SafetyData {
         _recentAlerts = recentAlerts,
         _activeAlerts = activeAlerts,
         super._();
-
-  factory _$SafetyDataImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SafetyDataImplFromJson(json);
+  factory _SafetyData.fromJson(Map<String, dynamic> json) =>
+      _$SafetyDataFromJson(json);
 
   /// Current safety status of the user
   @override
@@ -328,16 +478,26 @@ class _$SafetyDataImpl extends _SafetyData {
   @override
   final SafetyAlert? selectedAlert;
 
+  /// Create a copy of SafetyData
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SafetyData(currentStatus: $currentStatus, contacts: $contacts, checkIns: $checkIns, recentAlerts: $recentAlerts, activeAlerts: $activeAlerts, selectedCheckIn: $selectedCheckIn, selectedAlert: $selectedAlert)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SafetyDataCopyWith<_SafetyData> get copyWith =>
+      __$SafetyDataCopyWithImpl<_SafetyData>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SafetyDataToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SafetyDataImpl &&
+            other is _SafetyData &&
             (identical(other.currentStatus, currentStatus) ||
                 other.currentStatus == currentStatus) &&
             const DeepCollectionEquality().equals(other._contacts, _contacts) &&
@@ -364,68 +524,130 @@ class _$SafetyDataImpl extends _SafetyData {
       selectedCheckIn,
       selectedAlert);
 
-  /// Create a copy of SafetyData
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SafetyDataImplCopyWith<_$SafetyDataImpl> get copyWith =>
-      __$$SafetyDataImplCopyWithImpl<_$SafetyDataImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SafetyDataImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SafetyData(currentStatus: $currentStatus, contacts: $contacts, checkIns: $checkIns, recentAlerts: $recentAlerts, activeAlerts: $activeAlerts, selectedCheckIn: $selectedCheckIn, selectedAlert: $selectedAlert)';
   }
 }
 
-abstract class _SafetyData extends SafetyData {
-  const factory _SafetyData(
-      {final SafetyStatus? currentStatus,
-      final List<TrustedContact> contacts,
-      final List<CheckIn> checkIns,
-      final List<SafetyAlert> recentAlerts,
-      final List<SafetyAlert> activeAlerts,
-      final CheckIn? selectedCheckIn,
-      final SafetyAlert? selectedAlert}) = _$SafetyDataImpl;
-  const _SafetyData._() : super._();
-
-  factory _SafetyData.fromJson(Map<String, dynamic> json) =
-      _$SafetyDataImpl.fromJson;
-
-  /// Current safety status of the user
+/// @nodoc
+abstract mixin class _$SafetyDataCopyWith<$Res>
+    implements $SafetyDataCopyWith<$Res> {
+  factory _$SafetyDataCopyWith(
+          _SafetyData value, $Res Function(_SafetyData) _then) =
+      __$SafetyDataCopyWithImpl;
   @override
-  SafetyStatus? get currentStatus;
+  @useResult
+  $Res call(
+      {SafetyStatus? currentStatus,
+      List<TrustedContact> contacts,
+      List<CheckIn> checkIns,
+      List<SafetyAlert> recentAlerts,
+      List<SafetyAlert> activeAlerts,
+      CheckIn? selectedCheckIn,
+      SafetyAlert? selectedAlert});
 
-  /// List of trusted contacts
   @override
-  List<TrustedContact> get contacts;
+  $SafetyStatusCopyWith<$Res>? get currentStatus;
+  @override
+  $CheckInCopyWith<$Res>? get selectedCheckIn;
+  @override
+  $SafetyAlertCopyWith<$Res>? get selectedAlert;
+}
 
-  /// List of recent check-ins
-  @override
-  List<CheckIn> get checkIns;
+/// @nodoc
+class __$SafetyDataCopyWithImpl<$Res> implements _$SafetyDataCopyWith<$Res> {
+  __$SafetyDataCopyWithImpl(this._self, this._then);
 
-  /// List of recent safety alerts
-  @override
-  List<SafetyAlert> get recentAlerts;
-
-  /// List of active (unresolved) safety alerts
-  @override
-  List<SafetyAlert> get activeAlerts;
-
-  /// Currently selected check-in (for viewing)
-  @override
-  CheckIn? get selectedCheckIn;
-
-  /// Currently selected alert (for viewing)
-  @override
-  SafetyAlert? get selectedAlert;
+  final _SafetyData _self;
+  final $Res Function(_SafetyData) _then;
 
   /// Create a copy of SafetyData
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SafetyDataImplCopyWith<_$SafetyDataImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? currentStatus = freezed,
+    Object? contacts = null,
+    Object? checkIns = null,
+    Object? recentAlerts = null,
+    Object? activeAlerts = null,
+    Object? selectedCheckIn = freezed,
+    Object? selectedAlert = freezed,
+  }) {
+    return _then(_SafetyData(
+      currentStatus: freezed == currentStatus
+          ? _self.currentStatus
+          : currentStatus // ignore: cast_nullable_to_non_nullable
+              as SafetyStatus?,
+      contacts: null == contacts
+          ? _self._contacts
+          : contacts // ignore: cast_nullable_to_non_nullable
+              as List<TrustedContact>,
+      checkIns: null == checkIns
+          ? _self._checkIns
+          : checkIns // ignore: cast_nullable_to_non_nullable
+              as List<CheckIn>,
+      recentAlerts: null == recentAlerts
+          ? _self._recentAlerts
+          : recentAlerts // ignore: cast_nullable_to_non_nullable
+              as List<SafetyAlert>,
+      activeAlerts: null == activeAlerts
+          ? _self._activeAlerts
+          : activeAlerts // ignore: cast_nullable_to_non_nullable
+              as List<SafetyAlert>,
+      selectedCheckIn: freezed == selectedCheckIn
+          ? _self.selectedCheckIn
+          : selectedCheckIn // ignore: cast_nullable_to_non_nullable
+              as CheckIn?,
+      selectedAlert: freezed == selectedAlert
+          ? _self.selectedAlert
+          : selectedAlert // ignore: cast_nullable_to_non_nullable
+              as SafetyAlert?,
+    ));
+  }
+
+  /// Create a copy of SafetyData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SafetyStatusCopyWith<$Res>? get currentStatus {
+    if (_self.currentStatus == null) {
+      return null;
+    }
+
+    return $SafetyStatusCopyWith<$Res>(_self.currentStatus!, (value) {
+      return _then(_self.copyWith(currentStatus: value));
+    });
+  }
+
+  /// Create a copy of SafetyData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $CheckInCopyWith<$Res>? get selectedCheckIn {
+    if (_self.selectedCheckIn == null) {
+      return null;
+    }
+
+    return $CheckInCopyWith<$Res>(_self.selectedCheckIn!, (value) {
+      return _then(_self.copyWith(selectedCheckIn: value));
+    });
+  }
+
+  /// Create a copy of SafetyData
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SafetyAlertCopyWith<$Res>? get selectedAlert {
+    if (_self.selectedAlert == null) {
+      return null;
+    }
+
+    return $SafetyAlertCopyWith<$Res>(_self.selectedAlert!, (value) {
+      return _then(_self.copyWith(selectedAlert: value));
+    });
+  }
 }
+
+// dart format on

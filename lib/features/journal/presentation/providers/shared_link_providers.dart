@@ -1,18 +1,22 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/journal/data/services/shared_link_service_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/domain/services/shared_link_service.dart';
 
+// Generated file
+part 'shared_link_providers.g.dart';
+
 // ============================================================================
-// SERVICE PROVIDERS
+// DEPENDENCY INJECTION PROVIDERS
 // ============================================================================
 
 /// Provider for SharedLinkService
-final sharedLinkServiceProvider = Provider<SharedLinkService>((ref) {
+@riverpod
+SharedLinkService sharedLinkService(Ref ref) {
   final client = Supabase.instance.client;
   return SharedLinkServiceImpl(client: client);
-});
+}
 
 // ============================================================================
 // STATE MODELS
@@ -136,19 +140,25 @@ class ValidateLinkState {
 // ============================================================================
 
 /// Notifier for managing shared links
-class SharedLinkNotifier extends StateNotifier<SharedLinkState> {
-  final SharedLinkService _service;
-
-  SharedLinkNotifier(this._service) : super(const SharedLinkState()) {
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class SharedLinks extends _$SharedLinks {
+  @override
+  SharedLinkState build() {
+    // Load links automatically on build
     loadLinks();
+    return const SharedLinkState();
   }
 
   /// Load all shared links for the current user
   Future<void> loadLinks() async {
+    final service = ref.read(sharedLinkServiceProvider);
     state = state.copyWith(isLoading: true, clearSelected: true);
 
     try {
-      final links = await _service.getUserSharedLinks();
+      final links = await service.getUserSharedLinks();
       state = state.copyWith(
         links: links,
         isLoading: false,
@@ -164,10 +174,11 @@ class SharedLinkNotifier extends StateNotifier<SharedLinkState> {
 
   /// Load shared links for a specific trip
   Future<void> loadLinksForTrip(String tripId) async {
+    final service = ref.read(sharedLinkServiceProvider);
     state = state.copyWith(isLoading: true, clearSelected: true);
 
     try {
-      final links = await _service.getSharedLinksForTrip(tripId);
+      final links = await service.getSharedLinksForTrip(tripId);
       state = state.copyWith(
         links: links,
         isLoading: false,
@@ -203,17 +214,23 @@ class SharedLinkNotifier extends StateNotifier<SharedLinkState> {
 }
 
 /// Notifier for creating shared links
-class CreateSharedLinkNotifier extends StateNotifier<CreateSharedLinkState> {
-  final SharedLinkService _service;
-
-  CreateSharedLinkNotifier(this._service) : super(const CreateSharedLinkState());
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class CreateSharedLink extends _$CreateSharedLink {
+  @override
+  CreateSharedLinkState build() {
+    return const CreateSharedLinkState();
+  }
 
   /// Create a new shared link
   Future<void> createLink(CreateSharedLinkConfig config) async {
+    final service = ref.read(sharedLinkServiceProvider);
     state = state.copyWith(isCreating: true, clearError: true, clearLink: true);
 
     try {
-      final link = await _service.createSharedLink(config);
+      final link = await service.createSharedLink(config);
       state = state.copyWith(
         isCreating: false,
         createdLink: link,
@@ -238,16 +255,22 @@ class CreateSharedLinkNotifier extends StateNotifier<CreateSharedLinkState> {
 }
 
 /// Notifier for validating shared link access
-class ValidateLinkNotifier extends StateNotifier<ValidateLinkState> {
-  final SharedLinkService _service;
-
-  ValidateLinkNotifier(this._service) : super(const ValidateLinkState());
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class ValidateLink extends _$ValidateLink {
+  @override
+  ValidateLinkState build() {
+    return const ValidateLinkState();
+  }
 
   /// Validate access to a shared link
   Future<void> validateAccess({
     required String slug,
     String? password,
   }) async {
+    final service = ref.read(sharedLinkServiceProvider);
     state = state.copyWith(
       isValidating: true,
       clearError: true,
@@ -255,14 +278,14 @@ class ValidateLinkNotifier extends StateNotifier<ValidateLinkState> {
     );
 
     try {
-      final result = await _service.validateAccess(
+      final result = await service.validateAccess(
         slug: slug,
         password: password,
       );
 
       // Record view if access is granted
       if (result.isAccessible) {
-        await _service.recordView(slug);
+        await service.recordView(slug);
       }
 
       state = state.copyWith(
@@ -289,96 +312,79 @@ class ValidateLinkNotifier extends StateNotifier<ValidateLinkState> {
 }
 
 // ============================================================================
-// PROVIDERS
+// FAMILY PROVIDERS
 // ============================================================================
 
-/// Provider for SharedLinkNotifier
-final sharedLinkNotifierProvider =
-    StateNotifierProvider<SharedLinkNotifier, SharedLinkState>((ref) {
-  final service = ref.watch(sharedLinkServiceProvider);
-  return SharedLinkNotifier(service);
-});
-
 /// Provider for shared links for a specific trip
-final tripSharedLinksProvider =
-    Provider.family<Future<List<SharedLink>>, String>((ref, tripId) async {
+@riverpod
+Future<List<SharedLink>> tripSharedLinks(Ref ref, String tripId) async {
   final service = ref.watch(sharedLinkServiceProvider);
   return service.getSharedLinksForTrip(tripId);
-});
+}
 
 /// Provider for a single shared link by ID
-final sharedLinkProvider =
-    Provider.family<Future<SharedLink?>, String>((ref, linkId) async {
+@riverpod
+Future<SharedLink?> sharedLink(Ref ref, String linkId) async {
   final service = ref.watch(sharedLinkServiceProvider);
   return service.getSharedLink(linkId);
-});
+}
 
 /// Provider for a shared link by slug
-final sharedLinkBySlugProvider =
-    Provider.family<Future<SharedLink?>, String>((ref, slug) async {
+@riverpod
+Future<SharedLink?> sharedLinkBySlug(Ref ref, String slug) async {
   final service = ref.watch(sharedLinkServiceProvider);
   return service.getSharedLinkBySlug(slug);
-});
-
-/// Provider for CreateSharedLinkNotifier
-final createSharedLinkNotifierProvider =
-    StateNotifierProvider<CreateSharedLinkNotifier, CreateSharedLinkState>(
-  (ref) {
-    final service = ref.watch(sharedLinkServiceProvider);
-    return CreateSharedLinkNotifier(service);
-  },
-);
-
-/// Provider for ValidateLinkNotifier
-final validateLinkNotifierProvider =
-    StateNotifierProvider<ValidateLinkNotifier, ValidateLinkState>((ref) {
-  final service = ref.watch(sharedLinkServiceProvider);
-  return ValidateLinkNotifier(service);
-  });
+}
 
 /// Provider for shared link statistics
-final sharedLinkStatisticsProvider =
-    Provider.family<Future<SharedLinkStatistics>, String>((ref, linkId) async {
+@riverpod
+Future<SharedLinkStatistics> sharedLinkStatistics(Ref ref, String linkId) async {
   final service = ref.watch(sharedLinkServiceProvider);
   return service.getStatistics(linkId);
-});
+}
 
 // ============================================================================
 // COMPUTED PROVIDERS
 // ============================================================================
 
 /// Provider for active shared links only
-final activeSharedLinksProvider = Provider<List<SharedLink>>((ref) {
-  final state = ref.watch(sharedLinkNotifierProvider);
+@riverpod
+List<SharedLink> activeSharedLinks(Ref ref) {
+  final state = ref.watch(sharedLinksProvider);
   return state.links.where((link) => link.isActive).toList();
-});
+}
 
 /// Provider for expired shared links
-final expiredSharedLinksProvider = Provider<List<SharedLink>>((ref) {
-  final state = ref.watch(sharedLinkNotifierProvider);
+@riverpod
+List<SharedLink> expiredSharedLinks(Ref ref) {
+  final state = ref.watch(sharedLinksProvider);
   return state.links.where((link) => link.isExpired).toList();
-});
+}
 
 /// Provider for password-protected links
-final protectedSharedLinksProvider = Provider<List<SharedLink>>((ref) {
-  final state = ref.watch(sharedLinkNotifierProvider);
+@riverpod
+List<SharedLink> protectedSharedLinks(Ref ref) {
+  final state = ref.watch(sharedLinksProvider);
   return state.links.where((link) => link.hasPassword).toList();
-});
+}
 
 /// Provider for public (no password) links
-final publicSharedLinksProvider = Provider<List<SharedLink>>((ref) {
-  final state = ref.watch(sharedLinkNotifierProvider);
+@riverpod
+List<SharedLink> publicSharedLinks(Ref ref) {
+  final state = ref.watch(sharedLinksProvider);
   return state.links.where((link) => !link.hasPassword).toList();
-});
+}
 
 /// Provider for shared links count
-final sharedLinksCountProvider = Provider<int>((ref) {
-  final state = ref.watch(sharedLinkNotifierProvider);
+@riverpod
+int sharedLinksCount(Ref ref) {
+  final state = ref.watch(sharedLinksProvider);
   return state.links.length;
-});
+}
 
 /// Provider for active links count
-final activeLinksCountProvider = Provider<int>((ref) {
+@riverpod
+int activeLinksCount(Ref ref) {
   final links = ref.watch(activeSharedLinksProvider);
   return links.length;
-});
+}

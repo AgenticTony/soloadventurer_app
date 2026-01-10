@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'image_error_widget.dart';
@@ -225,9 +224,11 @@ class _MultiStageImageLoaderState extends State<MultiStageImageLoader>
   MapEntry<int?, int?> _getMemCacheDimensions(ImageLoadStage stage) {
     switch (stage) {
       case ImageLoadStage.thumbnail:
-        return MapEntry(widget.thumbnailMemCacheWidth, widget.thumbnailMemCacheHeight);
+        return MapEntry(
+            widget.thumbnailMemCacheWidth, widget.thumbnailMemCacheHeight);
       case ImageLoadStage.medium:
-        return MapEntry(widget.mediumMemCacheWidth, widget.mediumMemCacheHeight);
+        return MapEntry(
+            widget.mediumMemCacheWidth, widget.mediumMemCacheHeight);
       case ImageLoadStage.full:
         return MapEntry(widget.width?.toInt(), widget.height?.toInt());
     }

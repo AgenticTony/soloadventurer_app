@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/page_info.dart';
 import '../models/paginated_data.dart';
 import '../utils/preloading_strategy.dart';
 import 'virtual_list_view.dart';
@@ -51,12 +52,20 @@ class InfiniteScrollState<T> {
       status == InfiniteScrollStatus.loadingMore;
 
   /// Creates a new infinite scroll state
-  const InfiniteScrollState({
-    this.items = const [],
+  InfiniteScrollState({
+    List<T>? items,
     this.status = InfiniteScrollStatus.initialLoading,
     this.pageInfo,
     this.errorMessage,
-  });
+  }) : items = items ?? [];
+
+  /// Creates an initial state with proper type inference
+  factory InfiniteScrollState.initial() {
+    return InfiniteScrollState<T>(
+      items: [],
+      status: InfiniteScrollStatus.initialLoading,
+    );
+  }
 
   /// Creates a copy with modified fields
   InfiniteScrollState<T> copyWith({
@@ -174,6 +183,7 @@ class InfiniteScrollListView<T> extends StatefulWidget {
   final ScrollController? controller;
 
   /// Optional key for the widget
+  @override
   final Key? key;
 
   const InfiniteScrollListView({
@@ -204,7 +214,7 @@ class InfiniteScrollListView<T> extends StatefulWidget {
 
 class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
   late ScrollController _scrollController;
-  InfiniteScrollState<T> _state = const InfiniteScrollState();
+  late InfiniteScrollState<T> _state;
   bool _isLoadingNextPage = false;
   late PreloadingManager _preloadingManager;
   DateTime? _lastScrollUpdate;
@@ -212,6 +222,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
   @override
   void initState() {
     super.initState();
+    _state = InfiniteScrollState<T>.initial();
     _scrollController = widget.controller ?? ScrollController();
     _scrollController.addListener(_onScroll);
     _preloadingManager = PreloadingManager(
@@ -290,8 +301,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       if (!mounted) return;
 
       // Calculate load time
-      final loadTimeMs =
-          DateTime.now().difference(startTime).inMilliseconds;
+      final loadTimeMs = DateTime.now().difference(startTime).inMilliseconds;
 
       // Record successful load
       if (widget.preloadConfig != null) {
@@ -343,7 +353,8 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
       if (timeDiff.inMicroseconds > 0) {
         final velocity = (timeDiff.inMicroseconds > 0)
             ? (_scrollController.position.pixels - currentScroll) /
-                timeDiff.inMicroseconds * 1000000
+                timeDiff.inMicroseconds *
+                1000000
             : 0.0;
 
         // Update velocity in preloading manager
@@ -396,8 +407,7 @@ class _InfiniteScrollListViewState<T> extends State<InfiniteScrollListView<T>> {
 
     // Show error state
     if (_state.status == InfiniteScrollStatus.error) {
-      return widget.errorWidget ??
-          _buildDefaultErrorWidget();
+      return widget.errorWidget ?? _buildDefaultErrorWidget();
     }
 
     // Build the list with pull-to-refresh wrapper
@@ -586,9 +596,11 @@ class InfiniteScrollGridView<T> extends StatefulWidget {
   /// or cached in the model (e.g., Photo.aspectRatio getter).
   ///
   /// When this is null, [childAspectRatio] is used for all items.
-  final double Function(BuildContext context, int index, T item)? itemAspectRatioBuilder;
+  final double Function(BuildContext context, int index, T item)?
+      itemAspectRatioBuilder;
 
   /// Optional key for the widget
+  @override
   final Key? key;
 
   const InfiniteScrollGridView({
@@ -623,7 +635,7 @@ class InfiniteScrollGridView<T> extends StatefulWidget {
 
 class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
   late ScrollController _scrollController;
-  InfiniteScrollState<T> _state = const InfiniteScrollState();
+  late InfiniteScrollState<T> _state;
   bool _isLoadingNextPage = false;
   late PreloadingManager _preloadingManager;
   DateTime? _lastScrollUpdate;
@@ -631,6 +643,7 @@ class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
   @override
   void initState() {
     super.initState();
+    _state = InfiniteScrollState<T>.initial();
     _scrollController = widget.controller ?? ScrollController();
     _scrollController.addListener(_onScroll);
     _preloadingManager = PreloadingManager(
@@ -709,8 +722,7 @@ class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
       if (!mounted) return;
 
       // Calculate load time
-      final loadTimeMs =
-          DateTime.now().difference(startTime).inMilliseconds;
+      final loadTimeMs = DateTime.now().difference(startTime).inMilliseconds;
 
       // Record successful load
       if (widget.preloadConfig != null) {
@@ -762,7 +774,8 @@ class _InfiniteScrollGridViewState<T> extends State<InfiniteScrollGridView<T>> {
       if (timeDiff.inMicroseconds > 0) {
         final velocity = (timeDiff.inMicroseconds > 0)
             ? (_scrollController.position.pixels - currentScroll) /
-                timeDiff.inMicroseconds * 1000000
+                timeDiff.inMicroseconds *
+                1000000
             : 0.0;
 
         // Update velocity in preloading manager
@@ -971,8 +984,8 @@ extension InfiniteScrollListViewExtensions on InfiniteScrollListView {
       key: key,
       fetchData: fetchData,
       itemBuilder: itemBuilder,
-      separatorBuilder: separatorBuilder ??
-          (context, index) => const Divider(height: 1),
+      separatorBuilder:
+          separatorBuilder ?? (context, index) => const Divider(height: 1),
       header: header,
       footer: footer,
       emptyWidget: emptyWidget,

@@ -99,8 +99,7 @@ class LocationData {
   }
 
   @override
-  String toString() =>
-      'LocationData(lat: $latitude, lng: $longitude, '
+  String toString() => 'LocationData(lat: $latitude, lng: $longitude, '
       'accuracy: ${accuracy.toStringAsFixed(1)}m, '
       'name: ${locationName ?? "N/A"})';
 

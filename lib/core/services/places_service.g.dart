@@ -6,24 +6,50 @@ part of 'places_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$placesServiceHash() => r'fe40138fd41f49ffb8500012076726377eed273c';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for the places service implementation
+
+@ProviderFor(placesService)
+final placesServiceProvider = PlacesServiceProvider._();
 
 /// Provider for the places service implementation
-///
-/// Copied from [placesService].
-@ProviderFor(placesService)
-final placesServiceProvider = Provider<PlacesService>.internal(
-  placesService,
-  name: r'placesServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$placesServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PlacesServiceRef = ProviderRef<PlacesService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class PlacesServiceProvider
+    extends $FunctionalProvider<PlacesService, PlacesService, PlacesService>
+    with $Provider<PlacesService> {
+  /// Provider for the places service implementation
+  PlacesServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'placesServiceProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$placesServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<PlacesService> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PlacesService create(Ref ref) {
+    return placesService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PlacesService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PlacesService>(value),
+    );
+  }
+}
+
+String _$placesServiceHash() => r'fe40138fd41f49ffb8500012076726377eed273c';

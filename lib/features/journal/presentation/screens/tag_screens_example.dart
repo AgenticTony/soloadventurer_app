@@ -380,9 +380,8 @@ result.fold(
         );
       },
       (tags) {
-        final message = tags
-            .map((t) => '${t.name} (${t.usageCount})')
-            .join(', ');
+        final message =
+            tags.map((t) => '${t.name} (${t.usageCount})').join(', ');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Top tags: $message')),
         );

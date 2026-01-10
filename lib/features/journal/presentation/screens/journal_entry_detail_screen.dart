@@ -1,10 +1,10 @@
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_detail_provider.dart';
-import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/rich_text_viewer.dart';
 
 /// Screen for viewing a single journal entry with all content
@@ -77,7 +77,9 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(journalEntryDetailProvider(entryId).notifier).refresh();
+                ref
+                    .read(journalEntryDetailProvider(entryId).notifier)
+                    .refresh();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
@@ -151,7 +153,9 @@ class JournalEntryDetailScreen extends ConsumerWidget {
                   );
                 }
               },
-              tooltip: entry.isFavorite ? 'Remove from favorites' : 'Add to favorites',
+              tooltip: entry.isFavorite
+                  ? 'Remove from favorites'
+                  : 'Add to favorites',
             ),
 
             // Edit button
@@ -611,7 +615,8 @@ class JournalEntryDetailScreen extends ConsumerWidget {
     final lowerMood = mood.toLowerCase();
     if (lowerMood.contains('happy') || lowerMood.contains('joy')) {
       return '😊';
-    } else if (lowerMood.contains('adventurous') || lowerMood.contains('excited')) {
+    } else if (lowerMood.contains('adventurous') ||
+        lowerMood.contains('excited')) {
       return '🤩';
     } else if (lowerMood.contains('tired') || lowerMood.contains('exhausted')) {
       return '😴';

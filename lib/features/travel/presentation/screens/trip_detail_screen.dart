@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../domain/models/trip.dart';
 import '../providers/trip_detail_provider.dart';
-import '../../../destination_discovery/presentation/widgets/destination_card.dart';
 import '../../../destination_discovery/presentation/widgets/safety_score_badge.dart';
 import '../../../destination_discovery/presentation/widgets/solo_suitability_badge.dart';
 import '../../../destination_discovery/domain/models/destination.dart';
-import '../../domain/repositories/travel_operation_repository.dart';
 
 /// Detailed view of a trip with destinations from discovery feature.
 ///
@@ -365,12 +363,14 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit_note),
-                    onPressed: () => _editDestinationNotes(destination, notes ?? ''),
+                    onPressed: () =>
+                        _editDestinationNotes(destination, notes ?? ''),
                     tooltip: 'Edit notes',
                   ),
                   IconButton(
                     icon: const Icon(Icons.arrow_forward_ios),
-                    onPressed: () => _navigateToDestinationDetail(destination.id),
+                    onPressed: () =>
+                        _navigateToDestinationDetail(destination.id),
                   ),
                 ],
               ),
@@ -428,7 +428,8 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(

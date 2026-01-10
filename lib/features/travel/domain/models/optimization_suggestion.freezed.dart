@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,123 +9,75 @@ part of 'optimization_suggestion.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$OptimizationSuggestion {
-  String get id => throw _privateConstructorUsedError;
-  OptimizationType get type => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  List<ItineraryItem> get affectedItems => throw _privateConstructorUsedError;
-  List<ItineraryItem> get suggestedOrder => throw _privateConstructorUsedError;
-  String? get reasoning => throw _privateConstructorUsedError;
-  Duration get timeSaved => throw _privateConstructorUsedError;
-  double? get costSaved => throw _privateConstructorUsedError;
+  String get id;
+  OptimizationType get type;
+  String get title;
+  String get description;
+  List<ItineraryItem> get affectedItems;
+  List<ItineraryItem> get suggestedOrder;
+  String? get reasoning;
+  Duration get timeSaved;
+  double? get costSaved;
 
   /// Create a copy of OptimizationSuggestion
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $OptimizationSuggestionCopyWith<OptimizationSuggestion> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $OptimizationSuggestionCopyWith<$Res> {
-  factory $OptimizationSuggestionCopyWith(OptimizationSuggestion value,
-          $Res Function(OptimizationSuggestion) then) =
-      _$OptimizationSuggestionCopyWithImpl<$Res, OptimizationSuggestion>;
-  @useResult
-  $Res call(
-      {String id,
-      OptimizationType type,
-      String title,
-      String description,
-      List<ItineraryItem> affectedItems,
-      List<ItineraryItem> suggestedOrder,
-      String? reasoning,
-      Duration timeSaved,
-      double? costSaved});
-}
-
-/// @nodoc
-class _$OptimizationSuggestionCopyWithImpl<$Res,
-        $Val extends OptimizationSuggestion>
-    implements $OptimizationSuggestionCopyWith<$Res> {
-  _$OptimizationSuggestionCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of OptimizationSuggestion
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $OptimizationSuggestionCopyWith<OptimizationSuggestion> get copyWith =>
+      _$OptimizationSuggestionCopyWithImpl<OptimizationSuggestion>(
+          this as OptimizationSuggestion, _$identity);
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? type = null,
-    Object? title = null,
-    Object? description = null,
-    Object? affectedItems = null,
-    Object? suggestedOrder = null,
-    Object? reasoning = freezed,
-    Object? timeSaved = null,
-    Object? costSaved = freezed,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as OptimizationType,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      affectedItems: null == affectedItems
-          ? _value.affectedItems
-          : affectedItems // ignore: cast_nullable_to_non_nullable
-              as List<ItineraryItem>,
-      suggestedOrder: null == suggestedOrder
-          ? _value.suggestedOrder
-          : suggestedOrder // ignore: cast_nullable_to_non_nullable
-              as List<ItineraryItem>,
-      reasoning: freezed == reasoning
-          ? _value.reasoning
-          : reasoning // ignore: cast_nullable_to_non_nullable
-              as String?,
-      timeSaved: null == timeSaved
-          ? _value.timeSaved
-          : timeSaved // ignore: cast_nullable_to_non_nullable
-              as Duration,
-      costSaved: freezed == costSaved
-          ? _value.costSaved
-          : costSaved // ignore: cast_nullable_to_non_nullable
-              as double?,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is OptimizationSuggestion &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            const DeepCollectionEquality()
+                .equals(other.affectedItems, affectedItems) &&
+            const DeepCollectionEquality()
+                .equals(other.suggestedOrder, suggestedOrder) &&
+            (identical(other.reasoning, reasoning) ||
+                other.reasoning == reasoning) &&
+            (identical(other.timeSaved, timeSaved) ||
+                other.timeSaved == timeSaved) &&
+            (identical(other.costSaved, costSaved) ||
+                other.costSaved == costSaved));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      type,
+      title,
+      description,
+      const DeepCollectionEquality().hash(affectedItems),
+      const DeepCollectionEquality().hash(suggestedOrder),
+      reasoning,
+      timeSaved,
+      costSaved);
+
+  @override
+  String toString() {
+    return 'OptimizationSuggestion(id: $id, type: $type, title: $title, description: $description, affectedItems: $affectedItems, suggestedOrder: $suggestedOrder, reasoning: $reasoning, timeSaved: $timeSaved, costSaved: $costSaved)';
   }
 }
 
 /// @nodoc
-abstract class _$$OptimizationSuggestionImplCopyWith<$Res>
-    implements $OptimizationSuggestionCopyWith<$Res> {
-  factory _$$OptimizationSuggestionImplCopyWith(
-          _$OptimizationSuggestionImpl value,
-          $Res Function(_$OptimizationSuggestionImpl) then) =
-      __$$OptimizationSuggestionImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $OptimizationSuggestionCopyWith<$Res> {
+  factory $OptimizationSuggestionCopyWith(OptimizationSuggestion value,
+          $Res Function(OptimizationSuggestion) _then) =
+      _$OptimizationSuggestionCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -140,14 +92,12 @@ abstract class _$$OptimizationSuggestionImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$OptimizationSuggestionImplCopyWithImpl<$Res>
-    extends _$OptimizationSuggestionCopyWithImpl<$Res,
-        _$OptimizationSuggestionImpl>
-    implements _$$OptimizationSuggestionImplCopyWith<$Res> {
-  __$$OptimizationSuggestionImplCopyWithImpl(
-      _$OptimizationSuggestionImpl _value,
-      $Res Function(_$OptimizationSuggestionImpl) _then)
-      : super(_value, _then);
+class _$OptimizationSuggestionCopyWithImpl<$Res>
+    implements $OptimizationSuggestionCopyWith<$Res> {
+  _$OptimizationSuggestionCopyWithImpl(this._self, this._then);
+
+  final OptimizationSuggestion _self;
+  final $Res Function(OptimizationSuggestion) _then;
 
   /// Create a copy of OptimizationSuggestion
   /// with the given fields replaced by the non-null parameter values.
@@ -164,51 +114,265 @@ class __$$OptimizationSuggestionImplCopyWithImpl<$Res>
     Object? timeSaved = null,
     Object? costSaved = freezed,
   }) {
-    return _then(_$OptimizationSuggestionImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as OptimizationType,
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       affectedItems: null == affectedItems
-          ? _value._affectedItems
+          ? _self.affectedItems
           : affectedItems // ignore: cast_nullable_to_non_nullable
               as List<ItineraryItem>,
       suggestedOrder: null == suggestedOrder
-          ? _value._suggestedOrder
+          ? _self.suggestedOrder
           : suggestedOrder // ignore: cast_nullable_to_non_nullable
               as List<ItineraryItem>,
       reasoning: freezed == reasoning
-          ? _value.reasoning
+          ? _self.reasoning
           : reasoning // ignore: cast_nullable_to_non_nullable
               as String?,
       timeSaved: null == timeSaved
-          ? _value.timeSaved
+          ? _self.timeSaved
           : timeSaved // ignore: cast_nullable_to_non_nullable
               as Duration,
       costSaved: freezed == costSaved
-          ? _value.costSaved
+          ? _self.costSaved
           : costSaved // ignore: cast_nullable_to_non_nullable
               as double?,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [OptimizationSuggestion].
+extension OptimizationSuggestionPatterns on OptimizationSuggestion {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_OptimizationSuggestion value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OptimizationSuggestion() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_OptimizationSuggestion value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OptimizationSuggestion():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_OptimizationSuggestion value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OptimizationSuggestion() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            OptimizationType type,
+            String title,
+            String description,
+            List<ItineraryItem> affectedItems,
+            List<ItineraryItem> suggestedOrder,
+            String? reasoning,
+            Duration timeSaved,
+            double? costSaved)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OptimizationSuggestion() when $default != null:
+        return $default(
+            _that.id,
+            _that.type,
+            _that.title,
+            _that.description,
+            _that.affectedItems,
+            _that.suggestedOrder,
+            _that.reasoning,
+            _that.timeSaved,
+            _that.costSaved);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            OptimizationType type,
+            String title,
+            String description,
+            List<ItineraryItem> affectedItems,
+            List<ItineraryItem> suggestedOrder,
+            String? reasoning,
+            Duration timeSaved,
+            double? costSaved)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OptimizationSuggestion():
+        return $default(
+            _that.id,
+            _that.type,
+            _that.title,
+            _that.description,
+            _that.affectedItems,
+            _that.suggestedOrder,
+            _that.reasoning,
+            _that.timeSaved,
+            _that.costSaved);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            OptimizationType type,
+            String title,
+            String description,
+            List<ItineraryItem> affectedItems,
+            List<ItineraryItem> suggestedOrder,
+            String? reasoning,
+            Duration timeSaved,
+            double? costSaved)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OptimizationSuggestion() when $default != null:
+        return $default(
+            _that.id,
+            _that.type,
+            _that.title,
+            _that.description,
+            _that.affectedItems,
+            _that.suggestedOrder,
+            _that.reasoning,
+            _that.timeSaved,
+            _that.costSaved);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$OptimizationSuggestionImpl extends _OptimizationSuggestion {
-  const _$OptimizationSuggestionImpl(
+class _OptimizationSuggestion extends OptimizationSuggestion {
+  const _OptimizationSuggestion(
       {required this.id,
       required this.type,
       required this.title,
@@ -254,16 +418,20 @@ class _$OptimizationSuggestionImpl extends _OptimizationSuggestion {
   @override
   final double? costSaved;
 
+  /// Create a copy of OptimizationSuggestion
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'OptimizationSuggestion(id: $id, type: $type, title: $title, description: $description, affectedItems: $affectedItems, suggestedOrder: $suggestedOrder, reasoning: $reasoning, timeSaved: $timeSaved, costSaved: $costSaved)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$OptimizationSuggestionCopyWith<_OptimizationSuggestion> get copyWith =>
+      __$OptimizationSuggestionCopyWithImpl<_OptimizationSuggestion>(
+          this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$OptimizationSuggestionImpl &&
+            other is _OptimizationSuggestion &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.type, type) || other.type == type) &&
             (identical(other.title, title) || other.title == title) &&
@@ -294,52 +462,94 @@ class _$OptimizationSuggestionImpl extends _OptimizationSuggestion {
       timeSaved,
       costSaved);
 
+  @override
+  String toString() {
+    return 'OptimizationSuggestion(id: $id, type: $type, title: $title, description: $description, affectedItems: $affectedItems, suggestedOrder: $suggestedOrder, reasoning: $reasoning, timeSaved: $timeSaved, costSaved: $costSaved)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$OptimizationSuggestionCopyWith<$Res>
+    implements $OptimizationSuggestionCopyWith<$Res> {
+  factory _$OptimizationSuggestionCopyWith(_OptimizationSuggestion value,
+          $Res Function(_OptimizationSuggestion) _then) =
+      __$OptimizationSuggestionCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      OptimizationType type,
+      String title,
+      String description,
+      List<ItineraryItem> affectedItems,
+      List<ItineraryItem> suggestedOrder,
+      String? reasoning,
+      Duration timeSaved,
+      double? costSaved});
+}
+
+/// @nodoc
+class __$OptimizationSuggestionCopyWithImpl<$Res>
+    implements _$OptimizationSuggestionCopyWith<$Res> {
+  __$OptimizationSuggestionCopyWithImpl(this._self, this._then);
+
+  final _OptimizationSuggestion _self;
+  final $Res Function(_OptimizationSuggestion) _then;
+
   /// Create a copy of OptimizationSuggestion
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$OptimizationSuggestionImplCopyWith<_$OptimizationSuggestionImpl>
-      get copyWith => __$$OptimizationSuggestionImplCopyWithImpl<
-          _$OptimizationSuggestionImpl>(this, _$identity);
+  $Res call({
+    Object? id = null,
+    Object? type = null,
+    Object? title = null,
+    Object? description = null,
+    Object? affectedItems = null,
+    Object? suggestedOrder = null,
+    Object? reasoning = freezed,
+    Object? timeSaved = null,
+    Object? costSaved = freezed,
+  }) {
+    return _then(_OptimizationSuggestion(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as OptimizationType,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      affectedItems: null == affectedItems
+          ? _self._affectedItems
+          : affectedItems // ignore: cast_nullable_to_non_nullable
+              as List<ItineraryItem>,
+      suggestedOrder: null == suggestedOrder
+          ? _self._suggestedOrder
+          : suggestedOrder // ignore: cast_nullable_to_non_nullable
+              as List<ItineraryItem>,
+      reasoning: freezed == reasoning
+          ? _self.reasoning
+          : reasoning // ignore: cast_nullable_to_non_nullable
+              as String?,
+      timeSaved: null == timeSaved
+          ? _self.timeSaved
+          : timeSaved // ignore: cast_nullable_to_non_nullable
+              as Duration,
+      costSaved: freezed == costSaved
+          ? _self.costSaved
+          : costSaved // ignore: cast_nullable_to_non_nullable
+              as double?,
+    ));
+  }
 }
 
-abstract class _OptimizationSuggestion extends OptimizationSuggestion {
-  const factory _OptimizationSuggestion(
-      {required final String id,
-      required final OptimizationType type,
-      required final String title,
-      required final String description,
-      required final List<ItineraryItem> affectedItems,
-      required final List<ItineraryItem> suggestedOrder,
-      final String? reasoning,
-      final Duration timeSaved,
-      final double? costSaved}) = _$OptimizationSuggestionImpl;
-  const _OptimizationSuggestion._() : super._();
-
-  @override
-  String get id;
-  @override
-  OptimizationType get type;
-  @override
-  String get title;
-  @override
-  String get description;
-  @override
-  List<ItineraryItem> get affectedItems;
-  @override
-  List<ItineraryItem> get suggestedOrder;
-  @override
-  String? get reasoning;
-  @override
-  Duration get timeSaved;
-  @override
-  double? get costSaved;
-
-  /// Create a copy of OptimizationSuggestion
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$OptimizationSuggestionImplCopyWith<_$OptimizationSuggestionImpl>
-      get copyWith => throw _privateConstructorUsedError;
-}
+// dart format on

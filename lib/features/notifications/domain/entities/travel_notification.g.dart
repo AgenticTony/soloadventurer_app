@@ -6,9 +6,8 @@ part of 'travel_notification.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$NotificationActionImpl _$$NotificationActionImplFromJson(
-        Map<String, dynamic> json) =>
-    _$NotificationActionImpl(
+_NotificationAction _$NotificationActionFromJson(Map<String, dynamic> json) =>
+    _NotificationAction(
       id: json['id'] as String,
       label: json['label'] as String,
       type: $enumDecode(_$NotificationActionTypeEnumMap, json['type']),
@@ -16,8 +15,7 @@ _$NotificationActionImpl _$$NotificationActionImplFromJson(
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
 
-Map<String, dynamic> _$$NotificationActionImplToJson(
-        _$NotificationActionImpl instance) =>
+Map<String, dynamic> _$NotificationActionToJson(_NotificationAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'label': instance.label,
@@ -34,9 +32,8 @@ const _$NotificationActionTypeEnumMap = {
   NotificationActionType.custom: 'custom',
 };
 
-_$TravelNotificationImpl _$$TravelNotificationImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TravelNotificationImpl(
+_TravelNotification _$TravelNotificationFromJson(Map<String, dynamic> json) =>
+    _TravelNotification(
       id: json['id'] as String,
       type: $enumDecode(_$NotificationTypeEnumMap, json['type']),
       category: $enumDecode(_$NotificationCategoryEnumMap, json['category']),
@@ -64,8 +61,7 @@ _$TravelNotificationImpl _$$TravelNotificationImplFromJson(
       isOngoing: json['isOngoing'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$TravelNotificationImplToJson(
-        _$TravelNotificationImpl instance) =>
+Map<String, dynamic> _$TravelNotificationToJson(_TravelNotification instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': _$NotificationTypeEnumMap[instance.type]!,

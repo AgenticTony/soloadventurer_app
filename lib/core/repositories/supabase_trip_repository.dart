@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/travel/domain/models/trip.dart';
 import '../../features/travel/domain/repositories/trip_repository.dart';
 import '../models/paginated_data.dart';
-import '../models/page_info.dart';
 import 'paginated_repository_mixin.dart';
 
 /// Supabase implementation of TripRepository with cursor-based pagination
@@ -48,15 +47,15 @@ import 'paginated_repository_mixin.dart';
 ///
 /// **Note:** This is a placeholder implementation. Actual Supabase queries
 /// will be added when the supabase_flutter package is integrated into the project.
-class SupabaseTripRepository with PaginatedRepositoryMixin
+class SupabaseTripRepository
+    with PaginatedRepositoryMixin
     implements TripRepository {
   final SupabaseClient _client;
 
   /// Creates a new SupabaseTripRepository
   ///
   /// The [client] parameter should be an initialized SupabaseClient instance.
-  SupabaseTripRepository({required SupabaseClient client})
-      : _client = client;
+  SupabaseTripRepository({required SupabaseClient client}) : _client = client;
 
   @override
   Future<PaginatedData<Trip>> getTripsCursor({
@@ -77,10 +76,7 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
     final lastSortValue = cursorData?['lastSortValue'];
 
     // Build Supabase query
-    var query = _client
-        .from('trips')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('trips').select().eq('userId', userId);
 
     // Add additional filters
     if (filters != null) {
@@ -102,16 +98,17 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
     if (lastId != null && lastSortValue != null) {
       final sortField = _mapSortField(sortBy);
       if (sortOrder == SortOrder.ascending) {
-        query = query
-            .or('$sortField.gt.$lastSortValue,$sortField.eq.$lastSortValue and id.gt.$lastId');
+        query = query.or(
+            '$sortField.gt.$lastSortValue,$sortField.eq.$lastSortValue and id.gt.$lastId');
       } else {
-        query = query
-            .or('$sortField.lt.$lastSortValue,$sortField.eq.$lastSortValue and id.lt.$lastId');
+        query = query.or(
+            '$sortField.lt.$lastSortValue,$sortField.eq.$lastSortValue and id.lt.$lastId');
       }
     }
 
     // Add ordering
-    query = query.order(_mapSortField(sortBy), ascending: sortOrder == SortOrder.ascending);
+    query = query.order(_mapSortField(sortBy),
+        ascending: sortOrder == SortOrder.ascending);
 
     // Add pagination with limit
     query = query.limit(validatedPageSize);
@@ -175,10 +172,7 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
     final offset = (page - 1) * validatedPageSize;
 
     // Build Supabase query
-    var query = _client
-        .from('trips')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('trips').select().eq('userId', userId);
 
     // Add additional filters
     if (filters != null) {
@@ -201,7 +195,8 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
     final totalItems = countResponse.count ?? 0;
 
     // Add ordering
-    query = query.order(_mapSortField(sortBy), ascending: sortOrder == SortOrder.ascending);
+    query = query.order(_mapSortField(sortBy),
+        ascending: sortOrder == SortOrder.ascending);
 
     // Add offset and limit
     query = query.range(offset, offset + validatedPageSize - 1);
@@ -293,19 +288,15 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
         .single()
         .catchError((_) => null);
 
-    if (response == null) return null;
-
-    return _mapToTrip(response as Map<String, dynamic>);
+    return _mapToTrip(response);
   }
 
   @override
   Future<List<Trip>> getTripsByIds({required List<String> tripIds}) async {
     if (tripIds.isEmpty) return [];
 
-    final response = await _client
-        .from('trips')
-        .select()
-        .inFilter('id', tripIds);
+    final response =
+        await _client.from('trips').select().inFilter('id', tripIds);
 
     final tripsData = response as List<dynamic>;
     return tripsData
@@ -317,13 +308,9 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
   Future<Trip> createTrip({required Trip trip}) async {
     final data = _mapToDatabase(trip);
 
-    final response = await _client
-        .from('trips')
-        .insert(data)
-        .select()
-        .single();
+    final response = await _client.from('trips').insert(data).select().single();
 
-    return _mapToTrip(response as Map<String, dynamic>);
+    return _mapToTrip(response);
   }
 
   @override
@@ -340,7 +327,7 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
         .select()
         .single();
 
-    return _mapToTrip(response as Map<String, dynamic>);
+    return _mapToTrip(response);
   }
 
   @override
@@ -379,10 +366,7 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
     final offset = (currentPage - 1) * validatedPageSize;
 
     // Build search query using ILIKE for case-insensitive search
-    var queryBuilder = _client
-        .from('trips')
-        .select()
-        .eq('userId', userId);
+    var queryBuilder = _client.from('trips').select().eq('userId', userId);
 
     // Search across multiple fields
     queryBuilder = queryBuilder.or(
@@ -422,10 +406,7 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
     required String userId,
     Map<String, dynamic>? filters,
   }) async {
-    var query = _client
-        .from('trips')
-        .select()
-        .eq('userId', userId);
+    var query = _client.from('trips').select().eq('userId', userId);
 
     if (filters != null) {
       if (filters.containsKey('status')) {
@@ -496,8 +477,8 @@ class SupabaseTripRepository with PaginatedRepositoryMixin
       status: data['status'] as String,
       budget: data['budget'] as int,
       coverImageUrl: data['coverImageUrl'] as String?,
-      travelCompanionIds: (data['travelCompanionIds'] as List<dynamic>?)
-          ?.cast<String>(),
+      travelCompanionIds:
+          (data['travelCompanionIds'] as List<dynamic>?)?.cast<String>(),
       createdAt: DateTime.parse(data['createdAt'] as String),
       updatedAt: DateTime.parse(data['updatedAt'] as String),
     );

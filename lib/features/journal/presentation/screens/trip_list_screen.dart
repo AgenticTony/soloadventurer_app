@@ -102,7 +102,8 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            const Text('Create your first trip to start organizing your journal entries'),
+            const Text(
+                'Create your first trip to start organizing your journal entries'),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () async {
@@ -175,7 +176,8 @@ class _TripCard extends StatelessWidget {
             // Cover image or placeholder
             if (trip.coverImageUrl != null)
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
                 child: Image.network(
                   trip.coverImageUrl!,
                   height: 150,
@@ -242,7 +244,8 @@ class _TripCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        _formatDateRange(trip.startDate, trip.endDate, dateFormat),
+                        _formatDateRange(
+                            trip.startDate, trip.endDate, dateFormat),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
@@ -336,7 +339,8 @@ class _TripCard extends StatelessWidget {
     );
   }
 
-  String _formatDateRange(DateTime startDate, DateTime? endDate, DateFormat format) {
+  String _formatDateRange(
+      DateTime startDate, DateTime? endDate, DateFormat format) {
     final start = format.format(startDate);
     if (endDate == null) {
       return '$start - Present';

@@ -34,13 +34,15 @@ void main() {
     }
 
     group('Basic Rendering', () {
-      testWidgets('renders session expired screen', (WidgetTester tester) async {
+      testWidgets('renders session expired screen',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(const SessionExpiredScreen()),
         );
 
         expect(find.text('Session Expired'), findsOneWidget);
-        expect(find.byIcon(Icons.lock_clock), findsNWidgets(2)); // Large icon + illustration
+        expect(find.byIcon(Icons.lock_clock),
+            findsNWidgets(2)); // Large icon + illustration
       });
 
       testWidgets('renders default message', (WidgetTester tester) async {
@@ -49,7 +51,8 @@ void main() {
         );
 
         expect(
-          find.text('Your session has expired. Please sign in again to continue.'),
+          find.text(
+              'Your session has expired. Please sign in again to continue.'),
           findsOneWidget,
         );
       });
@@ -65,7 +68,8 @@ void main() {
 
         expect(find.text(customMessage), findsOneWidget);
         expect(
-          find.text('Your session has expired. Please sign in again to continue.'),
+          find.text(
+              'Your session has expired. Please sign in again to continue.'),
           findsNothing,
         );
       });
@@ -99,7 +103,8 @@ void main() {
         await tester.tap(find.text('Sign In Again'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.login)).called(1);
+        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.login))
+            .called(1);
       });
 
       testWidgets('navigates to home when cancel button pressed',
@@ -111,7 +116,8 @@ void main() {
         await tester.tap(find.text('Cancel'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.home)).called(1);
+        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.home))
+            .called(1);
       });
     });
 
@@ -192,7 +198,8 @@ void main() {
         );
 
         expect(
-          find.text('Unable to connect to the server. Please check your internet connection.'),
+          find.text(
+              'Unable to connect to the server. Please check your internet connection.'),
           findsOneWidget,
         );
       });
@@ -213,7 +220,8 @@ void main() {
         expect(find.text(customMessage), findsOneWidget);
       });
 
-      testWidgets('shows network status indicator', (WidgetTester tester) async {
+      testWidgets('shows network status indicator',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           makeTestableWidget(
             NetworkErrorScreen(
@@ -281,7 +289,8 @@ void main() {
         );
 
         expect(find.text('Troubleshooting'), findsOneWidget);
-        expect(find.textContaining('Check your Wi-Fi or mobile data connection'),
+        expect(
+            find.textContaining('Check your Wi-Fi or mobile data connection'),
             findsOneWidget);
       });
     });
@@ -364,7 +373,8 @@ void main() {
     }
 
     group('Basic Rendering', () {
-      testWidgets('renders credentials error screen', (WidgetTester tester) async {
+      testWidgets('renders credentials error screen',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
 
         await tester.pumpWidget(
@@ -380,7 +390,8 @@ void main() {
         expect(find.byIcon(Icons.lock_person), findsOneWidget);
       });
 
-      testWidgets('renders error message from errorInfo', (WidgetTester tester) async {
+      testWidgets('renders error message from errorInfo',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
 
         await tester.pumpWidget(
@@ -395,7 +406,8 @@ void main() {
         expect(find.text(errorInfo.userMessage), findsOneWidget);
       });
 
-      testWidgets('renders custom message when provided', (WidgetTester tester) async {
+      testWidgets('renders custom message when provided',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
         const customMessage = 'Custom credentials error';
 
@@ -445,7 +457,8 @@ void main() {
         expect(find.byType(ElevatedButton), findsOneWidget);
       });
 
-      testWidgets('displays forgot password button', (WidgetTester tester) async {
+      testWidgets('displays forgot password button',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
 
         await tester.pumpWidget(
@@ -478,7 +491,8 @@ void main() {
         expect(find.byIcon(Icons.person_add), findsOneWidget);
       });
 
-      testWidgets('hides sign up link for other errors', (WidgetTester tester) async {
+      testWidgets('hides sign up link for other errors',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
 
         await tester.pumpWidget(
@@ -493,7 +507,8 @@ void main() {
         expect(find.text('Create an Account'), findsNothing);
       });
 
-      testWidgets('displays common issues section', (WidgetTester tester) async {
+      testWidgets('displays common issues section',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
 
         await tester.pumpWidget(
@@ -506,7 +521,8 @@ void main() {
         );
 
         expect(find.text('Common Issues'), findsOneWidget);
-        expect(find.textContaining('Check that Caps Lock is not on'), findsOneWidget);
+        expect(find.textContaining('Check that Caps Lock is not on'),
+            findsOneWidget);
       });
     });
 
@@ -546,7 +562,8 @@ void main() {
         await tester.tap(find.text('Forgot Password?'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.forgotPassword))
+        verify(() =>
+                mockNavigationNotifier.navigateTo(AuthRoutes.forgotPassword))
             .called(1);
       });
 
@@ -566,10 +583,12 @@ void main() {
         await tester.tap(find.text('Create an Account'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.signup)).called(1);
+        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.signup))
+            .called(1);
       });
 
-      testWidgets('navigates back when go back pressed', (WidgetTester tester) async {
+      testWidgets('navigates back when go back pressed',
+          (WidgetTester tester) async {
         final errorInfo = createMockCredentialsError();
 
         await tester.pumpWidget(
@@ -611,7 +630,8 @@ void main() {
     }
 
     group('Basic Rendering', () {
-      testWidgets('renders rate limit error screen', (WidgetTester tester) async {
+      testWidgets('renders rate limit error screen',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
 
         await tester.pumpWidget(
@@ -627,7 +647,8 @@ void main() {
         expect(find.byIcon(Icons.speed), findsOneWidget);
       });
 
-      testWidgets('renders error message from errorInfo', (WidgetTester tester) async {
+      testWidgets('renders error message from errorInfo',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
 
         await tester.pumpWidget(
@@ -642,7 +663,8 @@ void main() {
         expect(find.text(errorInfo.userMessage), findsOneWidget);
       });
 
-      testWidgets('renders custom message when provided', (WidgetTester tester) async {
+      testWidgets('renders custom message when provided',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
         const customMessage = 'Custom rate limit message';
 
@@ -676,7 +698,8 @@ void main() {
         expect(find.byIcon(Icons.schedule), findsOneWidget);
       });
 
-      testWidgets('disables retry button during countdown', (WidgetTester tester) async {
+      testWidgets('disables retry button during countdown',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
 
         await tester.pumpWidget(
@@ -695,7 +718,8 @@ void main() {
         expect(find.text('Please Wait'), findsOneWidget);
       });
 
-      testWidgets('shows about rate limiting section', (WidgetTester tester) async {
+      testWidgets('shows about rate limiting section',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
 
         await tester.pumpWidget(
@@ -725,13 +749,16 @@ void main() {
         );
 
         expect(find.text('Tips'), findsOneWidget);
-        expect(find.textContaining('Double-check your credentials before each attempt'),
+        expect(
+            find.textContaining(
+                'Double-check your credentials before each attempt'),
             findsOneWidget);
       });
     });
 
     group('Countdown Timer', () {
-      testWidgets('counts down from initial duration', (WidgetTester tester) async {
+      testWidgets('counts down from initial duration',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
 
         await tester.pumpWidget(
@@ -757,10 +784,10 @@ void main() {
       testWidgets('enables retry button when countdown finishes',
           (WidgetTester tester) async {
         // Use a short duration for testing
-        final errorInfo = AuthErrorInfo(
+        const errorInfo = AuthErrorInfo(
           category: AuthErrorCategory.rateLimit,
           userMessage: 'Too many attempts',
-          recovery: const AuthErrorRecovery(
+          recovery: AuthErrorRecovery(
             primaryAction: 'Wait before retrying',
             canRetry: false,
             retryDelay: Duration(seconds: 2),
@@ -802,10 +829,10 @@ void main() {
       testWidgets('calls onRetryAllowed when retry pressed after countdown',
           (WidgetTester tester) async {
         // Use a short duration for testing
-        final errorInfo = AuthErrorInfo(
+        const errorInfo = AuthErrorInfo(
           category: AuthErrorCategory.rateLimit,
           userMessage: 'Too many attempts',
-          recovery: const AuthErrorRecovery(
+          recovery: AuthErrorRecovery(
             primaryAction: 'Wait before retrying',
             canRetry: false,
             retryDelay: Duration(seconds: 1),
@@ -855,7 +882,8 @@ void main() {
         expect(retryCalled, isFalse);
       });
 
-      testWidgets('navigates back when cancel pressed', (WidgetTester tester) async {
+      testWidgets('navigates back when cancel pressed',
+          (WidgetTester tester) async {
         final errorInfo = createMockRateLimitError();
 
         await tester.pumpWidget(
@@ -878,10 +906,10 @@ void main() {
 
     group('Time Formatting', () {
       testWidgets('formats seconds correctly', (WidgetTester tester) async {
-        final errorInfo = AuthErrorInfo(
+        const errorInfo = AuthErrorInfo(
           category: AuthErrorCategory.rateLimit,
           userMessage: 'Too many attempts',
-          recovery: const AuthErrorRecovery(
+          recovery: AuthErrorRecovery(
             primaryAction: 'Wait',
             canRetry: false,
             retryDelay: Duration(seconds: 45),
@@ -903,11 +931,12 @@ void main() {
         expect(find.textContaining('second'), findsOneWidget);
       });
 
-      testWidgets('formats minutes and seconds correctly', (WidgetTester tester) async {
-        final errorInfo = AuthErrorInfo(
+      testWidgets('formats minutes and seconds correctly',
+          (WidgetTester tester) async {
+        const errorInfo = AuthErrorInfo(
           category: AuthErrorCategory.rateLimit,
           userMessage: 'Too many attempts',
-          recovery: const AuthErrorRecovery(
+          recovery: AuthErrorRecovery(
             primaryAction: 'Wait',
             canRetry: false,
             retryDelay: Duration(minutes: 5, seconds: 30),
@@ -931,10 +960,10 @@ void main() {
       });
 
       testWidgets('formats hours correctly', (WidgetTester tester) async {
-        final errorInfo = AuthErrorInfo(
+        const errorInfo = AuthErrorInfo(
           category: AuthErrorCategory.rateLimit,
           userMessage: 'Too many attempts',
-          recovery: const AuthErrorRecovery(
+          recovery: AuthErrorRecovery(
             primaryAction: 'Wait',
             canRetry: false,
             retryDelay: Duration(hours: 2, minutes: 30),
@@ -961,7 +990,8 @@ void main() {
 }
 
 // Mock classes
-class MockAuthNavigationNotifier extends Mock implements AuthNavigationNotifier {}
+class MockAuthNavigationNotifier extends Mock
+    implements AuthNavigationNotifier {}
 
 // Helper functions to create mock error info
 AuthErrorInfo createMockCredentialsError() {

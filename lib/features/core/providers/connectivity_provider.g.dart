@@ -6,22 +6,52 @@ part of 'connectivity_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+
+@ProviderFor(ConnectivityNotifier)
+final connectivityProvider = ConnectivityNotifierProvider._();
+
+final class ConnectivityNotifierProvider
+    extends $NotifierProvider<ConnectivityNotifier, bool> {
+  ConnectivityNotifierProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'connectivityProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$connectivityNotifierHash();
+
+  @$internal
+  @override
+  ConnectivityNotifier create() => ConnectivityNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
 String _$connectivityNotifierHash() =>
     r'80ab8bd041c12eaa48fcd244ffc4913570ea4d60';
 
-/// See also [ConnectivityNotifier].
-@ProviderFor(ConnectivityNotifier)
-final connectivityNotifierProvider =
-    AutoDisposeNotifierProvider<ConnectivityNotifier, bool>.internal(
-  ConnectivityNotifier.new,
-  name: r'connectivityNotifierProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$connectivityNotifierHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$ConnectivityNotifier = AutoDisposeNotifier<bool>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$ConnectivityNotifier extends $Notifier<bool> {
+  bool build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<bool, bool>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<bool, bool>, bool, Object?, Object?>;
+    element.handleCreate(ref, build);
+  }
+}

@@ -29,7 +29,8 @@ class RateLimitErrorScreen extends ConsumerStatefulWidget {
   static const routeName = '/auth/rate-limit-error';
 
   @override
-  ConsumerState<RateLimitErrorScreen> createState() => _RateLimitErrorScreenState();
+  ConsumerState<RateLimitErrorScreen> createState() =>
+      _RateLimitErrorScreenState();
 }
 
 class _RateLimitErrorScreenState extends ConsumerState<RateLimitErrorScreen> {
@@ -212,7 +213,8 @@ class _RateLimitErrorScreenState extends ConsumerState<RateLimitErrorScreen> {
                   onPressed: _canRetry ? _handleRetry : null,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    disabledBackgroundColor: theme.colorScheme.surfaceContainerHighest,
+                    disabledBackgroundColor:
+                        theme.colorScheme.surfaceContainerHighest,
                   ),
                   child: Text(
                     _canRetry ? 'Retry Now' : 'Please Wait',
@@ -240,7 +242,8 @@ class _RateLimitErrorScreenState extends ConsumerState<RateLimitErrorScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.2),
@@ -285,7 +288,8 @@ class _RateLimitErrorScreenState extends ConsumerState<RateLimitErrorScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.2),

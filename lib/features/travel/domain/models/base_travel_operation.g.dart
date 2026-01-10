@@ -6,9 +6,8 @@ part of 'base_travel_operation.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$BaseTravelOperationImpl _$$BaseTravelOperationImplFromJson(
-        Map<String, dynamic> json) =>
-    _$BaseTravelOperationImpl(
+_BaseTravelOperation _$BaseTravelOperationFromJson(Map<String, dynamic> json) =>
+    _BaseTravelOperation(
       id: json['id'] as String,
       type: json['type'] as String,
       timestamp: DateTime.parse(json['timestamp'] as String),
@@ -17,8 +16,8 @@ _$BaseTravelOperationImpl _$$BaseTravelOperationImplFromJson(
       data: json['data'] as Map<String, dynamic>? ?? const {},
     );
 
-Map<String, dynamic> _$$BaseTravelOperationImplToJson(
-        _$BaseTravelOperationImpl instance) =>
+Map<String, dynamic> _$BaseTravelOperationToJson(
+        _BaseTravelOperation instance) =>
     <String, dynamic>{
       'id': instance.id,
       'type': instance.type,

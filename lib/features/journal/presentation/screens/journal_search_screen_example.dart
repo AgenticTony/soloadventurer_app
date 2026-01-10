@@ -134,7 +134,9 @@ class _ProgrammaticSearchExample extends ConsumerWidget {
                 // Search by text
                 ElevatedButton.icon(
                   onPressed: () {
-                    ref.read(journalSearchProvider.notifier).updateQuery('beach');
+                    ref
+                        .read(journalSearchProvider.notifier)
+                        .updateQuery('beach');
                     ref.read(journalSearchProvider.notifier).search();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Searching for "beach"...')),
@@ -146,11 +148,13 @@ class _ProgrammaticSearchExample extends ConsumerWidget {
                 // Search by location
                 ElevatedButton.icon(
                   onPressed: () {
-                    ref.read(journalSearchProvider.notifier)
+                    ref
+                        .read(journalSearchProvider.notifier)
                         .updateLocationFilter('Paris');
                     ref.read(journalSearchProvider.notifier).search();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Filtering by location: Paris')),
+                      const SnackBar(
+                          content: Text('Filtering by location: Paris')),
                     );
                   },
                   icon: const Icon(Icons.location_on),
@@ -160,7 +164,9 @@ class _ProgrammaticSearchExample extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () {
                     final now = DateTime.now();
-                    ref.read(journalSearchProvider.notifier).updateDateRangeFilter(
+                    ref
+                        .read(journalSearchProvider.notifier)
+                        .updateDateRangeFilter(
                           now.subtract(const Duration(days: 30)),
                           now,
                         );
@@ -175,7 +181,9 @@ class _ProgrammaticSearchExample extends ConsumerWidget {
                 // Search by mood
                 ElevatedButton.icon(
                   onPressed: () {
-                    ref.read(journalSearchProvider.notifier).updateMoodFilter('happy');
+                    ref
+                        .read(journalSearchProvider.notifier)
+                        .updateMoodFilter('happy');
                     ref.read(journalSearchProvider.notifier).search();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Filtering by mood: happy')),
@@ -187,7 +195,9 @@ class _ProgrammaticSearchExample extends ConsumerWidget {
                 // Search favorites
                 ElevatedButton.icon(
                   onPressed: () {
-                    ref.read(journalSearchProvider.notifier).updateFavoriteFilter(true);
+                    ref
+                        .read(journalSearchProvider.notifier)
+                        .updateFavoriteFilter(true);
                     ref.read(journalSearchProvider.notifier).search();
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Showing favorites only')),
@@ -394,9 +404,13 @@ class _CustomFilterExample extends ConsumerWidget {
                       final now = DateTime.now();
                       final start = DateTime(now.year, now.month, now.day);
                       final end = start.add(const Duration(days: 1));
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(start, end);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(start, end);
                     } else {
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(null, null);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(null, null);
                     }
                     ref.read(journalSearchProvider.notifier).search();
                   },
@@ -408,11 +422,16 @@ class _CustomFilterExample extends ConsumerWidget {
                   onSelected: (selected) {
                     if (selected) {
                       final now = DateTime.now();
-                      final start = now.subtract(Duration(days: now.weekday - 1));
+                      final start =
+                          now.subtract(Duration(days: now.weekday - 1));
                       final end = start.add(const Duration(days: 7));
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(start, end);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(start, end);
                     } else {
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(null, null);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(null, null);
                     }
                     ref.read(journalSearchProvider.notifier).search();
                   },
@@ -426,9 +445,13 @@ class _CustomFilterExample extends ConsumerWidget {
                       final now = DateTime.now();
                       final start = DateTime(now.year, now.month, 1);
                       final end = DateTime(now.year, now.month + 1, 1);
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(start, end);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(start, end);
                     } else {
-                      ref.read(journalSearchProvider.notifier).updateDateRangeFilter(null, null);
+                      ref
+                          .read(journalSearchProvider.notifier)
+                          .updateDateRangeFilter(null, null);
                     }
                     ref.read(journalSearchProvider.notifier).search();
                   },
@@ -525,7 +548,8 @@ class JournalSearchExampleMenu extends StatelessWidget {
             onTap: () {
               // Show custom filter example inline
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('See Search Examples for custom UI')),
+                const SnackBar(
+                    content: Text('See Search Examples for custom UI')),
               );
             },
           ),

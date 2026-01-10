@@ -8,7 +8,8 @@ abstract class SyncHistoryPersistence {
   /// Save history entries to persistent storage
   ///
   /// Returns a result indicating success or failure with error details.
-  Future<SyncHistoryPersistenceResult> saveHistory(List<SyncHistoryEntry> entries);
+  Future<SyncHistoryPersistenceResult> saveHistory(
+      List<SyncHistoryEntry> entries);
 
   /// Load history entries from persistent storage
   ///
@@ -60,7 +61,6 @@ class SyncHistoryPersistenceResult {
   }
 
   @override
-  String toString() =>
-      'SyncHistoryPersistenceResult(isSuccess: $isSuccess, '
+  String toString() => 'SyncHistoryPersistenceResult(isSuccess: $isSuccess, '
       'error: $error, entryCount: $entryCount)';
 }

@@ -1,0 +1,144 @@
+{
+  "code_improvements": [
+    {
+      "id": "ci-001",
+      "type": "code_improvements",
+      "title": "Add Search to Check-In History Screen",
+      "description": "Add a search input field to CheckInHistoryScreen that allows users to search check-ins by location name, status message, or trip name. The search pattern already exists in TripRepository.searchTrips() and the UI pattern for filtering/sorting is already implemented in the same screen.",
+      "rationale": "The CheckInHistoryScreen already has filter and sort functionality implemented with PopupMenuButtons. The searchTrips() pattern exists in TripRepository showing how to search entities. The CheckInNotifier already loads all check-ins into memory, making client-side search trivial to implement.",
+      "builds_upon": [
+        "Check-in history filtering (status filter exists)",
+        "Trip search pattern (searchTrips in TripRepository)",
+        "Riverpod AsyncValue state management"
+      ],
+      "estimated_effort": "trivial",
+      "affected_files": [
+        "lib/features/safety/presentation/screens/check_in_history_screen.dart",
+        "lib/features/safety/domain/usecases/get_upcoming_check_ins.dart"
+      ],
+      "existing_patterns": [
+        "Search pattern in TripRepository.searchTrips()",
+        "Filter UI in CheckInHistoryScreen (PopupMenuButton for status filter)",
+        "Client-side filtering in _applyFiltersAndSort() method"
+      ],
+      "implementation_approach": "1. Add TextField widget to CheckInHistoryScreen AppBar or as a header\n2. Add _searchQuery state variable to track search input\n3. Extend existing _applyFiltersAndSort() method to also filter by search term\n4. Search across checkIn.location.name, checkIn.statusMessage, and checkIn.tripId\n5. Use existing Riverpod state management (no new providers needed)",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-002",
+      "type": "code_improvements",
+      "title": "Add Trip Data Export (PDF/JSON)",
+      "description": "Add export functionality to trip data allowing users to export their trips, itineraries, and journals as JSON or PDF files. The upload pattern exists for avatars and repositories have getAll() methods to retrieve all data.",
+      "rationale": "The avatar upload pattern in ManageAvatarUseCase shows how to handle file operations. TripRepository.getTrips() and ItineraryRepository already have getAll() methods. The offline infrastructure shows the app can handle local file storage. This is a natural extension of existing CRUD patterns.",
+      "builds_upon": [
+        "Avatar upload pattern (ManageAvatarUseCase)",
+        "TripRepository.getTrips() getAll pattern",
+        "OfflineAwareRepository data access patterns",
+        "Riverpod notifier state management"
+      ],
+      "estimated_effort": "small",
+      "affected_files": [
+        "lib/features/travel/domain/repositories/trip_repository.dart",
+        "lib/features/travel/domain/usecases/export_trip_use_case.dart",
+        "lib/features/travel/presentation/notifiers/trip_export_notifier.dart"
+      ],
+      "existing_patterns": [
+        "File upload in ManageAvatarUseCase (uploadAvatar method)",
+        "Repository getAll() pattern (getTrips, getAllCheckIns)",
+        "Use case pattern for business logic encapsulation",
+        "AsyncValue state management for async operations"
+      ],
+      "implementation_approach": "1. Create ExportTripUseCase that calls repository getAll methods\n2. Create TripExportNotifier with Riverpod that manages export state (AsyncValue)\n3. Add export button to trip list screens\n4. Use dart:convert for JSON serialization (entities already have toJson patterns via freezed)\n5. For PDF: use existing pdf package or create simple text-based export\n6. Use path_provider to save files to Downloads/Documents directory\n7. Follow existing avatar upload pattern for file handling",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-003",
+      "type": "code_improvements",
+      "title": "Extend Performance Tracking to Screen Transitions and API Calls",
+      "description": "Extend the AppStartTracker pattern to track performance metrics for screen transitions and API calls, not just app startup. This builds on the existing performance monitoring infrastructure.",
+      "rationale": "AppStartTracker already has infrastructure for tracking phases and logging reports. The pattern shows phase tracking with startPhase/endPhase and comprehensive reporting. This same pattern can be applied to screen navigation (using go_router hooks) and API calls (using Dio interceptors that already exist).",
+      "builds_upon": [
+        "AppStartTracker performance tracking",
+        "Dio interceptors (auth_interceptor.dart, error_interceptor.dart exist)",
+        "go_router navigation (routes are already defined)",
+        "Logging service infrastructure"
+      ],
+      "estimated_effort": "small",
+      "affected_files": [
+        "lib/core/monitoring/performance/app_start_tracker.dart",
+        "lib/core/api/interceptors/auth_interceptor.dart",
+        "lib/app/router/app_router.dart"
+      ],
+      "existing_patterns": [
+        "AppStartTracker with phase tracking and reporting",
+        "Dio interceptor pattern for API request/response handling",
+        "go_router page builders for screen lifecycle hooks",
+        "Developer logging with developer.log() in AppStartTracker"
+      ],
+      "implementation_approach": "1. Extract common tracking logic from AppStartTracker into PerformanceTracker base class\n2. Create ScreenTransitionTracker that extends base class with screen-specific tracking\n3. Create ApiCallTracker integrated into existing Dio interceptors\n4. Add tracking in go_router pageBuilder wrappers to capture screen transitions\n5. Use existing interceptor infrastructure to track API call duration\n6. Follow existing report generation pattern with logPerformanceReport()\n7. Add new tracker instances in screen widgets and API service methods",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-004",
+      "type": "code_improvements",
+      "title": "Add Batch Operations for Check-In Management",
+      "description": "Add bulk operations to check-in management allowing users to complete or cancel multiple check-ins at once. The offline queue infrastructure already supports multiple operations and single operations are fully implemented.",
+      "rationale": "The sync queue infrastructure in SyncQueueService already handles multiple operations. Single check-in operations (completeCheckIn, cancelCheckIn) exist in CheckInNotifier. The offline-aware repository pattern shows operations can be queued. Adding batch operations is a natural extension.",
+      "builds_upon": [
+        "Check-in CRUD operations (completeCheckIn, cancelCheckIn in CheckInNotifier)",
+        "Sync queue infrastructure (SyncQueueService.enqueueOperation)",
+        "OfflineAwareRepository pattern for queuing operations",
+        "AsyncValue state management pattern"
+      ],
+      "estimated_effort": "medium",
+      "affected_files": [
+        "lib/features/safety/presentation/notifiers/check_in_notifier.dart",
+        "lib/features/safety/domain/usecases/complete_check_in.dart",
+        "lib/features/safety/domain/usecases/cancel_check_in.dart",
+        "lib/features/safety/presentation/screens/check_in_history_screen.dart"
+      ],
+      "existing_patterns": [
+        "Single check-in operations in CheckInNotifier",
+        "Sync queue for multiple operations (SyncQueueService)",
+        "RepositoryOperationResult pattern for operation feedback",
+        "Freezed data classes for immutable state updates"
+      ],
+      "implementation_approach": "1. Add batchCompleteCheckIns and batchCancelCheckIns methods to CheckInNotifier\n2. Use Future.wait() to execute multiple existing single operations in parallel\n3. Add selection mode to CheckInHistoryScreen (similar to existing reorder mode pattern)\n4. Add checkbox widgets to check-in list items when in selection mode\n5. Add 'Complete Selected' and 'Cancel Selected' action buttons\n6. Update CheckInData freezed class to track selected check-ins\n7. Follow existing AsyncValue.guard() pattern for error handling\n8. Return List<RepositoryOperationResult> for batch operations",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-005",
+      "type": "code_improvements",
+      "title": "Add Trip Statistics Dashboard",
+      "description": "Create a trip statistics dashboard that shows metrics like total trips, upcoming trips, completed trips, countries visited, and total travel days. The repository patterns already support querying by status and date range.",
+      "rationale": "TripRepository already has methods like getTripsByStatus(), getTripsByDateRange(), and searchTrips(). The itinerary screen shows progress tracking with completionPercentage. A statistics dashboard can use these existing query methods to aggregate data and show travel insights.",
+      "builds_upon": [
+        "TripRepository query methods (getTripsByStatus, getTripsByDateRange)",
+        "Itinerary progress tracking (completionPercentage pattern)",
+        "Riverpod AsyncValue state management",
+        "Freezed data classes for statistics entities"
+      ],
+      "estimated_effort": "medium",
+      "affected_files": [
+        "lib/features/travel/domain/usecases/get_trip_statistics_use_case.dart",
+        "lib/features/travel/presentation/notifiers/trip_statistics_notifier.dart",
+        "lib/features/travel/presentation/screens/trip_statistics_dashboard.dart",
+        "lib/features/travel/domain/entities/trip_statistics.dart"
+      ],
+      "existing_patterns": [
+        "Repository query patterns (getTripsByStatus, getTripsByDateRange)",
+        "Progress tracking pattern from Itinerary.completionPercentage",
+        "Use case pattern for business logic",
+        "Notifier pattern with AsyncValue state",
+        "Dashboard screen pattern (similar to ItineraryScreen structure)"
+      ],
+      "implementation_approach": "1. Create TripStatistics freezed entity with fields (totalTrips, upcomingTrips, completedTrips, countriesVisited, totalDays)\n2. Create GetTripStatisticsUseCase that queries repository using existing methods\n3. Use getTripsByStatus() for upcoming/completed counts\n4. Use getTripsByDateRange() for yearly statistics\n5. Aggregate country data from trip destination data\n6. Create TripStatisticsNotifier with AsyncValue<TripStatistics> state\n7. Create TripStatisticsDashboard screen with card-based layout\n8. Use existing progress indicator widgets from itinerary screen\n9. Follow existing screen patterns (Scaffold, AppBar, error/loading states)",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    }
+  ]
+}

@@ -63,8 +63,7 @@ class QueryOptimizerStats {
   final int selectiveFieldQueries;
 
   /// Cache hit rate (0.0 to 1.0)
-  double get cacheHitRate =>
-      totalQueries > 0 ? cacheHits / totalQueries : 0.0;
+  double get cacheHitRate => totalQueries > 0 ? cacheHits / totalQueries : 0.0;
 
   /// Cache miss rate (0.0 to 1.0)
   double get cacheMissRate =>
@@ -217,9 +216,7 @@ class FieldSelector {
   /// Check if a field should be included
   bool shouldInclude(String field) {
     if (fields.isEmpty) return true; // No filtering
-    return excludeMode
-        ? !fields.contains(field)
-        : fields.contains(field);
+    return excludeMode ? !fields.contains(field) : fields.contains(field);
   }
 
   /// Filter a map to only include selected fields
@@ -341,7 +338,7 @@ class QueryOptimizer {
 
     // Check cache first
     if (_cacheManager != null) {
-      final cacheResult = await _cacheManager!.get<T>(
+      final cacheResult = await _cacheManager.get<T>(
         key: key,
         strategy: CacheStrategy.cacheOnly,
       );
@@ -402,12 +399,12 @@ class QueryOptimizer {
 
       // Apply field selection if needed
       final filteredData = usedFieldSelection && data is List
-          ? _applyFieldSelection(data, fields!)
+          ? _applyFieldSelection(data, fields)
           : data;
 
       // Cache the result
       if (_cacheManager != null) {
-        await _cacheManager!.set(
+        await _cacheManager.set(
           key: key,
           value: filteredData as T,
           ttl: ttl ?? config.defaultCacheTtl,
@@ -442,7 +439,8 @@ class QueryOptimizer {
     Duration? ttl,
   }) async {
     if (debug) {
-      debugPrint('[QueryOptimizer] Executing batch of ${queries.length} queries');
+      debugPrint(
+          '[QueryOptimizer] Executing batch of ${queries.length} queries');
     }
 
     final futures = queries.entries.map((entry) async {
@@ -480,12 +478,12 @@ class QueryOptimizer {
     if (_cacheManager == null) return;
 
     if (key != null) {
-      await _cacheManager!.delete(key: key);
+      await _cacheManager.delete(key: key);
       if (debug) {
         debugPrint('[QueryOptimizer] Invalidated cache for "$key"');
       }
     } else {
-      await _cacheManager!.clear();
+      await _cacheManager.clear();
       if (debug) {
         debugPrint('[QueryOptimizer] Invalidated all cache');
       }

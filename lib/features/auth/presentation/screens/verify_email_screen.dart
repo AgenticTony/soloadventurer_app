@@ -22,7 +22,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authAsync = ref.read(authNotifierProvider);
-      final authState = authAsync.valueOrNull;
+      final authState = authAsync.value;
       debugPrint('VerifyEmailScreen: Auth state on init: $authState');
       debugPrint(
           'VerifyEmailScreen: User email from state: ${authState?.user?.email}');
@@ -78,7 +78,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       final code = _codeController.text.trim();
       // Store the current auth state before verification
-      final preservedUser = authAsync.valueOrNull?.user;
+      final preservedUser = authAsync.value?.user;
 
       debugPrint('VerifyEmailScreen: Starting verification');
       debugPrint('VerifyEmailScreen: Current auth async state: $authAsync');
@@ -89,7 +89,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       if (_email == null) {
         debugPrint('VerifyEmailScreen: No email available in local state');
         // Try to get email from preserved user first
-        _email = preservedUser?.email ?? authAsync.valueOrNull?.user?.email;
+        _email = preservedUser?.email ?? authAsync.value?.user?.email;
         if (_email == null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

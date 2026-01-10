@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../../core/models/map_marker.dart';
+import 'package:soloadventurer/core/models/map_marker.dart';
 import '../../domain/models/activity.dart';
 
 /// Result of a spatial query for activities within bounds
@@ -176,8 +176,7 @@ class _ViewportCache {
   /// Remove expired entries
   void _removeExpired() {
     final now = DateTime.now();
-    _entries.removeWhere((entry) =>
-        now.difference(entry.timestamp) > _ttl);
+    _entries.removeWhere((entry) => now.difference(entry.timestamp) > _ttl);
   }
 
   /// Check if bounds match within tolerance
@@ -279,7 +278,7 @@ class SpatialActivityRepository {
         _cache = _ViewportCache(
           maxSize: cacheSize,
           ttl: cacheTtl,
-        });
+        );
 
   /// Stream of query results (for debounced queries)
   Stream<SpatialQueryResult> get resultStream {
@@ -408,7 +407,7 @@ class SpatialActivityRepository {
         'cacheHits': _cacheHits,
         'cacheMisses': _cacheMisses,
         'cacheHitRate': _totalQueries > 0
-            ? (_cacheHits / _totalQueries * 100).toStringAsFixed(1) + '%'
+            ? '${(_cacheHits / _totalQueries * 100).toStringAsFixed(1)}%'
             : '0%',
         'cacheSize': _cache.size,
         'maxCacheSize': 10,

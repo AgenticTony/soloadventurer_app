@@ -433,40 +433,41 @@ class _CreateJournalEntryScreenState
               Semantics(
                 container: true,
                 child: Card(
-                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            size: 20,
-                            color: theme.colorScheme.primary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Coming Soon',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 20,
+                              color: theme.colorScheme.primary,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '• Add photos and videos to your entries\n'
-                        '• Tag your location on a map\n'
-                        '• Organize entries by trips',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color:
-                              theme.colorScheme.onSurface.withOpacity(0.7),
-                          height: 1.5,
+                            const SizedBox(width: 8),
+                            Text(
+                              'Coming Soon',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          '• Add photos and videos to your entries\n'
+                          '• Tag your location on a map\n'
+                          '• Organize entries by trips',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color:
+                                theme.colorScheme.onSurface.withOpacity(0.7),
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -474,6 +475,7 @@ class _CreateJournalEntryScreenState
               const SizedBox(height: 16),
             ],
           ),
+        ),
         ),
       ),
     );

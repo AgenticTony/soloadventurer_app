@@ -1,6 +1,4 @@
-import 'dart:ui';
-import 'dart:math' as math;
-import 'package:flutter/foundation.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/map_marker.dart';
 
@@ -128,6 +126,8 @@ class MapMarkerWidget extends StatelessWidget {
         return Colors.indigo;
       case MarkerType.poi:
         return Colors.amber;
+      case MarkerType.shopping:
+        return Colors.pink;
       case MarkerType.defaultType:
         return Theme.of(context).primaryColor;
     }
@@ -150,6 +150,8 @@ class MapMarkerWidget extends StatelessWidget {
         return Icons.directions_car;
       case MarkerType.poi:
         return Icons.place;
+      case MarkerType.shopping:
+        return Icons.shopping_bag;
       case MarkerType.defaultType:
         return Icons.location_on;
     }
@@ -264,6 +266,51 @@ class MapClusterWidget extends StatefulWidget {
     this.borderWidth = 2.0,
   });
 
+  /// Create cluster widget for small clusters
+  factory MapClusterWidget.small({
+    Key? key,
+    required MapCluster cluster,
+    VoidCallback? onTap,
+  }) {
+    return MapClusterWidget(
+      key: key,
+      cluster: cluster,
+      baseSize: 40.0,
+      onTap: onTap,
+    );
+  }
+
+  /// Create cluster widget for large clusters
+  factory MapClusterWidget.large({
+    Key? key,
+    required MapCluster cluster,
+    VoidCallback? onTap,
+  }) {
+    return MapClusterWidget(
+      key: key,
+      cluster: cluster,
+      baseSize: 60.0,
+      onTap: onTap,
+    );
+  }
+
+  /// Create cluster widget with custom color
+  factory MapClusterWidget.withColor({
+    Key? key,
+    required MapCluster cluster,
+    required Color color,
+    double baseSize = 50.0,
+    VoidCallback? onTap,
+  }) {
+    return MapClusterWidget(
+      key: key,
+      cluster: cluster,
+      baseSize: baseSize,
+      color: color,
+      onTap: onTap,
+    );
+  }
+
   @override
   State<MapClusterWidget> createState() => _MapClusterWidgetState();
 }
@@ -295,7 +342,8 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
   @override
   void didUpdateWidget(MapClusterWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.animate && widget.cluster.markerCount != oldWidget.cluster.markerCount) {
+    if (widget.animate &&
+        widget.cluster.markerCount != oldWidget.cluster.markerCount) {
       _scaleController.forward(from: 0.8);
     }
   }
@@ -315,7 +363,8 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
     final countText = _formatCount();
 
     Widget clusterWidget = AnimatedBuilder(
-      animation: widget.animate ? _scaleAnimation : const AlwaysStoppedAnimation(1.0),
+      animation:
+          widget.animate ? _scaleAnimation : const AlwaysStoppedAnimation(1.0),
       builder: (context, child) {
         return Transform.scale(
           scale: widget.animate ? _scaleAnimation.value : 1.0,
@@ -420,51 +469,12 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
       return '${(count / 1000).toStringAsFixed(0)}k';
     }
   }
+}
 
-  /// Create cluster widget for small clusters
-  factory MapClusterWidget.small({
-    Key? key,
-    required MapCluster cluster,
-    VoidCallback? onTap,
-  }) {
-    return MapClusterWidget(
-      key: key,
-      cluster: cluster,
-      baseSize: 40.0,
-      onTap: onTap,
-    );
-  }
-
-  /// Create cluster widget for large clusters
-  factory MapClusterWidget.large({
-    Key? key,
-    required MapCluster cluster,
-    VoidCallback? onTap,
-    }) {
-    return MapClusterWidget(
-      key: key,
-      cluster: cluster,
-      baseSize: 60.0,
-      onTap: onTap,
-    );
-  }
-
-  /// Create cluster widget with custom color
-  factory MapClusterWidget.withColor({
-    Key? key,
-    required MapCluster cluster,
-    required Color color,
-    double baseSize = 50.0,
-    VoidCallback? onTap,
-  }) {
-    return MapClusterWidget(
-      key: key,
-      cluster: cluster,
-      baseSize: baseSize,
-      color: color,
-      onTap: onTap,
-    );
-  }
+/// Constants for cluster sizing
+class _ClusterSizeConstants {
+  static const double minSize = 40.0;
+  static const double maxSize = 80.0;
 }
 
 /// Zoom-aware cluster widget that adjusts size and style based on map zoom level
@@ -523,40 +533,40 @@ class ZoomAwareClusterWidget extends StatelessWidget {
     // Adjust cluster appearance based on zoom level
     if (zoomLevel >= 15) {
       // Very zoomed in - smaller clusters, less prominent
-      return _ZoomConfig(
+      return const _ZoomConfig(
         baseSize: 40.0,
         borderWidth: 2.0,
-        textStyle: const TextStyle(
+        textStyle: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
       );
     } else if (zoomLevel >= 12) {
       // Moderately zoomed in - balanced appearance
-      return _ZoomConfig(
+      return const _ZoomConfig(
         baseSize: 50.0,
         borderWidth: 2.5,
-        textStyle: const TextStyle(
+        textStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
         ),
       );
     } else if (zoomLevel >= 9) {
       // Zoomed out - larger clusters for visibility
-      return _ZoomConfig(
+      return const _ZoomConfig(
         baseSize: 60.0,
         borderWidth: 3.0,
-        textStyle: const TextStyle(
+        textStyle: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
       );
     } else {
       // Very zoomed out - largest, most prominent clusters
-      return _ZoomConfig(
+      return const _ZoomConfig(
         baseSize: 70.0,
         borderWidth: 4.0,
-        textStyle: const TextStyle(
+        textStyle: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
@@ -768,6 +778,8 @@ class ClusterTypeIcons extends StatelessWidget {
         return Icons.directions_car;
       case MarkerType.poi:
         return Icons.place;
+      case MarkerType.shopping:
+        return Icons.shopping_bag;
       case MarkerType.defaultType:
         return Icons.location_on;
     }
@@ -789,6 +801,8 @@ class ClusterTypeIcons extends StatelessWidget {
         return Colors.indigo;
       case MarkerType.poi:
         return Colors.amber;
+      case MarkerType.shopping:
+        return Colors.pink;
       case MarkerType.defaultType:
         return Colors.grey;
     }

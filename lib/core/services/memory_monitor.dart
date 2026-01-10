@@ -256,13 +256,16 @@ class MemoryMonitorConfig {
     double? trendAnalysisThreshold,
   }) {
     return MemoryMonitorConfig(
-      warningThresholdBytes: warningThresholdBytes ?? this.warningThresholdBytes,
-      criticalThresholdBytes: criticalThresholdBytes ?? this.criticalThresholdBytes,
+      warningThresholdBytes:
+          warningThresholdBytes ?? this.warningThresholdBytes,
+      criticalThresholdBytes:
+          criticalThresholdBytes ?? this.criticalThresholdBytes,
       monitoringInterval: monitoringInterval ?? this.monitoringInterval,
       maxHistorySize: maxHistorySize ?? this.maxHistorySize,
       enabled: enabled ?? this.enabled,
       enableTrendAnalysis: enableTrendAnalysis ?? this.enableTrendAnalysis,
-      trendAnalysisThreshold: trendAnalysisThreshold ?? this.trendAnalysisThreshold,
+      trendAnalysisThreshold:
+          trendAnalysisThreshold ?? this.trendAnalysisThreshold,
     );
   }
 
@@ -353,7 +356,8 @@ class MemoryMonitor {
   /// Get the singleton instance
   static MemoryMonitor get instance {
     if (_instance == null) {
-      throw StateError('MemoryMonitor not initialized. Call initialize() first.');
+      throw StateError(
+          'MemoryMonitor not initialized. Call initialize() first.');
     }
     return _instance!;
   }
@@ -376,7 +380,8 @@ class MemoryMonitor {
     required void Function(MemoryAlert) onAlert,
   }) async {
     if (_instance != null) {
-      throw StateError('MemoryMonitor already initialized. Call dispose() first.');
+      throw StateError(
+          'MemoryMonitor already initialized. Call dispose() first.');
     }
 
     final effectiveConfig = config ?? const MemoryMonitorConfig();
@@ -396,9 +401,12 @@ class MemoryMonitor {
 
     if (kDebugMode) {
       debugPrint('MemoryMonitor initialized with config:');
-      debugPrint('  Warning threshold: ${effectiveConfig.warningThresholdMB.toStringAsFixed(0)} MB');
-      debugPrint('  Critical threshold: ${effectiveConfig.criticalThresholdMB.toStringAsFixed(0)} MB');
-      debugPrint('  Monitoring interval: ${effectiveConfig.monitoringInterval.inSeconds}s');
+      debugPrint(
+          '  Warning threshold: ${effectiveConfig.warningThresholdMB.toStringAsFixed(0)} MB');
+      debugPrint(
+          '  Critical threshold: ${effectiveConfig.criticalThresholdMB.toStringAsFixed(0)} MB');
+      debugPrint(
+          '  Monitoring interval: ${effectiveConfig.monitoringInterval.inSeconds}s');
     }
   }
 
@@ -484,7 +492,8 @@ class MemoryMonitor {
         currentUsageBytes: usage,
         thresholdBytes: _config.criticalThresholdBytes,
         timestamp: snapshot.timestamp,
-        message: 'CRITICAL: Memory usage at ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB exceeds threshold of ${_config.criticalThresholdMB.toStringAsFixed(0)} MB',
+        message:
+            'CRITICAL: Memory usage at ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB exceeds threshold of ${_config.criticalThresholdMB.toStringAsFixed(0)} MB',
       );
 
       if (_currentAlertLevel != MemoryAlertLevel.critical) {
@@ -504,7 +513,8 @@ class MemoryMonitor {
         currentUsageBytes: usage,
         thresholdBytes: _config.warningThresholdBytes,
         timestamp: snapshot.timestamp,
-        message: 'WARNING: Memory usage at ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB exceeds threshold of ${_config.warningThresholdMB.toStringAsFixed(0)} MB',
+        message:
+            'WARNING: Memory usage at ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB exceeds threshold of ${_config.warningThresholdMB.toStringAsFixed(0)} MB',
       );
 
       if (_currentAlertLevel != MemoryAlertLevel.warning &&
@@ -522,7 +532,8 @@ class MemoryMonitor {
     if (_currentAlertLevel != MemoryAlertLevel.normal) {
       _currentAlertLevel = MemoryAlertLevel.normal;
       if (kDebugMode) {
-        debugPrint('✅ Memory usage back to normal: ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB');
+        debugPrint(
+            '✅ Memory usage back to normal: ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB');
       }
     }
   }
@@ -568,9 +579,8 @@ class MemoryMonitor {
     final averageUsage = totalUsage ~/ history.length;
     final peakUsage =
         history.map((s) => s.memoryUsageBytes).reduce((a, b) => a > b ? a : b);
-    final lowestUsage = history
-        .map((s) => s.memoryUsageBytes)
-        .reduce((a, b) => a < b ? a : b);
+    final lowestUsage =
+        history.map((s) => s.memoryUsageBytes).reduce((a, b) => a < b ? a : b);
 
     // Calculate trend
     MemoryTrend trend = MemoryTrend.stable;
@@ -582,14 +592,12 @@ class MemoryMonitor {
       final firstHalf = history.sublist(0, midPoint);
       final secondHalf = history.sublist(midPoint);
 
-      final firstHalfAvg = firstHalf
-              .map((s) => s.memoryUsageBytes)
-              .reduce((a, b) => a + b) /
-          firstHalf.length;
-      final secondHalfAvg = secondHalf
-              .map((s) => s.memoryUsageBytes)
-              .reduce((a, b) => a + b) /
-          secondHalf.length;
+      final firstHalfAvg =
+          firstHalf.map((s) => s.memoryUsageBytes).reduce((a, b) => a + b) /
+              firstHalf.length;
+      final secondHalfAvg =
+          secondHalf.map((s) => s.memoryUsageBytes).reduce((a, b) => a + b) /
+              secondHalf.length;
 
       final change = (secondHalfAvg - firstHalfAvg) / firstHalfAvg;
 
@@ -646,7 +654,7 @@ class MemoryMonitor {
     _instance!._config = config;
 
     // Restart monitoring with new interval if changed
-    await _instance!._monitoringTimer?.cancel();
+    _instance!._monitoringTimer?.cancel();
     await _instance!._startMonitoring();
 
     if (kDebugMode) {
@@ -678,7 +686,7 @@ class MemoryMonitor {
       return;
     }
 
-    await _instance!._monitoringTimer?.cancel();
+    _instance!._monitoringTimer?.cancel();
     await _instance!._streamController.close();
 
     _instance = null;

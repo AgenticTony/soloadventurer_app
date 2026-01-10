@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/entity_version.dart';
+import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
 
 void main() {
   group('EntityVersion', () {
@@ -56,7 +56,7 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         version: 2,
-        lastModified: baseTime.add(Duration(seconds: 1)),
+        lastModified: baseTime.add(const Duration(seconds: 1)),
         deviceId: deviceId,
       );
 
@@ -101,7 +101,7 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         version: 1,
-        lastModified: baseTime.add(Duration(seconds: 5)),
+        lastModified: baseTime.add(const Duration(seconds: 5)),
         deviceId: deviceId,
       );
 

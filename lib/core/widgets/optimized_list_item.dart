@@ -274,10 +274,10 @@ class AutoOptimizedListItem extends StatelessWidget {
   }) {
     return AutoOptimizedListItem(
       key: key,
-      child: child,
       hasImages: imageCount > 0,
       childCount: 4, // Typical card: image, title, subtitle, actions
       enabled: enabled,
+      child: child,
     );
   }
 
@@ -294,9 +294,9 @@ class AutoOptimizedListItem extends StatelessWidget {
   }) {
     return AutoOptimizedListItem(
       key: key,
-      child: child,
       childCount: (hasLeading ? 1 : 0) + 2 + (hasTrailing ? 1 : 0),
       enabled: enabled,
+      child: child,
     );
   }
 }

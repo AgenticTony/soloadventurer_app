@@ -14,12 +14,13 @@ class SyncErrorWidgetsExample extends StatefulWidget {
   const SyncErrorWidgetsExample({super.key});
 
   @override
-  State<SyncErrorWidgetsExample> createState() => _SyncErrorWidgetsExampleState();
+  State<SyncErrorWidgetsExample> createState() =>
+      _SyncErrorWidgetsExampleState();
 }
 
 class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
   final List<SyncError> _errors = [];
-  bool _showToastExample = false;
+  final bool _showToastExample = false;
 
   @override
   void initState() {
@@ -35,7 +36,8 @@ class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
         type: SyncErrorType.network,
         severity: SyncErrorSeverity.medium,
         technicalMessage: 'Failed to connect to server: Connection timed out',
-        userMessage: 'Network connection issue. Please check your internet connection.',
+        userMessage:
+            'Network connection issue. Please check your internet connection.',
         suggestion: 'Check your WiFi or mobile data connection and try again.',
         statusCode: 503,
         entityType: 'trip',
@@ -51,7 +53,8 @@ class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
         severity: SyncErrorSeverity.high,
         technicalMessage: 'Authentication token expired',
         userMessage: 'Authentication failed. Please sign in again.',
-        suggestion: 'Your session may have expired. Please sign out and sign back in.',
+        suggestion:
+            'Your session may have expired. Please sign out and sign back in.',
         statusCode: 401,
         entityType: 'profile',
         operationType: 'update',
@@ -65,7 +68,8 @@ class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
         severity: SyncErrorSeverity.high,
         code: 'INVALID_DATE',
         technicalMessage: 'End date is before start date',
-        userMessage: 'Invalid trip dates. End date cannot be before start date.',
+        userMessage:
+            'Invalid trip dates. End date cannot be before start date.',
         suggestion: 'Please check your trip dates and ensure they are correct.',
         entityType: 'trip',
         entityId: 'trip_456',
@@ -80,7 +84,8 @@ class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
         severity: SyncErrorSeverity.low,
         technicalMessage: 'Request timed out after 30 seconds',
         userMessage: 'Request timed out. The server took too long to respond.',
-        suggestion: 'The server may be busy. Your request will be retried automatically.',
+        suggestion:
+            'The server may be busy. Your request will be retried automatically.',
         entityType: 'location',
         operationType: 'update',
         retryCount: 1,
@@ -93,7 +98,8 @@ class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
         severity: SyncErrorSeverity.medium,
         technicalMessage: 'Internal server error',
         userMessage: 'Server error. Our team has been notified.',
-        suggestion: 'This is usually temporary. Please try again in a few minutes.',
+        suggestion:
+            'This is usually temporary. Please try again in a few minutes.',
         statusCode: 500,
         entityType: 'travelNote',
         operationType: 'sync',
@@ -147,7 +153,8 @@ class _SyncErrorWidgetsExampleState extends State<SyncErrorWidgetsExample> {
           // Single error banner
           SyncErrorBanner(
             error: _errors.first,
-            onRetry: () => _showMessage('Retrying error: ${_errors.first.errorId}'),
+            onRetry: () =>
+                _showMessage('Retrying error: ${_errors.first.errorId}'),
             onDismiss: () => _showMessage('Banner dismissed'),
             onViewDetails: () => _showErrorDetails(_errors.first),
           ),

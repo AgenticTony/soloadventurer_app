@@ -24,6 +24,7 @@ class UserModel extends User {
   }
 
   /// Converts this [UserModel] to JSON map
+  @override
   Map<String, dynamic> toJson() {
     return {
       'id': id,

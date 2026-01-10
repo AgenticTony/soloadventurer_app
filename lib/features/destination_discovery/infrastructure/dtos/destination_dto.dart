@@ -145,14 +145,12 @@ class DestinationDto {
       safetyInsights: (json['safetyInsights'] as List?)
           ?.map((e) => e as Map<String, dynamic>)
           .toList(),
-      soloSuitabilityScore:
-          (json['soloSuitabilityScore'] as num?)?.toDouble(),
+      soloSuitabilityScore: (json['soloSuitabilityScore'] as num?)?.toDouble(),
       soloSuitabilityFactors:
           json['soloSuitabilityFactors'] as Map<String, dynamic>?,
       budgetLevel: json['budgetLevel'] as String?,
-      activityLevels: (json['activityLevels'] as List?)
-          ?.map((e) => e as String)
-          .toList(),
+      activityLevels:
+          (json['activityLevels'] as List?)?.map((e) => e as String).toList(),
       tags: (json['tags'] as List?)?.map((e) => e as String).toList(),
       images: (json['images'] as List?)?.map((e) => e as String).toList(),
       coverImageUrl: json['coverImageUrl'] as String?,
@@ -214,7 +212,7 @@ class DestinationDto {
       soloSuitabilityScore: soloSuitabilityScore ?? 5.0,
       soloSuitabilityFactors: soloSuitabilityFactors != null
           ? SoloSuitabilityFactors.fromJson(soloSuitabilityFactors!)
-          : SoloSuitabilityFactors(
+          : const SoloSuitabilityFactors(
               safety: 5.0,
               nightlife: 5.0,
               walkability: 5.0,
@@ -232,10 +230,9 @@ class DestinationDto {
       tags: tags ?? [],
       images: images ?? [],
       coverImageUrl: coverImageUrl,
-      popularActivities: popularActivities
-              ?.map((json) => Activity.fromJson(json))
-              .toList() ??
-          [],
+      popularActivities:
+          popularActivities?.map((json) => Activity.fromJson(json)).toList() ??
+              [],
       bestTimeToVisit: bestTimeToVisit,
       averageDailyCost: averageDailyCost,
       currencyCode: currencyCode,
@@ -243,12 +240,10 @@ class DestinationDto {
       timezone: timezone,
       isHiddenGem: isHiddenGem ?? false,
       popularityScore: popularityScore ?? 0.5,
-      createdAt: createdAt != null
-          ? DateTime.parse(createdAt!)
-          : DateTime.now(),
-      updatedAt: updatedAt != null
-          ? DateTime.parse(updatedAt!)
-          : DateTime.now(),
+      createdAt:
+          createdAt != null ? DateTime.parse(createdAt!) : DateTime.now(),
+      updatedAt:
+          updatedAt != null ? DateTime.parse(updatedAt!) : DateTime.now(),
     );
   }
 

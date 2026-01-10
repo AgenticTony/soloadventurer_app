@@ -18,8 +18,8 @@ void main() {
 
     // Setup default mock responses
     when(mockPersistence.loadQueue()).thenAnswer((_) async => []);
-    when(mockPersistence.saveQueue(any)).thenAnswer((_) async =>
-        SyncQueuePersistenceResult.success(operationCount: 0));
+    when(mockPersistence.saveQueue(any)).thenAnswer(
+        (_) async => SyncQueuePersistenceResult.success(operationCount: 0));
   });
 
   group('SyncServiceImpl with Persistence', () {
@@ -28,7 +28,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       when(mockPersistence.loadQueue()).thenAnswer((_) async => [operation]);
@@ -45,14 +45,14 @@ void main() {
 
     test('should persist queue when operation is enqueued', () async {
       // Arrange
-      when(mockPersistence.saveQueue(any)).thenAnswer((_) async =>
-          SyncQueuePersistenceResult.success(operationCount: 1));
+      when(mockPersistence.saveQueue(any)).thenAnswer(
+          (_) async => SyncQueuePersistenceResult.success(operationCount: 1));
 
       syncService = SyncServiceImpl(persistence: mockPersistence);
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       // Act
@@ -67,12 +67,12 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       when(mockPersistence.loadQueue()).thenAnswer((_) async => [operation]);
-      when(mockPersistence.saveQueue(any)).thenAnswer((_) async =>
-          SyncQueuePersistenceResult.success(operationCount: 0));
+      when(mockPersistence.saveQueue(any)).thenAnswer(
+          (_) async => SyncQueuePersistenceResult.success(operationCount: 0));
 
       syncService = SyncServiceImpl(persistence: mockPersistence);
       await Future.delayed(const Duration(milliseconds: 100));
@@ -89,14 +89,14 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       when(mockPersistence.loadQueue()).thenAnswer((_) async => [operation]);
-      when(mockPersistence.saveQueue(any)).thenAnswer((_) async =>
-          SyncQueuePersistenceResult.success(operationCount: 0));
-      when(mockPersistence.clearQueue()).thenAnswer((_) async =>
-          SyncQueuePersistenceResult.success());
+      when(mockPersistence.saveQueue(any)).thenAnswer(
+          (_) async => SyncQueuePersistenceResult.success(operationCount: 0));
+      when(mockPersistence.clearQueue())
+          .thenAnswer((_) async => SyncQueuePersistenceResult.success());
 
       syncService = SyncServiceImpl(persistence: mockPersistence);
       await Future.delayed(const Duration(milliseconds: 100));
@@ -111,8 +111,8 @@ void main() {
 
     test('should persist queue after processing operations', () async {
       // Arrange
-      when(mockPersistence.saveQueue(any)).thenAnswer((_) async =>
-          SyncQueuePersistenceResult.success(operationCount: 0));
+      when(mockPersistence.saveQueue(any)).thenAnswer(
+          (_) async => SyncQueuePersistenceResult.success(operationCount: 0));
 
       syncService = SyncServiceImpl(
         persistence: mockPersistence,
@@ -122,7 +122,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);
@@ -133,8 +133,7 @@ void main() {
 
       // Assert - verify that save was called multiple times
       // (enqueue + after processing)
-      verify(mockPersistence.saveQueue(any))
-          .called(greaterThanOrEqualTo(1));
+      verify(mockPersistence.saveQueue(any)).called(greaterThanOrEqualTo(1));
     });
 
     test('should work without persistence when not provided', () async {
@@ -144,7 +143,7 @@ void main() {
       final operation = SyncOperation.create(
         id: 'op1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Test Trip'},
+        data: const {'title': 'Test Trip'},
       );
 
       await syncService.enqueueOperation(operation);

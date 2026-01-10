@@ -230,7 +230,7 @@ class ErrorDisplayWidget extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceVariant.withOpacity(0.5),
+            color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -267,7 +267,7 @@ class ErrorDisplayWidget extends StatelessWidget {
                   ),
                 ),
               ],
-              if (error.id != null) ...[
+              ...[
                 const SizedBox(height: 8),
                 Text(
                   'Error ID: ${error.id}',
@@ -533,7 +533,7 @@ class ErrorCardWidget extends StatelessWidget {
                         error.code!,
                         style: theme.textTheme.labelSmall,
                       ),
-                      backgroundColor: colorScheme.surfaceVariant,
+                      backgroundColor: colorScheme.surfaceContainerHighest,
                     ),
                 ],
               ),

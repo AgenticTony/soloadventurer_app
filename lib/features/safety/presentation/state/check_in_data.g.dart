@@ -6,8 +6,7 @@ part of 'check_in_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CheckInDataImpl _$$CheckInDataImplFromJson(Map<String, dynamic> json) =>
-    _$CheckInDataImpl(
+_CheckInData _$CheckInDataFromJson(Map<String, dynamic> json) => _CheckInData(
       checkIns: (json['checkIns'] as List<dynamic>?)
               ?.map((e) => CheckIn.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -21,7 +20,7 @@ _$CheckInDataImpl _$$CheckInDataImplFromJson(Map<String, dynamic> json) =>
           : CheckIn.fromJson(json['selectedCheckIn'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$CheckInDataImplToJson(_$CheckInDataImpl instance) =>
+Map<String, dynamic> _$CheckInDataToJson(_CheckInData instance) =>
     <String, dynamic>{
       'checkIns': instance.checkIns,
       'upcomingCheckIns': instance.upcomingCheckIns,

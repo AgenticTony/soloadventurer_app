@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/notifiers/token_refresh_notification_handler.dart';
+import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_notification_listener.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/token_refresh_providers.dart';
 
 /// Widget that listens to token refresh notifications and displays them
@@ -132,7 +132,9 @@ class _TokenRefreshNotificationListenerState
       ),
     ).then((_) {
       // Clear the notification state after dialog is closed
-      ref.read(tokenRefreshNotificationHandlerProvider.notifier).clearNotification();
+      ref
+          .read(tokenRefreshNotificationHandlerProvider.notifier)
+          .clearNotification();
     });
   }
 
@@ -150,7 +152,9 @@ class _TokenRefreshNotificationListenerState
           onPressed: () {
             Navigator.of(dialogContext).pop();
             // Trigger re-authentication flow
-            ref.read(tokenRefreshNotificationHandlerProvider.notifier).reAuthenticate();
+            ref
+                .read(tokenRefreshNotificationHandlerProvider.notifier)
+                .reAuthenticate();
             // Navigate to login screen
             Navigator.of(context).pushNamedAndRemoveUntil(
               '/login',

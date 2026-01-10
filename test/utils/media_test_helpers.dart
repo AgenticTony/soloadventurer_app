@@ -5,6 +5,7 @@ import 'package:soloadventurer/utils/media_compression.dart';
 import 'package:soloadventurer/utils/video_compression.dart';
 import 'package:soloadventurer/features/journal/data/models/upload_task.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 
 // Test constants
 const testImageWidth = 1920;
@@ -347,9 +348,9 @@ const testQualityLevels = [50, 70, 85, 95, 100];
 
 /// Test image dimensions
 const testImageDimensions = [
-  (640, 480),      // VGA
-  (1280, 720),     // 720p
-  (1920, 1080),    // 1080p
-  (2560, 1440),    // 1440p
-  (3840, 2160),    // 4K
+  (640, 480), // VGA
+  (1280, 720), // 720p
+  (1920, 1080), // 1080p
+  (2560, 1440), // 1440p
+  (3840, 2160), // 4K
 ];

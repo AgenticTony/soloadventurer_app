@@ -147,7 +147,8 @@ class ImageCacheConfig {
     imageCache.maximumSizeBytes = maxMemoryCacheBytes;
 
     // Set default cache options for all CachedNetworkImage widgets
-    CachedNetworkImage.logLevel = kDebugMode ? CacheManagerLogLevel.high : CacheManagerLogLevel.none;
+    CachedNetworkImage.logLevel =
+        kDebugMode ? CacheManagerLogLevel.high : CacheManagerLogLevel.none;
 
     if (kDebugMode) {
       debugPrint('ImageCacheConfig: Cache settings configured');
@@ -269,7 +270,8 @@ class ImageCacheConfig {
     int size = 0;
 
     try {
-      await for (final entity in dir.list(recursive: true, followLinks: false)) {
+      await for (final entity
+          in dir.list(recursive: true, followLinks: false)) {
         if (entity is File) {
           try {
             size += await entity.length();
@@ -289,7 +291,9 @@ class ImageCacheConfig {
   static String _formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    if (bytes < 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
+    }
     return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 

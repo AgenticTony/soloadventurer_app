@@ -28,7 +28,8 @@ class ExponentialBackoff {
     this.jitterFactor = 0.1,
   })  : assert(baseDelayMs > 0, 'baseDelayMs must be positive'),
         assert(maxDelayMs >= baseDelayMs, 'maxDelayMs must be >= baseDelayMs'),
-        assert(jitterFactor >= 0 && jitterFactor <= 1, 'jitterFactor must be between 0 and 1');
+        assert(jitterFactor >= 0 && jitterFactor <= 1,
+            'jitterFactor must be between 0 and 1');
 
   /// Default configuration with standard exponential backoff
   static const standard = ExponentialBackoff();
@@ -63,7 +64,8 @@ class ExponentialBackoff {
     final exponentialDelay = baseDelayMs * (1 << retryCount);
 
     // Cap at max delay
-    final cappedDelay = exponentialDelay > maxDelayMs ? maxDelayMs : exponentialDelay;
+    final cappedDelay =
+        exponentialDelay > maxDelayMs ? maxDelayMs : exponentialDelay;
 
     // Add jitter if enabled
     if (withJitter && jitterFactor > 0) {
@@ -90,7 +92,8 @@ class ExponentialBackoff {
   /// [lastAttemptAt] is when the last retry attempt was made
   /// Returns the remaining Duration, or Duration.zero if ready
   Duration calculateRemainingDelay(int retryCount, DateTime lastAttemptAt) {
-    final nextRetryTime = calculateNextRetryTime(retryCount, from: lastAttemptAt);
+    final nextRetryTime =
+        calculateNextRetryTime(retryCount, from: lastAttemptAt);
     final now = DateTime.now();
     final diff = nextRetryTime.difference(now);
     return diff.isNegative ? Duration.zero : diff;
@@ -107,7 +110,8 @@ class ExponentialBackoff {
     final jitterRange = (delayMs * jitterFactor).toInt();
 
     // Generate random jitter value in range [-jitterRange, +jitterRange]
-    final random = DateTime.now().millisecondsSinceEpoch % (2 * jitterRange + 1);
+    final random =
+        DateTime.now().millisecondsSinceEpoch % (2 * jitterRange + 1);
     final jitter = random - jitterRange;
 
     // Apply jitter and ensure non-negative result

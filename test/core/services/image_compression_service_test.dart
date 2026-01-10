@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:soloadventurer/core/services/image_compression_service.dart';
@@ -104,7 +103,8 @@ void main() {
           if (await testFile.exists()) {
             await testFile.delete();
           }
-          final compressedFile = File('${tempDir.path}/test_image_compressed.jpg');
+          final compressedFile =
+              File('${tempDir.path}/test_image_compressed.jpg');
           if (await compressedFile.exists()) {
             await compressedFile.delete();
           }
@@ -139,7 +139,8 @@ void main() {
     group('compressBytes', () {
       test('compresses image bytes and returns data', () async {
         final testImage = img.Image(width: 2000, height: 2000);
-        final testBytes = Uint8List.fromList(img.encodeJpg(testImage, quality: 95));
+        final testBytes =
+            Uint8List.fromList(img.encodeJpg(testImage, quality: 95));
 
         final result = await ImageCompressionService.compressBytes(
           bytes: testBytes,
@@ -184,7 +185,8 @@ void main() {
         );
 
         // Aspect ratio should be maintained (4:1)
-        final aspectRatio = wideResult.compressedWidth / wideResult.compressedHeight;
+        final aspectRatio =
+            wideResult.compressedWidth / wideResult.compressedHeight;
         expect(aspectRatio, closeTo(4.0, 0.1));
 
         // Tall image
@@ -199,7 +201,8 @@ void main() {
         );
 
         // Aspect ratio should be maintained (1:4)
-        final tallAspectRatio = tallResult.compressedWidth / tallResult.compressedHeight;
+        final tallAspectRatio =
+            tallResult.compressedWidth / tallResult.compressedHeight;
         expect(tallAspectRatio, closeTo(0.25, 0.1));
       });
 
@@ -265,7 +268,8 @@ void main() {
           }
           // Clean up compressed files
           for (int i = 0; i < 3; i++) {
-            final compressedFile = File('${tempDir.path}/test_image_${i}_compressed.jpg');
+            final compressedFile =
+                File('${tempDir.path}/test_image_${i}_compressed.jpg');
             if (await compressedFile.exists()) {
               await compressedFile.delete();
             }

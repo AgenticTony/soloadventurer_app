@@ -12,7 +12,6 @@ part 'trusted_contacts_state.freezed.dart';
 /// - State is NEVER nullable
 @freezed
 class TrustedContactsState with _$TrustedContactsState {
-  const TrustedContactsState._();
 
   const factory TrustedContactsState({
     /// Loading indicator - always a field on State

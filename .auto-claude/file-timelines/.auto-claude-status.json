@@ -1,0 +1,28 @@
+{
+  "file_path": ".auto-claude-status",
+  "main_branch_history": [],
+  "task_views": {
+    "006-performance-optimization-for-large-trips": {
+      "task_id": "006-performance-optimization-for-large-trips",
+      "branch_point": {
+        "commit_hash": "20dd5b9cdb7f9994913f6179576f194a9e9883e1",
+        "content": "",
+        "timestamp": "2026-01-05T12:48:39.346326"
+      },
+      "worktree_state": {
+        "content": "{\n  \"active\": true,\n  \"spec\": \"006-performance-optimization-for-large-trips\",\n  \"state\": \"error\",\n  \"subtasks\": {\n    \"completed\": 0,\n    \"total\": 0,\n    \"in_progress\": 1,\n    \"failed\": 0\n  },\n  \"phase\": {\n    \"current\": \"\",\n    \"id\": 0,\n    \"total\": 0\n  },\n  \"workers\": {\n    \"active\": 0,\n    \"max\": 1\n  },\n  \"session\": {\n    \"number\": 1,\n    \"started_at\": \"2026-01-04T22:55:39.262438\"\n  },\n  \"last_update\": \"2026-01-04T22:59:24.542881\"\n}",
+        "last_modified": "2026-01-05T12:48:42.638597"
+      },
+      "task_intent": {
+        "title": "Performance Optimization for Large Trips",
+        "description": "Optimize app performance for handling large, complex trips with hundreds of locations, activities, and photos",
+        "from_plan": true
+      },
+      "commits_behind_main": 203,
+      "status": "active",
+      "merged_at": null
+    }
+  },
+  "created_at": "2026-01-05T12:48:39.375890",
+  "last_updated": "2026-01-05T12:48:39.388942"
+}

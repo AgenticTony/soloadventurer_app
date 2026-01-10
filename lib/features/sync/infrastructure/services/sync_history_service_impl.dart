@@ -75,7 +75,7 @@ class SyncHistoryServiceImpl implements SyncHistoryService {
     if (_persistence == null) return;
 
     try {
-      final persistedHistory = await _persistence!.loadHistory();
+      final persistedHistory = await _persistence.loadHistory();
       if (persistedHistory == null || persistedHistory.isEmpty) {
         developer.log(
           'SyncHistoryService: No persisted history to load',
@@ -109,7 +109,7 @@ class SyncHistoryServiceImpl implements SyncHistoryService {
     if (_persistence == null) return;
 
     try {
-      final result = await _persistence!.saveHistory(_entries);
+      final result = await _persistence.saveHistory(_entries);
 
       if (result.isSuccess) {
         developer.log(
@@ -263,7 +263,7 @@ class SyncHistoryServiceImpl implements SyncHistoryService {
   }
 
   @override
-  List<SyncHistoryEntry> getEntriesByStatus(SyncStatus status) {
+  List<SyncHistoryEntry> getEntriesByStatus(SyncOperationStatus status) {
     return _entries.where((e) => e.status == status).toList();
   }
 
@@ -368,7 +368,7 @@ class SyncHistoryServiceImpl implements SyncHistoryService {
 
       // Clear persistence
       if (_persistence != null) {
-        await _persistence!.clearHistory();
+        await _persistence.clearHistory();
       }
 
       // Notify listeners
@@ -383,7 +383,8 @@ class SyncHistoryServiceImpl implements SyncHistoryService {
         stackTrace: stackTrace,
         level: 1000, // ERROR
       );
-      return SyncHistoryResult.failure('Failed to clear history: ${e.toString()}');
+      return SyncHistoryResult.failure(
+          'Failed to clear history: ${e.toString()}');
     }
   }
 
@@ -425,7 +426,7 @@ class SyncHistoryServiceImpl implements SyncHistoryService {
   }
 
   @override
-  Future<int> deleteEntriesByStatus(SyncStatus status) async {
+  Future<int> deleteEntriesByStatus(SyncOperationStatus status) async {
     if (_isDisposed) {
       return 0;
     }

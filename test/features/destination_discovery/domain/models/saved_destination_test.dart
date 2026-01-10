@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/saved_destination.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/saved_destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
 
 void main() {
   group('SaveType enum', () {
@@ -38,7 +38,7 @@ void main() {
         safetyScore: 9.2,
         safetyInsights: [],
         soloSuitabilityScore: 8.8,
-        soloSuitabilityFactors: SoloSuitabilityFactors(
+        soloSuitabilityFactors: const SoloSuitabilityFactors(
           safety: 9.5,
           nightlife: 8.0,
           walkability: 9.0,

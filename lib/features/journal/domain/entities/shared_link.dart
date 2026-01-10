@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 
 /// Sync status for offline support
 enum SyncStatus {
@@ -9,11 +8,52 @@ enum SyncStatus {
   /// Entity has pending changes to sync
   pending,
 
+  /// Entity is currently being synced
+  syncing,
+
   /// Entity has a conflict that needs resolution
   conflict,
 
   /// Entity exists only on local device
   offlineOnly,
+}
+
+/// Extension on SyncStatus for database serialization
+extension SyncStatusExtension on SyncStatus {
+  /// Convert SyncStatus to string for database storage
+  String get value {
+    switch (this) {
+      case SyncStatus.synced:
+        return 'synced';
+      case SyncStatus.pending:
+        return 'pending';
+      case SyncStatus.syncing:
+        return 'syncing';
+      case SyncStatus.conflict:
+        return 'conflict';
+      case SyncStatus.offlineOnly:
+        return 'offline_only';
+    }
+  }
+
+  /// Parse string from database to SyncStatus
+  static SyncStatus fromString(String value) {
+    switch (value.toLowerCase()) {
+      case 'synced':
+        return SyncStatus.synced;
+      case 'pending':
+        return SyncStatus.pending;
+      case 'syncing':
+        return SyncStatus.syncing;
+      case 'conflict':
+        return SyncStatus.conflict;
+      case 'offline_only':
+      case 'offlineonly':
+        return SyncStatus.offlineOnly;
+      default:
+        return SyncStatus.offlineOnly;
+    }
+  }
 }
 
 /// Represents a shareable link for a trip with optional password protection
@@ -133,7 +173,7 @@ class SharedLink extends Equatable {
   }
 
   /// Check if password is required to access
-  bool get get requiresPassword => hasPassword;
+  bool get requiresPassword => hasPassword;
 }
 
 /// Result of validating a shared link access
@@ -217,7 +257,7 @@ class SharedLinkAccessResult extends Equatable {
 
   /// Create a not found result
   factory SharedLinkAccessResult.notFound() {
-    return SharedLinkAccessResult(
+    return const SharedLinkAccessResult(
       linkId: '',
       tripId: '',
       isAccessible: false,

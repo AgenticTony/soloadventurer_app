@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 import '../../domain/models/destination.dart';
 import '../../domain/models/saved_destination.dart';
+import '../../domain/models/curated_list.dart';
 import '../../application/providers/curated_lists_provider.dart';
 import '../../application/providers/saved_destinations_provider.dart';
 import '../widgets/destination_card.dart';
@@ -44,7 +45,8 @@ class CuratedListDetailScreen extends ConsumerStatefulWidget {
       _CuratedListDetailScreenState();
 }
 
-class _CuratedListDetailScreenState extends ConsumerState<CuratedListDetailScreen> {
+class _CuratedListDetailScreenState
+    extends ConsumerState<CuratedListDetailScreen> {
   @override
   void initState() {
     super.initState();
@@ -178,9 +180,8 @@ class _CuratedListDetailScreenState extends ConsumerState<CuratedListDetailScree
     // Get auth state for save functionality
     final authState = ref.watch(authNotifierProvider);
     final userId = authState.value?.user?.id;
-    final savedState = userId != null
-        ? ref.watch(savedDestinationsProvider(userId))
-        : null;
+    final savedState =
+        userId != null ? ref.watch(savedDestinationsProvider(userId)) : null;
 
     return Scaffold(
       body: curatedListsState.when(
@@ -207,7 +208,8 @@ class _CuratedListDetailScreenState extends ConsumerState<CuratedListDetailScree
                       _buildTitleSection(curatedList, theme),
 
                       // Scores section (if available)
-                      if (curatedList.hasSafetyScores || curatedList.hasSoloSuitabilityScores)
+                      if (curatedList.hasSafetyScores ||
+                          curatedList.hasSoloSuitabilityScores)
                         _buildScoresSection(curatedList, theme),
 
                       // Metadata section
@@ -282,7 +284,8 @@ class _CuratedListDetailScreenState extends ConsumerState<CuratedListDetailScree
                     child: Icon(
                       Icons.collections_bookmark,
                       size: 80,
-                      color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+                      color:
+                          theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
                     ),
                   ),
                 ),
@@ -409,7 +412,8 @@ class _CuratedListDetailScreenState extends ConsumerState<CuratedListDetailScree
               ),
             ),
 
-          if (curatedList.hasSafetyScores && curatedList.hasSoloSuitabilityScores)
+          if (curatedList.hasSafetyScores &&
+              curatedList.hasSoloSuitabilityScores)
             const VerticalDivider(),
 
           // Solo suitability score
@@ -676,7 +680,8 @@ class _CuratedListDetailScreenState extends ConsumerState<CuratedListDetailScree
       appBar: AppBar(),
       body: DestinationEmptyStateWidget(
         title: 'Curated list not found',
-        message: 'The curated list you\'re looking for doesn\'t exist or has been removed. '
+        message:
+            'The curated list you\'re looking for doesn\'t exist or has been removed. '
             'Browse our other curated collections for amazing destinations!',
         icon: Icons.collections_bookmark,
         actionLabel: 'Browse Collections',

@@ -1,7 +1,7 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 import '../../domain/models/destination.dart';
-import '../../domain/models/destination_filter.dart';
+import '../../domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
 import '../../domain/models/curated_list.dart';
 import '../../domain/models/personalized_recommendation.dart';
 import '../../domain/models/saved_destination.dart';
@@ -39,7 +39,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['searchDestinations'];
       if (data == null) {
-        throw const ServerException(
+        throw const app_exceptions.ServerException(
           message: 'No data returned from search',
         );
       }
@@ -52,7 +52,8 @@ class DestinationRepositoryImpl implements DestinationRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Failed to search destinations: ${e.toString()}');
+      throw app_exceptions.ServerException(
+          message: 'Failed to search destinations: ${e.toString()}');
     }
   }
 
@@ -82,7 +83,8 @@ class DestinationRepositoryImpl implements DestinationRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Failed to get destination: ${e.toString()}');
+      throw app_exceptions.ServerException(
+          message: 'Failed to get destination: ${e.toString()}');
     }
   }
 
@@ -114,7 +116,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(
+      throw app_exceptions.ServerException(
         message: 'Failed to get recommendations: ${e.toString()}',
       );
     }
@@ -136,7 +138,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['getCuratedLists'];
       if (data == null) {
-        throw const ServerException(
+        throw const app_exceptions.ServerException(
           message: 'No curated lists data returned',
         );
       }
@@ -149,7 +151,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(
+      throw app_exceptions.ServerException(
         message: 'Failed to get curated lists: ${e.toString()}',
       );
     }
@@ -181,7 +183,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(
+      throw app_exceptions.ServerException(
         message: 'Failed to get curated list: ${e.toString()}',
       );
     }
@@ -210,7 +212,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['saveDestination'];
       if (data == null) {
-        throw const ServerException(
+        throw const app_exceptions.ServerException(
           message: 'Failed to save destination: No data returned',
         );
       }
@@ -219,7 +221,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(
+      throw app_exceptions.ServerException(
         message: 'Failed to save destination: ${e.toString()}',
       );
     }
@@ -250,14 +252,14 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final success = result.data?['unsaveDestination']['success'] as bool?;
       if (success != true) {
-        throw const ServerException(
+        throw const app_exceptions.ServerException(
           message: 'Failed to unsave destination',
         );
       }
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(
+      throw app_exceptions.ServerException(
         message: 'Failed to unsave destination: ${e.toString()}',
       );
     }
@@ -286,20 +288,21 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['getSavedDestinations'];
       if (data == null) {
-        throw const ServerException(
+        throw const app_exceptions.ServerException(
           message: 'No saved destinations data returned',
         );
       }
 
       final savedDestinations = (data as List)
-          .map((json) => SavedDestination.fromJson(json as Map<String, dynamic>))
+          .map(
+              (json) => SavedDestination.fromJson(json as Map<String, dynamic>))
           .toList();
 
       return savedDestinations;
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ServerException(
+      throw app_exceptions.ServerException(
         message: 'Failed to get saved destinations: ${e.toString()}',
       );
     }
@@ -501,7 +504,8 @@ class DestinationRepositoryImpl implements DestinationRepository {
         case 'VALIDATION_ERROR':
           return ValidationException(
             message: message,
-            errors: (firstError.extensions?['errors'] as Map<String, dynamic>?)?.map(
+            errors: (firstError.extensions?['errors'] as Map<String, dynamic>?)
+                    ?.map(
                   (key, value) => MapEntry(
                     key,
                     (value as List).map((e) => e.toString()).toList(),

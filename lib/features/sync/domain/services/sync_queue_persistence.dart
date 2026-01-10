@@ -34,8 +34,7 @@ class SyncQueuePersistenceResult {
   }
 
   @override
-  String toString() =>
-      'SyncQueuePersistenceResult(success: $success, '
+  String toString() => 'SyncQueuePersistenceResult(success: $success, '
       'operationCount: $operationCount, error: $error)';
 }
 

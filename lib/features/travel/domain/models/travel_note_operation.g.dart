@@ -6,9 +6,8 @@ part of 'travel_note_operation.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$TravelNoteOperationImpl _$$TravelNoteOperationImplFromJson(
-        Map<String, dynamic> json) =>
-    _$TravelNoteOperationImpl(
+_TravelNoteOperation _$TravelNoteOperationFromJson(Map<String, dynamic> json) =>
+    _TravelNoteOperation(
       id: json['id'] as String,
       tripId: json['tripId'] as String,
       noteType: $enumDecode(_$NoteTypeEnumMap, json['noteType']),
@@ -31,8 +30,8 @@ _$TravelNoteOperationImpl _$$TravelNoteOperationImplFromJson(
       maxRetries: (json['maxRetries'] as num?)?.toInt() ?? 3,
     );
 
-Map<String, dynamic> _$$TravelNoteOperationImplToJson(
-        _$TravelNoteOperationImpl instance) =>
+Map<String, dynamic> _$TravelNoteOperationToJson(
+        _TravelNoteOperation instance) =>
     <String, dynamic>{
       'id': instance.id,
       'tripId': instance.tripId,

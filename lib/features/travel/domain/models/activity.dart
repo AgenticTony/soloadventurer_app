@@ -113,9 +113,10 @@ class Activity with _$Activity {
 
   factory Activity.fromJson(Map<String, dynamic> json) =>
       _$ActivityFromJson(json);
+}
 
-  const Activity._();
-
+/// Activity extensions for computed properties
+extension ActivityExtension on Activity {
   /// Whether this activity has geographic coordinates
   bool get hasLocation => latitude != null && longitude != null;
 

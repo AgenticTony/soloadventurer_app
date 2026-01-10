@@ -1,8 +1,3 @@
-import '../entities/journal_entry.dart';
-import '../entities/media_item.dart';
-import '../entities/trip.dart';
-import '../entities/tag.dart';
-
 /// Status of a sync operation
 enum SyncOperationType {
   /// Syncing journal entries
@@ -257,8 +252,7 @@ class SyncConfig {
     this.operationTimeout = const Duration(seconds: 30),
     this.syncMedia = true,
     this.autoResolveConflicts = false,
-    this.conflictResolutionStrategy =
-        ConflictResolutionStrategy.mostRecent,
+    this.conflictResolutionStrategy = ConflictResolutionStrategy.mostRecent,
     this.syncPendingOnly = false,
   });
 }

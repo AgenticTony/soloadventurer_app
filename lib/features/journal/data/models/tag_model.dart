@@ -1,4 +1,5 @@
 import 'package:soloadventurer/features/journal/domain/entities/tag.dart';
+import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 
 /// Data layer representation of [Tag] entity
 class TagModel {
@@ -8,6 +9,7 @@ class TagModel {
   final String? color;
   final String? icon;
   final int usageCount;
+  final SyncStatus syncStatus;
   final DateTime createdAt;
 
   const TagModel({
@@ -17,6 +19,7 @@ class TagModel {
     this.color,
     this.icon,
     this.usageCount = 0,
+    this.syncStatus = SyncStatus.synced,
     required this.createdAt,
   });
 
@@ -29,6 +32,7 @@ class TagModel {
       color: tag.color,
       icon: tag.icon,
       usageCount: tag.usageCount,
+      syncStatus: tag.syncStatus,
       createdAt: tag.createdAt,
     );
   }
@@ -42,6 +46,7 @@ class TagModel {
       color: color,
       icon: icon,
       usageCount: usageCount,
+      syncStatus: syncStatus,
       createdAt: createdAt,
     );
   }
@@ -55,6 +60,9 @@ class TagModel {
       color: json['color'] as String?,
       icon: json['icon'] as String?,
       usageCount: json['usage_count'] as int? ?? 0,
+      syncStatus: json['sync_status'] != null
+          ? SyncStatusExtension.fromString(json['sync_status'] as String)
+          : SyncStatus.synced,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
@@ -68,6 +76,7 @@ class TagModel {
       'color': color,
       'icon': icon,
       'usage_count': usageCount,
+      'sync_status': syncStatus.value,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -80,6 +89,7 @@ class TagModel {
     String? color,
     String? icon,
     int? usageCount,
+    SyncStatus? syncStatus,
     DateTime? createdAt,
   }) {
     return TagModel(
@@ -89,6 +99,7 @@ class TagModel {
       color: color ?? this.color,
       icon: icon ?? this.icon,
       usageCount: usageCount ?? this.usageCount,
+      syncStatus: syncStatus ?? this.syncStatus,
       createdAt: createdAt ?? this.createdAt,
     );
   }

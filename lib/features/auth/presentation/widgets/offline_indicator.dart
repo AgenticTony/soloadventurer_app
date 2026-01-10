@@ -129,9 +129,8 @@ class OfflineIndicator extends ConsumerWidget {
     final icon = isOffline
         ? (config.offlineIcon ?? Icons.cloud_off)
         : (config.onlineIcon ?? Icons.cloud_done);
-    final color = isOffline
-        ? theme.colorScheme.error
-        : theme.colorScheme.primary;
+    final color =
+        isOffline ? theme.colorScheme.error : theme.colorScheme.primary;
     final label = isOffline
         ? (config.offlineLabel ?? 'Offline')
         : (config.onlineLabel ?? 'Online');
@@ -139,9 +138,7 @@ class OfflineIndicator extends ConsumerWidget {
     final indicator = IconButton(
       icon: Icon(icon),
       color: color,
-      tooltip: config.showTooltip
-          ? _buildTooltipText(state, isOffline)
-          : label,
+      tooltip: config.showTooltip ? _buildTooltipText(state, isOffline) : label,
       onPressed: onTap,
     );
 
@@ -158,9 +155,8 @@ class OfflineIndicator extends ConsumerWidget {
     final icon = isOffline
         ? (config.offlineIcon ?? Icons.cloud_off)
         : (config.onlineIcon ?? Icons.cloud_done);
-    final color = isOffline
-        ? theme.colorScheme.error
-        : theme.colorScheme.primary;
+    final color =
+        isOffline ? theme.colorScheme.error : theme.colorScheme.primary;
     final label = isOffline
         ? (config.offlineLabel ?? 'Offline Mode')
         : (config.onlineLabel ?? 'Online');
@@ -222,7 +218,8 @@ class OfflineIndicator extends ConsumerWidget {
                 return const SizedBox.shrink();
               }
 
-              final cachedDataInfo = await cachedDataProvider.getCachedDataInfo();
+              final cachedDataInfo =
+                  await cachedDataProvider.getCachedDataInfo();
 
               final lastSyncAt = cachedDataInfo.lastCachedAt;
               if (lastSyncAt == null) {

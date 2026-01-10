@@ -10,7 +10,6 @@ part 'auth_state.freezed.dart';
 /// not by manual flags in this state.
 @freezed
 class AuthState with _$AuthState {
-  const AuthState._();
 
   /// Creates a new AuthState instance
   const factory AuthState({
@@ -55,6 +54,9 @@ class AuthState with _$AuthState {
 
   /// Whether user is logged in (authenticated AND has user)
   bool get isLoggedIn => isAuthenticated && hasUser;
+
+  // Private constructor for freezed getters
+  const AuthState._();
 
   /// Factory for initial unauthenticated state
   factory AuthState.initial() => const AuthState();

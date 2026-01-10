@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/destination.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
-import '../providers/add_to_trip_provider.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/add_to_trip_provider.dart';
 
 /// A flow for adding a destination to an existing or new trip.
 ///
@@ -115,7 +115,7 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
     final authState = ref.watch(authNotifierProvider);
 
     // Check authentication
-    if (!authState.isAuthenticated) {
+    if (!authState.value?.isAuthenticated ?? false) {
       return _buildSignInPrompt(context, theme);
     }
 
@@ -362,7 +362,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
                   child: InkWell(
                     onTap: () {
                       setState(() {
-                        _selectedTripId = isSelected ? null : trip['id'] as String;
+                        _selectedTripId =
+                            isSelected ? null : trip['id'] as String;
                         _newTripTitle = null;
                         _newTripDescription = null;
                       });
@@ -617,10 +618,11 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
 
         // Notes text field
         TextField(
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Your Notes',
-            hintText: 'e.g., "Must visit the ancient temples", "Try local street food"',
-            border: const OutlineInputBorder(),
+            hintText:
+                'e.g., "Must visit the ancient temples", "Try local street food"',
+            border: OutlineInputBorder(),
             alignLabelWithHint: true,
           ),
           maxLines: 8,
@@ -671,8 +673,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
   /// Build step 3: Confirmation
   Widget _buildConfirmStep(BuildContext context, ThemeData theme) {
     final tripTitle = _selectedTripId != null
-        ? _mockUserTrips
-            .firstWhere((trip) => trip['id'] == _selectedTripId)['title'] as String
+        ? _mockUserTrips.firstWhere(
+            (trip) => trip['id'] == _selectedTripId)['title'] as String
         : _newTripTitle ?? 'New Trip';
 
     return ListView(
@@ -1025,7 +1027,9 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
             Expanded(
               flex: isFirstStep ? 1 : 2,
               child: Semantics(
-                label: isLastStep ? 'Confirm and add destination to trip' : 'Proceed to next step',
+                label: isLastStep
+                    ? 'Confirm and add destination to trip'
+                    : 'Proceed to next step',
                 button: true,
                 child: ElevatedButton(
                   onPressed: _canProceed() ? _handleNext : null,
@@ -1186,8 +1190,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
 
       if (_selectedTripId != null) {
         // Add to existing trip
-        final tripTitle = _mockUserTrips
-            .firstWhere((trip) => trip['id'] == _selectedTripId)['title'] as String;
+        final tripTitle = _mockUserTrips.firstWhere(
+            (trip) => trip['id'] == _selectedTripId)['title'] as String;
 
         await notifier.addToExistingTrip(
           destination: widget.destination,
@@ -1216,7 +1220,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
 
       // Get the trip ID and name from the state
       final tripId = ref.read(addToTripProvider).tripId ?? '';
-      final tripName = ref.read(addToTripProvider).tripName ?? _newTripTitle ?? 'New Trip';
+      final tripName =
+          ref.read(addToTripProvider).tripName ?? _newTripTitle ?? 'New Trip';
 
       // Show success message
       if (mounted) {
@@ -1227,7 +1232,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
                 const Icon(Icons.check_circle, color: Colors.white),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text('Added "${widget.destination.name}" to $tripName'),
+                  child:
+                      Text('Added "${widget.destination.name}" to $tripName'),
                 ),
               ],
             ),

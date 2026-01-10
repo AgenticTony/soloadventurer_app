@@ -135,7 +135,7 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
     final message = state.failureCount == 0
         ? 'Successfully synced ${state.successCount} ${_pluralize('item', state.successCount)}'
         : 'Synced ${state.successCount} ${_pluralize('item', state.successCount)}, '
-          '${state.failureCount} ${_pluralize('failure', state.failureCount)}';
+            '${state.failureCount} ${_pluralize('failure', state.failureCount)}';
 
     scaffoldMessenger.showSnackBar(
       SnackBar(

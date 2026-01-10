@@ -6,8 +6,8 @@ part of 'location_update.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LocationUpdateImpl _$$LocationUpdateImplFromJson(Map<String, dynamic> json) =>
-    _$LocationUpdateImpl(
+_LocationUpdate _$LocationUpdateFromJson(Map<String, dynamic> json) =>
+    _LocationUpdate(
       id: json['id'] as String,
       userId: json['userId'] as String,
       latitude: (json['latitude'] as num).toDouble(),
@@ -31,8 +31,7 @@ _$LocationUpdateImpl _$$LocationUpdateImplFromJson(Map<String, dynamic> json) =>
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
-Map<String, dynamic> _$$LocationUpdateImplToJson(
-        _$LocationUpdateImpl instance) =>
+Map<String, dynamic> _$LocationUpdateToJson(_LocationUpdate instance) =>
     <String, dynamic>{
       'id': instance.id,
       'userId': instance.userId,

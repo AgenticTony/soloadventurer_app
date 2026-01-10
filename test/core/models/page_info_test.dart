@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/core/models/page_info.dart';
+import 'package:soloadventurer/core/models/page_info.dart';
 
 void main() {
   group('PageInfo', () {

@@ -175,7 +175,8 @@ class MediaGalleryStatesExample extends StatefulWidget {
   const MediaGalleryStatesExample({super.key});
 
   @override
-  State<MediaGalleryStatesExample> createState() => _MediaGalleryStatesExampleState();
+  State<MediaGalleryStatesExample> createState() =>
+      _MediaGalleryStatesExampleState();
 }
 
 class _MediaGalleryStatesExampleState extends State<MediaGalleryStatesExample> {
@@ -346,7 +347,8 @@ class MediaGalleryCompactExample extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Morning Adventure',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   const Text('Started our day with a hike'),
                   const SizedBox(height: 12),
@@ -373,7 +375,8 @@ class MediaGalleryCompactExample extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Beach Day',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   const Text('Relaxing by the ocean'),
                   const SizedBox(height: 12),

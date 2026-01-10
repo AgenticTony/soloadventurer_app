@@ -1,0 +1,433 @@
+{
+  "id": "ideation-20260107-140117",
+  "project_id": "/Users/anthonyforan/SoloAdventurer_app",
+  "config": {
+    "enabled_types": [
+      "code_improvements",
+      "ui_ux_improvements",
+      "security_hardening"
+    ],
+    "include_roadmap_context": true,
+    "include_kanban_context": true,
+    "max_ideas_per_type": 5
+  },
+  "ideas": [
+    {
+      "id": "ci-001",
+      "type": "code_improvements",
+      "title": "Add Search to Check-In History Screen",
+      "description": "Add a search input field to CheckInHistoryScreen that allows users to search check-ins by location name, status message, or trip name. The search pattern already exists in TripRepository.searchTrips() and the UI pattern for filtering/sorting is already implemented in the same screen.",
+      "rationale": "The CheckInHistoryScreen already has filter and sort functionality implemented with PopupMenuButtons. The searchTrips() pattern exists in TripRepository showing how to search entities. The CheckInNotifier already loads all check-ins into memory, making client-side search trivial to implement.",
+      "builds_upon": [
+        "Check-in history filtering (status filter exists)",
+        "Trip search pattern (searchTrips in TripRepository)",
+        "Riverpod AsyncValue state management"
+      ],
+      "estimated_effort": "trivial",
+      "affected_files": [
+        "lib/features/safety/presentation/screens/check_in_history_screen.dart",
+        "lib/features/safety/domain/usecases/get_upcoming_check_ins.dart"
+      ],
+      "existing_patterns": [
+        "Search pattern in TripRepository.searchTrips()",
+        "Filter UI in CheckInHistoryScreen (PopupMenuButton for status filter)",
+        "Client-side filtering in _applyFiltersAndSort() method"
+      ],
+      "implementation_approach": "1. Add TextField widget to CheckInHistoryScreen AppBar or as a header\n2. Add _searchQuery state variable to track search input\n3. Extend existing _applyFiltersAndSort() method to also filter by search term\n4. Search across checkIn.location.name, checkIn.statusMessage, and checkIn.tripId\n5. Use existing Riverpod state management (no new providers needed)",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-002",
+      "type": "code_improvements",
+      "title": "Add Trip Data Export (PDF/JSON)",
+      "description": "Add export functionality to trip data allowing users to export their trips, itineraries, and journals as JSON or PDF files. The upload pattern exists for avatars and repositories have getAll() methods to retrieve all data.",
+      "rationale": "The avatar upload pattern in ManageAvatarUseCase shows how to handle file operations. TripRepository.getTrips() and ItineraryRepository already have getAll() methods. The offline infrastructure shows the app can handle local file storage. This is a natural extension of existing CRUD patterns.",
+      "builds_upon": [
+        "Avatar upload pattern (ManageAvatarUseCase)",
+        "TripRepository.getTrips() getAll pattern",
+        "OfflineAwareRepository data access patterns",
+        "Riverpod notifier state management"
+      ],
+      "estimated_effort": "small",
+      "affected_files": [
+        "lib/features/travel/domain/repositories/trip_repository.dart",
+        "lib/features/travel/domain/usecases/export_trip_use_case.dart",
+        "lib/features/travel/presentation/notifiers/trip_export_notifier.dart"
+      ],
+      "existing_patterns": [
+        "File upload in ManageAvatarUseCase (uploadAvatar method)",
+        "Repository getAll() pattern (getTrips, getAllCheckIns)",
+        "Use case pattern for business logic encapsulation",
+        "AsyncValue state management for async operations"
+      ],
+      "implementation_approach": "1. Create ExportTripUseCase that calls repository getAll methods\n2. Create TripExportNotifier with Riverpod that manages export state (AsyncValue)\n3. Add export button to trip list screens\n4. Use dart:convert for JSON serialization (entities already have toJson patterns via freezed)\n5. For PDF: use existing pdf package or create simple text-based export\n6. Use path_provider to save files to Downloads/Documents directory\n7. Follow existing avatar upload pattern for file handling",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-003",
+      "type": "code_improvements",
+      "title": "Extend Performance Tracking to Screen Transitions and API Calls",
+      "description": "Extend the AppStartTracker pattern to track performance metrics for screen transitions and API calls, not just app startup. This builds on the existing performance monitoring infrastructure.",
+      "rationale": "AppStartTracker already has infrastructure for tracking phases and logging reports. The pattern shows phase tracking with startPhase/endPhase and comprehensive reporting. This same pattern can be applied to screen navigation (using go_router hooks) and API calls (using Dio interceptors that already exist).",
+      "builds_upon": [
+        "AppStartTracker performance tracking",
+        "Dio interceptors (auth_interceptor.dart, error_interceptor.dart exist)",
+        "go_router navigation (routes are already defined)",
+        "Logging service infrastructure"
+      ],
+      "estimated_effort": "small",
+      "affected_files": [
+        "lib/core/monitoring/performance/app_start_tracker.dart",
+        "lib/core/api/interceptors/auth_interceptor.dart",
+        "lib/app/router/app_router.dart"
+      ],
+      "existing_patterns": [
+        "AppStartTracker with phase tracking and reporting",
+        "Dio interceptor pattern for API request/response handling",
+        "go_router page builders for screen lifecycle hooks",
+        "Developer logging with developer.log() in AppStartTracker"
+      ],
+      "implementation_approach": "1. Extract common tracking logic from AppStartTracker into PerformanceTracker base class\n2. Create ScreenTransitionTracker that extends base class with screen-specific tracking\n3. Create ApiCallTracker integrated into existing Dio interceptors\n4. Add tracking in go_router pageBuilder wrappers to capture screen transitions\n5. Use existing interceptor infrastructure to track API call duration\n6. Follow existing report generation pattern with logPerformanceReport()\n7. Add new tracker instances in screen widgets and API service methods",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-004",
+      "type": "code_improvements",
+      "title": "Add Batch Operations for Check-In Management",
+      "description": "Add bulk operations to check-in management allowing users to complete or cancel multiple check-ins at once. The offline queue infrastructure already supports multiple operations and single operations are fully implemented.",
+      "rationale": "The sync queue infrastructure in SyncQueueService already handles multiple operations. Single check-in operations (completeCheckIn, cancelCheckIn) exist in CheckInNotifier. The offline-aware repository pattern shows operations can be queued. Adding batch operations is a natural extension.",
+      "builds_upon": [
+        "Check-in CRUD operations (completeCheckIn, cancelCheckIn in CheckInNotifier)",
+        "Sync queue infrastructure (SyncQueueService.enqueueOperation)",
+        "OfflineAwareRepository pattern for queuing operations",
+        "AsyncValue state management pattern"
+      ],
+      "estimated_effort": "medium",
+      "affected_files": [
+        "lib/features/safety/presentation/notifiers/check_in_notifier.dart",
+        "lib/features/safety/domain/usecases/complete_check_in.dart",
+        "lib/features/safety/domain/usecases/cancel_check_in.dart",
+        "lib/features/safety/presentation/screens/check_in_history_screen.dart"
+      ],
+      "existing_patterns": [
+        "Single check-in operations in CheckInNotifier",
+        "Sync queue for multiple operations (SyncQueueService)",
+        "RepositoryOperationResult pattern for operation feedback",
+        "Freezed data classes for immutable state updates"
+      ],
+      "implementation_approach": "1. Add batchCompleteCheckIns and batchCancelCheckIns methods to CheckInNotifier\n2. Use Future.wait() to execute multiple existing single operations in parallel\n3. Add selection mode to CheckInHistoryScreen (similar to existing reorder mode pattern)\n4. Add checkbox widgets to check-in list items when in selection mode\n5. Add 'Complete Selected' and 'Cancel Selected' action buttons\n6. Update CheckInData freezed class to track selected check-ins\n7. Follow existing AsyncValue.guard() pattern for error handling\n8. Return List<RepositoryOperationResult> for batch operations",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "ci-005",
+      "type": "code_improvements",
+      "title": "Add Trip Statistics Dashboard",
+      "description": "Create a trip statistics dashboard that shows metrics like total trips, upcoming trips, completed trips, countries visited, and total travel days. The repository patterns already support querying by status and date range.",
+      "rationale": "TripRepository already has methods like getTripsByStatus(), getTripsByDateRange(), and searchTrips(). The itinerary screen shows progress tracking with completionPercentage. A statistics dashboard can use these existing query methods to aggregate data and show travel insights.",
+      "builds_upon": [
+        "TripRepository query methods (getTripsByStatus, getTripsByDateRange)",
+        "Itinerary progress tracking (completionPercentage pattern)",
+        "Riverpod AsyncValue state management",
+        "Freezed data classes for statistics entities"
+      ],
+      "estimated_effort": "medium",
+      "affected_files": [
+        "lib/features/travel/domain/usecases/get_trip_statistics_use_case.dart",
+        "lib/features/travel/presentation/notifiers/trip_statistics_notifier.dart",
+        "lib/features/travel/presentation/screens/trip_statistics_dashboard.dart",
+        "lib/features/travel/domain/entities/trip_statistics.dart"
+      ],
+      "existing_patterns": [
+        "Repository query patterns (getTripsByStatus, getTripsByDateRange)",
+        "Progress tracking pattern from Itinerary.completionPercentage",
+        "Use case pattern for business logic",
+        "Notifier pattern with AsyncValue state",
+        "Dashboard screen pattern (similar to ItineraryScreen structure)"
+      ],
+      "implementation_approach": "1. Create TripStatistics freezed entity with fields (totalTrips, upcomingTrips, completedTrips, countriesVisited, totalDays)\n2. Create GetTripStatisticsUseCase that queries repository using existing methods\n3. Use getTripsByStatus() for upcoming/completed counts\n4. Use getTripsByDateRange() for yearly statistics\n5. Aggregate country data from trip destination data\n6. Create TripStatisticsNotifier with AsyncValue<TripStatistics> state\n7. Create TripStatisticsDashboard screen with card-based layout\n8. Use existing progress indicator widgets from itinerary screen\n9. Follow existing screen patterns (Scaffold, AppBar, error/loading states)",
+      "status": "draft",
+      "created_at": "2025-01-07T13:57:09.715615"
+    },
+    {
+      "id": "uiux-006",
+      "type": "ui_ux_improvements",
+      "title": "Add Keyboard Input Enhancement with Autofill and Submit Handling",
+      "description": "Implement proper autofill hints, keyboard submit actions, and automatic text trimming to improve form input UX on mobile devices.",
+      "rationale": "Current forms in login_screen.dart and signup_screen.dart have TextInputAction but NO corresponding onFieldSubmitted handlers. Users cannot submit forms by pressing the keyboard's action button. No autofillHints are configured for email/password fields, preventing password managers from auto-filling credentials. Text inputs don't automatically trim whitespace, which can cause validation errors with accidental spaces.",
+      "category": "usability",
+      "affected_components": [
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/auth/presentation/screens/forgot_password_screen.dart",
+        "lib/features/auth/presentation/screens/confirm_password_reset_screen.dart",
+        "lib/features/safety/presentation/screens/add_edit_trusted_contact_screen.dart"
+      ],
+      "screenshots": [],
+      "current_state": "TextFormField widgets have textInputAction set to TextInputAction.next and TextInputAction.done, but no onFieldSubmitted callback to handle the action. Email fields lack autofillHints: [AutofillHints.email]. Password fields lack autofillHints: [AutofillHints.password]. No AutofillGroup wrapper. Controller text is not trimmed before validation (0 instances of .trim() on controllers found in auth screens).",
+      "proposed_change": "Add onFieldSubmitted handlers to all text fields:\n\n```dart\nTextFormField(\n  controller: _emailController,\n  decoration: const InputDecoration(\n    labelText: 'Email',\n    prefixIcon: Icon(Icons.email),\n  ),\n  keyboardType: TextInputType.emailAddress,\n  textInputAction: TextInputAction.next,\n  autofillHints: const [AutofillHints.email],\n  onFieldSubmitted: (_) {\n    FocusScope.of(context).nextFocus();\n  },\n  validator: _validateEmail,\n)\n\n// For last field\nTextFormField(\n  controller: _passwordController,\n  textInputAction: TextInputAction.done,\n  autofillHints: const [AutofillHints.password],\n  onFieldSubmitted: (_) => _login(), // Submit on done\n)\n```\n\nWrap forms in AutofillGroup. Trim text in validators: `value?.trim() ?? ''`.",
+      "user_benefit": "Users can submit forms faster using keyboard actions instead of tapping submit buttons. Password managers can auto-fill credentials, eliminating manual typing errors. Automatic trimming prevents validation failures from accidental spaces. Overall form completion becomes faster and less error-prone, especially on mobile devices where typing is more difficult.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-007",
+      "type": "ui_ux_improvements",
+      "title": "Implement Swipe-to-Dismiss Actions for List Items",
+      "description": "Add Dismissible widgets to list items (trusted contacts, operation queue, notifications) with swipe-to-delete and swipe-to-action gestures for faster, more intuitive list management.",
+      "rationale": "No Dismissible widgets found in the codebase. List items in TrustedContactsScreen and OperationQueueScreen require tapping a menu button, then selecting an action - a multi-step process. Modern mobile apps use swipe gestures for quick actions (delete, archive, etc.) which is more intuitive and faster than drilling into menus. Swipe gestures are a core Material Design pattern that users expect.",
+      "category": "interaction",
+      "affected_components": [
+        "lib/features/safety/presentation/screens/trusted_contacts_screen.dart",
+        "lib/features/core/presentation/screens/operation_queue_screen.dart",
+        "lib/features/notifications/presentation/screens/notification_history_screen.dart",
+        "lib/features/core/presentation/widgets/operation_list_item.dart"
+      ],
+      "screenshots": [],
+      "current_state": "TrustedContactsScreen shows list items with PopupMenuButton for edit/delete actions. OperationListItem is a Card with inline retry/remove buttons but no swipe actions. NotificationHistoryScreen likely has similar menu-based actions. No swipe gestures available for quick actions. Users must tap menu \u2192 select action for each item.",
+      "proposed_change": "Wrap list items in Dismissible widgets:\n\n```dart\nListView.builder(\n  itemBuilder: (context, index) {\n    final contact = contacts[index];\n    return Dismissible(\n      key: Key(contact.id),\n      background: _buildSwipeLeftBackground(), // Delete action\n      secondaryBackground: _buildSwipeRightBackground(), // Edit action\n      onDismissed: (direction) {\n        if (direction == DismissDirection.startToEnd) {\n          _deleteContact(contact);\n        } else {\n          _editContact(contact);\n        }\n        ScaffoldMessenger.of(context).showSnackBar(\n          SnackBar(content: Text('${contact.name} removed')),\n        );\n      },\n      child: _buildContactTile(contact),\n    );\n  },\n)\n\nWidget _buildSwipeLeftBackground() {\n  return Container(\n    alignment: Alignment.centerRight,\n    padding: EdgeInsets.only(right: 20),\n    color: Colors.red,\n    child: Icon(Icons.delete, color: Colors.white),\n  );\n}\n```\n\nAdd undo functionality via SnackBar for destructive actions.",
+      "user_benefit": "Users can quickly delete or perform actions on list items with a single swipe gesture instead of tapping menus. This dramatically speeds up list management tasks. Undo functionality provides safety net for accidental deletions. The app feels more modern and intuitive, matching user expectations from other mobile apps. Particularly valuable for frequently-managed lists like trusted contacts and operation queue.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-008",
+      "type": "ui_ux_improvements",
+      "title": "Add Success Celebration Animations for Key User Achievements",
+      "description": "Implement animated feedback (confetti, checkmark animations, success toasts) when users complete important actions to provide emotional reward and reinforce successful outcomes.",
+      "rationale": "Current app shows basic feedback (SnackBar, navigation) but no celebration for successful actions. After login, signup, adding a trusted contact, or completing check-ins - users see no visual reward or acknowledgment. Success animations create positive emotional response, reinforce user confidence, and make the app feel more engaging. Key moments like first trusted contact added, successful check-in, or emergency contact setup deserve celebration.",
+      "category": "interaction",
+      "affected_components": [
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/safety/presentation/screens/add_edit_trusted_contact_screen.dart",
+        "lib/features/safety/presentation/screens/manual_check_in_screen.dart",
+        "lib/features/auth/presentation/widgets/token_refresh_overlay.dart"
+      ],
+      "screenshots": [],
+      "current_state": "After successful login, app navigates to home screen with no celebration. Signup completion navigates to verify email without acknowledgment. Adding trusted contact returns to list silently. Manual check-in completion shows basic confirmation. No confetti, checkmark animations, or success celebrations. No visual reward system for completing important safety setup tasks.",
+      "proposed_change": "Create celebration widgets and integrate at key moments:\n\n```dart\n// lib/core/widgets/success_checkmark.dart\nclass SuccessCheckmark extends StatefulWidget {\n  @override\n  Widget build(BuildContext context) {\n    return TweenAnimationBuilder(\n      duration: Duration(milliseconds: 800),\n      tween: Tween(begin: 0.0, end: 1.0),\n      builder: (context, value, child) {\n    return CustomPaint(\n      size: Size(100, 100),\n      painter: _CheckmarkPainter(progress: value),\n    );\n      },\n    );\n  }\n}\n\n// Confetti for key achievements\nimport 'package:confetti/confetti.dart';\n\nclass CelebrationOverlay extends StatelessWidget {\n  @override\n  Widget build(BuildContext context) {\n    return Stack(\n      children: [\n        Positioned.fill(\n          child: ConfettiWidget(\n            confettiController: _controller,\n            blastDirection: pi / 2,\n            emissionFrequency: 0.05,\n          ),\n        ),\n        SuccessCheckmark(),\n      ],\n    );\n  }\n}\n\n// After successful login\nif (authState.isLoggedIn) {\n  _showSuccessCelebration(context);\n  await Future.delayed(Duration(milliseconds: 1500));\n  ref.read(authNavigationNotifierProvider.notifier).navigateTo(AuthRoutes.home);\n}\n```",
+      "user_benefit": "Users feel rewarded and confident when completing important actions. Positive emotional reinforcement increases user engagement and satisfaction. Success celebrations make the app feel more polished and delightful. First-time setup (adding contacts, completing check-ins) becomes more encouraging, increasing completion rates. Particularly important for safety features where user confidence is crucial.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-009",
+      "type": "ui_ux_improvements",
+      "title": "Implement Responsive Layout Support for Tablets and Foldables",
+      "description": "Add LayoutBuilder and responsive breakpoints to adapt layouts for tablets, foldables, and large screens instead of using fixed layouts designed only for phones.",
+      "rationale": "No LayoutBuilder or responsive design patterns found in the codebase. All screens use fixed layouts optimized for phone screens. On tablets (iPad) and foldable devices, this results in narrow content columns with wasted space, poor use of larger screens, and awkward navigation. Material Design encourages adaptive layouts that use available space efficiently. As tablets and foldables become more common, responsive design is increasingly important.",
+      "category": "usability",
+      "affected_components": [
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/safety/presentation/screens/safety_hub_screen.dart",
+        "lib/features/home/presentation/screens/home_screen.dart",
+        "lib/features/safety/presentation/screens/trusted_contacts_screen.dart"
+      ],
+      "screenshots": [],
+      "current_state": "LoginScreen uses SingleChildScrollView with centered Column constrained to phone width. SafetyHubScreen uses CustomScrollView with single-column layout. HomeScreen shows cards in single column. No max-width constraints or adaptive layouts. On tablets, content stretches to fill screen or remains narrow with empty space on sides. No master-detail views or two-column layouts for larger screens.",
+      "proposed_change": "Implement responsive layout helper:\n\n```dart\n// lib/core/utils/responsive_helper.dart\nclass ResponsiveHelper {\n  static bool isMobile(BuildContext context) =>\n      MediaQuery.of(context).size.width < 600;\n  \n  static bool isTablet(BuildContext context) =>\n      MediaQuery.of(context).size.width >= 600 &&\n      MediaQuery.of(context).size.width < 1200;\n  \n  static bool isDesktop(BuildContext context) =>\n      MediaQuery.of(context).size.width >= 1200;\n  \n  static double getAdaptiveWidth(BuildContext context) {\n    final width = MediaQuery.of(context).size.width;\n    if (width >= 1200) return 800; // Max width for desktop\n    if (width >= 600) return 600;  // Max width for tablet\n    return double.infinity; // Full width for mobile\n  }\n}\n\n// In login_screen.dart\nWidget build(BuildContext context) {\n  final maxWidth = ResponsiveHelper.getAdaptiveWidth(context);\n  final isTablet = ResponsiveHelper.isTablet(context);\n  \n  return Scaffold(\n    body: Center(\n      child: Container(\n        constraints: BoxConstraints(maxWidth: maxWidth),\n        child: isTablet\n            ? Row(\n                children: [\n                  Expanded(child: _buildForm()),\n                  Expanded(child: _buildIllustration()),\n                ],\n              )\n            : SingleChildScrollView(child: _buildForm()),\n      ),\n    ),\n  );\n}\n\n// Safety hub - two column on tablet\nWidget build(BuildContext context) {\n  final isTablet = ResponsiveHelper.isTablet(context);\n  \n  return isTablet\n      ? Row(\n          children: [\n            Expanded(flex: 2, child: _buildSafetyStats()),\n            Expanded(flex: 3, child: _buildQuickActions()),\n          ],\n        )\n      : _buildMobileLayout();\n}\n```",
+      "user_benefit": "Tablet and foldable users get much better experience with optimized layouts. Content uses available screen space efficiently instead of appearing stretched or cramped. Multi-column layouts on tablets improve information density and reduce scrolling. App feels professional and polished across all device types. Future-proofs the app as large-screen phones and foldables become more common. Improves accessibility with better text and touch target sizing on larger screens.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "uiux-010",
+      "type": "ui_ux_improvements",
+      "title": "Create Enhanced Toast/SnackBar System with Rich Actions",
+      "description": "Build a comprehensive notification system with customizable toasts that support actions, icons, progress indicators, and persistent notifications instead of basic SnackBars.",
+      "rationale": "Current app uses basic ScaffoldMessenger.showSnackBar() with simple text messages (51 occurrences found). These basic toasts have limited functionality - no icons, no action buttons, no persistent options, no progress indicators. Users cannot take action directly from notifications. For async operations (sync, upload, download), there's no progress feedback in the notification. No way to undo actions or provide rich feedback directly from the toast.",
+      "category": "usability",
+      "affected_components": [
+        "lib/features/core/presentation/screens/operation_queue_screen.dart",
+        "lib/features/offline/presentation/widgets/sync_status_banner.dart",
+        "lib/features/auth/presentation/screens/login_screen.dart",
+        "lib/features/auth/presentation/screens/signup_screen.dart",
+        "lib/features/safety/presentation/screens/trusted_contacts_screen.dart"
+      ],
+      "screenshots": [],
+      "current_state": "All notifications use basic SnackBar:\n```dart\nScaffoldMessenger.of(context).showSnackBar(\n  const SnackBar(\n    content: Text('Operation queued for retry'),\n    duration: Duration(seconds: 2),\n  ),\n);\n```\nNo icons in toasts. No action buttons (undo, retry, view). No persistent notifications for important alerts. No progress indicators for long-running operations. Error toasts just show text without visual emphasis. No custom styling or branding.",
+      "proposed_change": "Create enhanced toast system:\n\n```dart\n// lib/core/widgets/enhanced_toast.dart\nclass EnhancedToast {\n  static void showSuccess(\n    BuildContext context,\n    String message, {\n    VoidCallback? onAction,\n    String? actionLabel,\n  }) {\n    ScaffoldMessenger.of(context).showSnackBar(\n      SnackBar(\n        content: Row(\n          children: [\n            Icon(Icons.check_circle, color: Colors.white),\n            SizedBox(width: 12),\n            Expanded(child: Text(message)),\n          ],\n        ),\n        backgroundColor: Colors.green,\n        action: onAction != null\n            ? SnackBarAction(\n                label: actionLabel ?? 'UNDO',\n                textColor: Colors.white,\n                onPressed: onAction,\n              )\n            : null,\n        duration: Duration(seconds: 4),\n      ),\n    );\n  }\n  \n  static void showProgress(\n    BuildContext context,\n    String message,\n    Stream<double> progressStream,\n  ) {\n    final controller = ScaffoldMessenger.of(context);\n    controller.showSnackBar(\n      SnackBar(\n        content: StreamBuilder<double>(\n          stream: progressStream,\n          builder: (context, snapshot) {\n            return Column(\n              mainAxisSize: MainAxisSize.min,\n              children: [\n                LinearProgressIndicator(value: snapshot.data),\n                SizedBox(height: 8),\n                Text(message),\n              ],\n            );\n          },\n        ),\n        duration: Duration(minutes: 5), // Persistent\n      ),\n    );\n  }\n  \n  static void showError(\n    BuildContext context,\n    String message, {\n    VoidCallback? onRetry,\n  }) {\n    ScaffoldMessenger.of(context).showSnackBar(\n      SnackBar(\n        content: Row(\n          children: [\n            Icon(Icons.error, color: Colors.white),\n            SizedBox(width: 12),\n            Expanded(child: Text(message)),\n          ],\n        ),\n        backgroundColor: Theme.of(context).colorScheme.error,\n        action: onRetry != null\n            ? SnackBarAction(\n                label: 'RETRY',\n                onPressed: onRetry,\n              )\n            : null,\n        duration: Duration(seconds: 5),\n      ),\n    );\n  }\n}\n\n// Usage\nEnhancedToast.showSuccess(\n  context,\n  'Contact added successfully',\n  onAction: () => _undoAddContact(),\n  actionLabel: 'UNDO',\n);\n```",
+      "user_benefit": "Users get rich, informative notifications with visual context (icons, colors). Action buttons in toasts allow immediate response (undo, retry) without navigating away. Progress indicators keep users informed about long-running operations. Success/error states are visually distinct. Persistent notifications for important alerts prevent missing critical information. Overall communication becomes clearer, more actionable, and more professional.",
+      "status": "draft",
+      "created_at": "2025-01-07T14:00:00.000Z"
+    },
+    {
+      "id": "sec-001",
+      "type": "security_hardening",
+      "title": "URGENT: Rotate and remove hardcoded production secrets from .env files",
+      "description": "The .env and .env.backup files contain actual production secrets, not placeholders: AWS_SECRET_ACCESS_KEY with a real key, LLM_API_KEY with active OpenAI API key (sk-proj-*), OPENAI_API_KEY with service account key, and SUPABASE_SERVICE_KEY with a valid JWT token. These are committed to the repository or accessible via worktrees.",
+      "rationale": "This is a CRITICAL security breach requiring immediate action. Hardcoded production secrets give attackers direct access to AWS resources (bills, data, infrastructure), OpenAI API (accumulating charges), and Supabase database (all user data). Even if .env is .gitignored, it exists in worktrees and backup files.",
+      "category": "secrets_management",
+      "severity": "critical",
+      "affectedFiles": [
+        ".env",
+        ".env.backup",
+        "test_supabase.py",
+        "test_embedding.py",
+        "aws-kb-mcp.sh"
+      ],
+      "vulnerability": "CWE-798: Use of Hard-coded Credentials",
+      "currentRisk": "Active AWS secret access key, OpenAI API keys, and Supabase service key are stored in plaintext. Test files also contain hardcoded API keys. Any exposure (git history, worktree access, file sharing) compromises production infrastructure and user data.",
+      "remediation": "IMMEDIATE ACTIONS:\n1) RIGHT NOW: Revoke/rotate AWS_SECRET_ACCESS_KEY in AWS IAM console\n2) RIGHT NOW: Revoke OpenAI API keys (sk-proj-5NQ4HzhxYtbj1flaGa2EtRT..., sk-svcacct-KtQ9Xks2drnEPi1LAwB1sxO6AE...)\n3) RIGHT NOW: Revoke Supabase service key (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)\n4) Replace all .env values with placeholder text (e.g., 'your_aws_secret_key')\n5) Add .env, .env.backup to .gitignore if not already there\n6) Remove test scripts with hardcoded secrets or use env variables\n7) Scan git history for these secrets using git-secrets or trufflehog\n8) Setup CI/CD secret scanning for future commits\n9) Use environment-specific configs loaded from secure storage (CI/CD secrets, AWS Secrets Manager)",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html",
+        "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Review_Web_Page_Content_for_Information_Leakage",
+        "https://docs.gitlab.com/ee/user/project/repository/secret_detection.html"
+      ],
+      "compliance": [
+        "SOC2",
+        "PCI-DSS",
+        "GDPR",
+        "HIPAA"
+      ]
+    },
+    {
+      "id": "sec-002",
+      "type": "security_hardening",
+      "title": "Remove .env files from Flutter app assets bundle to prevent secret extraction",
+      "description": "The pubspec.yaml includes '.env' and '.env.example' in the assets section (lines 179-181), causing Flutter to bundle these files into the mobile app binary. Anyone extracting the app bundle can access all environment variables and API keys.",
+      "rationale": "Mobile apps can be easily decompiled and assets extracted. Bundling .env files into the app binary means all secrets become accessible to attackers. Combined with the hardcoded production secrets in .env, this is an active data breach.",
+      "category": "secrets_management",
+      "severity": "critical",
+      "affectedFiles": [
+        "pubspec.yaml",
+        "lib/app/bootstrap.dart"
+      ],
+      "vulnerability": "CWE-312: Cleartext Storage of Sensitive Information",
+      "currentRisk": "Production AWS keys, OpenAI keys, and Supabase tokens are bundled into the app. Anyone can download the app, extract the .env from assets, and gain full access to cloud infrastructure and user data.",
+      "remediation": "1) IMMEDIATELY remove '.env' and '.env.example' from pubspec.yaml assets section\n2) Use --dart-define for compile-time environment variables in production builds\n3) For development, use .env files that are .gitignored and NOT bundled\n4) Add kReleaseMode check in bootstrap.dart to prevent .env loading in production\n5) Store runtime secrets in platform secure storage (Keychain/Keystore)\n6) Consider backend proxy for sensitive API calls instead of direct access",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/312.html",
+        "https://owasp.org/www-project-mobile-top-10/2024-risks/m1-improper-platform-usage",
+        "https://docs.flutter.dev/deployment/obfuscate#dart-define"
+      ],
+      "compliance": [
+        "SOC2",
+        "PCI-DSS",
+        "OWASP Mobile M1"
+      ]
+    },
+    {
+      "id": "sec-003",
+      "type": "security_hardening",
+      "title": "Add .env to .gitignore and implement secret detection pre-commit hooks",
+      "description": "The .gitignore file does not explicitly exclude .env files. While .env is commonly excluded, the lack of explicit blocking increases risk of accidental commits. Given the actual production secrets currently in .env, this is urgent.",
+      "rationale": "Defense in depth requires multiple layers of protection. Explicit .gitignore rules prevent accidental secret commits. Pre-commit hooks provide automated detection. The current .env contains real production credentials, making this an active breach risk.",
+      "category": "configuration",
+      "severity": "high",
+      "affectedFiles": [
+        ".gitignore",
+        ".env"
+      ],
+      "vulnerability": "CWE-312: Cleartext Storage of Sensitive Information",
+      "currentRisk": ".env with production secrets could be accidentally committed. .env.backup also contains secrets. No automated secret detection in commits. Worktrees may expose .env files.",
+      "remediation": "1) Add to .gitignore:\n   # Environment files with secrets\n   .env\n   .env.local\n   .env.*.local\n   .env.backup\n2) Install git-secrets: https://github.com/awslabs/git-secrets\n3) Add secret patterns: AWS_SECRET_ACCESS_KEY, sk-proj-, sk-svcacct-, eyJhbGci\n4) Setup pre-commit hook: git secrets --install\n5) Run: git secrets --register-aws (to detect AWS keys)\n6) Scan history: git secrets --scan-history\n7) Consider GitHub Secret Scanning or GitLab Secret Detection",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/312.html",
+        "https://github.com/awslabs/git-secrets",
+        "https://github.com/trufflesecurity/trufflehog"
+      ],
+      "compliance": [
+        "SOC2",
+        "PCI-DSS"
+      ]
+    },
+    {
+      "id": "sec-004",
+      "type": "security_hardening",
+      "title": "Reduce excessive debug logging of authentication tokens and session data",
+      "description": "The codebase contains extensive debugPrint() statements in authentication flows that log session expiry times, token refresh schedules, connectivity status, and authentication states. Token manager alone has 50+ debug statements.",
+      "rationale": "While debugPrint() only outputs in debug mode, logs may be captured by crash reporting tools, logging SDKs, or device monitoring. Excessive auth logging increases risk of token leakage, session hijacking, and exposing user activity patterns.",
+      "category": "data_protection",
+      "severity": "medium",
+      "affectedFiles": [
+        "lib/features/auth/infrastructure/services/token_manager.dart",
+        "lib/features/auth/infrastructure/logging/token_audit_logger.dart",
+        "lib/app/bootstrap.dart",
+        "lib/features/auth/data/datasources/auth_remote_data_source_impl.dart"
+      ],
+      "vulnerability": "CWE-532: Insertion of Sensitive Information into Log File",
+      "currentRisk": "Token lifecycle, session expiry, auth state transitions, and connectivity patterns are logged. In debug builds or crash reports, this reveals user authentication patterns and token validity windows.",
+      "remediation": "1) Audit all debugPrint() for sensitive data (tokens, emails, timing)\n2) Remove/sanitize logs containing auth state or timing info\n3) Replace with proper logging service that redacts in production\n4) Use kDebugMode guards: if (kDebugMode) debugPrint(...)\n5) Ensure CloudWatch excludes sensitive fields\n6) Configure crash reporting to exclude auth logs",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/532.html",
+        "https://owasp.org/www-project-mobile-top-10/2024-risks/M7-Insecure-Logging",
+        "https://docs.flutter.dev/testing/code-debugging#logging"
+      ],
+      "compliance": [
+        "SOC2",
+        "PCI-DSS",
+        "GDPR"
+      ]
+    },
+    {
+      "id": "sec-005",
+      "type": "security_hardening",
+      "title": "Implement SSL certificate pinning to prevent man-in-the-middle attacks",
+      "description": "The application uses Dio for API communication but does not implement SSL certificate pinning. This creates vulnerability to MITM attacks, especially for travelers using public WiFi networks where attackers may have compromised device CA stores.",
+      "rationale": "Without certificate pinning, the app trusts any certificate signed by a trusted CA. Compromised CAs, malicious apps, or attackers on public WiFi can intercept communications. Travelers using airport/cafe WiFi are at heightened risk. Auth tokens and personal data could be stolen.",
+      "category": "data_protection",
+      "severity": "high",
+      "affectedFiles": [
+        "lib/core/api/client/api_client.dart",
+        "lib/core/api/interceptors/auth_interceptor.dart"
+      ],
+      "vulnerability": "CWE-295: Improper Certificate Validation",
+      "currentRisk": "No certificate pinning for API communications to soloadventurer.com, AWS Cognito, or Supabase. Auth tokens, travel plans, and personal data vulnerable to interception on compromised networks.",
+      "remediation": "1) Implement certificate pinning using dio's SecurityContext or http_certificate_pinning package\n2) Extract leaf certificates from api.soloadventurer.com, cognito-idp.us-east-1.amazonaws.com, *.supabase.co\n3) Store certificate hashes in app\n4) Validate server certs against pinned hashes on every request\n5) Support pin updates via app updates (avoid out-of-date pins)\n6) Consider Public Key Pinning for better rotation\n7) Test with mitmproxy to verify pinning works",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/295.html",
+        "https://owasp.org/www-project-mobile-app-security/",
+        "https://pub.dev/packages/http_certificate_pinning",
+        "https://developer.apple.com/news/?id=1222022"
+      ],
+      "compliance": [
+        "OWASP Mobile M3",
+        "PCI-DSS"
+      ]
+    }
+  ],
+  "project_context": {
+    "existing_features": [],
+    "tech_stack": [],
+    "target_audience": "Solo travelers who plan and manage their own trips, typically aged 25-45, tech-savvy, safety-conscious, and seeking adventure while maintaining independence",
+    "planned_features": [
+      "Travel Journal with Media",
+      "Error Tracking Integration",
+      "Safety Check-in & Location Sharing",
+      "Google Maps Integration with Proper Navigation",
+      "AI-Powered Solo Recommendations",
+      "Reliable Operation Queue with Persistence",
+      "Traveler Community & Connections",
+      "Offline-First Core Architecture",
+      "Analytics & Event Tracking",
+      "Sync & Conflict Resolution System",
+      "Crowdsourced Place Verification System",
+      "Performance Optimization for Large Trips",
+      "Solo-Specific Destination Discovery",
+      "Trip Planning Workflow UI",
+      "Privacy-First Safety Features",
+      "Freemium Pricing Model Implementation",
+      "Robust Authentication & Token Refresh",
+      "Centralized Document Storage Management"
+    ]
+  },
+  "summary": {
+    "total_ideas": 15,
+    "by_type": {
+      "code_improvements": 5,
+      "ui_ux_improvements": 5,
+      "security_hardening": 5
+    },
+    "by_status": {
+      "draft": 15
+    }
+  },
+  "generated_at": "2026-01-07T14:01:17.525683",
+  "updated_at": "2026-01-07T14:01:17.525699"
+}

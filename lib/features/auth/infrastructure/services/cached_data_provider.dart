@@ -197,7 +197,8 @@ class CachedDataProvider {
         try {
           cachedAt = DateTime.parse(cachedAtStr);
         } catch (e) {
-          debugPrint('CachedDataProvider: Failed to parse cached_at timestamp: $e');
+          debugPrint(
+              'CachedDataProvider: Failed to parse cached_at timestamp: $e');
         }
       }
 
@@ -205,7 +206,8 @@ class CachedDataProvider {
       final isFresh = cachedAt != null &&
           DateTime.now().difference(cachedAt) < _maxCacheAge;
 
-      debugPrint('CachedDataProvider: Retrieved cached user profile: ${user.username}, '
+      debugPrint(
+          'CachedDataProvider: Retrieved cached user profile: ${user.username}, '
           'isFresh: $isFresh, cachedAt: $cachedAt');
 
       return CachedDataResult<User>.cached(
@@ -296,7 +298,8 @@ class CachedDataProvider {
     final isOffline = await _offlineAuthManager.isCurrentlyOffline();
 
     if (isOffline) {
-      debugPrint('CachedDataProvider: Cannot update user profile while offline');
+      debugPrint(
+          'CachedDataProvider: Cannot update user profile while offline');
 
       throw OfflineException(
         message: 'Cannot update user profile while offline',
@@ -326,7 +329,7 @@ class CachedDataProvider {
       debugPrint('Stack trace: $stackTrace');
 
       throw AuthException(
-        message: 'Failed to update user profile: ${e.toString()}',
+        'Failed to update user profile: ${e.toString()}',
         originalError: e,
       );
     }

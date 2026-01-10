@@ -1,6 +1,5 @@
 import 'dart:async';
-import 'package:soloadventurer/core/error/exceptions.dart';
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_local_data_source.dart';
@@ -24,7 +23,8 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
   final TagRemoteDataSource _tagRemoteDataSource;
 
   final _conflictController = StreamController<SyncConflict>.broadcast();
-  final _resolutionController = StreamController<ConflictResolutionResult>.broadcast();
+  final _resolutionController =
+      StreamController<ConflictResolutionResult>.broadcast();
 
   final List<SyncConflict> _conflicts = [];
   final List<ConflictResolutionResult> _resolutionHistory = [];
@@ -98,7 +98,8 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
     required Map<String, dynamic> remoteVersion,
   }) async {
     final localUpdatedAt = DateTime.parse(localVersion['updated_at'] as String);
-    final remoteUpdatedAt = DateTime.parse(remoteVersion['updated_at'] as String);
+    final remoteUpdatedAt =
+        DateTime.parse(remoteVersion['updated_at'] as String);
 
     // Check if both versions were modified around the same time (potential conflict)
     final timeDifference = localUpdatedAt.difference(remoteUpdatedAt).abs();
@@ -230,7 +231,7 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
       }
 
       // Apply the resolved version
-      await _applyResolution(conflict, finalVersion!);
+      await _applyResolution(conflict, finalVersion);
 
       // Update conflict status to resolved
       final resolvedConflict = conflict.copyWith(
@@ -350,9 +351,15 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
   @override
   Future<ConflictResolutionStatistics> getStatistics() async {
     final total = _conflicts.length;
-    final resolved = _conflicts.where((c) => c.status == ConflictResolutionStatus.resolved).length;
-    final failed = _conflicts.where((c) => c.status == ConflictResolutionStatus.failed).length;
-    final ignored = _conflicts.where((c) => c.status == ConflictResolutionStatus.ignored).length;
+    final resolved = _conflicts
+        .where((c) => c.status == ConflictResolutionStatus.resolved)
+        .length;
+    final failed = _conflicts
+        .where((c) => c.status == ConflictResolutionStatus.failed)
+        .length;
+    final ignored = _conflicts
+        .where((c) => c.status == ConflictResolutionStatus.ignored)
+        .length;
     final pending = _conflicts.where((c) => !c.isResolved).length;
 
     // Calculate most common conflict type
@@ -363,9 +370,7 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
     }
     final mostCommonType = typeCounts.entries.isEmpty
         ? null
-        : typeCounts.entries
-            .reduce((a, b) => a.value > b.value ? a : b)
-            .key;
+        : typeCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key;
 
     // Calculate average resolution time
     final resolvedConflicts =
@@ -374,7 +379,8 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
         ? Duration.zero
         : Duration(
             microseconds: resolvedConflicts
-                    .map((c) => c.resolvedAt!.difference(c.detectedAt).inMicroseconds)
+                    .map((c) =>
+                        c.resolvedAt!.difference(c.detectedAt).inMicroseconds)
                     .reduce((a, b) => a + b) ~/
                 resolvedConflicts.length,
           );
@@ -441,7 +447,8 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
   // Private helper methods
 
   void _updateConflict(SyncConflict conflict) {
-    final index = _conflicts.indexWhere((c) => c.conflictId == conflict.conflictId);
+    final index =
+        _conflicts.indexWhere((c) => c.conflictId == conflict.conflictId);
     if (index != -1) {
       _conflicts[index] = conflict;
     }
@@ -615,7 +622,9 @@ class ConflictResolutionServiceImpl implements ConflictResolutionService {
       default:
         throw ValidationException(
           message: 'Unknown entity type: $entity',
-          errors: {'entity_type': ['Unknown type']},
+          errors: {
+            'entity_type': ['Unknown type']
+          },
         );
     }
   }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import '../../domain/models/entity_version.dart';
 import '../../domain/models/conflict_info.dart';
 import '../../domain/services/conflict_detector.dart';
@@ -21,9 +20,10 @@ class ConflictDetectorImpl extends ConflictDetector {
   /// Creates a new [ConflictDetectorImpl] with the given configuration
   ConflictDetectorImpl({
     ConflictDetectionConfig? config,
-  }) : config = config ?? ConflictDetectionConfig.defaultConfig(
-          deviceId: 'default-device',
-        ) {
+  }) : config = config ??
+            ConflictDetectionConfig.defaultConfig(
+              deviceId: 'default-device',
+            ) {
     _conflictStreamController = StreamController<ConflictInfo>.broadcast();
   }
 
@@ -47,9 +47,9 @@ class ConflictDetectorImpl extends ConflictDetector {
 
     // Check if there's actually a conflict
     if (!isInConflict(
-          localVersion: localVersion,
-          remoteVersion: remoteVersion,
-        )) {
+      localVersion: localVersion,
+      remoteVersion: remoteVersion,
+    )) {
       return null; // No conflict detected
     }
 
@@ -185,9 +185,9 @@ class ConflictDetectorImpl extends ConflictDetector {
       }
       // If no hash or same hash, no conflict
       if (areTimestampsConcurrent(
-            timestamp1: local.lastModified,
-            timestamp2: remote.lastModified,
-          )) {
+        timestamp1: local.lastModified,
+        timestamp2: remote.lastModified,
+      )) {
         return ConflictType.timestampConflict;
       }
     }
@@ -196,9 +196,9 @@ class ConflictDetectorImpl extends ConflictDetector {
     if (local.version != remote.version) {
       // If versions differ but are concurrent, it's a diverged conflict
       if (areTimestampsConcurrent(
-            timestamp1: local.lastModified,
-            timestamp2: remote.lastModified,
-          )) {
+        timestamp1: local.lastModified,
+        timestamp2: remote.lastModified,
+      )) {
         return ConflictType.diverged;
       }
 
@@ -325,7 +325,8 @@ class ConflictDetectorImpl extends ConflictDetector {
         if (localVersion.dataHash != null && remoteVersion.dataHash != null) {
           if (localVersion.dataHash != remoteVersion.dataHash) {
             // Different content - use timestamp to determine newer
-            return localVersion.lastModified.compareTo(remoteVersion.lastModified);
+            return localVersion.lastModified
+                .compareTo(remoteVersion.lastModified);
           }
           return 0; // Same content
         }
@@ -362,9 +363,9 @@ class ConflictDetectorImpl extends ConflictDetector {
     if (local.version != remote.version) {
       // If timestamps are concurrent, it's definitely a conflict
       if (areTimestampsConcurrent(
-            timestamp1: local.lastModified,
-            timestamp2: remote.lastModified,
-          )) {
+        timestamp1: local.lastModified,
+        timestamp2: remote.lastModified,
+      )) {
         return true;
       }
     }
@@ -379,9 +380,9 @@ class ConflictDetectorImpl extends ConflictDetector {
   ) {
     // If timestamps are concurrent, check content
     if (areTimestampsConcurrent(
-          timestamp1: local.lastModified,
-          timestamp2: remote.lastModified,
-        )) {
+      timestamp1: local.lastModified,
+      timestamp2: remote.lastModified,
+    )) {
       // If content hashing is enabled and hashes differ, conflict
       if (config.useContentHashing &&
           local.dataHash != null &&

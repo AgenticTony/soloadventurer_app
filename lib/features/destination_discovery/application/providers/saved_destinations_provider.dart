@@ -1,9 +1,20 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/saved_destination.dart';
 import '../../domain/models/destination.dart';
-import '../../domain/repositories/destination_repository.dart';
 import '../state/saved_destinations_state.dart';
+import 'destination_repository_provider.dart';
 
+part 'saved_destinations_provider.g.dart';
+
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Dependencies injected via ref.watch() in build() method
+/// - Family provider with userId parameter in build()
+/// - AutoDispose enabled via @Riverpod annotation
+/// - build() returns Future<T> not AsyncValue<T>
+/// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+/// - Constructor auto-load logic moved to build() method
+///
 /// Provider for saved destinations state management
 ///
 /// This provider manages the state of user's saved destinations including:
@@ -11,6 +22,9 @@ import '../state/saved_destinations_state.dart';
 /// - Loading and error states
 /// - Save/unsave operations
 /// - Filtering by save type (wishlist or trip)
+///
+/// Riverpod 3.0: Uses @riverpod annotation with AsyncNotifier pattern.
+/// Auto-dispose behavior for family provider.
 ///
 /// Usage:
 /// ```dart
@@ -38,61 +52,24 @@ import '../state/saved_destinations_state.dart';
 /// ```
 ///
 /// The [userId] parameter is the user ID to manage saved destinations for.
-final savedDestinationsProvider = StateNotifierProvider.autoDispose
-    .family<SavedDestinationsNotifier, AsyncValue<SavedDestinationsState>,
-        String>(
-  (ref, userId) {
+@riverpod
+class SavedDestinations extends _$SavedDestinations {
+  /// Initialize the notifier and auto-load saved destinations
+  ///
+  /// Riverpod 3.0: build() returns Future<SavedDestinationsState>
+  /// Family provider parameter (userId) is passed here
+  /// AutoDispose behavior: provider will be disposed when no longer watched
+  @override
+  Future<SavedDestinationsState> build(String userId) async {
+    // Get dependencies via ref.watch()
     final repository = ref.watch(destinationRepositoryProvider);
-    return SavedDestinationsNotifier(repository, userId);
-  },
-);
 
-/// Notifier for managing saved destinations state
-///
-/// This notifier handles all operations for saved destinations:
-/// - Loading saved destinations for a user
-/// - Saving destinations to wishlist or trips
-/// - Unsaving destinations
-/// - Updating notes on saved destinations
-/// - Checking if destinations are saved
-/// - Filtering by save type
-class SavedDestinationsNotifier
-    extends StateNotifier<AsyncValue<SavedDestinationsState>> {
-  final DestinationRepository _repository;
-  final String _userId;
+    // Auto-load saved destinations on build
+    final savedDestinations = await repository.getSavedDestinations(userId);
 
-  /// Creates a new [SavedDestinationsNotifier]
-  ///
-  /// The [repository] parameter is required for performing data operations.
-  /// The [userId] parameter is the ID of the user to manage saved destinations for.
-  SavedDestinationsNotifier(this._repository, this._userId)
-      : super(const AsyncValue.data(SavedDestinationsState.initial())) {
-    // Auto-load saved destinations on creation
-    loadSavedDestinations();
-  }
-
-  /// Load saved destinations for the user
-  ///
-  /// The optional [saveType] parameter filters by save type (wishlist or trip).
-  /// When null, loads all saved destinations regardless of type.
-  ///
-  /// Throws an exception if loading fails.
-  ///
-  /// Note: This is automatically called when the notifier is created.
-  Future<void> loadSavedDestinations({SaveType? saveType}) async {
-    state = const AsyncValue.loading();
-
-    try {
-      final savedDestinations =
-          await _repository.getSavedDestinations(_userId, saveType: saveType);
-
-      state = AsyncValue.data(SavedDestinationsState(
-        savedDestinations: savedDestinations,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+    return SavedDestinationsState(
+      savedDestinations: savedDestinations,
+    );
   }
 
   /// Refresh the saved destinations
@@ -105,22 +82,27 @@ class SavedDestinationsNotifier
   ///
   /// Throws an exception if refreshing fails.
   Future<void> refresh({SaveType? saveType}) async {
-    // Preserve current state while loading if available
-    if (state.hasValue && state.value!.savedDestinations.isNotEmpty) {
-      state = AsyncValue.data(state.value!);
+    // Get userId from current state and repository
+    final currentState = state.value;
+    if (currentState == null || currentState.savedDestinations.isEmpty) {
+      return;
     }
 
-    try {
+    final userId = currentState.savedDestinations.first.userId;
+    final repository = ref.read(destinationRepositoryProvider);
+
+    // Set loading state
+    state = const AsyncValue.loading();
+
+    // Load saved destinations
+    state = await AsyncValue.guard(() async {
       final savedDestinations =
-          await _repository.getSavedDestinations(_userId, saveType: saveType);
+          await repository.getSavedDestinations(userId, saveType: saveType);
 
-      state = AsyncValue.data(SavedDestinationsState(
+      return SavedDestinationsState(
         savedDestinations: savedDestinations,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+      );
+    });
   }
 
   /// Save a destination to wishlist or trip
@@ -140,9 +122,11 @@ class SavedDestinationsNotifier
     String? tripId,
     String? notes,
   }) async {
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
     // Create a temporary ID for the new saved destination
-    // The actual ID will be generated by the backend
-    final tempId = '${userId}_${destination.id}_${DateTime.now().millisecondsSinceEpoch}';
+    final tempId = userId + '_' + destination.id + '_' + DateTime.now().millisecondsSinceEpoch.toString();
 
     final savedDestination = SavedDestination(
       id: tempId,
@@ -155,26 +139,20 @@ class SavedDestinationsNotifier
       updatedAt: DateTime.now(),
     );
 
-    try {
-      // Call repository to save
-      final result = await _repository.saveDestination(savedDestination);
+    // Call repository to save
+    final result = await repository.saveDestination(savedDestination);
 
-      // Update state with the new saved destination
-      if (state.hasValue) {
-        final currentState = state.value!;
-        final updatedList = [...currentState.savedDestinations, result];
+    // Update state with the new saved destination
+    if (state.hasValue) {
+      final currentState = state.value!;
+      final updatedList = [...currentState.savedDestinations, result];
 
-        state = AsyncValue.data(currentState.copyWith(
-          savedDestinations: updatedList,
-        ));
-      }
-
-      return result;
-    } catch (error, stackTrace) {
-      // Don't change state on error, just rethrow
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
+      state = AsyncValue.data(currentState.copyWith(
+        savedDestinations: updatedList,
+      ));
     }
+
+    return result;
   }
 
   /// Remove a destination from saved destinations
@@ -190,42 +168,39 @@ class SavedDestinationsNotifier
     required String destinationId,
     SaveType? saveType,
   }) async {
-    try {
-      // Call repository to unsave
-      await _repository.unsaveDestination(
-        destinationId: destinationId,
-        userId: userId,
-        saveType: saveType,
-      );
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
 
-      // Update state by removing the unsaved destination(s)
-      if (state.hasValue) {
-        final currentState = state.value!;
+    // Call repository to unsave
+    await repository.unsaveDestination(
+      destinationId: destinationId,
+      userId: userId,
+      saveType: saveType,
+    );
 
-        // Filter out the removed destinations
-        final updatedList = currentState.savedDestinations.where((item) {
-          // Keep item if it doesn't match the destinationId
-          if (item.destination.id != destinationId) {
-            return true;
-          }
+    // Update state by removing the unsaved destination(s)
+    if (state.hasValue) {
+      final currentState = state.value!;
 
-          // If saveType is specified, remove only matching type
-          if (saveType != null) {
-            return item.saveType != saveType;
-          }
+      // Filter out the removed destinations
+      final updatedList = currentState.savedDestinations.where((item) {
+        // Keep item if it doesn't match the destinationId
+        if (item.destination.id != destinationId) {
+          return true;
+        }
 
-          // If saveType is not specified, remove all matching destinations
-          return false;
-        }).toList();
+        // If saveType is specified, remove only matching type
+        if (saveType != null) {
+          return item.saveType != saveType;
+        }
 
-        state = AsyncValue.data(currentState.copyWith(
-          savedDestinations: updatedList,
-        ));
-      }
-    } catch (error, stackTrace) {
-      // Don't change state on error, just rethrow
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
+        // If saveType is not specified, remove all matching destinations
+        return false;
+      }).toList();
+
+      state = AsyncValue.data(currentState.copyWith(
+        savedDestinations: updatedList,
+      ));
     }
   }
 
@@ -236,6 +211,9 @@ class SavedDestinationsNotifier
   ///
   /// Throws an exception if the update fails.
   Future<void> updateNotes(String destinationId, String? notes) async {
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
     if (!state.hasValue) {
       return;
     }
@@ -248,26 +226,20 @@ class SavedDestinationsNotifier
       throw Exception('Destination not found in saved list');
     }
 
-    try {
-      // Create updated saved destination with new notes
-      final updated = savedDest.withNotes(notes);
+    // Create updated saved destination with new notes
+    final updated = savedDest.withNotes(notes);
 
-      // Save the updated version
-      await _repository.saveDestination(updated);
+    // Save the updated version
+    await repository.saveDestination(updated);
 
-      // Update state
-      final updatedList = currentState.savedDestinations.map((item) {
-        return item.destination.id == destinationId ? updated : item;
-      }).toList();
+    // Update state
+    final updatedList = currentState.savedDestinations.map((item) {
+      return item.destination.id == destinationId ? updated : item;
+    }).toList();
 
-      state = AsyncValue.data(currentState.copyWith(
-        savedDestinations: updatedList,
-      ));
-    } catch (error, stackTrace) {
-      // Don't change state on error, just rethrow
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+    state = AsyncValue.data(currentState.copyWith(
+      savedDestinations: updatedList,
+    ));
   }
 
   /// Clear the saved destinations state

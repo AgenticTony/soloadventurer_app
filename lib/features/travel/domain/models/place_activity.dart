@@ -9,7 +9,6 @@ part 'place_activity.g.dart';
 /// based on their interests, location, and weather conditions.
 @freezed
 class PlaceActivity with _$PlaceActivity {
-  const PlaceActivity._();
 
   /// Creates a place activity
   ///
@@ -64,6 +63,9 @@ class PlaceActivity with _$PlaceActivity {
     if (cost == 0) return 'Free';
     return '\$${cost!.toStringAsFixed(2)}';
   }
+
+  // Private constructor for freezed getters
+  const PlaceActivity._();
 }
 
 /// Travel interest category

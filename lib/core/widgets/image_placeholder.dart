@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// A collection of optimized placeholder widgets for image loading states.
@@ -244,7 +243,7 @@ class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
 class _GradientRotation extends GradientTransform {
   final double angle;
 
-  _GradientRotation(this.angle);
+  const _GradientRotation(this.angle);
 
   @override
   Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
@@ -332,9 +331,10 @@ class _ColorPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = backgroundColor ??
-        Theme.of(context).primaryColor.withOpacity(0.2);
-    final icColor = iconColor ?? Theme.of(context).primaryColor.withOpacity(0.5);
+    final bgColor =
+        backgroundColor ?? Theme.of(context).primaryColor.withOpacity(0.2);
+    final icColor =
+        iconColor ?? Theme.of(context).primaryColor.withOpacity(0.5);
 
     return Container(
       width: width,

@@ -25,7 +25,6 @@ class OperationQueueState with _$OperationQueueState {
     @Default(0) int failedCount,
   }) = _OperationQueueState;
 
-  const OperationQueueState._();
 }
 
 /// Provider that exposes the operation queue state to the UI

@@ -1,0 +1,28 @@
+{
+  "file_path": "test/utils/performance/performance_test_utils.dart",
+  "main_branch_history": [],
+  "task_views": {
+    "006-performance-optimization-for-large-trips": {
+      "task_id": "006-performance-optimization-for-large-trips",
+      "branch_point": {
+        "commit_hash": "20dd5b9cdb7f9994913f6179576f194a9e9883e1",
+        "content": "",
+        "timestamp": "2026-01-05T12:48:39.346326"
+      },
+      "worktree_state": {
+        "content": "/// Performance testing utilities for generating large test datasets\n///\n/// This library provides utilities for generating large amounts of test data\n/// (500+ items) for performance benchmarking and optimization testing.\n///\n/// ## Usage\n///\n/// ### Generate Large Trip Lists\n/// ```dart\n/// import 'package:soloadventurer_test/utils/performance/performance_test_utils.dart';\n///\n/// // Generate 500 trips for list rendering tests\n/// final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);\n///\n/// // Generate geographically distributed trips for map tests\n/// final mapTrips = PerformanceTestDataGenerator.generateGeographicallyDistributedTrips(count: 500);\n///\n/// // Generate clustered trips for clustering algorithm tests\n/// final clusteredTrips = PerformanceTestDataGenerator.generateClusteredTrips(count: 100);\n/// ```\n///\n/// ### Generate Photo Data for Gallery Tests\n/// ```dart\n/// // Generate photo URLs for testing image loading\n/// final photoUrls = PhotoDataGenerator.generatePhotoUrls(count: 500);\n///\n/// // Generate detailed photo metadata for list rendering tests\n/// final photoMetadata = PhotoDataGenerator.generatePhotoMetadata(count: 500);\n///\n/// // Generate trip-specific photos\n/// final tripPhotos = PhotoDataGenerator.generateTripPhotoUrls(tripId: 'trip-123', photoCount: 200);\n/// ```\n///\n/// ### Test Data Estimation\n/// ```dart\n/// // Estimate memory usage for photo caching\n/// final memoryBytes = PhotoDataGenerator.estimateMemoryUsage(photoCount: 500);\n/// print('Estimated memory: ${(memoryBytes / 1024 / 1024).toStringAsFixed(2)} MB');\n/// ```\n///\n/// ## Performance Test Patterns\n///\n/// ### List Rendering Performance\n/// ```dart\n/// testWidgets('Trip list renders smoothly with 500+ items', (tester) async {\n///   final trips = PerformanceTestDataGenerator.generateLargeTripList(count: 500);\n///\n///   final stopwatch = Stopwatch()..start();\n///\n///   await tester.pumpWidget(\n///     MaterialApp(\n///       home: TripListScreen(trips: trips),\n///     ),\n///   );\n///\n///   await tester.pumpAndSettle();\n///   stopwatch.stop();\n///\n///   expect(stopwatch.elapsedMilliseconds, lessThan(3000)); // Should render in < 3s\n/// });\n/// ```\n///\n/// ### Map Marker Performance\n/// ```dart\n/// test('Map renders 500+ markers efficiently', () async {\n///   final trips = PerformanceTestDataGenerator.generateGeographicallyDistributedTrips(count: 500);\n///\n///   final stopwatch = Stopwatch()..start();\n///\n///   // Add all markers to map\n///   for (final trip in trips) {\n///     await mapController.addMarker(\n///       LatLng(trip.latitude!, trip.longitude!),\n///     );\n///   }\n///\n///   stopwatch.stop();\n///\n///   expect(stopwatch.elapsedMilliseconds, lessThan(2000)); // Should add markers in < 2s\n/// });\n/// ```\n///\n/// ### Memory Usage Testing\n/// ```dart\n/// test('Photo gallery stays within memory limits', () async {\n///   final photos = PhotoDataGenerator.generatePhotoUrls(count: 500);\n///   final initialMemory = await getMemoryUsage();\n///\n///   // Load all photos\n///   for (final url in photos) {\n///     await imageCache.loadImage(url);\n///   }\n///\n///   final finalMemory = await getMemoryUsage();\n///   final memoryDelta = finalMemory - initialMemory;\n///\n///   expect(memoryDelta, lessThan(200 * 1024 * 1024)); // Less than 200MB increase\n/// });\n/// ```\n\nlibrary;\n\nexport 'test_data_generator.dart';\nexport 'photo_data_generator.dart';\nexport 'performance_reporter.dart';\n",
+        "last_modified": "2026-01-05T12:48:42.798364"
+      },
+      "task_intent": {
+        "title": "Performance Optimization for Large Trips",
+        "description": "Optimize app performance for handling large, complex trips with hundreds of locations, activities, and photos",
+        "from_plan": true
+      },
+      "commits_behind_main": 203,
+      "status": "active",
+      "merged_at": null
+    }
+  },
+  "created_at": "2026-01-05T12:48:42.541168",
+  "last_updated": "2026-01-05T12:48:42.554311"
+}

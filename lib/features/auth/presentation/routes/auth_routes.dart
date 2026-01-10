@@ -25,5 +25,4 @@ class AuthRoutes {
   static const cloudWatchTest = '/cloudwatch-test';
 
   /// Private constructor to prevent instantiation
-  const AuthRoutes._();
 }

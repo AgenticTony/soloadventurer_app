@@ -144,6 +144,7 @@
 ///   onStageChanged: (stage) => debugPrint('Stage: $stage'),
 /// )
 /// ```
+library;
 
 export 'virtual_list_view.dart';
 export 'virtual_grid_view.dart';

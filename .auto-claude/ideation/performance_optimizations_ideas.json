@@ -1,0 +1,107 @@
+{
+  "performance_optimizations": [
+    {
+      "id": "perf-001",
+      "type": "performance_optimizations",
+      "title": "Remove Duplicate Map Libraries to Reduce Bundle Size by ~2MB",
+      "description": "The app includes both google_maps_flutter (2.6.0) and flutter_map (8.1.0), doubling the map library bundle size. Only one map library should be used based on the chosen map provider.",
+      "rationale": "Both map libraries are included in pubspec.yaml but the app should only use one. google_maps_flutter uses Google Maps API (requires API key) while flutter_map uses OpenStreetMap (free). Including both adds unnecessary ~2MB to the app bundle.",
+      "category": "bundle_size",
+      "impact": "high",
+      "affectedAreas": [
+        "pubspec.yaml",
+        "lib/features/travel/",
+        "docs/PROJECT_PLAN.md"
+      ],
+      "currentMetric": "Bundle includes both google_maps_flutter (~1.2MB) and flutter_map (~800KB) = ~2MB overhead",
+      "expectedImprovement": "~2MB reduction in bundle size (~15-20% smaller app), faster initial app launch, and simplified map integration",
+      "implementation": "1. Audit codebase to identify which map library is actually used\n2. Remove the unused library from pubspec.yaml\n3. Remove any unused imports from map-related files\n4. Run flutter pub get to update dependencies\n5. Test map functionality across all travel features\n6. Update documentation to reflect chosen map provider",
+      "tradeoffs": "If switching from Google Maps to flutter_map, lose Google Maps features (Street View, indoor maps). If switching to Google Maps, need API key and potential usage costs.",
+      "estimatedEffort": "small"
+    },
+    {
+      "id": "perf-002",
+      "type": "performance_optimizations",
+      "title": "Fix Memory Leak in Background Token Refresh Service",
+      "description": "The background token refresh callbackDispatcher creates a new ProviderContainer on every execution without proper disposal, causing memory leaks in background tasks.",
+      "rationale": "In lib/features/auth/infrastructure/services/background_token_refresh_service.dart:125, a new ProviderContainer is created but never disposed. Each background refresh (every 15-45 minutes) leaks memory from providers, services, and cached data.",
+      "category": "memory",
+      "impact": "high",
+      "affectedAreas": [
+        "lib/features/auth/infrastructure/services/background_token_refresh_service.dart"
+      ],
+      "currentMetric": "New ProviderContainer created every 15-45 minutes without disposal, leaking ~5-10MB per execution",
+      "expectedImprovement": "Eliminate memory leaks in background tasks, reduce long-term memory growth by ~50-100MB over 24 hours, improve app stability",
+      "implementation": "1. Wrap ProviderContainer usage in try-finally block\n2. Add container.dispose() in finally clause after all operations complete\n3. Use ref.read() instead of creating new containers where possible\n4. Add memory profiling to verify fix\n5. Consider using a singleton container for background tasks",
+      "tradeoffs": "Need to ensure all async operations complete before disposal, may require careful error handling to prevent premature container disposal",
+      "estimatedEffort": "small"
+    },
+    {
+      "id": "perf-003",
+      "type": "performance_optimizations",
+      "title": "Remove Unused graphql_flutter Dependency",
+      "description": "The graphql_flutter dependency (5.2.0-beta.8) is included but not used anywhere in the codebase, adding unnecessary bundle size.",
+      "rationale": "Grep analysis shows graphql_flutter only appears in pubspec files and mock files, with no actual implementation in lib/ directory. The app uses REST APIs with dio/http instead. Removing it reduces dependency overhead and potential security vulnerabilities.",
+      "category": "bundle_size",
+      "impact": "medium",
+      "affectedAreas": [
+        "pubspec.yaml",
+        "pubspec.lock"
+      ],
+      "currentMetric": "graphql_flutter package adds ~300KB to bundle size despite no usage",
+      "expectedImprovement": "~300KB bundle reduction, fewer dependencies to maintain, reduced attack surface",
+      "implementation": "1. Remove graphql_flutter: ^5.2.0-beta.8 from pubspec.yaml dependencies\n2. Run flutter pub get to update lock file\n3. Remove any graphql-related mock files if present\n4. Verify app builds and tests pass\n5. Update architecture documentation to reflect REST-only approach",
+      "tradeoffs": "None - dependency is unused. If GraphQL is planned for future, can add back when needed with latest stable version.",
+      "estimatedEffort": "trivial"
+    },
+    {
+      "id": "perf-004",
+      "type": "performance_optimizations",
+      "title": "Optimize Token Manager with Conditional Logging and Lazy Initialization",
+      "description": "The TokenManager has 75+ debugPrint statements executing in production and performs multiple synchronous storage reads on initialization, adding unnecessary overhead.",
+      "rationale": "Every token refresh operation logs 10+ debugPrint statements even when ENABLE_DETAILED_LOGS=false. These string allocations and I/O operations slow down the critical authentication path. The initialization also loads 4 storage values synchronously.",
+      "category": "runtime",
+      "impact": "medium",
+      "affectedAreas": [
+        "lib/features/auth/domain/services/token_manager.dart"
+      ],
+      "currentMetric": "75 debugPrint statements in token_manager.dart, each allocating strings and performing I/O on every token operation",
+      "expectedImprovement": "~20-30ms faster token refresh, reduced GC pressure, lower CPU usage during auth operations",
+      "implementation": "1. Wrap all debugPrint statements in kDebugMode checks or ENABLE_DETAILED_LOGS flag\n2. Use a logging service that can be toggled at runtime\n3. Lazy load token data only when needed instead of all at initialization\n4. Cache validation checks to avoid repeated DateTime.now() calls\n5. Consider using a logger with log levels (info, warn, error)",
+      "tradeoffs": "Harder to debug production issues without detailed logs. Solution: Use remote logging service (CloudWatch) for production, keep debug logs for dev.",
+      "estimatedEffort": "small"
+    },
+    {
+      "id": "perf-005",
+      "type": "performance_optimizations",
+      "title": "Add HTTP Response Caching with Dio Interceptor",
+      "description": "The API client makes repeated requests for the same data without caching. Implementing HTTP caching would reduce redundant network calls and improve response times.",
+      "rationale": "The ApiClient in lib/core/api/client/api_client.dart has no caching mechanism. Frequently accessed resources like user profiles, trip data, and static content are fetched on every screen load. Dio supports caching via CacheInterceptor but it's not configured.",
+      "category": "network",
+      "impact": "high",
+      "affectedAreas": [
+        "lib/core/api/client/api_client.dart",
+        "lib/core/api/interceptors/"
+      ],
+      "currentMetric": "Every navigation triggers full network request, even for unchanged data (e.g., user profiles, trip lists)",
+      "expectedImprovement": "~40-60% faster screen loads for cached data, reduced bandwidth usage, better offline experience",
+      "implementation": "1. Add dio_cache_interceptor dependency to pubspec.yaml\n2. Create CacheInterceptor with configurable policies (cache-first, network-first)\n3. Configure cache store (file-based or in-memory with size limits)\n4. Set cache headers (Cache-Control) on API responses\n5. Add cache invalidation on mutations (POST/PUT/DELETE)\n6. Use environment variable CACHE_MAX_SIZE_MB (100MB already configured)\n7. Profile cache hit/miss ratio to optimize TTL values",
+      "tradeoffs": "Increased complexity, stale data risk if cache invalidation is incomplete, storage usage for cache database. Mitigate with short TTLs (5-15 min) and ETag support.",
+      "estimatedEffort": "medium"
+    }
+  ],
+  "metadata": {
+    "totalBundleSize": "~15MB estimated (typical Flutter app)",
+    "largestDependencies": [
+      "google_maps_flutter (~1.2MB)",
+      "flutter_map (~800KB)",
+      "amazon_cognito_identity_dart_2 (~500KB)",
+      "dio (~300KB)",
+      "graphql_flutter (~300KB - unused)"
+    ],
+    "filesAnalyzed": 145,
+    "potentialSavings": "~2.3MB bundle reduction + 20-30% faster auth operations + 40-60% faster cached API calls",
+    "generatedAt": "2025-01-03T21:00:00Z",
+    "note": "All estimates based on typical Flutter/Dart performance characteristics. Actual improvements should be measured with profiling tools before and after implementation."
+  }
+}

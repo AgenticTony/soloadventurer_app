@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
 import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
-import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart'
-    show ConflictType, ConflictSeverity;
 import 'package:soloadventurer/features/sync/presentation/widgets/conflict_comparison_view.dart';
 
 void main() {
@@ -34,13 +32,13 @@ void main() {
           deviceId: 'device_002',
           dataHash: 'xyz789uvw012',
         ),
-        localData: {
+        localData: const {
           'destination': 'Paris',
           'startDate': '2025-06-15',
           'endDate': '2025-06-22',
           'budget': 5000,
         },
-        remoteData: {
+        remoteData: const {
           'destination': 'Paris',
           'startDate': '2025-06-15',
           'endDate': '2025-06-25',
@@ -106,7 +104,8 @@ void main() {
       expect(find.text('startDate'), findsWidgets);
     });
 
-    testWidgets('should show no data message when data is null', (tester) async {
+    testWidgets('should show no data message when data is null',
+        (tester) async {
       final noDataConflict = ConflictInfo(
         conflictId: 'test_conflict_2',
         entityId: 'entity_456',

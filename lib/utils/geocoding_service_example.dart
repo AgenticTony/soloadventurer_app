@@ -98,7 +98,8 @@ class GeocodingServiceExample {
   /// Example 5: Using GeocodingResult data
   Future<void> useResultData() async {
     try {
-      final results = await _geocodingService.searchLocations('Big Ben, London');
+      final results =
+          await _geocodingService.searchLocations('Big Ben, London');
 
       if (results.isNotEmpty) {
         final location = results.first;

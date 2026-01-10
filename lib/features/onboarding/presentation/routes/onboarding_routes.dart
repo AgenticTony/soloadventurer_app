@@ -7,5 +7,4 @@ class OnboardingRoutes {
   static const starterItinerary = '/onboarding/starter-itinerary';
 
   /// Private constructor to prevent instantiation
-  const OnboardingRoutes._();
 }

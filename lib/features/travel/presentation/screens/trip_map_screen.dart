@@ -69,7 +69,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
   double _currentZoom = 12.0;
 
   /// Map center
-  LatLng _mapCenter = const LatLng(37.7749, -122.4194); // San Francisco
+  final LatLng _mapCenter = const LatLng(37.7749, -122.4194); // San Francisco
 
   /// Show cluster statistics overlay
   bool _showStats = true;
@@ -122,7 +122,8 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
       markers: [],
       initialZoom: _currentZoom,
       debounceDelayMs: 300,
-      useBoundsBasedClustering: false, // We handle viewport filtering at loader level
+      useBoundsBasedClustering:
+          false, // We handle viewport filtering at loader level
     );
 
     // Listen to clustering result stream
@@ -308,7 +309,8 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            _buildStatRow('Zoom', '${clusterStats['currentZoom'].toStringAsFixed(1)}'),
+            _buildStatRow(
+                'Zoom', '${clusterStats['currentZoom'].toStringAsFixed(1)}'),
             const Divider(height: 16),
             Text(
               'Viewport Loader',
@@ -331,7 +333,8 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
               ),
             ),
             _buildStatRow('Clusters', '${clusterStats['clusters']}'),
-            _buildStatRow('Unclustered', '${clusterStats['unclusteredMarkers']}'),
+            _buildStatRow(
+                'Unclustered', '${clusterStats['unclusteredMarkers']}'),
             _buildStatRow(
               'Efficiency',
               '${(clusterStats['efficiency'] * 100).toStringAsFixed(0)}%',
@@ -795,7 +798,8 @@ class _ClusterExpandSheet extends ConsumerWidget {
   }
 
   /// Group markers by type for organized display
-  Map<MarkerType, List<MapMarker>> _groupMarkersByType(List<MapMarker> markers) {
+  Map<MarkerType, List<MapMarker>> _groupMarkersByType(
+      List<MapMarker> markers) {
     final grouped = <MarkerType, List<MapMarker>>{};
 
     for (final marker in markers) {

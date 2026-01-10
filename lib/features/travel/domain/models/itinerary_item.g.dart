@@ -6,9 +6,9 @@ part of 'itinerary_item.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ItineraryItemFlightArrivalImpl _$$ItineraryItemFlightArrivalImplFromJson(
+ItineraryItemFlightArrival _$ItineraryItemFlightArrivalFromJson(
         Map<String, dynamic> json) =>
-    _$ItineraryItemFlightArrivalImpl(
+    ItineraryItemFlightArrival(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       flightNumber: json['flightNumber'] as String?,
@@ -18,8 +18,8 @@ _$ItineraryItemFlightArrivalImpl _$$ItineraryItemFlightArrivalImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemFlightArrivalImplToJson(
-        _$ItineraryItemFlightArrivalImpl instance) =>
+Map<String, dynamic> _$ItineraryItemFlightArrivalToJson(
+        ItineraryItemFlightArrival instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),
@@ -30,9 +30,9 @@ Map<String, dynamic> _$$ItineraryItemFlightArrivalImplToJson(
       'runtimeType': instance.$type,
     };
 
-_$ItineraryItemFlightDepartureImpl _$$ItineraryItemFlightDepartureImplFromJson(
+ItineraryItemFlightDeparture _$ItineraryItemFlightDepartureFromJson(
         Map<String, dynamic> json) =>
-    _$ItineraryItemFlightDepartureImpl(
+    ItineraryItemFlightDeparture(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       flightNumber: json['flightNumber'] as String?,
@@ -42,8 +42,8 @@ _$ItineraryItemFlightDepartureImpl _$$ItineraryItemFlightDepartureImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemFlightDepartureImplToJson(
-        _$ItineraryItemFlightDepartureImpl instance) =>
+Map<String, dynamic> _$ItineraryItemFlightDepartureToJson(
+        ItineraryItemFlightDeparture instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),
@@ -54,9 +54,9 @@ Map<String, dynamic> _$$ItineraryItemFlightDepartureImplToJson(
       'runtimeType': instance.$type,
     };
 
-_$ItineraryItemHotelCheckInImpl _$$ItineraryItemHotelCheckInImplFromJson(
+ItineraryItemHotelCheckIn _$ItineraryItemHotelCheckInFromJson(
         Map<String, dynamic> json) =>
-    _$ItineraryItemHotelCheckInImpl(
+    ItineraryItemHotelCheckIn(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       hotelName: json['hotelName'] as String?,
@@ -67,8 +67,8 @@ _$ItineraryItemHotelCheckInImpl _$$ItineraryItemHotelCheckInImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemHotelCheckInImplToJson(
-        _$ItineraryItemHotelCheckInImpl instance) =>
+Map<String, dynamic> _$ItineraryItemHotelCheckInToJson(
+        ItineraryItemHotelCheckIn instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),
@@ -80,9 +80,9 @@ Map<String, dynamic> _$$ItineraryItemHotelCheckInImplToJson(
       'runtimeType': instance.$type,
     };
 
-_$ItineraryItemHotelCheckOutImpl _$$ItineraryItemHotelCheckOutImplFromJson(
+ItineraryItemHotelCheckOut _$ItineraryItemHotelCheckOutFromJson(
         Map<String, dynamic> json) =>
-    _$ItineraryItemHotelCheckOutImpl(
+    ItineraryItemHotelCheckOut(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       hotelName: json['hotelName'] as String?,
@@ -91,8 +91,8 @@ _$ItineraryItemHotelCheckOutImpl _$$ItineraryItemHotelCheckOutImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemHotelCheckOutImplToJson(
-        _$ItineraryItemHotelCheckOutImpl instance) =>
+Map<String, dynamic> _$ItineraryItemHotelCheckOutToJson(
+        ItineraryItemHotelCheckOut instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),
@@ -102,9 +102,9 @@ Map<String, dynamic> _$$ItineraryItemHotelCheckOutImplToJson(
       'runtimeType': instance.$type,
     };
 
-_$ItineraryItemActivityImpl _$$ItineraryItemActivityImplFromJson(
+ItineraryItemActivity _$ItineraryItemActivityFromJson(
         Map<String, dynamic> json) =>
-    _$ItineraryItemActivityImpl(
+    ItineraryItemActivity(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       name: json['name'] as String,
@@ -118,8 +118,8 @@ _$ItineraryItemActivityImpl _$$ItineraryItemActivityImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemActivityImplToJson(
-        _$ItineraryItemActivityImpl instance) =>
+Map<String, dynamic> _$ItineraryItemActivityToJson(
+        ItineraryItemActivity instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),
@@ -134,9 +134,8 @@ Map<String, dynamic> _$$ItineraryItemActivityImplToJson(
       'runtimeType': instance.$type,
     };
 
-_$ItineraryItemLunchImpl _$$ItineraryItemLunchImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ItineraryItemLunchImpl(
+ItineraryItemLunch _$ItineraryItemLunchFromJson(Map<String, dynamic> json) =>
+    ItineraryItemLunch(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       name: json['name'] as String,
@@ -148,8 +147,7 @@ _$ItineraryItemLunchImpl _$$ItineraryItemLunchImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemLunchImplToJson(
-        _$ItineraryItemLunchImpl instance) =>
+Map<String, dynamic> _$ItineraryItemLunchToJson(ItineraryItemLunch instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),
@@ -162,9 +160,8 @@ Map<String, dynamic> _$$ItineraryItemLunchImplToJson(
       'runtimeType': instance.$type,
     };
 
-_$ItineraryItemDinnerImpl _$$ItineraryItemDinnerImplFromJson(
-        Map<String, dynamic> json) =>
-    _$ItineraryItemDinnerImpl(
+ItineraryItemDinner _$ItineraryItemDinnerFromJson(Map<String, dynamic> json) =>
+    ItineraryItemDinner(
       id: json['id'] as String,
       time: DateTime.parse(json['time'] as String),
       name: json['name'] as String,
@@ -176,8 +173,8 @@ _$ItineraryItemDinnerImpl _$$ItineraryItemDinnerImplFromJson(
       $type: json['runtimeType'] as String?,
     );
 
-Map<String, dynamic> _$$ItineraryItemDinnerImplToJson(
-        _$ItineraryItemDinnerImpl instance) =>
+Map<String, dynamic> _$ItineraryItemDinnerToJson(
+        ItineraryItemDinner instance) =>
     <String, dynamic>{
       'id': instance.id,
       'time': instance.time.toIso8601String(),

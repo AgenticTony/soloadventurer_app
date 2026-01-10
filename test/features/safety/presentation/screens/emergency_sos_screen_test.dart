@@ -11,9 +11,9 @@ import 'package:soloadventurer/features/safety/presentation/state/check_in_state
 import 'package:soloadventurer/features/safety/presentation/state/location_sharing_state.dart';
 import 'package:soloadventurer/features/safety/presentation/screens/emergency_sos_screen.dart';
 import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
+import 'package:soloadventurer/core/services/location_service.dart' hide locationServiceProvider;
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
-import 'package:soloadventurer/core/services/location_service.dart';
 
 // Mock classes
 class MockSafetyNotifier extends ChangeNotifier implements SafetyNotifier {

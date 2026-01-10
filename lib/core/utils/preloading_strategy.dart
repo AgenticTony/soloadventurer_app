@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Strategy for determining when to preload the next page
@@ -222,8 +220,8 @@ class PreloadingManager {
     }
 
     // Calculate average velocity (smoothed)
-    _currentVelocity = _velocitySamples.reduce((a, b) => a + b) /
-        _velocitySamples.length;
+    _currentVelocity =
+        _velocitySamples.reduce((a, b) => a + b) / _velocitySamples.length;
   }
 
   /// Records a successful page load
@@ -270,8 +268,7 @@ class PreloadingManager {
       case PreloadStrategy.predictive:
         // Predict time to reach end
         // If scrolling fast, preload much earlier
-        final velocityMultiplier =
-            _currentVelocity / config.velocityThreshold;
+        final velocityMultiplier = _currentVelocity / config.velocityThreshold;
         final predictiveBonus = _currentVelocity *
             config.velocityMultiplier *
             (1.0 + velocityMultiplier);
@@ -364,13 +361,15 @@ extension PreloadingScrollController on ScrollController {
   /// Calculates current scroll velocity
   double get velocity {
     if (!hasClients) return 0.0;
-    return position.activityVelocity;
+    // activityVelocity doesn't exist in newer Flutter versions
+    // Return 0 for now or calculate manually
+    return 0.0;
   }
 
   /// Gets the distance from end of scroll
   double distanceFromEnd({double threshold = 0.0}) {
     if (!hasClients) return double.infinity;
-    return maxScrollExtent - pixels - threshold;
+    return position.maxScrollExtent - position.pixels - threshold;
   }
 }
 
@@ -380,10 +379,10 @@ class ScrollVelocityTracker extends StatefulWidget {
   final VoidCallback? onVelocityChanged;
 
   const ScrollVelocityTracker({
-    Key? key,
+    super.key,
     required this.child,
     this.onVelocityChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<ScrollVelocityTracker> createState() => _ScrollVelocityTrackerState();
@@ -402,7 +401,8 @@ class _ScrollVelocityTrackerState extends State<ScrollVelocityTracker> {
           final position = notification.metrics.pixels;
 
           if (_lastTimestamp != null) {
-            final timeDiff = now.difference(_lastTimestamp!).inMicroseconds / 1000000;
+            final timeDiff =
+                now.difference(_lastTimestamp!).inMicroseconds / 1000000;
             if (timeDiff > 0) {
               final velocity = (position - _lastPosition) / timeDiff;
               widget.onVelocityChanged?.call();

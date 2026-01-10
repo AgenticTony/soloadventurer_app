@@ -1,6 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models/destination.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/destination_filter.dart';
+
+// Generated file
+part 'filter_provider.g.dart';
 
 /// Provider for destination filter state management
 ///
@@ -43,23 +45,24 @@ import '../../domain/models/destination_filter.dart';
 ///   // Show active filters indicator
 /// }
 /// ```
-final filterProvider =
-    StateNotifierProvider<FilterNotifier, DestinationFilter>((ref) {
-  return FilterNotifier();
-});
 
 /// Notifier for managing destination filter state
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
 ///
 /// This notifier handles all filter update operations:
 /// - Updating individual filter fields
 /// - Updating the entire filter at once
 /// - Resetting filters to default values
 /// - Providing helper methods to check filter status
-class FilterNotifier extends StateNotifier<DestinationFilter> {
-  /// Creates a new [FilterNotifier]
-  ///
-  /// The filter starts with default values (no filters applied).
-  FilterNotifier() : super(const DestinationFilter());
+@riverpod
+class Filter extends _$Filter {
+  @override
+  DestinationFilter build() {
+    // The filter starts with default values (no filters applied)
+    return const DestinationFilter();
+  }
 
   /// Update the entire filter at once
   ///

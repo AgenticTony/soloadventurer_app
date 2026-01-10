@@ -6,7 +6,7 @@ import 'video_compression.dart';
 Future<void> example1_BasicCompression() async {
   print('=== Example 1: Basic Compression ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videoFile = File('/path/to/video.mp4');
 
   try {
@@ -30,11 +30,11 @@ Future<void> example1_BasicCompression() async {
 Future<void> example2_CustomConfiguration() async {
   print('=== Example 2: Custom Configuration ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videoFile = File('/path/to/video.mp4');
 
   // Create custom configuration
-  final config = VideoCompressionConfig(
+  const config = VideoCompressionConfig(
     maxWidth: 1280,
     maxHeight: 720,
     quality: 80,
@@ -64,7 +64,7 @@ Future<void> example2_CustomConfiguration() async {
 Future<void> example3_PredefinedConfigurations() async {
   print('=== Example 3: Predefined Configurations ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videoFile = File('/path/to/video.mp4');
 
   // Try different predefined configs
@@ -84,7 +84,8 @@ Future<void> example3_PredefinedConfigurations() async {
 
       print('  ✓ ${result.sizeReductionPercent}% reduction');
       print('    Resolution: ${result.width}x${result.height}');
-      print('    Size: ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
+      print(
+          '    Size: ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
 
       await compressor.cleanup(result.file);
     } catch (e) {
@@ -97,7 +98,7 @@ Future<void> example3_PredefinedConfigurations() async {
 Future<void> example4_WithProgressTracking() async {
   print('=== Example 4: Progress Tracking ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videoFile = File('/path/to/video.mp4');
 
   try {
@@ -110,7 +111,8 @@ Future<void> example4_WithProgressTracking() async {
     );
 
     print('\n✓ Compression complete!');
-    print('  Final size: ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
+    print(
+        '  Final size: ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
 
     await compressor.cleanup(result.file);
   } catch (e) {
@@ -122,7 +124,7 @@ Future<void> example4_WithProgressTracking() async {
 Future<void> example5_ConditionalCompression() async {
   print('=== Example 5: Conditional Compression ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videoFile = File('/path/to/video.mp4');
 
   try {
@@ -158,9 +160,9 @@ Future<void> example6_RecommendedSettings() async {
 
   // Simulate getting video metadata
   final fileSize = await videoFile.length();
-  final width = 1920;
-  final height = 1080;
-  final duration = 30.0;
+  const width = 1920;
+  const height = 1080;
+  const duration = 30.0;
 
   // Get recommended config for normal network
   final config = VideoCompression.getRecommendedConfig(
@@ -195,10 +197,10 @@ Future<void> example6_RecommendedSettings() async {
 Future<void> example7_EstimateCompressedSize() async {
   print('=== Example 7: Estimate Compressed Size ===\n');
 
-  final width = 1920;
-  final height = 1080;
-  final duration = 30.0;
-  final quality = 80;
+  const width = 1920;
+  const height = 1080;
+  const duration = 30.0;
+  const quality = 80;
 
   // Estimate size before compression
   final estimatedSize = VideoCompression.estimateCompressedSize(
@@ -209,8 +211,10 @@ Future<void> example7_EstimateCompressedSize() async {
   );
 
   print('Estimated compressed size:');
-  print('  Original: ${(1920 * 1080 * 30 * 0.5 / (1024 * 1024)).toStringAsFixed(2)} MB (rough estimate)');
-  print('  Compressed: ${(estimatedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
+  print(
+      '  Original: ${(1920 * 1080 * 30 * 0.5 / (1024 * 1024)).toStringAsFixed(2)} MB (rough estimate)');
+  print(
+      '  Compressed: ${(estimatedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
   print('  Quality: $quality%');
 }
 
@@ -218,7 +222,7 @@ Future<void> example7_EstimateCompressedSize() async {
 Future<void> example8_ErrorHandling() async {
   print('=== Example 8: Error Handling ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final invalidFile = File('/path/to/invalid.txt');
 
   try {
@@ -238,7 +242,7 @@ Future<void> example8_ErrorHandling() async {
 Future<void> example9_BatchProcessing() async {
   print('=== Example 9: Batch Processing ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videos = [
     File('/path/to/video1.mp4'),
     File('/path/to/video2.mp4'),
@@ -273,14 +277,15 @@ Future<void> example9_BatchProcessing() async {
   print('\nSummary:');
   print('  Successful: $successCount');
   print('  Failed: $failureCount');
-  print('  Average reduction: ${totalReduction / (successCount > 0 ? successCount : 1)}%');
+  print(
+      '  Average reduction: ${totalReduction / (successCount > 0 ? successCount : 1)}%');
 }
 
 /// Example 10: Integration with journal entry upload
 Future<void> example10_JournalIntegration() async {
   print('=== Example 10: Journal Integration ===\n');
 
-  final compressor = VideoCompression();
+  const compressor = VideoCompression();
   final videoFile = File('/path/to/video.mp4');
 
   try {
@@ -295,7 +300,8 @@ Future<void> example10_JournalIntegration() async {
     );
 
     print('\n✓ Compression complete!');
-    print('  Size: ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
+    print(
+        '  Size: ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB');
     print('  Reduction: ${result.sizeReductionPercent}%');
     print('  Duration: ${result.duration}s');
 
@@ -325,7 +331,8 @@ class Example11_ProgressDialog extends StatefulWidget {
   const Example11_ProgressDialog({super.key});
 
   @override
-  State<Example11_ProgressDialog> createState() => _Example11_ProgressDialogState();
+  State<Example11_ProgressDialog> createState() =>
+      _Example11_ProgressDialogState();
 }
 
 class _Example11_ProgressDialogState extends State<Example11_ProgressDialog> {
@@ -342,7 +349,7 @@ class _Example11_ProgressDialogState extends State<Example11_ProgressDialog> {
       _errorMessage = null;
     });
 
-    final compressor = VideoCompression();
+    const compressor = VideoCompression();
     final videoFile = File('/path/to/video.mp4');
 
     try {
@@ -358,7 +365,8 @@ class _Example11_ProgressDialogState extends State<Example11_ProgressDialog> {
       );
 
       setState(() {
-        _status = 'Complete! ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB';
+        _status =
+            'Complete! ${(result.compressedSize / (1024 * 1024)).toStringAsFixed(2)} MB';
       });
 
       await compressor.cleanup(result.file);
@@ -424,31 +432,31 @@ Future<void> main() async {
 
   // Run console examples
   await example1_BasicCompression();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example2_CustomConfiguration();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example3_PredefinedConfigurations();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example4_WithProgressTracking();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example5_ConditionalCompression();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example6_RecommendedSettings();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example7_EstimateCompressedSize();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example8_ErrorHandling();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example9_BatchProcessing();
-  print('\n' + '-' * 50 + '\n');
+  print('\n${'-' * 50}\n');
 
   await example10_JournalIntegration();
 

@@ -115,7 +115,8 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                                   ? Icons.expand_less
                                   : Icons.expand_more,
                               size: 20,
-                              color: theme.colorScheme.onSurface.withOpacity(0.5),
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.5),
                             ),
                           ],
                         ),
@@ -143,13 +144,15 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                             Icon(
                               Icons.access_time,
                               size: 12,
-                              color: theme.colorScheme.onSurface.withOpacity(0.5),
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.5),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               _getTimeAgo(),
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.6),
                               ),
                             ),
 
@@ -159,13 +162,15 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                               Icon(
                                 Icons.refresh,
                                 size: 12,
-                                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                                color: theme.colorScheme.onSurface
+                                    .withOpacity(0.5),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 '${widget.error.retryCount} attempt${widget.error.retryCount > 1 ? 's' : ''}',
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                                  color: theme.colorScheme.onSurface
+                                      .withOpacity(0.6),
                                 ),
                               ),
                             ],
@@ -278,7 +283,8 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                   _buildDetailRow(
                     context,
                     'Occurred At',
-                    DateFormat('yyyy-MM-dd HH:mm:ss').format(widget.error.occurredAt),
+                    DateFormat('yyyy-MM-dd HH:mm:ss')
+                        .format(widget.error.occurredAt),
                   ),
 
                   // Retryable status
@@ -289,7 +295,8 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                   ),
 
                   // Additional details if available
-                  if (widget.error.details != null && widget.error.details!.isNotEmpty) ...[
+                  if (widget.error.details != null &&
+                      widget.error.details!.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     Text(
                       'Additional Details:',
@@ -301,7 +308,8 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.errorContainer.withOpacity(0.1),
+                        color:
+                            theme.colorScheme.errorContainer.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

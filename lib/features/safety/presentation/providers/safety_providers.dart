@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/core/services/location_service.dart';
 import 'package:soloadventurer/core/services/location_service_impl.dart';
@@ -23,14 +24,12 @@ import 'package:soloadventurer/features/safety/domain/usecases/update_safety_sta
 import 'package:soloadventurer/features/safety/domain/usecases/get_safety_status.dart';
 import 'package:soloadventurer/features/safety/infrastructure/services/missed_checkin_detector.dart';
 import 'package:soloadventurer/features/safety/infrastructure/services/missed_checkin_detector_impl.dart';
-import 'package:soloadventurer/features/safety/presentation/notifiers/location_sharing_notifier.dart';
-import 'package:soloadventurer/features/safety/presentation/notifiers/safety_notifier.dart';
 
-// Export new Riverpod 2 Phase 1 providers
+// Export new Riverpod 3.0 providers
 export 'trusted_contacts_provider.dart';
 export 'check_in_provider.dart';
-import 'package:soloadventurer/features/safety/presentation/state/location_sharing_state.dart';
-import 'package:soloadventurer/features/safety/presentation/state/safety_state.dart';
+export 'safety_provider.dart';
+export 'location_sharing_provider.dart';
 
 part 'safety_providers.g.dart';
 
@@ -40,7 +39,7 @@ part 'safety_providers.g.dart';
 
 /// Provider for LocationService
 @riverpod
-LocationService locationService(LocationServiceRef ref) {
+LocationService locationService(Ref ref) {
   final service = LocationServiceImpl();
 
   ref.onDispose(() => service.dispose());
@@ -50,7 +49,7 @@ LocationService locationService(LocationServiceRef ref) {
 
 /// Provider for NotificationService
 @riverpod
-NotificationService notificationService(NotificationServiceRef ref) {
+NotificationService notificationService(Ref ref) {
   final service = NotificationServiceImpl();
 
   ref.onDispose(() => service.dispose());
@@ -60,9 +59,7 @@ NotificationService notificationService(NotificationServiceRef ref) {
 
 /// Provider for BackgroundCheckInService
 @riverpod
-BackgroundCheckInService backgroundCheckInService(
-  BackgroundCheckInServiceRef ref,
-) {
+BackgroundCheckInService backgroundCheckInService(Ref ref) {
   final service = BackgroundCheckInServiceImpl();
 
   ref.onDispose(() => service.dispose());
@@ -72,7 +69,7 @@ BackgroundCheckInService backgroundCheckInService(
 
 /// Provider for MissedCheckInDetector
 @riverpod
-MissedCheckInDetector missedCheckInDetector(MissedCheckInDetectorRef ref) {
+MissedCheckInDetector missedCheckInDetector(Ref ref) {
   final service = MissedCheckInDetectorImpl(
     safetyRepository: ref.watch(safetyRepositoryOverrideProvider),
     locationService: ref.watch(locationServiceProvider),
@@ -90,9 +87,7 @@ MissedCheckInDetector missedCheckInDetector(MissedCheckInDetectorRef ref) {
 
 /// Provider for AddTrustedContactUseCase
 @riverpod
-AddTrustedContactUseCase addTrustedContactUseCase(
-  AddTrustedContactUseCaseRef ref,
-) {
+AddTrustedContactUseCase addTrustedContactUseCase(Ref ref) {
   return AddTrustedContactUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -100,9 +95,7 @@ AddTrustedContactUseCase addTrustedContactUseCase(
 
 /// Provider for RemoveTrustedContactUseCase
 @riverpod
-RemoveTrustedContactUseCase removeTrustedContactUseCase(
-  RemoveTrustedContactUseCaseRef ref,
-) {
+RemoveTrustedContactUseCase removeTrustedContactUseCase(Ref ref) {
   return RemoveTrustedContactUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -110,9 +103,7 @@ RemoveTrustedContactUseCase removeTrustedContactUseCase(
 
 /// Provider for UpdateTrustedContactUseCase
 @riverpod
-UpdateTrustedContactUseCase updateTrustedContactUseCase(
-  UpdateTrustedContactUseCaseRef ref,
-) {
+UpdateTrustedContactUseCase updateTrustedContactUseCase(Ref ref) {
   return UpdateTrustedContactUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -120,9 +111,7 @@ UpdateTrustedContactUseCase updateTrustedContactUseCase(
 
 /// Provider for GetTrustedContactsUseCase
 @riverpod
-GetTrustedContactsUseCase getTrustedContactsUseCase(
-  GetTrustedContactsUseCaseRef ref,
-) {
+GetTrustedContactsUseCase getTrustedContactsUseCase(Ref ref) {
   return GetTrustedContactsUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -134,7 +123,7 @@ GetTrustedContactsUseCase getTrustedContactsUseCase(
 
 /// Provider for CreateCheckInUseCase
 @riverpod
-CreateCheckInUseCase createCheckInUseCase(CreateCheckInUseCaseRef ref) {
+CreateCheckInUseCase createCheckInUseCase(Ref ref) {
   return CreateCheckInUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -142,7 +131,7 @@ CreateCheckInUseCase createCheckInUseCase(CreateCheckInUseCaseRef ref) {
 
 /// Provider for CompleteCheckInUseCase
 @riverpod
-CompleteCheckInUseCase completeCheckInUseCase(CompleteCheckInUseCaseRef ref) {
+CompleteCheckInUseCase completeCheckInUseCase(Ref ref) {
   return CompleteCheckInUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -150,7 +139,7 @@ CompleteCheckInUseCase completeCheckInUseCase(CompleteCheckInUseCaseRef ref) {
 
 /// Provider for ScheduleCheckInUseCase
 @riverpod
-ScheduleCheckInUseCase scheduleCheckInUseCase(ScheduleCheckInUseCaseRef ref) {
+ScheduleCheckInUseCase scheduleCheckInUseCase(Ref ref) {
   return ScheduleCheckInUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -158,7 +147,7 @@ ScheduleCheckInUseCase scheduleCheckInUseCase(ScheduleCheckInUseCaseRef ref) {
 
 /// Provider for CancelCheckInUseCase
 @riverpod
-CancelCheckInUseCase cancelCheckInUseCase(CancelCheckInUseCaseRef ref) {
+CancelCheckInUseCase cancelCheckInUseCase(Ref ref) {
   return CancelCheckInUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -166,9 +155,7 @@ CancelCheckInUseCase cancelCheckInUseCase(CancelCheckInUseCaseRef ref) {
 
 /// Provider for GetUpcomingCheckInsUseCase
 @riverpod
-GetUpcomingCheckInsUseCase getUpcomingCheckInsUseCase(
-  GetUpcomingCheckInsUseCaseRef ref,
-) {
+GetUpcomingCheckInsUseCase getUpcomingCheckInsUseCase(Ref ref) {
   return GetUpcomingCheckInsUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -180,7 +167,7 @@ GetUpcomingCheckInsUseCase getUpcomingCheckInsUseCase(
 
 /// Provider for ShareLocationUseCase
 @riverpod
-ShareLocationUseCase shareLocationUseCase(ShareLocationUseCaseRef ref) {
+ShareLocationUseCase shareLocationUseCase(Ref ref) {
   return ShareLocationUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -188,9 +175,7 @@ ShareLocationUseCase shareLocationUseCase(ShareLocationUseCaseRef ref) {
 
 /// Provider for StopLocationSharingUseCase
 @riverpod
-StopLocationSharingUseCase stopLocationSharingUseCase(
-  StopLocationSharingUseCaseRef ref,
-) {
+StopLocationSharingUseCase stopLocationSharingUseCase(Ref ref) {
   return StopLocationSharingUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -198,9 +183,7 @@ StopLocationSharingUseCase stopLocationSharingUseCase(
 
 /// Provider for GetActiveLocationSharesUseCase
 @riverpod
-GetActiveLocationSharesUseCase getActiveLocationSharesUseCase(
-  GetActiveLocationSharesUseCaseRef ref,
-) {
+GetActiveLocationSharesUseCase getActiveLocationSharesUseCase(Ref ref) {
   return GetActiveLocationSharesUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -212,9 +195,7 @@ GetActiveLocationSharesUseCase getActiveLocationSharesUseCase(
 
 /// Provider for TriggerEmergencySOSUseCase
 @riverpod
-TriggerEmergencySOSUseCase triggerEmergencySOSUseCase(
-  TriggerEmergencySOSUseCaseRef ref,
-) {
+TriggerEmergencySOSUseCase triggerEmergencySOSUseCase(Ref ref) {
   return TriggerEmergencySOSUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -222,9 +203,7 @@ TriggerEmergencySOSUseCase triggerEmergencySOSUseCase(
 
 /// Provider for UpdateSafetyStatusUseCase
 @riverpod
-UpdateSafetyStatusUseCase updateSafetyStatusUseCase(
-  UpdateSafetyStatusUseCaseRef ref,
-) {
+UpdateSafetyStatusUseCase updateSafetyStatusUseCase(Ref ref) {
   return UpdateSafetyStatusUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
@@ -232,172 +211,8 @@ UpdateSafetyStatusUseCase updateSafetyStatusUseCase(
 
 /// Provider for GetSafetyStatusUseCase
 @riverpod
-GetSafetyStatusUseCase getSafetyStatusUseCase(GetSafetyStatusUseCaseRef ref) {
+GetSafetyStatusUseCase getSafetyStatusUseCase(Ref ref) {
   return GetSafetyStatusUseCase(
     ref.watch(safetyRepositoryOverrideProvider),
   );
 }
-
-// ============================================================================
-// Notifiers - Location Sharing
-// ============================================================================
-
-/// Provider for LocationSharingNotifier
-@riverpod
-LocationSharingNotifier locationSharingNotifier(
-    LocationSharingNotifierRef ref) {
-  final notifier = LocationSharingNotifier(
-    shareLocation: ref.watch(shareLocationUseCaseProvider),
-    stopLocationSharing: ref.watch(stopLocationSharingUseCaseProvider),
-    getActiveShares: ref.watch(getActiveLocationSharesUseCaseProvider),
-  );
-
-  ref.onDispose(() => notifier.dispose());
-
-  return notifier;
-}
-
-// ============================================================================
-// Notifiers - Safety
-// ============================================================================
-
-/// Provider for SafetyNotifier
-@riverpod
-SafetyNotifier safetyNotifier(SafetyNotifierRef ref) {
-  final notifier = SafetyNotifier(
-    triggerSOS: ref.watch(triggerEmergencySOSUseCaseProvider),
-    updateStatus: ref.watch(updateSafetyStatusUseCaseProvider),
-    getStatus: ref.watch(getSafetyStatusUseCaseProvider),
-    repository: ref.watch(safetyRepositoryOverrideProvider),
-  );
-
-  ref.onDispose(() => notifier.dispose());
-
-  return notifier;
-}
-
-// ============================================================================
-// State Providers - Location Sharing
-// ============================================================================
-
-/// Provider for location sharing state
-final locationSharingStateProvider = Provider<LocationSharingState>((ref) {
-  return ref.watch(locationSharingNotifierProvider).state;
-});
-
-/// Provider for active location shares
-final activeLocationSharesProvider = Provider((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.activeShares;
-});
-
-/// Provider for location updates
-final locationUpdatesProvider = Provider((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.locationUpdates;
-});
-
-/// Provider for latest location
-final latestLocationProvider = Provider((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.latestLocation;
-});
-
-/// Provider for location sharing loading state
-final locationSharingLoadingProvider = Provider<bool>((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.isLoading;
-});
-
-/// Provider for location sharing error
-final locationSharingErrorProvider = Provider<String?>((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.error;
-});
-
-/// Provider for active sharing count
-final activeSharingCountProvider = Provider<int>((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.activeSharingCount;
-});
-
-/// Provider for has emergency sharing
-final hasEmergencySharingProvider = Provider<bool>((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.hasEmergencySharing;
-});
-
-/// Provider for active contact IDs
-final activeContactIdsProvider = Provider((ref) {
-  final state = ref.watch(locationSharingNotifierProvider).state;
-  return state.activeContactIds;
-});
-
-// ============================================================================
-// State Providers - Safety
-// ============================================================================
-
-/// Provider for safety state
-final safetyStateProvider = Provider<SafetyState>((ref) {
-  return ref.watch(safetyNotifierProvider).state;
-});
-
-/// Provider for current safety status
-final currentSafetyStatusProvider = Provider((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.currentStatus;
-});
-
-/// Provider for recent safety alerts
-final recentSafetyAlertsProvider = Provider((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.recentAlerts;
-});
-
-/// Provider for active safety alerts
-final activeSafetyAlertsProvider = Provider((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.activeAlerts;
-});
-
-/// Provider for safety loading state
-final safetyLoadingProvider = Provider<bool>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.isLoading;
-});
-
-/// Provider for safety processing state
-final safetyProcessingProvider = Provider<bool>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.isProcessing;
-});
-
-/// Provider for safety error
-final safetyErrorProvider = Provider<String?>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.error;
-});
-
-/// Provider for trusted contacts count
-final trustedContactsCountProvider = Provider<int>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.trustedContactsCount;
-});
-
-/// Provider for has active emergency
-final hasActiveEmergencyProvider = Provider<bool>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.hasActiveEmergency;
-});
-
-/// Provider for is in danger
-final isInDangerProvider = Provider<bool>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.isInDanger;
-});
-
-/// Provider for safety initialized
-final safetyInitializedProvider = Provider<bool>((ref) {
-  final state = ref.watch(safetyNotifierProvider).state;
-  return state.isInitialized;
-});

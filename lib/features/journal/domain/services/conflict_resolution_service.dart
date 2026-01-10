@@ -1,8 +1,3 @@
-import '../entities/journal_entry.dart';
-import '../entities/media_item.dart';
-import '../entities/trip.dart';
-import '../entities/tag.dart';
-
 /// Severity level of a conflict
 enum ConflictSeverity {
   /// Low severity - can be auto-resolved
@@ -96,7 +91,7 @@ class FieldConflict {
   final bool canMerge;
 
   /// Suggested merged value (if available)
-  final dynamic? suggestedValue;
+  final dynamic suggestedValue;
 
   const FieldConflict({
     required this.fieldName,
@@ -240,8 +235,7 @@ class SyncConflict {
   bool get failed => status == ConflictResolutionStatus.failed;
 
   /// How long this conflict has been pending
-  Duration get pendingDuration =>
-      DateTime.now().difference(detectedAt);
+  Duration get pendingDuration => DateTime.now().difference(detectedAt);
 
   @override
   String toString() {

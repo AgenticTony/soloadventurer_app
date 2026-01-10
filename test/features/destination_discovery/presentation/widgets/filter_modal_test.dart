@@ -95,7 +95,8 @@ void main() {
         expect(find.text('Minimum Solo Suitability'), findsOneWidget);
       });
 
-      testWidgets('renders activity level section', (WidgetTester tester) async {
+      testWidgets('renders activity level section',
+          (WidgetTester tester) async {
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
@@ -284,13 +285,17 @@ void main() {
         // Find the selected budget chip
         final selectedChip = find.byWidgetPredicate(
           (widget) =>
-              widget is FilterChip && widget.selected == true && widget.label is Text && (widget.label as Text).data == 'Budget',
+              widget is FilterChip &&
+              widget.selected == true &&
+              widget.label is Text &&
+              (widget.label as Text).data == 'Budget',
         );
 
         expect(selectedChip, findsOneWidget);
       });
 
-      testWidgets('displays current activity level', (WidgetTester tester) async {
+      testWidgets('displays current activity level',
+          (WidgetTester tester) async {
         filterNotifier.updateActivityLevel(ActivityLevel.relaxed);
 
         await tester.pumpWidget(
@@ -310,7 +315,10 @@ void main() {
 
         final selectedChip = find.byWidgetPredicate(
           (widget) =>
-              widget is FilterChip && widget.selected == true && widget.label is Text && (widget.label as Text).data == 'Relaxed',
+              widget is FilterChip &&
+              widget.selected == true &&
+              widget.label is Text &&
+              (widget.label as Text).data == 'Relaxed',
         );
 
         expect(selectedChip, findsOneWidget);

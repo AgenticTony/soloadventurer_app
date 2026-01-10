@@ -9,7 +9,6 @@ part 'place_activity.g.dart';
 /// at a destination. Contains rich metadata for personalization.
 @freezed
 class PlaceActivity with _$PlaceActivity {
-  const PlaceActivity._();
 
   /// Creates a place activity with all details
   ///
@@ -101,6 +100,9 @@ class PlaceActivity with _$PlaceActivity {
         return 'Adventure';
     }
   }
+
+  // Private constructor for freezed getters
+  const PlaceActivity._();
 }
 
 /// Categories of places/activities for recommendations

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/conflict_resolution.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/conflict_info.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/entity_version.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_resolution.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
+import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
 
 void main() {
   group('ConflictResolution', () {
@@ -38,8 +38,8 @@ void main() {
         severity: ConflictSeverity.medium,
         localVersion: localVersion,
         remoteVersion: remoteVersion,
-        localData: {'name': 'Local Trip', 'duration': 5},
-        remoteData: {'name': 'Remote Trip', 'duration': 7},
+        localData: const {'name': 'Local Trip', 'duration': 5},
+        remoteData: const {'name': 'Remote Trip', 'duration': 7},
         description: 'Versions conflict',
         detectedAt: now,
       );
@@ -60,7 +60,7 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         strategy: ConflictResolutionStrategy.lastWriteWins,
-        resolvedData: {'name': 'Resolved Trip', 'duration': 7},
+        resolvedData: const {'name': 'Resolved Trip', 'duration': 7},
         resolvedVersion: resolvedVersion,
         choseRemote: true,
         resolvedAt: DateTime.utc(2024, 1, 1, 12, 0, 30),
@@ -79,7 +79,7 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         strategy: ConflictResolutionStrategy.manual,
-        resolvedData: {'name': 'Test'},
+        resolvedData: const {'name': 'Test'},
         resolvedVersion: localVersion,
         resolvedAt: DateTime.utc(2024, 1, 1, 12, 0, 0),
       );
@@ -100,13 +100,13 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         strategy: ConflictResolutionStrategy.lastWriteWins,
-        resolvedData: {'name': 'Test', 'duration': 5},
+        resolvedData: const {'name': 'Test', 'duration': 5},
         resolvedVersion: localVersion,
         choseLocal: true,
-        localFieldsUsed: ['name'],
-        remoteFieldsUsed: ['duration'],
+        localFieldsUsed: const ['name'],
+        remoteFieldsUsed: const ['duration'],
         resolvedAt: DateTime.utc(2024, 1, 1, 12, 0, 0),
-        metadata: {'source': 'auto'},
+        metadata: const {'source': 'auto'},
       );
 
       final json = resolution.toJson();
@@ -153,9 +153,9 @@ void main() {
   group('MergeResult', () {
     test('should create successful merge result', () {
       final result = MergeResult.success(
-        mergedData: {'name': 'Merged', 'duration': 5},
-        localFieldsUsed: ['name'],
-        remoteFieldsUsed: ['duration'],
+        mergedData: const {'name': 'Merged', 'duration': 5},
+        localFieldsUsed: const ['name'],
+        remoteFieldsUsed: const ['duration'],
       );
 
       expect(result.success, true);
@@ -167,10 +167,10 @@ void main() {
 
     test('should create merge result with conflicts', () {
       final result = MergeResult.success(
-        mergedData: {'name': 'Local', 'duration': 5},
-        localFieldsUsed: ['name', 'duration'],
-        remoteFieldsUsed: ['location'],
-        conflictingFields: ['duration'],
+        mergedData: const {'name': 'Local', 'duration': 5},
+        localFieldsUsed: const ['name', 'duration'],
+        remoteFieldsUsed: const ['location'],
+        conflictingFields: const ['duration'],
       );
 
       expect(result.success, true);
@@ -188,10 +188,10 @@ void main() {
 
     test('should calculate field counts correctly', () {
       final result = MergeResult.success(
-        mergedData: {'a': 1, 'b': 2, 'c': 3},
-        localFieldsUsed: ['a', 'b'],
-        remoteFieldsUsed: ['c'],
-        conflictingFields: ['b'],
+        mergedData: const {'a': 1, 'b': 2, 'c': 3},
+        localFieldsUsed: const ['a', 'b'],
+        remoteFieldsUsed: const ['c'],
+        conflictingFields: const ['b'],
       );
 
       expect(result.localFieldCount, 2);
@@ -207,7 +207,7 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         strategy: ConflictResolutionStrategy.lastWriteWins,
-        resolvedData: {'name': 'Test1'},
+        resolvedData: const {'name': 'Test1'},
         resolvedVersion: EntityVersion.initial(
           entityId: 'entity-1',
           entityType: 'trip',
@@ -221,7 +221,7 @@ void main() {
         entityId: 'entity-2',
         entityType: 'trip',
         strategy: ConflictResolutionStrategy.manual,
-        resolvedData: {'name': 'Test2'},
+        resolvedData: const {'name': 'Test2'},
         resolvedVersion: EntityVersion.initial(
           entityId: 'entity-2',
           entityType: 'trip',
@@ -246,7 +246,7 @@ void main() {
         entityId: 'entity-1',
         entityType: 'trip',
         strategy: ConflictResolutionStrategy.lastWriteWins,
-        resolvedData: {'name': 'Test'},
+        resolvedData: const {'name': 'Test'},
         resolvedVersion: EntityVersion.initial(
           entityId: 'entity-1',
           entityType: 'trip',
@@ -281,7 +281,7 @@ void main() {
         failedCount: 1,
         resolutions: [resolution],
         failedConflicts: [conflict],
-        errors: {'conflict-2': 'Merge failed'},
+        errors: const {'conflict-2': 'Merge failed'},
       );
 
       expect(result.totalConflicts, 2);
@@ -294,7 +294,7 @@ void main() {
 
   group('ConflictResolutionStrategy', () {
     test('should have all required strategies', () {
-      final strategies = ConflictResolutionStrategy.values;
+      const strategies = ConflictResolutionStrategy.values;
 
       expect(strategies.length, 3);
       expect(strategies, contains(ConflictResolutionStrategy.lastWriteWins));
@@ -305,7 +305,7 @@ void main() {
 
   group('ManualResolutionChoice', () {
     test('should have all required choices', () {
-      final choices = ManualResolutionChoice.values;
+      const choices = ManualResolutionChoice.values;
 
       expect(choices.length, 3);
       expect(choices, contains(ManualResolutionChoice.keepLocal));

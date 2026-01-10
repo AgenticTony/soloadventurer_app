@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solodventurer_app/core/utils/preloading_strategy.dart';
+import 'package:soloadventurer/core/utils/preloading_strategy.dart';
 
 void main() {
   group('PreloadConfig', () {
@@ -34,9 +34,9 @@ void main() {
     });
 
     test('should provide predefined configs', () {
-      final defaultConfig = PreloadConfig.defaultConfig;
-      final aggressiveConfig = PreloadConfig.aggressiveConfig;
-      final conservativeConfig = PreloadConfig.conservativeConfig;
+      const defaultConfig = PreloadConfig.defaultConfig;
+      const aggressiveConfig = PreloadConfig.aggressiveConfig;
+      const conservativeConfig = PreloadConfig.conservativeConfig;
 
       expect(defaultConfig.strategy, PreloadStrategy.predictive);
       expect(aggressiveConfig.strategy, PreloadStrategy.aggressive);
@@ -264,7 +264,7 @@ void main() {
 
     test('should calculate adaptive threshold based on performance', () {
       manager = PreloadingManager(
-        config: PreloadConfig(
+        config: const PreloadConfig(
           strategy: PreloadStrategy.predictive,
           enableAdaptiveThreshold: true,
         ),
@@ -346,7 +346,7 @@ void main() {
 
     setUp(() {
       manager = PreloadingManager(
-        config: PreloadConfig(
+        config: const PreloadConfig(
           strategy: PreloadStrategy.predictive,
           enableAdaptiveThreshold: true,
         ),

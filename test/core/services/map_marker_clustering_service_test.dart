@@ -6,7 +6,7 @@ import 'package:soloadventurer/core/services/map_marker_clustering_service.dart'
 void main() {
   group('MapMarker', () {
     test('should create marker with required fields', () {
-      final marker = MapMarker(
+      const marker = MapMarker(
         id: 'marker-1',
         position: LatLng(37.7749, -122.4194),
       );
@@ -56,11 +56,11 @@ void main() {
     });
 
     test('should calculate distance to another marker', () {
-      final marker1 = MapMarker(
+      const marker1 = MapMarker(
         id: 'marker-1',
         position: LatLng(37.7749, -122.4194),
       );
-      final marker2 = MapMarker(
+      const marker2 = MapMarker(
         id: 'marker-2',
         position: LatLng(37.7750, -122.4195),
       );
@@ -72,7 +72,7 @@ void main() {
     });
 
     test('should copy with modified fields', () {
-      final marker = MapMarker(
+      const marker = MapMarker(
         id: 'marker-1',
         position: LatLng(37.7749, -122.4194),
         title: 'Original',
@@ -89,11 +89,11 @@ void main() {
   group('MapCluster', () {
     test('should create cluster from markers', () {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
         ),
@@ -113,7 +113,7 @@ void main() {
       expect(
         () => MapCluster.fromMarkers(
           id: 'cluster-1',
-          markers: [],
+          markers: const [],
         ),
         throwsArgumentError,
       );
@@ -121,11 +121,11 @@ void main() {
 
     test('should calculate cluster center position', () {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7751, -122.4196),
         ),
@@ -143,12 +143,12 @@ void main() {
 
     test('should detect marker types in cluster', () {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
           type: MarkerType.trip,
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
           type: MarkerType.activity,
@@ -167,17 +167,17 @@ void main() {
 
     test('should count markers by type', () {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
           type: MarkerType.trip,
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
           type: MarkerType.trip,
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-3',
           position: LatLng(37.7751, -122.4196),
           type: MarkerType.activity,
@@ -195,12 +195,12 @@ void main() {
 
     test('should use weighted center when enabled', () {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'trip-marker',
           position: LatLng(37.7749, -122.4194),
           type: MarkerType.trip, // Higher weight (3.0)
         ),
-        MapMarker(
+        const MapMarker(
           id: 'photo-marker',
           position: LatLng(37.7751, -122.4196),
           type: MarkerType.photo, // Lower weight (1.0)
@@ -222,7 +222,7 @@ void main() {
 
   group('ClusteringParams', () {
     test('should create default params', () {
-      final params = ClusteringParams();
+      const params = ClusteringParams();
 
       expect(params.clusterRadius, 80);
       expect(params.minClusterSize, 2);
@@ -232,7 +232,7 @@ void main() {
     });
 
     test('should create high density params', () {
-      final params = ClusteringParams.highDensity();
+      const params = ClusteringParams.highDensity();
 
       expect(params.clusterRadius, 50);
       expect(params.minClusterSize, 3);
@@ -241,7 +241,7 @@ void main() {
     });
 
     test('should create low density params', () {
-      final params = ClusteringParams.lowDensity();
+      const params = ClusteringParams.lowDensity();
 
       expect(params.clusterRadius, 120);
       expect(params.minClusterSize, 2);
@@ -289,7 +289,7 @@ void main() {
   group('MapMarkerClusteringService - Distance Algorithm', () {
     test('should cluster nearby markers', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 100,
           minClusterSize: 2,
           algorithm: ClusteringAlgorithm.distance,
@@ -297,11 +297,11 @@ void main() {
       );
 
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195), // ~15 meters away
         ),
@@ -316,7 +316,7 @@ void main() {
 
     test('should not cluster distant markers', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 50,
           minClusterSize: 2,
           algorithm: ClusteringAlgorithm.distance,
@@ -324,11 +324,11 @@ void main() {
       );
 
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7849, -122.4294), // ~1.5 km away
         ),
@@ -342,7 +342,7 @@ void main() {
 
     test('should respect minClusterSize parameter', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 100,
           minClusterSize: 3, // Require at least 3 markers
           algorithm: ClusteringAlgorithm.distance,
@@ -350,11 +350,11 @@ void main() {
       );
 
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
         ),
@@ -368,7 +368,7 @@ void main() {
 
     test('should respect maxClusterSize parameter', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 200,
           minClusterSize: 2,
           maxClusterSize: 3,
@@ -396,7 +396,7 @@ void main() {
 
     test('should calculate clustering efficiency', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 100,
           minClusterSize: 2,
         ),
@@ -464,7 +464,7 @@ void main() {
       final service = MapMarkerClusteringService();
 
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
@@ -480,7 +480,7 @@ void main() {
   group('MapMarkerClusteringService - Grid Algorithm', () {
     test('should cluster markers using grid algorithm', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           algorithm: ClusteringAlgorithm.grid,
           gridCellSize: 100,
           minClusterSize: 2,
@@ -515,14 +515,14 @@ void main() {
 
     test('should be faster than distance-based for large datasets', () {
       final distanceService = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           algorithm: ClusteringAlgorithm.distance,
           clusterRadius: 80,
         ),
       );
 
       final gridService = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           algorithm: ClusteringAlgorithm.grid,
           gridCellSize: 100,
         ),
@@ -553,7 +553,7 @@ void main() {
   group('MapMarkerClusteringService - K-means Algorithm', () {
     test('should cluster markers using k-means', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           algorithm: ClusteringAlgorithm.kmeans,
           minClusterSize: 3,
         ),
@@ -563,7 +563,8 @@ void main() {
         30,
         (i) => MapMarker(
           id: 'marker-$i',
-          position: LatLng(37.7749 + (i % 10) * 0.001, -122.4194 + (i ~/ 10) * 0.001),
+          position:
+              LatLng(37.7749 + (i % 10) * 0.001, -122.4194 + (i ~/ 10) * 0.001),
         ),
       );
 
@@ -575,7 +576,7 @@ void main() {
 
     test('should not cluster if less than minClusterSize', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           algorithm: ClusteringAlgorithm.kmeans,
           minClusterSize: 10,
         ),
@@ -599,7 +600,7 @@ void main() {
   group('MapMarkerClusteringService - Bounds Clustering', () {
     test('should cluster only markers within bounds', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 100,
           minClusterSize: 2,
         ),
@@ -607,30 +608,31 @@ void main() {
 
       final markers = [
         // Within bounds (San Francisco)
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
         ),
         // Outside bounds (New York)
-        MapMarker(
+        const MapMarker(
           id: 'marker-3',
           position: LatLng(40.7128, -74.0060),
         ),
       ];
 
       final bounds = LatLngBounds(
-        southwest: LatLng(37.4, -122.5),
-        northeast: LatLng(37.8, -122.0),
+        southwest: const LatLng(37.4, -122.5),
+        northeast: const LatLng(37.8, -122.0),
       );
 
       final result = service.clusterMarkersInBounds(markers, bounds);
 
       expect(result.clusters.length, 1);
-      expect(result.clusters.first.markerIds, containsAll(['marker-1', 'marker-2']));
+      expect(result.clusters.first.markerIds,
+          containsAll(['marker-1', 'marker-2']));
       expect(result.clusters.first.markerIds, isNot(contains('marker-3')));
     });
 
@@ -638,15 +640,15 @@ void main() {
       final service = MapMarkerClusteringService();
 
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(40.7128, -74.0060), // New York
         ),
       ];
 
       final bounds = LatLngBounds(
-        southwest: LatLng(37.4, -122.5), // San Francisco
-        northeast: LatLng(37.8, -122.0),
+        southwest: const LatLng(37.4, -122.5), // San Francisco
+        northeast: const LatLng(37.8, -122.0),
       );
 
       final result = service.clusterMarkersInBounds(markers, bounds);
@@ -659,7 +661,7 @@ void main() {
   group('MapMarkerClusteringService - Incremental Clustering', () {
     test('should add new markers to existing clusters', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 100,
           minClusterSize: 2,
         ),
@@ -667,11 +669,11 @@ void main() {
 
       // Initial markers
       final existingMarkers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
         ),
@@ -681,7 +683,7 @@ void main() {
 
       // New markers (close to existing cluster)
       final newMarkers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-3',
           position: LatLng(37.7751, -122.4196),
         ),
@@ -699,22 +701,22 @@ void main() {
 
     test('should handle removal of markers', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           clusterRadius: 100,
           minClusterSize: 2,
         ),
       );
 
       final allMarkers = [
-        MapMarker(
+        const MapMarker(
           id: 'marker-1',
           position: LatLng(37.7749, -122.4194),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-2',
           position: LatLng(37.7750, -122.4195),
         ),
-        MapMarker(
+        const MapMarker(
           id: 'marker-3',
           position: LatLng(37.7751, -122.4196),
         ),
@@ -758,7 +760,8 @@ void main() {
         50,
         (i) => MapMarker(
           id: 'marker-$i',
-          position: LatLng(37.7749 + (i % 10) * 0.0005, -122.4194 + (i ~/ 10) * 0.0005),
+          position: LatLng(
+              37.7749 + (i % 10) * 0.0005, -122.4194 + (i ~/ 10) * 0.0005),
         ),
       );
 
@@ -771,20 +774,22 @@ void main() {
       final resultZoomedIn = service.clusterMarkers(markers);
 
       // Zoomed out should have fewer, larger clusters
-      expect(resultZoomedOut.clusters.length, lessThanOrEqualTo(resultZoomedIn.clusters.length));
+      expect(resultZoomedOut.clusters.length,
+          lessThanOrEqualTo(resultZoomedIn.clusters.length));
 
       // Zoomed out should have higher efficiency
-      expect(resultZoomedOut.efficiency, greaterThanOrEqualTo(resultZoomedIn.efficiency));
+      expect(resultZoomedOut.efficiency,
+          greaterThanOrEqualTo(resultZoomedIn.efficiency));
     });
   });
 
   group('ClusteringResult', () {
     test('should calculate efficiency correctly', () {
       final markers = [
-        MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
-        MapMarker(id: '2', position: LatLng(37.7750, -122.4195)),
-        MapMarker(id: '3', position: LatLng(37.7751, -122.4196)),
-        MapMarker(id: '4', position: LatLng(37.7752, -122.4197)),
+        const MapMarker(id: '1', position: LatLng(37.7749, -122.4194)),
+        const MapMarker(id: '2', position: LatLng(37.7750, -122.4195)),
+        const MapMarker(id: '3', position: LatLng(37.7751, -122.4196)),
+        const MapMarker(id: '4', position: LatLng(37.7752, -122.4197)),
       ];
 
       final cluster1 = MapCluster.fromMarkers(
@@ -810,12 +815,12 @@ void main() {
     });
 
     test('should handle zero markers', () {
-      final result = ClusteringResult(
+      const result = ClusteringResult(
         clusters: [],
         unclusteredMarkers: [],
         totalMarkers: 0,
         algorithm: ClusteringAlgorithm.distance,
-        params: const ClusteringParams(),
+        params: ClusteringParams(),
       );
 
       expect(result.efficiency, 0.0);
@@ -825,7 +830,7 @@ void main() {
   group('Performance Tests', () {
     test('should handle 500 markers efficiently', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams(
+        const ClusteringParams(
           algorithm: ClusteringAlgorithm.grid, // Fastest for large datasets
           gridCellSize: 100,
         ),
@@ -853,7 +858,7 @@ void main() {
 
     test('should achieve 80-90% efficiency on clustered data', () {
       final service = MapMarkerClusteringService(
-        ClusteringParams.highDensity(),
+        const ClusteringParams.highDensity(),
       );
 
       // Generate clustered data (10 clusters of 50 markers each)

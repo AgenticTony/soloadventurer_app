@@ -6,25 +6,53 @@ part of 'recommendation_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$recommendationServiceHash() =>
-    r'200c425fb239899d8aa06cf4605a89c3afb3f383';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for the recommendation service implementation
+
+@ProviderFor(recommendationService)
+final recommendationServiceProvider = RecommendationServiceProvider._();
 
 /// Provider for the recommendation service implementation
-///
-/// Copied from [recommendationService].
-@ProviderFor(recommendationService)
-final recommendationServiceProvider = Provider<RecommendationService>.internal(
-  recommendationService,
-  name: r'recommendationServiceProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$recommendationServiceHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef RecommendationServiceRef = ProviderRef<RecommendationService>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+final class RecommendationServiceProvider extends $FunctionalProvider<
+    RecommendationService,
+    RecommendationService,
+    RecommendationService> with $Provider<RecommendationService> {
+  /// Provider for the recommendation service implementation
+  RecommendationServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'recommendationServiceProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$recommendationServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<RecommendationService> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  RecommendationService create(Ref ref) {
+    return recommendationService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RecommendationService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RecommendationService>(value),
+    );
+  }
+}
+
+String _$recommendationServiceHash() =>
+    r'200c425fb239899d8aa06cf4605a89c3afb3f383';

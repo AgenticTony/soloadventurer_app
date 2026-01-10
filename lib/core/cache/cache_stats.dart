@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// Cache statistics for tracking cache performance
 ///
 /// Tracks metrics like hit rate, miss rate, eviction counts, and memory usage
@@ -185,7 +183,8 @@ class CacheStats {
     stats._totalAdditions = json['totalAdditions'] as int? ?? 0;
     stats._totalRemovals = json['totalRemovals'] as int? ?? 0;
     if (json['lastOperationAt'] != null) {
-      stats._lastOperationAt = DateTime.parse(json['lastOperationAt'] as String);
+      stats._lastOperationAt =
+          DateTime.parse(json['lastOperationAt'] as String);
     }
     return stats;
   }

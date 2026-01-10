@@ -281,7 +281,8 @@ class _StandaloneMoodPickerExampleState
                       decoration: BoxDecoration(
                         color: isSelected
                             ? theme.colorScheme.primaryContainer
-                            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                            : theme.colorScheme.surfaceContainerHighest
+                                .withOpacity(0.3),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
@@ -301,8 +302,9 @@ class _StandaloneMoodPickerExampleState
                           Text(
                             mood.label,
                             style: theme.textTheme.labelMedium?.copyWith(
-                              fontWeight:
-                                  isSelected ? FontWeight.w600 : FontWeight.normal,
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.normal,
                             ),
                           ),
                         ],
@@ -451,12 +453,12 @@ class JournalEntryWithMoodExample extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Create Journal Entry'),
       ),
-      body: Column(
+      body: const Column(
         children: [
           // ... other form fields ...
 
           // Mood picker
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(16.0),
             child: MoodPicker(),
           ),

@@ -6,9 +6,9 @@ part of 'recommendation_request.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$RecommendationRequestImpl _$$RecommendationRequestImplFromJson(
+_RecommendationRequest _$RecommendationRequestFromJson(
         Map<String, dynamic> json) =>
-    _$RecommendationRequestImpl(
+    _RecommendationRequest(
       itineraryId: json['itineraryId'] as String,
       destination:
           Destination.fromJson(json['destination'] as Map<String, dynamic>),
@@ -35,8 +35,8 @@ _$RecommendationRequestImpl _$$RecommendationRequestImplFromJson(
       excludeItineraryItems: json['excludeItineraryItems'] as bool? ?? true,
     );
 
-Map<String, dynamic> _$$RecommendationRequestImplToJson(
-        _$RecommendationRequestImpl instance) =>
+Map<String, dynamic> _$RecommendationRequestToJson(
+        _RecommendationRequest instance) =>
     <String, dynamic>{
       'itineraryId': instance.itineraryId,
       'destination': instance.destination,
@@ -94,15 +94,15 @@ const _$DistanceFromHotelEnumMap = {
   DistanceFromHotel.far: 'far',
 };
 
-_$HotelLocationImpl _$$HotelLocationImplFromJson(Map<String, dynamic> json) =>
-    _$HotelLocationImpl(
+_HotelLocation _$HotelLocationFromJson(Map<String, dynamic> json) =>
+    _HotelLocation(
       name: json['name'] as String,
       address: json['address'] as String?,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$$HotelLocationImplToJson(_$HotelLocationImpl instance) =>
+Map<String, dynamic> _$HotelLocationToJson(_HotelLocation instance) =>
     <String, dynamic>{
       'name': instance.name,
       'address': instance.address,
@@ -110,14 +110,13 @@ Map<String, dynamic> _$$HotelLocationImplToJson(_$HotelLocationImpl instance) =>
       'longitude': instance.longitude,
     };
 
-_$BudgetRangeImpl _$$BudgetRangeImplFromJson(Map<String, dynamic> json) =>
-    _$BudgetRangeImpl(
+_BudgetRange _$BudgetRangeFromJson(Map<String, dynamic> json) => _BudgetRange(
       min: (json['min'] as num?)?.toDouble(),
       max: (json['max'] as num?)?.toDouble(),
       currency: json['currency'] as String? ?? 'USD',
     );
 
-Map<String, dynamic> _$$BudgetRangeImplToJson(_$BudgetRangeImpl instance) =>
+Map<String, dynamic> _$BudgetRangeToJson(_BudgetRange instance) =>
     <String, dynamic>{
       'min': instance.min,
       'max': instance.max,

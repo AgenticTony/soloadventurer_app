@@ -52,9 +52,10 @@ class Photo with _$Photo {
   }) = _Photo;
 
   factory Photo.fromJson(Map<String, dynamic> json) => _$PhotoFromJson(json);
+}
 
-  const Photo._();
-
+/// Photo extensions for computed properties
+extension PhotoExtension on Photo {
   /// Calculates aspect ratio for proper image display
   ///
   /// Returns the width-to-height ratio of the photo. Returns 1.0 (square)

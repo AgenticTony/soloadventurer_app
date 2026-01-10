@@ -135,7 +135,8 @@ class ImageCompressionService {
       );
 
       // Determine output path
-      final finalOutputPath = outputPath ?? _generateOutputPath(file.path, targetFormat);
+      final finalOutputPath =
+          outputPath ?? _generateOutputPath(file.path, targetFormat);
 
       // Write compressed file
       final compressedFile = File(finalOutputPath);
@@ -158,7 +159,8 @@ class ImageCompressionService {
       if (kDebugMode) {
         debugPrint('  - Compressed size: ${result.formattedCompressedSize}');
         debugPrint('  - Savings: ${result.savingsPercentage}%');
-        debugPrint('  - Dimensions: ${result.originalWidth}x${result.originalHeight} → ${result.compressedWidth}x${result.compressedHeight}');
+        debugPrint(
+            '  - Dimensions: ${result.originalWidth}x${result.originalHeight} → ${result.compressedWidth}x${result.compressedHeight}');
       }
 
       return result;
@@ -215,7 +217,7 @@ class ImageCompressionService {
       final image = img.decodeImage(bytes);
 
       if (image == null) {
-        throw CompressionException('Failed to decode image');
+        throw const CompressionException('Failed to decode image');
       }
 
       final originalWidth = image.width;
@@ -260,9 +262,12 @@ class ImageCompressionService {
       }
 
       if (kDebugMode) {
-        final savings = ((1 - compressedBytes.length / bytes.length) * 100).toInt();
-        debugPrint('  - Original: ${_formatBytes(bytes.length)} ($originalWidth x $originalHeight)');
-        debugPrint('  - Compressed: ${_formatBytes(compressedBytes.length)} ($compressedWidth x $compressedHeight)');
+        final savings =
+            ((1 - compressedBytes.length / bytes.length) * 100).toInt();
+        debugPrint(
+            '  - Original: ${_formatBytes(bytes.length)} ($originalWidth x $originalHeight)');
+        debugPrint(
+            '  - Compressed: ${_formatBytes(compressedBytes.length)} ($compressedWidth x $compressedHeight)');
         debugPrint('  - Savings: $savings%');
       }
 
@@ -313,7 +318,8 @@ class ImageCompressionService {
     int? maxHeight,
   }) async {
     if (kDebugMode) {
-      debugPrint('ImageCompressionService: Compressing batch of ${files.length} images');
+      debugPrint(
+          'ImageCompressionService: Compressing batch of ${files.length} images');
     }
 
     // Process in batches to avoid overwhelming memory
@@ -351,7 +357,8 @@ class ImageCompressionService {
       debugPrint('Batch compression complete:');
       debugPrint('  - Total original: ${_formatBytes(totalOriginal)}');
       debugPrint('  - Total compressed: ${_formatBytes(totalCompressed)}');
-      debugPrint('  - Total savings: ${_formatBytes(totalSavings)} (${((1 - totalCompressed / totalOriginal) * 100).toStringAsFixed(1)}%)');
+      debugPrint(
+          '  - Total savings: ${_formatBytes(totalSavings)} (${((1 - totalCompressed / totalOriginal) * 100).toStringAsFixed(1)}%)');
     }
 
     return results;
@@ -416,7 +423,7 @@ class ImageCompressionService {
   /// Validate quality parameter.
   static void _validateQuality(int quality) {
     if (quality < minQuality || quality > maxQuality) {
-      throw CompressionException(
+      throw const CompressionException(
         'Quality must be between $minQuality and $maxQuality',
       );
     }
@@ -528,7 +535,7 @@ class CompressionResult {
         'originalSize: $formattedOriginalSize, '
         'compressedSize: $formattedCompressedSize, '
         'savings: ${savingsPercentage.toStringAsFixed(1)}%, '
-        'dimensions: ${originalWidth}x${originalHeight} → ${compressedWidth}x${compressedHeight}, '
+        'dimensions: ${originalWidth}x$originalHeight → ${compressedWidth}x$compressedHeight, '
         'quality: $quality, '
         'format: $format)';
   }

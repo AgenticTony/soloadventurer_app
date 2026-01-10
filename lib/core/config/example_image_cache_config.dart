@@ -51,7 +51,7 @@ class ExampleHomeScreen extends StatelessWidget {
         title: const Text('ImageCacheConfig Examples'),
       ),
       body: ListView(
-        children: [
+        children: const [
           _ExampleTile(
             title: 'Basic Initialization',
             description: 'Initialize cache with default settings',
@@ -195,8 +195,7 @@ class CacheManagementExample extends StatefulWidget {
   const CacheManagementExample({super.key});
 
   @override
-  State<CacheManagementExample> createState() =>
-      _CacheManagementExampleState();
+  State<CacheManagementExample> createState() => _CacheManagementExampleState();
 }
 
 class _CacheManagementExampleState extends State<CacheManagementExample> {
@@ -314,8 +313,7 @@ class CacheStatisticsExample extends StatefulWidget {
   const CacheStatisticsExample({super.key});
 
   @override
-  State<CacheStatisticsExample> createState() =>
-      _CacheStatisticsExampleState();
+  State<CacheStatisticsExample> createState() => _CacheStatisticsExampleState();
 }
 
 class _CacheStatisticsExampleState extends State<CacheStatisticsExample> {
@@ -377,7 +375,8 @@ class _CacheStatisticsExampleState extends State<CacheStatisticsExample> {
                     ),
                     _StatCard(
                       title: 'Avg Memory per Image',
-                      value: _formatBytes(_stats!.averageMemoryPerImage.toInt()),
+                      value:
+                          _formatBytes(_stats!.averageMemoryPerImage.toInt()),
                       icon: Icons.calculate,
                     ),
                     _StatCard(
@@ -507,7 +506,7 @@ class _DeviceSpecificConfigExampleState
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: _selectedDevice,
+              initialValue: _selectedDevice,
               decoration: const InputDecoration(
                 labelText: 'Device Type',
                 border: OutlineInputBorder(),
@@ -573,15 +572,15 @@ class MemoryDimensionsExample extends StatelessWidget {
             style: TextStyle(fontSize: 16),
           ),
           const SizedBox(height: 24),
-          _DimensionCard(
+          const _DimensionCard(
             title: 'Thumbnail (48x48)',
             displaySize: 48.0,
           ),
-          _DimensionCard(
+          const _DimensionCard(
             title: 'Photo Grid (100x100)',
             displaySize: 100.0,
           ),
-          _DimensionCard(
+          const _DimensionCard(
             title: 'Card Image (200x300)',
             displayWidth: 300.0,
             displayHeight: 200.0,
@@ -644,9 +643,11 @@ class _DimensionCard extends StatelessWidget {
     );
   }
 
-  String _calculateSavings(double displayW, double displayH, int cacheW, int cacheH) {
+  String _calculateSavings(
+      double displayW, double displayH, int cacheW, int cacheH) {
     final displayPixels = displayW * displayH;
-    final fullResPixels = displayW * displayH * 4 * 4; // 4x for typical device pixel ratio
+    final fullResPixels =
+        displayW * displayH * 4 * 4; // 4x for typical device pixel ratio
     final cachePixels = (cacheW * cacheH).toDouble();
     final savings = 1 - (cachePixels / fullResPixels);
     return '${(savings * 100).toStringAsFixed(0)}%';

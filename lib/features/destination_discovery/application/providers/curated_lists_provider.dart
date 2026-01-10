@@ -1,8 +1,17 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/models/curated_list.dart';
-import '../../domain/repositories/destination_repository.dart';
 import '../state/curated_lists_state.dart';
+import 'destination_repository_provider.dart';
 
+part 'curated_lists_provider.g.dart';
+
+/// Riverpod 3.0 Migration Notes:
+/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Dependencies injected via ref.watch() in build() method
+/// - build() returns Future<T> not AsyncValue<T>
+/// - State is automatically AsyncValue<CuratedListsState> when consumed
+/// - Constructor auto-load logic moved to build() method
+///
 /// Provider for curated destination lists state management
 ///
 /// This provider manages the state of curated destination collections including:
@@ -10,10 +19,12 @@ import '../state/curated_lists_state.dart';
 /// - Selected/detailed curated list
 /// - Loading and error states
 ///
+/// Riverpod 3.0: Uses @riverpod annotation with AsyncNotifier pattern.
+///
 /// Usage:
 /// ```dart
 /// final curatedListsState = ref.watch(curatedListsProvider);
-/// final curatedListsNotifier = ref.read(curatedListsProvider.notifier);
+/// final curatedListsNotifier = ref.watch(curatedListsProvider.notifier);
 ///
 /// // Load all curated lists (automatically called on first watch)
 /// // Lists are auto-loaded when the provider is first watched
@@ -30,51 +41,23 @@ import '../state/curated_lists_state.dart';
 /// // Get curated lists by type
 /// final hiddenGems = curatedListsNotifier.hiddenGemsLists;
 /// ```
-final curatedListsProvider =
-    StateNotifierProvider<CuratedListsNotifier, AsyncValue<CuratedListsState>>((ref) {
-  final repository = ref.watch(destinationRepositoryProvider);
-  return CuratedListsNotifier(repository);
-});
-
-/// Notifier for managing curated destination lists state
-///
-/// This notifier handles all operations for curated destination lists:
-/// - Loading all curated lists
-/// - Loading a specific curated list by ID
-/// - Refreshing curated lists
-/// - Filtering curated lists by type
-class CuratedListsNotifier
-    extends StateNotifier<AsyncValue<CuratedListsState>> {
-  final DestinationRepository _repository;
-
-  /// Creates a new [CuratedListsNotifier]
+@riverpod
+class CuratedLists extends _$CuratedLists {
+  /// Initialize the notifier and auto-load curated lists
   ///
-  /// The [repository] parameter is required for performing data operations.
-  CuratedListsNotifier(this._repository)
-      : super(const AsyncValue.data(CuratedListsState.initial())) {
-    // Auto-load curated lists on creation
-    loadCuratedLists();
-  }
+  /// Riverpod 3.0: build() returns Future<CuratedListsState>
+  /// AsyncValue wrapping is handled automatically by the framework
+  @override
+  Future<CuratedListsState> build() async {
+    // Get dependencies via ref.watch()
+    final repository = ref.watch(destinationRepositoryProvider);
 
-  /// Load all curated lists
-  ///
-  /// This method fetches all curated lists from the repository.
-  /// Throws an exception if loading fails.
-  ///
-  /// Note: This is automatically called when the notifier is created.
-  Future<void> loadCuratedLists() async {
-    state = const AsyncValue.loading();
+    // Auto-load curated lists on build
+    final curatedLists = await repository.getCuratedLists();
 
-    try {
-      final curatedLists = await _repository.getCuratedLists();
-
-      state = AsyncValue.data(CuratedListsState(
-        curatedLists: curatedLists,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+    return CuratedListsState(
+      curatedLists: curatedLists,
+    );
   }
 
   /// Load a specific curated list by ID
@@ -84,16 +67,21 @@ class CuratedListsNotifier
   ///
   /// Throws an exception if loading fails.
   Future<void> loadCuratedList(String listId) async {
-    // Update state to loading while keeping current data if available
-    if (state.hasValue) {
-      state = AsyncValue.data(state.value!);
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
+    // Guard against loading if not in success state
+    final currentState = state.value;
+    if (currentState == null) {
+      return;
     }
 
-    try {
-      final curatedList = await _repository.getCuratedListById(listId);
+    // Set loading state while keeping current data
+    state = const AsyncValue.loading();
 
-      // Update state with the selected list
-      final currentState = state.value ?? CuratedListsState.initial();
+    // Load curated list
+    state = await AsyncValue.guard(() async {
+      final curatedList = await repository.getCuratedListById(listId);
 
       // Update the list in the curated lists array if it exists
       final updatedLists = currentState.curatedLists.map((list) {
@@ -105,15 +93,11 @@ class CuratedListsNotifier
         updatedLists.add(curatedList);
       }
 
-      state = AsyncValue.data(currentState.copyWith(
+      return currentState.copyWith(
         curatedLists: updatedLists,
         selectedList: curatedList,
-      ));
-    } catch (error, stackTrace) {
-      // Revert to previous state on error
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+      );
+    });
   }
 
   /// Refresh all curated lists
@@ -123,24 +107,27 @@ class CuratedListsNotifier
   ///
   /// Throws an exception if refreshing fails.
   Future<void> refresh() async {
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
     // Preserve selected list while loading if available
     CuratedList? selectedList;
     if (state.hasValue && state.value!.selectedList != null) {
       selectedList = state.value!.selectedList;
-      state = AsyncValue.data(state.value!);
     }
 
-    try {
-      final curatedLists = await _repository.getCuratedLists();
+    // Set loading state
+    state = const AsyncValue.loading();
 
-      state = AsyncValue.data(CuratedListsState(
+    // Load curated lists
+    state = await AsyncValue.guard(() async {
+      final curatedLists = await repository.getCuratedLists();
+
+      return CuratedListsState(
         curatedLists: curatedLists,
         selectedList: selectedList,
-      ));
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+      );
+    });
   }
 
   /// Refresh the selected curated list
@@ -150,17 +137,18 @@ class CuratedListsNotifier
   ///
   /// Throws an exception if refreshing fails.
   Future<bool> refreshSelectedList() async {
+    // Get repository
+    final repository = ref.read(destinationRepositoryProvider);
+
     if (!state.hasValue || state.value!.selectedList == null) {
       return false;
     }
 
     final listId = state.value!.selectedList!.id;
 
-    // Update state to loading while keeping current data
-    state = AsyncValue.data(state.value!);
-
-    try {
-      final curatedList = await _repository.getCuratedListById(listId);
+    // Set loading state
+    state = await AsyncValue.guard(() async {
+      final curatedList = await repository.getCuratedListById(listId);
 
       // Update the list in the curated lists array
       final currentState = state.value!;
@@ -168,16 +156,13 @@ class CuratedListsNotifier
         return list.id == listId ? curatedList : list;
       }).toList();
 
-      state = AsyncValue.data(currentState.copyWith(
+      return currentState.copyWith(
         curatedLists: updatedLists,
         selectedList: curatedList,
-      ));
+      );
+    });
 
-      return true;
-    } catch (error, stackTrace) {
-      state = AsyncValue.error(error, stackTrace);
-      rethrow;
-    }
+    return true;
   }
 
   /// Clear the curated lists state

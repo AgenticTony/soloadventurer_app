@@ -78,11 +78,16 @@ class MemoryAwareCacheConfig {
     return MemoryAwareCacheConfig(
       baselineMemoryBytes: baselineMemoryBytes ?? this.baselineMemoryBytes,
       monitoringInterval: monitoringInterval ?? this.monitoringInterval,
-      maxCacheSizeAtNoPressure: maxCacheSizeAtNoPressure ?? this.maxCacheSizeAtNoPressure,
-      maxCacheSizeAtLowPressure: maxCacheSizeAtLowPressure ?? this.maxCacheSizeAtLowPressure,
-      maxCacheSizeAtMediumPressure: maxCacheSizeAtMediumPressure ?? this.maxCacheSizeAtMediumPressure,
-      maxCacheSizeAtHighPressure: maxCacheSizeAtHighPressure ?? this.maxCacheSizeAtHighPressure,
-      maxCacheSizeAtCriticalPressure: maxCacheSizeAtCriticalPressure ?? this.maxCacheSizeAtCriticalPressure,
+      maxCacheSizeAtNoPressure:
+          maxCacheSizeAtNoPressure ?? this.maxCacheSizeAtNoPressure,
+      maxCacheSizeAtLowPressure:
+          maxCacheSizeAtLowPressure ?? this.maxCacheSizeAtLowPressure,
+      maxCacheSizeAtMediumPressure:
+          maxCacheSizeAtMediumPressure ?? this.maxCacheSizeAtMediumPressure,
+      maxCacheSizeAtHighPressure:
+          maxCacheSizeAtHighPressure ?? this.maxCacheSizeAtHighPressure,
+      maxCacheSizeAtCriticalPressure:
+          maxCacheSizeAtCriticalPressure ?? this.maxCacheSizeAtCriticalPressure,
       autoResize: autoResize ?? this.autoResize,
       autoCleanupExpired: autoCleanupExpired ?? this.autoCleanupExpired,
     );
@@ -287,9 +292,10 @@ class MemoryAwareCacheManager<K, V> {
     CacheManagerConfig? cacheManagerConfig,
   }) : config = config ?? const MemoryAwareCacheConfig() {
     // Initialize with default cache size
-    final initialCacheSize = config?.getMaxCacheSize(MemoryPressure.none) ?? 300;
-    final effectiveCacheConfig = (cacheManagerConfig ?? const CacheManagerConfig())
-        .copyWith(
+    final initialCacheSize =
+        config?.getMaxCacheSize(MemoryPressure.none) ?? 300;
+    final effectiveCacheConfig =
+        (cacheManagerConfig ?? const CacheManagerConfig()).copyWith(
       memoryConfig: MemoryCacheConfig(maxSize: initialCacheSize),
     );
 
@@ -529,7 +535,8 @@ class MemoryAwareCacheManager<K, V> {
       return _currentPressure;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('MemoryAwareCacheManager: Error checking memory pressure: $e');
+        debugPrint(
+            'MemoryAwareCacheManager: Error checking memory pressure: $e');
       }
       return _currentPressure;
     }

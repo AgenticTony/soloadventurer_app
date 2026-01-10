@@ -6,8 +6,8 @@ import '../models/auth_session.dart';
 part 'token_blacklist_manager.g.dart';
 
 /// Manages token blacklisting and rotation according to AWS Cognito best practices
-@riverpod
-class TokenBlacklistManager extends AutoDisposeNotifier<void> {
+@Riverpod(keepAlive: false)
+class TokenBlacklistManager extends _$TokenBlacklistManager {
   static const Duration _blacklistDuration = Duration(hours: 24);
   final Map<String, DateTime> _blacklistedTokens = {};
   Timer? _cleanupTimer;

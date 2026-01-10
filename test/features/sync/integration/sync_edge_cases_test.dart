@@ -15,8 +15,10 @@ import 'package:soloadventurer/features/sync/domain/models/network_status.dart';
 
 /// Manual mock implementation of NetworkConnectivity for testing
 class MockNetworkConnectivity implements NetworkConnectivity {
-  final StreamController<bool> _onlineController = StreamController<bool>.broadcast();
-  final StreamController<NetworkStatus> _statusController = StreamController<NetworkStatus>.broadcast();
+  final StreamController<bool> _onlineController =
+      StreamController<bool>.broadcast();
+  final StreamController<NetworkStatus> _statusController =
+      StreamController<NetworkStatus>.broadcast();
 
   NetworkStatus? _currentStatus;
 
@@ -33,7 +35,8 @@ class MockNetworkConnectivity implements NetworkConnectivity {
   Stream<bool> get onOnline => _onlineController.stream;
 
   @override
-  Stream<bool> get onOffline => _onlineController.stream.map((isOnline) => !isOnline);
+  Stream<bool> get onOffline =>
+      _onlineController.stream.map((isOnline) => !isOnline);
 
   @override
   Stream<NetworkStatus> get onStatusChange => _statusController.stream;
@@ -47,6 +50,7 @@ class MockNetworkConnectivity implements NetworkConnectivity {
   @override
   Stream<NetworkStatus> get statusStream => _statusController.stream;
 
+  @override
   void dispose() {
     _onlineController.close();
     _statusController.close();
@@ -71,7 +75,8 @@ class MockSyncQueuePersistence implements SyncQueuePersistence {
   }
 
   @override
-  Future<SyncQueuePersistenceResult> saveQueue(List<SyncOperation> queue) async {
+  Future<SyncQueuePersistenceResult> saveQueue(
+      List<SyncOperation> queue) async {
     if (_shouldFailOnSave) {
       return SyncQueuePersistenceResult.failure(_failureMessage);
     }
@@ -124,7 +129,8 @@ class EdgeCaseBackendServer {
   Map<String, dynamic>? getRemoteData(String entityId) => _remoteData[entityId];
   int getRequestCount(String entityId) => _requestCounts[entityId] ?? 0;
 
-  void updateRemoteData(String entityId, EntityVersion version, Map<String, dynamic> data) {
+  void updateRemoteData(
+      String entityId, EntityVersion version, Map<String, dynamic> data) {
     _remoteVersions[entityId] = version;
     _remoteData[entityId] = data;
     _requestCounts[entityId] = (_requestCounts[entityId] ?? 0) + 1;
@@ -175,12 +181,13 @@ void main() {
 
   tearDown(() async {
     mockNetworkConnectivity.dispose();
-    await syncService.dispose();
+    syncService.dispose();
     mockBackend.clear();
   });
 
   group('Edge Case - Stale Data Rejection Tests', () {
-    test('should reject stale local data when remote version is newer', () async {
+    test('should reject stale local data when remote version is newer',
+        () async {
       // Arrange
       final baseTime = DateTime.now().toUtc();
       final staleLocalVersion = EntityVersion(
@@ -219,7 +226,8 @@ void main() {
       expect(conflict.shouldAutoResolve, isTrue);
     });
 
-    test('should reject stale remote data when local version is newer', () async {
+    test('should reject stale remote data when local version is newer',
+        () async {
       // Arrange
       final baseTime = DateTime.now().toUtc();
       final newerLocalVersion = EntityVersion(
@@ -264,21 +272,21 @@ void main() {
       final staleOp1 = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Old 1'},
+        data: const {'title': 'Old 1'},
         version: 1,
         lastModified: baseTime.subtract(const Duration(days: 3)),
       );
       final staleOp2 = SyncOperation.create(
         entityId: 'trip-2',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Old 2'},
+        data: const {'title': 'Old 2'},
         version: 1,
         lastModified: baseTime.subtract(const Duration(days: 2)),
       );
       final staleOp3 = SyncOperation.create(
         entityId: 'trip-3',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Old 3'},
+        data: const {'title': 'Old 3'},
         version: 1,
         lastModified: baseTime.subtract(const Duration(days: 1)),
       );
@@ -304,7 +312,7 @@ void main() {
       expect(loadedQueue[1].entityId, 'trip-2');
       expect(loadedQueue[2].entityId, 'trip-3');
 
-      await freshSyncService.dispose();
+      freshSyncService.dispose();
     });
 
     test('should reject operation with stale version number', () async {
@@ -344,27 +352,28 @@ void main() {
   });
 
   group('Edge Case - Partial Sync Recovery Tests', () {
-    test('should recover from partial sync when only some operations succeed', () async {
+    test('should recover from partial sync when only some operations succeed',
+        () async {
       // Arrange
       final baseTime = DateTime.now().toUtc();
       final op1 = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
         version: 1,
         lastModified: baseTime,
       );
       final op2 = SyncOperation.create(
         entityId: 'trip-2',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 2'},
+        data: const {'title': 'Trip 2'},
         version: 1,
         lastModified: baseTime,
       );
       final op3 = SyncOperation.create(
         entityId: 'trip-3',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 3'},
+        data: const {'title': 'Trip 3'},
         version: 1,
         lastModified: baseTime,
       );
@@ -401,7 +410,7 @@ void main() {
       final op1 = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
         version: 1,
         lastModified: baseTime,
       );
@@ -410,7 +419,7 @@ void main() {
         entityId: 'trip-2',
         entityType: SyncEntityType.trip,
         operationType: SyncOperationType.create,
-        data: {'title': 'Trip 2'},
+        data: const {'title': 'Trip 2'},
         version: 1,
         lastModified: baseTime,
         retryCount: 2,
@@ -435,7 +444,7 @@ void main() {
       expect(freshSyncService.queue[1].entityId, 'trip-2');
       expect(freshSyncService.queue[1].retryCount, 2);
 
-      await freshSyncService.dispose();
+      freshSyncService.dispose();
     });
 
     test('should handle partial sync with batch operations', () async {
@@ -511,7 +520,8 @@ void main() {
       // Assert
       expect(progressUpdates, isNotEmpty);
       expect(progressUpdates.last, lessThan(20)); // Some operations should fail
-      expect(syncService.queueSize, greaterThan(0)); // Failed ops remain in queue
+      expect(
+          syncService.queueSize, greaterThan(0)); // Failed ops remain in queue
     });
   });
 
@@ -530,9 +540,9 @@ void main() {
 
       // Assert
       expect(freshSyncService.queueSize, 0);
-      expect(freshSyncService.status, SyncStatus.idle);
+      expect(freshSyncService.status, SyncOperationStatus.idle);
 
-      await freshSyncService.dispose();
+      freshSyncService.dispose();
     });
 
     test('should handle operation with invalid data structure', () async {
@@ -541,10 +551,12 @@ void main() {
       final corruptedOp = SyncOperation.create(
         entityId: 'trip-corrupted',
         entityType: SyncEntityType.trip,
-        data: {
+        data: const {
           'title': null,
           'days': 'invalid',
-          'nested': {'invalid': [null, 'data']},
+          'nested': {
+            'invalid': [null, 'data']
+          },
         },
         version: 1,
         lastModified: baseTime,
@@ -597,7 +609,7 @@ void main() {
       final op = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
         version: 1,
         lastModified: baseTime,
       );
@@ -605,7 +617,8 @@ void main() {
       mockPersistence.setFailOnSave(true, message: 'Storage error');
 
       // Act & Assert - Should not throw
-      await expectLater(() async => await syncService.enqueue(op), returnsNormally);
+      await expectLater(
+          () async => await syncService.enqueue(op), returnsNormally);
       expect(syncService.queueSize, 1);
 
       // Reset for other tests
@@ -619,14 +632,14 @@ void main() {
         SyncOperation.create(
           entityId: 'trip-1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Valid 1'},
+          data: const {'title': 'Valid 1'},
           version: 1,
           lastModified: baseTime,
         ),
         SyncOperation.create(
           entityId: 'trip-2',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Valid 2'},
+          data: const {'title': 'Valid 2'},
           version: 1,
           lastModified: baseTime,
         ),
@@ -636,7 +649,7 @@ void main() {
         SyncOperation.create(
           entityId: '',
           entityType: SyncEntityType.trip,
-          data: <String, dynamic>{},
+          data: const <String, dynamic>{},
           version: -1,
           lastModified: baseTime,
         ),
@@ -644,7 +657,8 @@ void main() {
 
       // Act & Assert - Should handle gracefully
       for (final op in [...validOps, ...corruptedOps]) {
-        await expectLater(() async => await syncService.enqueue(op), returnsNormally);
+        await expectLater(
+            () async => await syncService.enqueue(op), returnsNormally);
       }
 
       expect(syncService.queueSize, 3);
@@ -681,7 +695,8 @@ void main() {
 
       // Assert
       expect(syncService.queueSize, 1000);
-      expect(stopwatch.elapsedMilliseconds, lessThan(5000)); // Should complete in < 5 seconds
+      expect(stopwatch.elapsedMilliseconds,
+          lessThan(5000)); // Should complete in < 5 seconds
     });
 
     test('should process large batch with reasonable performance', () async {
@@ -716,7 +731,8 @@ void main() {
       // Assert
       expect(processedCount, 500);
       expect(syncService.queueSize, 0);
-      expect(stopwatch.elapsedMilliseconds, lessThan(10000)); // Should complete in < 10 seconds
+      expect(stopwatch.elapsedMilliseconds,
+          lessThan(10000)); // Should complete in < 10 seconds
     });
 
     test('should handle memory efficiently with large queue', () async {
@@ -747,7 +763,8 @@ void main() {
       expect(syncService.queue.last.entityId, 'trip-1999');
     });
 
-    test('should maintain performance with frequent queue operations', () async {
+    test('should maintain performance with frequent queue operations',
+        () async {
       // Arrange
       final baseTime = DateTime.now().toUtc();
       final stopwatch = Stopwatch()..start();
@@ -779,7 +796,8 @@ void main() {
       // Assert
       expect(operationCount, 1000);
       expect(syncService.queueSize, 0);
-      expect(stopwatch.elapsedMilliseconds, lessThan(15000)); // Should complete in < 15 seconds
+      expect(stopwatch.elapsedMilliseconds,
+          lessThan(15000)); // Should complete in < 15 seconds
     });
 
     test('should handle large batch with mixed operation types', () async {
@@ -837,7 +855,8 @@ void main() {
         100,
         (i) => SyncOperation.create(
           entityId: 'trip-$i',
-          entityType: i % 2 == 0 ? SyncEntityType.authTokens : SyncEntityType.trip,
+          entityType:
+              i % 2 == 0 ? SyncEntityType.authTokens : SyncEntityType.trip,
           data: {'title': 'Trip $i'},
           version: 1,
           lastModified: baseTime,
@@ -963,7 +982,7 @@ void main() {
       final op = SyncOperation.create(
         entityId: 'trip-1',
         entityType: SyncEntityType.trip,
-        data: {'title': 'Trip 1'},
+        data: const {'title': 'Trip 1'},
         version: 1,
         lastModified: baseTime,
       );
@@ -971,7 +990,7 @@ void main() {
       await syncService.enqueue(op);
 
       // Act
-      await syncService.dispose();
+      syncService.dispose();
 
       // Assert - Operations after dispose should be handled gracefully
       expect(() => syncService.queue, returnsNormally);
@@ -979,15 +998,16 @@ void main() {
 
     test('should handle rapid status transitions', () async {
       // Arrange
-      final statusTransitions = <SyncStatus>[];
-      final subscription = syncService.statusStream.listen(statusTransitions.add);
+      final statusTransitions = <SyncOperationStatus>[];
+      final subscription =
+          syncService.statusStream.listen(statusTransitions.add);
 
       // Act - Rapidly change status
       await syncService.enqueue(
         SyncOperation.create(
           entityId: 'trip-1',
           entityType: SyncEntityType.trip,
-          data: {'title': 'Trip 1'},
+          data: const {'title': 'Trip 1'},
           version: 1,
           lastModified: DateTime.now().toUtc(),
         ),

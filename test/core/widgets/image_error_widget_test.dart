@@ -5,10 +5,9 @@ import 'package:soloadventurer/core/widgets/image_error_widget.dart';
 void main() {
   group('ImageErrorWidget', () {
     group('Basic rendering', () {
-      testWidgets('creates error widget with default values',
-          (tester) async {
+      testWidgets('creates error widget with default values', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Test error',
@@ -25,7 +24,7 @@ void main() {
 
       testWidgets('shows error icon', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Test error',
@@ -71,7 +70,7 @@ void main() {
       testWidgets('does not show retry button when onRetry is null',
           (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Test error',
@@ -91,7 +90,7 @@ void main() {
     group('Error type classification', () {
       testWidgets('shows timeout icon for timeout errors', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'TimeoutException',
@@ -109,7 +108,7 @@ void main() {
 
       testWidgets('shows not found icon for 404 errors', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'HTTP 404 Not Found',
@@ -128,7 +127,7 @@ void main() {
       testWidgets('shows network error icon for connection errors',
           (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Network connection failed',
@@ -144,10 +143,9 @@ void main() {
         expect(find.byIcon(Icons.wifi_off), findsOneWidget);
       });
 
-      testWidgets('shows lock icon for authorization errors',
-          (tester) async {
+      testWidgets('shows lock icon for authorization errors', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'HTTP 401 Unauthorized',
@@ -163,10 +161,9 @@ void main() {
         expect(find.byIcon(Icons.lock), findsOneWidget);
       });
 
-      testWidgets('shows broken image icon for format errors',
-          (tester) async {
+      testWidgets('shows broken image icon for format errors', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Invalid image format',
@@ -186,7 +183,7 @@ void main() {
     group('Compact mode', () {
       testWidgets('creates compact error widget', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget.compact(
                 error: 'Test error',
@@ -207,7 +204,7 @@ void main() {
         const size = 48.0;
 
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget.compact(
                 error: 'Test error',
@@ -246,7 +243,7 @@ void main() {
 
       testWidgets('applies custom icon', (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Test error',
@@ -279,8 +276,7 @@ void main() {
     });
 
     group('Retry functionality', () {
-      testWidgets('withRetry constructor creates retry button',
-          (tester) async {
+      testWidgets('withRetry constructor creates retry button', (tester) async {
         bool retried = false;
 
         await tester.pumpWidget(
@@ -338,7 +334,7 @@ void main() {
       testWidgets('calculates appropriate icon size for small containers',
           (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Test error',
@@ -357,7 +353,7 @@ void main() {
       testWidgets('calculates appropriate icon size for large containers',
           (tester) async {
         await tester.pumpWidget(
-          MaterialApp(
+          const MaterialApp(
             home: Scaffold(
               body: ImageErrorWidget(
                 error: 'Test error',
@@ -419,8 +415,7 @@ void main() {
     });
 
     test('determines retryability correctly', () {
-      final networkError =
-          ImageErrorClassifier.classify('Network error');
+      final networkError = ImageErrorClassifier.classify('Network error');
       expect(networkError.isRetryable(), isTrue);
 
       final notFoundError = ImageErrorClassifier.classify('404 Not Found');

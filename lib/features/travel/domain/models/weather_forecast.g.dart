@@ -6,9 +6,8 @@ part of 'weather_forecast.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$WeatherForecastImpl _$$WeatherForecastImplFromJson(
-        Map<String, dynamic> json) =>
-    _$WeatherForecastImpl(
+_WeatherForecast _$WeatherForecastFromJson(Map<String, dynamic> json) =>
+    _WeatherForecast(
       date: DateTime.parse(json['date'] as String),
       temperatureMin: (json['temperatureMin'] as num).toDouble(),
       temperatureMax: (json['temperatureMax'] as num).toDouble(),
@@ -21,8 +20,7 @@ _$WeatherForecastImpl _$$WeatherForecastImplFromJson(
       description: json['description'] as String?,
     );
 
-Map<String, dynamic> _$$WeatherForecastImplToJson(
-        _$WeatherForecastImpl instance) =>
+Map<String, dynamic> _$WeatherForecastToJson(_WeatherForecast instance) =>
     <String, dynamic>{
       'date': instance.date.toIso8601String(),
       'temperatureMin': instance.temperatureMin,

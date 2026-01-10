@@ -1,18 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
-import 'package:image/image.dart' as img;
 import '../../domain/entities/journal_entry.dart';
 import '../../domain/entities/trip.dart';
-import '../../domain/entities/media_item.dart';
 import '../../domain/repositories/journal_repository.dart';
 import '../../domain/repositories/trip_repository.dart';
 import '../../domain/services/pdf_export_service.dart';
-import '../../../core/errors/exceptions.dart';
 
 /// Implementation of PDF export service
 class PdfExportServiceImpl implements PdfExportService {
@@ -45,8 +40,8 @@ class PdfExportServiceImpl implements PdfExportService {
       ));
 
       // Load entries if not provided
-      final entriesToExport = entries ??
-          await _journalRepository.getEntriesByTrip(trip.id);
+      final entriesToExport =
+          entries ?? await _journalRepository.getEntriesByTrip(trip.id);
 
       onProgress?.call(PdfExportProgress(
         stage: PdfExportStage.loadingData,
@@ -292,7 +287,7 @@ class PdfExportServiceImpl implements PdfExportService {
     final imageSize = mediaCount * avgImageSize;
 
     // Metadata overhead
-    final metadataSize = 10000;
+    const metadataSize = 10000;
 
     return baseSize + imageSize + metadataSize;
   }
@@ -302,8 +297,8 @@ class PdfExportServiceImpl implements PdfExportService {
     required Trip trip,
     List<JournalEntry>? entries,
   }) async {
-    final entriesToExport = entries ??
-        await _journalRepository.getEntriesByTrip(trip.id);
+    final entriesToExport =
+        entries ?? await _journalRepository.getEntriesByTrip(trip.id);
 
     int totalMediaCount = 0;
     int photoCount = 0;
@@ -396,7 +391,8 @@ class PdfExportServiceImpl implements PdfExportService {
     return await pdf.save();
   }
 
-  pw.Widget _buildCoverPage(Trip trip, PdfExportConfig config, pw.PageTheme theme) {
+  pw.Widget _buildCoverPage(
+      Trip trip, PdfExportConfig config, pw.PageTheme theme) {
     final dateFormat = DateFormat.yMMMMd('en_US');
     final durationFormat = trip.duration.inDays > 0
         ? '${trip.duration.inDays} days'
@@ -554,7 +550,7 @@ class PdfExportServiceImpl implements PdfExportService {
   }
 
   pw.PageTheme _getTheme(PdfColorScheme scheme) {
-    final baseColor = PdfColor.fromInt(0xFF000000);
+    const baseColor = PdfColor.fromInt(0xFF000000);
 
     switch (scheme) {
       case PdfColorScheme.light:
@@ -586,7 +582,7 @@ class PdfExportServiceImpl implements PdfExportService {
           buildBackground: (pw.Context context) {
             return pw.FullPage(
               ignoreMargins: true,
-              child: pw.Container(color: PdfColor.fromInt(0xFF1E1E1E)),
+              child: pw.Container(color: const PdfColor.fromInt(0xFF1E1E1E)),
             );
           },
         );
@@ -601,7 +597,7 @@ class PdfExportServiceImpl implements PdfExportService {
           buildBackground: (pw.Context context) {
             return pw.FullPage(
               ignoreMargins: true,
-              child: pw.Container(color: PdfColor.fromInt(0xFFF4ECD8)),
+              child: pw.Container(color: const PdfColor.fromInt(0xFFF4ECD8)),
             );
           },
         );

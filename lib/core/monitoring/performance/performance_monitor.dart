@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:solo_adventurer/core/monitoring/performance/performance_metrics.dart'
+import 'package:soloadventurer/core/monitoring/performance/performance_metrics.dart'
     show PerformanceMetrics, PerformanceAlert, PerformanceAlertLevel;
 
-import 'package:solo_adventurer/core/monitoring/performance/network_monitor.dart';
+import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
 
 /// Configuration for performance monitoring
 class PerformanceMonitorConfig {
@@ -50,7 +50,8 @@ class PerformanceMonitorConfig {
       enabled: enabled ?? this.enabled,
       enableAlerts: enableAlerts ?? this.enableAlerts,
       targetFPS: targetFPS ?? this.targetFPS,
-      jankyFrameThresholdMs: jankyFrameThresholdMs ?? this.jankyFrameThresholdMs,
+      jankyFrameThresholdMs:
+          jankyFrameThresholdMs ?? this.jankyFrameThresholdMs,
     );
   }
 }
@@ -95,7 +96,7 @@ typedef PerformanceAlertCallback = void Function(PerformanceAlert alert);
 /// ```
 class PerformanceMonitor {
   static PerformanceMonitor? _instance;
-  PerformanceMonitorConfig _config;
+  final PerformanceMonitorConfig _config;
 
   /// Network monitor for tracking network performance
   final NetworkMonitor _networkMonitor = NetworkMonitor();
@@ -105,10 +106,10 @@ class PerformanceMonitor {
       StreamController<PerformanceMetrics>.broadcast();
 
   /// Callback for metrics updates
-  PerformanceMetricsCallback? _onMetricsUpdated;
+  final PerformanceMetricsCallback? _onMetricsUpdated;
 
   /// Callback for alerts
-  PerformanceAlertCallback? _onAlert;
+  final PerformanceAlertCallback? _onAlert;
 
   /// Monitoring timer
   Timer? _monitoringTimer;
@@ -197,7 +198,8 @@ class PerformanceMonitor {
 
     if (kDebugMode) {
       debugPrint('PerformanceMonitor initialized');
-      debugPrint('  Monitoring interval: ${effectiveConfig.monitoringInterval.inSeconds}s');
+      debugPrint(
+          '  Monitoring interval: ${effectiveConfig.monitoringInterval.inSeconds}s');
       debugPrint('  Target FPS: ${effectiveConfig.targetFPS}');
     }
   }
@@ -262,12 +264,16 @@ class PerformanceMonitor {
   /// Stop tracking frame rates
   void _stopFrameTracking() {
     if (!_isFrameTracking) return;
+    // Note: Persistent frame callbacks cannot be removed in Flutter.
+    // We use the _isFrameTracking flag to effectively disable tracking.
+    // The callback will still be called but will do nothing when disabled.
     _isFrameTracking = false;
-    SchedulerBinding.instance.removePersistentFrameCallback(_onFrame);
   }
 
   /// Called on each frame
   void _onFrame(Duration timestamp) {
+    if (!_isFrameTracking) return;
+
     final now = DateTime.now();
 
     // Calculate frame time
@@ -324,7 +330,7 @@ class PerformanceMonitor {
     try {
       // Get current memory usage (simplified estimate)
       // In production, this would integrate with MemoryMonitor
-      final currentMemoryBytes = 100 * 1024 * 1024; // 100MB baseline
+      const currentMemoryBytes = 100 * 1024 * 1024; // 100MB baseline
       _updateMemoryTracking(currentMemoryBytes);
 
       // Calculate average memory
@@ -334,9 +340,7 @@ class PerformanceMonitor {
 
       // Calculate FPS metrics
       final avgFrameTime = _frameTimes.isNotEmpty
-          ? _frameTimes
-                  .map((d) => d.inMicroseconds)
-                  .reduce((a, b) => a + b) /
+          ? _frameTimes.map((d) => d.inMicroseconds).reduce((a, b) => a + b) /
               _frameTimes.length
           : 16667; // Default to ~60fps
 
@@ -349,7 +353,10 @@ class PerformanceMonitor {
       final avgLatency = _totalNetworkRequests > 0
           ? _networkMonitor.getRequestHistory().isEmpty
               ? 0.0
-              : _networkMonitor.getRequestHistory().map((r) => r.duration.inMilliseconds).reduce((a, b) => a + b) /
+              : _networkMonitor
+                      .getRequestHistory()
+                      .map((r) => r.duration.inMilliseconds)
+                      .reduce((a, b) => a + b) /
                   _networkMonitor.getRequestHistory().length
           : 0.0;
 
@@ -380,7 +387,7 @@ class PerformanceMonitor {
 
       // Notify callback
       if (_onMetricsUpdated != null) {
-        _onMetricsUpdated!(metrics);
+        _onMetricsUpdated(metrics);
       }
 
       // Check for alerts
@@ -418,7 +425,8 @@ class PerformanceMonitor {
 
     // Check FPS
     if (metrics.averageFPS < 50) {
-      issues.add('Average FPS is ${metrics.averageFPS.toStringAsFixed(1)} (<50 target)');
+      issues.add(
+          'Average FPS is ${metrics.averageFPS.toStringAsFixed(1)} (<50 target)');
       level = PerformanceAlertLevel.warning;
     }
 
@@ -439,7 +447,8 @@ class PerformanceMonitor {
 
     // Check network error rate
     if (metrics.errorRate > 0.10) {
-      issues.add('Network error rate is ${(metrics.errorRate * 100).toStringAsFixed(1)}% (>10% target)');
+      issues.add(
+          'Network error rate is ${(metrics.errorRate * 100).toStringAsFixed(1)}% (>10% target)');
       level = PerformanceAlertLevel.warning;
     }
 
@@ -448,11 +457,12 @@ class PerformanceMonitor {
       final alert = PerformanceAlert(
         level: level,
         metrics: metrics,
-        message: 'Performance ${level.name}: ${issues.length} issue(s) detected',
+        message:
+            'Performance ${level.name}: ${issues.length} issue(s) detected',
         issues: issues,
         timestamp: DateTime.now(),
       );
-      _onAlert!(alert);
+      _onAlert(alert);
 
       if (kDebugMode) {
         debugPrint('⚠️ Performance Alert: $alert');
@@ -461,7 +471,7 @@ class PerformanceMonitor {
   }
 
   /// Get current performance metrics
-  static Future<PerformanceMetrics?> getCurrentMetrics() async {
+  static Future<PerformanceMetrics> getCurrentMetrics() async {
     if (_instance == null) {
       throw StateError('PerformanceMonitor not initialized');
     }
@@ -475,7 +485,28 @@ class PerformanceMonitor {
     await Future.delayed(Duration.zero);
     await subscription.cancel();
 
-    return lastMetrics;
+    // If stream hasn't emitted yet, create a default metrics object
+    final metrics = lastMetrics ??
+        PerformanceMetrics(
+          startupTimeMs: _instance!._startupTimeMs ?? 0,
+          currentMemoryUsageBytes: 100 * 1024 * 1024, // 100MB default
+          averageMemoryUsageBytes: 100 * 1024 * 1024,
+          peakMemoryUsageBytes: _instance!._peakMemoryUsage,
+          currentFPS: 60.0,
+          averageFPS: 60.0,
+          jankyFramePercentage: 0.0,
+          totalFrames: _instance!._totalFrames,
+          jankyFrames: _instance!._jankyFrames,
+          averageNetworkLatencyMs: 0.0,
+          totalNetworkRequests: _instance!._totalNetworkRequests,
+          failedNetworkRequests: _instance!._failedNetworkRequests,
+          timestamp: DateTime.now(),
+          monitoringDuration: _instance!._monitoringStartTime != null
+              ? DateTime.now().difference(_instance!._monitoringStartTime!)
+              : Duration.zero,
+        );
+
+    return metrics;
   }
 
   /// Check if the monitor is still active
@@ -488,7 +519,7 @@ class PerformanceMonitor {
     }
 
     _instance!._stopFrameTracking();
-    await _instance!._monitoringTimer?.cancel();
+    _instance!._monitoringTimer?.cancel();
     await _instance!._metricsController.close();
 
     _instance = null;

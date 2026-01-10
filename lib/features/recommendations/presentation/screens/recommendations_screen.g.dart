@@ -6,318 +6,179 @@ part of 'recommendations_screen.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$recommendationsForItineraryHash() =>
-    r'd188d51bdecdf0851b8129809db37685531926a2';
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 /// Provider for recommendations for a specific itinerary
-///
-/// Copied from [recommendationsForItinerary].
+
 @ProviderFor(recommendationsForItinerary)
-const recommendationsForItineraryProvider = RecommendationsForItineraryFamily();
+final recommendationsForItineraryProvider =
+    RecommendationsForItineraryFamily._();
 
 /// Provider for recommendations for a specific itinerary
-///
-/// Copied from [recommendationsForItinerary].
-class RecommendationsForItineraryFamily
-    extends Family<AsyncValue<List<PersonalizedRecommendation>>> {
+
+final class RecommendationsForItineraryProvider extends $FunctionalProvider<
+        AsyncValue<List<PersonalizedRecommendation>>,
+        List<PersonalizedRecommendation>,
+        FutureOr<List<PersonalizedRecommendation>>>
+    with
+        $FutureModifier<List<PersonalizedRecommendation>>,
+        $FutureProvider<List<PersonalizedRecommendation>> {
   /// Provider for recommendations for a specific itinerary
-  ///
-  /// Copied from [recommendationsForItinerary].
-  const RecommendationsForItineraryFamily();
-
-  /// Provider for recommendations for a specific itinerary
-  ///
-  /// Copied from [recommendationsForItinerary].
-  RecommendationsForItineraryProvider call(
-    String itineraryId,
-  ) {
-    return RecommendationsForItineraryProvider(
-      itineraryId,
-    );
-  }
-
-  @override
-  RecommendationsForItineraryProvider getProviderOverride(
-    covariant RecommendationsForItineraryProvider provider,
-  ) {
-    return call(
-      provider.itineraryId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'recommendationsForItineraryProvider';
-}
-
-/// Provider for recommendations for a specific itinerary
-///
-/// Copied from [recommendationsForItinerary].
-class RecommendationsForItineraryProvider
-    extends AutoDisposeFutureProvider<List<PersonalizedRecommendation>> {
-  /// Provider for recommendations for a specific itinerary
-  ///
-  /// Copied from [recommendationsForItinerary].
-  RecommendationsForItineraryProvider(
-    String itineraryId,
-  ) : this._internal(
-          (ref) => recommendationsForItinerary(
-            ref as RecommendationsForItineraryRef,
-            itineraryId,
-          ),
-          from: recommendationsForItineraryProvider,
+  RecommendationsForItineraryProvider._(
+      {required RecommendationsForItineraryFamily super.from,
+      required String super.argument})
+      : super(
+          retry: null,
           name: r'recommendationsForItineraryProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$recommendationsForItineraryHash,
-          dependencies: RecommendationsForItineraryFamily._dependencies,
-          allTransitiveDependencies:
-              RecommendationsForItineraryFamily._allTransitiveDependencies,
-          itineraryId: itineraryId,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  RecommendationsForItineraryProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.itineraryId,
-  }) : super.internal();
-
-  final String itineraryId;
+  @override
+  String debugGetCreateSourceHash() => _$recommendationsForItineraryHash();
 
   @override
-  Override overrideWith(
-    FutureOr<List<PersonalizedRecommendation>> Function(
-            RecommendationsForItineraryRef provider)
-        create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: RecommendationsForItineraryProvider._internal(
-        (ref) => create(ref as RecommendationsForItineraryRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        itineraryId: itineraryId,
-      ),
-    );
+  String toString() {
+    return r'recommendationsForItineraryProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  AutoDisposeFutureProviderElement<List<PersonalizedRecommendation>>
-      createElement() {
-    return _RecommendationsForItineraryProviderElement(this);
+  $FutureProviderElement<List<PersonalizedRecommendation>> $createElement(
+          $ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<PersonalizedRecommendation>> create(Ref ref) {
+    final argument = this.argument as String;
+    return recommendationsForItinerary(
+      ref,
+      argument,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return other is RecommendationsForItineraryProvider &&
-        other.itineraryId == itineraryId;
+        other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, itineraryId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin RecommendationsForItineraryRef
-    on AutoDisposeFutureProviderRef<List<PersonalizedRecommendation>> {
-  /// The parameter `itineraryId` of this provider.
-  String get itineraryId;
-}
+String _$recommendationsForItineraryHash() =>
+    r'd188d51bdecdf0851b8129809db37685531926a2';
 
-class _RecommendationsForItineraryProviderElement
-    extends AutoDisposeFutureProviderElement<List<PersonalizedRecommendation>>
-    with RecommendationsForItineraryRef {
-  _RecommendationsForItineraryProviderElement(super.provider);
+/// Provider for recommendations for a specific itinerary
+
+final class RecommendationsForItineraryFamily extends $Family
+    with
+        $FunctionalFamilyOverride<FutureOr<List<PersonalizedRecommendation>>,
+            String> {
+  RecommendationsForItineraryFamily._()
+      : super(
+          retry: null,
+          name: r'recommendationsForItineraryProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// Provider for recommendations for a specific itinerary
+
+  RecommendationsForItineraryProvider call(
+    String itineraryId,
+  ) =>
+      RecommendationsForItineraryProvider._(argument: itineraryId, from: this);
 
   @override
-  String get itineraryId =>
-      (origin as RecommendationsForItineraryProvider).itineraryId;
+  String toString() => r'recommendationsForItineraryProvider';
+}
+
+/// Provider for getting an itinerary
+
+@ProviderFor(itinerary)
+final itineraryProvider = ItineraryFamily._();
+
+/// Provider for getting an itinerary
+
+final class ItineraryProvider extends $FunctionalProvider<AsyncValue<Itinerary>,
+        Itinerary, FutureOr<Itinerary>>
+    with $FutureModifier<Itinerary>, $FutureProvider<Itinerary> {
+  /// Provider for getting an itinerary
+  ItineraryProvider._(
+      {required ItineraryFamily super.from, required String super.argument})
+      : super(
+          retry: null,
+          name: r'itineraryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$itineraryHash();
+
+  @override
+  String toString() {
+    return r'itineraryProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Itinerary> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Itinerary> create(Ref ref) {
+    final argument = this.argument as String;
+    return itinerary(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ItineraryProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
 String _$itineraryHash() => r'a7e19284f3eee684643f28fc4b9e356bc9c5ba93';
 
 /// Provider for getting an itinerary
-///
-/// Copied from [itinerary].
-@ProviderFor(itinerary)
-const itineraryProvider = ItineraryFamily();
 
-/// Provider for getting an itinerary
-///
-/// Copied from [itinerary].
-class ItineraryFamily extends Family<AsyncValue<Itinerary>> {
-  /// Provider for getting an itinerary
-  ///
-  /// Copied from [itinerary].
-  const ItineraryFamily();
-
-  /// Provider for getting an itinerary
-  ///
-  /// Copied from [itinerary].
-  ItineraryProvider call(
-    String itineraryId,
-  ) {
-    return ItineraryProvider(
-      itineraryId,
-    );
-  }
-
-  @override
-  ItineraryProvider getProviderOverride(
-    covariant ItineraryProvider provider,
-  ) {
-    return call(
-      provider.itineraryId,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'itineraryProvider';
-}
-
-/// Provider for getting an itinerary
-///
-/// Copied from [itinerary].
-class ItineraryProvider extends AutoDisposeFutureProvider<Itinerary> {
-  /// Provider for getting an itinerary
-  ///
-  /// Copied from [itinerary].
-  ItineraryProvider(
-    String itineraryId,
-  ) : this._internal(
-          (ref) => itinerary(
-            ref as ItineraryRef,
-            itineraryId,
-          ),
-          from: itineraryProvider,
+final class ItineraryFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Itinerary>, String> {
+  ItineraryFamily._()
+      : super(
+          retry: null,
           name: r'itineraryProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$itineraryHash,
-          dependencies: ItineraryFamily._dependencies,
-          allTransitiveDependencies: ItineraryFamily._allTransitiveDependencies,
-          itineraryId: itineraryId,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
         );
 
-  ItineraryProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.itineraryId,
-  }) : super.internal();
+  /// Provider for getting an itinerary
 
-  final String itineraryId;
+  ItineraryProvider call(
+    String itineraryId,
+  ) =>
+      ItineraryProvider._(argument: itineraryId, from: this);
 
   @override
-  Override overrideWith(
-    FutureOr<Itinerary> Function(ItineraryRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: ItineraryProvider._internal(
-        (ref) => create(ref as ItineraryRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        itineraryId: itineraryId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<Itinerary> createElement() {
-    return _ItineraryProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is ItineraryProvider && other.itineraryId == itineraryId;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, itineraryId.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
+  String toString() => r'itineraryProvider';
 }
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin ItineraryRef on AutoDisposeFutureProviderRef<Itinerary> {
-  /// The parameter `itineraryId` of this provider.
-  String get itineraryId;
-}
-
-class _ItineraryProviderElement
-    extends AutoDisposeFutureProviderElement<Itinerary> with ItineraryRef {
-  _ItineraryProviderElement(super.provider);
-
-  @override
-  String get itineraryId => (origin as ItineraryProvider).itineraryId;
-}
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

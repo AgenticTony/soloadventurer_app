@@ -6,8 +6,22 @@ part of 'onboarding_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$itineraryGenerationRepositoryHash() =>
-    r'7ed1a51ae012b2b139f065daca256244331bbbcb';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for the itinerary generation repository
+///
+/// Provides the repository implementation that connects to the
+/// itinerary generation service. This can be overridden with mocks
+/// for testing.
+///
+/// Note: This uses a mock implementation that returns dummy itineraries.
+/// In production, this should be replaced with GetIt injection of the
+/// actual service implementation when the itinerary generation service
+/// is complete.
+
+@ProviderFor(itineraryGenerationRepository)
+final itineraryGenerationRepositoryProvider =
+    ItineraryGenerationRepositoryProvider._();
 
 /// Provider for the itinerary generation repository
 ///
@@ -19,189 +33,452 @@ String _$itineraryGenerationRepositoryHash() =>
 /// In production, this should be replaced with GetIt injection of the
 /// actual service implementation when the itinerary generation service
 /// is complete.
-///
-/// Copied from [itineraryGenerationRepository].
-@ProviderFor(itineraryGenerationRepository)
-final itineraryGenerationRepositoryProvider =
-    AutoDisposeProvider<ItineraryGenerationRepository>.internal(
-  itineraryGenerationRepository,
-  name: r'itineraryGenerationRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$itineraryGenerationRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef ItineraryGenerationRepositoryRef
-    = AutoDisposeProviderRef<ItineraryGenerationRepository>;
-String _$generateStarterItineraryHash() =>
-    r'a2c07ae6fa68958e686bbf27b1700b928664fe74';
+final class ItineraryGenerationRepositoryProvider extends $FunctionalProvider<
+        ItineraryGenerationRepository,
+        ItineraryGenerationRepository,
+        ItineraryGenerationRepository>
+    with $Provider<ItineraryGenerationRepository> {
+  /// Provider for the itinerary generation repository
+  ///
+  /// Provides the repository implementation that connects to the
+  /// itinerary generation service. This can be overridden with mocks
+  /// for testing.
+  ///
+  /// Note: This uses a mock implementation that returns dummy itineraries.
+  /// In production, this should be replaced with GetIt injection of the
+  /// actual service implementation when the itinerary generation service
+  /// is complete.
+  ItineraryGenerationRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'itineraryGenerationRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$itineraryGenerationRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<ItineraryGenerationRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ItineraryGenerationRepository create(Ref ref) {
+    return itineraryGenerationRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ItineraryGenerationRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<ItineraryGenerationRepository>(value),
+    );
+  }
+}
+
+String _$itineraryGenerationRepositoryHash() =>
+    r'7ed1a51ae012b2b139f065daca256244331bbbcb';
 
 /// Provider for the generate starter itinerary use case
 ///
 /// Provides the use case that orchestrates itinerary generation
 /// from onboarding data.
-///
-/// Copied from [generateStarterItinerary].
-@ProviderFor(generateStarterItinerary)
-final generateStarterItineraryProvider =
-    AutoDisposeProvider<GenerateStarterItinerary>.internal(
-  generateStarterItinerary,
-  name: r'generateStarterItineraryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$generateStarterItineraryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GenerateStarterItineraryRef
-    = AutoDisposeProviderRef<GenerateStarterItinerary>;
-String _$currentOnboardingDataHash() =>
-    r'af0fca7afb96ebbb8b483bc88dc8d8bb19710a40';
+@ProviderFor(generateStarterItinerary)
+final generateStarterItineraryProvider = GenerateStarterItineraryProvider._();
+
+/// Provider for the generate starter itinerary use case
+///
+/// Provides the use case that orchestrates itinerary generation
+/// from onboarding data.
+
+final class GenerateStarterItineraryProvider extends $FunctionalProvider<
+    GenerateStarterItinerary,
+    GenerateStarterItinerary,
+    GenerateStarterItinerary> with $Provider<GenerateStarterItinerary> {
+  /// Provider for the generate starter itinerary use case
+  ///
+  /// Provides the use case that orchestrates itinerary generation
+  /// from onboarding data.
+  GenerateStarterItineraryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'generateStarterItineraryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$generateStarterItineraryHash();
+
+  @$internal
+  @override
+  $ProviderElement<GenerateStarterItinerary> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GenerateStarterItinerary create(Ref ref) {
+    return generateStarterItinerary(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GenerateStarterItinerary value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GenerateStarterItinerary>(value),
+    );
+  }
+}
+
+String _$generateStarterItineraryHash() =>
+    r'a2c07ae6fa68958e686bbf27b1700b928664fe74';
 
 /// Provider for accessing the current onboarding data
 ///
 /// Convenience provider that extracts the current OnboardingData
 /// from the OnboardingState.
-///
-/// Copied from [currentOnboardingData].
-@ProviderFor(currentOnboardingData)
-final currentOnboardingDataProvider =
-    AutoDisposeProvider<OnboardingData?>.internal(
-  currentOnboardingData,
-  name: r'currentOnboardingDataProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$currentOnboardingDataHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef CurrentOnboardingDataRef = AutoDisposeProviderRef<OnboardingData?>;
-String _$isOnboardingFormValidHash() =>
-    r'ca61be0d40894ec7366ed6aed3eb3af38b6d4063';
+@ProviderFor(currentOnboardingData)
+final currentOnboardingDataProvider = CurrentOnboardingDataProvider._();
+
+/// Provider for accessing the current onboarding data
+///
+/// Convenience provider that extracts the current OnboardingData
+/// from the OnboardingState.
+
+final class CurrentOnboardingDataProvider extends $FunctionalProvider<
+    OnboardingData?,
+    OnboardingData?,
+    OnboardingData?> with $Provider<OnboardingData?> {
+  /// Provider for accessing the current onboarding data
+  ///
+  /// Convenience provider that extracts the current OnboardingData
+  /// from the OnboardingState.
+  CurrentOnboardingDataProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'currentOnboardingDataProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentOnboardingDataHash();
+
+  @$internal
+  @override
+  $ProviderElement<OnboardingData?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  OnboardingData? create(Ref ref) {
+    return currentOnboardingData(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(OnboardingData? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<OnboardingData?>(value),
+    );
+  }
+}
+
+String _$currentOnboardingDataHash() =>
+    r'af0fca7afb96ebbb8b483bc88dc8d8bb19710a40';
 
 /// Provider for checking if the form is valid
 ///
 /// Convenience provider that extracts the validation status
 /// from the OnboardingState.
-///
-/// Copied from [isOnboardingFormValid].
-@ProviderFor(isOnboardingFormValid)
-final isOnboardingFormValidProvider = AutoDisposeProvider<bool>.internal(
-  isOnboardingFormValid,
-  name: r'isOnboardingFormValidProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$isOnboardingFormValidHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef IsOnboardingFormValidRef = AutoDisposeProviderRef<bool>;
-String _$onboardingValidationErrorsHash() =>
-    r'70df35f149943252bb026d86f7f8770d225edbe9';
+@ProviderFor(isOnboardingFormValid)
+final isOnboardingFormValidProvider = IsOnboardingFormValidProvider._();
+
+/// Provider for checking if the form is valid
+///
+/// Convenience provider that extracts the validation status
+/// from the OnboardingState.
+
+final class IsOnboardingFormValidProvider
+    extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
+  /// Provider for checking if the form is valid
+  ///
+  /// Convenience provider that extracts the validation status
+  /// from the OnboardingState.
+  IsOnboardingFormValidProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'isOnboardingFormValidProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$isOnboardingFormValidHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return isOnboardingFormValid(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$isOnboardingFormValidHash() =>
+    r'ca61be0d40894ec7366ed6aed3eb3af38b6d4063';
 
 /// Provider for accessing validation errors
 ///
 /// Convenience provider that extracts validation errors
 /// from the OnboardingState.
-///
-/// Copied from [onboardingValidationErrors].
+
 @ProviderFor(onboardingValidationErrors)
 final onboardingValidationErrorsProvider =
-    AutoDisposeProvider<List<String>>.internal(
-  onboardingValidationErrors,
-  name: r'onboardingValidationErrorsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$onboardingValidationErrorsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+    OnboardingValidationErrorsProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef OnboardingValidationErrorsRef = AutoDisposeProviderRef<List<String>>;
-String _$isOnboardingSubmittingHash() =>
-    r'07314e8cfa63c5d06fe010ce887c91e362564f1f';
+/// Provider for accessing validation errors
+///
+/// Convenience provider that extracts validation errors
+/// from the OnboardingState.
+
+final class OnboardingValidationErrorsProvider
+    extends $FunctionalProvider<List<String>, List<String>, List<String>>
+    with $Provider<List<String>> {
+  /// Provider for accessing validation errors
+  ///
+  /// Convenience provider that extracts validation errors
+  /// from the OnboardingState.
+  OnboardingValidationErrorsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'onboardingValidationErrorsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$onboardingValidationErrorsHash();
+
+  @$internal
+  @override
+  $ProviderElement<List<String>> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  List<String> create(Ref ref) {
+    return onboardingValidationErrors(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<String> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<String>>(value),
+    );
+  }
+}
+
+String _$onboardingValidationErrorsHash() =>
+    r'70df35f149943252bb026d86f7f8770d225edbe9';
 
 /// Provider for checking if the form is submitting
 ///
 /// Convenience provider that extracts the submitting status
 /// from the OnboardingState.
-///
-/// Copied from [isOnboardingSubmitting].
-@ProviderFor(isOnboardingSubmitting)
-final isOnboardingSubmittingProvider = AutoDisposeProvider<bool>.internal(
-  isOnboardingSubmitting,
-  name: r'isOnboardingSubmittingProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$isOnboardingSubmittingHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef IsOnboardingSubmittingRef = AutoDisposeProviderRef<bool>;
-String _$generatedItineraryHash() =>
-    r'950cba847cdea72feef66253db09c69e6e260e14';
+@ProviderFor(isOnboardingSubmitting)
+final isOnboardingSubmittingProvider = IsOnboardingSubmittingProvider._();
+
+/// Provider for checking if the form is submitting
+///
+/// Convenience provider that extracts the submitting status
+/// from the OnboardingState.
+
+final class IsOnboardingSubmittingProvider
+    extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
+  /// Provider for checking if the form is submitting
+  ///
+  /// Convenience provider that extracts the submitting status
+  /// from the OnboardingState.
+  IsOnboardingSubmittingProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'isOnboardingSubmittingProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$isOnboardingSubmittingHash();
+
+  @$internal
+  @override
+  $ProviderElement<bool> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  bool create(Ref ref) {
+    return isOnboardingSubmitting(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(bool value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<bool>(value),
+    );
+  }
+}
+
+String _$isOnboardingSubmittingHash() =>
+    r'07314e8cfa63c5d06fe010ce887c91e362564f1f';
 
 /// Provider for accessing the generated itinerary
 ///
 /// Convenience provider that extracts the itinerary from the
 /// OnboardingState when available.
-///
-/// Copied from [generatedItinerary].
-@ProviderFor(generatedItinerary)
-final generatedItineraryProvider =
-    AutoDisposeProvider<Map<String, dynamic>?>.internal(
-  generatedItinerary,
-  name: r'generatedItineraryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$generatedItineraryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GeneratedItineraryRef = AutoDisposeProviderRef<Map<String, dynamic>?>;
-String _$onboardingErrorMessageHash() =>
-    r'c6a9c99278347d32a4b7de50b7500bc525a53aaf';
+@ProviderFor(generatedItinerary)
+final generatedItineraryProvider = GeneratedItineraryProvider._();
+
+/// Provider for accessing the generated itinerary
+///
+/// Convenience provider that extracts the itinerary from the
+/// OnboardingState when available.
+
+final class GeneratedItineraryProvider extends $FunctionalProvider<
+    Map<String, dynamic>?,
+    Map<String, dynamic>?,
+    Map<String, dynamic>?> with $Provider<Map<String, dynamic>?> {
+  /// Provider for accessing the generated itinerary
+  ///
+  /// Convenience provider that extracts the itinerary from the
+  /// OnboardingState when available.
+  GeneratedItineraryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'generatedItineraryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$generatedItineraryHash();
+
+  @$internal
+  @override
+  $ProviderElement<Map<String, dynamic>?> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  Map<String, dynamic>? create(Ref ref) {
+    return generatedItinerary(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(Map<String, dynamic>? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<Map<String, dynamic>?>(value),
+    );
+  }
+}
+
+String _$generatedItineraryHash() =>
+    r'950cba847cdea72feef66253db09c69e6e260e14';
 
 /// Provider for accessing the error message
 ///
 /// Convenience provider that extracts the error message
 /// from the OnboardingState when available.
-///
-/// Copied from [onboardingErrorMessage].
-@ProviderFor(onboardingErrorMessage)
-final onboardingErrorMessageProvider = AutoDisposeProvider<String?>.internal(
-  onboardingErrorMessage,
-  name: r'onboardingErrorMessageProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$onboardingErrorMessageHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef OnboardingErrorMessageRef = AutoDisposeProviderRef<String?>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(onboardingErrorMessage)
+final onboardingErrorMessageProvider = OnboardingErrorMessageProvider._();
+
+/// Provider for accessing the error message
+///
+/// Convenience provider that extracts the error message
+/// from the OnboardingState when available.
+
+final class OnboardingErrorMessageProvider
+    extends $FunctionalProvider<String?, String?, String?>
+    with $Provider<String?> {
+  /// Provider for accessing the error message
+  ///
+  /// Convenience provider that extracts the error message
+  /// from the OnboardingState when available.
+  OnboardingErrorMessageProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'onboardingErrorMessageProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$onboardingErrorMessageHash();
+
+  @$internal
+  @override
+  $ProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  String? create(Ref ref) {
+    return onboardingErrorMessage(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String?>(value),
+    );
+  }
+}
+
+String _$onboardingErrorMessageHash() =>
+    r'c6a9c99278347d32a4b7de50b7500bc525a53aaf';

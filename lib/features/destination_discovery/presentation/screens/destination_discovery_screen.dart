@@ -69,7 +69,8 @@ class _DestinationDiscoveryScreenState
 
   /// Apply initial filter from deep link if provided
   void _applyInitialFilter() {
-    if (widget.initialFilter != null && widget.initialFilter!.hasActiveFilters) {
+    if (widget.initialFilter != null &&
+        widget.initialFilter!.hasActiveFilters) {
       final filterNotifier = ref.read(filterProvider.notifier);
       filterNotifier.updateFilter(widget.initialFilter!);
 
@@ -286,7 +287,8 @@ class _DestinationDiscoveryScreenState
               ),
             ),
             filled: true,
-            fillColor: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+            fillColor:
+                theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
           ),
         ),
       ),
@@ -301,7 +303,8 @@ class _DestinationDiscoveryScreenState
   }
 
   /// Build the results list with proper state handling
-  Widget _buildResultsList(ThemeData theme, AsyncValue<DestinationSearchState> searchState) {
+  Widget _buildResultsList(
+      ThemeData theme, AsyncValue<DestinationSearchState> searchState) {
     return searchState.when(
       data: (state) {
         // Initial state - show loading indicator in center

@@ -8,7 +8,7 @@ import '../../domain/models/sync_status.dart';
 /// queue information, and last sync results for real-time UI updates.
 class SyncState with EquatableMixin {
   /// Current sync status
-  final SyncStatus status;
+  final SyncOperationStatus status;
 
   /// Number of operations in the sync queue
   final int queueSize;
@@ -49,20 +49,20 @@ class SyncState with EquatableMixin {
   /// Factory constructor for initial state
   factory SyncState.initial() {
     return const SyncState(
-      status: SyncStatus.idle,
+      status: SyncOperationStatus.idle,
       queueSize: 0,
       isProcessing: false,
     );
   }
 
   /// Whether the current state represents an active sync
-  bool get isSyncing => status == SyncStatus.syncing;
+  bool get isSyncing => status == SyncOperationStatus.syncing;
 
   /// Whether the last sync was successful
-  bool get wasLastSyncSuccessful => status == SyncStatus.success;
+  bool get wasLastSyncSuccessful => status == SyncOperationStatus.success;
 
   /// Whether the last sync failed
-  bool get didLastSyncFail => status == SyncStatus.failed;
+  bool get didLastSyncFail => status == SyncOperationStatus.failed;
 
   /// Whether there are operations waiting to sync
   bool get hasQueue => queueSize > 0;
@@ -78,7 +78,7 @@ class SyncState with EquatableMixin {
 
   /// Create a copy with updated fields
   SyncState copyWith({
-    SyncStatus? status,
+    SyncOperationStatus? status,
     int? queueSize,
     bool? isProcessing,
     DateTime? lastStatusChangeAt,
@@ -151,17 +151,19 @@ class SyncState with EquatableMixin {
       final statusString = json['status'] as String?;
       if (statusString == null) return null;
 
-      final status = SyncStatus.values.firstWhere(
+      final status = SyncOperationStatus.values.firstWhere(
         (s) => s.name == statusString,
-        orElse: () => SyncStatus.idle,
+        orElse: () => SyncOperationStatus.idle,
       );
 
       return SyncState(
         status: status,
         queueSize: json['queueSize'] as int? ?? 0,
         isProcessing: json['isProcessing'] as bool? ?? false,
-        lastStatusChangeAt: _parseDateTime(json['lastStatusChangeAt'] as String?),
-        lastSuccessfulSyncAt: _parseDateTime(json['lastSuccessfulSyncAt'] as String?),
+        lastStatusChangeAt:
+            _parseDateTime(json['lastStatusChangeAt'] as String?),
+        lastSuccessfulSyncAt:
+            _parseDateTime(json['lastSuccessfulSyncAt'] as String?),
         lastSuccessCount: json['lastSuccessCount'] as int? ?? 0,
         lastFailureCount: json['lastFailureCount'] as int? ?? 0,
         lastError: json['lastError'] as String?,

@@ -7,7 +7,7 @@ import '../../domain/models/sync_status.dart';
 /// including progress, results, and error information.
 class ManualSyncState with EquatableMixin {
   /// Current sync status
-  final SyncStatus status;
+  final SyncOperationStatus status;
 
   /// Whether a manual sync is currently in progress
   final bool isSyncing;
@@ -47,8 +47,8 @@ class ManualSyncState with EquatableMixin {
 
   /// Factory constructor for initial state
   factory ManualSyncState.initial() {
-    return ManualSyncState(
-      status: SyncStatus.idle,
+    return const ManualSyncState(
+      status: SyncOperationStatus.idle,
       isSyncing: false,
     );
   }
@@ -56,7 +56,7 @@ class ManualSyncState with EquatableMixin {
   /// Factory constructor for syncing state
   factory ManualSyncState.syncing({
     required DateTime startedAt,
-    SyncStatus status = SyncStatus.syncing,
+    SyncOperationStatus status = SyncOperationStatus.syncing,
   }) {
     return ManualSyncState(
       status: status,
@@ -72,7 +72,7 @@ class ManualSyncState with EquatableMixin {
     required DateTime completedAt,
     DateTime? startedAt,
     int totalProcessed = 0,
-    SyncStatus status = SyncStatus.success,
+    SyncOperationStatus status = SyncOperationStatus.success,
   }) {
     return ManualSyncState(
       status: status,
@@ -94,7 +94,7 @@ class ManualSyncState with EquatableMixin {
     int successCount = 0,
     int failureCount = 0,
     int totalProcessed = 0,
-    SyncStatus status = SyncStatus.failed,
+    SyncOperationStatus status = SyncOperationStatus.failed,
   }) {
     return ManualSyncState(
       status: status,
@@ -143,7 +143,7 @@ class ManualSyncState with EquatableMixin {
 
   /// Create a copy with updated fields
   ManualSyncState copyWith({
-    SyncStatus? status,
+    SyncOperationStatus? status,
     bool? isSyncing,
     bool? lastSyncSuccess,
     int? successCount,

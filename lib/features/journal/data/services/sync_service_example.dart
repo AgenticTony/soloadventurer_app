@@ -191,12 +191,8 @@ class SyncExampleScreen extends ConsumerWidget {
                   Row(
                     children: [
                       Icon(
-                        syncState.isSyncing
-                            ? Icons.sync
-                            : Icons.cloud_done,
-                        color: syncState.isSyncing
-                            ? Colors.blue
-                            : Colors.green,
+                        syncState.isSyncing ? Icons.sync : Icons.cloud_done,
+                        color: syncState.isSyncing ? Colors.blue : Colors.green,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -486,11 +482,11 @@ class CustomSyncExample extends ConsumerWidget {
     final syncService = ref.read(syncServiceProvider);
 
     // Create custom configuration
-    final customConfig = SyncConfig(
+    const customConfig = SyncConfig(
       batchSize: 20, // Smaller batches
       batchDelay: 100,
       maxRetries: 5, // More retries
-      operationTimeout: const Duration(minutes: 1),
+      operationTimeout: Duration(minutes: 1),
       syncMedia: false, // Skip media for now
       autoResolveConflicts: true,
       conflictResolutionStrategy: ConflictResolutionStrategy.mostRecent,
@@ -533,9 +529,7 @@ class SyncStatusIndicator extends ConsumerWidget {
           const Icon(Icons.cloud_done, size: 16),
           const SizedBox(width: 4),
           Text(
-            syncState.lastSyncTime != null
-                ? 'Synced'
-                : 'Pending',
+            syncState.lastSyncTime != null ? 'Synced' : 'Pending',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
@@ -548,8 +542,7 @@ class SyncStatusIndicator extends ConsumerWidget {
 // These are placeholders - replace with your actual providers
 
 @riverpod
-JournalLocalDataSource journalLocalDataSource(
-    JournalLocalDataSourceRef ref) {
+JournalLocalDataSource journalLocalDataSource(JournalLocalDataSourceRef ref) {
   throw UnimplementedError('Provider not implemented');
 }
 

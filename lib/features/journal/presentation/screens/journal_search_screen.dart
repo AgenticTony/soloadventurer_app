@@ -34,7 +34,9 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
 
   void _onSearchChanged() {
     _debouncer.run(() {
-      ref.read(journalSearchProvider.notifier).updateQuery(_searchController.text);
+      ref
+          .read(journalSearchProvider.notifier)
+          .updateQuery(_searchController.text);
       ref.read(journalSearchProvider.notifier).search();
     });
   }
@@ -49,7 +51,8 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
           Consumer(
             builder: (context, ref, child) {
               final filterCount = ref.watch(
-                journalSearchProvider.select((state) => state.filters.activeFilterCount),
+                journalSearchProvider
+                    .select((state) => state.filters.activeFilterCount),
               );
 
               return Stack(
@@ -74,7 +77,10 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         ),
                         child: Text(
                           filterCount.toString(),
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
                                 color: Theme.of(context).colorScheme.onError,
                                 fontSize: 10,
                               ),
@@ -90,7 +96,8 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
           Consumer(
             builder: (context, ref, child) {
               final hasFilters = ref.watch(
-                journalSearchProvider.select((state) => state.filters.hasActiveFilters),
+                journalSearchProvider
+                    .select((state) => state.filters.hasActiveFilters),
               );
 
               if (!hasFilters) return const SizedBox.shrink();
@@ -157,16 +164,21 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         label: filters.locationName!,
                         icon: Icons.location_on,
                         onDeleted: () {
-                          ref.read(journalSearchProvider.notifier).updateLocationFilter(null);
+                          ref
+                              .read(journalSearchProvider.notifier)
+                              .updateLocationFilter(null);
                           ref.read(journalSearchProvider.notifier).search();
                         },
                       ),
                     if (filters.startDate != null || filters.endDate != null)
                       _FilterChip(
-                        label: _formatDateRange(filters.startDate, filters.endDate),
+                        label: _formatDateRange(
+                            filters.startDate, filters.endDate),
                         icon: Icons.calendar_today,
                         onDeleted: () {
-                          ref.read(journalSearchProvider.notifier).updateDateRangeFilter(null, null);
+                          ref
+                              .read(journalSearchProvider.notifier)
+                              .updateDateRangeFilter(null, null);
                           ref.read(journalSearchProvider.notifier).search();
                         },
                       ),
@@ -175,7 +187,9 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         label: filters.mood!,
                         icon: Icons.emoji_emotions,
                         onDeleted: () {
-                          ref.read(journalSearchProvider.notifier).updateMoodFilter(null);
+                          ref
+                              .read(journalSearchProvider.notifier)
+                              .updateMoodFilter(null);
                           ref.read(journalSearchProvider.notifier).search();
                         },
                       ),
@@ -184,7 +198,9 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         label: 'Favorites',
                         icon: Icons.star,
                         onDeleted: () {
-                          ref.read(journalSearchProvider.notifier).updateFavoriteFilter(null);
+                          ref
+                              .read(journalSearchProvider.notifier)
+                              .updateFavoriteFilter(null);
                           ref.read(journalSearchProvider.notifier).search();
                         },
                       ),
@@ -225,7 +241,9 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         const SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () {
-                            ref.read(journalSearchProvider.notifier).clearError();
+                            ref
+                                .read(journalSearchProvider.notifier)
+                                .clearError();
                             ref.read(journalSearchProvider.notifier).search();
                           },
                           icon: const Icon(Icons.refresh),
@@ -244,7 +262,9 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         Icon(
                           Icons.search,
                           size: 64,
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -254,9 +274,12 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Enter keywords or use filters to find entries',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -271,7 +294,9 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         Icon(
                           Icons.search_off,
                           size: 64,
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -281,9 +306,12 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Try adjusting your search or filters',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                     ),
@@ -445,7 +473,9 @@ class _SearchResultCard extends StatelessWidget {
                       child: Text(
                         entry.locationName!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -469,7 +499,8 @@ class _SearchResultCard extends StatelessWidget {
                     Text(
                       entry.mood!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                     ),
                   ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/create_journal_entry_screen.dart';
-import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 
 /// Example screen demonstrating how to use CreateJournalEntryScreen
 ///

@@ -282,15 +282,12 @@ class MultipleConflictsBanner extends StatelessWidget {
 
   /// Gets summary text for conflicts
   String _getSummaryText() {
-    final highSeverity = conflicts
-        .where((c) => c.severity == ConflictSeverity.high)
-        .length;
-    final mediumSeverity = conflicts
-        .where((c) => c.severity == ConflictSeverity.medium)
-        .length;
-    final lowSeverity = conflicts
-        .where((c) => c.severity == ConflictSeverity.low)
-        .length;
+    final highSeverity =
+        conflicts.where((c) => c.severity == ConflictSeverity.high).length;
+    final mediumSeverity =
+        conflicts.where((c) => c.severity == ConflictSeverity.medium).length;
+    final lowSeverity =
+        conflicts.where((c) => c.severity == ConflictSeverity.low).length;
 
     final parts = <String>[];
     if (highSeverity > 0) {
@@ -310,4 +307,3 @@ class MultipleConflictsBanner extends StatelessWidget {
     return '${parts.join(', ')} severity';
   }
 }
-

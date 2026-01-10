@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/map_marker.dart';
 
@@ -40,7 +41,7 @@ class ViewportLoadResult {
         'preloadedMarkers': preloadedMarkers.length,
         'totalMarkers': totalMarkers,
         'loadEfficiency': totalMarkers > 0
-            ? (allMarkers.length / totalMarkers * 100).toStringAsFixed(1) + '%'
+            ? '${(allMarkers.length / totalMarkers * 100).toStringAsFixed(1)}%'
             : '0%',
         'isFromCache': isFromCache,
       };
@@ -210,9 +211,8 @@ class MapViewportLoader {
     final markersInBounds = _filterMarkersInBounds(_allMarkers, extendedBounds);
 
     final visibleMarkers = _filterMarkersInBounds(_allMarkers, bounds);
-    final preloadedMarkers = markersInBounds
-        .where((m) => !visibleMarkers.contains(m))
-        .toList();
+    final preloadedMarkers =
+        markersInBounds.where((m) => !visibleMarkers.contains(m)).toList();
 
     return ViewportLoadResult(
       visibleMarkers: visibleMarkers,
@@ -227,7 +227,7 @@ class MapViewportLoader {
   /// Wait for pending debounced load to complete
   Future<ViewportLoadResult> waitForLoadUpdate() async {
     if (_debounceTimer != null && _debounceTimer!.isActive) {
-      await _debounceTimer!;
+      _debounceTimer!;
     }
 
     if (_currentResult != null) {
@@ -247,7 +247,7 @@ class MapViewportLoader {
         'cacheHits': _cacheHits,
         'cacheMisses': _cacheMisses,
         'cacheHitRate': _totalLoads > 0
-            ? ((_cacheHits / _totalLoads) * 100).toStringAsFixed(1) + '%'
+            ? '${((_cacheHits / _totalLoads) * 100).toStringAsFixed(1)}%'
             : '0%',
         'cacheSize': _cache.size,
         'bufferRatio': bufferRatio,
@@ -354,9 +354,9 @@ class MapViewportLoader {
 
     final sizeChanged =
         (_calculateBoundsSize(newBounds) - _calculateBoundsSize(oldBounds))
-                .abs() /
-            _calculateBoundsSize(oldBounds) >
-        threshold;
+                    .abs() /
+                _calculateBoundsSize(oldBounds) >
+            threshold;
 
     return centerChanged || sizeChanged;
   }

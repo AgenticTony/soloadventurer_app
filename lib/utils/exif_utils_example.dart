@@ -88,7 +88,7 @@ Future<void> customConfigurationExample() async {
   final file = File('/path/to/photo.jpg');
 
   // Custom config: extract everything but throw on error
-  final config = ExifExtractionConfig(
+  const config = ExifExtractionConfig(
     extractLocation: true,
     extractDateTime: true,
     extractCameraInfo: true,
@@ -191,13 +191,15 @@ Future<void> imageDimensionsExample() async {
   final exifData = await ExifUtils.extractExif(file);
 
   if (exifData.imageWidth != null && exifData.imageHeight != null) {
-    print('Dimensions from EXIF: ${exifData.imageWidth}x${exifData.imageHeight}');
+    print(
+        'Dimensions from EXIF: ${exifData.imageWidth}x${exifData.imageHeight}');
   } else {
     // Fallback to reading the actual image
     print('EXIF dimensions not available, reading image...');
     final dimensions = await ExifUtils.getImageDimensions(file);
     if (dimensions != null) {
-      print('Actual dimensions: ${dimensions['width']}x${dimensions['height']}');
+      print(
+          'Actual dimensions: ${dimensions['width']}x${dimensions['height']}');
     }
   }
 }
@@ -280,12 +282,21 @@ class _ExifWidgetExampleState extends State<ExifWidgetExample> {
             else if (_errorMessage != null)
               Text(_errorMessage!, style: const TextStyle(color: Colors.red))
             else if (_exifData != null) ...[
-              _buildInfoRow('Location',
-                  _exifData!.hasLocation ? '${_exifData!.latitude!.toStringAsFixed(6)}, ${_exifData!.longitude!.toStringAsFixed(6)}' : 'Not available'),
-              _buildInfoRow('Date', _exifData!.bestDateTime?.toString() ?? 'Not available'),
-              _buildInfoRow('Camera', '${_exifData!.make ?? 'Unknown'} ${_exifData!.model ?? ''}'.trim()),
-              if (_exifData!.imageWidth != null && _exifData!.imageHeight != null)
-                _buildInfoRow('Dimensions', '${_exifData!.imageWidth}x${_exifData!.imageHeight}'),
+              _buildInfoRow(
+                  'Location',
+                  _exifData!.hasLocation
+                      ? '${_exifData!.latitude!.toStringAsFixed(6)}, ${_exifData!.longitude!.toStringAsFixed(6)}'
+                      : 'Not available'),
+              _buildInfoRow('Date',
+                  _exifData!.bestDateTime?.toString() ?? 'Not available'),
+              _buildInfoRow(
+                  'Camera',
+                  '${_exifData!.make ?? 'Unknown'} ${_exifData!.model ?? ''}'
+                      .trim()),
+              if (_exifData!.imageWidth != null &&
+                  _exifData!.imageHeight != null)
+                _buildInfoRow('Dimensions',
+                    '${_exifData!.imageWidth}x${_exifData!.imageHeight}'),
             ],
           ],
         ),

@@ -9,6 +9,8 @@ import 'package:soloadventurer/core/widgets/widgets.dart';
 class ExampleBasicPerformanceTracking extends StatelessWidget {
   final List<String> items = List.generate(500, (i) => 'Item $i');
 
+  ExampleBasicPerformanceTracking({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +37,8 @@ class ExampleBasicPerformanceTracking extends StatelessWidget {
 class ExamplePerformanceWithCallbacks extends StatelessWidget {
   final List<String> items = List.generate(500, (i) => 'Item $i');
 
+  ExamplePerformanceWithCallbacks({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,9 +51,11 @@ class ExamplePerformanceWithCallbacks extends StatelessWidget {
           if (kDebugMode) {
             debugPrint('=== Performance Metrics ===');
             debugPrint('Initial Render: ${metrics.initialRenderTimeMs}ms');
-            debugPrint('Memory: ${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(2)} MB');
+            debugPrint(
+                'Memory: ${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(2)} MB');
             debugPrint('Average FPS: ${metrics.averageFPS.toStringAsFixed(1)}');
-            debugPrint('Janky Frames: ${metrics.jankyFramePercentage.toStringAsFixed(1)}%');
+            debugPrint(
+                'Janky Frames: ${metrics.jankyFramePercentage.toStringAsFixed(1)}%');
 
             // Check if targets are met
             if (metrics.meetsTargets()) {
@@ -80,6 +86,8 @@ class ExamplePerformanceWithCallbacks extends StatelessWidget {
 class ExampleGridPerformanceTracking extends StatelessWidget {
   final List<String> photos = List.generate(500, (i) => 'Photo $i');
 
+  ExampleGridPerformanceTracking({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,8 +99,10 @@ class ExampleGridPerformanceTracking extends StatelessWidget {
           // Monitor grid-specific performance
           if (kDebugMode && !metrics.meetsTargets()) {
             debugPrint('⚠️ Grid performance below target');
-            debugPrint('  FPS: ${metrics.averageFPS.toStringAsFixed(1)} (target: ≥55)');
-            debugPrint('  Memory: ${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(1)} MB (target: <150)');
+            debugPrint(
+                '  FPS: ${metrics.averageFPS.toStringAsFixed(1)} (target: ≥55)');
+            debugPrint(
+                '  Memory: ${(metrics.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(1)} MB (target: <150)');
           }
         },
         child: VirtualGridView<String>(
@@ -128,6 +138,8 @@ class ExampleGridPerformanceTracking extends StatelessWidget {
 class ExampleDisabledPerformanceTracking extends StatelessWidget {
   final List<String> items = List.generate(500, (i) => 'Item $i');
 
+  ExampleDisabledPerformanceTracking({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -149,6 +161,8 @@ class ExampleDisabledPerformanceTracking extends StatelessWidget {
 /// the visual overlay, useful for production monitoring.
 class ExampleSilentPerformanceTracking extends StatefulWidget {
   final List<String> items = List.generate(500, (i) => 'Item $i');
+
+  ExampleSilentPerformanceTracking({super.key});
 
   @override
   State<ExampleSilentPerformanceTracking> createState() =>
@@ -197,7 +211,8 @@ class _ExampleSilentPerformanceTrackingState
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Performance Metrics'),
-          content: const Text('No metrics available yet. Scroll the list first.'),
+          content:
+              const Text('No metrics available yet. Scroll the list first.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -221,14 +236,20 @@ class _ExampleSilentPerformanceTrackingState
               Text('Initial Render: ${_latestMetrics!.initialRenderTimeMs}ms'),
               Text(
                   'Memory: ${(_latestMetrics!.currentMemoryUsageBytes / 1024 / 1024).toStringAsFixed(2)} MB'),
-              Text('Average FPS: ${_latestMetrics!.averageFPS.toStringAsFixed(1)}'),
-              Text('Janky Frames: ${_latestMetrics!.jankyFramePercentage.toStringAsFixed(1)}%'),
+              Text(
+                  'Average FPS: ${_latestMetrics!.averageFPS.toStringAsFixed(1)}'),
+              Text(
+                  'Janky Frames: ${_latestMetrics!.jankyFramePercentage.toStringAsFixed(1)}%'),
               Text('Total Frames: ${_latestMetrics!.totalFrames}'),
               const SizedBox(height: 16),
               Text(
-                _latestMetrics!.meetsTargets() ? '✅ All targets met!' : '❌ Some targets not met',
+                _latestMetrics!.meetsTargets()
+                    ? '✅ All targets met!'
+                    : '❌ Some targets not met',
                 style: TextStyle(
-                  color: _latestMetrics!.meetsTargets() ? Colors.green : Colors.orange,
+                  color: _latestMetrics!.meetsTargets()
+                      ? Colors.green
+                      : Colors.orange,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -253,6 +274,8 @@ class _ExampleSilentPerformanceTrackingState
 class ExampleCombinedPerformanceTracking extends StatelessWidget {
   final List<String> items = List.generate(500, (i) => 'Item $i');
 
+  ExampleCombinedPerformanceTracking({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,10 +296,14 @@ class ExampleCombinedPerformanceTracking extends StatelessWidget {
             if (kDebugMode) {
               debugPrint('=== Scroll Performance ===');
               debugPrint('Duration: ${details.scrollDurationMs}ms');
-              debugPrint('Distance: ${details.pixelsScrolled.toStringAsFixed(0)}px');
-              debugPrint('Avg Velocity: ${details.averageVelocity.toStringAsFixed(0)}px/s');
-              debugPrint('Peak Velocity: ${details.peakVelocity.toStringAsFixed(0)}px/s');
-              debugPrint('Scroll FPS: ${details.averageFPS.toStringAsFixed(1)}');
+              debugPrint(
+                  'Distance: ${details.pixelsScrolled.toStringAsFixed(0)}px');
+              debugPrint(
+                  'Avg Velocity: ${details.averageVelocity.toStringAsFixed(0)}px/s');
+              debugPrint(
+                  'Peak Velocity: ${details.peakVelocity.toStringAsFixed(0)}px/s');
+              debugPrint(
+                  'Scroll FPS: ${details.averageFPS.toStringAsFixed(1)}');
             }
           },
           child: VirtualListView<String>(
@@ -285,7 +312,7 @@ class ExampleCombinedPerformanceTracking extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: ListTile(
                 title: Text(items[index]),
-                subtitle: Text('Scroll to see performance metrics'),
+                subtitle: const Text('Scroll to see performance metrics'),
                 leading: const Icon(Icons.speed),
               ),
             ),
@@ -301,6 +328,8 @@ class ExampleCombinedPerformanceTracking extends StatelessWidget {
 /// This example shows how to track performance across different
 /// states (loading, error, empty).
 class ExamplePerformanceWithStates extends StatefulWidget {
+  const ExamplePerformanceWithStates({super.key});
+
   @override
   State<ExamplePerformanceWithStates> createState() =>
       _ExamplePerformanceWithStatesState();
@@ -407,7 +436,7 @@ class _ExamplePerformanceWithStatesState
           ),
           itemBuilder: (context, index) => ListTile(
             title: Text(_items[index]),
-            subtitle: Text('Item with state tracking'),
+            subtitle: const Text('Item with state tracking'),
           ),
         ),
       ),
@@ -420,6 +449,8 @@ class _ExamplePerformanceWithStatesState
 /// This example shows how to compare performance between different
 /// list configurations.
 class ExamplePerformanceComparison extends StatelessWidget {
+  const ExamplePerformanceComparison({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -447,7 +478,7 @@ class ExamplePerformanceComparison extends StatelessWidget {
               child: ListTile(
                 leading: const CircleAvatar(child: Icon(Icons.person)),
                 title: Text('Complex Item $index'),
-                subtitle: Text('With subtitle and icon'),
+                subtitle: const Text('With subtitle and icon'),
                 trailing: const Icon(Icons.more_vert),
               ),
             ),
@@ -488,7 +519,8 @@ class _PerformanceTestCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(title,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(description),
           ),
           const Divider(height: 1),

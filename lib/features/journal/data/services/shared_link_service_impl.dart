@@ -1,8 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/core/error/exceptions.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/shared_link_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/shared_link_remote_data_source_impl.dart';
-import 'package:soloadventurer/features/journal/data/models/shared_link_model.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/domain/services/shared_link_service.dart';
 

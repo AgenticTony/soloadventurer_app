@@ -78,7 +78,8 @@ class CredentialsErrorScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.2),
@@ -185,7 +186,8 @@ class CredentialsErrorScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withOpacity(0.3),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: theme.colorScheme.outline.withOpacity(0.2),
@@ -246,8 +248,6 @@ class CredentialsErrorScreen extends ConsumerWidget {
   }
 
   void _navigateToSignUp(BuildContext context, WidgetRef ref) {
-    ref
-        .read(authNavigationProvider.notifier)
-        .navigateTo(AuthRoutes.signup);
+    ref.read(authNavigationProvider.notifier).navigateTo(AuthRoutes.signup);
   }
 }

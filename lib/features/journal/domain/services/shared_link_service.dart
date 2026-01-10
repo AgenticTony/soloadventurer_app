@@ -106,7 +106,7 @@ class SharedLinkException implements Exception {
 
   /// Error for invalid password
   factory SharedLinkException.invalidPassword() {
-    return SharedLinkException(
+    return const SharedLinkException(
       'Invalid password',
       code: 'invalid_password',
     );
@@ -114,7 +114,7 @@ class SharedLinkException implements Exception {
 
   /// Error for link not owned by user
   factory SharedLinkException.notAuthorized() {
-    return SharedLinkException(
+    return const SharedLinkException(
       'You are not authorized to modify this shared link',
       code: 'not_authorized',
     );

@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,52 +9,111 @@ part of 'safety_alert_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-SafetyAlertModel _$SafetyAlertModelFromJson(Map<String, dynamic> json) {
-  return _SafetyAlertModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$SafetyAlertModel {
-  String get id => throw _privateConstructorUsedError;
-  String get userId => throw _privateConstructorUsedError;
-  SafetyAlertType get type => throw _privateConstructorUsedError;
-  SafetyAlertStatus get status => throw _privateConstructorUsedError;
-  String? get message => throw _privateConstructorUsedError;
-  SafetyAlertLocation? get location => throw _privateConstructorUsedError;
-  List<String> get notifiedContactIds => throw _privateConstructorUsedError;
-  List<String> get acknowledgedByContactIds =>
-      throw _privateConstructorUsedError;
-  DateTime get triggeredAt => throw _privateConstructorUsedError;
-  DateTime? get firstAcknowledgedAt => throw _privateConstructorUsedError;
-  DateTime? get resolvedAt => throw _privateConstructorUsedError;
-  DateTime? get cancelledAt => throw _privateConstructorUsedError;
-  int? get batteryLevel => throw _privateConstructorUsedError;
-  String? get checkInId => throw _privateConstructorUsedError;
-  String? get tripId => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
-
-  /// Serializes this SafetyAlertModel to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  String get id;
+  String get userId;
+  SafetyAlertType get type;
+  SafetyAlertStatus get status;
+  String? get message;
+  SafetyAlertLocation? get location;
+  List<String> get notifiedContactIds;
+  List<String> get acknowledgedByContactIds;
+  DateTime get triggeredAt;
+  DateTime? get firstAcknowledgedAt;
+  DateTime? get resolvedAt;
+  DateTime? get cancelledAt;
+  int? get batteryLevel;
+  String? get checkInId;
+  String? get tripId;
+  Map<String, dynamic>? get metadata;
+  DateTime get createdAt;
+  DateTime? get updatedAt;
 
   /// Create a copy of SafetyAlertModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
   $SafetyAlertModelCopyWith<SafetyAlertModel> get copyWith =>
-      throw _privateConstructorUsedError;
+      _$SafetyAlertModelCopyWithImpl<SafetyAlertModel>(
+          this as SafetyAlertModel, _$identity);
+
+  /// Serializes this SafetyAlertModel to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is SafetyAlertModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.message, message) || other.message == message) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            const DeepCollectionEquality()
+                .equals(other.notifiedContactIds, notifiedContactIds) &&
+            const DeepCollectionEquality().equals(
+                other.acknowledgedByContactIds, acknowledgedByContactIds) &&
+            (identical(other.triggeredAt, triggeredAt) ||
+                other.triggeredAt == triggeredAt) &&
+            (identical(other.firstAcknowledgedAt, firstAcknowledgedAt) ||
+                other.firstAcknowledgedAt == firstAcknowledgedAt) &&
+            (identical(other.resolvedAt, resolvedAt) ||
+                other.resolvedAt == resolvedAt) &&
+            (identical(other.cancelledAt, cancelledAt) ||
+                other.cancelledAt == cancelledAt) &&
+            (identical(other.batteryLevel, batteryLevel) ||
+                other.batteryLevel == batteryLevel) &&
+            (identical(other.checkInId, checkInId) ||
+                other.checkInId == checkInId) &&
+            (identical(other.tripId, tripId) || other.tripId == tripId) &&
+            const DeepCollectionEquality().equals(other.metadata, metadata) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      userId,
+      type,
+      status,
+      message,
+      location,
+      const DeepCollectionEquality().hash(notifiedContactIds),
+      const DeepCollectionEquality().hash(acknowledgedByContactIds),
+      triggeredAt,
+      firstAcknowledgedAt,
+      resolvedAt,
+      cancelledAt,
+      batteryLevel,
+      checkInId,
+      tripId,
+      const DeepCollectionEquality().hash(metadata),
+      createdAt,
+      updatedAt);
+
+  @override
+  String toString() {
+    return 'SafetyAlertModel(id: $id, userId: $userId, type: $type, status: $status, message: $message, location: $location, notifiedContactIds: $notifiedContactIds, acknowledgedByContactIds: $acknowledgedByContactIds, triggeredAt: $triggeredAt, firstAcknowledgedAt: $firstAcknowledgedAt, resolvedAt: $resolvedAt, cancelledAt: $cancelledAt, batteryLevel: $batteryLevel, checkInId: $checkInId, tripId: $tripId, metadata: $metadata, createdAt: $createdAt, updatedAt: $updatedAt)';
+  }
 }
 
 /// @nodoc
-abstract class $SafetyAlertModelCopyWith<$Res> {
+abstract mixin class $SafetyAlertModelCopyWith<$Res> {
   factory $SafetyAlertModelCopyWith(
-          SafetyAlertModel value, $Res Function(SafetyAlertModel) then) =
-      _$SafetyAlertModelCopyWithImpl<$Res, SafetyAlertModel>;
+          SafetyAlertModel value, $Res Function(SafetyAlertModel) _then) =
+      _$SafetyAlertModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -80,14 +139,12 @@ abstract class $SafetyAlertModelCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$SafetyAlertModelCopyWithImpl<$Res, $Val extends SafetyAlertModel>
+class _$SafetyAlertModelCopyWithImpl<$Res>
     implements $SafetyAlertModelCopyWith<$Res> {
-  _$SafetyAlertModelCopyWithImpl(this._value, this._then);
+  _$SafetyAlertModelCopyWithImpl(this._self, this._then);
 
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
+  final SafetyAlertModel _self;
+  final $Res Function(SafetyAlertModel) _then;
 
   /// Create a copy of SafetyAlertModel
   /// with the given fields replaced by the non-null parameter values.
@@ -113,80 +170,80 @@ class _$SafetyAlertModelCopyWithImpl<$Res, $Val extends SafetyAlertModel>
     Object? createdAt = null,
     Object? updatedAt = freezed,
   }) {
-    return _then(_value.copyWith(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       userId: null == userId
-          ? _value.userId
+          ? _self.userId
           : userId // ignore: cast_nullable_to_non_nullable
               as String,
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as SafetyAlertType,
       status: null == status
-          ? _value.status
+          ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as SafetyAlertStatus,
       message: freezed == message
-          ? _value.message
+          ? _self.message
           : message // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as SafetyAlertLocation?,
       notifiedContactIds: null == notifiedContactIds
-          ? _value.notifiedContactIds
+          ? _self.notifiedContactIds
           : notifiedContactIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
       acknowledgedByContactIds: null == acknowledgedByContactIds
-          ? _value.acknowledgedByContactIds
+          ? _self.acknowledgedByContactIds
           : acknowledgedByContactIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
       triggeredAt: null == triggeredAt
-          ? _value.triggeredAt
+          ? _self.triggeredAt
           : triggeredAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
       firstAcknowledgedAt: freezed == firstAcknowledgedAt
-          ? _value.firstAcknowledgedAt
+          ? _self.firstAcknowledgedAt
           : firstAcknowledgedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       resolvedAt: freezed == resolvedAt
-          ? _value.resolvedAt
+          ? _self.resolvedAt
           : resolvedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       cancelledAt: freezed == cancelledAt
-          ? _value.cancelledAt
+          ? _self.cancelledAt
           : cancelledAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       batteryLevel: freezed == batteryLevel
-          ? _value.batteryLevel
+          ? _self.batteryLevel
           : batteryLevel // ignore: cast_nullable_to_non_nullable
               as int?,
       checkInId: freezed == checkInId
-          ? _value.checkInId
+          ? _self.checkInId
           : checkInId // ignore: cast_nullable_to_non_nullable
               as String?,
       tripId: freezed == tripId
-          ? _value.tripId
+          ? _self.tripId
           : tripId // ignore: cast_nullable_to_non_nullable
               as String?,
       metadata: freezed == metadata
-          ? _value.metadata
+          ? _self.metadata
           : metadata // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>?,
       createdAt: null == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
       updatedAt: freezed == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
-    ) as $Val);
+    ));
   }
 
   /// Create a copy of SafetyAlertModel
@@ -194,161 +251,288 @@ class _$SafetyAlertModelCopyWithImpl<$Res, $Val extends SafetyAlertModel>
   @override
   @pragma('vm:prefer-inline')
   $SafetyAlertLocationCopyWith<$Res>? get location {
-    if (_value.location == null) {
+    if (_self.location == null) {
       return null;
     }
 
-    return $SafetyAlertLocationCopyWith<$Res>(_value.location!, (value) {
-      return _then(_value.copyWith(location: value) as $Val);
+    return $SafetyAlertLocationCopyWith<$Res>(_self.location!, (value) {
+      return _then(_self.copyWith(location: value));
     });
   }
 }
 
-/// @nodoc
-abstract class _$$SafetyAlertModelImplCopyWith<$Res>
-    implements $SafetyAlertModelCopyWith<$Res> {
-  factory _$$SafetyAlertModelImplCopyWith(_$SafetyAlertModelImpl value,
-          $Res Function(_$SafetyAlertModelImpl) then) =
-      __$$SafetyAlertModelImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      String userId,
-      SafetyAlertType type,
-      SafetyAlertStatus status,
-      String? message,
-      SafetyAlertLocation? location,
-      List<String> notifiedContactIds,
-      List<String> acknowledgedByContactIds,
-      DateTime triggeredAt,
-      DateTime? firstAcknowledgedAt,
-      DateTime? resolvedAt,
-      DateTime? cancelledAt,
-      int? batteryLevel,
-      String? checkInId,
-      String? tripId,
-      Map<String, dynamic>? metadata,
-      DateTime createdAt,
-      DateTime? updatedAt});
+/// Adds pattern-matching-related methods to [SafetyAlertModel].
+extension SafetyAlertModelPatterns on SafetyAlertModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
 
-  @override
-  $SafetyAlertLocationCopyWith<$Res>? get location;
-}
-
-/// @nodoc
-class __$$SafetyAlertModelImplCopyWithImpl<$Res>
-    extends _$SafetyAlertModelCopyWithImpl<$Res, _$SafetyAlertModelImpl>
-    implements _$$SafetyAlertModelImplCopyWith<$Res> {
-  __$$SafetyAlertModelImplCopyWithImpl(_$SafetyAlertModelImpl _value,
-      $Res Function(_$SafetyAlertModelImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of SafetyAlertModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? userId = null,
-    Object? type = null,
-    Object? status = null,
-    Object? message = freezed,
-    Object? location = freezed,
-    Object? notifiedContactIds = null,
-    Object? acknowledgedByContactIds = null,
-    Object? triggeredAt = null,
-    Object? firstAcknowledgedAt = freezed,
-    Object? resolvedAt = freezed,
-    Object? cancelledAt = freezed,
-    Object? batteryLevel = freezed,
-    Object? checkInId = freezed,
-    Object? tripId = freezed,
-    Object? metadata = freezed,
-    Object? createdAt = null,
-    Object? updatedAt = freezed,
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_SafetyAlertModel value)? $default, {
+    required TResult orElse(),
   }) {
-    return _then(_$SafetyAlertModelImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as String,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as SafetyAlertType,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as SafetyAlertStatus,
-      message: freezed == message
-          ? _value.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as SafetyAlertLocation?,
-      notifiedContactIds: null == notifiedContactIds
-          ? _value._notifiedContactIds
-          : notifiedContactIds // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      acknowledgedByContactIds: null == acknowledgedByContactIds
-          ? _value._acknowledgedByContactIds
-          : acknowledgedByContactIds // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      triggeredAt: null == triggeredAt
-          ? _value.triggeredAt
-          : triggeredAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      firstAcknowledgedAt: freezed == firstAcknowledgedAt
-          ? _value.firstAcknowledgedAt
-          : firstAcknowledgedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      resolvedAt: freezed == resolvedAt
-          ? _value.resolvedAt
-          : resolvedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      cancelledAt: freezed == cancelledAt
-          ? _value.cancelledAt
-          : cancelledAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      batteryLevel: freezed == batteryLevel
-          ? _value.batteryLevel
-          : batteryLevel // ignore: cast_nullable_to_non_nullable
-              as int?,
-      checkInId: freezed == checkInId
-          ? _value.checkInId
-          : checkInId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      tripId: freezed == tripId
-          ? _value.tripId
-          : tripId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      metadata: freezed == metadata
-          ? _value._metadata
-          : metadata // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
-      createdAt: null == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-    ));
+    final _that = this;
+    switch (_that) {
+      case _SafetyAlertModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_SafetyAlertModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyAlertModel():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_SafetyAlertModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyAlertModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            SafetyAlertType type,
+            SafetyAlertStatus status,
+            String? message,
+            SafetyAlertLocation? location,
+            List<String> notifiedContactIds,
+            List<String> acknowledgedByContactIds,
+            DateTime triggeredAt,
+            DateTime? firstAcknowledgedAt,
+            DateTime? resolvedAt,
+            DateTime? cancelledAt,
+            int? batteryLevel,
+            String? checkInId,
+            String? tripId,
+            Map<String, dynamic>? metadata,
+            DateTime createdAt,
+            DateTime? updatedAt)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyAlertModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.type,
+            _that.status,
+            _that.message,
+            _that.location,
+            _that.notifiedContactIds,
+            _that.acknowledgedByContactIds,
+            _that.triggeredAt,
+            _that.firstAcknowledgedAt,
+            _that.resolvedAt,
+            _that.cancelledAt,
+            _that.batteryLevel,
+            _that.checkInId,
+            _that.tripId,
+            _that.metadata,
+            _that.createdAt,
+            _that.updatedAt);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String userId,
+            SafetyAlertType type,
+            SafetyAlertStatus status,
+            String? message,
+            SafetyAlertLocation? location,
+            List<String> notifiedContactIds,
+            List<String> acknowledgedByContactIds,
+            DateTime triggeredAt,
+            DateTime? firstAcknowledgedAt,
+            DateTime? resolvedAt,
+            DateTime? cancelledAt,
+            int? batteryLevel,
+            String? checkInId,
+            String? tripId,
+            Map<String, dynamic>? metadata,
+            DateTime createdAt,
+            DateTime? updatedAt)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyAlertModel():
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.type,
+            _that.status,
+            _that.message,
+            _that.location,
+            _that.notifiedContactIds,
+            _that.acknowledgedByContactIds,
+            _that.triggeredAt,
+            _that.firstAcknowledgedAt,
+            _that.resolvedAt,
+            _that.cancelledAt,
+            _that.batteryLevel,
+            _that.checkInId,
+            _that.tripId,
+            _that.metadata,
+            _that.createdAt,
+            _that.updatedAt);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String userId,
+            SafetyAlertType type,
+            SafetyAlertStatus status,
+            String? message,
+            SafetyAlertLocation? location,
+            List<String> notifiedContactIds,
+            List<String> acknowledgedByContactIds,
+            DateTime triggeredAt,
+            DateTime? firstAcknowledgedAt,
+            DateTime? resolvedAt,
+            DateTime? cancelledAt,
+            int? batteryLevel,
+            String? checkInId,
+            String? tripId,
+            Map<String, dynamic>? metadata,
+            DateTime createdAt,
+            DateTime? updatedAt)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _SafetyAlertModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.userId,
+            _that.type,
+            _that.status,
+            _that.message,
+            _that.location,
+            _that.notifiedContactIds,
+            _that.acknowledgedByContactIds,
+            _that.triggeredAt,
+            _that.firstAcknowledgedAt,
+            _that.resolvedAt,
+            _that.cancelledAt,
+            _that.batteryLevel,
+            _that.checkInId,
+            _that.tripId,
+            _that.metadata,
+            _that.createdAt,
+            _that.updatedAt);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$SafetyAlertModelImpl extends _SafetyAlertModel {
-  const _$SafetyAlertModelImpl(
+class _SafetyAlertModel implements SafetyAlertModel {
+  const _SafetyAlertModel(
       {required this.id,
       required this.userId,
       required this.type,
@@ -369,11 +553,9 @@ class _$SafetyAlertModelImpl extends _SafetyAlertModel {
       this.updatedAt})
       : _notifiedContactIds = notifiedContactIds,
         _acknowledgedByContactIds = acknowledgedByContactIds,
-        _metadata = metadata,
-        super._();
-
-  factory _$SafetyAlertModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$SafetyAlertModelImplFromJson(json);
+        _metadata = metadata;
+  factory _SafetyAlertModel.fromJson(Map<String, dynamic> json) =>
+      _$SafetyAlertModelFromJson(json);
 
   @override
   final String id;
@@ -434,16 +616,26 @@ class _$SafetyAlertModelImpl extends _SafetyAlertModel {
   @override
   final DateTime? updatedAt;
 
+  /// Create a copy of SafetyAlertModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'SafetyAlertModel(id: $id, userId: $userId, type: $type, status: $status, message: $message, location: $location, notifiedContactIds: $notifiedContactIds, acknowledgedByContactIds: $acknowledgedByContactIds, triggeredAt: $triggeredAt, firstAcknowledgedAt: $firstAcknowledgedAt, resolvedAt: $resolvedAt, cancelledAt: $cancelledAt, batteryLevel: $batteryLevel, checkInId: $checkInId, tripId: $tripId, metadata: $metadata, createdAt: $createdAt, updatedAt: $updatedAt)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$SafetyAlertModelCopyWith<_SafetyAlertModel> get copyWith =>
+      __$SafetyAlertModelCopyWithImpl<_SafetyAlertModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$SafetyAlertModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$SafetyAlertModelImpl &&
+            other is _SafetyAlertModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.type, type) || other.type == type) &&
@@ -498,89 +690,165 @@ class _$SafetyAlertModelImpl extends _SafetyAlertModel {
       createdAt,
       updatedAt);
 
-  /// Create a copy of SafetyAlertModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$SafetyAlertModelImplCopyWith<_$SafetyAlertModelImpl> get copyWith =>
-      __$$SafetyAlertModelImplCopyWithImpl<_$SafetyAlertModelImpl>(
-          this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$SafetyAlertModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'SafetyAlertModel(id: $id, userId: $userId, type: $type, status: $status, message: $message, location: $location, notifiedContactIds: $notifiedContactIds, acknowledgedByContactIds: $acknowledgedByContactIds, triggeredAt: $triggeredAt, firstAcknowledgedAt: $firstAcknowledgedAt, resolvedAt: $resolvedAt, cancelledAt: $cancelledAt, batteryLevel: $batteryLevel, checkInId: $checkInId, tripId: $tripId, metadata: $metadata, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 }
 
-abstract class _SafetyAlertModel extends SafetyAlertModel {
-  const factory _SafetyAlertModel(
-      {required final String id,
-      required final String userId,
-      required final SafetyAlertType type,
-      required final SafetyAlertStatus status,
-      final String? message,
-      final SafetyAlertLocation? location,
-      required final List<String> notifiedContactIds,
-      required final List<String> acknowledgedByContactIds,
-      required final DateTime triggeredAt,
-      final DateTime? firstAcknowledgedAt,
-      final DateTime? resolvedAt,
-      final DateTime? cancelledAt,
-      final int? batteryLevel,
-      final String? checkInId,
-      final String? tripId,
-      final Map<String, dynamic>? metadata,
-      required final DateTime createdAt,
-      final DateTime? updatedAt}) = _$SafetyAlertModelImpl;
-  const _SafetyAlertModel._() : super._();
+/// @nodoc
+abstract mixin class _$SafetyAlertModelCopyWith<$Res>
+    implements $SafetyAlertModelCopyWith<$Res> {
+  factory _$SafetyAlertModelCopyWith(
+          _SafetyAlertModel value, $Res Function(_SafetyAlertModel) _then) =
+      __$SafetyAlertModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      String userId,
+      SafetyAlertType type,
+      SafetyAlertStatus status,
+      String? message,
+      SafetyAlertLocation? location,
+      List<String> notifiedContactIds,
+      List<String> acknowledgedByContactIds,
+      DateTime triggeredAt,
+      DateTime? firstAcknowledgedAt,
+      DateTime? resolvedAt,
+      DateTime? cancelledAt,
+      int? batteryLevel,
+      String? checkInId,
+      String? tripId,
+      Map<String, dynamic>? metadata,
+      DateTime createdAt,
+      DateTime? updatedAt});
 
-  factory _SafetyAlertModel.fromJson(Map<String, dynamic> json) =
-      _$SafetyAlertModelImpl.fromJson;
+  @override
+  $SafetyAlertLocationCopyWith<$Res>? get location;
+}
 
-  @override
-  String get id;
-  @override
-  String get userId;
-  @override
-  SafetyAlertType get type;
-  @override
-  SafetyAlertStatus get status;
-  @override
-  String? get message;
-  @override
-  SafetyAlertLocation? get location;
-  @override
-  List<String> get notifiedContactIds;
-  @override
-  List<String> get acknowledgedByContactIds;
-  @override
-  DateTime get triggeredAt;
-  @override
-  DateTime? get firstAcknowledgedAt;
-  @override
-  DateTime? get resolvedAt;
-  @override
-  DateTime? get cancelledAt;
-  @override
-  int? get batteryLevel;
-  @override
-  String? get checkInId;
-  @override
-  String? get tripId;
-  @override
-  Map<String, dynamic>? get metadata;
-  @override
-  DateTime get createdAt;
-  @override
-  DateTime? get updatedAt;
+/// @nodoc
+class __$SafetyAlertModelCopyWithImpl<$Res>
+    implements _$SafetyAlertModelCopyWith<$Res> {
+  __$SafetyAlertModelCopyWithImpl(this._self, this._then);
+
+  final _SafetyAlertModel _self;
+  final $Res Function(_SafetyAlertModel) _then;
 
   /// Create a copy of SafetyAlertModel
   /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$SafetyAlertModelImplCopyWith<_$SafetyAlertModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? id = null,
+    Object? userId = null,
+    Object? type = null,
+    Object? status = null,
+    Object? message = freezed,
+    Object? location = freezed,
+    Object? notifiedContactIds = null,
+    Object? acknowledgedByContactIds = null,
+    Object? triggeredAt = null,
+    Object? firstAcknowledgedAt = freezed,
+    Object? resolvedAt = freezed,
+    Object? cancelledAt = freezed,
+    Object? batteryLevel = freezed,
+    Object? checkInId = freezed,
+    Object? tripId = freezed,
+    Object? metadata = freezed,
+    Object? createdAt = null,
+    Object? updatedAt = freezed,
+  }) {
+    return _then(_SafetyAlertModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      userId: null == userId
+          ? _self.userId
+          : userId // ignore: cast_nullable_to_non_nullable
+              as String,
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as SafetyAlertType,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as SafetyAlertStatus,
+      message: freezed == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String?,
+      location: freezed == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as SafetyAlertLocation?,
+      notifiedContactIds: null == notifiedContactIds
+          ? _self._notifiedContactIds
+          : notifiedContactIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      acknowledgedByContactIds: null == acknowledgedByContactIds
+          ? _self._acknowledgedByContactIds
+          : acknowledgedByContactIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      triggeredAt: null == triggeredAt
+          ? _self.triggeredAt
+          : triggeredAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      firstAcknowledgedAt: freezed == firstAcknowledgedAt
+          ? _self.firstAcknowledgedAt
+          : firstAcknowledgedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      resolvedAt: freezed == resolvedAt
+          ? _self.resolvedAt
+          : resolvedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      cancelledAt: freezed == cancelledAt
+          ? _self.cancelledAt
+          : cancelledAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      batteryLevel: freezed == batteryLevel
+          ? _self.batteryLevel
+          : batteryLevel // ignore: cast_nullable_to_non_nullable
+              as int?,
+      checkInId: freezed == checkInId
+          ? _self.checkInId
+          : checkInId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      tripId: freezed == tripId
+          ? _self.tripId
+          : tripId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      metadata: freezed == metadata
+          ? _self._metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
+      createdAt: null == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      updatedAt: freezed == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+    ));
+  }
+
+  /// Create a copy of SafetyAlertModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SafetyAlertLocationCopyWith<$Res>? get location {
+    if (_self.location == null) {
+      return null;
+    }
+
+    return $SafetyAlertLocationCopyWith<$Res>(_self.location!, (value) {
+      return _then(_self.copyWith(location: value));
+    });
+  }
 }
+
+// dart format on

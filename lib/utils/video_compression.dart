@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:path/path.dart' as path;
 import '../core/errors/exceptions.dart';
 
@@ -272,7 +271,8 @@ class VideoCompression {
     _validateFile(file);
 
     // Use default config if none provided
-    final compressionConfig = config ?? VideoCompressionConfig.optimizedForTravel;
+    final compressionConfig =
+        config ?? VideoCompressionConfig.optimizedForTravel;
     compressionConfig.validate();
 
     try {
@@ -331,7 +331,7 @@ class VideoCompression {
       rethrow;
     } on UnsupportedVideoFormatException {
       rethrow;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw MediaCompressionException(
         message: 'Failed to compress video: ${e.toString()}',
         code: 'compression_failed',
@@ -517,7 +517,7 @@ class VideoCompression {
 
     // Rough estimation formula for H.264 video
     // Base bitrate: 0.07 bits per pixel per frame at quality 100
-    final baseBitsPerPixel = 0.07;
+    const baseBitsPerPixel = 0.07;
     final qualityFactor = quality / 100;
     final estimatedBitrate = pixelCount * baseBitsPerPixel * qualityFactor;
 

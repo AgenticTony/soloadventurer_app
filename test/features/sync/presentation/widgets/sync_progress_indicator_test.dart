@@ -234,10 +234,12 @@ void main() {
       );
 
       final sizedBox = tester.widget<SizedBox>(
-        find.descendant(
-          of: find.byType(SyncCircularProgress),
-          matching: find.byType(SizedBox),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncCircularProgress),
+              matching: find.byType(SizedBox),
+            )
+            .first,
       );
 
       expect(sizedBox.width, customSize);
@@ -259,10 +261,12 @@ void main() {
       );
 
       final progressIndicator = tester.widget<CircularProgressIndicator>(
-        find.descendant(
-          of: find.byType(SyncCircularProgress),
-          matching: find.byType(CircularProgressIndicator),
-        ).first,
+        find
+            .descendant(
+              of: find.byType(SyncCircularProgress),
+              matching: find.byType(CircularProgressIndicator),
+            )
+            .first,
       );
 
       expect(progressIndicator.strokeWidth, customStrokeWidth);
@@ -283,10 +287,12 @@ void main() {
       );
 
       final progressIndicator = tester.widget<CircularProgressIndicator>(
-        find.descendant(
-          of: find.byType(SyncCircularProgress),
-          matching: find.byType(CircularProgressIndicator),
-        ).last,
+        find
+            .descendant(
+              of: find.byType(SyncCircularProgress),
+              matching: find.byType(CircularProgressIndicator),
+            )
+            .last,
       );
 
       expect(progressIndicator.color, customColor);
@@ -439,10 +445,10 @@ void main() {
   group('Progress indicator integration tests', () {
     testWidgets('multiple progress bars work together', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Column(
-              children: const [
+              children: [
                 SyncProgressBar(progress: 0.25),
                 SyncProgressBar(progress: 0.5),
                 SyncProgressBar(progress: 0.75),

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/sync/domain/services/exponential_backoff.dart';
+import 'package:soloadventurer/features/sync/domain/services/exponential_backoff.dart';
 
 void main() {
   group('ExponentialBackoff', () {
@@ -40,7 +40,7 @@ void main() {
       });
 
       test('should respect custom base delay', () {
-        final customBackoff = ExponentialBackoff(baseDelayMs: 500);
+        const customBackoff = ExponentialBackoff(baseDelayMs: 500);
 
         // Retry 0: 500ms
         expect(customBackoff.calculateDelay(0), 500);
@@ -53,7 +53,7 @@ void main() {
       });
 
       test('should respect custom max delay', () {
-        final customBackoff = ExponentialBackoff(
+        const customBackoff = ExponentialBackoff(
           baseDelayMs: 1000,
           maxDelayMs: 30000,
         );
@@ -81,13 +81,13 @@ void main() {
       });
 
       test('should add jitter when enabled', () {
-        final backoffWithJitter = ExponentialBackoff(
+        const backoffWithJitter = ExponentialBackoff(
           withJitter: true,
           jitterFactor: 0.1,
         );
 
         // With jitter, the delay should be within ±10% of the base delay
-        final baseDelay = 1000;
+        const baseDelay = 1000;
         final delayWithJitter = backoffWithJitter.calculateDelay(0);
 
         // Allow ±10% variance
@@ -99,7 +99,7 @@ void main() {
       });
 
       test('should not add jitter when disabled', () {
-        final backoffNoJitter = ExponentialBackoff(withJitter: false);
+        const backoffNoJitter = ExponentialBackoff(withJitter: false);
 
         expect(backoffNoJitter.calculateDelay(0), 1000);
         expect(backoffNoJitter.calculateDelay(1), 2000);
@@ -107,7 +107,7 @@ void main() {
       });
 
       test('should handle zero jitter factor', () {
-        final backoff = ExponentialBackoff(
+        const backoff = ExponentialBackoff(
           withJitter: true,
           jitterFactor: 0.0,
         );
@@ -157,8 +157,14 @@ void main() {
         final expectedMin = before.add(const Duration(seconds: 1));
         final expectedMax = after.add(const Duration(seconds: 1));
 
-        expect(retryTime.isAfter(expectedMin.subtract(const Duration(milliseconds: 100))), true);
-        expect(retryTime.isBefore(expectedMax.add(const Duration(milliseconds: 100))), true);
+        expect(
+            retryTime.isAfter(
+                expectedMin.subtract(const Duration(milliseconds: 100))),
+            true);
+        expect(
+            retryTime
+                .isBefore(expectedMax.add(const Duration(milliseconds: 100))),
+            true);
       });
     });
 
@@ -191,7 +197,7 @@ void main() {
 
     group('predefined configurations', () {
       test('standard configuration should have standard delays', () {
-        final standard = ExponentialBackoff.standard;
+        const standard = ExponentialBackoff.standard;
 
         expect(standard.baseDelayMs, 1000);
         expect(standard.maxDelayMs, 60000);
@@ -200,7 +206,7 @@ void main() {
       });
 
       test('aggressive configuration should have shorter delays', () {
-        final aggressive = ExponentialBackoff.aggressive;
+        const aggressive = ExponentialBackoff.aggressive;
 
         expect(aggressive.baseDelayMs, 500);
         expect(aggressive.maxDelayMs, 30000);
@@ -209,7 +215,7 @@ void main() {
       });
 
       test('conservative configuration should have longer delays', () {
-        final conservative = ExponentialBackoff.conservative;
+        const conservative = ExponentialBackoff.conservative;
 
         expect(conservative.baseDelayMs, 2000);
         expect(conservative.maxDelayMs, 120000);
@@ -235,7 +241,8 @@ void main() {
       });
 
       test('should mention jitter in description when enabled', () {
-        final backoffWithJitter = ExponentialBackoff(withJitter: true, jitterFactor: 0.1);
+        const backoffWithJitter =
+            ExponentialBackoff(withJitter: true, jitterFactor: 0.1);
         final desc = backoffWithJitter.getDelayDescription(0);
 
         expect(desc, contains('jitter'));
@@ -243,7 +250,7 @@ void main() {
       });
 
       test('should not mention jitter when disabled', () {
-        final backoffNoJitter = ExponentialBackoff(withJitter: false);
+        const backoffNoJitter = ExponentialBackoff(withJitter: false);
         final desc = backoffNoJitter.getDelayDescription(0);
 
         expect(desc, isNot(contains('jitter')));

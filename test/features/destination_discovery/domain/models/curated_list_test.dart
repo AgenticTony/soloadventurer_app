@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/curated_list.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/curated_list.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
 
 void main() {
   group('CuratedListType enum', () {
@@ -37,9 +37,12 @@ void main() {
     });
 
     test('should deserialize correctly', () {
-      expect(CuratedListType.fromJson('popular_solo'), CuratedListType.popularSolo);
-      expect(CuratedListType.fromJson('hidden_gems'), CuratedListType.hiddenGems);
-      expect(CuratedListType.fromJson('budget_friendly'), CuratedListType.budgetFriendly);
+      expect(CuratedListType.fromJson('popular_solo'),
+          CuratedListType.popularSolo);
+      expect(
+          CuratedListType.fromJson('hidden_gems'), CuratedListType.hiddenGems);
+      expect(CuratedListType.fromJson('budget_friendly'),
+          CuratedListType.budgetFriendly);
       expect(CuratedListType.fromJson('adventure'), CuratedListType.adventure);
       expect(CuratedListType.fromJson('cultural'), CuratedListType.cultural);
       expect(CuratedListType.fromJson('beach'), CuratedListType.beach);
@@ -69,7 +72,7 @@ void main() {
         safetyScore: 9.2,
         safetyInsights: [],
         soloSuitabilityScore: 8.8,
-        soloSuitabilityFactors: SoloSuitabilityFactors(
+        soloSuitabilityFactors: const SoloSuitabilityFactors(
           safety: 9.5,
           nightlife: 8.0,
           walkability: 9.0,
@@ -274,7 +277,9 @@ void main() {
       expect(listWithoutCover.hasCoverImage, false);
     });
 
-    test('hasDestinations should return true when destinations list is not empty', () {
+    test(
+        'hasDestinations should return true when destinations list is not empty',
+        () {
       final listWithDests = CuratedList(
         id: 'list_1',
         name: 'List',
@@ -288,7 +293,8 @@ void main() {
       expect(listWithDests.hasDestinations, true);
     });
 
-    test('hasDestinations should return false when destinations list is empty', () {
+    test('hasDestinations should return false when destinations list is empty',
+        () {
       final listWithoutDests = CuratedList(
         id: 'list_1',
         name: 'List',
@@ -342,7 +348,7 @@ void main() {
         safetyScore: 9.5,
         safetyInsights: [],
         soloSuitabilityScore: 9.0,
-        soloSuitabilityFactors: SoloSuitabilityFactors(
+        soloSuitabilityFactors: const SoloSuitabilityFactors(
           safety: 9.5,
           nightlife: 7.0,
           walkability: 9.0,
@@ -431,7 +437,8 @@ void main() {
       expect(popularList.isHiddenGemsList, false);
     });
 
-    test('isBudgetFriendly should return true only for budget friendly type', () {
+    test('isBudgetFriendly should return true only for budget friendly type',
+        () {
       final budgetList = CuratedList(
         id: 'list_1',
         name: 'Budget',
@@ -536,7 +543,8 @@ void main() {
       expect(updated.id, list.id);
     });
 
-    test('hasSafetyScores should return true when averageSafetyScore is set', () {
+    test('hasSafetyScores should return true when averageSafetyScore is set',
+        () {
       final listWithSafety = CuratedList(
         id: 'list_1',
         name: 'List',
@@ -563,7 +571,9 @@ void main() {
       expect(listWithoutSafety.hasSafetyScores, false);
     });
 
-    test('hasSoloSuitabilityScores should return true when averageSoloSuitabilityScore is set', () {
+    test(
+        'hasSoloSuitabilityScores should return true when averageSoloSuitabilityScore is set',
+        () {
       final listWithSolo = CuratedList(
         id: 'list_1',
         name: 'List',

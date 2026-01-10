@@ -166,7 +166,8 @@ class AppError {
   }) {
     return AppError(
       id: id ?? _generateErrorId(),
-      message: message ?? 'Unable to connect. Please check your internet connection.',
+      message: message ??
+          'Unable to connect. Please check your internet connection.',
       technicalMessage: exception?.toString(),
       code: 'network_error',
       severity: ErrorSeverity.error,
@@ -239,7 +240,8 @@ class AppError {
   }) {
     return AppError(
       id: id ?? _generateErrorId(),
-      message: message ?? 'Not enough storage space. Please free up some space.',
+      message:
+          message ?? 'Not enough storage space. Please free up some space.',
       technicalMessage: exception?.toString(),
       code: 'storage_error',
       severity: ErrorSeverity.error,
@@ -336,7 +338,8 @@ class AppError {
   }) {
     return AppError(
       id: id ?? _generateErrorId(),
-      message: message ?? 'Failed to compress media. The file may be corrupted.',
+      message:
+          message ?? 'Failed to compress media. The file may be corrupted.',
       technicalMessage: exception?.toString(),
       code: 'media_compression',
       severity: ErrorSeverity.error,
@@ -358,7 +361,8 @@ class AppError {
   }) {
     return AppError(
       id: id ?? _generateErrorId(),
-      message: message ?? 'Unable to get your location. Please check location permissions.',
+      message: message ??
+          'Unable to get your location. Please check location permissions.',
       technicalMessage: exception?.toString(),
       code: 'location_error',
       severity: ErrorSeverity.warning,
@@ -426,7 +430,7 @@ class AppError {
 
   /// Generate a unique error ID
   static String _generateErrorId() {
-    return 'err_${DateTime.now().millisecondsSinceEpoch}_${hashCode}';
+    return 'err_${DateTime.now().millisecondsSinceEpoch}_$hashCode';
   }
 
   /// Get user-friendly message from exception
@@ -489,7 +493,11 @@ class AppError {
     switch (exception.runtimeType) {
       case NetworkTimeoutException:
       case NetworkConnectivityException:
-        return [ErrorAction.retry, ErrorAction.checkConnection, ErrorAction.dismiss];
+        return [
+          ErrorAction.retry,
+          ErrorAction.checkConnection,
+          ErrorAction.dismiss
+        ];
       case UnauthorizedException:
         return [ErrorAction.reauthenticate, ErrorAction.dismiss];
       case ForbiddenException:

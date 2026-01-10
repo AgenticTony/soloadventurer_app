@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// App-wide performance metrics collected over time
 ///
 /// This class aggregates performance data from various sources including
@@ -71,16 +69,13 @@ class PerformanceMetrics {
   });
 
   /// Current memory usage in MB
-  double get currentMemoryUsageMB =>
-      currentMemoryUsageBytes / (1024 * 1024);
+  double get currentMemoryUsageMB => currentMemoryUsageBytes / (1024 * 1024);
 
   /// Average memory usage in MB
-  double get averageMemoryUsageMB =>
-      averageMemoryUsageBytes / (1024 * 1024);
+  double get averageMemoryUsageMB => averageMemoryUsageBytes / (1024 * 1024);
 
   /// Peak memory usage in MB
-  double get peakMemoryUsageMB =>
-      peakMemoryUsageBytes / (1024 * 1024);
+  double get peakMemoryUsageMB => peakMemoryUsageBytes / (1024 * 1024);
 
   /// Convert metrics to a JSON-serializable map
   Map<String, dynamic> toJson() {
@@ -115,7 +110,7 @@ App Performance Metrics:
 - FPS: ${currentFPS.toStringAsFixed(1)} (avg: ${averageFPS.toStringAsFixed(1)})
 - Janky Frames: ${jankyFramePercentage.toStringAsFixed(1)}%
 - Network: ${averageNetworkLatencyMs.toStringAsFixed(1)}ms avg latency
-- Requests: $totalNetworkRequests total, ${failedNetworkRequests} failed
+- Requests: $totalNetworkRequests total, $failedNetworkRequests failed
 - Monitoring Duration: ${monitoringDuration.inMinutes} minutes
 ''';
   }
@@ -167,17 +162,21 @@ App Performance Metrics:
   }) {
     return PerformanceMetrics(
       startupTimeMs: startupTimeMs ?? this.startupTimeMs,
-      currentMemoryUsageBytes: currentMemoryUsageBytes ?? this.currentMemoryUsageBytes,
-      averageMemoryUsageBytes: averageMemoryUsageBytes ?? this.averageMemoryUsageBytes,
+      currentMemoryUsageBytes:
+          currentMemoryUsageBytes ?? this.currentMemoryUsageBytes,
+      averageMemoryUsageBytes:
+          averageMemoryUsageBytes ?? this.averageMemoryUsageBytes,
       peakMemoryUsageBytes: peakMemoryUsageBytes ?? this.peakMemoryUsageBytes,
       currentFPS: currentFPS ?? this.currentFPS,
       averageFPS: averageFPS ?? this.averageFPS,
       jankyFramePercentage: jankyFramePercentage ?? this.jankyFramePercentage,
       totalFrames: totalFrames ?? this.totalFrames,
       jankyFrames: jankyFrames ?? this.jankyFrames,
-      averageNetworkLatencyMs: averageNetworkLatencyMs ?? this.averageNetworkLatencyMs,
+      averageNetworkLatencyMs:
+          averageNetworkLatencyMs ?? this.averageNetworkLatencyMs,
       totalNetworkRequests: totalNetworkRequests ?? this.totalNetworkRequests,
-      failedNetworkRequests: failedNetworkRequests ?? this.failedNetworkRequests,
+      failedNetworkRequests:
+          failedNetworkRequests ?? this.failedNetworkRequests,
       timestamp: timestamp ?? this.timestamp,
       monitoringDuration: monitoringDuration ?? this.monitoringDuration,
     );
@@ -234,6 +233,6 @@ class PerformanceAlert {
 
   @override
   String toString() {
-    return 'PerformanceAlert(${level.name}: $message\nIssues: ${issues.join(', ')}')';
+    return 'PerformanceAlert(${level.name}: $message\\nIssues: ${issues.join(', ')})';
   }
 }

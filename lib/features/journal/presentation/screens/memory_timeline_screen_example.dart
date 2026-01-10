@@ -41,7 +41,8 @@ class MemoryTimelineExampleMenu extends StatelessWidget {
         children: [
           _ExampleCard(
             title: 'Basic Memory Timeline',
-            description: 'Full timeline with all journal entries grouped by time',
+            description:
+                'Full timeline with all journal entries grouped by time',
             icon: Icons.timeline,
             onTap: () {
               Navigator.push(
@@ -193,8 +194,8 @@ class _ProviderScopeExample extends ConsumerWidget {
             Text(
               'with ProviderScope injection',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
@@ -235,17 +236,21 @@ class _StateMonitoringExample extends ConsumerWidget {
                     Text(
                       'Timeline State',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 16),
                     _StateRow('Loading', timelineState.isLoading.toString()),
-                    _StateRow('Has Error', (timelineState.error != null).toString()),
+                    _StateRow(
+                        'Has Error', (timelineState.error != null).toString()),
                     _StateRow('Error', timelineState.error ?? 'None'),
                     const SizedBox(height: 8),
-                    _StateRow('Entry Count', timelineState.entryCount.toString()),
-                    _StateRow('Group Count', timelineState.groupCount.toString()),
-                    _StateRow('Has Content', timelineState.hasContent.toString()),
+                    _StateRow(
+                        'Entry Count', timelineState.entryCount.toString()),
+                    _StateRow(
+                        'Group Count', timelineState.groupCount.toString()),
+                    _StateRow(
+                        'Has Content', timelineState.hasContent.toString()),
                   ],
                 ),
               ),
@@ -260,31 +265,40 @@ class _StateMonitoringExample extends ConsumerWidget {
                     children: [
                       Text(
                         'Groups',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                       ),
                       const SizedBox(height: 16),
                       ...timelineState.groups.map((group) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              group.title,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  group.title,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                                Text(
+                                  '${group.entryCount} entries',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              '${group.entryCount} entries',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                          )),
                     ],
                   ),
                 ),
@@ -319,16 +333,16 @@ class _StateRow extends StatelessWidget {
             child: Text(
               '$label:',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+                    fontWeight: FontWeight.w500,
+                  ),
             ),
           ),
           Expanded(
             child: Text(
               value,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ),
         ],
@@ -362,16 +376,16 @@ class _NavigationExample extends StatelessWidget {
               Text(
                 'Navigate to Memory Timeline',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontWeight: FontWeight.bold,
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               Text(
                 'Example code for navigating from home screen or dashboard',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
@@ -387,9 +401,9 @@ class _NavigationExample extends StatelessWidget {
                     Text(
                       '// Code Example',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.bold,
-                      ),
+                            fontFamily: 'monospace',
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -401,8 +415,8 @@ class _NavigationExample extends StatelessWidget {
   ),
 );''',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontFamily: 'monospace',
-                      ),
+                            fontFamily: 'monospace',
+                          ),
                     ),
                   ],
                 ),
@@ -413,8 +427,7 @@ class _NavigationExample extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          const MemoryTimelineExampleScreen(),
+                      builder: (context) => const MemoryTimelineExampleScreen(),
                     ),
                   );
                 },

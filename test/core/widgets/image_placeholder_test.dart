@@ -58,8 +58,7 @@ void main() {
     });
 
     group('skeleton', () {
-      testWidgets('creates skeleton placeholder without icon',
-          (tester) async {
+      testWidgets('creates skeleton placeholder without icon', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -147,8 +146,7 @@ void main() {
         expect(find.byType(Icon), findsOneWidget);
       });
 
-      testWidgets('creates color placeholder with custom icon',
-          (tester) async {
+      testWidgets('creates color placeholder with custom icon', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -240,8 +238,7 @@ void main() {
     });
 
     group('Performance', () {
-      testWidgets('shimmer placeholder renders efficiently',
-          (tester) async {
+      testWidgets('shimmer placeholder renders efficiently', (tester) async {
         final stopwatch = Stopwatch()..start();
 
         await tester.pumpWidget(
@@ -266,8 +263,7 @@ void main() {
         expect(stopwatch.elapsedMilliseconds, lessThan(1000));
       });
 
-      testWidgets('skeleton placeholder renders efficiently',
-          (tester) async {
+      testWidgets('skeleton placeholder renders efficiently', (tester) async {
         final stopwatch = Stopwatch()..start();
 
         await tester.pumpWidget(

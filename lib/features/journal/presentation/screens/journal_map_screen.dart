@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -469,8 +471,9 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
 
     // Adjust zoom based on spread
     double zoom = 13.0;
-    if (maxDiff > 100) zoom = 3.0;
-    else if (maxDiff > 50) zoom = 4.0;
+    if (maxDiff > 100) {
+      zoom = 3.0;
+    } else if (maxDiff > 50) zoom = 4.0;
     else if (maxDiff > 20) zoom = 5.0;
     else if (maxDiff > 10) zoom = 6.0;
     else if (maxDiff > 5) zoom = 7.0;
@@ -493,6 +496,3 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
     );
   }
 }
-
-// Import dart:math for min/max functions
-import 'dart:math' as math;

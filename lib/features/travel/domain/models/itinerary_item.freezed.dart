@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,11 +9,8 @@ part of 'itinerary_item.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
 ItineraryItem _$ItineraryItemFromJson(Map<String, dynamic> json) {
   switch (json['runtimeType']) {
     case 'flightArrival':
@@ -40,124 +37,242 @@ ItineraryItem _$ItineraryItemFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ItineraryItem {
   /// Unique identifier for this item
-  String get id => throw _privateConstructorUsedError;
+  String get id;
 
   /// Scheduled time of arrival
-  DateTime get time => throw _privateConstructorUsedError;
+  DateTime get time;
 
   /// Additional notes
-  String? get note => throw _privateConstructorUsedError;
+  String? get note;
 
   /// Whether this item is completed
-  bool get isCompleted => throw _privateConstructorUsedError;
+  bool get isCompleted;
+
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemCopyWith<ItineraryItem> get copyWith =>
+      _$ItineraryItemCopyWithImpl<ItineraryItem>(
+          this as ItineraryItem, _$identity);
+
+  /// Serializes this ItineraryItem to a JSON map.
+  Map<String, dynamic> toJson();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ItineraryItem &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.time, time) || other.time == time) &&
+            (identical(other.note, note) || other.note == note) &&
+            (identical(other.isCompleted, isCompleted) ||
+                other.isCompleted == isCompleted));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, id, time, note, isCompleted);
+
+  @override
+  String toString() {
+    return 'ItineraryItem(id: $id, time: $time, note: $note, isCompleted: $isCompleted)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ItineraryItemCopyWith<$Res> {
+  factory $ItineraryItemCopyWith(
+          ItineraryItem value, $Res Function(ItineraryItem) _then) =
+      _$ItineraryItemCopyWithImpl;
+  @useResult
+  $Res call({String id, DateTime time, String? note, bool isCompleted});
+}
+
+/// @nodoc
+class _$ItineraryItemCopyWithImpl<$Res>
+    implements $ItineraryItemCopyWith<$Res> {
+  _$ItineraryItemCopyWithImpl(this._self, this._then);
+
+  final ItineraryItem _self;
+  final $Res Function(ItineraryItem) _then;
+
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? time = null,
+    Object? note = freezed,
+    Object? isCompleted = null,
+  }) {
+    return _then(_self.copyWith(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      time: null == time
+          ? _self.time
+          : time // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      note: freezed == note
+          ? _self.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCompleted: null == isCompleted
+          ? _self.isCompleted
+          : isCompleted // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [ItineraryItem].
+extension ItineraryItemPatterns on ItineraryItem {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) =>
-      throw _privateConstructorUsedError;
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
+    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
+    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
+    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
+    TResult Function(ItineraryItemActivity value)? activity,
+    TResult Function(ItineraryItemLunch value)? lunch,
+    TResult Function(ItineraryItemDinner value)? dinner,
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case ItineraryItemFlightArrival() when flightArrival != null:
+        return flightArrival(_that);
+      case ItineraryItemFlightDeparture() when flightDeparture != null:
+        return flightDeparture(_that);
+      case ItineraryItemHotelCheckIn() when hotelCheckIn != null:
+        return hotelCheckIn(_that);
+      case ItineraryItemHotelCheckOut() when hotelCheckOut != null:
+        return hotelCheckOut(_that);
+      case ItineraryItemActivity() when activity != null:
+        return activity(_that);
+      case ItineraryItemLunch() when lunch != null:
+        return lunch(_that);
+      case ItineraryItemDinner() when dinner != null:
+        return dinner(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
   @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
+  TResult map<TResult extends Object?>({
+    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
+    required TResult Function(ItineraryItemFlightDeparture value)
         flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) =>
-      throw _privateConstructorUsedError;
+    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
+    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
+    required TResult Function(ItineraryItemActivity value) activity,
+    required TResult Function(ItineraryItemLunch value) lunch,
+    required TResult Function(ItineraryItemDinner value) dinner,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case ItineraryItemFlightArrival():
+        return flightArrival(_that);
+      case ItineraryItemFlightDeparture():
+        return flightDeparture(_that);
+      case ItineraryItemHotelCheckIn():
+        return hotelCheckIn(_that);
+      case ItineraryItemHotelCheckOut():
+        return hotelCheckOut(_that);
+      case ItineraryItemActivity():
+        return activity(_that);
+      case ItineraryItemLunch():
+        return lunch(_that);
+      case ItineraryItemDinner():
+        return dinner(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
+    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
+    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
+    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
+    TResult? Function(ItineraryItemActivity value)? activity,
+    TResult? Function(ItineraryItemLunch value)? lunch,
+    TResult? Function(ItineraryItemDinner value)? dinner,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case ItineraryItemFlightArrival() when flightArrival != null:
+        return flightArrival(_that);
+      case ItineraryItemFlightDeparture() when flightDeparture != null:
+        return flightDeparture(_that);
+      case ItineraryItemHotelCheckIn() when hotelCheckIn != null:
+        return hotelCheckIn(_that);
+      case ItineraryItemHotelCheckOut() when hotelCheckOut != null:
+        return hotelCheckOut(_that);
+      case ItineraryItemActivity() when activity != null:
+        return activity(_that);
+      case ItineraryItemLunch() when lunch != null:
+        return lunch(_that);
+      case ItineraryItemDinner() when dinner != null:
+        return dinner(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String id, DateTime time, String? flightNumber,
@@ -211,176 +326,270 @@ mixin _$ItineraryItem {
             bool isCompleted)?
         dinner,
     required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) =>
-      throw _privateConstructorUsedError;
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) =>
-      throw _privateConstructorUsedError;
-
-  /// Serializes this ItineraryItem to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $ItineraryItemCopyWith<ItineraryItem> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ItineraryItemCopyWith<$Res> {
-  factory $ItineraryItemCopyWith(
-          ItineraryItem value, $Res Function(ItineraryItem) then) =
-      _$ItineraryItemCopyWithImpl<$Res, ItineraryItem>;
-  @useResult
-  $Res call({String id, DateTime time, String? note, bool isCompleted});
-}
-
-/// @nodoc
-class _$ItineraryItemCopyWithImpl<$Res, $Val extends ItineraryItem>
-    implements $ItineraryItemCopyWith<$Res> {
-  _$ItineraryItemCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? time = null,
-    Object? note = freezed,
-    Object? isCompleted = null,
   }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      note: freezed == note
-          ? _value.note
-          : note // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isCompleted: null == isCompleted
-          ? _value.isCompleted
-          : isCompleted // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+    final _that = this;
+    switch (_that) {
+      case ItineraryItemFlightArrival() when flightArrival != null:
+        return flightArrival(_that.id, _that.time, _that.flightNumber,
+            _that.airportCode, _that.note, _that.isCompleted);
+      case ItineraryItemFlightDeparture() when flightDeparture != null:
+        return flightDeparture(_that.id, _that.time, _that.flightNumber,
+            _that.airportCode, _that.note, _that.isCompleted);
+      case ItineraryItemHotelCheckIn() when hotelCheckIn != null:
+        return hotelCheckIn(
+            _that.id,
+            _that.time,
+            _that.hotelName,
+            _that.address,
+            _that.confirmationNumber,
+            _that.note,
+            _that.isCompleted);
+      case ItineraryItemHotelCheckOut() when hotelCheckOut != null:
+        return hotelCheckOut(_that.id, _that.time, _that.hotelName, _that.note,
+            _that.isCompleted);
+      case ItineraryItemActivity() when activity != null:
+        return activity(
+            _that.id,
+            _that.time,
+            _that.name,
+            _that.description,
+            _that.location,
+            _that.durationHours,
+            _that.cost,
+            _that.bookingUrl,
+            _that.note,
+            _that.isCompleted);
+      case ItineraryItemLunch() when lunch != null:
+        return lunch(_that.id, _that.time, _that.name, _that.cuisine,
+            _that.location, _that.priceRange, _that.note, _that.isCompleted);
+      case ItineraryItemDinner() when dinner != null:
+        return dinner(_that.id, _that.time, _that.name, _that.cuisine,
+            _that.location, _that.priceRange, _that.note, _that.isCompleted);
+      case _:
+        return orElse();
+    }
   }
-}
 
-/// @nodoc
-abstract class _$$ItineraryItemFlightArrivalImplCopyWith<$Res>
-    implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemFlightArrivalImplCopyWith(
-          _$ItineraryItemFlightArrivalImpl value,
-          $Res Function(_$ItineraryItemFlightArrivalImpl) then) =
-      __$$ItineraryItemFlightArrivalImplCopyWithImpl<$Res>;
-  @override
-  @useResult
-  $Res call(
-      {String id,
-      DateTime time,
-      String? flightNumber,
-      String? airportCode,
-      String? note,
-      bool isCompleted});
-}
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
 
-/// @nodoc
-class __$$ItineraryItemFlightArrivalImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res, _$ItineraryItemFlightArrivalImpl>
-    implements _$$ItineraryItemFlightArrivalImplCopyWith<$Res> {
-  __$$ItineraryItemFlightArrivalImplCopyWithImpl(
-      _$ItineraryItemFlightArrivalImpl _value,
-      $Res Function(_$ItineraryItemFlightArrivalImpl) _then)
-      : super(_value, _then);
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? id = null,
-    Object? time = null,
-    Object? flightNumber = freezed,
-    Object? airportCode = freezed,
-    Object? note = freezed,
-    Object? isCompleted = null,
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String id, DateTime time, String? flightNumber,
+            String? airportCode, String? note, bool isCompleted)
+        flightArrival,
+    required TResult Function(String id, DateTime time, String? flightNumber,
+            String? airportCode, String? note, bool isCompleted)
+        flightDeparture,
+    required TResult Function(
+            String id,
+            DateTime time,
+            String? hotelName,
+            String? address,
+            String? confirmationNumber,
+            String? note,
+            bool isCompleted)
+        hotelCheckIn,
+    required TResult Function(String id, DateTime time, String? hotelName,
+            String? note, bool isCompleted)
+        hotelCheckOut,
+    required TResult Function(
+            String id,
+            DateTime time,
+            String name,
+            String? description,
+            String? location,
+            int? durationHours,
+            double? cost,
+            String? bookingUrl,
+            String? note,
+            bool isCompleted)
+        activity,
+    required TResult Function(
+            String id,
+            DateTime time,
+            String name,
+            String? cuisine,
+            String? location,
+            String? priceRange,
+            String? note,
+            bool isCompleted)
+        lunch,
+    required TResult Function(
+            String id,
+            DateTime time,
+            String name,
+            String? cuisine,
+            String? location,
+            String? priceRange,
+            String? note,
+            bool isCompleted)
+        dinner,
   }) {
-    return _then(_$ItineraryItemFlightArrivalImpl(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      flightNumber: freezed == flightNumber
-          ? _value.flightNumber
-          : flightNumber // ignore: cast_nullable_to_non_nullable
-              as String?,
-      airportCode: freezed == airportCode
-          ? _value.airportCode
-          : airportCode // ignore: cast_nullable_to_non_nullable
-              as String?,
-      note: freezed == note
-          ? _value.note
-          : note // ignore: cast_nullable_to_non_nullable
-              as String?,
-      isCompleted: null == isCompleted
-          ? _value.isCompleted
-          : isCompleted // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
+    final _that = this;
+    switch (_that) {
+      case ItineraryItemFlightArrival():
+        return flightArrival(_that.id, _that.time, _that.flightNumber,
+            _that.airportCode, _that.note, _that.isCompleted);
+      case ItineraryItemFlightDeparture():
+        return flightDeparture(_that.id, _that.time, _that.flightNumber,
+            _that.airportCode, _that.note, _that.isCompleted);
+      case ItineraryItemHotelCheckIn():
+        return hotelCheckIn(
+            _that.id,
+            _that.time,
+            _that.hotelName,
+            _that.address,
+            _that.confirmationNumber,
+            _that.note,
+            _that.isCompleted);
+      case ItineraryItemHotelCheckOut():
+        return hotelCheckOut(_that.id, _that.time, _that.hotelName, _that.note,
+            _that.isCompleted);
+      case ItineraryItemActivity():
+        return activity(
+            _that.id,
+            _that.time,
+            _that.name,
+            _that.description,
+            _that.location,
+            _that.durationHours,
+            _that.cost,
+            _that.bookingUrl,
+            _that.note,
+            _that.isCompleted);
+      case ItineraryItemLunch():
+        return lunch(_that.id, _that.time, _that.name, _that.cuisine,
+            _that.location, _that.priceRange, _that.note, _that.isCompleted);
+      case ItineraryItemDinner():
+        return dinner(_that.id, _that.time, _that.name, _that.cuisine,
+            _that.location, _that.priceRange, _that.note, _that.isCompleted);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String id, DateTime time, String? flightNumber,
+            String? airportCode, String? note, bool isCompleted)?
+        flightArrival,
+    TResult? Function(String id, DateTime time, String? flightNumber,
+            String? airportCode, String? note, bool isCompleted)?
+        flightDeparture,
+    TResult? Function(
+            String id,
+            DateTime time,
+            String? hotelName,
+            String? address,
+            String? confirmationNumber,
+            String? note,
+            bool isCompleted)?
+        hotelCheckIn,
+    TResult? Function(String id, DateTime time, String? hotelName, String? note,
+            bool isCompleted)?
+        hotelCheckOut,
+    TResult? Function(
+            String id,
+            DateTime time,
+            String name,
+            String? description,
+            String? location,
+            int? durationHours,
+            double? cost,
+            String? bookingUrl,
+            String? note,
+            bool isCompleted)?
+        activity,
+    TResult? Function(
+            String id,
+            DateTime time,
+            String name,
+            String? cuisine,
+            String? location,
+            String? priceRange,
+            String? note,
+            bool isCompleted)?
+        lunch,
+    TResult? Function(
+            String id,
+            DateTime time,
+            String name,
+            String? cuisine,
+            String? location,
+            String? priceRange,
+            String? note,
+            bool isCompleted)?
+        dinner,
+  }) {
+    final _that = this;
+    switch (_that) {
+      case ItineraryItemFlightArrival() when flightArrival != null:
+        return flightArrival(_that.id, _that.time, _that.flightNumber,
+            _that.airportCode, _that.note, _that.isCompleted);
+      case ItineraryItemFlightDeparture() when flightDeparture != null:
+        return flightDeparture(_that.id, _that.time, _that.flightNumber,
+            _that.airportCode, _that.note, _that.isCompleted);
+      case ItineraryItemHotelCheckIn() when hotelCheckIn != null:
+        return hotelCheckIn(
+            _that.id,
+            _that.time,
+            _that.hotelName,
+            _that.address,
+            _that.confirmationNumber,
+            _that.note,
+            _that.isCompleted);
+      case ItineraryItemHotelCheckOut() when hotelCheckOut != null:
+        return hotelCheckOut(_that.id, _that.time, _that.hotelName, _that.note,
+            _that.isCompleted);
+      case ItineraryItemActivity() when activity != null:
+        return activity(
+            _that.id,
+            _that.time,
+            _that.name,
+            _that.description,
+            _that.location,
+            _that.durationHours,
+            _that.cost,
+            _that.bookingUrl,
+            _that.note,
+            _that.isCompleted);
+      case ItineraryItemLunch() when lunch != null:
+        return lunch(_that.id, _that.time, _that.name, _that.cuisine,
+            _that.location, _that.priceRange, _that.note, _that.isCompleted);
+      case ItineraryItemDinner() when dinner != null:
+        return dinner(_that.id, _that.time, _that.name, _that.cuisine,
+            _that.location, _that.priceRange, _that.note, _that.isCompleted);
+      case _:
+        return null;
+    }
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemFlightArrivalImpl extends ItineraryItemFlightArrival {
-  const _$ItineraryItemFlightArrivalImpl(
+class ItineraryItemFlightArrival extends ItineraryItem {
+  const ItineraryItemFlightArrival(
       {required this.id,
       required this.time,
       this.flightNumber,
@@ -390,10 +599,8 @@ class _$ItineraryItemFlightArrivalImpl extends ItineraryItemFlightArrival {
       final String? $type})
       : $type = $type ?? 'flightArrival',
         super._();
-
-  factory _$ItineraryItemFlightArrivalImpl.fromJson(
-          Map<String, dynamic> json) =>
-      _$$ItineraryItemFlightArrivalImplFromJson(json);
+  factory ItineraryItemFlightArrival.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemFlightArrivalFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -404,11 +611,9 @@ class _$ItineraryItemFlightArrivalImpl extends ItineraryItemFlightArrival {
   final DateTime time;
 
   /// Flight number
-  @override
   final String? flightNumber;
 
   /// Airport code
-  @override
   final String? airportCode;
 
   /// Additional notes
@@ -423,16 +628,28 @@ class _$ItineraryItemFlightArrivalImpl extends ItineraryItemFlightArrival {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.flightArrival(id: $id, time: $time, flightNumber: $flightNumber, airportCode: $airportCode, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemFlightArrivalCopyWith<ItineraryItemFlightArrival>
+      get copyWith =>
+          _$ItineraryItemFlightArrivalCopyWithImpl<ItineraryItemFlightArrival>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemFlightArrivalToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemFlightArrivalImpl &&
+            other is ItineraryItemFlightArrival &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.flightNumber, flightNumber) ||
@@ -449,298 +666,18 @@ class _$ItineraryItemFlightArrivalImpl extends ItineraryItemFlightArrival {
   int get hashCode => Object.hash(
       runtimeType, id, time, flightNumber, airportCode, note, isCompleted);
 
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryItemFlightArrivalImplCopyWith<_$ItineraryItemFlightArrivalImpl>
-      get copyWith => __$$ItineraryItemFlightArrivalImplCopyWithImpl<
-          _$ItineraryItemFlightArrivalImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) {
-    return flightArrival(
-        id, time, flightNumber, airportCode, note, isCompleted);
+  String toString() {
+    return 'ItineraryItem.flightArrival(id: $id, time: $time, flightNumber: $flightNumber, airportCode: $airportCode, note: $note, isCompleted: $isCompleted)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return flightArrival?.call(
-        id, time, flightNumber, airportCode, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (flightArrival != null) {
-      return flightArrival(
-          id, time, flightNumber, airportCode, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return flightArrival(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return flightArrival?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (flightArrival != null) {
-      return flightArrival(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemFlightArrivalImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class ItineraryItemFlightArrival extends ItineraryItem {
-  const factory ItineraryItemFlightArrival(
-      {required final String id,
-      required final DateTime time,
-      final String? flightNumber,
-      final String? airportCode,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemFlightArrivalImpl;
-  const ItineraryItemFlightArrival._() : super._();
-
-  factory ItineraryItemFlightArrival.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemFlightArrivalImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Scheduled time of arrival
-  @override
-  DateTime get time;
-
-  /// Flight number
-  String? get flightNumber;
-
-  /// Airport code
-  String? get airportCode;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemFlightArrivalImplCopyWith<_$ItineraryItemFlightArrivalImpl>
-      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ItineraryItemFlightDepartureImplCopyWith<$Res>
+abstract mixin class $ItineraryItemFlightArrivalCopyWith<$Res>
     implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemFlightDepartureImplCopyWith(
-          _$ItineraryItemFlightDepartureImpl value,
-          $Res Function(_$ItineraryItemFlightDepartureImpl) then) =
-      __$$ItineraryItemFlightDepartureImplCopyWithImpl<$Res>;
+  factory $ItineraryItemFlightArrivalCopyWith(ItineraryItemFlightArrival value,
+          $Res Function(ItineraryItemFlightArrival) _then) =
+      _$ItineraryItemFlightArrivalCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -753,19 +690,17 @@ abstract class _$$ItineraryItemFlightDepartureImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ItineraryItemFlightDepartureImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res,
-        _$ItineraryItemFlightDepartureImpl>
-    implements _$$ItineraryItemFlightDepartureImplCopyWith<$Res> {
-  __$$ItineraryItemFlightDepartureImplCopyWithImpl(
-      _$ItineraryItemFlightDepartureImpl _value,
-      $Res Function(_$ItineraryItemFlightDepartureImpl) _then)
-      : super(_value, _then);
+class _$ItineraryItemFlightArrivalCopyWithImpl<$Res>
+    implements $ItineraryItemFlightArrivalCopyWith<$Res> {
+  _$ItineraryItemFlightArrivalCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemFlightArrival _self;
+  final $Res Function(ItineraryItemFlightArrival) _then;
 
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? time = null,
@@ -774,29 +709,29 @@ class __$$ItineraryItemFlightDepartureImplCopyWithImpl<$Res>
     Object? note = freezed,
     Object? isCompleted = null,
   }) {
-    return _then(_$ItineraryItemFlightDepartureImpl(
+    return _then(ItineraryItemFlightArrival(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as DateTime,
       flightNumber: freezed == flightNumber
-          ? _value.flightNumber
+          ? _self.flightNumber
           : flightNumber // ignore: cast_nullable_to_non_nullable
               as String?,
       airportCode: freezed == airportCode
-          ? _value.airportCode
+          ? _self.airportCode
           : airportCode // ignore: cast_nullable_to_non_nullable
               as String?,
       note: freezed == note
-          ? _value.note
+          ? _self.note
           : note // ignore: cast_nullable_to_non_nullable
               as String?,
       isCompleted: null == isCompleted
-          ? _value.isCompleted
+          ? _self.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -805,8 +740,8 @@ class __$$ItineraryItemFlightDepartureImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemFlightDepartureImpl extends ItineraryItemFlightDeparture {
-  const _$ItineraryItemFlightDepartureImpl(
+class ItineraryItemFlightDeparture extends ItineraryItem {
+  const ItineraryItemFlightDeparture(
       {required this.id,
       required this.time,
       this.flightNumber,
@@ -816,10 +751,8 @@ class _$ItineraryItemFlightDepartureImpl extends ItineraryItemFlightDeparture {
       final String? $type})
       : $type = $type ?? 'flightDeparture',
         super._();
-
-  factory _$ItineraryItemFlightDepartureImpl.fromJson(
-          Map<String, dynamic> json) =>
-      _$$ItineraryItemFlightDepartureImplFromJson(json);
+  factory ItineraryItemFlightDeparture.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemFlightDepartureFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -830,11 +763,9 @@ class _$ItineraryItemFlightDepartureImpl extends ItineraryItemFlightDeparture {
   final DateTime time;
 
   /// Flight number
-  @override
   final String? flightNumber;
 
   /// Airport code
-  @override
   final String? airportCode;
 
   /// Additional notes
@@ -849,16 +780,27 @@ class _$ItineraryItemFlightDepartureImpl extends ItineraryItemFlightDeparture {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.flightDeparture(id: $id, time: $time, flightNumber: $flightNumber, airportCode: $airportCode, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemFlightDepartureCopyWith<ItineraryItemFlightDeparture>
+      get copyWith => _$ItineraryItemFlightDepartureCopyWithImpl<
+          ItineraryItemFlightDeparture>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemFlightDepartureToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemFlightDepartureImpl &&
+            other is ItineraryItemFlightDeparture &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.flightNumber, flightNumber) ||
@@ -875,361 +817,73 @@ class _$ItineraryItemFlightDepartureImpl extends ItineraryItemFlightDeparture {
   int get hashCode => Object.hash(
       runtimeType, id, time, flightNumber, airportCode, note, isCompleted);
 
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryItemFlightDepartureImplCopyWith<
-          _$ItineraryItemFlightDepartureImpl>
-      get copyWith => __$$ItineraryItemFlightDepartureImplCopyWithImpl<
-          _$ItineraryItemFlightDepartureImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) {
-    return flightDeparture(
-        id, time, flightNumber, airportCode, note, isCompleted);
+  String toString() {
+    return 'ItineraryItem.flightDeparture(id: $id, time: $time, flightNumber: $flightNumber, airportCode: $airportCode, note: $note, isCompleted: $isCompleted)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return flightDeparture?.call(
-        id, time, flightNumber, airportCode, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (flightDeparture != null) {
-      return flightDeparture(
-          id, time, flightNumber, airportCode, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return flightDeparture(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return flightDeparture?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (flightDeparture != null) {
-      return flightDeparture(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemFlightDepartureImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class ItineraryItemFlightDeparture extends ItineraryItem {
-  const factory ItineraryItemFlightDeparture(
-      {required final String id,
-      required final DateTime time,
-      final String? flightNumber,
-      final String? airportCode,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemFlightDepartureImpl;
-  const ItineraryItemFlightDeparture._() : super._();
-
-  factory ItineraryItemFlightDeparture.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemFlightDepartureImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Scheduled time of departure
-  @override
-  DateTime get time;
-
-  /// Flight number
-  String? get flightNumber;
-
-  /// Airport code
-  String? get airportCode;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemFlightDepartureImplCopyWith<
-          _$ItineraryItemFlightDepartureImpl>
-      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ItineraryItemHotelCheckInImplCopyWith<$Res>
+abstract mixin class $ItineraryItemFlightDepartureCopyWith<$Res>
     implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemHotelCheckInImplCopyWith(
-          _$ItineraryItemHotelCheckInImpl value,
-          $Res Function(_$ItineraryItemHotelCheckInImpl) then) =
-      __$$ItineraryItemHotelCheckInImplCopyWithImpl<$Res>;
+  factory $ItineraryItemFlightDepartureCopyWith(
+          ItineraryItemFlightDeparture value,
+          $Res Function(ItineraryItemFlightDeparture) _then) =
+      _$ItineraryItemFlightDepartureCopyWithImpl;
   @override
   @useResult
   $Res call(
       {String id,
       DateTime time,
-      String? hotelName,
-      String? address,
-      String? confirmationNumber,
+      String? flightNumber,
+      String? airportCode,
       String? note,
       bool isCompleted});
 }
 
 /// @nodoc
-class __$$ItineraryItemHotelCheckInImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res, _$ItineraryItemHotelCheckInImpl>
-    implements _$$ItineraryItemHotelCheckInImplCopyWith<$Res> {
-  __$$ItineraryItemHotelCheckInImplCopyWithImpl(
-      _$ItineraryItemHotelCheckInImpl _value,
-      $Res Function(_$ItineraryItemHotelCheckInImpl) _then)
-      : super(_value, _then);
+class _$ItineraryItemFlightDepartureCopyWithImpl<$Res>
+    implements $ItineraryItemFlightDepartureCopyWith<$Res> {
+  _$ItineraryItemFlightDepartureCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemFlightDeparture _self;
+  final $Res Function(ItineraryItemFlightDeparture) _then;
 
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? time = null,
-    Object? hotelName = freezed,
-    Object? address = freezed,
-    Object? confirmationNumber = freezed,
+    Object? flightNumber = freezed,
+    Object? airportCode = freezed,
     Object? note = freezed,
     Object? isCompleted = null,
   }) {
-    return _then(_$ItineraryItemHotelCheckInImpl(
+    return _then(ItineraryItemFlightDeparture(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      hotelName: freezed == hotelName
-          ? _value.hotelName
-          : hotelName // ignore: cast_nullable_to_non_nullable
+      flightNumber: freezed == flightNumber
+          ? _self.flightNumber
+          : flightNumber // ignore: cast_nullable_to_non_nullable
               as String?,
-      address: freezed == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String?,
-      confirmationNumber: freezed == confirmationNumber
-          ? _value.confirmationNumber
-          : confirmationNumber // ignore: cast_nullable_to_non_nullable
+      airportCode: freezed == airportCode
+          ? _self.airportCode
+          : airportCode // ignore: cast_nullable_to_non_nullable
               as String?,
       note: freezed == note
-          ? _value.note
+          ? _self.note
           : note // ignore: cast_nullable_to_non_nullable
               as String?,
       isCompleted: null == isCompleted
-          ? _value.isCompleted
+          ? _self.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -1238,8 +892,8 @@ class __$$ItineraryItemHotelCheckInImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemHotelCheckInImpl extends ItineraryItemHotelCheckIn {
-  const _$ItineraryItemHotelCheckInImpl(
+class ItineraryItemHotelCheckIn extends ItineraryItem {
+  const ItineraryItemHotelCheckIn(
       {required this.id,
       required this.time,
       this.hotelName,
@@ -1250,9 +904,8 @@ class _$ItineraryItemHotelCheckInImpl extends ItineraryItemHotelCheckIn {
       final String? $type})
       : $type = $type ?? 'hotelCheckIn',
         super._();
-
-  factory _$ItineraryItemHotelCheckInImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ItineraryItemHotelCheckInImplFromJson(json);
+  factory ItineraryItemHotelCheckIn.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemHotelCheckInFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -1263,15 +916,12 @@ class _$ItineraryItemHotelCheckInImpl extends ItineraryItemHotelCheckIn {
   final DateTime time;
 
   /// Hotel/accommodation name
-  @override
   final String? hotelName;
 
   /// Address of the accommodation
-  @override
   final String? address;
 
   /// Confirmation number
-  @override
   final String? confirmationNumber;
 
   /// Additional notes
@@ -1286,16 +936,27 @@ class _$ItineraryItemHotelCheckInImpl extends ItineraryItemHotelCheckIn {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.hotelCheckIn(id: $id, time: $time, hotelName: $hotelName, address: $address, confirmationNumber: $confirmationNumber, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemHotelCheckInCopyWith<ItineraryItemHotelCheckIn> get copyWith =>
+      _$ItineraryItemHotelCheckInCopyWithImpl<ItineraryItemHotelCheckIn>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemHotelCheckInToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemHotelCheckInImpl &&
+            other is ItineraryItemHotelCheckIn &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.hotelName, hotelName) ||
@@ -1313,351 +974,78 @@ class _$ItineraryItemHotelCheckInImpl extends ItineraryItemHotelCheckIn {
   int get hashCode => Object.hash(runtimeType, id, time, hotelName, address,
       confirmationNumber, note, isCompleted);
 
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryItemHotelCheckInImplCopyWith<_$ItineraryItemHotelCheckInImpl>
-      get copyWith => __$$ItineraryItemHotelCheckInImplCopyWithImpl<
-          _$ItineraryItemHotelCheckInImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) {
-    return hotelCheckIn(
-        id, time, hotelName, address, confirmationNumber, note, isCompleted);
+  String toString() {
+    return 'ItineraryItem.hotelCheckIn(id: $id, time: $time, hotelName: $hotelName, address: $address, confirmationNumber: $confirmationNumber, note: $note, isCompleted: $isCompleted)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return hotelCheckIn?.call(
-        id, time, hotelName, address, confirmationNumber, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (hotelCheckIn != null) {
-      return hotelCheckIn(
-          id, time, hotelName, address, confirmationNumber, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return hotelCheckIn(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return hotelCheckIn?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (hotelCheckIn != null) {
-      return hotelCheckIn(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemHotelCheckInImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class ItineraryItemHotelCheckIn extends ItineraryItem {
-  const factory ItineraryItemHotelCheckIn(
-      {required final String id,
-      required final DateTime time,
-      final String? hotelName,
-      final String? address,
-      final String? confirmationNumber,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemHotelCheckInImpl;
-  const ItineraryItemHotelCheckIn._() : super._();
-
-  factory ItineraryItemHotelCheckIn.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemHotelCheckInImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Scheduled check-in time
-  @override
-  DateTime get time;
-
-  /// Hotel/accommodation name
-  String? get hotelName;
-
-  /// Address of the accommodation
-  String? get address;
-
-  /// Confirmation number
-  String? get confirmationNumber;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemHotelCheckInImplCopyWith<_$ItineraryItemHotelCheckInImpl>
-      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ItineraryItemHotelCheckOutImplCopyWith<$Res>
+abstract mixin class $ItineraryItemHotelCheckInCopyWith<$Res>
     implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemHotelCheckOutImplCopyWith(
-          _$ItineraryItemHotelCheckOutImpl value,
-          $Res Function(_$ItineraryItemHotelCheckOutImpl) then) =
-      __$$ItineraryItemHotelCheckOutImplCopyWithImpl<$Res>;
+  factory $ItineraryItemHotelCheckInCopyWith(ItineraryItemHotelCheckIn value,
+          $Res Function(ItineraryItemHotelCheckIn) _then) =
+      _$ItineraryItemHotelCheckInCopyWithImpl;
   @override
   @useResult
   $Res call(
       {String id,
       DateTime time,
       String? hotelName,
+      String? address,
+      String? confirmationNumber,
       String? note,
       bool isCompleted});
 }
 
 /// @nodoc
-class __$$ItineraryItemHotelCheckOutImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res, _$ItineraryItemHotelCheckOutImpl>
-    implements _$$ItineraryItemHotelCheckOutImplCopyWith<$Res> {
-  __$$ItineraryItemHotelCheckOutImplCopyWithImpl(
-      _$ItineraryItemHotelCheckOutImpl _value,
-      $Res Function(_$ItineraryItemHotelCheckOutImpl) _then)
-      : super(_value, _then);
+class _$ItineraryItemHotelCheckInCopyWithImpl<$Res>
+    implements $ItineraryItemHotelCheckInCopyWith<$Res> {
+  _$ItineraryItemHotelCheckInCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemHotelCheckIn _self;
+  final $Res Function(ItineraryItemHotelCheckIn) _then;
 
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? time = null,
     Object? hotelName = freezed,
+    Object? address = freezed,
+    Object? confirmationNumber = freezed,
     Object? note = freezed,
     Object? isCompleted = null,
   }) {
-    return _then(_$ItineraryItemHotelCheckOutImpl(
+    return _then(ItineraryItemHotelCheckIn(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as DateTime,
       hotelName: freezed == hotelName
-          ? _value.hotelName
+          ? _self.hotelName
           : hotelName // ignore: cast_nullable_to_non_nullable
               as String?,
+      address: freezed == address
+          ? _self.address
+          : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      confirmationNumber: freezed == confirmationNumber
+          ? _self.confirmationNumber
+          : confirmationNumber // ignore: cast_nullable_to_non_nullable
+              as String?,
       note: freezed == note
-          ? _value.note
+          ? _self.note
           : note // ignore: cast_nullable_to_non_nullable
               as String?,
       isCompleted: null == isCompleted
-          ? _value.isCompleted
+          ? _self.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -1666,8 +1054,8 @@ class __$$ItineraryItemHotelCheckOutImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemHotelCheckOutImpl extends ItineraryItemHotelCheckOut {
-  const _$ItineraryItemHotelCheckOutImpl(
+class ItineraryItemHotelCheckOut extends ItineraryItem {
+  const ItineraryItemHotelCheckOut(
       {required this.id,
       required this.time,
       this.hotelName,
@@ -1676,10 +1064,8 @@ class _$ItineraryItemHotelCheckOutImpl extends ItineraryItemHotelCheckOut {
       final String? $type})
       : $type = $type ?? 'hotelCheckOut',
         super._();
-
-  factory _$ItineraryItemHotelCheckOutImpl.fromJson(
-          Map<String, dynamic> json) =>
-      _$$ItineraryItemHotelCheckOutImplFromJson(json);
+  factory ItineraryItemHotelCheckOut.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemHotelCheckOutFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -1690,7 +1076,6 @@ class _$ItineraryItemHotelCheckOutImpl extends ItineraryItemHotelCheckOut {
   final DateTime time;
 
   /// Hotel/accommodation name
-  @override
   final String? hotelName;
 
   /// Additional notes
@@ -1705,16 +1090,28 @@ class _$ItineraryItemHotelCheckOutImpl extends ItineraryItemHotelCheckOut {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.hotelCheckOut(id: $id, time: $time, hotelName: $hotelName, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemHotelCheckOutCopyWith<ItineraryItemHotelCheckOut>
+      get copyWith =>
+          _$ItineraryItemHotelCheckOutCopyWithImpl<ItineraryItemHotelCheckOut>(
+              this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemHotelCheckOutToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemHotelCheckOutImpl &&
+            other is ItineraryItemHotelCheckOut &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.hotelName, hotelName) ||
@@ -1729,369 +1126,66 @@ class _$ItineraryItemHotelCheckOutImpl extends ItineraryItemHotelCheckOut {
   int get hashCode =>
       Object.hash(runtimeType, id, time, hotelName, note, isCompleted);
 
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryItemHotelCheckOutImplCopyWith<_$ItineraryItemHotelCheckOutImpl>
-      get copyWith => __$$ItineraryItemHotelCheckOutImplCopyWithImpl<
-          _$ItineraryItemHotelCheckOutImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) {
-    return hotelCheckOut(id, time, hotelName, note, isCompleted);
+  String toString() {
+    return 'ItineraryItem.hotelCheckOut(id: $id, time: $time, hotelName: $hotelName, note: $note, isCompleted: $isCompleted)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return hotelCheckOut?.call(id, time, hotelName, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (hotelCheckOut != null) {
-      return hotelCheckOut(id, time, hotelName, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return hotelCheckOut(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return hotelCheckOut?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (hotelCheckOut != null) {
-      return hotelCheckOut(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemHotelCheckOutImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class ItineraryItemHotelCheckOut extends ItineraryItem {
-  const factory ItineraryItemHotelCheckOut(
-      {required final String id,
-      required final DateTime time,
-      final String? hotelName,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemHotelCheckOutImpl;
-  const ItineraryItemHotelCheckOut._() : super._();
-
-  factory ItineraryItemHotelCheckOut.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemHotelCheckOutImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Scheduled check-out time
-  @override
-  DateTime get time;
-
-  /// Hotel/accommodation name
-  String? get hotelName;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemHotelCheckOutImplCopyWith<_$ItineraryItemHotelCheckOutImpl>
-      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ItineraryItemActivityImplCopyWith<$Res>
+abstract mixin class $ItineraryItemHotelCheckOutCopyWith<$Res>
     implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemActivityImplCopyWith(
-          _$ItineraryItemActivityImpl value,
-          $Res Function(_$ItineraryItemActivityImpl) then) =
-      __$$ItineraryItemActivityImplCopyWithImpl<$Res>;
+  factory $ItineraryItemHotelCheckOutCopyWith(ItineraryItemHotelCheckOut value,
+          $Res Function(ItineraryItemHotelCheckOut) _then) =
+      _$ItineraryItemHotelCheckOutCopyWithImpl;
   @override
   @useResult
   $Res call(
       {String id,
       DateTime time,
-      String name,
-      String? description,
-      String? location,
-      int? durationHours,
-      double? cost,
-      String? bookingUrl,
+      String? hotelName,
       String? note,
       bool isCompleted});
 }
 
 /// @nodoc
-class __$$ItineraryItemActivityImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res, _$ItineraryItemActivityImpl>
-    implements _$$ItineraryItemActivityImplCopyWith<$Res> {
-  __$$ItineraryItemActivityImplCopyWithImpl(_$ItineraryItemActivityImpl _value,
-      $Res Function(_$ItineraryItemActivityImpl) _then)
-      : super(_value, _then);
+class _$ItineraryItemHotelCheckOutCopyWithImpl<$Res>
+    implements $ItineraryItemHotelCheckOutCopyWith<$Res> {
+  _$ItineraryItemHotelCheckOutCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemHotelCheckOut _self;
+  final $Res Function(ItineraryItemHotelCheckOut) _then;
 
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? time = null,
-    Object? name = null,
-    Object? description = freezed,
-    Object? location = freezed,
-    Object? durationHours = freezed,
-    Object? cost = freezed,
-    Object? bookingUrl = freezed,
+    Object? hotelName = freezed,
     Object? note = freezed,
     Object? isCompleted = null,
   }) {
-    return _then(_$ItineraryItemActivityImpl(
+    return _then(ItineraryItemHotelCheckOut(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String?,
-      location: freezed == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String?,
-      durationHours: freezed == durationHours
-          ? _value.durationHours
-          : durationHours // ignore: cast_nullable_to_non_nullable
-              as int?,
-      cost: freezed == cost
-          ? _value.cost
-          : cost // ignore: cast_nullable_to_non_nullable
-              as double?,
-      bookingUrl: freezed == bookingUrl
-          ? _value.bookingUrl
-          : bookingUrl // ignore: cast_nullable_to_non_nullable
+      hotelName: freezed == hotelName
+          ? _self.hotelName
+          : hotelName // ignore: cast_nullable_to_non_nullable
               as String?,
       note: freezed == note
-          ? _value.note
+          ? _self.note
           : note // ignore: cast_nullable_to_non_nullable
               as String?,
       isCompleted: null == isCompleted
-          ? _value.isCompleted
+          ? _self.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -2100,8 +1194,8 @@ class __$$ItineraryItemActivityImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemActivityImpl extends ItineraryItemActivity {
-  const _$ItineraryItemActivityImpl(
+class ItineraryItemActivity extends ItineraryItem {
+  const ItineraryItemActivity(
       {required this.id,
       required this.time,
       required this.name,
@@ -2115,9 +1209,8 @@ class _$ItineraryItemActivityImpl extends ItineraryItemActivity {
       final String? $type})
       : $type = $type ?? 'activity',
         super._();
-
-  factory _$ItineraryItemActivityImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ItineraryItemActivityImplFromJson(json);
+  factory ItineraryItemActivity.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemActivityFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -2128,27 +1221,21 @@ class _$ItineraryItemActivityImpl extends ItineraryItemActivity {
   final DateTime time;
 
   /// Activity name/title
-  @override
   final String name;
 
   /// Activity description
-  @override
   final String? description;
 
   /// Location/address
-  @override
   final String? location;
 
   /// Estimated duration in hours
-  @override
   final int? durationHours;
 
   /// Estimated cost in local currency
-  @override
   final double? cost;
 
   /// Booking URL if advance booking required
-  @override
   final String? bookingUrl;
 
   /// Additional notes
@@ -2163,16 +1250,27 @@ class _$ItineraryItemActivityImpl extends ItineraryItemActivity {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.activity(id: $id, time: $time, name: $name, description: $description, location: $location, durationHours: $durationHours, cost: $cost, bookingUrl: $bookingUrl, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemActivityCopyWith<ItineraryItemActivity> get copyWith =>
+      _$ItineraryItemActivityCopyWithImpl<ItineraryItemActivity>(
+          this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemActivityToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemActivityImpl &&
+            other is ItineraryItemActivity &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.name, name) || other.name == name) &&
@@ -2195,379 +1293,96 @@ class _$ItineraryItemActivityImpl extends ItineraryItemActivity {
   int get hashCode => Object.hash(runtimeType, id, time, name, description,
       location, durationHours, cost, bookingUrl, note, isCompleted);
 
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryItemActivityImplCopyWith<_$ItineraryItemActivityImpl>
-      get copyWith => __$$ItineraryItemActivityImplCopyWithImpl<
-          _$ItineraryItemActivityImpl>(this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) {
-    return activity(id, time, name, description, location, durationHours, cost,
-        bookingUrl, note, isCompleted);
+  String toString() {
+    return 'ItineraryItem.activity(id: $id, time: $time, name: $name, description: $description, location: $location, durationHours: $durationHours, cost: $cost, bookingUrl: $bookingUrl, note: $note, isCompleted: $isCompleted)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return activity?.call(id, time, name, description, location, durationHours,
-        cost, bookingUrl, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (activity != null) {
-      return activity(id, time, name, description, location, durationHours,
-          cost, bookingUrl, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return activity(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return activity?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (activity != null) {
-      return activity(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemActivityImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class ItineraryItemActivity extends ItineraryItem {
-  const factory ItineraryItemActivity(
-      {required final String id,
-      required final DateTime time,
-      required final String name,
-      final String? description,
-      final String? location,
-      final int? durationHours,
-      final double? cost,
-      final String? bookingUrl,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemActivityImpl;
-  const ItineraryItemActivity._() : super._();
-
-  factory ItineraryItemActivity.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemActivityImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Start time of the activity
-  @override
-  DateTime get time;
-
-  /// Activity name/title
-  String get name;
-
-  /// Activity description
-  String? get description;
-
-  /// Location/address
-  String? get location;
-
-  /// Estimated duration in hours
-  int? get durationHours;
-
-  /// Estimated cost in local currency
-  double? get cost;
-
-  /// Booking URL if advance booking required
-  String? get bookingUrl;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemActivityImplCopyWith<_$ItineraryItemActivityImpl>
-      get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ItineraryItemLunchImplCopyWith<$Res>
+abstract mixin class $ItineraryItemActivityCopyWith<$Res>
     implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemLunchImplCopyWith(_$ItineraryItemLunchImpl value,
-          $Res Function(_$ItineraryItemLunchImpl) then) =
-      __$$ItineraryItemLunchImplCopyWithImpl<$Res>;
+  factory $ItineraryItemActivityCopyWith(ItineraryItemActivity value,
+          $Res Function(ItineraryItemActivity) _then) =
+      _$ItineraryItemActivityCopyWithImpl;
   @override
   @useResult
   $Res call(
       {String id,
       DateTime time,
       String name,
-      String? cuisine,
+      String? description,
       String? location,
-      String? priceRange,
+      int? durationHours,
+      double? cost,
+      String? bookingUrl,
       String? note,
       bool isCompleted});
 }
 
 /// @nodoc
-class __$$ItineraryItemLunchImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res, _$ItineraryItemLunchImpl>
-    implements _$$ItineraryItemLunchImplCopyWith<$Res> {
-  __$$ItineraryItemLunchImplCopyWithImpl(_$ItineraryItemLunchImpl _value,
-      $Res Function(_$ItineraryItemLunchImpl) _then)
-      : super(_value, _then);
+class _$ItineraryItemActivityCopyWithImpl<$Res>
+    implements $ItineraryItemActivityCopyWith<$Res> {
+  _$ItineraryItemActivityCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemActivity _self;
+  final $Res Function(ItineraryItemActivity) _then;
 
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? time = null,
     Object? name = null,
-    Object? cuisine = freezed,
+    Object? description = freezed,
     Object? location = freezed,
-    Object? priceRange = freezed,
+    Object? durationHours = freezed,
+    Object? cost = freezed,
+    Object? bookingUrl = freezed,
     Object? note = freezed,
     Object? isCompleted = null,
   }) {
-    return _then(_$ItineraryItemLunchImpl(
+    return _then(ItineraryItemActivity(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as DateTime,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      cuisine: freezed == cuisine
-          ? _value.cuisine
-          : cuisine // ignore: cast_nullable_to_non_nullable
+      description: freezed == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as String?,
-      priceRange: freezed == priceRange
-          ? _value.priceRange
-          : priceRange // ignore: cast_nullable_to_non_nullable
+      durationHours: freezed == durationHours
+          ? _self.durationHours
+          : durationHours // ignore: cast_nullable_to_non_nullable
+              as int?,
+      cost: freezed == cost
+          ? _self.cost
+          : cost // ignore: cast_nullable_to_non_nullable
+              as double?,
+      bookingUrl: freezed == bookingUrl
+          ? _self.bookingUrl
+          : bookingUrl // ignore: cast_nullable_to_non_nullable
               as String?,
       note: freezed == note
-          ? _value.note
+          ? _self.note
           : note // ignore: cast_nullable_to_non_nullable
               as String?,
       isCompleted: null == isCompleted
-          ? _value.isCompleted
+          ? _self.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -2576,8 +1391,8 @@ class __$$ItineraryItemLunchImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemLunchImpl extends ItineraryItemLunch {
-  const _$ItineraryItemLunchImpl(
+class ItineraryItemLunch extends ItineraryItem {
+  const ItineraryItemLunch(
       {required this.id,
       required this.time,
       required this.name,
@@ -2589,9 +1404,8 @@ class _$ItineraryItemLunchImpl extends ItineraryItemLunch {
       final String? $type})
       : $type = $type ?? 'lunch',
         super._();
-
-  factory _$ItineraryItemLunchImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ItineraryItemLunchImplFromJson(json);
+  factory ItineraryItemLunch.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemLunchFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -2602,19 +1416,15 @@ class _$ItineraryItemLunchImpl extends ItineraryItemLunch {
   final DateTime time;
 
   /// Restaurant name
-  @override
   final String name;
 
   /// Cuisine type
-  @override
   final String? cuisine;
 
   /// Location/address
-  @override
   final String? location;
 
   /// Average price range ($, $$, $$$)
-  @override
   final String? priceRange;
 
   /// Additional notes
@@ -2629,16 +1439,26 @@ class _$ItineraryItemLunchImpl extends ItineraryItemLunch {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.lunch(id: $id, time: $time, name: $name, cuisine: $cuisine, location: $location, priceRange: $priceRange, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemLunchCopyWith<ItineraryItemLunch> get copyWith =>
+      _$ItineraryItemLunchCopyWithImpl<ItineraryItemLunch>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemLunchToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemLunchImpl &&
+            other is ItineraryItemLunch &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.name, name) || other.name == name) &&
@@ -2657,305 +1477,18 @@ class _$ItineraryItemLunchImpl extends ItineraryItemLunch {
   int get hashCode => Object.hash(runtimeType, id, time, name, cuisine,
       location, priceRange, note, isCompleted);
 
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$ItineraryItemLunchImplCopyWith<_$ItineraryItemLunchImpl> get copyWith =>
-      __$$ItineraryItemLunchImplCopyWithImpl<_$ItineraryItemLunchImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
-  }) {
-    return lunch(
-        id, time, name, cuisine, location, priceRange, note, isCompleted);
+  String toString() {
+    return 'ItineraryItem.lunch(id: $id, time: $time, name: $name, cuisine: $cuisine, location: $location, priceRange: $priceRange, note: $note, isCompleted: $isCompleted)';
   }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return lunch?.call(
-        id, time, name, cuisine, location, priceRange, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (lunch != null) {
-      return lunch(
-          id, time, name, cuisine, location, priceRange, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return lunch(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return lunch?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (lunch != null) {
-      return lunch(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemLunchImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class ItineraryItemLunch extends ItineraryItem {
-  const factory ItineraryItemLunch(
-      {required final String id,
-      required final DateTime time,
-      required final String name,
-      final String? cuisine,
-      final String? location,
-      final String? priceRange,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemLunchImpl;
-  const ItineraryItemLunch._() : super._();
-
-  factory ItineraryItemLunch.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemLunchImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Scheduled lunch time
-  @override
-  DateTime get time;
-
-  /// Restaurant name
-  String get name;
-
-  /// Cuisine type
-  String? get cuisine;
-
-  /// Location/address
-  String? get location;
-
-  /// Average price range ($, $$, $$$)
-  String? get priceRange;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemLunchImplCopyWith<_$ItineraryItemLunchImpl> get copyWith =>
-      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class _$$ItineraryItemDinnerImplCopyWith<$Res>
+abstract mixin class $ItineraryItemLunchCopyWith<$Res>
     implements $ItineraryItemCopyWith<$Res> {
-  factory _$$ItineraryItemDinnerImplCopyWith(_$ItineraryItemDinnerImpl value,
-          $Res Function(_$ItineraryItemDinnerImpl) then) =
-      __$$ItineraryItemDinnerImplCopyWithImpl<$Res>;
+  factory $ItineraryItemLunchCopyWith(
+          ItineraryItemLunch value, $Res Function(ItineraryItemLunch) _then) =
+      _$ItineraryItemLunchCopyWithImpl;
   @override
   @useResult
   $Res call(
@@ -2970,17 +1503,17 @@ abstract class _$$ItineraryItemDinnerImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$ItineraryItemDinnerImplCopyWithImpl<$Res>
-    extends _$ItineraryItemCopyWithImpl<$Res, _$ItineraryItemDinnerImpl>
-    implements _$$ItineraryItemDinnerImplCopyWith<$Res> {
-  __$$ItineraryItemDinnerImplCopyWithImpl(_$ItineraryItemDinnerImpl _value,
-      $Res Function(_$ItineraryItemDinnerImpl) _then)
-      : super(_value, _then);
+class _$ItineraryItemLunchCopyWithImpl<$Res>
+    implements $ItineraryItemLunchCopyWith<$Res> {
+  _$ItineraryItemLunchCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemLunch _self;
+  final $Res Function(ItineraryItemLunch) _then;
 
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
     Object? id = null,
     Object? time = null,
@@ -2991,37 +1524,37 @@ class __$$ItineraryItemDinnerImplCopyWithImpl<$Res>
     Object? note = freezed,
     Object? isCompleted = null,
   }) {
-    return _then(_$ItineraryItemDinnerImpl(
+    return _then(ItineraryItemLunch(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as DateTime,
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       cuisine: freezed == cuisine
-          ? _value.cuisine
+          ? _self.cuisine
           : cuisine // ignore: cast_nullable_to_non_nullable
               as String?,
       location: freezed == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as String?,
       priceRange: freezed == priceRange
-          ? _value.priceRange
+          ? _self.priceRange
           : priceRange // ignore: cast_nullable_to_non_nullable
               as String?,
       note: freezed == note
-          ? _value.note
+          ? _self.note
           : note // ignore: cast_nullable_to_non_nullable
               as String?,
       isCompleted: null == isCompleted
-          ? _value.isCompleted
+          ? _self.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
@@ -3030,8 +1563,8 @@ class __$$ItineraryItemDinnerImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$ItineraryItemDinnerImpl extends ItineraryItemDinner {
-  const _$ItineraryItemDinnerImpl(
+class ItineraryItemDinner extends ItineraryItem {
+  const ItineraryItemDinner(
       {required this.id,
       required this.time,
       required this.name,
@@ -3043,9 +1576,8 @@ class _$ItineraryItemDinnerImpl extends ItineraryItemDinner {
       final String? $type})
       : $type = $type ?? 'dinner',
         super._();
-
-  factory _$ItineraryItemDinnerImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ItineraryItemDinnerImplFromJson(json);
+  factory ItineraryItemDinner.fromJson(Map<String, dynamic> json) =>
+      _$ItineraryItemDinnerFromJson(json);
 
   /// Unique identifier for this item
   @override
@@ -3056,19 +1588,15 @@ class _$ItineraryItemDinnerImpl extends ItineraryItemDinner {
   final DateTime time;
 
   /// Restaurant name
-  @override
   final String name;
 
   /// Cuisine type
-  @override
   final String? cuisine;
 
   /// Location/address
-  @override
   final String? location;
 
   /// Average price range ($, $$, $$$)
-  @override
   final String? priceRange;
 
   /// Additional notes
@@ -3083,16 +1611,26 @@ class _$ItineraryItemDinnerImpl extends ItineraryItemDinner {
   @JsonKey(name: 'runtimeType')
   final String $type;
 
+  /// Create a copy of ItineraryItem
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ItineraryItem.dinner(id: $id, time: $time, name: $name, cuisine: $cuisine, location: $location, priceRange: $priceRange, note: $note, isCompleted: $isCompleted)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $ItineraryItemDinnerCopyWith<ItineraryItemDinner> get copyWith =>
+      _$ItineraryItemDinnerCopyWithImpl<ItineraryItemDinner>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$ItineraryItemDinnerToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$ItineraryItemDinnerImpl &&
+            other is ItineraryItemDinner &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.time, time) || other.time == time) &&
             (identical(other.name, name) || other.name == name) &&
@@ -3111,295 +1649,88 @@ class _$ItineraryItemDinnerImpl extends ItineraryItemDinner {
   int get hashCode => Object.hash(runtimeType, id, time, name, cuisine,
       location, priceRange, note, isCompleted);
 
+  @override
+  String toString() {
+    return 'ItineraryItem.dinner(id: $id, time: $time, name: $name, cuisine: $cuisine, location: $location, priceRange: $priceRange, note: $note, isCompleted: $isCompleted)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $ItineraryItemDinnerCopyWith<$Res>
+    implements $ItineraryItemCopyWith<$Res> {
+  factory $ItineraryItemDinnerCopyWith(
+          ItineraryItemDinner value, $Res Function(ItineraryItemDinner) _then) =
+      _$ItineraryItemDinnerCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String id,
+      DateTime time,
+      String name,
+      String? cuisine,
+      String? location,
+      String? priceRange,
+      String? note,
+      bool isCompleted});
+}
+
+/// @nodoc
+class _$ItineraryItemDinnerCopyWithImpl<$Res>
+    implements $ItineraryItemDinnerCopyWith<$Res> {
+  _$ItineraryItemDinnerCopyWithImpl(this._self, this._then);
+
+  final ItineraryItemDinner _self;
+  final $Res Function(ItineraryItemDinner) _then;
+
   /// Create a copy of ItineraryItem
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$ItineraryItemDinnerImplCopyWith<_$ItineraryItemDinnerImpl> get copyWith =>
-      __$$ItineraryItemDinnerImplCopyWithImpl<_$ItineraryItemDinnerImpl>(
-          this, _$identity);
-
-  @override
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightArrival,
-    required TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)
-        flightDeparture,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)
-        hotelCheckIn,
-    required TResult Function(String id, DateTime time, String? hotelName,
-            String? note, bool isCompleted)
-        hotelCheckOut,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)
-        activity,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        lunch,
-    required TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)
-        dinner,
+  $Res call({
+    Object? id = null,
+    Object? time = null,
+    Object? name = null,
+    Object? cuisine = freezed,
+    Object? location = freezed,
+    Object? priceRange = freezed,
+    Object? note = freezed,
+    Object? isCompleted = null,
   }) {
-    return dinner(
-        id, time, name, cuisine, location, priceRange, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult? Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult? Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult? Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-  }) {
-    return dinner?.call(
-        id, time, name, cuisine, location, priceRange, note, isCompleted);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightArrival,
-    TResult Function(String id, DateTime time, String? flightNumber,
-            String? airportCode, String? note, bool isCompleted)?
-        flightDeparture,
-    TResult Function(
-            String id,
-            DateTime time,
-            String? hotelName,
-            String? address,
-            String? confirmationNumber,
-            String? note,
-            bool isCompleted)?
-        hotelCheckIn,
-    TResult Function(String id, DateTime time, String? hotelName, String? note,
-            bool isCompleted)?
-        hotelCheckOut,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? description,
-            String? location,
-            int? durationHours,
-            double? cost,
-            String? bookingUrl,
-            String? note,
-            bool isCompleted)?
-        activity,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        lunch,
-    TResult Function(
-            String id,
-            DateTime time,
-            String name,
-            String? cuisine,
-            String? location,
-            String? priceRange,
-            String? note,
-            bool isCompleted)?
-        dinner,
-    required TResult orElse(),
-  }) {
-    if (dinner != null) {
-      return dinner(
-          id, time, name, cuisine, location, priceRange, note, isCompleted);
-    }
-    return orElse();
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(ItineraryItemFlightArrival value) flightArrival,
-    required TResult Function(ItineraryItemFlightDeparture value)
-        flightDeparture,
-    required TResult Function(ItineraryItemHotelCheckIn value) hotelCheckIn,
-    required TResult Function(ItineraryItemHotelCheckOut value) hotelCheckOut,
-    required TResult Function(ItineraryItemActivity value) activity,
-    required TResult Function(ItineraryItemLunch value) lunch,
-    required TResult Function(ItineraryItemDinner value) dinner,
-  }) {
-    return dinner(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult? Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult? Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult? Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult? Function(ItineraryItemActivity value)? activity,
-    TResult? Function(ItineraryItemLunch value)? lunch,
-    TResult? Function(ItineraryItemDinner value)? dinner,
-  }) {
-    return dinner?.call(this);
-  }
-
-  @override
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(ItineraryItemFlightArrival value)? flightArrival,
-    TResult Function(ItineraryItemFlightDeparture value)? flightDeparture,
-    TResult Function(ItineraryItemHotelCheckIn value)? hotelCheckIn,
-    TResult Function(ItineraryItemHotelCheckOut value)? hotelCheckOut,
-    TResult Function(ItineraryItemActivity value)? activity,
-    TResult Function(ItineraryItemLunch value)? lunch,
-    TResult Function(ItineraryItemDinner value)? dinner,
-    required TResult orElse(),
-  }) {
-    if (dinner != null) {
-      return dinner(this);
-    }
-    return orElse();
-  }
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ItineraryItemDinnerImplToJson(
-      this,
-    );
+    return _then(ItineraryItemDinner(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      time: null == time
+          ? _self.time
+          : time // ignore: cast_nullable_to_non_nullable
+              as DateTime,
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      cuisine: freezed == cuisine
+          ? _self.cuisine
+          : cuisine // ignore: cast_nullable_to_non_nullable
+              as String?,
+      location: freezed == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String?,
+      priceRange: freezed == priceRange
+          ? _self.priceRange
+          : priceRange // ignore: cast_nullable_to_non_nullable
+              as String?,
+      note: freezed == note
+          ? _self.note
+          : note // ignore: cast_nullable_to_non_nullable
+              as String?,
+      isCompleted: null == isCompleted
+          ? _self.isCompleted
+          : isCompleted // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
   }
 }
 
-abstract class ItineraryItemDinner extends ItineraryItem {
-  const factory ItineraryItemDinner(
-      {required final String id,
-      required final DateTime time,
-      required final String name,
-      final String? cuisine,
-      final String? location,
-      final String? priceRange,
-      final String? note,
-      final bool isCompleted}) = _$ItineraryItemDinnerImpl;
-  const ItineraryItemDinner._() : super._();
-
-  factory ItineraryItemDinner.fromJson(Map<String, dynamic> json) =
-      _$ItineraryItemDinnerImpl.fromJson;
-
-  /// Unique identifier for this item
-  @override
-  String get id;
-
-  /// Scheduled dinner time
-  @override
-  DateTime get time;
-
-  /// Restaurant name
-  String get name;
-
-  /// Cuisine type
-  String? get cuisine;
-
-  /// Location/address
-  String? get location;
-
-  /// Average price range ($, $$, $$$)
-  String? get priceRange;
-
-  /// Additional notes
-  @override
-  String? get note;
-
-  /// Whether this item is completed
-  @override
-  bool get isCompleted;
-
-  /// Create a copy of ItineraryItem
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$ItineraryItemDinnerImplCopyWith<_$ItineraryItemDinnerImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

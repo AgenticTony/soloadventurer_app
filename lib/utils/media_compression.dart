@@ -219,7 +219,8 @@ class MediaCompression {
     _validateFile(file);
 
     // Use default config if none provided
-    final compressionConfig = config ?? ImageCompressionConfig.optimizedForTravel;
+    final compressionConfig =
+        config ?? ImageCompressionConfig.optimizedForTravel;
     compressionConfig.validate();
 
     try {
@@ -244,7 +245,7 @@ class MediaCompression {
       rethrow;
     } on UnsupportedImageFormatException {
       rethrow;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw MediaCompressionException(
         message: 'Failed to compress image: ${e.toString()}',
         code: 'compression_failed',
@@ -274,7 +275,8 @@ class MediaCompression {
       );
     }
 
-    final compressionConfig = config ?? ImageCompressionConfig.optimizedForTravel;
+    final compressionConfig =
+        config ?? ImageCompressionConfig.optimizedForTravel;
     compressionConfig.validate();
 
     try {
@@ -295,7 +297,7 @@ class MediaCompression {
       rethrow;
     } on UnsupportedImageFormatException {
       rethrow;
-    } catch (e, stackTrace) {
+    } catch (e) {
       throw MediaCompressionException(
         message: 'Failed to compress image bytes: ${e.toString()}',
         code: 'compression_failed',
@@ -481,7 +483,9 @@ class MediaCompression {
     var minQ = MediaCompression.minQuality;
     var maxQ = config.quality;
 
-    while (compressed != null && compressed.length > targetSize && quality > minQ) {
+    while (compressed != null &&
+        compressed.length > targetSize &&
+        quality > minQ) {
       quality = ((minQ + maxQ) / 2).round();
       compressed = await FlutterImageCompress.compressWithFile(
         source is File ? source.path : null,
@@ -549,7 +553,7 @@ class MediaCompression {
     } else {
       // JPEG: varies significantly by quality and content
       // This is a very rough estimate
-      final baseBytesPerPixel = 0.15;
+      const baseBytesPerPixel = 0.15;
       final qualityFactor = quality / 100;
       return (pixelCount * baseBytesPerPixel * qualityFactor).round();
     }

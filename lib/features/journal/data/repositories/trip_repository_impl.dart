@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/errors/app_exception.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';

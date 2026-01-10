@@ -8,15 +8,21 @@ import 'package:soloadventurer/features/journal/data/services/media_upload_servi
 import 'package:soloadventurer/features/journal/data/models/upload_task.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import '../../utils/media_test_helpers.dart';
+import 'package:soloadventurer/test/utils/media_test_helpers.dart';
 
 // Mock classes
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockGoTrueClient extends Mock implements GoTrueClient {}
+
 class MockUser extends Mock implements User {}
+
 class MockStorageClient extends Mock implements SupabaseStorageClient {}
+
 class MockStorageBucketApi extends Mock implements StorageBucketApi {}
+
 class MockSharedPreferences extends Mock implements SharedPreferences {}
+
 class MockWorkmanager extends Mock implements Workmanager {}
 
 void main() {
@@ -44,7 +50,7 @@ void main() {
     when(() => mockStorage.from(any())).thenReturn(mockBucket);
 
     // Register fallback values
-    registerFallbackValue(FileOptions());
+    registerFallbackValue(const FileOptions());
 
     uploadService = MediaUploadServiceImpl(
       client: mockClient,
@@ -186,7 +192,8 @@ void main() {
       expect(task.createdAt, isNotNull);
     });
 
-    test('should create task with default priority when not specified', () async {
+    test('should create task with default priority when not specified',
+        () async {
       // Arrange
       final file = File('/tmp/test1.jpg');
 
@@ -230,7 +237,8 @@ void main() {
       expect(task.journalEntryId, equals('entry-123'));
     });
 
-    test('should set compressBeforeUpload from config when not specified', () async {
+    test('should set compressBeforeUpload from config when not specified',
+        () async {
       // Arrange
       final file = File('/tmp/test1.jpg');
 
@@ -241,10 +249,12 @@ void main() {
       );
 
       // Assert
-      expect(task.compressBeforeUpload, equals(uploadService.config.enableCompression));
+      expect(task.compressBeforeUpload,
+          equals(uploadService.config.enableCompression));
     });
 
-    test('should set compressBeforeUpload from config when specified', () async {
+    test('should set compressBeforeUpload from config when specified',
+        () async {
       // Arrange
       final file = File('/tmp/test1.jpg');
       final customConfig = UploadConfig(enableCompression: false);
@@ -293,7 +303,9 @@ void main() {
       expect(tasks[1].mediaType, equals(MediaType.photo));
     });
 
-    test('should throw InvalidImageException when arrays have different lengths', () async {
+    test(
+        'should throw InvalidImageException when arrays have different lengths',
+        () async {
       // Arrange
       final files = [File('/tmp/test1.jpg'), File('/tmp/test2.jpg')];
       final mediaTypes = [MediaType.photo]; // Only one type
@@ -309,7 +321,8 @@ void main() {
       );
     });
 
-    test('should associate all uploads with same entry when provided', () async {
+    test('should associate all uploads with same entry when provided',
+        () async {
       // Arrange
       final files = [File('/tmp/test1.jpg'), File('/tmp/test2.jpg')];
       final mediaTypes = [MediaType.photo, MediaType.photo];
@@ -379,7 +392,8 @@ void main() {
   });
 
   group('MediaUploadServiceImpl - Queue Cleanup', () {
-    test('should clear completed tasks when clearCompletedTasks is called', () async {
+    test('should clear completed tasks when clearCompletedTasks is called',
+        () async {
       // Arrange
       final file = File('/tmp/test1.jpg');
       final task = await uploadService.enqueueUpload(
@@ -553,7 +567,8 @@ void main() {
       // Test user ID in path
     });
 
-    test('should update media item in database after successful upload', () async {
+    test('should update media item in database after successful upload',
+        () async {
       // Test database update
     });
   });

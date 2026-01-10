@@ -9,7 +9,6 @@ part 'notification_preferences.g.dart';
 /// and how they are delivered.
 @freezed
 abstract class NotificationPreferences with _$NotificationPreferences {
-  const NotificationPreferences._();
 
   const factory NotificationPreferences({
     // Flight notifications
@@ -122,6 +121,9 @@ abstract class NotificationPreferences with _$NotificationPreferences {
   NotificationPreferences withTimestamp() {
     return copyWith(lastUpdated: DateTime.now().toUtc());
   }
+
+  // Private constructor for freezed getters
+  const NotificationPreferences._();
 
   /// Returns the default notification preferences
   static NotificationPreferences defaultPrefs() {

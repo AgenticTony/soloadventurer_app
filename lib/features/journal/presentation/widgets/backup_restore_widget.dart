@@ -106,7 +106,8 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
   @override
   Widget build(BuildContext context) {
     final backupState = ref.watch(backupNotifierProvider);
-    final estimatedSize = ref.watch(estimatedBackupSizeProvider(includeMedia: _includeMedia));
+    final estimatedSize =
+        ref.watch(estimatedBackupSizeProvider(includeMedia: _includeMedia));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -295,7 +296,8 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
   }
 
   bool _canCreateBackup() {
-    if (_encrypt && (_encryptionPassword == null || _encryptionPassword!.length < 8)) {
+    if (_encrypt &&
+        (_encryptionPassword == null || _encryptionPassword!.length < 8)) {
       return false;
     }
     return true;
@@ -312,7 +314,9 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
     );
 
     try {
-      await ref.read(backupNotifierProvider.notifier).createBackup(config: config);
+      await ref
+          .read(backupNotifierProvider.notifier)
+          .createBackup(config: config);
     } catch (e) {
       // Error is handled in state
     }
@@ -418,7 +422,8 @@ class _RestoreSectionState extends ConsumerState<_RestoreSection> {
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
                       'Error loading backups: $error',
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.error),
                     ),
                   ),
                 ),
@@ -489,7 +494,8 @@ class _RestoreSectionState extends ConsumerState<_RestoreSection> {
                   ),
                   ListTile(
                     title: const Text('Conflict Resolution'),
-                    subtitle: Text(_getConflictResolutionLabel(_conflictResolution)),
+                    subtitle:
+                        Text(_getConflictResolutionLabel(_conflictResolution)),
                     trailing: DropdownButton<ConflictResolution>(
                       value: _conflictResolution,
                       items: const [
@@ -815,7 +821,7 @@ class _BackupSuccessCard extends StatelessWidget {
               value: _formatDuration(result.duration),
             ),
             if (result.isEncrypted)
-              _StatRow(
+              const _StatRow(
                 label: 'Encryption',
                 value: 'Yes',
                 icon: Icons.lock,
@@ -826,9 +832,11 @@ class _BackupSuccessCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(text: result.backupPath!));
+                      Clipboard.setData(
+                          ClipboardData(text: result.backupPath!));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Path copied to clipboard')),
+                        const SnackBar(
+                            content: Text('Path copied to clipboard')),
                       );
                     },
                     child: const Text('Copy Path'),
@@ -1064,7 +1072,7 @@ class _RestoreSuccessCard extends StatelessWidget {
               value: _formatDuration(result.duration),
             ),
             if (result.preRestoreBackupPath != null)
-              _StatRow(
+              const _StatRow(
                 label: 'Backup Created',
                 value: 'Yes',
                 icon: Icons.backup,

@@ -6,45 +6,119 @@ part of 'auth_navigation_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$navigatorKeyHash() => r'8b4dbfb31d887f8bbb1a13b7214b897e71dac1f7';
-
-/// Global navigator key for handling navigation from providers
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Provider for handling auth-related navigation state
 ///
-/// Copied from [navigatorKey].
-@ProviderFor(navigatorKey)
-final navigatorKeyProvider =
-    AutoDisposeProvider<GlobalKey<NavigatorState>>.internal(
-  navigatorKey,
-  name: r'navigatorKeyProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$navigatorKeyHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// Uses Riverpod 3.0 @riverpod annotation with Notifier pattern.
+/// Monitors auth state changes and handles navigation accordingly.
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef NavigatorKeyRef = AutoDisposeProviderRef<GlobalKey<NavigatorState>>;
-String _$authNavigationHash() => r'e94fb3deb043d0d619efc61e1383ecc654ce0a65';
+@ProviderFor(AuthNavigation)
+final authNavigationProvider = AuthNavigationProvider._();
 
 /// Provider for handling auth-related navigation state
 ///
 /// Uses Riverpod 3.0 @riverpod annotation with Notifier pattern.
 /// Monitors auth state changes and handles navigation accordingly.
-///
-/// Copied from [AuthNavigation].
-@ProviderFor(AuthNavigation)
-final authNavigationProvider =
-    AutoDisposeNotifierProvider<AuthNavigation, AuthNavigationState>.internal(
-  AuthNavigation.new,
-  name: r'authNavigationProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$authNavigationHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final class AuthNavigationProvider
+    extends $NotifierProvider<AuthNavigation, AuthNavigationState> {
+  /// Provider for handling auth-related navigation state
+  ///
+  /// Uses Riverpod 3.0 @riverpod annotation with Notifier pattern.
+  /// Monitors auth state changes and handles navigation accordingly.
+  AuthNavigationProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'authNavigationProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
 
-typedef _$AuthNavigation = AutoDisposeNotifier<AuthNavigationState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+  @override
+  String debugGetCreateSourceHash() => _$authNavigationHash();
+
+  @$internal
+  @override
+  AuthNavigation create() => AuthNavigation();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AuthNavigationState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AuthNavigationState>(value),
+    );
+  }
+}
+
+String _$authNavigationHash() => r'5992c99d9ad999d8f182377fea78a98e60d1ef0a';
+
+/// Provider for handling auth-related navigation state
+///
+/// Uses Riverpod 3.0 @riverpod annotation with Notifier pattern.
+/// Monitors auth state changes and handles navigation accordingly.
+
+abstract class _$AuthNavigation extends $Notifier<AuthNavigationState> {
+  AuthNavigationState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AuthNavigationState, AuthNavigationState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AuthNavigationState, AuthNavigationState>,
+        AuthNavigationState,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Global navigator key for handling navigation from providers
+
+@ProviderFor(navigatorKey)
+final navigatorKeyProvider = NavigatorKeyProvider._();
+
+/// Global navigator key for handling navigation from providers
+
+final class NavigatorKeyProvider extends $FunctionalProvider<
+    GlobalKey<NavigatorState>,
+    GlobalKey<NavigatorState>,
+    GlobalKey<NavigatorState>> with $Provider<GlobalKey<NavigatorState>> {
+  /// Global navigator key for handling navigation from providers
+  NavigatorKeyProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'navigatorKeyProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$navigatorKeyHash();
+
+  @$internal
+  @override
+  $ProviderElement<GlobalKey<NavigatorState>> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GlobalKey<NavigatorState> create(Ref ref) {
+    return navigatorKey(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GlobalKey<NavigatorState> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GlobalKey<NavigatorState>>(value),
+    );
+  }
+}
+
+String _$navigatorKeyHash() => r'8b4dbfb31d887f8bbb1a13b7214b897e71dac1f7';

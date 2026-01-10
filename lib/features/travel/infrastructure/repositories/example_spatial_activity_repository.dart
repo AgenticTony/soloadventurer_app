@@ -1,4 +1,3 @@
-import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'spatial_activity_repository.dart';
 
@@ -336,7 +335,8 @@ class ExampleSpatialActivityRepository {
       final result = await spatialRepo.waitForDebouncedQuery();
 
       if (result.isLimited) {
-        print('Warning: Only showing ${result.activities.length} of ${result.totalActivities} activities');
+        print(
+            'Warning: Only showing ${result.activities.length} of ${result.totalActivities} activities');
       }
 
       // Check performance statistics

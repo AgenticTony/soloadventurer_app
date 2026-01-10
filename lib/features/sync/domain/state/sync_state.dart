@@ -6,7 +6,7 @@ import '../entities/sync_entity_type.dart';
 @immutable
 class SyncState {
   /// Current sync status
-  final SyncStatus status;
+  final SyncOperationStatus status;
 
   /// Number of pending operations waiting to sync
   final int pendingCount;
@@ -30,20 +30,20 @@ class SyncState {
   final List<SyncEntityType> pendingEntityTypes;
 
   /// Whether sync is currently in progress
-  bool get isSyncing => status == SyncStatus.syncing;
+  bool get isSyncing => status == SyncOperationStatus.syncing;
 
   /// Whether there are pending changes
   bool get hasPending => pendingCount > 0;
 
   /// Whether the last sync was successful
-  bool get isSuccessful => status == SyncStatus.success;
+  bool get isSuccessful => status == SyncOperationStatus.success;
 
   /// Whether there are errors
-  bool get hasError => status == SyncStatus.failed;
+  bool get hasError => status == SyncOperationStatus.failed;
 
   /// Creates a new [SyncState]
   const SyncState({
-    this.status = SyncStatus.idle,
+    this.status = SyncOperationStatus.idle,
     this.pendingCount = 0,
     this.failedCount = 0,
     this.lastSyncTime,
@@ -55,7 +55,7 @@ class SyncState {
 
   /// Creates a copy of this state with the given fields replaced
   SyncState copyWith({
-    SyncStatus? status,
+    SyncOperationStatus? status,
     int? pendingCount,
     int? failedCount,
     DateTime? lastSyncTime,
@@ -70,10 +70,10 @@ class SyncState {
       failedCount: failedCount ?? this.failedCount,
       lastSyncTime: lastSyncTime ?? this.lastSyncTime,
       error: error, // Intentionally not using ?? to allow clearing errors
-      errorCode: errorCode, // Intentionally not using ?? to allow clearing codes
+      errorCode:
+          errorCode, // Intentionally not using ?? to allow clearing codes
       syncProgress: syncProgress ?? this.syncProgress,
-      pendingEntityTypes:
-          pendingEntityTypes ?? this.pendingEntityTypes,
+      pendingEntityTypes: pendingEntityTypes ?? this.pendingEntityTypes,
     );
   }
 
@@ -81,14 +81,15 @@ class SyncState {
   factory SyncState.initial() => const SyncState();
 
   /// Creates an idle state
-  factory SyncState.idle() => const SyncState(status: SyncStatus.idle);
+  factory SyncState.idle() => const SyncState(status: SyncOperationStatus.idle);
 
   /// Creates a syncing state
   factory SyncState.syncing({
     double progress = 0.0,
     List<SyncEntityType> pendingEntityTypes = const [],
-  }) => SyncState(
-        status: SyncStatus.syncing,
+  }) =>
+      SyncState(
+        status: SyncOperationStatus.syncing,
         syncProgress: progress,
         pendingEntityTypes: pendingEntityTypes,
       );
@@ -98,8 +99,9 @@ class SyncState {
     DateTime? syncTime,
     int? pendingCount,
     List<SyncEntityType> pendingEntityTypes = const [],
-  }) => SyncState(
-        status: SyncStatus.success,
+  }) =>
+      SyncState(
+        status: SyncOperationStatus.success,
         lastSyncTime: syncTime ?? DateTime.now(),
         pendingCount: pendingCount ?? 0,
         pendingEntityTypes: pendingEntityTypes,
@@ -111,8 +113,9 @@ class SyncState {
     String? code,
     int? failedCount,
     List<SyncEntityType> pendingEntityTypes = const [],
-  }) => SyncState(
-        status: SyncStatus.failed,
+  }) =>
+      SyncState(
+        status: SyncOperationStatus.failed,
         error: message,
         errorCode: code,
         failedCount: failedCount ?? 0,
@@ -123,8 +126,9 @@ class SyncState {
   factory SyncState.pending({
     required int count,
     List<SyncEntityType> pendingEntityTypes = const [],
-  }) => SyncState(
-        status: SyncStatus.pending,
+  }) =>
+      SyncState(
+        status: SyncOperationStatus.pending,
         pendingCount: count,
         pendingEntityTypes: pendingEntityTypes,
       );

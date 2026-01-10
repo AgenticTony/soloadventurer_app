@@ -11,7 +11,6 @@ part 'recommendation.g.dart';
 /// personalization metadata, scoring details, and transparent reasoning.
 @freezed
 class PersonalizedRecommendation with _$PersonalizedRecommendation {
-  const PersonalizedRecommendation._();
 
   /// Creates a personalized recommendation
   ///
@@ -41,6 +40,9 @@ class PersonalizedRecommendation with _$PersonalizedRecommendation {
     if (relevanceScore >= 40) return ScoreColor.fair;
     return ScoreColor.poor;
   }
+
+  // Private constructor for freezed getters
+  const PersonalizedRecommendation._();
 }
 
 /// Color categories for relevance scores
@@ -54,7 +56,6 @@ enum ScoreColor {
 /// Metadata about why and when to recommend something
 @freezed
 class RecommendationMetadata with _$RecommendationMetadata {
-  const RecommendationMetadata._();
 
   /// Creates recommendation metadata
   ///
@@ -91,7 +92,6 @@ class RecommendationMetadata with _$RecommendationMetadata {
 /// Time of day for a suggestion
 @freezed
 class TimeOfDay with _$TimeOfDay {
-  const TimeOfDay._();
 
   /// Creates a time of day
   ///
@@ -118,12 +118,14 @@ class TimeOfDay with _$TimeOfDay {
   DateTime toDateTime(DateTime date) {
     return DateTime(date.year, date.month, date.day, hour, minute);
   }
+
+  // Private constructor for freezed getters
+  const TimeOfDay._();
 }
 
 /// Represents a monetary amount
 @freezed
 class Money with _$Money {
-  const Money._();
 
   /// Creates a money value
   ///
@@ -156,6 +158,9 @@ class Money with _$Money {
         return '\$';
     }
   }
+
+  // Private constructor for freezed getters
+  const Money._();
 }
 
 /// Source of a recommendation

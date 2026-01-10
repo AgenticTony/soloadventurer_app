@@ -14,7 +14,6 @@ part 'recommendation_request.g.dart';
 /// including trip details, user interests, and preferences.
 @freezed
 class RecommendationRequest with _$RecommendationRequest {
-  const RecommendationRequest._();
 
   /// Creates a recommendation request
   ///
@@ -63,12 +62,14 @@ class RecommendationRequest with _$RecommendationRequest {
     }
     return '${interests.first.label} +${interests.length - 1} more';
   }
+
+  // Private constructor for freezed getters
+  const RecommendationRequest._();
 }
 
 /// Location of user's accommodation
 @freezed
 class HotelLocation with _$HotelLocation {
-  const HotelLocation._();
 
   /// Creates a hotel location
   ///
@@ -91,7 +92,6 @@ class HotelLocation with _$HotelLocation {
 /// Budget range for filtering recommendations
 @freezed
 class BudgetRange with _$BudgetRange {
-  const BudgetRange._();
 
   /// Creates a budget range
   ///
@@ -141,6 +141,9 @@ class BudgetRange with _$BudgetRange {
         return '\$';
     }
   }
+
+  // Private constructor for freezed getters
+  const BudgetRange._();
 }
 
 /// User feedback on a recommendation

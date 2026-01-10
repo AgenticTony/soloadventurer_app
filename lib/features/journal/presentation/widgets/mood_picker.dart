@@ -172,7 +172,8 @@ class MoodPicker extends ConsumerWidget {
                         icon: const Icon(Icons.clear, size: 16),
                         label: const Text('Clear'),
                         style: TextButton.styleFrom(
-                          foregroundColor: theme.colorScheme.onSurface.withOpacity(0.6),
+                          foregroundColor:
+                              theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ),
@@ -247,9 +248,8 @@ class _MoodTile extends StatelessWidget {
                   : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : Colors.transparent,
+                color:
+                    isSelected ? theme.colorScheme.primary : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -266,7 +266,8 @@ class _MoodTile extends StatelessWidget {
                 Text(
                   mood.label,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                     color: isSelected
                         ? theme.colorScheme.onPrimaryContainer
                         : theme.colorScheme.onSurface,
@@ -341,8 +342,8 @@ class MoodPickerButton extends ConsumerWidget {
                     Text(
                       'How are you feeling?',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                   ],
                 ),
@@ -396,9 +397,8 @@ class MoodPickerButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final selectedMood = selectedMoodId != null
-        ? MoodOptions.findById(selectedMoodId!)
-        : null;
+    final selectedMood =
+        selectedMoodId != null ? MoodOptions.findById(selectedMoodId!) : null;
 
     return Semantics(
       button: true,
@@ -427,7 +427,9 @@ class MoodPickerButton extends ConsumerWidget {
             child: Row(
               children: [
                 Icon(
-                  selectedMood != null ? Icons.sentiment_satisfied_alt : Icons.add,
+                  selectedMood != null
+                      ? Icons.sentiment_satisfied_alt
+                      : Icons.add,
                   color: selectedMood != null
                       ? theme.colorScheme.primary
                       : theme.colorScheme.onSurface.withOpacity(0.6),
@@ -436,7 +438,7 @@ class MoodPickerButton extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Text(
                   selectedMood != null
-                      ? '${selectedMood!.emoji} ${selectedMood.label}'
+                      ? '${selectedMood.emoji} ${selectedMood.label}'
                       : 'Add mood',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: selectedMood != null
@@ -476,13 +478,13 @@ class _MoodTileForBottomSheet extends ConsumerWidget {
       button: true,
       selected: isSelected,
       label: mood.label,
-      hint: isSelected ? 'Currently selected, tap to keep' : 'Set mood to ${mood.label}',
+      hint: isSelected
+          ? 'Currently selected, tap to keep'
+          : 'Set mood to ${mood.label}',
       child: ExcludeSemantics(
         child: InkWell(
           onTap: () {
-            ref
-                .read(journalEntryCreationProvider.notifier)
-                .updateMood(mood.id);
+            ref.read(journalEntryCreationProvider.notifier).updateMood(mood.id);
             Navigator.of(context).pop();
           },
           borderRadius: BorderRadius.circular(12),
@@ -493,9 +495,8 @@ class _MoodTileForBottomSheet extends ConsumerWidget {
                   : theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : Colors.transparent,
+                color:
+                    isSelected ? theme.colorScheme.primary : Colors.transparent,
                 width: 2,
               ),
             ),
@@ -512,7 +513,8 @@ class _MoodTileForBottomSheet extends ConsumerWidget {
                 Text(
                   mood.label,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontWeight:
+                        isSelected ? FontWeight.w600 : FontWeight.normal,
                     color: isSelected
                         ? theme.colorScheme.onPrimaryContainer
                         : theme.colorScheme.onSurface,

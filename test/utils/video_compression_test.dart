@@ -75,7 +75,7 @@ void main() {
     group('presets', () {
       test('should have optimizedForTravel preset with correct values', () {
         // Assert
-        final config = VideoCompressionConfig.optimizedForTravel;
+        const config = VideoCompressionConfig.optimizedForTravel;
         expect(config.maxWidth, equals(1280));
         expect(config.maxHeight, equals(720));
         expect(config.quality, equals(80));
@@ -87,7 +87,7 @@ void main() {
 
       test('should have highQuality preset with correct values', () {
         // Assert
-        final config = VideoCompressionConfig.highQuality;
+        const config = VideoCompressionConfig.highQuality;
         expect(config.maxWidth, equals(1920));
         expect(config.maxHeight, equals(1080));
         expect(config.quality, equals(90));
@@ -99,7 +99,7 @@ void main() {
 
       test('should have aggressive preset with correct values', () {
         // Assert
-        final config = VideoCompressionConfig.aggressive;
+        const config = VideoCompressionConfig.aggressive;
         expect(config.maxWidth, equals(854));
         expect(config.maxHeight, equals(480));
         expect(config.quality, equals(70));
@@ -111,9 +111,11 @@ void main() {
     });
 
     group('validate', () {
-      test('should throw InvalidVideoException when quality is out of range (negative)', () {
+      test(
+          'should throw InvalidVideoException when quality is out of range (negative)',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(quality: -1);
+        const config = VideoCompressionConfig(quality: -1);
 
         // Act & Assert
         expect(
@@ -123,9 +125,11 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when quality is out of range (> 100)', () {
+      test(
+          'should throw InvalidVideoException when quality is out of range (> 100)',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(quality: 101);
+        const config = VideoCompressionConfig(quality: 101);
 
         // Act & Assert
         expect(
@@ -135,9 +139,10 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when maxWidth is less than 1', () {
+      test('should throw InvalidVideoException when maxWidth is less than 1',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(maxWidth: 0);
+        const config = VideoCompressionConfig(maxWidth: 0);
 
         // Act & Assert
         expect(
@@ -147,9 +152,10 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when maxHeight is less than 1', () {
+      test('should throw InvalidVideoException when maxHeight is less than 1',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(maxHeight: 0);
+        const config = VideoCompressionConfig(maxHeight: 0);
 
         // Act & Assert
         expect(
@@ -159,9 +165,11 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when frameRate is out of range (< 1)', () {
+      test(
+          'should throw InvalidVideoException when frameRate is out of range (< 1)',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(frameRate: 0);
+        const config = VideoCompressionConfig(frameRate: 0);
 
         // Act & Assert
         expect(
@@ -171,9 +179,11 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when frameRate is out of range (> 120)', () {
+      test(
+          'should throw InvalidVideoException when frameRate is out of range (> 120)',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(frameRate: 121);
+        const config = VideoCompressionConfig(frameRate: 121);
 
         // Act & Assert
         expect(
@@ -183,9 +193,11 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when audioBitrate is out of range (< 32)', () {
+      test(
+          'should throw InvalidVideoException when audioBitrate is out of range (< 32)',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(audioBitrate: 31);
+        const config = VideoCompressionConfig(audioBitrate: 31);
 
         // Act & Assert
         expect(
@@ -195,9 +207,11 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException when audioBitrate is out of range (> 320)', () {
+      test(
+          'should throw InvalidVideoException when audioBitrate is out of range (> 320)',
+          () {
         // Arrange
-        final config = VideoCompressionConfig(audioBitrate: 321);
+        const config = VideoCompressionConfig(audioBitrate: 321);
 
         // Act & Assert
         expect(
@@ -209,7 +223,7 @@ void main() {
 
       test('should not throw when all values are valid', () {
         // Arrange
-        final config = VideoCompressionConfig(
+        const config = VideoCompressionConfig(
           maxWidth: 1920,
           maxHeight: 1080,
           quality: 80,
@@ -225,7 +239,7 @@ void main() {
     group('copyWith', () {
       test('should create copy with modified maxWidth', () {
         // Arrange
-        final config = VideoCompressionConfig(maxWidth: 1280);
+        const config = VideoCompressionConfig(maxWidth: 1280);
 
         // Act
         final copy = config.copyWith(maxWidth: 1920);
@@ -237,7 +251,7 @@ void main() {
 
       test('should create copy with multiple modified fields', () {
         // Arrange
-        final config = VideoCompressionConfig(
+        const config = VideoCompressionConfig(
           maxWidth: 1280,
           quality: 80,
           frameRate: 30,
@@ -262,7 +276,7 @@ void main() {
 
       test('should preserve original values when no parameters provided', () {
         // Arrange
-        final config = VideoCompressionConfig(
+        const config = VideoCompressionConfig(
           maxWidth: 1280,
           quality: 80,
         );
@@ -280,7 +294,7 @@ void main() {
   group('VideoCompressionProgress', () {
     test('should store progress value correctly', () {
       // Arrange
-      final progress = VideoCompressionProgress(
+      const progress = VideoCompressionProgress(
         progress: 0.5,
         status: 'Compressing...',
       );
@@ -292,7 +306,7 @@ void main() {
 
     test('should format toString correctly', () {
       // Arrange
-      final progress = VideoCompressionProgress(
+      const progress = VideoCompressionProgress(
         progress: 0.75,
         status: 'Processing',
       );
@@ -570,7 +584,8 @@ void main() {
         final nonExistentFile = File('/nonexistent/path.mp4');
 
         // Act & Assert
-        expect(() => videoCompression.cleanup(nonExistentFile), returnsNormally);
+        expect(
+            () => videoCompression.cleanup(nonExistentFile), returnsNormally);
       });
     });
   });
@@ -656,11 +671,13 @@ void main() {
   });
 
   group('Video Compression Performance', () {
-    test('should complete compression within reasonable time for short videos', () async {
+    test('should complete compression within reasonable time for short videos',
+        () async {
       // Test compression speed for < 30 second videos
     });
 
-    test('should complete compression within reasonable time for long videos', () async {
+    test('should complete compression within reasonable time for long videos',
+        () async {
       // Test compression speed for > 5 minute videos
     });
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/scheduler.dart';
 import 'memory_monitor.dart';
 
 /// Data priority level for unload decisions
@@ -82,8 +81,7 @@ class DataEntry {
   }
 
   /// Estimated size in MB
-  double get estimatedSizeMB =>
-      (estimatedSizeBytes ?? 0) / (1024 * 1024);
+  double get estimatedSizeMB => (estimatedSizeBytes ?? 0) / (1024 * 1024);
 
   @override
   String toString() {
@@ -197,8 +195,7 @@ class UnloadStatistics {
   });
 
   /// Total memory freed in MB
-  double get totalMemoryFreedMB =>
-      totalMemoryFreedBytes / (1024 * 1024);
+  double get totalMemoryFreedMB => totalMemoryFreedBytes / (1024 * 1024);
 
   /// Average memory freed per unload
   double get averageMemoryFreedMB {
@@ -270,17 +267,14 @@ class DataUnloadConfig {
     bool? enableDebugLogging,
   }) {
     return DataUnloadConfig(
-      autoUnloadOnWarning:
-          autoUnloadOnWarning ?? this.autoUnloadOnWarning,
-      autoUnloadOnCritical:
-          autoUnloadOnCritical ?? this.autoUnloadOnCritical,
+      autoUnloadOnWarning: autoUnloadOnWarning ?? this.autoUnloadOnWarning,
+      autoUnloadOnCritical: autoUnloadOnCritical ?? this.autoUnloadOnCritical,
       targetFreePercentageWarning:
           targetFreePercentageWarning ?? this.targetFreePercentageWarning,
       targetFreePercentageCritical:
           targetFreePercentageCritical ?? this.targetFreePercentageCritical,
       maxUnloadDuration: maxUnloadDuration ?? this.maxUnloadDuration,
-      prioritizeByPriority:
-          prioritizeByPriority ?? this.prioritizeByPriority,
+      prioritizeByPriority: prioritizeByPriority ?? this.prioritizeByPriority,
       prioritizeByVisibility:
           prioritizeByVisibility ?? this.prioritizeByVisibility,
       enableDebugLogging: enableDebugLogging ?? this.enableDebugLogging,
@@ -350,8 +344,7 @@ class DataUnloadStrategy {
   DateTime? _lastUnloadTime;
 
   /// Private constructor
-  DataUnloadStrategy._({required DataUnloadConfig config})
-      : _config = config;
+  DataUnloadStrategy._({required DataUnloadConfig config}) : _config = config;
 
   /// Get the singleton instance
   static DataUnloadStrategy get instance {
@@ -396,8 +389,10 @@ class DataUnloadStrategy {
 
     if (kDebugMode && effectiveConfig.enableDebugLogging) {
       debugPrint('DataUnloadStrategy initialized');
-      debugPrint('  Auto-unload on warning: ${effectiveConfig.autoUnloadOnWarning}');
-      debugPrint('  Auto-unload on critical: ${effectiveConfig.autoUnloadOnCritical}');
+      debugPrint(
+          '  Auto-unload on warning: ${effectiveConfig.autoUnloadOnWarning}');
+      debugPrint(
+          '  Auto-unload on critical: ${effectiveConfig.autoUnloadOnCritical}');
     }
   }
 
@@ -430,8 +425,10 @@ class DataUnloadStrategy {
 
     if (kDebugMode && _config.enableDebugLogging) {
       debugPrint('🔄 Auto-unload triggered ($alertLevel)');
-      debugPrint('  Current usage: ${(currentUsage / (1024 * 1024)).toStringAsFixed(2)} MB');
-      debugPrint('  Target free: ${(targetFreePercentage * 100).toStringAsFixed(0)}% = ${(targetFreeBytes / (1024 * 1024)).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Current usage: ${(currentUsage / (1024 * 1024)).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Target free: ${(targetPercentage * 100).toStringAsFixed(0)}% = ${(targetFreeBytes / (1024 * 1024)).toStringAsFixed(2)} MB');
     }
 
     await unloadOffScreenData(
@@ -533,7 +530,8 @@ class DataUnloadStrategy {
     }
 
     final startTime = DateTime.now();
-    final effectiveMaxDuration = maxDuration ?? _instance!._config.maxUnloadDuration;
+    final effectiveMaxDuration =
+        maxDuration ?? _instance!._config.maxUnloadDuration;
 
     int memoryFreed = 0;
     int entriesUnloaded = 0;
@@ -542,7 +540,8 @@ class DataUnloadStrategy {
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
       debugPrint('🧹 Starting data unload...');
-      debugPrint('  Target free: ${(targetFreeBytes / (1024 * 1024)).toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Target free: ${(targetFreeBytes / (1024 * 1024)).toStringAsFixed(2)} MB');
       debugPrint('  Max duration: ${effectiveMaxDuration.inMilliseconds}ms');
       debugPrint('  Only off-screen: $onlyOffScreen');
       debugPrint('  Max priority: ${maxPriority.name}');
@@ -609,7 +608,8 @@ class DataUnloadStrategy {
 
         await candidate.unloadCallback!();
 
-        memoryFreed += candidate.estimatedSizeBytes ?? (1024 * 1024); // 1 MB default
+        memoryFreed +=
+            candidate.estimatedSizeBytes ?? (1024 * 1024); // 1 MB default
         entriesUnloaded++;
 
         // Remove from tracking
@@ -620,7 +620,8 @@ class DataUnloadStrategy {
         }
       } catch (e) {
         failedUnloads++;
-        errors.add('Failed to unload ${candidate.dataType}:${candidate.id}: $e');
+        errors
+            .add('Failed to unload ${candidate.dataType}:${candidate.id}: $e');
 
         if (kDebugMode && _instance!._config.enableDebugLogging) {
           debugPrint('    ✗ Failed: $e');
@@ -653,7 +654,8 @@ class DataUnloadStrategy {
     if (kDebugMode && _instance!._config.enableDebugLogging) {
       debugPrint('🧹 Unload complete');
       debugPrint('  Entries unloaded: $entriesUnloaded');
-      debugPrint('  Memory freed: ${result.memoryFreedMB.toStringAsFixed(2)} MB');
+      debugPrint(
+          '  Memory freed: ${result.memoryFreedMB.toStringAsFixed(2)} MB');
       debugPrint('  Failed: $failedUnloads');
       debugPrint('  Duration: ${duration.inMilliseconds}ms');
     }
@@ -681,7 +683,7 @@ class DataUnloadStrategy {
       totalUnloads: _instance!._totalUnloads,
       totalEntriesUnloaded: _instance!._totalEntriesUnloaded,
       totalMemoryFreedBytes: _instance!._totalMemoryFreedBytes,
-      totalFailedUnloads: _instance!_totalFailedUnloads,
+      totalFailedUnloads: _instance!._totalFailedUnloads,
       averageDuration: avgDuration,
       lastUnloadTime: _instance!._lastUnloadTime,
     );

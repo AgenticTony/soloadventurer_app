@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:solo_adventurer/features/destination_discovery/application/providers/recommendation_provider.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/personalized_recommendation.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:solo_adventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/recommendation_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/personalized_recommendation.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
 
 // Mock classes
 class MockDestinationRepository extends Mock implements DestinationRepository {}
@@ -22,7 +22,7 @@ void main() {
       location: (lat: 35.6762, lng: 139.6503),
       safetyScore: 8.5,
       soloSuitabilityScore: 8.0,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 8.5,
         nightlife: 7.0,
         walkability: 9.0,
@@ -47,7 +47,7 @@ void main() {
       location: (lat: 35.0116, lng: 135.7681),
       safetyScore: 9.0,
       soloSuitabilityScore: 8.5,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 9.0,
         nightlife: 6.0,
         walkability: 8.5,
@@ -72,7 +72,7 @@ void main() {
       location: (lat: 36.0, lng: 138.0),
       safetyScore: 7.5,
       soloSuitabilityScore: 7.0,
-      soloSuitabilityFactors: SoloSuitabilityFactors(
+      soloSuitabilityFactors: const SoloSuitabilityFactors(
         safety: 7.5,
         nightlife: 5.0,
         walkability: 7.0,
@@ -169,7 +169,8 @@ void main() {
         // Wait for auto-load
         await Future.delayed(const Duration(milliseconds: 100));
 
-        verify(() => mockRepository.getPersonalizedRecommendations(testUserId)).called(1);
+        verify(() => mockRepository.getPersonalizedRecommendations(testUserId))
+            .called(1);
       });
     });
 
@@ -179,7 +180,8 @@ void main() {
 
         await notifier.loadRecommendations();
 
-        verify(() => mockRepository.getPersonalizedRecommendations(testUserId)).called(1);
+        verify(() => mockRepository.getPersonalizedRecommendations(testUserId))
+            .called(1);
         expect(notifier.state.value, isNotNull);
         expect(notifier.state.value!.recommendation?.userId, testUserId);
         expect(notifier.state.value!.destinations.length, 3);
@@ -262,7 +264,8 @@ void main() {
         final result = await notifier.refreshIfExpired();
 
         expect(result, isTrue);
-        verify(() => mockRepository.getPersonalizedRecommendations(testUserId)).called(1);
+        verify(() => mockRepository.getPersonalizedRecommendations(testUserId))
+            .called(1);
       });
 
       test('should not refresh when recommendations are valid', () async {
@@ -272,7 +275,8 @@ void main() {
 
         expect(result, isFalse);
         // Should not call repository again
-        verify(() => mockRepository.getPersonalizedRecommendations(any())).called(1); // Only initial call
+        verify(() => mockRepository.getPersonalizedRecommendations(any()))
+            .called(1); // Only initial call
       });
 
       test('should return false when state has no value', () async {
@@ -295,7 +299,9 @@ void main() {
     });
 
     group('getters', () {
-      test('highMatchRecommendations should return destinations with score >= 0.7', () async {
+      test(
+          'highMatchRecommendations should return destinations with score >= 0.7',
+          () async {
         notifier.clear();
         await notifier.loadRecommendations();
 
@@ -329,7 +335,8 @@ void main() {
         expect(sorted[2].matchScore, 0.60);
       });
 
-      test('isExpired should return true for expired recommendations', () async {
+      test('isExpired should return true for expired recommendations',
+          () async {
         notifier.clear();
         when(() => mockRepository.getPersonalizedRecommendations(any()))
             .thenAnswer((_) async => expiredRecommendation);
@@ -376,7 +383,8 @@ void main() {
         expect(notifier.totalCount, 10);
       });
 
-      test('getters should return empty/null when state has no value', () async {
+      test('getters should return empty/null when state has no value',
+          () async {
         notifier.clear();
 
         expect(notifier.highMatchRecommendations.isEmpty, isTrue);
@@ -391,7 +399,8 @@ void main() {
     });
 
     group('state helpers', () {
-      test('isExpired should correctly identify expired recommendations', () async {
+      test('isExpired should correctly identify expired recommendations',
+          () async {
         notifier.clear();
         when(() => mockRepository.getPersonalizedRecommendations(any()))
             .thenAnswer((_) async => expiredRecommendation);

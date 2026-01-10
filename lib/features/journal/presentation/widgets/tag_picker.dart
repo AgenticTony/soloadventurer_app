@@ -19,7 +19,9 @@ class TagPicker extends ConsumerWidget {
     final entryTagsState = ref.watch(entryTagsProvider);
 
     // Load available tags if not loaded
-    if (!entryTagsState.isLoading && entryTagsState.tags.isEmpty && entryTagsState.error == null) {
+    if (!entryTagsState.isLoading &&
+        entryTagsState.tags.isEmpty &&
+        entryTagsState.error == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(entryTagsProvider.notifier).loadAvailableTags();
       });
@@ -111,8 +113,10 @@ class _TagsChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedTags = tags.where((t) => selectedTagIds.contains(t.id)).toList();
-    final availableTags = tags.where((t) => !selectedTagIds.contains(t.id)).toList();
+    final selectedTags =
+        tags.where((t) => selectedTagIds.contains(t.id)).toList();
+    final availableTags =
+        tags.where((t) => !selectedTagIds.contains(t.id)).toList();
 
     return Card(
       child: Padding(
@@ -290,8 +294,8 @@ class _TagManagementSheetState extends ConsumerState<_TagManagementSheet> {
                                   onToggle: () {
                                     widget.entryTagsNotifier.toggleTag(tag.id);
                                     widget.onTagsChanged(
-                                      List.from(widget
-                                          .entryTagsNotifier.state.selectedTagIds),
+                                      List.from(widget.entryTagsNotifier.state
+                                          .selectedTagIds),
                                     );
                                   },
                                 );

@@ -36,9 +36,8 @@ final loggingServiceProvider = Provider<LoggingService>((ref) {
 ///
 /// Manages conflict resolution state and user interactions.
 /// Uses AsyncValue pattern for loading, error, and data states.
-final conflictResolutionNotifierProvider =
-    StateNotifierProvider<ConflictResolutionNotifier,
-        AsyncValue<ConflictResolutionState>>((ref) {
+final conflictResolutionNotifierProvider = StateNotifierProvider<
+    ConflictResolutionNotifier, AsyncValue<ConflictResolutionState>>((ref) {
   final resolver = ref.watch(conflictResolverProvider);
   final syncService = ref.watch(syncServiceProvider);
   final logger = ref.watch(loggingServiceProvider);
@@ -61,8 +60,8 @@ final conflictResolutionNotifierProvider =
 ///
 /// Provides a stream of state updates for reactive UI.
 /// This is useful for widgets that need to react to state changes.
-final conflictResolutionStateProvider = StreamProvider<
-    AsyncValue<ConflictResolutionState>>((ref) {
+final conflictResolutionStateProvider =
+    StreamProvider<AsyncValue<ConflictResolutionState>>((ref) {
   final notifier = ref.watch(conflictResolutionNotifierProvider);
   return notifier.stream;
 });
@@ -73,16 +72,16 @@ final conflictResolutionStateProvider = StreamProvider<
 /// Returns null if state is loading or error.
 final currentConflictResolutionStateProvider =
     Provider<ConflictResolutionState?>((ref) {
-      final asyncState = ref.watch(conflictResolutionNotifierProvider);
-      return asyncState.valueOrNull;
-    });
+  final asyncState = ref.watch(conflictResolutionNotifierProvider);
+  return asyncState.value;
+});
 
 /// Provider for pending conflicts count
 ///
 /// Provides the number of conflicts waiting to be resolved.
 /// Useful for showing badge counts in UI.
 final pendingConflictsCountProvider = Provider<int>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).valueOrNull;
+  final state = ref.watch(conflictResolutionNotifierProvider).value;
   return state?.pendingCount ?? 0;
 });
 
@@ -91,7 +90,7 @@ final pendingConflictsCountProvider = Provider<int>((ref) {
 /// Provides a boolean indicating if there are pending or active conflicts.
 /// Useful for showing/hiding conflict indicators.
 final hasConflictsProvider = Provider<bool>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).valueOrNull;
+  final state = ref.watch(conflictResolutionNotifierProvider).value;
   return state?.hasConflicts ?? false;
 });
 
@@ -99,7 +98,7 @@ final hasConflictsProvider = Provider<bool>((ref) {
 ///
 /// Provides the conflict currently being resolved, if any.
 final activeConflictProvider = Provider<ConflictInfo?>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).valueOrNull;
+  final state = ref.watch(conflictResolutionNotifierProvider).value;
   return state?.activeConflict;
 });
 
@@ -107,7 +106,7 @@ final activeConflictProvider = Provider<ConflictInfo?>((ref) {
 ///
 /// Provides the result of the last successful resolution, if any.
 final resolutionResultProvider = Provider<ConflictResolution?>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).valueOrNull;
+  final state = ref.watch(conflictResolutionNotifierProvider).value;
   return state?.resolution;
 });
 
@@ -135,7 +134,7 @@ enum ConflictResolutionStatus {
 final conflictResolutionStatusProvider =
     Provider<ConflictResolutionStatus>((ref) {
   final state = ref.watch(conflictResolutionNotifierProvider);
-  final value = state.valueOrNull;
+  final value = state.value;
 
   if (value == null) {
     return ConflictResolutionStatus.idle;

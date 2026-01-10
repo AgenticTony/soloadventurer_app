@@ -6,8 +6,7 @@ part of 'safety_data.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$SafetyDataImpl _$$SafetyDataImplFromJson(Map<String, dynamic> json) =>
-    _$SafetyDataImpl(
+_SafetyData _$SafetyDataFromJson(Map<String, dynamic> json) => _SafetyData(
       currentStatus: json['currentStatus'] == null
           ? null
           : SafetyStatus.fromJson(
@@ -36,7 +35,7 @@ _$SafetyDataImpl _$$SafetyDataImplFromJson(Map<String, dynamic> json) =>
           : SafetyAlert.fromJson(json['selectedAlert'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$$SafetyDataImplToJson(_$SafetyDataImpl instance) =>
+Map<String, dynamic> _$SafetyDataToJson(_SafetyData instance) =>
     <String, dynamic>{
       'currentStatus': instance.currentStatus,
       'contacts': instance.contacts,

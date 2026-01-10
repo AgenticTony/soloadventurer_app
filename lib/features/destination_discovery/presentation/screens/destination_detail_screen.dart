@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 import '../../domain/models/destination.dart';
 import '../../domain/models/saved_destination.dart';
 import '../../application/providers/destination_detail_provider.dart';
@@ -51,7 +51,8 @@ class DestinationDetailScreen extends ConsumerStatefulWidget {
       _DestinationDetailScreenState();
 }
 
-class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScreen>
+class _DestinationDetailScreenState
+    extends ConsumerState<DestinationDetailScreen>
     with SingleTickerProviderStateMixin {
   /// Controller for image gallery page view
   late PageController _pageController;
@@ -93,7 +94,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
 
   /// Load related destinations
   Future<void> _loadRelatedDestinations() async {
-    final detailNotifier = ref.read(destinationDetailProvider(widget.destinationId).notifier);
+    final detailNotifier =
+        ref.read(destinationDetailProvider(widget.destinationId).notifier);
     try {
       await detailNotifier.loadRelatedDestinations();
     } catch (error) {
@@ -103,7 +105,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
 
   /// Refresh destination data
   Future<void> _refreshDestination() async {
-    final detailNotifier = ref.read(destinationDetailProvider(widget.destinationId).notifier);
+    final detailNotifier =
+        ref.read(destinationDetailProvider(widget.destinationId).notifier);
     try {
       await detailNotifier.refresh();
       await _loadRelatedDestinations();
@@ -225,14 +228,14 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final detailState = ref.watch(destinationDetailProvider(widget.destinationId));
+    final detailState =
+        ref.watch(destinationDetailProvider(widget.destinationId));
 
     // Get auth state for save functionality
     final authState = ref.watch(authNotifierProvider);
     final userId = authState.value?.user?.id;
-    final savedState = userId != null
-        ? ref.watch(savedDestinationsProvider(userId))
-        : null;
+    final savedState =
+        userId != null ? ref.watch(savedDestinationsProvider(userId)) : null;
 
     return Scaffold(
       body: detailState.when(
@@ -281,7 +284,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
 
                         // Related destinations
                         if (state.hasRelatedDestinations)
-                          _buildRelatedDestinationsSection(state.relatedDestinations, theme),
+                          _buildRelatedDestinationsSection(
+                              state.relatedDestinations, theme),
 
                         // Bottom padding for FAB
                         const SizedBox(height: 80),
@@ -373,7 +377,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
                   ),
                 ),
               ),
-              errorWidget: (context, url, error) => _buildImagePlaceholder(theme),
+              errorWidget: (context, url, error) =>
+                  _buildImagePlaceholder(theme),
             );
           },
         ),
@@ -441,7 +446,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
               ),
               if (destination.isHiddenGem)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.amber.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
@@ -729,7 +735,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
   }
 
   /// Builds floating action buttons
-  Widget _buildFloatingActionButtons(Destination destination, ThemeData theme, bool isSaved) {
+  Widget _buildFloatingActionButtons(
+      Destination destination, ThemeData theme, bool isSaved) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -780,7 +787,8 @@ class _DestinationDetailScreenState extends ConsumerState<DestinationDetailScree
       appBar: AppBar(),
       body: DestinationEmptyStateWidget(
         title: 'Destination not found',
-        message: 'The destination you\'re looking for doesn\'t exist or has been removed. '
+        message:
+            'The destination you\'re looking for doesn\'t exist or has been removed. '
             'Try browsing our other amazing destinations!',
         icon: Icons.place,
         actionLabel: 'Browse Destinations',

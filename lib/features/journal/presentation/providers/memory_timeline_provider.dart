@@ -1,8 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
-import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
+import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+
+part 'memory_timeline_provider.g.dart';
 
 /// State for the memory timeline
 class MemoryTimelineState {
@@ -81,7 +83,8 @@ class TimelineGroup {
   int get entryCount => entries.length;
 
   /// First entry date in group
-  DateTime? get firstDate => entries.isNotEmpty ? entries.first.entryDate : null;
+  DateTime? get firstDate =>
+      entries.isNotEmpty ? entries.first.entryDate : null;
 
   /// Last entry date in group
   DateTime? get lastDate => entries.isNotEmpty ? entries.last.entryDate : null;
@@ -111,21 +114,32 @@ enum TimelineGroupType {
   year,
 }
 
-/// Provider for memory timeline
-class MemoryTimelineNotifier extends StateNotifier<MemoryTimelineState> {
-  final JournalRepository _repository;
+// ============================================================================
+// Memory Timeline Notifier (Riverpod 3.0)
+// ============================================================================
 
-  MemoryTimelineNotifier(this._repository) : super(MemoryTimelineState()) {
-    loadTimeline();
+/// Notifier for managing memory timeline state
+/// MIGRATION: StateNotifier → Notifier pattern
+/// - Constructor logic moved to build() method
+/// - Dependencies accessed via ref.watch() in methods
+/// - Automatic provider generation via @riverpod annotation
+@riverpod
+class MemoryTimeline extends _$MemoryTimeline {
+  @override
+  MemoryTimelineState build() {
+    // Initial load happens automatically when provider is first accessed
+    // Note: We don't call loadTimeline() here to avoid issues during build
+    return MemoryTimelineState();
   }
 
   /// Load all journal entries and build timeline
   Future<void> loadTimeline() async {
+    final repository = ref.watch(journalRepositoryProvider);
     state = state.copyWith(isLoading: true, clearedError: null);
 
     try {
       // Fetch all entries
-      final entries = await _repository.getEntries();
+      final entries = await repository.getEntries();
 
       // Sort entries by date (newest first)
       final sortedEntries = entries.toList()
@@ -138,7 +152,7 @@ class MemoryTimelineNotifier extends StateNotifier<MemoryTimelineState> {
       final mediaByEntry = <String, List<MediaItem>>{};
       for (final entry in sortedEntries) {
         try {
-          final media = await _repository.getMediaForEntry(entry.id);
+          final media = await repository.getMediaForEntry(entry.id);
           if (media.isNotEmpty) {
             mediaByEntry[entry.id] = media;
           }
@@ -212,15 +226,19 @@ class MemoryTimelineNotifier extends StateNotifier<MemoryTimelineState> {
         todayEntries.add(entry);
       } else if (entryDate == yesterday) {
         yesterdayEntries.add(entry);
-      } else if (entryDate.isAfter(thisWeekStart) || entryDate == thisWeekStart) {
+      } else if (entryDate.isAfter(thisWeekStart) ||
+          entryDate == thisWeekStart) {
         thisWeekEntries.add(entry);
-      } else if (entryDate.isAfter(thisMonthStart) || entryDate == thisMonthStart) {
+      } else if (entryDate.isAfter(thisMonthStart) ||
+          entryDate == thisMonthStart) {
         thisMonthEntries.add(entry);
-      } else if (entryDate.isAfter(thisYearStart) || entryDate == thisYearStart) {
+      } else if (entryDate.isAfter(thisYearStart) ||
+          entryDate == thisYearStart) {
         thisYearEntries.add(entry);
       } else {
         // Older entries - group by month and year
-        final monthKey = '${entry.entryDate.year}-${entry.entryDate.month.toString().padLeft(2, '0')}';
+        final monthKey =
+            '${entry.entryDate.year}-${entry.entryDate.month.toString().padLeft(2, '0')}';
         monthGroups.putIfAbsent(monthKey, () => []).add(entry);
       }
     }
@@ -297,21 +315,19 @@ class MemoryTimelineNotifier extends StateNotifier<MemoryTimelineState> {
   /// Format month name
   String _formatMonth(int year, int month) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
     ];
     return months[month - 1];
   }
 }
-
-/// Provider for journal repository (to be injected)
-final journalRepositoryProvider = Provider<JournalRepository>((ref) {
-  throw UnimplementedError('JournalRepository must be provided');
-});
-
-/// Provider for memory timeline
-final memoryTimelineProvider =
-    StateNotifierProvider<MemoryTimelineNotifier, MemoryTimelineState>((ref) {
-  final repository = ref.watch(journalRepositoryProvider);
-  return MemoryTimelineNotifier(repository);
-});

@@ -1,0 +1,140 @@
+{
+  "security_hardening": [
+    {
+      "id": "sec-001",
+      "type": "security_hardening",
+      "title": "URGENT: Rotate and remove hardcoded production secrets from .env files",
+      "description": "The .env and .env.backup files contain actual production secrets, not placeholders: AWS_SECRET_ACCESS_KEY with a real key, LLM_API_KEY with active OpenAI API key (sk-proj-*), OPENAI_API_KEY with service account key, and SUPABASE_SERVICE_KEY with a valid JWT token. These are committed to the repository or accessible via worktrees.",
+      "rationale": "This is a CRITICAL security breach requiring immediate action. Hardcoded production secrets give attackers direct access to AWS resources (bills, data, infrastructure), OpenAI API (accumulating charges), and Supabase database (all user data). Even if .env is .gitignored, it exists in worktrees and backup files.",
+      "category": "secrets_management",
+      "severity": "critical",
+      "affectedFiles": [
+        ".env",
+        ".env.backup",
+        "test_supabase.py",
+        "test_embedding.py",
+        "aws-kb-mcp.sh"
+      ],
+      "vulnerability": "CWE-798: Use of Hard-coded Credentials",
+      "currentRisk": "Active AWS secret access key, OpenAI API keys, and Supabase service key are stored in plaintext. Test files also contain hardcoded API keys. Any exposure (git history, worktree access, file sharing) compromises production infrastructure and user data.",
+      "remediation": "IMMEDIATE ACTIONS:\n1) RIGHT NOW: Revoke/rotate AWS_SECRET_ACCESS_KEY in AWS IAM console\n2) RIGHT NOW: Revoke OpenAI API keys (sk-proj-5NQ4HzhxYtbj1flaGa2EtRT..., sk-svcacct-KtQ9Xks2drnEPi1LAwB1sxO6AE...)\n3) RIGHT NOW: Revoke Supabase service key (eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)\n4) Replace all .env values with placeholder text (e.g., 'your_aws_secret_key')\n5) Add .env, .env.backup to .gitignore if not already there\n6) Remove test scripts with hardcoded secrets or use env variables\n7) Scan git history for these secrets using git-secrets or trufflehog\n8) Setup CI/CD secret scanning for future commits\n9) Use environment-specific configs loaded from secure storage (CI/CD secrets, AWS Secrets Manager)",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html",
+        "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Review_Web_Page_Content_for_Information_Leakage",
+        "https://docs.gitlab.com/ee/user/project/repository/secret_detection.html"
+      ],
+      "compliance": ["SOC2", "PCI-DSS", "GDPR", "HIPAA"]
+    },
+    {
+      "id": "sec-002",
+      "type": "security_hardening",
+      "title": "Remove .env files from Flutter app assets bundle to prevent secret extraction",
+      "description": "The pubspec.yaml includes '.env' and '.env.example' in the assets section (lines 179-181), causing Flutter to bundle these files into the mobile app binary. Anyone extracting the app bundle can access all environment variables and API keys.",
+      "rationale": "Mobile apps can be easily decompiled and assets extracted. Bundling .env files into the app binary means all secrets become accessible to attackers. Combined with the hardcoded production secrets in .env, this is an active data breach.",
+      "category": "secrets_management",
+      "severity": "critical",
+      "affectedFiles": [
+        "pubspec.yaml",
+        "lib/app/bootstrap.dart"
+      ],
+      "vulnerability": "CWE-312: Cleartext Storage of Sensitive Information",
+      "currentRisk": "Production AWS keys, OpenAI keys, and Supabase tokens are bundled into the app. Anyone can download the app, extract the .env from assets, and gain full access to cloud infrastructure and user data.",
+      "remediation": "1) IMMEDIATELY remove '.env' and '.env.example' from pubspec.yaml assets section\n2) Use --dart-define for compile-time environment variables in production builds\n3) For development, use .env files that are .gitignored and NOT bundled\n4) Add kReleaseMode check in bootstrap.dart to prevent .env loading in production\n5) Store runtime secrets in platform secure storage (Keychain/Keystore)\n6) Consider backend proxy for sensitive API calls instead of direct access",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/312.html",
+        "https://owasp.org/www-project-mobile-top-10/2024-risks/m1-improper-platform-usage",
+        "https://docs.flutter.dev/deployment/obfuscate#dart-define"
+      ],
+      "compliance": ["SOC2", "PCI-DSS", "OWASP Mobile M1"]
+    },
+    {
+      "id": "sec-003",
+      "type": "security_hardening",
+      "title": "Add .env to .gitignore and implement secret detection pre-commit hooks",
+      "description": "The .gitignore file does not explicitly exclude .env files. While .env is commonly excluded, the lack of explicit blocking increases risk of accidental commits. Given the actual production secrets currently in .env, this is urgent.",
+      "rationale": "Defense in depth requires multiple layers of protection. Explicit .gitignore rules prevent accidental secret commits. Pre-commit hooks provide automated detection. The current .env contains real production credentials, making this an active breach risk.",
+      "category": "configuration",
+      "severity": "high",
+      "affectedFiles": [
+        ".gitignore",
+        ".env"
+      ],
+      "vulnerability": "CWE-312: Cleartext Storage of Sensitive Information",
+      "currentRisk": ".env with production secrets could be accidentally committed. .env.backup also contains secrets. No automated secret detection in commits. Worktrees may expose .env files.",
+      "remediation": "1) Add to .gitignore:\n   # Environment files with secrets\n   .env\n   .env.local\n   .env.*.local\n   .env.backup\n2) Install git-secrets: https://github.com/awslabs/git-secrets\n3) Add secret patterns: AWS_SECRET_ACCESS_KEY, sk-proj-, sk-svcacct-, eyJhbGci\n4) Setup pre-commit hook: git secrets --install\n5) Run: git secrets --register-aws (to detect AWS keys)\n6) Scan history: git secrets --scan-history\n7) Consider GitHub Secret Scanning or GitLab Secret Detection",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/312.html",
+        "https://github.com/awslabs/git-secrets",
+        "https://github.com/trufflesecurity/trufflehog"
+      ],
+      "compliance": ["SOC2", "PCI-DSS"]
+    },
+    {
+      "id": "sec-004",
+      "type": "security_hardening",
+      "title": "Reduce excessive debug logging of authentication tokens and session data",
+      "description": "The codebase contains extensive debugPrint() statements in authentication flows that log session expiry times, token refresh schedules, connectivity status, and authentication states. Token manager alone has 50+ debug statements.",
+      "rationale": "While debugPrint() only outputs in debug mode, logs may be captured by crash reporting tools, logging SDKs, or device monitoring. Excessive auth logging increases risk of token leakage, session hijacking, and exposing user activity patterns.",
+      "category": "data_protection",
+      "severity": "medium",
+      "affectedFiles": [
+        "lib/features/auth/infrastructure/services/token_manager.dart",
+        "lib/features/auth/infrastructure/logging/token_audit_logger.dart",
+        "lib/app/bootstrap.dart",
+        "lib/features/auth/data/datasources/auth_remote_data_source_impl.dart"
+      ],
+      "vulnerability": "CWE-532: Insertion of Sensitive Information into Log File",
+      "currentRisk": "Token lifecycle, session expiry, auth state transitions, and connectivity patterns are logged. In debug builds or crash reports, this reveals user authentication patterns and token validity windows.",
+      "remediation": "1) Audit all debugPrint() for sensitive data (tokens, emails, timing)\n2) Remove/sanitize logs containing auth state or timing info\n3) Replace with proper logging service that redacts in production\n4) Use kDebugMode guards: if (kDebugMode) debugPrint(...)\n5) Ensure CloudWatch excludes sensitive fields\n6) Configure crash reporting to exclude auth logs",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/532.html",
+        "https://owasp.org/www-project-mobile-top-10/2024-risks/M7-Insecure-Logging",
+        "https://docs.flutter.dev/testing/code-debugging#logging"
+      ],
+      "compliance": ["SOC2", "PCI-DSS", "GDPR"]
+    },
+    {
+      "id": "sec-005",
+      "type": "security_hardening",
+      "title": "Implement SSL certificate pinning to prevent man-in-the-middle attacks",
+      "description": "The application uses Dio for API communication but does not implement SSL certificate pinning. This creates vulnerability to MITM attacks, especially for travelers using public WiFi networks where attackers may have compromised device CA stores.",
+      "rationale": "Without certificate pinning, the app trusts any certificate signed by a trusted CA. Compromised CAs, malicious apps, or attackers on public WiFi can intercept communications. Travelers using airport/cafe WiFi are at heightened risk. Auth tokens and personal data could be stolen.",
+      "category": "data_protection",
+      "severity": "high",
+      "affectedFiles": [
+        "lib/core/api/client/api_client.dart",
+        "lib/core/api/interceptors/auth_interceptor.dart"
+      ],
+      "vulnerability": "CWE-295: Improper Certificate Validation",
+      "currentRisk": "No certificate pinning for API communications to soloadventurer.com, AWS Cognito, or Supabase. Auth tokens, travel plans, and personal data vulnerable to interception on compromised networks.",
+      "remediation": "1) Implement certificate pinning using dio's SecurityContext or http_certificate_pinning package\n2) Extract leaf certificates from api.soloadventurer.com, cognito-idp.us-east-1.amazonaws.com, *.supabase.co\n3) Store certificate hashes in app\n4) Validate server certs against pinned hashes on every request\n5) Support pin updates via app updates (avoid out-of-date pins)\n6) Consider Public Key Pinning for better rotation\n7) Test with mitmproxy to verify pinning works",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/295.html",
+        "https://owasp.org/www-project-mobile-app-security/",
+        "https://pub.dev/packages/http_certificate_pinning",
+        "https://developer.apple.com/news/?id=1222022"
+      ],
+      "compliance": ["OWASP Mobile M3", "PCI-DSS"]
+    }
+  ],
+  "metadata": {
+    "dependenciesScanned": 38,
+    "knownVulnerabilities": 0,
+    "filesAnalyzed": 267,
+    "criticalIssues": 2,
+    "highIssues": 2,
+    "mediumIssues": 1,
+    "lowIssues": 0,
+    "generatedAt": "2025-01-07T14:30:00Z",
+    "summary": "CRITICAL: Immediate action required to rotate hardcoded production secrets in .env files. Found active AWS, OpenAI, and Supabase credentials in plaintext. Also critical: .env files are bundled into the app binary, exposing all secrets to anyone who extracts the app. High priority: add .env to .gitignore and implement secret scanning. App has good security foundations (token encryption, secure storage usage) but these secret management issues create active breach risk.",
+    "positiveFindings": [
+      "Strong token encryption: AES-256-GCM with PBKDF2 (100,000 iterations)",
+      "Proper use of flutter_secure_storage for token persistence",
+      "Comprehensive suspicious activity detection (impossible travel, rate limiting)",
+      "Token rotation support with exponential backoff",
+      "Good session management with token refresh automation",
+      "No SQL injection risks (uses Cognito SDK and Supabase client libs)",
+      "Security-aware architecture with dedicated security services"
+    ]
+  }
+}

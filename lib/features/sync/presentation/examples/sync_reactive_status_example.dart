@@ -93,20 +93,20 @@ class _AppBarStatusIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final status = ref.watch(globalSyncStatusProvider);
+    final status = ref.watch(globalSyncOperationStatusProvider);
     final queueSize = ref.watch(globalQueueSizeProvider);
 
     return Padding(
       padding: const EdgeInsets.only(right: 16),
       child: Row(
         children: [
-          SyncStatusIcon(
+          SyncOperationStatusIcon(
             status: status,
             size: 20,
           ),
           if (queueSize > 0) ...[
             const SizedBox(width: 4),
-            SyncStatusBadge(
+            SyncOperationStatusBadge(
               count: queueSize,
               size: 16,
             ),
@@ -126,8 +126,8 @@ class _StatusOverviewCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final status = ref.watch(globalSyncStatusProvider);
-    final statusText = ref.watch(globalSyncStatusTextProvider);
+    final status = ref.watch(globalSyncOperationStatusProvider);
+    final statusText = ref.watch(globalSyncOperationStatusTextProvider);
 
     final theme = Theme.of(context);
 
@@ -136,7 +136,7 @@ class _StatusOverviewCard extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            SyncStatusIcon(
+            SyncOperationStatusIcon(
               status: status,
               size: 48,
               withBackground: true,
@@ -178,7 +178,7 @@ class _MultipleIndicatorsRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final status = ref.watch(globalSyncStatusProvider);
+    final status = ref.watch(globalSyncOperationStatusProvider);
     final queueSize = ref.watch(globalQueueSizeProvider);
     final isSyncing = ref.watch(isGloballySyncingProvider);
 
@@ -199,7 +199,7 @@ class _MultipleIndicatorsRow extends ConsumerWidget {
                 // Indicator 1: Icon only
                 Column(
                   children: [
-                    SyncStatusIcon(status: status),
+                    SyncOperationStatusIcon(status: status),
                     const SizedBox(height: 8),
                     const Text('Icon'),
                   ],
@@ -207,9 +207,9 @@ class _MultipleIndicatorsRow extends ConsumerWidget {
                 // Indicator 2: Icon with badge
                 Column(
                   children: [
-                    SyncStatusBadge(
+                    SyncOperationStatusBadge(
                       count: queueSize,
-                      child: SyncStatusIcon(status: status),
+                      child: SyncOperationStatusIcon(status: status),
                     ),
                     const SizedBox(height: 8),
                     const Text('Badge'),
@@ -232,7 +232,7 @@ class _MultipleIndicatorsRow extends ConsumerWidget {
                 // Indicator 4: Small indicator
                 Column(
                   children: [
-                    SyncStatusIndicator(status: status),
+                    SyncOperationStatusIndicator(status: status),
                     const SizedBox(height: 8),
                     const Text('Dot'),
                   ],
@@ -407,7 +407,8 @@ class _ActionButtons extends ConsumerWidget {
                       // TODO: Trigger sync operation
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Sync triggered - watch all indicators update'),
+                          content: Text(
+                              'Sync triggered - watch all indicators update'),
                         ),
                       );
                     },
@@ -420,7 +421,8 @@ class _ActionButtons extends ConsumerWidget {
                 // TODO: Add operations to queue
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Operations added - watch queue count update'),
+                    content:
+                        Text('Operations added - watch queue count update'),
                   ),
                 );
               },

@@ -34,7 +34,6 @@ class SafetyRoutes {
   static const locationSharing = '/safety/location-sharing';
 
   /// Private constructor to prevent instantiation
-  const SafetyRoutes._();
 
   /// Generate routes for safety feature
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {

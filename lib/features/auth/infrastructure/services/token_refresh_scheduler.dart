@@ -1,5 +1,3 @@
-import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
@@ -101,7 +99,8 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// This keeps the session but stops the refresh timer.
   void pause() {
     if (_status != TokenRefreshSchedulerStatus.running) {
-      debugPrint('TokenRefreshScheduler: Cannot pause - scheduler is not running');
+      debugPrint(
+          'TokenRefreshScheduler: Cannot pause - scheduler is not running');
       return;
     }
 
@@ -112,7 +111,8 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
     // Stop the tracking timer but keep the session
     _expirationTracker.stopTracking();
 
-    debugPrint('TokenRefreshScheduler: Scheduler paused (timer stopped, session retained)');
+    debugPrint(
+        'TokenRefreshScheduler: Scheduler paused (timer stopped, session retained)');
   }
 
   /// Resumes the scheduler (e.g., when app returns to foreground)
@@ -120,7 +120,8 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// This restarts the refresh timer with the retained session.
   void resume() {
     if (_status != TokenRefreshSchedulerStatus.paused) {
-      debugPrint('TokenRefreshScheduler: Cannot resume - scheduler is not paused');
+      debugPrint(
+          'TokenRefreshScheduler: Cannot resume - scheduler is not paused');
       return;
     }
 
@@ -146,7 +147,8 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         // App returned to foreground
-        debugPrint('TokenRefreshScheduler: App resumed - checking if refresh needed');
+        debugPrint(
+            'TokenRefreshScheduler: App resumed - checking if refresh needed');
         _handleAppResumed();
         break;
 
@@ -184,17 +186,21 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
     }
 
     // Check if token needs immediate refresh
-    final expirationResult = _expirationTracker.checkExpiration(_currentSession!);
+    final expirationResult =
+        _expirationTracker.checkExpiration(_currentSession!);
 
     if (expirationResult.isExpired) {
-      debugPrint('TokenRefreshScheduler: Token is expired, immediate refresh needed');
+      debugPrint(
+          'TokenRefreshScheduler: Token is expired, immediate refresh needed');
       // Resume will trigger immediate refresh if needed
     } else if (expirationResult.shouldRefresh) {
       debugPrint('TokenRefreshScheduler: Token should be refreshed soon');
       // Resume will schedule refresh appropriately
     } else {
-      final minutesUntilRefresh = expirationResult.timeUntilRefresh?.inMinutes ?? 0;
-      debugPrint('TokenRefreshScheduler: Token is valid, refresh in $minutesUntilRefresh minutes');
+      final minutesUntilRefresh =
+          expirationResult.timeUntilRefresh?.inMinutes ?? 0;
+      debugPrint(
+          'TokenRefreshScheduler: Token is valid, refresh in $minutesUntilRefresh minutes');
     }
 
     // Resume the scheduler

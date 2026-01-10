@@ -6,6 +6,65 @@ part of 'trusted_contacts_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Notifier for managing trusted contacts state
+/// Handles CRUD operations for trusted contacts
+///
+/// Riverpod 2 Compliant:
+/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// - NO getters in state - all derived values are fields
+/// - UI reads STATE only via ref.watch()
+/// - UI calls methods via ref.read(provider.notifier)
+
+@ProviderFor(TrustedContacts)
+final trustedContactsProvider = TrustedContactsProvider._();
+
+/// Notifier for managing trusted contacts state
+/// Handles CRUD operations for trusted contacts
+///
+/// Riverpod 2 Compliant:
+/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// - NO getters in state - all derived values are fields
+/// - UI reads STATE only via ref.watch()
+/// - UI calls methods via ref.read(provider.notifier)
+final class TrustedContactsProvider
+    extends $NotifierProvider<TrustedContacts, TrustedContactsState> {
+  /// Notifier for managing trusted contacts state
+  /// Handles CRUD operations for trusted contacts
+  ///
+  /// Riverpod 2 Compliant:
+  /// - Uses AutoDisposeNotifier (auto-disposes when unused)
+  /// - NO getters in state - all derived values are fields
+  /// - UI reads STATE only via ref.watch()
+  /// - UI calls methods via ref.read(provider.notifier)
+  TrustedContactsProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'trustedContactsProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$trustedContactsHash();
+
+  @$internal
+  @override
+  TrustedContacts create() => TrustedContacts();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TrustedContactsState value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TrustedContactsState>(value),
+    );
+  }
+}
+
 String _$trustedContactsHash() => r'1e279e949c721c57383773d4adb6bcad3accde4a';
 
 /// Notifier for managing trusted contacts state
@@ -16,20 +75,18 @@ String _$trustedContactsHash() => r'1e279e949c721c57383773d4adb6bcad3accde4a';
 /// - NO getters in state - all derived values are fields
 /// - UI reads STATE only via ref.watch()
 /// - UI calls methods via ref.read(provider.notifier)
-///
-/// Copied from [TrustedContacts].
-@ProviderFor(TrustedContacts)
-final trustedContactsProvider =
-    AutoDisposeNotifierProvider<TrustedContacts, TrustedContactsState>.internal(
-  TrustedContacts.new,
-  name: r'trustedContactsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$trustedContactsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
 
-typedef _$TrustedContacts = AutoDisposeNotifier<TrustedContactsState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+abstract class _$TrustedContacts extends $Notifier<TrustedContactsState> {
+  TrustedContactsState build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<TrustedContactsState, TrustedContactsState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<TrustedContactsState, TrustedContactsState>,
+        TrustedContactsState,
+        Object?,
+        Object?>;
+    element.handleCreate(ref, build);
+  }
+}

@@ -10,7 +10,7 @@ void main() {
   group('TripMapScreen', () {
     /// Sample markers for testing
     final testMarkers = [
-      MapMarker(
+      const MapMarker(
         id: '1',
         lat: 37.7749,
         lng: -122.4194,
@@ -18,7 +18,7 @@ void main() {
         title: 'San Francisco',
         description: 'Test location 1',
       ),
-      MapMarker(
+      const MapMarker(
         id: '2',
         lat: 37.7899,
         lng: -122.4014,
@@ -26,7 +26,7 @@ void main() {
         title: 'Golden Gate Park',
         description: 'Test location 2',
       ),
-      MapMarker(
+      const MapMarker(
         id: '3',
         lat: 37.7694,
         lng: -122.4862,
@@ -164,7 +164,7 @@ void main() {
 
     testWidgets('handles single marker', (tester) async {
       final singleMarker = [
-        MapMarker(
+        const MapMarker(
           id: '1',
           lat: 37.7749,
           lng: -122.4194,
@@ -262,14 +262,14 @@ void main() {
 
   group('TripMapScreen - Map Interactions', () {
     final testMarkers = [
-      MapMarker(
+      const MapMarker(
         id: '1',
         lat: 37.7749,
         lng: -122.4194,
         type: MapMarkerType.trip,
         title: 'San Francisco',
       ),
-      MapMarker(
+      const MapMarker(
         id: '2',
         lat: 37.7899,
         lng: -122.4014,
@@ -313,8 +313,7 @@ void main() {
   });
 
   group('TripMapScreen - Integration Tests', () {
-    testWidgets('integrates with ZoomAwareClusteringManager',
-        (tester) async {
+    testWidgets('integrates with ZoomAwareClusteringManager', (tester) async {
       final markers = List.generate(
         20,
         (i) => MapMarker(
@@ -347,13 +346,13 @@ void main() {
 
     testWidgets('updates clustering on zoom change', (tester) async {
       final markers = [
-        MapMarker(
+        const MapMarker(
           id: '1',
           lat: 37.7749,
           lng: -122.4194,
           type: MapMarkerType.poi,
         ),
-        MapMarker(
+        const MapMarker(
           id: '2',
           lat: 37.7749,
           lng: -122.4194,
@@ -491,7 +490,7 @@ void main() {
             break;
         }
 
-        await tester.pump(Duration(milliseconds: 100));
+        await tester.pump(const Duration(milliseconds: 100));
       }
 
       // Should handle rapid changes without crashes

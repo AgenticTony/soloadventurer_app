@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/services/sync_service.dart';
+import '../../domain/services/sync_state_persistence.dart';
 import '../../domain/models/sync_status.dart';
 import '../notifiers/manual_sync_notifier.dart';
 import '../notifiers/sync_state_notifier.dart';
@@ -25,10 +26,23 @@ final loggingServiceProvider = Provider<LoggingService>((ref) {
   );
 });
 
+/// Provider for the sync state persistence service
+///
+/// This is an optional provider. If not overridden, state persistence will be disabled.
+final syncStatePersistenceProvider = Provider<SyncStatePersistence?>((ref) {
+  // Return null by default - can be overridden in the main app
+  return null;
+});
+
 /// Provider for the manual sync notifier
+///
+/// **DEPRECATED**: This provider is deprecated in favor of the @riverpod generated provider.
+/// The ManualSyncNotifier class has been migrated to Riverpod 3.0 using @riverpod annotation.
+/// Use the auto-generated `manualSyncProvider` instead.
 ///
 /// Manages manual sync state and operations.
 /// Uses AsyncValue pattern for loading, error, and data states.
+@Deprecated('Use manualSyncProvider (generated from @riverpod ManualSync) instead')
 final manualSyncNotifierProvider =
     StateNotifierProvider<ManualSyncNotifier, ManualSyncState>((ref) {
   final syncService = ref.watch(syncServiceProvider);
@@ -75,7 +89,7 @@ final lastSyncSuccessProvider = Provider<bool?>((ref) {
 /// Provider for sync status
 ///
 /// Provides the current sync status from the manual sync state.
-final syncStatusProvider = Provider<SyncStatus>((ref) {
+final syncStatusProvider = Provider<SyncOperationStatus>((ref) {
   final state = ref.watch(manualSyncNotifierProvider);
   return state.status;
 });
@@ -96,7 +110,7 @@ final syncResultSummaryProvider = Provider<String?>((ref) {
       return 'Successfully synced ${state.successCount} ${_pluralize('item', state.successCount)}';
     } else {
       return 'Synced ${state.successCount} ${_pluralize('item', state.successCount)}, '
-             '${state.failureCount} ${_pluralize('failure', state.failureCount)}';
+          '${state.failureCount} ${_pluralize('failure', state.failureCount)}';
     }
   } else if (state.lastSyncSuccess == false) {
     return 'Sync failed: ${state.errorMessage ?? "Unknown error"}';
@@ -168,8 +182,13 @@ String _pluralize(String word, int count) {
 
 /// Provider for the comprehensive sync state notifier
 ///
+/// **DEPRECATED**: This provider is deprecated in favor of the @riverpod generated provider.
+/// The SyncStateNotifier class has been migrated to Riverpod 3.0 using @riverpod annotation.
+/// Use the auto-generated `syncStateProviderOld` instead.
+///
 /// Manages global sync state by listening to all sync service changes.
 /// Provides real-time updates for all sync status indicators.
+@Deprecated('Use syncStateProviderOld (generated from @riverpod SyncState) instead')
 final syncStateNotifierProvider =
     StateNotifierProvider<SyncStateNotifier, SyncState>((ref) {
   final syncService = ref.watch(syncServiceProvider);
@@ -190,9 +209,14 @@ final syncStateNotifierProvider =
 
 /// Provider for current comprehensive sync state
 ///
+/// **DEPRECATED**: This provider is deprecated in favor of the @riverpod generated provider.
+/// The SyncStateNotifier class has been migrated to Riverpod 3.0 using @riverpod annotation.
+/// Use the auto-generated `syncStateProviderOld` instead.
+///
 /// Provides direct access to the current sync state.
 /// This state includes status, queue size, processing state, and last sync results.
-final syncStateProvider = Provider<SyncState>((ref) {
+@Deprecated('Use syncStateProviderOld (generated from @riverpod SyncState) instead')
+final syncStateProviderOldDeprecated = Provider<SyncState>((ref) {
   return ref.watch(syncStateNotifierProvider);
 });
 
@@ -200,7 +224,7 @@ final syncStateProvider = Provider<SyncState>((ref) {
 ///
 /// Provides the current sync status for all sync operations (not just manual).
 /// Updates immediately when any sync operation changes status.
-final globalSyncStatusProvider = Provider<SyncStatus>((ref) {
+final globalSyncOperationStatusProvider = Provider<SyncOperationStatus>((ref) {
   final state = ref.watch(syncStateNotifierProvider);
   return state.status;
 });
@@ -255,19 +279,19 @@ final wasLastSyncSuccessfulProvider = Provider<bool?>((ref) {
 ///
 /// Provides a user-friendly text representation of the current sync status.
 /// Updates immediately when sync status changes.
-final globalSyncStatusTextProvider = Provider<String>((ref) {
+final globalSyncOperationStatusTextProvider = Provider<String>((ref) {
   final state = ref.watch(syncStateNotifierProvider);
 
   switch (state.status) {
-    case SyncStatus.syncing:
+    case SyncOperationStatus.syncing:
       return 'Syncing...';
-    case SyncStatus.success:
+    case SyncOperationStatus.success:
       return 'Synced successfully';
-    case SyncStatus.failed:
+    case SyncOperationStatus.failed:
       return 'Sync failed';
-    case SyncStatus.pending:
+    case SyncOperationStatus.pending:
       return 'Pending sync (${state.queueSize} ${_pluralize('item', state.queueSize)})';
-    case SyncStatus.idle:
+    case SyncOperationStatus.idle:
       if (state.hasQueue) {
         return 'Ready to sync (${state.queueSize} ${_pluralize('item', state.queueSize)})';
       }
@@ -290,9 +314,10 @@ final syncStatusDetailsProvider = Provider<String>((ref) {
     buffer.write(' | Queue: ${state.queueSize}');
   }
 
-  if (state.lastSuccessfulSyncAt != null) {
+  final lastSyncTime = state.lastSuccessfulSyncAt;
+  if (lastSyncTime != null) {
     final now = DateTime.now();
-    final diff = now.difference(state.lastSuccessfulSyncAt!);
+    final diff = now.difference(lastSyncTime);
     buffer.write(' | Last sync: ');
     if (diff.inMinutes < 1) {
       buffer.write('Just now');

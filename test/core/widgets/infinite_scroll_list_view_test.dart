@@ -104,7 +104,8 @@ void main() {
       expect(find.text('No items'), findsOneWidget);
     });
 
-    testWidgets('shows error widget on fetch error', (WidgetTester tester) async {
+    testWidgets('shows error widget on fetch error',
+        (WidgetTester tester) async {
       mockFetcher.setError(Exception('Network error'));
 
       await tester.pumpWidget(
@@ -208,7 +209,8 @@ void main() {
       expect(find.text('You\'ve reached the end'), findsOneWidget);
     });
 
-    testWidgets('renders separators between items', (WidgetTester tester) async {
+    testWidgets('renders separators between items',
+        (WidgetTester tester) async {
       mockFetcher.setData(
         PaginatedData<String>(
           items: ['Item 1', 'Item 2', 'Item 3'],
@@ -364,7 +366,7 @@ void main() {
           home: Scaffold(
             body: InfiniteScrollListView<String>(
               fetchData: mockFetcher.fetch,
-              itemBuilder: (context, item) => Container(
+              itemBuilder: (context, item) => SizedBox(
                 height: 50,
                 child: Text(item),
               ),
@@ -392,7 +394,8 @@ void main() {
 
       // Scroll near the end (should trigger pagination)
       final scrollable = find.byType(Scrollable);
-      await tester.drag(scrollable, const Offset(0, -900)); // Scroll close to end
+      await tester.drag(
+          scrollable, const Offset(0, -900)); // Scroll close to end
       await tester.pump();
 
       // Should have triggered next page load
@@ -472,7 +475,8 @@ void main() {
       expect(find.text('Item 1'), findsOneWidget);
     });
 
-    testWidgets('renders custom loading more widget', (WidgetTester tester) async {
+    testWidgets('renders custom loading more widget',
+        (WidgetTester tester) async {
       // First page
       mockFetcher.setData(
         PaginatedData<String>(
@@ -599,17 +603,17 @@ void main() {
     });
 
     test('calculates isLoading correctly', () {
-      final initialLoading = InfiniteScrollState<String>(
+      const initialLoading = InfiniteScrollState<String>(
         status: InfiniteScrollStatus.initialLoading,
       );
       expect(initialLoading.isLoading, true);
 
-      final loadingMore = InfiniteScrollState<String>(
+      const loadingMore = InfiniteScrollState<String>(
         status: InfiniteScrollStatus.loadingMore,
       );
       expect(loadingMore.isLoading, true);
 
-      final loaded = InfiniteScrollState<String>(
+      const loaded = InfiniteScrollState<String>(
         status: InfiniteScrollStatus.loaded,
       );
       expect(loaded.isLoading, false);

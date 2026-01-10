@@ -69,17 +69,14 @@ class SavedDestinationDto {
           : throw const FormatException(
               'Destination data is required for SavedDestination',
             ),
-      saveType: saveType != null
-          ? _parseSaveType(saveType!)
-          : SaveType.wishlist,
+      saveType:
+          saveType != null ? _parseSaveType(saveType!) : SaveType.wishlist,
       tripId: tripId,
       notes: notes,
-      createdAt: createdAt != null
-          ? DateTime.parse(createdAt!)
-          : DateTime.now(),
-      updatedAt: updatedAt != null
-          ? DateTime.parse(updatedAt!)
-          : DateTime.now(),
+      createdAt:
+          createdAt != null ? DateTime.parse(createdAt!) : DateTime.now(),
+      updatedAt:
+          updatedAt != null ? DateTime.parse(updatedAt!) : DateTime.now(),
     );
   }
 
@@ -117,7 +114,8 @@ class SavedDestinationDto {
   /// Converts a list of JSON objects to a list of [SavedDestinationDto]s
   static List<SavedDestinationDto> fromJsonList(List<dynamic> jsonList) {
     return jsonList
-        .map((json) => SavedDestinationDto.fromJson(json as Map<String, dynamic>))
+        .map((json) =>
+            SavedDestinationDto.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

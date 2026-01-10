@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:solo_adventurer_app/features/sync/domain/models/sync_error.dart';
-import 'package:solo_adventurer_app/features/sync/domain/services/sync_error_categorizer.dart';
+import 'package:soloadventurer/features/sync/domain/models/sync_error.dart';
+import 'package:soloadventurer/features/sync/domain/services/sync_error_categorizer.dart';
 
 void main() {
   group('SyncErrorCategorizerImpl', () {
@@ -20,7 +20,8 @@ void main() {
       });
 
       test('should return user-friendly message for authentication error', () {
-        final message = categorizer.getUserMessage(SyncErrorType.authentication);
+        final message =
+            categorizer.getUserMessage(SyncErrorType.authentication);
         expect(message, 'Authentication failed. Please sign in again.');
       });
 
@@ -90,7 +91,8 @@ void main() {
       });
 
       test('should return actionable suggestion for authentication error', () {
-        final suggestion = categorizer.getSuggestion(SyncErrorType.authentication);
+        final suggestion =
+            categorizer.getSuggestion(SyncErrorType.authentication);
         expect(
           suggestion,
           'Your session may have expired. Please sign out and sign back in.',
@@ -146,7 +148,8 @@ void main() {
       });
 
       test('should return actionable suggestion for quota exceeded error', () {
-        final suggestion = categorizer.getSuggestion(SyncErrorType.quotaExceeded);
+        final suggestion =
+            categorizer.getSuggestion(SyncErrorType.quotaExceeded);
         expect(
           suggestion,
           'Delete old trips or upgrade your account to increase storage.',
@@ -400,7 +403,8 @@ void main() {
           technicalMessage: 'Auth failed',
         );
 
-        expect(error.userMessage, 'Authentication failed. Please sign in again.');
+        expect(
+            error.userMessage, 'Authentication failed. Please sign in again.');
         expect(
           error.suggestion,
           'Your session may have expired. Please sign out and sign back in.',
@@ -455,7 +459,9 @@ void main() {
       });
 
       test('createValidationError should create validation error', () {
-        final validationErrors = {'email': ['Invalid email format']};
+        final validationErrors = {
+          'email': ['Invalid email format']
+        };
         final error = categorizer.createValidationError(
           technicalMessage: 'Validation failed',
           validationErrors: validationErrors,

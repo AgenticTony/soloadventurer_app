@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/shared_link_providers.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
-import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
 
 /// Screen for viewing a publicly shared trip
 class PublicTripViewer extends ConsumerStatefulWidget {
@@ -280,7 +279,9 @@ class _TripContentView extends ConsumerWidget {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           height: 250,
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest,
                           child: const Icon(Icons.travel_explore, size: 64),
                         );
                       },
@@ -303,9 +304,12 @@ class _TripContentView extends ConsumerWidget {
                         const SizedBox(height: 8),
                         Text(
                           trip.description!,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
                         ),
                       ],
                       const SizedBox(height: 16),
@@ -319,7 +323,8 @@ class _TripContentView extends ConsumerWidget {
                             ),
                           _InfoChip(
                             icon: Icons.calendar_today,
-                            label: _formatDateRange(trip.startDate, trip.endDate),
+                            label:
+                                _formatDateRange(trip.startDate, trip.endDate),
                           ),
                         ],
                       ),
@@ -352,7 +357,9 @@ class _TripContentView extends ConsumerWidget {
                       Text(
                         'Journal entries will be displayed here',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                             ),
                       ),
                     ],
@@ -378,7 +385,7 @@ class _TripContentView extends ConsumerWidget {
   }
 
   String _formatDateRange(DateTime start, DateTime? end) {
-    final format = (DateTime date) => '${date.month}/${date.day}/${date.year}';
+    String format(DateTime date) => '${date.month}/${date.day}/${date.year}';
     if (end == null) {
       return '${format(start)} - Present';
     }
@@ -439,7 +446,8 @@ final tripDetailProvider =
 
 /// Provider for trip repository (placeholder - should be in trip_providers.dart)
 final tripRepositoryProvider = Provider<TripRepository>((ref) {
-  throw UnimplementedError('tripRepositoryProvider should be in trip_providers.dart');
+  throw UnimplementedError(
+      'tripRepositoryProvider should be in trip_providers.dart');
 });
 
 /// TripRepository placeholder

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/rich_text_editor.dart';
-import 'package:soloadventurer/features/journal/presentation/widgets/editor_toolbar.dart';
 
 /// Example screen demonstrating the RichTextEditor usage
 ///

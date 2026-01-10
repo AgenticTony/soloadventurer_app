@@ -10,7 +10,6 @@ part 'safety_data.g.dart';
 /// Data class for safety feature state
 @freezed
 class SafetyData with _$SafetyData {
-  const SafetyData._();
 
   const factory SafetyData({
     /// Current safety status of the user
@@ -38,6 +37,12 @@ class SafetyData with _$SafetyData {
   factory SafetyData.fromJson(Map<String, dynamic> json) =>
       _$SafetyDataFromJson(json);
 
+  // Private constructor for freezed
+  const SafetyData._();
+}
+
+/// Extension on [SafetyData] for computed properties
+extension SafetyDataExtension on SafetyData {
   /// Whether there's an active emergency
   bool get hasActiveEmergency => activeAlerts.isNotEmpty;
 

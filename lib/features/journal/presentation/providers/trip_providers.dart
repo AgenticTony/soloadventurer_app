@@ -1,30 +1,36 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/journal/data/repositories/trip_repository_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/trip_repository.dart';
 
+// Generated file
+part 'trip_providers.g.dart';
+
 // ============================================================================
 // Dependency Injection Providers
 // ============================================================================
 
 /// Provides the Supabase client instance
-final supabaseClientProvider = Provider<SupabaseClient>((ref) {
+@riverpod
+SupabaseClient supabaseClient(Ref ref) {
   return Supabase.instance.client;
-});
+}
 
 /// Provides the TripRemoteDataSource implementation
-final tripRemoteDataSourceProvider = Provider<TripRemoteDataSourceImpl>((ref) {
+@riverpod
+TripRemoteDataSourceImpl tripRemoteDataSource(Ref ref) {
   final client = ref.watch(supabaseClientProvider);
   return TripRemoteDataSourceImpl(client: client);
-});
+}
 
 /// Provides the TripRepository implementation
-final tripRepositoryProvider = Provider<TripRepository>((ref) {
+@riverpod
+TripRepository tripRepository(Ref ref) {
   final remoteDataSource = ref.watch(tripRemoteDataSourceProvider);
   return TripRepositoryImpl(remoteDataSource: remoteDataSource);
-});
+}
 
 // ============================================================================
 // Trip List State
@@ -56,11 +62,16 @@ class TripListState {
 }
 
 /// Notifier for managing trip list state
-class TripListNotifier extends StateNotifier<TripListState> {
-  final TripRepository _repository;
-
-  TripListNotifier(this._repository) : super(const TripListState()) {
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class TripList extends _$TripList {
+  @override
+  TripListState build() {
+    // Load trips automatically on build
     loadTrips();
+    return const TripListState();
   }
 
   /// Loads all trips for the current user
@@ -68,7 +79,8 @@ class TripListNotifier extends StateNotifier<TripListState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final trips = await _repository.getTrips();
+      final repository = ref.read(tripRepositoryProvider);
+      final trips = await repository.getTrips();
       state = state.copyWith(trips: trips, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -83,7 +95,8 @@ class TripListNotifier extends StateNotifier<TripListState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final trips = await _repository.getOngoingTrips();
+      final repository = ref.read(tripRepositoryProvider);
+      final trips = await repository.getOngoingTrips();
       state = state.copyWith(trips: trips, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -98,12 +111,6 @@ class TripListNotifier extends StateNotifier<TripListState> {
     state = state.copyWith(error: null);
   }
 }
-
-/// Provider for trip list state
-final tripListProvider = StateNotifierProvider<TripListNotifier, TripListState>((ref) {
-  final repository = ref.watch(tripRepositoryProvider);
-  return TripListNotifier(repository);
-});
 
 // ============================================================================
 // Trip Creation/Edit State
@@ -185,14 +192,17 @@ class TripFormState {
 }
 
 /// Notifier for managing trip form state
-class TripFormNotifier extends StateNotifier<TripFormState> {
-  final TripRepository _repository;
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+@riverpod
+class TripForm extends _$TripForm {
   String? _editingTripId;
 
-  TripFormNotifier(this._repository)
-      : super(TripFormState(
-          startDate: DateTime.now(),
-        ));
+  @override
+  TripFormState build() {
+    return TripFormState(startDate: DateTime.now());
+  }
 
   /// Updates the trip name
   void updateName(String name) {
@@ -235,7 +245,8 @@ class TripFormNotifier extends StateNotifier<TripFormState> {
     _editingTripId = tripId;
 
     try {
-      final trip = await _repository.getTrip(tripId);
+      final repository = ref.read(tripRepositoryProvider);
+      final trip = await repository.getTrip(tripId);
       state = state.copyWith(
         name: trip.name,
         description: trip.description,
@@ -272,10 +283,12 @@ class TripFormNotifier extends StateNotifier<TripFormState> {
         throw Exception('User not authenticated');
       }
 
+      final repository = ref.read(tripRepositoryProvider);
       Trip trip;
+
       if (_editingTripId != null) {
         // Update existing trip
-        final existingTrip = await _repository.getTrip(_editingTripId!);
+        final existingTrip = await repository.getTrip(_editingTripId!);
         trip = existingTrip.copyWith(
           name: state.name.trim(),
           description: state.description?.trim(),
@@ -286,7 +299,7 @@ class TripFormNotifier extends StateNotifier<TripFormState> {
           coverImageUrl: state.coverImageUrl,
           updatedAt: now,
         );
-        trip = await _repository.updateTrip(trip);
+        trip = await repository.updateTrip(trip);
       } else {
         // Create new trip
         trip = Trip(
@@ -302,7 +315,7 @@ class TripFormNotifier extends StateNotifier<TripFormState> {
           createdAt: now,
           updatedAt: now,
         );
-        trip = await _repository.createTrip(trip);
+        trip = await repository.createTrip(trip);
       }
 
       state = state.copyWith(isLoading: false);
@@ -327,12 +340,6 @@ class TripFormNotifier extends StateNotifier<TripFormState> {
     state = state.copyWith(error: null);
   }
 }
-
-/// Provider for trip form state
-final tripFormProvider = StateNotifierProvider<TripFormNotifier, TripFormState>((ref) {
-  final repository = ref.watch(tripRepositoryProvider);
-  return TripFormNotifier(repository);
-});
 
 // ============================================================================
 // Trip Detail State
@@ -368,18 +375,32 @@ class TripDetailState {
 }
 
 /// Notifier for managing trip detail state
-class TripDetailNotifier extends StateNotifier<TripDetailState> {
-  final TripRepository _repository;
-
-  TripDetailNotifier(this._repository) : super(const TripDetailState());
+///
+/// Migration from StateNotifier to Notifier (Riverpod 3.0)
+/// See: https://riverpod.dev/docs/migration/from_state_notifier
+///
+/// Family provider pattern: pass tripId as parameter
+/// Usage: ref.watch(tripDetailProvider(tripId))
+@riverpod
+class TripDetail extends _$TripDetail {
+  @override
+  TripDetailState build(String tripIdArg) {
+    // Load trip automatically on build with the provided tripId
+    if (tripIdArg.isNotEmpty) {
+      // Use a microtask to avoid calling async during build
+      Future.microtask(() => loadTrip(tripIdArg));
+    }
+    return const TripDetailState();
+  }
 
   /// Loads a trip by ID
-  Future<void> loadTrip(String tripId) async {
+  Future<void> loadTrip(String tripIdParam) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final trip = await _repository.getTrip(tripId);
-      final entryCount = await _repository.getEntryCountForTrip(tripId);
+      final repository = ref.read(tripRepositoryProvider);
+      final trip = await repository.getTrip(tripIdParam);
+      final entryCount = await repository.getEntryCountForTrip(tripIdParam);
 
       state = state.copyWith(
         trip: trip,
@@ -401,7 +422,8 @@ class TripDetailNotifier extends StateNotifier<TripDetailState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      await _repository.deleteTrip(state.trip!.id);
+      final repository = ref.read(tripRepositoryProvider);
+      await repository.deleteTrip(state.trip!.id);
       state = const TripDetailState();
       return true;
     } catch (e) {
@@ -418,12 +440,3 @@ class TripDetailNotifier extends StateNotifier<TripDetailState> {
     state = state.copyWith(error: null);
   }
 }
-
-/// Provider for trip detail state (family provider for different trip IDs)
-final tripDetailProvider = StateNotifierProvider.family<TripDetailNotifier, TripDetailState, String>((ref, tripId) {
-  final repository = ref.watch(tripRepositoryProvider);
-  final notifier = TripDetailNotifier(repository);
-  // Load the trip immediately
-  Future.microtask(() => notifier.loadTrip(tripId));
-  return notifier;
-});
