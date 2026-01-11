@@ -46,7 +46,7 @@ part of 'curated_lists_provider.dart';
 /// ```
 
 @ProviderFor(CuratedLists)
-final curatedListsProvider = CuratedListsProvider._();
+const curatedListsProvider = CuratedListsProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -122,7 +122,7 @@ final class CuratedListsProvider
   /// // Get curated lists by type
   /// final hiddenGems = curatedListsNotifier.hiddenGemsLists;
   /// ```
-  CuratedListsProvider._()
+  const CuratedListsProvider._()
       : super(
           from: null,
           argument: null,
@@ -185,6 +185,7 @@ abstract class _$CuratedLists extends $AsyncNotifier<CuratedListsState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref =
         this.ref as $Ref<AsyncValue<CuratedListsState>, CuratedListsState>;
     final element = ref.element as $ClassProviderElement<
@@ -192,6 +193,6 @@ abstract class _$CuratedLists extends $AsyncNotifier<CuratedListsState> {
         AsyncValue<CuratedListsState>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

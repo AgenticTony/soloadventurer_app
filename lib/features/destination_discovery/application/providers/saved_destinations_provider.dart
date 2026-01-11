@@ -126,7 +126,8 @@ class SavedDestinations extends _$SavedDestinations {
     final repository = ref.read(destinationRepositoryProvider);
 
     // Create a temporary ID for the new saved destination
-    final tempId = userId + '_' + destination.id + '_' + DateTime.now().millisecondsSinceEpoch.toString();
+    final tempId =
+        '${userId}_${destination.id}_${DateTime.now().millisecondsSinceEpoch}';
 
     final savedDestination = SavedDestination(
       id: tempId,

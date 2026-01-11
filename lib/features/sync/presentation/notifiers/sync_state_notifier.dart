@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/services/sync_service.dart';
 import '../../domain/models/sync_status.dart';
 import '../state/sync_state.dart';
 import '../../../core/domain/services/logging_service.dart';
-import '../providers/sync_providers.dart';
+import '../providers/service_providers.dart';
 
 part 'sync_state_notifier.g.dart';
 
@@ -68,7 +67,6 @@ class SyncStateNotifier extends _$SyncStateNotifier {
   /// Stream subscriptions for cleanup
   StreamSubscription<SyncOperationStatus>? _statusSubscription;
   StreamSubscription<List<dynamic>>? _queueSubscription;
-
 
   /// Load persisted state from storage
   /// NOTE: State persistence disabled due to type mismatch between domain/presentation SyncState

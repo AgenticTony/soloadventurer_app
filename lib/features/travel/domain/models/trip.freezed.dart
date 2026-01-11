@@ -298,8 +298,6 @@ extension TripPatterns on Trip {
     switch (_that) {
       case _Trip():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -449,8 +447,6 @@ extension TripPatterns on Trip {
             _that.destinationIds,
             _that.destinationNotes,
             _that.isFromDiscovery);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

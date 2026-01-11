@@ -1,10 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'dart:io';
 import '../../domain/services/backup_service.dart';
 import '../../data/services/backup_service_impl.dart';
-import '../../domain/repositories/journal_repository.dart';
-import '../../domain/repositories/trip_repository.dart';
-import '../../domain/repositories/tag_repository.dart';
 import 'journal_entry_providers.dart';
 import 'trip_providers.dart';
 import 'tag_providers.dart';

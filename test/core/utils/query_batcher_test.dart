@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/core/utils/query_batcher.dart';
 
@@ -96,7 +95,7 @@ void main() {
     test('should deduplicate queries with same key', () async {
       const config = BatchConfig(
         maxBatchSize: 10,
-        maxWaitTime: const Duration(milliseconds: 100),
+        maxWaitTime: Duration(milliseconds: 100),
         deduplicate: true,
       );
 

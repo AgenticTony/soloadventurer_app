@@ -266,8 +266,6 @@ extension PlaceActivityPatterns on PlaceActivity {
     switch (_that) {
       case _PlaceActivity():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -405,8 +403,6 @@ extension PlaceActivityPatterns on PlaceActivity {
             _that.cost,
             _that.bookingUrl,
             _that.photoUrl);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -843,8 +839,6 @@ extension PeakHoursPatterns on PeakHours {
     switch (_that) {
       case _PeakHours():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -922,8 +916,6 @@ extension PeakHoursPatterns on PeakHours {
     switch (_that) {
       case _PeakHours():
         return $default(_that.hours, _that.dayOfWeek, _that.currentHour);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

@@ -186,14 +186,15 @@ class _TagTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color =
+    final baseColor =
         tag.hasColor ? _tryParseColor(tag.color!) : theme.colorScheme.primary;
+    final color = baseColor ?? theme.colorScheme.primary;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha:0.2),
+          backgroundColor: color.withValues(alpha: 0.2),
           child: tag.hasIcon
               ? Text(
                   tag.icon!,

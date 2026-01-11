@@ -7,9 +7,12 @@ part 'location_update_operation.freezed.dart';
 part 'location_update_operation.g.dart';
 
 @freezed
-class LocationUpdateOperation
+sealed class LocationUpdateOperation
     with _$LocationUpdateOperation
     implements QueueableOperation {
+  // Private constructor for freezed with custom members
+  const LocationUpdateOperation._();
+
   const factory LocationUpdateOperation({
     required String id,
     required double latitude,
@@ -26,7 +29,6 @@ class LocationUpdateOperation
 
   factory LocationUpdateOperation.fromJson(Map<String, dynamic> json) =>
       _$LocationUpdateOperationFromJson(json);
-
 
   /// Create a new location update operation
   factory LocationUpdateOperation.create({
@@ -102,7 +104,4 @@ class LocationUpdateOperation
       lastError: null,
     );
   }
-
-  // Private constructor for freezed getters
-  const LocationUpdateOperation._();
 }

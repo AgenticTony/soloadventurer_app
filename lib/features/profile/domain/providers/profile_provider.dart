@@ -2,7 +2,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../entities/profile.dart';
 import '../entities/profile_state.dart';
 import '../repositories/profile_repository.dart';
-import '../../presentation/providers/profile_providers.dart' show profileRepositoryProvider;
+import '../../presentation/providers/profile_providers.dart'
+    show profileRepositoryProvider;
 
 part 'profile_provider.g.dart';
 

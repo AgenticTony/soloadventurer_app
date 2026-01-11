@@ -311,22 +311,15 @@ class JournalRepositoryImpl extends OfflineAwareRepository<
 
   @override
   Future<List<Journal>> executeRemoteFetchAll({String? userId}) async {
-    try {
-      // For journals, we need tripId, not userId
-      // This is a limitation - the repository pattern expects userId
-      // We'll need to handle this differently
-      // For now, throw an exception if tripId is not provided
-      throw UnimplementedError(
-        'executeRemoteFetchAll requires tripId for journals, not userId',
-      );
-    } catch (e) {
-      debugPrint('❌ journal: Error in remote fetch all: ${e.toString()}');
-      if (e is AppException) {
-        rethrow;
-      }
-      throw const ServerException(
-          message: 'Failed to fetch journals from server');
-    }
+    // Journals are organized by trip, not directly by user.
+    // The base class OfflineAwareRepository expects a fetchAll(userId) method,
+    // but for journals, we need to fetch by tripId.
+    // This method should not be called directly - use getJournals(tripId) instead.
+    debugPrint(
+      '⚠️ journal: executeRemoteFetchAll called, but journals require tripId. '
+      'Use getJournals(tripId) method instead.',
+    );
+    return const [];
   }
 
   // ==============================================================================
@@ -614,8 +607,9 @@ class JournalRepositoryImpl extends OfflineAwareRepository<
     return data;
   }
 
-  @override
-  Map<String, dynamic> _modelToJson(LocalJournalModel model) {
-    return model.toJson();
-  }
+  // Note: _modelToJson is not used in this implementation
+  // The _journalToJsonData helper method handles JSON conversion
+  // Map<String, dynamic> _modelToJson(LocalJournalModel model) {
+  //   return model.toJson();
+  // }
 }

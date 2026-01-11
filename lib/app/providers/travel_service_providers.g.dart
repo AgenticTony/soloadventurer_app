@@ -13,7 +13,7 @@ part of 'travel_service_providers.dart';
 /// Provides the Dio-based API service for network operations.
 
 @ProviderFor(dioApiService)
-final dioApiServiceProvider = DioApiServiceProvider._();
+const dioApiServiceProvider = DioApiServiceProvider._();
 
 /// Provider for DioApiService
 ///
@@ -25,7 +25,7 @@ final class DioApiServiceProvider
   /// Provider for DioApiService
   ///
   /// Provides the Dio-based API service for network operations.
-  DioApiServiceProvider._()
+  const DioApiServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -65,7 +65,7 @@ String _$dioApiServiceHash() => r'fa92ae2b59327ec38680bb80f3de3eb127548ad4';
 /// Manages trip data with offline-first sync support.
 
 @ProviderFor(tripRepository)
-final tripRepositoryProvider = TripRepositoryProvider._();
+const tripRepositoryProvider = TripRepositoryProvider._();
 
 /// Provider for TripRepository
 ///
@@ -77,7 +77,7 @@ final class TripRepositoryProvider
   /// Provider for TripRepository
   ///
   /// Manages trip data with offline-first sync support.
-  TripRepositoryProvider._()
+  const TripRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -117,7 +117,7 @@ String _$tripRepositoryHash() => r'b001acb67558869c773d4df8c4adadeeedc3c4c6';
 /// Manages journal entries with offline-first sync support.
 
 @ProviderFor(journalRepository)
-final journalRepositoryProvider = JournalRepositoryProvider._();
+const journalRepositoryProvider = JournalRepositoryProvider._();
 
 /// Provider for JournalRepository
 ///
@@ -130,7 +130,7 @@ final class JournalRepositoryProvider extends $FunctionalProvider<
   /// Provider for JournalRepository
   ///
   /// Manages journal entries with offline-first sync support.
-  JournalRepositoryProvider._()
+  const JournalRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -171,7 +171,7 @@ String _$journalRepositoryHash() => r'683a3dda6a001627ad4e3046d6d7e46896f5095b';
 /// Manages itinerary data stored in local database.
 
 @ProviderFor(itineraryRepository)
-final itineraryRepositoryProvider = ItineraryRepositoryProvider._();
+const itineraryRepositoryProvider = ItineraryRepositoryProvider._();
 
 /// Provider for ItineraryRepository
 ///
@@ -184,7 +184,7 @@ final class ItineraryRepositoryProvider extends $FunctionalProvider<
   /// Provider for ItineraryRepository
   ///
   /// Manages itinerary data stored in local database.
-  ItineraryRepositoryProvider._()
+  const ItineraryRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -226,7 +226,7 @@ String _$itineraryRepositoryHash() =>
 /// Handles local storage of notification data.
 
 @ProviderFor(notificationLocalDataSource)
-final notificationLocalDataSourceProvider =
+const notificationLocalDataSourceProvider =
     NotificationLocalDataSourceProvider._();
 
 /// Provider for NotificationLocalDataSource
@@ -240,7 +240,7 @@ final class NotificationLocalDataSourceProvider extends $FunctionalProvider<
   /// Provider for NotificationLocalDataSource
   ///
   /// Handles local storage of notification data.
-  NotificationLocalDataSourceProvider._()
+  const NotificationLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -282,7 +282,7 @@ String _$notificationLocalDataSourceHash() =>
 /// Manages notification data with connectivity awareness.
 
 @ProviderFor(notificationRepository)
-final notificationRepositoryProvider = NotificationRepositoryProvider._();
+const notificationRepositoryProvider = NotificationRepositoryProvider._();
 
 /// Provider for NotificationRepository
 ///
@@ -295,7 +295,7 @@ final class NotificationRepositoryProvider extends $FunctionalProvider<
   /// Provider for NotificationRepository
   ///
   /// Manages notification data with connectivity awareness.
-  NotificationRepositoryProvider._()
+  const NotificationRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -337,7 +337,7 @@ String _$notificationRepositoryHash() =>
 /// Schedules notifications based on itinerary events.
 
 @ProviderFor(notificationSchedulerService)
-final notificationSchedulerServiceProvider =
+const notificationSchedulerServiceProvider =
     NotificationSchedulerServiceProvider._();
 
 /// Provider for NotificationSchedulerService
@@ -351,7 +351,7 @@ final class NotificationSchedulerServiceProvider extends $FunctionalProvider<
   /// Provider for NotificationSchedulerService
   ///
   /// Schedules notifications based on itinerary events.
-  NotificationSchedulerServiceProvider._()
+  const NotificationSchedulerServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -393,7 +393,7 @@ String _$notificationSchedulerServiceHash() =>
 /// Triggers notifications based on user location changes.
 
 @ProviderFor(locationBasedNotificationService)
-final locationBasedNotificationServiceProvider =
+const locationBasedNotificationServiceProvider =
     LocationBasedNotificationServiceProvider._();
 
 /// Provider for LocationBasedNotificationService
@@ -407,7 +407,7 @@ final class LocationBasedNotificationServiceProvider
   /// Provider for LocationBasedNotificationService
   ///
   /// Triggers notifications based on user location changes.
-  LocationBasedNotificationServiceProvider._()
+  const LocationBasedNotificationServiceProvider._()
       : super(
           from: null,
           argument: null,

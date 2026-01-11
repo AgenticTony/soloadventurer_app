@@ -126,7 +126,9 @@ class AddToTripNotifier extends _$AddToTripNotifier {
         timestamp: DateTime.now(),
         priority: operation.priority,
       );
-      await ref.read(travelOperationRepositoryProvider).saveOperation(baseOperation);
+      await ref
+          .read(travelOperationRepositoryProvider)
+          .saveOperation(baseOperation);
 
       // Update state to success
       state = state.asSuccess(tripId, tripName);
@@ -197,7 +199,9 @@ class AddToTripNotifier extends _$AddToTripNotifier {
         timestamp: DateTime.now(),
         priority: operation.priority,
       );
-      await ref.read(travelOperationRepositoryProvider).saveOperation(baseOperation);
+      await ref
+          .read(travelOperationRepositoryProvider)
+          .saveOperation(baseOperation);
 
       // Get the new trip ID from the operation
       final newTripId = operation.tripId;

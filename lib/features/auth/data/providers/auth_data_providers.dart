@@ -1,7 +1,6 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/core/config/cognito_config.dart';
 import 'package:soloadventurer/core/security/security_manager.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
@@ -10,6 +9,7 @@ import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_s
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_blacklist_manager.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart'; // Import for sharedPreferencesProvider
 
 /// Provider for SecureStorage
 final secureStorageProvider = Provider<SecureStorage>((ref) {
@@ -19,10 +19,8 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
 // SecurityManager is provided by @riverpod annotation in security_manager.dart
 // The generated provider is: securityManagerProvider
 
-/// Provider for SharedPreferences
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError('SharedPreferences provider must be overridden');
-});
+// SharedPreferences provider is imported from core_service_providers.dart
+// It's overridden in bootstrap.dart with the actual instance
 
 /// Provider for CognitoUserPool
 final cognitoUserPoolProvider = Provider<CognitoUserPool>((ref) {

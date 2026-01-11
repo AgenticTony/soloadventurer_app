@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:soloadventurer/core/config/cognito_config.dart';
 
 /// Application configuration class
 ///
@@ -69,7 +70,7 @@ class AppConfig {
   ///
   /// Set via: `flutter run --dart-define=AUTH_PROVIDER=cognito`
   static String get authProvider =>
-      const String.fromEnvironment('AUTH_PROVIDER', defaultValue: 'cognito');
+      const String.fromEnvironment('AUTH_PROVIDER', defaultValue: 'supabase');
 
   /// Whether to use Supabase for authentication
   static bool get useSupabaseAuth => authProvider == 'supabase';
@@ -116,6 +117,37 @@ class AppConfig {
   ///
   /// Automatically disabled in production, enabled in other environments.
   static bool get supabaseDebugMode => !isProduction;
+
+  // ============================================================
+  // COGNITO CONFIGURATION (LEGACY)
+  // ============================================================
+
+  /// AWS Cognito configuration for legacy authentication
+  ///
+  /// Only used when `useCognitoAuth` is true.
+  /// See [CognitoConfig] for individual settings.
+  static CognitoConfig get awsConfig => CognitoConfig();
+
+  // ============================================================
+  // API CONFIGURATION
+  // ============================================================
+
+  /// Base URL for API requests
+  ///
+  /// Defaults to environment-specific URLs if not set via .env file.
+  /// Set in `.env` file: `API_BASE_URL=https://api.example.com`
+  static String get apiBaseUrl {
+    if (kReleaseMode) {
+      return dotenv.env['API_BASE_URL_PROD'] ??
+          'https://api.soloadventurer.com/prod';
+    } else if (kProfileMode) {
+      return dotenv.env['API_BASE_URL_STAGING'] ??
+          'https://api.soloadventurer.com/staging';
+    } else {
+      return dotenv.env['API_BASE_URL_DEV'] ??
+          'https://api.soloadventurer.com/dev';
+    }
+  }
 
   // ============================================================
   // DEBUG CONFIGURATION

@@ -659,7 +659,7 @@ extension NotificationPreferencesModelPatterns on NotificationPreferencesModel {
 
 /// @nodoc
 @JsonSerializable()
-class _NotificationPreferencesModel implements NotificationPreferencesModel {
+class _NotificationPreferencesModel extends NotificationPreferencesModel {
   const _NotificationPreferencesModel(
       {this.flightCheckInReminders = true,
       this.flightDelaysAndCancellations = true,
@@ -686,7 +686,8 @@ class _NotificationPreferencesModel implements NotificationPreferencesModel {
       this.locationBasedNotificationsEnabled = false,
       this.proximityNotificationRadiusMeters = 500,
       this.lastUpdated,
-      this.userId});
+      this.userId})
+      : super._();
   factory _NotificationPreferencesModel.fromJson(Map<String, dynamic> json) =>
       _$NotificationPreferencesModelFromJson(json);
 

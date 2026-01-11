@@ -11,13 +11,13 @@ part of 'logging_service_impl.dart';
 /// Implementation of [LoggingService] that follows AWS best practices for logging
 
 @ProviderFor(LoggingServiceImpl)
-final loggingServiceImplProvider = LoggingServiceImplProvider._();
+const loggingServiceImplProvider = LoggingServiceImplProvider._();
 
 /// Implementation of [LoggingService] that follows AWS best practices for logging
 final class LoggingServiceImplProvider
     extends $NotifierProvider<LoggingServiceImpl, LoggingService> {
   /// Implementation of [LoggingService] that follows AWS best practices for logging
-  LoggingServiceImplProvider._()
+  const LoggingServiceImplProvider._()
       : super(
           from: null,
           argument: null,
@@ -54,12 +54,13 @@ abstract class _$LoggingServiceImpl extends $Notifier<LoggingService> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<LoggingService, LoggingService>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<LoggingService, LoggingService>,
         LoggingService,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

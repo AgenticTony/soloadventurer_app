@@ -265,8 +265,6 @@ extension TrustedContactModelPatterns on TrustedContactModel {
     switch (_that) {
       case _TrustedContactModel():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -404,8 +402,6 @@ extension TrustedContactModelPatterns on TrustedContactModel {
             _that.updatedAt,
             _that.revokedAt,
             _that.notes);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

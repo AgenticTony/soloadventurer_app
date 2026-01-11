@@ -11,7 +11,7 @@ part of 'journal_map_provider.dart';
 /// Provides the Supabase client instance
 
 @ProviderFor(supabaseClient)
-final supabaseClientProvider = SupabaseClientProvider._();
+const supabaseClientProvider = SupabaseClientProvider._();
 
 /// Provides the Supabase client instance
 
@@ -19,7 +19,7 @@ final class SupabaseClientProvider
     extends $FunctionalProvider<SupabaseClient, SupabaseClient, SupabaseClient>
     with $Provider<SupabaseClient> {
   /// Provides the Supabase client instance
-  SupabaseClientProvider._()
+  const SupabaseClientProvider._()
       : super(
           from: null,
           argument: null,
@@ -57,7 +57,7 @@ String _$supabaseClientHash() => r'834a58d6ae4b94e36f4e04a10d8a7684b929310e';
 /// Provides the JournalRemoteDataSource implementation
 
 @ProviderFor(journalRemoteDataSource)
-final journalRemoteDataSourceProvider = JournalRemoteDataSourceProvider._();
+const journalRemoteDataSourceProvider = JournalRemoteDataSourceProvider._();
 
 /// Provides the JournalRemoteDataSource implementation
 
@@ -66,7 +66,7 @@ final class JournalRemoteDataSourceProvider extends $FunctionalProvider<
     JournalRemoteDataSourceImpl,
     JournalRemoteDataSourceImpl> with $Provider<JournalRemoteDataSourceImpl> {
   /// Provides the JournalRemoteDataSource implementation
-  JournalRemoteDataSourceProvider._()
+  const JournalRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -106,7 +106,7 @@ String _$journalRemoteDataSourceHash() =>
 /// Provides the JournalRepository implementation for map operations
 
 @ProviderFor(journalMapRepository)
-final journalMapRepositoryProvider = JournalMapRepositoryProvider._();
+const journalMapRepositoryProvider = JournalMapRepositoryProvider._();
 
 /// Provides the JournalRepository implementation for map operations
 
@@ -115,7 +115,7 @@ final class JournalMapRepositoryProvider extends $FunctionalProvider<
     JournalRepository,
     JournalRepository> with $Provider<JournalRepository> {
   /// Provides the JournalRepository implementation for map operations
-  JournalMapRepositoryProvider._()
+  const JournalMapRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -159,7 +159,7 @@ String _$journalMapRepositoryHash() =>
 /// - Automatic provider generation via @riverpod annotation
 
 @ProviderFor(JournalMap)
-final journalMapProvider = JournalMapProvider._();
+const journalMapProvider = JournalMapProvider._();
 
 /// Notifier for managing journal map state
 /// MIGRATION: StateNotifier → Notifier pattern
@@ -173,7 +173,7 @@ final class JournalMapProvider
   /// - Constructor logic moved to build() method
   /// - Dependencies accessed via ref.watch() in methods
   /// - Automatic provider generation via @riverpod annotation
-  JournalMapProvider._()
+  const JournalMapProvider._()
       : super(
           from: null,
           argument: null,
@@ -213,13 +213,14 @@ abstract class _$JournalMap extends $Notifier<JournalMapState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<JournalMapState, JournalMapState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<JournalMapState, JournalMapState>,
         JournalMapState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -228,7 +229,7 @@ abstract class _$JournalMap extends $Notifier<JournalMapState> {
 /// Usage: ref.watch(journalTripMapProvider(tripId))
 
 @ProviderFor(JournalTripMap)
-final journalTripMapProvider = JournalTripMapFamily._();
+const journalTripMapProvider = JournalTripMapFamily._();
 
 /// Provider for journal map state scoped to a trip
 /// MIGRATION: StateNotifierProvider.family → Notifier with family parameter
@@ -238,7 +239,7 @@ final class JournalTripMapProvider
   /// Provider for journal map state scoped to a trip
   /// MIGRATION: StateNotifierProvider.family → Notifier with family parameter
   /// Usage: ref.watch(journalTripMapProvider(tripId))
-  JournalTripMapProvider._(
+  const JournalTripMapProvider._(
       {required JournalTripMapFamily super.from,
       required String super.argument})
       : super(
@@ -292,7 +293,7 @@ final class JournalTripMapFamily extends $Family
     with
         $ClassFamilyOverride<JournalTripMap, JournalMapState, JournalMapState,
             JournalMapState, String> {
-  JournalTripMapFamily._()
+  const JournalTripMapFamily._()
       : super(
           retry: null,
           name: r'journalTripMapProvider',
@@ -328,16 +329,15 @@ abstract class _$JournalTripMap extends $Notifier<JournalMapState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<JournalMapState, JournalMapState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<JournalMapState, JournalMapState>,
         JournalMapState,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

@@ -23,7 +23,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to create journal entry: $e');
+      throw ServerException(message: 'Failed to create journal entry: $e');
     }
   }
 
@@ -35,7 +35,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get journal entry: $e');
+      throw ServerException(message: 'Failed to get journal entry: $e');
     }
   }
 
@@ -47,7 +47,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get journal entries: $e');
+      throw ServerException(message: 'Failed to get journal entries: $e');
     }
   }
 
@@ -59,7 +59,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get entries for trip: $e');
+      throw ServerException(message: 'Failed to get entries for trip: $e');
     }
   }
 
@@ -77,7 +77,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get entries by date range: $e');
+      throw ServerException(message: 'Failed to get entries by date range: $e');
     }
   }
 
@@ -89,7 +89,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to search entries: $e');
+      throw ServerException(message: 'Failed to search entries: $e');
     }
   }
 
@@ -101,7 +101,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get favorite entries: $e');
+      throw ServerException(message: 'Failed to get favorite entries: $e');
     }
   }
 
@@ -114,7 +114,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to update journal entry: $e');
+      throw ServerException(message: 'Failed to update journal entry: $e');
     }
   }
 
@@ -125,7 +125,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to delete journal entry: $e');
+      throw ServerException(message: 'Failed to delete journal entry: $e');
     }
   }
 
@@ -137,7 +137,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to toggle favorite: $e');
+      throw ServerException(message: 'Failed to toggle favorite: $e');
     }
   }
 
@@ -149,7 +149,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get entries with location: $e');
+      throw ServerException(message: 'Failed to get entries with location: $e');
     }
   }
 
@@ -169,7 +169,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get entries near location: $e');
+      throw ServerException(message: 'Failed to get entries near location: $e');
     }
   }
 
@@ -182,7 +182,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to add media: $e');
+      throw ServerException(message: 'Failed to add media: $e');
     }
   }
 
@@ -195,7 +195,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to update media: $e');
+      throw ServerException(message: 'Failed to update media: $e');
     }
   }
 
@@ -206,7 +206,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to delete media: $e');
+      throw ServerException(message: 'Failed to delete media: $e');
     }
   }
 
@@ -218,7 +218,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get media for entry: $e');
+      throw ServerException(message: 'Failed to get media for entry: $e');
     }
   }
 
@@ -230,7 +230,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get media for trip: $e');
+      throw ServerException(message: 'Failed to get media for trip: $e');
     }
   }
 
@@ -248,7 +248,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to update upload progress: $e');
+      throw ServerException(message: 'Failed to update upload progress: $e');
     }
   }
 
@@ -266,7 +266,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to complete upload: $e');
+      throw ServerException(message: 'Failed to complete upload: $e');
     }
   }
 
@@ -284,7 +284,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to mark upload as failed: $e');
+      throw ServerException(message: 'Failed to mark upload as failed: $e');
     }
   }
 
@@ -297,7 +297,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get tags for entry: $e');
+      throw ServerException(message: 'Failed to get tags for entry: $e');
     }
   }
 
@@ -308,7 +308,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to add tag to entry: $e');
+      throw ServerException(message: 'Failed to add tag to entry: $e');
     }
   }
 
@@ -319,7 +319,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to remove tag from entry: $e');
+      throw ServerException(message: 'Failed to remove tag from entry: $e');
     }
   }
 
@@ -330,7 +330,7 @@ class JournalRepositoryImpl implements JournalRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to update tags for entry: $e');
+      throw ServerException(message: 'Failed to update tags for entry: $e');
     }
   }
 }

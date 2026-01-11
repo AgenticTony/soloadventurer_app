@@ -425,7 +425,7 @@ void main() {
 
       final service = MapMarkerClusteringService();
 
-      final bounds = LatLngBounds(
+      final bounds = Bounds(
         southwest: const LatLng(37.7, -122.5),
         northeast: const LatLng(37.8, -122.3),
       );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 import 'package:soloadventurer/features/sync/presentation/notifiers/manual_sync_notifier.dart';
 import 'package:soloadventurer/features/sync/presentation/providers/sync_providers.dart';
 import 'package:soloadventurer/features/sync/presentation/state/manual_sync_state.dart';

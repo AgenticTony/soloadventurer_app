@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/models/paginated_data.dart';
+import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
 import 'package:soloadventurer/features/offline/data/models/local_trip_model.dart';
@@ -302,8 +304,9 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
   // ==============================================================================
 
   @override
-  Future<Trip> getTripById(String id) {
-    return getById(id);
+  Future<Trip?> getTripById({required String tripId}) async {
+    final result = await getById(tripId);
+    return result;
   }
 
   @override
@@ -312,20 +315,27 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
   }
 
   @override
-  Future<RepositoryOperationResult<Trip>> createTrip(Trip trip) {
+  Future<Trip> createTrip({required Trip trip}) async {
     final tripModel = entityToModel(trip);
-    return create(tripModel);
+    final result = await create(tripModel);
+    return result.data;
   }
 
   @override
-  Future<RepositoryOperationResult<Trip>> updateTrip(String id, Trip trip) {
-    final tripModel = entityToModel(trip);
-    return update(id, tripModel);
+  Future<Trip> updateTrip({required String tripId, required Trip updates}) async {
+    final tripModel = entityToModel(updates);
+    final result = await update(tripId, tripModel);
+    return result.data;
   }
 
   @override
-  Future<RepositoryOperationResult<void>> deleteTrip(String id) {
-    return delete(id);
+  Future<bool> deleteTrip({required String tripId}) async {
+    try {
+      await delete(tripId);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
@@ -367,17 +377,203 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
   }
 
   @override
-  Future<List<Trip>> searchTrips(String searchTerm, {String? userId}) async {
+  Future<PaginatedData<Trip>> getTripsCursor({
+    required String userId,
+    String? cursor,
+    int pageSize = 20,
+    String sortBy = 'createdAt',
+    SortOrder sortOrder = SortOrder.descending,
+    Map<String, dynamic>? filters,
+  }) async {
     try {
       // For now, we only support local queries
-      // Remote sync will happen automatically when needed
-      final trips = await _tripDao.searchTrips(searchTerm, userId: userId);
-      return trips
+      // TODO: Implement cursor-based pagination with remote sync
+      final trips = await _tripDao.getTripsByUserId(userId);
+      final entities = trips
           .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
           .toList();
+
+      return PaginatedData<Trip>(
+        items: entities,
+        pageInfo: PageInfo(
+          currentPage: 1,
+          itemsPerPage: entities.length,
+          totalItems: entities.length,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ trip: Error getting trips cursor: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get trips cursor');
+    }
+  }
+
+  @override
+  Future<PaginatedData<Trip>> getTripsOffset({
+    required String userId,
+    int page = 1,
+    int pageSize = 20,
+    String sortBy = 'createdAt',
+    SortOrder sortOrder = SortOrder.descending,
+    Map<String, dynamic>? filters,
+  }) async {
+    try {
+      // For now, we only support local queries
+      // TODO: Implement offset-based pagination with remote sync
+      final trips = await _tripDao.getTripsByUserId(userId);
+      final entities = trips
+          .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
+          .toList();
+
+      // Apply offset and limit
+      final startIndex = (page - 1) * pageSize;
+      final endIndex = startIndex + pageSize;
+      final paginatedItems = startIndex < entities.length
+          ? entities.sublist(startIndex, endIndex.clamp(0, entities.length))
+          : <Trip>[];
+
+      return PaginatedData<Trip>(
+        items: paginatedItems,
+        pageInfo: PageInfo(
+          currentPage: page,
+          itemsPerPage: pageSize,
+          totalItems: entities.length,
+          hasNextPage: endIndex < entities.length,
+          hasPreviousPage: page > 1,
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ trip: Error getting trips offset: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get trips offset');
+    }
+  }
+
+  @override
+  Future<PaginatedData<TripMetadata>> getTripsMetadata({
+    required String userId,
+    String? cursor,
+    int pageSize = 50,
+  }) async {
+    try {
+      // For now, we only support local queries
+      // TODO: Implement cursor-based pagination for metadata
+      final trips = await _tripDao.getTripsByUserId(userId);
+      final metadata = trips.map((t) => TripMetadata.fromTrip(
+        LocalTripModel.fromDatabase(t).toDomainEntity()
+      )).toList();
+
+      return PaginatedData<TripMetadata>(
+        items: metadata,
+        pageInfo: PageInfo(
+          currentPage: 1,
+          itemsPerPage: metadata.length,
+          totalItems: metadata.length,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ trip: Error getting trips metadata: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get trips metadata');
+    }
+  }
+
+  @override
+  Future<List<Trip>> getTripsByIds({required List<String> tripIds}) async {
+    try {
+      // Batch query from local database
+      final results = <Trip>[];
+      for (final tripId in tripIds) {
+        final localTrip = await _tripDao.getTripById(tripId);
+        if (localTrip != null) {
+          results.add(LocalTripModel.fromDatabase(localTrip).toDomainEntity());
+        }
+      }
+      return results;
+    } catch (e) {
+      debugPrint('❌ trip: Error getting trips by ids: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get trips by ids');
+    }
+  }
+
+  @override
+  Future<PaginatedData<Trip>> searchTrips({
+    required String userId,
+    required String query,
+    String? cursor,
+    int? page,
+    int pageSize = 20,
+  }) async {
+    try {
+      // For now, we only support local queries
+      final trips = await _tripDao.searchTrips(query, userId: userId);
+      final entities = trips
+          .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
+          .toList();
+
+      return PaginatedData<Trip>(
+        items: entities,
+        pageInfo: PageInfo(
+          currentPage: 1,
+          itemsPerPage: entities.length,
+          totalItems: entities.length,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        ),
+      );
     } catch (e) {
       debugPrint('❌ trip: Error searching trips: ${e.toString()}');
       throw const CacheException(message: 'Failed to search trips');
+    }
+  }
+
+  @override
+  Future<int> countTrips({
+    required String userId,
+    Map<String, dynamic>? filters,
+  }) async {
+    try {
+      final trips = await _tripDao.getTripsByUserId(userId);
+      return trips.length;
+    } catch (e) {
+      debugPrint('❌ trip: Error counting trips: ${e.toString()}');
+      throw const CacheException(message: 'Failed to count trips');
+    }
+  }
+
+  @override
+  Future<PaginatedData<Trip>> getTripsInDateRange({
+    required String userId,
+    required DateTime startDate,
+    required DateTime endDate,
+    String? cursor,
+    int pageSize = 20,
+  }) async {
+    try {
+      // Use the existing date range method
+      final trips = await _tripDao.getTripsByDateRange(
+        startDate,
+        endDate,
+        userId: userId,
+      );
+      final entities = trips
+          .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
+          .toList();
+
+      return PaginatedData<Trip>(
+        items: entities,
+        pageInfo: PageInfo(
+          currentPage: 1,
+          itemsPerPage: entities.length,
+          totalItems: entities.length,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        ),
+      );
+    } catch (e) {
+      debugPrint('❌ trip: Error getting trips in date range: ${e.toString()}');
+      throw const CacheException(message: 'Failed to get trips in date range');
     }
   }
 

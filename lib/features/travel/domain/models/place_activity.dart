@@ -8,8 +8,7 @@ part 'place_activity.g.dart';
 /// Represents a place/activity that can be suggested to users
 /// based on their interests, location, and weather conditions.
 @freezed
-class PlaceActivity with _$PlaceActivity {
-
+sealed class PlaceActivity with _$PlaceActivity {
   /// Creates a place activity
   ///
   /// The [id] parameter is a unique identifier (e.g., Google Place ID).
@@ -91,7 +90,7 @@ enum TravelInterest {
 ///
 /// Contains information about when a place is busiest.
 @freezed
-class PeakHours with _$PeakHours {
+sealed class PeakHours with _$PeakHours {
   const factory PeakHours({
     required List<int> hours, // Hours that are peak (0-23)
     required String dayOfWeek, // Day this applies to (or 'daily')

@@ -22,7 +22,9 @@ class AuthNavigation extends _$AuthNavigation {
 
   @override
   AuthNavigationState build() {
-    // Listen to auth state changes
+    // Listen to auth state changes for logging only
+    // Note: AuthWrapper handles automatic auth-based routing
+    // This provider only handles explicit navigation requests (e.g., from button taps)
     ref.listen(authProvider, (previous, next) {
       final authState = next.value;
       if (authState == null) return;
@@ -30,50 +32,11 @@ class AuthNavigation extends _$AuthNavigation {
       debugPrint('AuthNavigation: Auth state changed');
       debugPrint('AuthNavigation: Previous state: $previous');
       debugPrint('AuthNavigation: Next state: $authState');
-
-      // Only navigate if we're not already on the target route
-      final currentRoute = getCurrentRoute();
-
-      // Email verification takes highest priority
-      if (authState.requiresEmailVerification) {
-        debugPrint('AuthNavigation: User needs verification');
-        if (currentRoute != AuthRoutes.verifyEmail) {
-          debugPrint('AuthNavigation: Navigating to verify email');
-          navigateToVerification(authState.user?.email);
-        } else {
-          debugPrint('AuthNavigation: Already on verify email screen');
-        }
-        return; // Early return to prevent other navigation
-      }
-
-      // Password reset takes second priority
-      if (authState.requiresPasswordReset) {
-        debugPrint('AuthNavigation: Password reset required');
-        if (currentRoute != AuthRoutes.confirmPasswordReset) {
-          debugPrint('AuthNavigation: Navigating to confirm password reset');
-          navigateToConfirmPasswordReset(authState.user?.email ?? '');
-        } else {
-          debugPrint(
-              'AuthNavigation: Already on confirm password reset screen');
-        }
-        return; // Early return to prevent other navigation
-      }
-
-      // Only handle login/home navigation if no special states are active
-      if (!authState.requiresEmailVerification &&
-          !authState.requiresPasswordReset) {
-        if (authState.isAuthenticated) {
-          debugPrint('AuthNavigation: User is logged in, navigating to home');
-          navigateToHome();
-        } else {
-          debugPrint(
-              'AuthNavigation: User is not logged in, navigating to login');
-          navigateToLogin(null);
-        }
-      }
+      // AuthWrapper handles automatic routing based on auth state
+      // We don't navigate here to avoid conflicts with AuthWrapper
     });
 
-    // Listen to token manager state changes
+    // Listen to token manager state changes for unauthorized handling
     ref.listen(tokenManagerProvider, (previous, next) {
       if (next == FeatureAvailability.unauthorized) {
         _handleUnauthorized();
@@ -353,6 +316,6 @@ class AuthNavigation extends _$AuthNavigation {
 
 /// Global navigator key for handling navigation from providers
 @riverpod
-GlobalKey<NavigatorState> navigatorKey(NavigatorKeyRef ref) {
+GlobalKey<NavigatorState> navigatorKey(Ref ref) {
   return GlobalKey<NavigatorState>();
 }

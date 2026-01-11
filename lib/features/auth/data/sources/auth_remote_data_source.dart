@@ -126,7 +126,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String confirmationCode,
   }) async {
     try {
-      await _apiClient.post<Map<String, dynamic>>(
+      await _apiClient.post(
         AuthEndpoints.confirm,
         data: {
           'email': email,
@@ -143,7 +143,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
   }) async {
     try {
-      await _apiClient.post<Map<String, dynamic>>(
+      await _apiClient.post(
         AuthEndpoints.resendCode,
         data: {
           'email': email,
@@ -175,7 +175,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
   }) async {
     try {
-      await _apiClient.post<Map<String, dynamic>>(
+      await _apiClient.post(
         AuthEndpoints.forgotPassword,
         data: {
           'email': email,
@@ -193,7 +193,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String newPassword,
   }) async {
     try {
-      await _apiClient.post<Map<String, dynamic>>(
+      await _apiClient.post(
         AuthEndpoints.resetPassword,
         data: {
           'email': email,
@@ -244,7 +244,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String newPassword,
   }) async {
     try {
-      await _apiClient.post<Map<String, dynamic>>(
+      await _apiClient.post(
         AuthEndpoints.changePassword,
         data: {
           'currentPassword': currentPassword,

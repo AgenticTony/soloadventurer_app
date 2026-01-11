@@ -11,7 +11,7 @@ part of 'recommendation_service.dart';
 /// Provider for the recommendation service implementation
 
 @ProviderFor(recommendationService)
-final recommendationServiceProvider = RecommendationServiceProvider._();
+const recommendationServiceProvider = RecommendationServiceProvider._();
 
 /// Provider for the recommendation service implementation
 
@@ -20,7 +20,7 @@ final class RecommendationServiceProvider extends $FunctionalProvider<
     RecommendationService,
     RecommendationService> with $Provider<RecommendationService> {
   /// Provider for the recommendation service implementation
-  RecommendationServiceProvider._()
+  const RecommendationServiceProvider._()
       : super(
           from: null,
           argument: null,

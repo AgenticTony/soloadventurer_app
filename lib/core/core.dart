@@ -4,7 +4,7 @@
 /// ```dart
 /// import 'package:soloadventurer/core/core.dart';
 /// ```
-library core;
+library;
 
 // Widgets
 export 'widgets/spacing.dart';

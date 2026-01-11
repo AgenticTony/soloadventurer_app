@@ -48,7 +48,7 @@ part of 'operation_storage_service.dart';
 /// ```
 
 @ProviderFor(OperationStorageService)
-final operationStorageServiceProvider = OperationStorageServiceProvider._();
+const operationStorageServiceProvider = OperationStorageServiceProvider._();
 
 /// Service for persisting and retrieving queued operations.
 ///
@@ -128,7 +128,7 @@ final class OperationStorageServiceProvider
   /// final stats = await storageService.getStorageStats();
   /// print('Total size: ${stats['totalSizeBytes']} bytes');
   /// ```
-  OperationStorageServiceProvider._()
+  const OperationStorageServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -194,12 +194,13 @@ abstract class _$OperationStorageService extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
+    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, void>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, null);
   }
 }

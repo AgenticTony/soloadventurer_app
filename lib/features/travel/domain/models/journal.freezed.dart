@@ -253,8 +253,6 @@ extension JournalPatterns on Journal {
     switch (_that) {
       case _Journal():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -380,8 +378,6 @@ extension JournalPatterns on Journal {
             _that.tags,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

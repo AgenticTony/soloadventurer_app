@@ -37,7 +37,8 @@ class JsonHelpers {
   }
 
   /// Parse double with a default value.
-  static double parseDoubleOrDefault(dynamic value, {double defaultValue = 0.0}) {
+  static double parseDoubleOrDefault(dynamic value,
+      {double defaultValue = 0.0}) {
     return parseDouble(value) ?? defaultValue;
   }
 
@@ -49,7 +50,8 @@ class JsonHelpers {
   }
 
   /// Parse String with a default value.
-  static String parseStringOrDefault(dynamic value, {String defaultValue = ''}) {
+  static String parseStringOrDefault(dynamic value,
+      {String defaultValue = ''}) {
     return parseString(value) ?? defaultValue;
   }
 
@@ -104,7 +106,8 @@ class JsonHelpers {
   }
 
   /// Parse List with empty default.
-  static List<T> parseListOrEmpty<T>(dynamic value, T Function(dynamic) mapper) {
+  static List<T> parseListOrEmpty<T>(
+      dynamic value, T Function(dynamic) mapper) {
     return parseList(value, mapper) ?? [];
   }
 

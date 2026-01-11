@@ -1,13 +1,9 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_resolution.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_operation.dart';
-import 'package:soloadventurer/features/sync/domain/services/conflict_resolver.dart';
-import 'package:soloadventurer/features/sync/domain/services/sync_service.dart';
 import 'package:soloadventurer/features/sync/domain/entities/sync_entity_type.dart';
 import 'package:soloadventurer/features/sync/presentation/state/conflict_resolution_state.dart';
-import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
 import '../providers/conflict_resolution_providers.dart';
 
 part 'conflict_resolution_notifier.g.dart';

@@ -26,7 +26,7 @@ part of 'conflict_resolution_notifier.dart';
 /// 6. Updates UI state
 
 @ProviderFor(ConflictResolutionNotifier)
-final conflictResolutionProvider = ConflictResolutionNotifierProvider._();
+const conflictResolutionProvider = ConflictResolutionNotifierProvider._();
 
 /// Notifier for managing conflict resolution state and user interactions
 ///
@@ -62,7 +62,7 @@ final class ConflictResolutionNotifierProvider extends $NotifierProvider<
   /// 4. Applies resolution to local data store
   /// 5. Queues sync operations for remote update
   /// 6. Updates UI state
-  ConflictResolutionNotifierProvider._()
+  const ConflictResolutionNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -115,6 +115,7 @@ abstract class _$ConflictResolutionNotifier
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref =
         this.ref as $Ref<ConflictResolutionState, ConflictResolutionState>;
     final element = ref.element as $ClassProviderElement<
@@ -122,6 +123,6 @@ abstract class _$ConflictResolutionNotifier
         ConflictResolutionState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

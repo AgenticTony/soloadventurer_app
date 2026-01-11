@@ -151,8 +151,6 @@ extension AuthTokensPatterns on AuthTokens {
     switch (_that) {
       case _AuthTokens():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -234,8 +232,6 @@ extension AuthTokensPatterns on AuthTokens {
       case _AuthTokens():
         return $default(_that.idToken, _that.accessToken, _that.refreshToken,
             _that.expiresIn);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

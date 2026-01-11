@@ -11,13 +11,13 @@ part of 'itinerary_screen.dart';
 /// Provider for view mode
 
 @ProviderFor(ViewModeNotifier)
-final viewModeProvider = ViewModeNotifierProvider._();
+const viewModeProvider = ViewModeNotifierProvider._();
 
 /// Provider for view mode
 final class ViewModeNotifierProvider
     extends $NotifierProvider<ViewModeNotifier, ViewMode> {
   /// Provider for view mode
-  ViewModeNotifierProvider._()
+  const ViewModeNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -53,23 +53,24 @@ abstract class _$ViewModeNotifier extends $Notifier<ViewMode> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<ViewMode, ViewMode>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ViewMode, ViewMode>, ViewMode, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for reorder mode
 
 @ProviderFor(IsReorderModeNotifier)
-final isReorderModeProvider = IsReorderModeNotifierProvider._();
+const isReorderModeProvider = IsReorderModeNotifierProvider._();
 
 /// Provider for reorder mode
 final class IsReorderModeNotifierProvider
     extends $NotifierProvider<IsReorderModeNotifier, bool> {
   /// Provider for reorder mode
-  IsReorderModeNotifierProvider._()
+  const IsReorderModeNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -106,9 +107,10 @@ abstract class _$IsReorderModeNotifier extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<bool, bool>, bool, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

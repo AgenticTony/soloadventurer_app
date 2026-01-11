@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../auth/presentation/providers/auth_notifier_provider.dart';
@@ -306,8 +307,8 @@ class _DestinationDetailScreenState
           if (destination == null) return const SizedBox.shrink();
 
           // Check if destination is saved
-          final isSaved = savedState.hasValue &&
-              savedState.value!.isDestinationInWishlist(destination.id);
+          final isSaved = savedState?.hasValue ?? false &&
+              savedState!.value!.isDestinationInWishlist(destination.id);
 
           return _buildFloatingActionButtons(destination, theme, isSaved);
         },
@@ -420,7 +421,7 @@ class _DestinationDetailScreenState
         child: Icon(
           Icons.place,
           size: 80,
-          color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
         ),
       ),
     );
@@ -449,7 +450,7 @@ class _DestinationDetailScreenState
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha:0.2),
+                    color: Colors.amber.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.amber,
@@ -519,7 +520,7 @@ class _DestinationDetailScreenState
   Widget _buildScoresSection(Destination destination, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       child: Row(
         children: [
           // Safety score

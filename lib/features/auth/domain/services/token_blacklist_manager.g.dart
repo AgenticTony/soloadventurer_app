@@ -11,13 +11,13 @@ part of 'token_blacklist_manager.dart';
 /// Manages token blacklisting and rotation according to AWS Cognito best practices
 
 @ProviderFor(TokenBlacklistManager)
-final tokenBlacklistManagerProvider = TokenBlacklistManagerProvider._();
+const tokenBlacklistManagerProvider = TokenBlacklistManagerProvider._();
 
 /// Manages token blacklisting and rotation according to AWS Cognito best practices
 final class TokenBlacklistManagerProvider
     extends $NotifierProvider<TokenBlacklistManager, void> {
   /// Manages token blacklisting and rotation according to AWS Cognito best practices
-  TokenBlacklistManagerProvider._()
+  const TokenBlacklistManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -54,9 +54,10 @@ abstract class _$TokenBlacklistManager extends $Notifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
+    build();
     final ref = this.ref as $Ref<void, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<void, void>, void, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, null);
   }
 }

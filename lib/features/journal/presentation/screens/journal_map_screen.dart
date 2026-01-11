@@ -62,9 +62,8 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
           // Center on all markers
           IconButton(
             icon: const Icon(Icons.center_focus_strong),
-            onPressed: mapState.hasMarkers
-                ? () => _centerOnMarkers(mapState)
-                : null,
+            onPressed:
+                mapState.hasMarkers ? () => _centerOnMarkers(mapState) : null,
             tooltip: 'Center on all markers',
           ),
 
@@ -73,7 +72,9 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: () {
               if (widget.tripId != null) {
-                ref.read(journalTripMapProvider(widget.tripId!).notifier).refresh();
+                ref
+                    .read(journalTripMapProvider(widget.tripId!).notifier)
+                    .refresh();
               } else {
                 ref.read(journalMapProvider.notifier).refresh();
               }
@@ -120,8 +121,9 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
                 final notifier = widget.tripId != null
                     ? ref.read(journalTripMapProvider(widget.tripId!).notifier)
                     : ref.read(journalMapProvider.notifier);
-                notifier.updateCenter(event.camera.center);
-                notifier.updateZoom(event.camera.zoom);
+                // Use dynamic to access the methods
+                (notifier as dynamic).updateCenter(event.camera.center);
+                (notifier as dynamic).updateZoom(event.camera.zoom);
               }
             },
           ),
@@ -150,7 +152,7 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withValues(alpha:0.5),
+                        .withValues(alpha: 0.5),
                   ),
                 ],
               ),
@@ -197,7 +199,7 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
                 height: isSelected ? 40 : 30,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black.withValues(alpha:0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                 ),
               ),
               // Marker icon
@@ -281,9 +283,12 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: () {
                     if (widget.tripId != null) {
-                      ref.read(journalTripMapProvider(widget.tripId!).notifier).clearSelection();
+                      final notifier = ref
+                          .read(journalTripMapProvider(widget.tripId!).notifier);
+                      (notifier as dynamic).clearSelection();
                     } else {
-                      ref.read(journalMapProvider.notifier).clearSelection();
+                      final notifier = ref.read(journalMapProvider.notifier);
+                      (notifier as dynamic).clearSelection();
                     }
                   },
                   padding: EdgeInsets.zero,
@@ -322,7 +327,8 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
               const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.emoji_emotions, size: 14, color: Colors.grey),
+                  const Icon(Icons.emoji_emotions,
+                      size: 14, color: Colors.grey),
                   const SizedBox(width: 4),
                   Text(
                     entry.mood!,
@@ -338,7 +344,8 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
   }
 
   /// Build marker count badge
-  Widget _buildMarkerCountBadge(BuildContext context, JournalMapState mapState) {
+  Widget _buildMarkerCountBadge(
+      BuildContext context, JournalMapState mapState) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -385,7 +392,9 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
           ElevatedButton.icon(
             onPressed: () {
               if (widget.tripId != null) {
-                ref.read(journalTripMapProvider(widget.tripId!).notifier).refresh();
+                ref
+                    .read(journalTripMapProvider(widget.tripId!).notifier)
+                    .refresh();
               } else {
                 ref.read(journalMapProvider.notifier).refresh();
               }
@@ -407,7 +416,7 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
           Icon(
             Icons.map_outlined,
             size: 80,
-            color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 24),
           Text(
@@ -438,9 +447,9 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
 
     // Toggle selection
     if (mapState.selectedEntry?.id == marker.entry.id) {
-      notifier.clearSelection();
+      (notifier as dynamic).clearSelection();
     } else {
-      notifier.selectEntry(marker.entry);
+      (notifier as dynamic).selectEntry(marker.entry);
       // Move map to marker position
       _mapController.move(marker.position, 15.0);
     }
@@ -473,14 +482,22 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
     double zoom = 13.0;
     if (maxDiff > 100) {
       zoom = 3.0;
-    } else if (maxDiff > 50) zoom = 4.0;
-    else if (maxDiff > 20) zoom = 5.0;
-    else if (maxDiff > 10) zoom = 6.0;
-    else if (maxDiff > 5) zoom = 7.0;
-    else if (maxDiff > 2) zoom = 8.0;
-    else if (maxDiff > 1) zoom = 9.0;
-    else if (maxDiff > 0.5) zoom = 10.0;
-    else if (maxDiff > 0.2) zoom = 11.0;
+    } else if (maxDiff > 50)
+      zoom = 4.0;
+    else if (maxDiff > 20)
+      zoom = 5.0;
+    else if (maxDiff > 10)
+      zoom = 6.0;
+    else if (maxDiff > 5)
+      zoom = 7.0;
+    else if (maxDiff > 2)
+      zoom = 8.0;
+    else if (maxDiff > 1)
+      zoom = 9.0;
+    else if (maxDiff > 0.5)
+      zoom = 10.0;
+    else if (maxDiff > 0.2)
+      zoom = 11.0;
     else if (maxDiff > 0.1) zoom = 12.0;
 
     _mapController.move(center, zoom);

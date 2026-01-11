@@ -623,7 +623,7 @@ void main() {
         ),
       ];
 
-      final bounds = LatLngBounds(
+      final bounds = Bounds(
         southwest: const LatLng(37.4, -122.5),
         northeast: const LatLng(37.8, -122.0),
       );
@@ -646,7 +646,7 @@ void main() {
         ),
       ];
 
-      final bounds = LatLngBounds(
+      final bounds = Bounds(
         southwest: const LatLng(37.4, -122.5), // San Francisco
         northeast: const LatLng(37.8, -122.0),
       );

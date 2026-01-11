@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/app/router/app_router.dart';
+import 'package:soloadventurer/app/router/go_router_config.dart';
 import 'package:soloadventurer/app/theme/app_theme.dart';
 import 'package:soloadventurer/app/app_lifecycle_sync_manager.dart';
-import 'package:soloadventurer/features/profile/presentation/routes/profile_route_guard.dart';
-import 'package:soloadventurer/features/profile/presentation/providers/profile_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_overlay.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_notification_listener.dart';
 
-/// Provider for the profile route observer
-final profileRouteObserverProvider = Provider<ProfileRouteObserver>((ref) {
-  final notifier = ref.watch(profileNavigationHistoryProvider.notifier);
-  return ProfileRouteObserver(notifier);
-});
-
-/// Global navigator key
-final navigatorKey = GlobalKey<NavigatorState>();
-
-/// Widget that handles navigation state changes
-class NavigationHandler extends ConsumerStatefulWidget {
+/// Widget that handles navigation state changes via go_router
+class NavigationHandler extends ConsumerWidget {
   final Widget child;
 
   const NavigationHandler({
@@ -29,12 +18,8 @@ class NavigationHandler extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<NavigationHandler> createState() => _NavigationHandlerState();
-}
-
-class _NavigationHandlerState extends ConsumerState<NavigationHandler> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Listen for navigation requests from authNavigationProvider
     ref.listen<AuthNavigationState>(
       authNavigationProvider,
       (previous, current) {
@@ -44,28 +29,22 @@ class _NavigationHandlerState extends ConsumerState<NavigationHandler> {
           return;
         }
 
-        final navigatorState = navigatorKey.currentState;
-        if (navigatorState == null) {
-          debugPrint(
-              '[Navigation] Navigator not available, skipping navigation');
-          return;
-        }
+        // Get the go_router instance
+        final router = ref.read(goRouterProvider);
 
         try {
           if (request.isBack) {
             debugPrint('[Navigation] Handling back navigation');
-            if (navigatorState.canPop()) {
-              navigatorState.pop();
+            if (router.canPop()) {
+              router.pop();
             } else {
               debugPrint('[Navigation] Cannot pop - no routes to pop');
               return;
             }
           } else {
             debugPrint('[Navigation] Handling navigation to ${request.route}');
-            navigatorState.pushNamed(
-              request.route,
-              arguments: request.arguments,
-            );
+            // Use go_router's go() method for navigation
+            router.go(request.route, extra: request.arguments);
           }
 
           // Mark the request as handled only if navigation was successful
@@ -77,7 +56,7 @@ class _NavigationHandlerState extends ConsumerState<NavigationHandler> {
       },
     );
 
-    return widget.child;
+    return child;
   }
 }
 
@@ -88,28 +67,20 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final navigatorKey = ref.watch(navigatorKeyProvider);
+    final router = ref.watch(goRouterProvider);
 
     return AppLifecycleSyncManager(
-      child: TokenRefreshNotificationListener(
-        child: TokenRefreshOverlay(
-          child: MaterialApp(
-            navigatorKey: navigatorKey,
-            title: 'SoloAdventurer',
-            theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system,
-            debugShowCheckedModeBanner: false,
-            onGenerateRoute: AppRouter.onGenerateRoute,
-            initialRoute: '/',
-            navigatorObservers: [
-              NavigatorObserver(),
-              ref.watch(profileRouteObserverProvider),
-            ],
-            builder: (context, child) {
-              if (child == null) return const SizedBox();
-              return NavigationHandler(child: child);
-            },
+      child: NavigationHandler(
+        child: TokenRefreshNotificationListener(
+          child: TokenRefreshOverlay(
+            child: MaterialApp.router(
+              title: 'SoloAdventurer',
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: ThemeMode.system,
+              debugShowCheckedModeBanner: false,
+              routerConfig: router,
+            ),
           ),
         ),
       ),

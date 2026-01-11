@@ -53,7 +53,7 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
       // Trigger sync on next frame after widget is built
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          ref.read(manualSyncNotifierProvider.notifier).triggerSync();
+          ref.read(manualSyncProvider.notifier).triggerSync();
         }
       });
     }
@@ -88,7 +88,7 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
 
   Future<void> _handleRefresh(BuildContext context) async {
     // Trigger sync
-    await ref.read(manualSyncNotifierProvider.notifier).triggerSync();
+    await ref.read(manualSyncProvider.notifier).triggerSync();
 
     // Wait a bit for visual feedback
     await Future.delayed(const Duration(milliseconds: 500));
@@ -174,7 +174,7 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
           label: 'Retry',
           textColor: theme.colorScheme.onError,
           onPressed: () {
-            ref.read(manualSyncNotifierProvider.notifier).triggerSync();
+            ref.read(manualSyncProvider.notifier).triggerSync();
           },
         ),
       ),

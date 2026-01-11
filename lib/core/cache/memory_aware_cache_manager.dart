@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'cache_manager.dart';
+import 'cache_stats.dart';
 import 'memory_cache.dart';
 import '../monitoring/performance/memory_profiler.dart';
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/auth/presentation/widgets/token_refresh_notification_listener.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/token_refresh_providers.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/token_refresh_notification_handler.dart';
 
 /// Widget that listens to token refresh notifications and displays them
 ///

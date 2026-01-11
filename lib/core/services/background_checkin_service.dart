@@ -150,8 +150,7 @@ abstract class BackgroundCheckInService {
 
 /// Provider for the background check-in service implementation
 @riverpod
-BackgroundCheckInService backgroundCheckInService(
-    BackgroundCheckInServiceRef ref) {
+BackgroundCheckInService backgroundCheckInService(Ref ref) {
   throw UnimplementedError(
     'BackgroundCheckInService implementation not provided. '
     'Use backgroundCheckInServiceProvider from background_checkin_service_impl.dart',

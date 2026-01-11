@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/destination_discovery/presentation/screens/screens.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart' hide BudgetLevel, ActivityLevel;
 
 /// Destination discovery route names
 class DestinationDiscoveryRoutes {
@@ -196,7 +196,7 @@ class DestinationDiscoveryRouter {
   static DestinationFilter _parseFilterQueryParams(Map<String, String> params) {
     // Check if there are any filter parameters
     if (params.isEmpty) {
-      return const DestinationFilter();
+      return DestinationFilter();
     }
 
     return DestinationFilter(
@@ -214,7 +214,7 @@ class DestinationDiscoveryRouter {
           .where((tag) => tag.isNotEmpty)
           .toList(),
       hiddenGemsOnly: params['hiddenGems']?.toLowerCase() == 'true',
-      sortBy: _parseSortOrder(params['sortBy']),
+      sortBy: _parseSortOrder(params['sortBy']) ?? DestinationSortOrder.popularity,
     );
   }
 
@@ -223,16 +223,16 @@ class DestinationDiscoveryRouter {
   /// Performs case-insensitive parsing of budget level strings.
   /// Returns null for null input or unknown values (silently ignored).
   ///
-  /// Valid values: "budget", "moderate", "expensive"
-  static BudgetLevel? _parseBudgetLevel(String? value) {
+  /// Valid values: "budget", "moderate", "expensive" (mapped to filter equivalents)
+  static FilterBudgetLevel? _parseBudgetLevel(String? value) {
     if (value == null) return null;
     switch (value.toLowerCase()) {
       case 'budget':
-        return BudgetLevel.budget;
+        return FilterBudgetLevel.budget;
       case 'moderate':
-        return BudgetLevel.moderate;
+        return FilterBudgetLevel.midRange;
       case 'expensive':
-        return BudgetLevel.expensive;
+        return FilterBudgetLevel.luxury;
       default:
         return null;
     }
@@ -243,16 +243,16 @@ class DestinationDiscoveryRouter {
   /// Performs case-insensitive parsing of activity level strings.
   /// Returns null for null input or unknown values (silently ignored).
   ///
-  /// Valid values: "relaxed", "moderate", "adventurous"
-  static ActivityLevel? _parseActivityLevel(String? value) {
+  /// Valid values: "relaxed", "moderate", "adventurous" (mapped to filter equivalents)
+  static FilterActivityLevel? _parseActivityLevel(String? value) {
     if (value == null) return null;
     switch (value.toLowerCase()) {
       case 'relaxed':
-        return ActivityLevel.relaxed;
+        return FilterActivityLevel.relaxed;
       case 'moderate':
-        return ActivityLevel.moderate;
+        return FilterActivityLevel.moderate;
       case 'adventurous':
-        return ActivityLevel.adventurous;
+        return FilterActivityLevel.active;
       default:
         return null;
     }

@@ -109,7 +109,8 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
           metadata: {
             'user_id': userId,
             'attempts': _loginAttemptThreshold,
-            'timeframe': loginAttempts.first.difference(loginAttempts.last).inMinutes,
+            'timeframe':
+                loginAttempts.first.difference(loginAttempts.last).inMinutes,
           },
         );
       }

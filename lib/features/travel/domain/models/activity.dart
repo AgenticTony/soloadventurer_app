@@ -33,7 +33,7 @@ enum ActivityCategory {
 /// a larger trip itinerary. Examples include restaurant reservations, museum
 /// visits, transportation bookings, etc.
 @freezed
-class Activity with _$Activity {
+sealed class Activity with _$Activity {
   const factory Activity({
     /// Unique identifier for the activity
     required String id,

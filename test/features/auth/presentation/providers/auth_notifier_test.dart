@@ -135,10 +135,10 @@ void main() {
         addTearDown(container.dispose);
 
         // Act - await the build to complete
-        await container.read(authNotifierProvider.future);
+        await container.read(authProvider.future);
 
         // Assert - read state after awaiting
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -163,10 +163,10 @@ void main() {
         addTearDown(container.dispose);
 
         // Act - await the build to complete
-        await container.read(authNotifierProvider.future);
+        await container.read(authProvider.future);
 
         // Assert - read state after awaiting
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -192,13 +192,13 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        final future = container.read(authNotifierProvider.notifier).signIn(
+        final future = container.read(authProvider.notifier).signIn(
               'test@test.com',
               'password',
             );
 
         // Assert - while loading (AsyncValue.loading() preserves previous value)
-        final state = container.read(authNotifierProvider);
+        final state = container.read(authProvider);
         expect(state.isLoading, isTrue);
 
         // Complete sign in
@@ -219,13 +219,13 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signIn(
+        await container.read(authProvider.notifier).signIn(
               'test@test.com',
               'password',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -244,13 +244,13 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signIn(
+        await container.read(authProvider.notifier).signIn(
               'test@test.com',
               'password',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncError<AuthState>>()
@@ -269,13 +269,13 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signIn(
+        await container.read(authProvider.notifier).signIn(
               'test@test.com',
               'password',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>().having(
@@ -301,17 +301,17 @@ void main() {
         addTearDown(container.dispose);
 
         // Await initial build
-        await container.read(authNotifierProvider.future);
+        await container.read(authProvider.future);
 
         // Act
-        final future = container.read(authNotifierProvider.notifier).signUp(
+        final future = container.read(authProvider.notifier).signUp(
               email: 'test@test.com',
               password: 'password',
               name: 'Test',
             );
 
         // Assert - while loading (AsyncValue.loading() preserves previous value)
-        final state = container.read(authNotifierProvider);
+        final state = container.read(authProvider);
         expect(state.isLoading, isTrue);
 
         // Complete sign up
@@ -332,17 +332,17 @@ void main() {
         addTearDown(container.dispose);
 
         // Await initial build
-        await container.read(authNotifierProvider.future);
+        await container.read(authProvider.future);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signUp(
+        await container.read(authProvider.notifier).signUp(
               email: 'test@test.com',
               password: 'password',
               name: 'Test',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -367,17 +367,17 @@ void main() {
         addTearDown(container.dispose);
 
         // Await initial build
-        await container.read(authNotifierProvider.future);
+        await container.read(authProvider.future);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signUp(
+        await container.read(authProvider.notifier).signUp(
               email: 'test@test.com',
               password: 'password',
               name: 'Test',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>().having(
@@ -397,10 +397,10 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        final future = container.read(authNotifierProvider.notifier).signOut();
+        final future = container.read(authProvider.notifier).signOut();
 
         // Assert - while loading (AsyncValue.loading() preserves previous value)
-        final state = container.read(authNotifierProvider);
+        final state = container.read(authProvider);
         expect(state.isLoading, isTrue);
 
         // Complete sign out
@@ -415,10 +415,10 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signOut();
+        await container.read(authProvider.notifier).signOut();
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -436,10 +436,10 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).signOut();
+        await container.read(authProvider.notifier).signOut();
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncError<AuthState>>()
@@ -468,13 +468,13 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).verifyEmail(
+        await container.read(authProvider.notifier).verifyEmail(
               '123456',
               'test@test.com',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -495,12 +495,12 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container.read(authNotifierProvider.notifier).forgotPassword(
+        await container.read(authProvider.notifier).forgotPassword(
               'test@test.com',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>().having(
@@ -521,16 +521,14 @@ void main() {
         addTearDown(container.dispose);
 
         // Act
-        await container
-            .read(authNotifierProvider.notifier)
-            .confirmPasswordReset(
+        await container.read(authProvider.notifier).confirmPasswordReset(
               code: '123456',
               newPassword: 'newPassword',
               email: 'test@test.com',
             );
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>()
@@ -560,18 +558,16 @@ void main() {
         addTearDown(container.dispose);
 
         // First, sign in to set up the state with a user
-        await container.read(authNotifierProvider.notifier).signIn(
+        await container.read(authProvider.notifier).signIn(
               'test@test.com',
               'password',
             );
 
         // Act
-        await container
-            .read(authNotifierProvider.notifier)
-            .resendVerificationEmail();
+        await container.read(authProvider.notifier).resendVerificationEmail();
 
         // Assert
-        final authStateAsync = container.read(authNotifierProvider);
+        final authStateAsync = container.read(authProvider);
         expect(
           authStateAsync,
           isA<AsyncData<AuthState>>().having(

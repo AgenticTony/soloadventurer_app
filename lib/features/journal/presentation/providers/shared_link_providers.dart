@@ -338,7 +338,8 @@ Future<SharedLink?> sharedLinkBySlug(Ref ref, String slug) async {
 
 /// Provider for shared link statistics
 @riverpod
-Future<SharedLinkStatistics> sharedLinkStatistics(Ref ref, String linkId) async {
+Future<SharedLinkStatistics> sharedLinkStatistics(
+    Ref ref, String linkId) async {
   final service = ref.watch(sharedLinkServiceProvider);
   return service.getStatistics(linkId);
 }

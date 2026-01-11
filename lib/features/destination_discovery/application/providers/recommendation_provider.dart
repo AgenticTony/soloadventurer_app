@@ -53,7 +53,8 @@ class Recommendation extends _$Recommendation {
     final repository = ref.watch(destinationRepositoryProvider);
 
     // Auto-load recommendations on build
-    final recommendation = await repository.getPersonalizedRecommendations(userId);
+    final recommendation =
+        await repository.getPersonalizedRecommendations(userId);
 
     return RecommendationState(
       recommendation: recommendation,
@@ -81,7 +82,8 @@ class Recommendation extends _$Recommendation {
 
     // Load recommendations
     state = await AsyncValue.guard(() async {
-      final recommendation = await repository.getPersonalizedRecommendations(userId);
+      final recommendation =
+          await repository.getPersonalizedRecommendations(userId);
 
       return RecommendationState(
         recommendation: recommendation,

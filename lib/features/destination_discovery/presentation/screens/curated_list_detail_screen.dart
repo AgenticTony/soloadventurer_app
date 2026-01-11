@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../auth/presentation/providers/auth_notifier_provider.dart';
@@ -284,8 +285,8 @@ class _CuratedListDetailScreenState
                     child: Icon(
                       Icons.collections_bookmark,
                       size: 80,
-                      color:
-                          theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.3),
                     ),
                   ),
                 ),
@@ -296,7 +297,8 @@ class _CuratedListDetailScreenState
                   child: Icon(
                     Icons.collections_bookmark,
                     size: 80,
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
+                    color: theme.colorScheme.onSurfaceVariant
+                        .withValues(alpha: 0.3),
                   ),
                 ),
               ),
@@ -388,7 +390,7 @@ class _CuratedListDetailScreenState
   Widget _buildScoresSection(CuratedList curatedList, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       child: Row(
         children: [
           // Safety score

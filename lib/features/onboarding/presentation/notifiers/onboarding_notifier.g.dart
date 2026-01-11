@@ -15,7 +15,7 @@ part of 'onboarding_notifier.dart';
 /// the onboarding process.
 
 @ProviderFor(OnboardingNotifier)
-final onboardingProvider = OnboardingNotifierProvider._();
+const onboardingProvider = OnboardingNotifierProvider._();
 
 /// Notifier for managing onboarding form state
 ///
@@ -29,7 +29,7 @@ final class OnboardingNotifierProvider
   /// Handles the onboarding flow from form input through itinerary generation.
   /// Uses a freezed state union type to represent the different states of
   /// the onboarding process.
-  OnboardingNotifierProvider._()
+  const OnboardingNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -70,12 +70,13 @@ abstract class _$OnboardingNotifier extends $Notifier<OnboardingState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<OnboardingState, OnboardingState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<OnboardingState, OnboardingState>,
         OnboardingState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

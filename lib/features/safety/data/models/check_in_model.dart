@@ -6,8 +6,7 @@ part 'check_in_model.g.dart';
 
 /// Model for [CheckIn] with JSON serialization
 @freezed
-class CheckInModel with _$CheckInModel {
-
+sealed class CheckInModel with _$CheckInModel {
   const factory CheckInModel({
     required String id,
     required String userId,

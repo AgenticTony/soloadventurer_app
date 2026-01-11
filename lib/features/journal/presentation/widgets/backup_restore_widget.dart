@@ -676,7 +676,7 @@ class _BackupListTile extends StatelessWidget {
         isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
         color: isSelected
             ? theme.colorScheme.primary
-            : theme.colorScheme.onSurface.withValues(alpha:0.6),
+            : theme.colorScheme.onSurface.withValues(alpha: 0.6),
       ),
       title: Text(
         DateFormat('MMM dd, yyyy HH:mm').format(backup.createdAt),

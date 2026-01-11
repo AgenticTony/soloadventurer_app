@@ -8,8 +8,7 @@ part 'place_activity.g.dart';
 /// Represents attractions, restaurants, activities, or experiences
 /// at a destination. Contains rich metadata for personalization.
 @freezed
-class PlaceActivity with _$PlaceActivity {
-
+sealed class PlaceActivity with _$PlaceActivity {
   /// Creates a place activity with all details
   ///
   /// [id] Unique identifier for this place

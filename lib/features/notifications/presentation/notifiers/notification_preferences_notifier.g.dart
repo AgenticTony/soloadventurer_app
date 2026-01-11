@@ -11,14 +11,14 @@ part of 'notification_preferences_notifier.dart';
 /// Notifier for managing notification preferences state
 
 @ProviderFor(NotificationPreferencesNotifier)
-final notificationPreferencesProvider =
+const notificationPreferencesProvider =
     NotificationPreferencesNotifierProvider._();
 
 /// Notifier for managing notification preferences state
 final class NotificationPreferencesNotifierProvider extends $NotifierProvider<
     NotificationPreferencesNotifier, AsyncValue<NotificationPreferences>> {
   /// Notifier for managing notification preferences state
-  NotificationPreferencesNotifierProvider._()
+  const NotificationPreferencesNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -57,6 +57,7 @@ abstract class _$NotificationPreferencesNotifier
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AsyncValue<NotificationPreferences>,
         AsyncValue<NotificationPreferences>>;
     final element = ref.element as $ClassProviderElement<
@@ -65,6 +66,6 @@ abstract class _$NotificationPreferencesNotifier
         AsyncValue<NotificationPreferences>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

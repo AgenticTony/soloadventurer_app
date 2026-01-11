@@ -6,8 +6,7 @@ part 'trusted_contact_model.g.dart';
 
 /// Model for [TrustedContact] with JSON serialization
 @freezed
-class TrustedContactModel with _$TrustedContactModel {
-
+sealed class TrustedContactModel with _$TrustedContactModel {
   const factory TrustedContactModel({
     required String id,
     required String userId,

@@ -92,7 +92,7 @@ class AppError {
   /// Additional context data
   final Map<String, dynamic>? context;
 
-  const AppError({
+  AppError({
     required this.id,
     required this.message,
     this.technicalMessage,
@@ -106,7 +106,7 @@ class AppError {
     this.stackTrace,
     DateTime? timestamp,
     this.context,
-  }) : timestamp = timestamp ?? const DateTime.now();
+  }) : timestamp = timestamp ?? DateTime.now();
 
   /// Creates an [AppError] from an [AppException]
   factory AppError.fromException(
@@ -430,7 +430,7 @@ class AppError {
 
   /// Generate a unique error ID
   static String _generateErrorId() {
-    return 'err_${DateTime.now().millisecondsSinceEpoch}_$hashCode';
+    return 'err_${DateTime.now().millisecondsSinceEpoch}_${Object().hashCode}';
   }
 
   /// Get user-friendly message from exception

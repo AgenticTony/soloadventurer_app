@@ -22,13 +22,13 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
     super.initState();
     // Load all check-ins when screen initializes
     Future.microtask(() {
-      ref.read(checkInNotifierProvider.notifier).loadCheckIns();
+      ref.read(checkInProvider.notifier).loadCheckIns();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final checkInState = ref.watch(checkInNotifierProvider);
+    final checkInState = ref.watch(checkInProvider);
     final allCheckIns = checkInState.checkIns;
     final isLoading = checkInState.isLoading;
     final error = checkInState.error;
@@ -153,7 +153,7 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(checkInNotifierProvider.notifier).loadCheckIns();
+        await ref.read(checkInProvider.notifier).loadCheckIns();
       },
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
@@ -466,7 +466,7 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(checkInNotifierProvider.notifier).loadCheckIns();
+                ref.read(checkInProvider.notifier).loadCheckIns();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),

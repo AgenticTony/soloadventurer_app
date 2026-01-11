@@ -11,14 +11,14 @@ part of 'safety_providers.dart';
 /// Provider for LocationService
 
 @ProviderFor(locationService)
-final locationServiceProvider = LocationServiceProvider._();
+const locationServiceProvider = LocationServiceProvider._();
 
 /// Provider for LocationService
 
 final class LocationServiceProvider extends $FunctionalProvider<LocationService,
     LocationService, LocationService> with $Provider<LocationService> {
   /// Provider for LocationService
-  LocationServiceProvider._()
+  const LocationServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -56,7 +56,7 @@ String _$locationServiceHash() => r'117c345c56e5232f0ef76e67f36a124d33c5d324';
 /// Provider for NotificationService
 
 @ProviderFor(notificationService)
-final notificationServiceProvider = NotificationServiceProvider._();
+const notificationServiceProvider = NotificationServiceProvider._();
 
 /// Provider for NotificationService
 
@@ -65,7 +65,7 @@ final class NotificationServiceProvider extends $FunctionalProvider<
     NotificationService,
     NotificationService> with $Provider<NotificationService> {
   /// Provider for NotificationService
-  NotificationServiceProvider._()
+  const NotificationServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -105,7 +105,7 @@ String _$notificationServiceHash() =>
 /// Provider for BackgroundCheckInService
 
 @ProviderFor(backgroundCheckInService)
-final backgroundCheckInServiceProvider = BackgroundCheckInServiceProvider._();
+const backgroundCheckInServiceProvider = BackgroundCheckInServiceProvider._();
 
 /// Provider for BackgroundCheckInService
 
@@ -114,7 +114,7 @@ final class BackgroundCheckInServiceProvider extends $FunctionalProvider<
     BackgroundCheckInService,
     BackgroundCheckInService> with $Provider<BackgroundCheckInService> {
   /// Provider for BackgroundCheckInService
-  BackgroundCheckInServiceProvider._()
+  const BackgroundCheckInServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -154,7 +154,7 @@ String _$backgroundCheckInServiceHash() =>
 /// Provider for MissedCheckInDetector
 
 @ProviderFor(missedCheckInDetector)
-final missedCheckInDetectorProvider = MissedCheckInDetectorProvider._();
+const missedCheckInDetectorProvider = MissedCheckInDetectorProvider._();
 
 /// Provider for MissedCheckInDetector
 
@@ -163,7 +163,7 @@ final class MissedCheckInDetectorProvider extends $FunctionalProvider<
     MissedCheckInDetector,
     MissedCheckInDetector> with $Provider<MissedCheckInDetector> {
   /// Provider for MissedCheckInDetector
-  MissedCheckInDetectorProvider._()
+  const MissedCheckInDetectorProvider._()
       : super(
           from: null,
           argument: null,
@@ -203,7 +203,7 @@ String _$missedCheckInDetectorHash() =>
 /// Provider for AddTrustedContactUseCase
 
 @ProviderFor(addTrustedContactUseCase)
-final addTrustedContactUseCaseProvider = AddTrustedContactUseCaseProvider._();
+const addTrustedContactUseCaseProvider = AddTrustedContactUseCaseProvider._();
 
 /// Provider for AddTrustedContactUseCase
 
@@ -212,7 +212,7 @@ final class AddTrustedContactUseCaseProvider extends $FunctionalProvider<
     AddTrustedContactUseCase,
     AddTrustedContactUseCase> with $Provider<AddTrustedContactUseCase> {
   /// Provider for AddTrustedContactUseCase
-  AddTrustedContactUseCaseProvider._()
+  const AddTrustedContactUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -252,7 +252,7 @@ String _$addTrustedContactUseCaseHash() =>
 /// Provider for RemoveTrustedContactUseCase
 
 @ProviderFor(removeTrustedContactUseCase)
-final removeTrustedContactUseCaseProvider =
+const removeTrustedContactUseCaseProvider =
     RemoveTrustedContactUseCaseProvider._();
 
 /// Provider for RemoveTrustedContactUseCase
@@ -262,7 +262,7 @@ final class RemoveTrustedContactUseCaseProvider extends $FunctionalProvider<
     RemoveTrustedContactUseCase,
     RemoveTrustedContactUseCase> with $Provider<RemoveTrustedContactUseCase> {
   /// Provider for RemoveTrustedContactUseCase
-  RemoveTrustedContactUseCaseProvider._()
+  const RemoveTrustedContactUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -302,7 +302,7 @@ String _$removeTrustedContactUseCaseHash() =>
 /// Provider for UpdateTrustedContactUseCase
 
 @ProviderFor(updateTrustedContactUseCase)
-final updateTrustedContactUseCaseProvider =
+const updateTrustedContactUseCaseProvider =
     UpdateTrustedContactUseCaseProvider._();
 
 /// Provider for UpdateTrustedContactUseCase
@@ -312,7 +312,7 @@ final class UpdateTrustedContactUseCaseProvider extends $FunctionalProvider<
     UpdateTrustedContactUseCase,
     UpdateTrustedContactUseCase> with $Provider<UpdateTrustedContactUseCase> {
   /// Provider for UpdateTrustedContactUseCase
-  UpdateTrustedContactUseCaseProvider._()
+  const UpdateTrustedContactUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -352,7 +352,7 @@ String _$updateTrustedContactUseCaseHash() =>
 /// Provider for GetTrustedContactsUseCase
 
 @ProviderFor(getTrustedContactsUseCase)
-final getTrustedContactsUseCaseProvider = GetTrustedContactsUseCaseProvider._();
+const getTrustedContactsUseCaseProvider = GetTrustedContactsUseCaseProvider._();
 
 /// Provider for GetTrustedContactsUseCase
 
@@ -361,7 +361,7 @@ final class GetTrustedContactsUseCaseProvider extends $FunctionalProvider<
     GetTrustedContactsUseCase,
     GetTrustedContactsUseCase> with $Provider<GetTrustedContactsUseCase> {
   /// Provider for GetTrustedContactsUseCase
-  GetTrustedContactsUseCaseProvider._()
+  const GetTrustedContactsUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -401,7 +401,7 @@ String _$getTrustedContactsUseCaseHash() =>
 /// Provider for CreateCheckInUseCase
 
 @ProviderFor(createCheckInUseCase)
-final createCheckInUseCaseProvider = CreateCheckInUseCaseProvider._();
+const createCheckInUseCaseProvider = CreateCheckInUseCaseProvider._();
 
 /// Provider for CreateCheckInUseCase
 
@@ -410,7 +410,7 @@ final class CreateCheckInUseCaseProvider extends $FunctionalProvider<
     CreateCheckInUseCase,
     CreateCheckInUseCase> with $Provider<CreateCheckInUseCase> {
   /// Provider for CreateCheckInUseCase
-  CreateCheckInUseCaseProvider._()
+  const CreateCheckInUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -450,7 +450,7 @@ String _$createCheckInUseCaseHash() =>
 /// Provider for CompleteCheckInUseCase
 
 @ProviderFor(completeCheckInUseCase)
-final completeCheckInUseCaseProvider = CompleteCheckInUseCaseProvider._();
+const completeCheckInUseCaseProvider = CompleteCheckInUseCaseProvider._();
 
 /// Provider for CompleteCheckInUseCase
 
@@ -459,7 +459,7 @@ final class CompleteCheckInUseCaseProvider extends $FunctionalProvider<
     CompleteCheckInUseCase,
     CompleteCheckInUseCase> with $Provider<CompleteCheckInUseCase> {
   /// Provider for CompleteCheckInUseCase
-  CompleteCheckInUseCaseProvider._()
+  const CompleteCheckInUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -499,7 +499,7 @@ String _$completeCheckInUseCaseHash() =>
 /// Provider for ScheduleCheckInUseCase
 
 @ProviderFor(scheduleCheckInUseCase)
-final scheduleCheckInUseCaseProvider = ScheduleCheckInUseCaseProvider._();
+const scheduleCheckInUseCaseProvider = ScheduleCheckInUseCaseProvider._();
 
 /// Provider for ScheduleCheckInUseCase
 
@@ -508,7 +508,7 @@ final class ScheduleCheckInUseCaseProvider extends $FunctionalProvider<
     ScheduleCheckInUseCase,
     ScheduleCheckInUseCase> with $Provider<ScheduleCheckInUseCase> {
   /// Provider for ScheduleCheckInUseCase
-  ScheduleCheckInUseCaseProvider._()
+  const ScheduleCheckInUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -548,7 +548,7 @@ String _$scheduleCheckInUseCaseHash() =>
 /// Provider for CancelCheckInUseCase
 
 @ProviderFor(cancelCheckInUseCase)
-final cancelCheckInUseCaseProvider = CancelCheckInUseCaseProvider._();
+const cancelCheckInUseCaseProvider = CancelCheckInUseCaseProvider._();
 
 /// Provider for CancelCheckInUseCase
 
@@ -557,7 +557,7 @@ final class CancelCheckInUseCaseProvider extends $FunctionalProvider<
     CancelCheckInUseCase,
     CancelCheckInUseCase> with $Provider<CancelCheckInUseCase> {
   /// Provider for CancelCheckInUseCase
-  CancelCheckInUseCaseProvider._()
+  const CancelCheckInUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -597,7 +597,7 @@ String _$cancelCheckInUseCaseHash() =>
 /// Provider for GetUpcomingCheckInsUseCase
 
 @ProviderFor(getUpcomingCheckInsUseCase)
-final getUpcomingCheckInsUseCaseProvider =
+const getUpcomingCheckInsUseCaseProvider =
     GetUpcomingCheckInsUseCaseProvider._();
 
 /// Provider for GetUpcomingCheckInsUseCase
@@ -607,7 +607,7 @@ final class GetUpcomingCheckInsUseCaseProvider extends $FunctionalProvider<
     GetUpcomingCheckInsUseCase,
     GetUpcomingCheckInsUseCase> with $Provider<GetUpcomingCheckInsUseCase> {
   /// Provider for GetUpcomingCheckInsUseCase
-  GetUpcomingCheckInsUseCaseProvider._()
+  const GetUpcomingCheckInsUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -647,7 +647,7 @@ String _$getUpcomingCheckInsUseCaseHash() =>
 /// Provider for ShareLocationUseCase
 
 @ProviderFor(shareLocationUseCase)
-final shareLocationUseCaseProvider = ShareLocationUseCaseProvider._();
+const shareLocationUseCaseProvider = ShareLocationUseCaseProvider._();
 
 /// Provider for ShareLocationUseCase
 
@@ -656,7 +656,7 @@ final class ShareLocationUseCaseProvider extends $FunctionalProvider<
     ShareLocationUseCase,
     ShareLocationUseCase> with $Provider<ShareLocationUseCase> {
   /// Provider for ShareLocationUseCase
-  ShareLocationUseCaseProvider._()
+  const ShareLocationUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -696,7 +696,7 @@ String _$shareLocationUseCaseHash() =>
 /// Provider for StopLocationSharingUseCase
 
 @ProviderFor(stopLocationSharingUseCase)
-final stopLocationSharingUseCaseProvider =
+const stopLocationSharingUseCaseProvider =
     StopLocationSharingUseCaseProvider._();
 
 /// Provider for StopLocationSharingUseCase
@@ -706,7 +706,7 @@ final class StopLocationSharingUseCaseProvider extends $FunctionalProvider<
     StopLocationSharingUseCase,
     StopLocationSharingUseCase> with $Provider<StopLocationSharingUseCase> {
   /// Provider for StopLocationSharingUseCase
-  StopLocationSharingUseCaseProvider._()
+  const StopLocationSharingUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -746,7 +746,7 @@ String _$stopLocationSharingUseCaseHash() =>
 /// Provider for GetActiveLocationSharesUseCase
 
 @ProviderFor(getActiveLocationSharesUseCase)
-final getActiveLocationSharesUseCaseProvider =
+const getActiveLocationSharesUseCaseProvider =
     GetActiveLocationSharesUseCaseProvider._();
 
 /// Provider for GetActiveLocationSharesUseCase
@@ -757,7 +757,7 @@ final class GetActiveLocationSharesUseCaseProvider extends $FunctionalProvider<
         GetActiveLocationSharesUseCase>
     with $Provider<GetActiveLocationSharesUseCase> {
   /// Provider for GetActiveLocationSharesUseCase
-  GetActiveLocationSharesUseCaseProvider._()
+  const GetActiveLocationSharesUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -798,7 +798,7 @@ String _$getActiveLocationSharesUseCaseHash() =>
 /// Provider for TriggerEmergencySOSUseCase
 
 @ProviderFor(triggerEmergencySOSUseCase)
-final triggerEmergencySOSUseCaseProvider =
+const triggerEmergencySOSUseCaseProvider =
     TriggerEmergencySOSUseCaseProvider._();
 
 /// Provider for TriggerEmergencySOSUseCase
@@ -808,7 +808,7 @@ final class TriggerEmergencySOSUseCaseProvider extends $FunctionalProvider<
     TriggerEmergencySOSUseCase,
     TriggerEmergencySOSUseCase> with $Provider<TriggerEmergencySOSUseCase> {
   /// Provider for TriggerEmergencySOSUseCase
-  TriggerEmergencySOSUseCaseProvider._()
+  const TriggerEmergencySOSUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -848,7 +848,7 @@ String _$triggerEmergencySOSUseCaseHash() =>
 /// Provider for UpdateSafetyStatusUseCase
 
 @ProviderFor(updateSafetyStatusUseCase)
-final updateSafetyStatusUseCaseProvider = UpdateSafetyStatusUseCaseProvider._();
+const updateSafetyStatusUseCaseProvider = UpdateSafetyStatusUseCaseProvider._();
 
 /// Provider for UpdateSafetyStatusUseCase
 
@@ -857,7 +857,7 @@ final class UpdateSafetyStatusUseCaseProvider extends $FunctionalProvider<
     UpdateSafetyStatusUseCase,
     UpdateSafetyStatusUseCase> with $Provider<UpdateSafetyStatusUseCase> {
   /// Provider for UpdateSafetyStatusUseCase
-  UpdateSafetyStatusUseCaseProvider._()
+  const UpdateSafetyStatusUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -897,7 +897,7 @@ String _$updateSafetyStatusUseCaseHash() =>
 /// Provider for GetSafetyStatusUseCase
 
 @ProviderFor(getSafetyStatusUseCase)
-final getSafetyStatusUseCaseProvider = GetSafetyStatusUseCaseProvider._();
+const getSafetyStatusUseCaseProvider = GetSafetyStatusUseCaseProvider._();
 
 /// Provider for GetSafetyStatusUseCase
 
@@ -906,7 +906,7 @@ final class GetSafetyStatusUseCaseProvider extends $FunctionalProvider<
     GetSafetyStatusUseCase,
     GetSafetyStatusUseCase> with $Provider<GetSafetyStatusUseCase> {
   /// Provider for GetSafetyStatusUseCase
-  GetSafetyStatusUseCaseProvider._()
+  const GetSafetyStatusUseCaseProvider._()
       : super(
           from: null,
           argument: null,

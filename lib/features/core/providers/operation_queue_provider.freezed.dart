@@ -176,8 +176,6 @@ extension OperationQueueStatePatterns on OperationQueueState {
     switch (_that) {
       case _OperationQueueState():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -267,8 +265,6 @@ extension OperationQueueStatePatterns on OperationQueueState {
       case _OperationQueueState():
         return $default(_that.pendingOperations, _that.failedOperations,
             _that.isProcessing, _that.pendingCount, _that.failedCount);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

@@ -108,7 +108,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
       return;
     }
 
-    final notifier = ref.read(checkInNotifierProvider.notifier);
+    final notifier = ref.read(checkInProvider.notifier);
 
     try {
       if (widget.existingCheckIn != null) {
@@ -157,7 +157,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
 
         // Optionally update safety status if selected
         if (_selectedStatus != null) {
-          final safetyNotifier = ref.read(safetyNotifierProvider);
+          final safetyNotifier = ref.read(safetyProvider.notifier);
           await safetyNotifier.updateSafetyStatus(
             status: _selectedStatus!,
             message: _messageController.text.trim().isEmpty
@@ -202,8 +202,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyNotifier = ref.watch(safetyNotifierProvider);
-    final isSubmitting = safetyNotifier.state.isProcessing;
+    final safetyState = ref.watch(safetyProvider);
+    final isSubmitting = safetyState.isProcessing;
 
     return Scaffold(
       appBar: AppBar(
@@ -334,8 +334,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
   }
 
   bool get _isSubmitting {
-    final safetyNotifier = ref.watch(safetyNotifierProvider);
-    return safetyNotifier.state.isProcessing;
+    final safetyState = ref.watch(safetyProvider);
+    return safetyState.isProcessing;
   }
 
   Widget _buildLocationCard(ThemeData theme) {

@@ -282,8 +282,6 @@ extension CheckInModelPatterns on CheckInModel {
     switch (_that) {
       case _CheckInModel():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -421,8 +419,6 @@ extension CheckInModelPatterns on CheckInModel {
             _that.alertSentAt,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

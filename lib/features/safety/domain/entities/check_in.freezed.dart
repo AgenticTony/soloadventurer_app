@@ -320,8 +320,6 @@ extension CheckInPatterns on CheckIn {
     switch (_that) {
       case _CheckIn():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -463,8 +461,6 @@ extension CheckInPatterns on CheckIn {
             _that.metadata,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1034,8 +1030,6 @@ extension CheckInLocationPatterns on CheckInLocation {
     switch (_that) {
       case _CheckInLocation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1129,8 +1123,6 @@ extension CheckInLocationPatterns on CheckInLocation {
       case _CheckInLocation():
         return $default(_that.latitude, _that.longitude, _that.accuracy,
             _that.altitude, _that.address, _that.placeName, _that.timestamp);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

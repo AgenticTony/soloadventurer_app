@@ -27,13 +27,13 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
     super.initState();
     // Load initial state
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(operationQueueNotifierProvider.notifier).refreshState();
+      ref.read(operationQueueProvider.notifier).refreshState();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final queueState = ref.watch(operationQueueNotifierProvider);
+    final queueState = ref.watch(operationQueueProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -80,7 +80,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.read(operationQueueNotifierProvider.notifier).refreshState();
+          ref.read(operationQueueProvider.notifier).refreshState();
         },
         child: queueState.pendingCount == 0 && queueState.failedCount == 0
             ? _buildEmptyState(context)
@@ -200,7 +200,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
           : FloatingActionButton.extended(
               onPressed: () async {
                 await ref
-                    .read(operationQueueNotifierProvider.notifier)
+                    .read(operationQueueProvider.notifier)
                     .processQueue();
               },
               icon: const Icon(Icons.play_arrow),
@@ -268,7 +268,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
   Future<void> _retryOperation(String operationId) async {
     try {
       await ref
-          .read(operationQueueNotifierProvider.notifier)
+          .read(operationQueueProvider.notifier)
           .retryOperation(operationId);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -304,7 +304,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
     if (confirmed == true) {
       try {
         await ref
-            .read(operationQueueNotifierProvider.notifier)
+            .read(operationQueueProvider.notifier)
             .removeFailedOperation(operationId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -333,7 +333,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
       context,
       title: 'Clear All Failed Operations',
       content:
-          'Are you sure you want to clear all ${ref.read(operationQueueNotifierProvider).failedCount} failed operations? This action cannot be undone.',
+          'Are you sure you want to clear all ${ref.read(operationQueueProvider).failedCount} failed operations? This action cannot be undone.',
       confirmText: 'Clear All',
       isDestructive: true,
     );
@@ -341,7 +341,7 @@ class _OperationQueueScreenState extends ConsumerState<OperationQueueScreen> {
     if (confirmed == true) {
       try {
         await ref
-            .read(operationQueueNotifierProvider.notifier)
+            .read(operationQueueProvider.notifier)
             .clearFailedOperations();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(

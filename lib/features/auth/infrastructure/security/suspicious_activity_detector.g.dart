@@ -11,14 +11,14 @@ part of 'suspicious_activity_detector.dart';
 /// Detects and logs suspicious activity patterns related to authentication and API usage
 
 @ProviderFor(SuspiciousActivityDetector)
-final suspiciousActivityDetectorProvider =
+const suspiciousActivityDetectorProvider =
     SuspiciousActivityDetectorProvider._();
 
 /// Detects and logs suspicious activity patterns related to authentication and API usage
 final class SuspiciousActivityDetectorProvider extends $NotifierProvider<
     SuspiciousActivityDetector, SuspiciousActivityDetector> {
   /// Detects and logs suspicious activity patterns related to authentication and API usage
-  SuspiciousActivityDetectorProvider._()
+  const SuspiciousActivityDetectorProvider._()
       : super(
           from: null,
           argument: null,
@@ -56,6 +56,7 @@ abstract class _$SuspiciousActivityDetector
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref
         as $Ref<SuspiciousActivityDetector, SuspiciousActivityDetector>;
     final element = ref.element as $ClassProviderElement<
@@ -63,6 +64,6 @@ abstract class _$SuspiciousActivityDetector
         SuspiciousActivityDetector,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

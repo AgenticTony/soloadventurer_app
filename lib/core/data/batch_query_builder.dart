@@ -148,7 +148,7 @@ class BatchQueryConfig {
   /// Conservative (with rate limiting protection)
   static const conservative = BatchQueryConfig(
     batchSize: 25,
-    maxConcurrency = 2,
+    maxConcurrency: 2,
     batchDelay: Duration(milliseconds: 200),
     retryCount: 2,
   );
@@ -387,7 +387,7 @@ class BatchQueryBuilder<T> {
 
     int successCount = 0;
     int failureCount = 0;
-    final errors = <BatchError>[];
+    var errors = <BatchError>[];
     int processedCount = 0;
 
     // Split into batches
@@ -477,7 +477,7 @@ class BatchQueryBuilder<T> {
   }) async {
     int successCount = 0;
     int failureCount = 0;
-    final errors = <BatchError>[];
+    var errors = <BatchError>[];
 
     if (config.maxConcurrency <= 1) {
       // Sequential processing
@@ -522,7 +522,7 @@ class BatchQueryBuilder<T> {
   }) async {
     int successCount = 0;
     int failureCount = 0;
-    final errors = <BatchError>[];
+    var errors = <BatchError>[];
 
     // Process in chunks based on maxConcurrency
     for (int i = 0; i < batch.length; i += config.maxConcurrency) {
@@ -556,7 +556,7 @@ class BatchQueryBuilder<T> {
   }
 
   /// Process a single item with retry logic
-  Future<(bool success, BatchError? error)> _processItem({
+  Future<({bool success, BatchError? error})> _processItem({
     required _BatchOperation<T> item,
     required Future<void> Function(T data) operation,
   }) async {

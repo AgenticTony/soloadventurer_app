@@ -253,4 +253,71 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       expiration: DateTime.now().add(const Duration(hours: 1)),
     );
   }
+
+  @override
+  Future<(String factorId, String qrCode, String secret)> setupMFA() async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Return mock MFA setup data
+    return (
+      'mock-factor-id-${DateTime.now().millisecondsSinceEpoch}',
+      '<svg>Mock QR Code</svg>',
+      'JBSWY3DPEHPK3PXP'
+    );
+  }
+
+  @override
+  Future<bool> verifyMFA(String code, {String? factorId}) async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Mock verification - accept any 6-digit code
+    return code.length == 6 && int.tryParse(code) != null;
+  }
+
+  @override
+  Future<void> disableMFA(String factorId) async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+    // Mock disable MFA - nothing to do in mock
+  }
+
+  @override
+  Future<List<String>> listMFAFactors() async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+    // Return empty list for mock - no MFA factors enrolled by default
+    return const [];
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    if (_apiClient.isOffline) {
+      throw const NetworkConnectivityException(
+          message: 'No internet connection');
+    }
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    // Mock delete account - clear local state
+    _isAuthenticated = false;
+    _currentUser = null;
+  }
 }

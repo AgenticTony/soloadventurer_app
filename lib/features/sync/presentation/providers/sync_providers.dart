@@ -1,71 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/services/sync_service.dart';
-import '../../domain/services/sync_state_persistence.dart';
 import '../../domain/models/sync_status.dart';
-import '../notifiers/manual_sync_notifier.dart';
-import '../notifiers/sync_state_notifier.dart';
+import '../notifiers/manual_sync_notifier.dart' show manualSyncProvider;
+import '../notifiers/sync_state_notifier.dart' show syncStateProvider;
 import '../state/manual_sync_state.dart';
 import '../state/sync_state.dart';
-import '../../../core/domain/services/logging_service.dart';
+import 'service_providers.dart' show syncServiceProvider, loggingServiceProvider;
 
-/// Provider for the sync service
-///
-/// This must be overridden in the main app with the actual implementation.
-final syncServiceProvider = Provider<SyncService>((ref) {
-  throw UnimplementedError(
-    'syncServiceProvider must be overridden with the actual implementation',
-  );
-});
-
-/// Provider for the logging service
-///
-/// This must be overridden in the main app with the actual implementation.
-final loggingServiceProvider = Provider<LoggingService>((ref) {
-  throw UnimplementedError(
-    'loggingServiceProvider must be overridden with the actual implementation',
-  );
-});
-
-/// Provider for the sync state persistence service
-///
-/// This is an optional provider. If not overridden, state persistence will be disabled.
-final syncStatePersistenceProvider = Provider<SyncStatePersistence?>((ref) {
-  // Return null by default - can be overridden in the main app
-  return null;
-});
-
-/// Provider for the manual sync notifier
-///
-/// **DEPRECATED**: This provider is deprecated in favor of the @riverpod generated provider.
-/// The ManualSyncNotifier class has been migrated to Riverpod 3.0 using @riverpod annotation.
-/// Use the auto-generated `manualSyncProvider` instead.
-///
-/// Manages manual sync state and operations.
-/// Uses AsyncValue pattern for loading, error, and data states.
-@Deprecated('Use manualSyncProvider (generated from @riverpod ManualSync) instead')
-final manualSyncNotifierProvider =
-    StateNotifierProvider<ManualSyncNotifier, ManualSyncState>((ref) {
-  final syncService = ref.watch(syncServiceProvider);
-  final logger = ref.watch(loggingServiceProvider);
-
-  final notifier = ManualSyncNotifier(
-    syncService: syncService,
-    logger: logger,
-  );
-
-  // Dispose notifier when provider is disposed
-  ref.onDispose(() {
-    notifier.dispose();
-  });
-
-  return notifier;
-});
+// ============================================================================
+// MANUAL SYNC PROVIDERS
+// ============================================================================
+// The ManualSyncNotifier class has been migrated to Riverpod 3.0 using @riverpod.
+// Use the auto-generated `manualSyncProvider` from manual_sync_notifier.dart.
+// The @riverpod annotation automatically generates the provider with dependencies
+// injected via ref.watch() in the build() method.
 
 /// Provider for current manual sync state
 ///
 /// Provides direct access to the current manual sync state.
 final manualSyncStateProvider = Provider<ManualSyncState>((ref) {
-  return ref.watch(manualSyncNotifierProvider);
+  return ref.watch(manualSyncProvider);
 });
 
 /// Provider for whether a manual sync is in progress
@@ -73,7 +26,7 @@ final manualSyncStateProvider = Provider<ManualSyncState>((ref) {
 /// Provides a boolean indicating if sync is currently running.
 /// Useful for showing loading indicators and disabling sync buttons.
 final isSyncingProvider = Provider<bool>((ref) {
-  final state = ref.watch(manualSyncNotifierProvider);
+  final state = ref.watch(manualSyncProvider);
   return state.isSyncing;
 });
 
@@ -82,7 +35,7 @@ final isSyncingProvider = Provider<bool>((ref) {
 /// Provides the success status of the last manual sync.
 /// Returns null if no sync has been performed yet.
 final lastSyncSuccessProvider = Provider<bool?>((ref) {
-  final state = ref.watch(manualSyncNotifierProvider);
+  final state = ref.watch(manualSyncProvider);
   return state.lastSyncSuccess;
 });
 
@@ -90,7 +43,7 @@ final lastSyncSuccessProvider = Provider<bool?>((ref) {
 ///
 /// Provides the current sync status from the manual sync state.
 final syncStatusProvider = Provider<SyncOperationStatus>((ref) {
-  final state = ref.watch(manualSyncNotifierProvider);
+  final state = ref.watch(manualSyncProvider);
   return state.status;
 });
 
@@ -99,7 +52,7 @@ final syncStatusProvider = Provider<SyncOperationStatus>((ref) {
 /// Provides a formatted string summary of the last sync result.
 /// Useful for displaying sync results to users.
 final syncResultSummaryProvider = Provider<String?>((ref) {
-  final state = ref.watch(manualSyncNotifierProvider);
+  final state = ref.watch(manualSyncProvider);
 
   if (!state.hasResults) {
     return null;
@@ -140,7 +93,7 @@ final hasPendingOperationsProvider = Provider<bool>((ref) {
 ///
 /// Provides a user-friendly text representation of the sync status.
 final syncStatusTextProvider = Provider<String>((ref) {
-  final state = ref.watch(manualSyncNotifierProvider);
+  final state = ref.watch(manualSyncProvider);
 
   if (state.isSyncing) {
     return 'Syncing...';
@@ -165,7 +118,7 @@ final syncStatusTextProvider = Provider<String>((ref) {
 ///
 /// Provides the timestamp of the last completed sync, if any.
 final lastSyncTimeProvider = Provider<DateTime?>((ref) {
-  final state = ref.watch(manualSyncNotifierProvider);
+  final state = ref.watch(manualSyncProvider);
   return state.completedAt;
 });
 
@@ -180,44 +133,21 @@ String _pluralize(String word, int count) {
 // These providers track ALL sync state changes (not just manual sync)
 // and ensure all UI components receive immediate updates when sync state changes.
 
-/// Provider for the comprehensive sync state notifier
-///
-/// **DEPRECATED**: This provider is deprecated in favor of the @riverpod generated provider.
-/// The SyncStateNotifier class has been migrated to Riverpod 3.0 using @riverpod annotation.
-/// Use the auto-generated `syncStateProviderOld` instead.
-///
-/// Manages global sync state by listening to all sync service changes.
-/// Provides real-time updates for all sync status indicators.
-@Deprecated('Use syncStateProviderOld (generated from @riverpod SyncState) instead')
-final syncStateNotifierProvider =
-    StateNotifierProvider<SyncStateNotifier, SyncState>((ref) {
-  final syncService = ref.watch(syncServiceProvider);
-  final logger = ref.watch(loggingServiceProvider);
-
-  final notifier = SyncStateNotifier(
-    syncService: syncService,
-    logger: logger,
-  );
-
-  // Dispose notifier when provider is disposed
-  ref.onDispose(() {
-    notifier.dispose();
-  });
-
-  return notifier;
-});
+// ============================================================================
+// COMPREHENSIVE SYNC STATE PROVIDERS
+// ============================================================================
+// The SyncStateNotifier class has been migrated to Riverpod 3.0 using @riverpod.
+// Use the auto-generated `syncStateProvider` from sync_state_notifier.dart.
+// The @riverpod annotation automatically generates the provider with dependencies
+// injected via ref.watch() in the build() method.
 
 /// Provider for current comprehensive sync state
 ///
-/// **DEPRECATED**: This provider is deprecated in favor of the @riverpod generated provider.
-/// The SyncStateNotifier class has been migrated to Riverpod 3.0 using @riverpod annotation.
-/// Use the auto-generated `syncStateProviderOld` instead.
-///
-/// Provides direct access to the current sync state.
-/// This state includes status, queue size, processing state, and last sync results.
-@Deprecated('Use syncStateProviderOld (generated from @riverpod SyncState) instead')
+/// Note: Use the auto-generated `syncStateProvider` from sync_state_notifier.dart
+/// which directly provides the SyncState. This provider is kept for backward compatibility
+/// and simply watches the generated provider.
 final syncStateProviderOldDeprecated = Provider<SyncState>((ref) {
-  return ref.watch(syncStateNotifierProvider);
+  return ref.watch(syncStateProvider);
 });
 
 /// Provider for global sync status
@@ -225,7 +155,7 @@ final syncStateProviderOldDeprecated = Provider<SyncState>((ref) {
 /// Provides the current sync status for all sync operations (not just manual).
 /// Updates immediately when any sync operation changes status.
 final globalSyncOperationStatusProvider = Provider<SyncOperationStatus>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
   return state.status;
 });
 
@@ -234,7 +164,7 @@ final globalSyncOperationStatusProvider = Provider<SyncOperationStatus>((ref) {
 /// Provides a boolean indicating if ANY sync operation is currently running.
 /// Updates immediately when sync starts or stops.
 final isGloballySyncingProvider = Provider<bool>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
   return state.isSyncing;
 });
 
@@ -243,7 +173,7 @@ final isGloballySyncingProvider = Provider<bool>((ref) {
 /// Provides the current number of operations in the sync queue.
 /// Updates immediately when operations are added or removed from the queue.
 final globalQueueSizeProvider = Provider<int>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
   return state.queueSize;
 });
 
@@ -252,7 +182,7 @@ final globalQueueSizeProvider = Provider<int>((ref) {
 /// Provides a boolean indicating if there are any pending operations.
 /// Updates immediately when queue state changes.
 final hasGlobalPendingOperationsProvider = Provider<bool>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
   return state.hasPendingOperations;
 });
 
@@ -261,7 +191,7 @@ final hasGlobalPendingOperationsProvider = Provider<bool>((ref) {
 /// Provides the timestamp of the last successful sync (any type).
 /// Useful for showing "Last synced: Xm ago" indicators.
 final lastSuccessfulSyncTimeProvider = Provider<DateTime?>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
   return state.lastSuccessfulSyncAt;
 });
 
@@ -270,7 +200,7 @@ final lastSuccessfulSyncTimeProvider = Provider<DateTime?>((ref) {
 /// Provides a boolean indicating if the last sync was successful.
 /// Returns null if no sync has occurred yet.
 final wasLastSyncSuccessfulProvider = Provider<bool?>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
   if (state.lastSuccessfulSyncAt == null) return null;
   return state.wasLastSyncSuccessful;
 });
@@ -280,7 +210,7 @@ final wasLastSyncSuccessfulProvider = Provider<bool?>((ref) {
 /// Provides a user-friendly text representation of the current sync status.
 /// Updates immediately when sync status changes.
 final globalSyncOperationStatusTextProvider = Provider<String>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
 
   switch (state.status) {
     case SyncOperationStatus.syncing:
@@ -304,7 +234,7 @@ final globalSyncOperationStatusTextProvider = Provider<String>((ref) {
 /// Provides detailed status information including counts and timing.
 /// Useful for comprehensive status displays.
 final syncStatusDetailsProvider = Provider<String>((ref) {
-  final state = ref.watch(syncStateNotifierProvider);
+  final state = ref.watch(syncStateProvider);
 
   final buffer = StringBuffer();
 

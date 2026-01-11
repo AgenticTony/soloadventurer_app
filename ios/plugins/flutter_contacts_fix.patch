@@ -1,0 +1,14 @@
+--- a/ios/.symlinks/plugins/flutter_contacts/ios/Classes/SwiftFlutterContactsPlugin.swift
++++ b/ios/.symlinks/plugins/flutter_contacts/ios/Classes/SwiftFlutterContactsPlugin.swift
+@@ -432,8 +432,9 @@
+         )
+         let eventChannel = FlutterEventChannel(
+             name: "github.com/QuisApp/flutter_contacts/events",
+             binaryMessenger: registrar.messenger()
+         )
+-        let rootViewController = UIApplication.shared.delegate!.window!!.rootViewController!
++        // Safely get rootViewController - may be nil during early initialization
++        let rootViewController = UIApplication.shared.delegate?.window??.rootViewController ?? UIViewController()
+         let instance = SwiftFlutterContactsPlugin(rootViewController)
+         registrar.addMethodCallDelegate(instance, channel: channel)
+         eventChannel.setStreamHandler(instance)

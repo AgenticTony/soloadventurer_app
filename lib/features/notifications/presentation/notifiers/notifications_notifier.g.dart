@@ -11,13 +11,13 @@ part of 'notifications_notifier.dart';
 /// Notifier for managing notifications state
 
 @ProviderFor(NotificationsNotifier)
-final notificationsProvider = NotificationsNotifierProvider._();
+const notificationsProvider = NotificationsNotifierProvider._();
 
 /// Notifier for managing notifications state
 final class NotificationsNotifierProvider extends $NotifierProvider<
     NotificationsNotifier, AsyncValue<List<TravelNotification>>> {
   /// Notifier for managing notifications state
-  NotificationsNotifierProvider._()
+  const NotificationsNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -56,6 +56,7 @@ abstract class _$NotificationsNotifier
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AsyncValue<List<TravelNotification>>,
         AsyncValue<List<TravelNotification>>>;
     final element = ref.element as $ClassProviderElement<
@@ -64,6 +65,6 @@ abstract class _$NotificationsNotifier
         AsyncValue<List<TravelNotification>>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

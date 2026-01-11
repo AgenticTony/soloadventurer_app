@@ -1,6 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart';
+import 'package:soloadventurer/core/providers/api_providers.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
+import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source_impl.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
+import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/safety/data/repositories/safety_repository_impl.dart';
 import 'package:soloadventurer/features/safety/domain/repositories/safety_repository.dart';
 
@@ -8,26 +12,26 @@ part 'safety_providers.g.dart';
 
 /// Provider for SafetyLocalDataSource
 @riverpod
-SafetyLocalDataSource safetyLocalDataSource(SafetyLocalDataSourceRef ref) {
-  // Get SharedPreferences from a provider or create it
-  // For now, we'll use a workaround - this should be properly injected
-  throw UnimplementedError(
-      'SafetyLocalDataSource requires SharedPreferences - should be provided via dependency injection');
+SafetyLocalDataSource safetyLocalDataSource(Ref ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  return SafetyLocalDataSourceImpl(prefs);
 }
 
 /// Provider for SafetyRemoteDataSource
 /// Uses mock implementation for now, should be replaced with real implementation
 @riverpod
-SafetyRemoteDataSource safetyRemoteDataSource(SafetyRemoteDataSourceRef ref) {
-  // Get ApiClient from a provider or create it
-  // For now, we'll use a workaround - this should be properly injected
-  throw UnimplementedError(
-      'SafetyRemoteDataSource requires ApiClient - should be provided via dependency injection');
+SafetyRemoteDataSource safetyRemoteDataSource(Ref ref) {
+  final apiClient = ref.watch(apiClientProviderFull);
+  final baseUrl = ref.watch(apiBaseUrlProvider);
+  return SafetyRemoteDataSourceImpl(
+    apiClient: apiClient,
+    baseUrl: baseUrl,
+  );
 }
 
 /// Provider for SafetyRepository implementation
 @riverpod
-SafetyRepository safetyRepository(SafetyRepositoryRef ref) {
+SafetyRepository safetyRepository(Ref ref) {
   final localDataSource = ref.watch(safetyLocalDataSourceProvider);
   final remoteDataSource = ref.watch(safetyRemoteDataSourceProvider);
 
@@ -39,6 +43,6 @@ SafetyRepository safetyRepository(SafetyRepositoryRef ref) {
 
 /// Provider override for SafetyRepository interface
 @riverpod
-SafetyRepository safetyRepositoryOverride(SafetyRepositoryOverrideRef ref) {
+SafetyRepository safetyRepositoryOverride(Ref ref) {
   return ref.watch(safetyRepositoryProvider);
 }

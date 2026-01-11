@@ -14,7 +14,7 @@ part of 'sync_notification_service.dart';
 /// It auto-disposes when no longer being listened to.
 
 @ProviderFor(syncNotificationService)
-final syncNotificationServiceProvider = SyncNotificationServiceProvider._();
+const syncNotificationServiceProvider = SyncNotificationServiceProvider._();
 
 /// Provider for SyncNotificationService
 ///
@@ -29,7 +29,7 @@ final class SyncNotificationServiceProvider extends $FunctionalProvider<
   ///
   /// This provider creates and manages the SyncNotificationService instance.
   /// It auto-disposes when no longer being listened to.
-  SyncNotificationServiceProvider._()
+  const SyncNotificationServiceProvider._()
       : super(
           from: null,
           argument: null,

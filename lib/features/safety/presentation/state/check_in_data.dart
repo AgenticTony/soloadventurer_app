@@ -6,8 +6,7 @@ part 'check_in_data.g.dart';
 
 /// Data class for check-in state
 @freezed
-class CheckInData with _$CheckInData {
-
+sealed class CheckInData with _$CheckInData {
   const factory CheckInData({
     @Default([]) List<CheckIn> checkIns,
     @Default([]) List<CheckIn> upcomingCheckIns,

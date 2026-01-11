@@ -331,10 +331,10 @@ class _ColorPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor =
-        backgroundColor ?? Theme.of(context).primaryColor.withValues(alpha:0.2);
+    final bgColor = backgroundColor ??
+        Theme.of(context).primaryColor.withValues(alpha: 0.2);
     final icColor =
-        iconColor ?? Theme.of(context).primaryColor.withValues(alpha:0.5);
+        iconColor ?? Theme.of(context).primaryColor.withValues(alpha: 0.5);
 
     return Container(
       width: width,

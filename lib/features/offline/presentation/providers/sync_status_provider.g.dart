@@ -17,7 +17,7 @@ part of 'sync_status_provider.dart';
 /// - Constructor auto-load and stream subscription moved to build() method
 
 @ProviderFor(syncManager)
-final syncManagerProvider = SyncManagerProvider._();
+const syncManagerProvider = SyncManagerProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<SyncStatus> to Notifier<SyncStatus>
@@ -37,7 +37,7 @@ final class SyncManagerProvider
   /// - build() returns SyncStatus not AsyncValue
   /// - StreamSubscription management via ref.onDispose()
   /// - Constructor auto-load and stream subscription moved to build() method
-  SyncManagerProvider._()
+  const SyncManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -73,12 +73,12 @@ final class SyncManagerProvider
 String _$syncManagerHash() => r'fff15752fb7ceb1729469931f3523982a6fe0ced';
 
 @ProviderFor(syncStatusStream)
-final syncStatusStreamProvider = SyncStatusStreamProvider._();
+const syncStatusStreamProvider = SyncStatusStreamProvider._();
 
 final class SyncStatusStreamProvider extends $FunctionalProvider<
         AsyncValue<SyncStatus>, SyncStatus, Stream<SyncStatus>>
     with $FutureModifier<SyncStatus>, $StreamProvider<SyncStatus> {
-  SyncStatusStreamProvider._()
+  const SyncStatusStreamProvider._()
       : super(
           from: null,
           argument: null,
@@ -106,11 +106,11 @@ final class SyncStatusStreamProvider extends $FunctionalProvider<
 String _$syncStatusStreamHash() => r'465783115fc5580afd5e794432f4a3926e9c9484';
 
 @ProviderFor(SyncStatusNotifier)
-final syncStatusProvider = SyncStatusNotifierProvider._();
+const syncStatusProvider = SyncStatusNotifierProvider._();
 
 final class SyncStatusNotifierProvider
     extends $NotifierProvider<SyncStatusNotifier, SyncStatus> {
-  SyncStatusNotifierProvider._()
+  const SyncStatusNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -145,17 +145,18 @@ abstract class _$SyncStatusNotifier extends $Notifier<SyncStatus> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SyncStatus, SyncStatus>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SyncStatus, SyncStatus>, SyncStatus, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Selector provider for sync state enum
 
 @ProviderFor(syncState)
-final syncStateProvider = SyncStateProvider._();
+const syncStateProvider = SyncStateProvider._();
 
 /// Selector provider for sync state enum
 
@@ -163,7 +164,7 @@ final class SyncStateProvider
     extends $FunctionalProvider<SyncState, SyncState, SyncState>
     with $Provider<SyncState> {
   /// Selector provider for sync state enum
-  SyncStateProvider._()
+  const SyncStateProvider._()
       : super(
           from: null,
           argument: null,
@@ -201,14 +202,14 @@ String _$syncStateHash() => r'0d179a69b30cfa807eda6045de7ee6a6c036c458';
 /// Selector provider for is syncing status
 
 @ProviderFor(isSyncing)
-final isSyncingProvider = IsSyncingProvider._();
+const isSyncingProvider = IsSyncingProvider._();
 
 /// Selector provider for is syncing status
 
 final class IsSyncingProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Selector provider for is syncing status
-  IsSyncingProvider._()
+  const IsSyncingProvider._()
       : super(
           from: null,
           argument: null,
@@ -246,14 +247,14 @@ String _$isSyncingHash() => r'23970d11b239f5c140a7d1196a852034890b16fb';
 /// Selector provider for sync progress
 
 @ProviderFor(syncProgress)
-final syncProgressProvider = SyncProgressProvider._();
+const syncProgressProvider = SyncProgressProvider._();
 
 /// Selector provider for sync progress
 
 final class SyncProgressProvider
     extends $FunctionalProvider<double, double, double> with $Provider<double> {
   /// Selector provider for sync progress
-  SyncProgressProvider._()
+  const SyncProgressProvider._()
       : super(
           from: null,
           argument: null,
@@ -291,7 +292,7 @@ String _$syncProgressHash() => r'c67cff3a3dc8370fd9d30951617938b1899508ef';
 /// Selector provider for sync phase
 
 @ProviderFor(syncPhase)
-final syncPhaseProvider = SyncPhaseProvider._();
+const syncPhaseProvider = SyncPhaseProvider._();
 
 /// Selector provider for sync phase
 
@@ -299,7 +300,7 @@ final class SyncPhaseProvider
     extends $FunctionalProvider<SyncPhase, SyncPhase, SyncPhase>
     with $Provider<SyncPhase> {
   /// Selector provider for sync phase
-  SyncPhaseProvider._()
+  const SyncPhaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -337,14 +338,14 @@ String _$syncPhaseHash() => r'76c1ede92d38abaf65a727a423cec8a885f9e6ba';
 /// Selector provider for pending operations count
 
 @ProviderFor(pendingOperations)
-final pendingOperationsProvider = PendingOperationsProvider._();
+const pendingOperationsProvider = PendingOperationsProvider._();
 
 /// Selector provider for pending operations count
 
 final class PendingOperationsProvider extends $FunctionalProvider<int, int, int>
     with $Provider<int> {
   /// Selector provider for pending operations count
-  PendingOperationsProvider._()
+  const PendingOperationsProvider._()
       : super(
           from: null,
           argument: null,
@@ -382,14 +383,14 @@ String _$pendingOperationsHash() => r'8287e0dbef2c3d0f182712c25de2a268881d6538';
 /// Selector provider for has pending operations
 
 @ProviderFor(hasPendingOperations)
-final hasPendingOperationsProvider = HasPendingOperationsProvider._();
+const hasPendingOperationsProvider = HasPendingOperationsProvider._();
 
 /// Selector provider for has pending operations
 
 final class HasPendingOperationsProvider
     extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
   /// Selector provider for has pending operations
-  HasPendingOperationsProvider._()
+  const HasPendingOperationsProvider._()
       : super(
           from: null,
           argument: null,
@@ -428,14 +429,14 @@ String _$hasPendingOperationsHash() =>
 /// Selector provider for sync error status
 
 @ProviderFor(hasSyncError)
-final hasSyncErrorProvider = HasSyncErrorProvider._();
+const hasSyncErrorProvider = HasSyncErrorProvider._();
 
 /// Selector provider for sync error status
 
 final class HasSyncErrorProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Selector provider for sync error status
-  HasSyncErrorProvider._()
+  const HasSyncErrorProvider._()
       : super(
           from: null,
           argument: null,
@@ -473,7 +474,7 @@ String _$hasSyncErrorHash() => r'6954754d230dd8131487c4b385a9c2772d9a2b3b';
 /// Selector provider for error message
 
 @ProviderFor(syncErrorMessage)
-final syncErrorMessageProvider = SyncErrorMessageProvider._();
+const syncErrorMessageProvider = SyncErrorMessageProvider._();
 
 /// Selector provider for error message
 
@@ -481,7 +482,7 @@ final class SyncErrorMessageProvider
     extends $FunctionalProvider<String?, String?, String?>
     with $Provider<String?> {
   /// Selector provider for error message
-  SyncErrorMessageProvider._()
+  const SyncErrorMessageProvider._()
       : super(
           from: null,
           argument: null,
@@ -519,7 +520,7 @@ String _$syncErrorMessageHash() => r'6b80286c227823851a53e48fb85b7943d2d93274';
 /// Selector provider for last sync time
 
 @ProviderFor(lastSyncTime)
-final lastSyncTimeProvider = LastSyncTimeProvider._();
+const lastSyncTimeProvider = LastSyncTimeProvider._();
 
 /// Selector provider for last sync time
 
@@ -527,7 +528,7 @@ final class LastSyncTimeProvider
     extends $FunctionalProvider<DateTime?, DateTime?, DateTime?>
     with $Provider<DateTime?> {
   /// Selector provider for last sync time
-  LastSyncTimeProvider._()
+  const LastSyncTimeProvider._()
       : super(
           from: null,
           argument: null,
@@ -565,7 +566,7 @@ String _$lastSyncTimeHash() => r'0945bfd8903b2c9d07f5fcb668dd43caba774077';
 /// Selector provider for current operation description
 
 @ProviderFor(currentSyncOperation)
-final currentSyncOperationProvider = CurrentSyncOperationProvider._();
+const currentSyncOperationProvider = CurrentSyncOperationProvider._();
 
 /// Selector provider for current operation description
 
@@ -573,7 +574,7 @@ final class CurrentSyncOperationProvider
     extends $FunctionalProvider<String?, String?, String?>
     with $Provider<String?> {
   /// Selector provider for current operation description
-  CurrentSyncOperationProvider._()
+  const CurrentSyncOperationProvider._()
       : super(
           from: null,
           argument: null,
@@ -612,14 +613,14 @@ String _$currentSyncOperationHash() =>
 /// Selector provider for is idle status
 
 @ProviderFor(isSyncIdle)
-final isSyncIdleProvider = IsSyncIdleProvider._();
+const isSyncIdleProvider = IsSyncIdleProvider._();
 
 /// Selector provider for is idle status
 
 final class IsSyncIdleProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Selector provider for is idle status
-  IsSyncIdleProvider._()
+  const IsSyncIdleProvider._()
       : super(
           from: null,
           argument: null,

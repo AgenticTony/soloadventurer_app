@@ -10,11 +10,11 @@ part of 'connectivity_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ConnectivityNotifier)
-final connectivityProvider = ConnectivityNotifierProvider._();
+const connectivityProvider = ConnectivityNotifierProvider._();
 
 final class ConnectivityNotifierProvider
     extends $NotifierProvider<ConnectivityNotifier, bool> {
-  ConnectivityNotifierProvider._()
+  const ConnectivityNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -49,9 +49,10 @@ abstract class _$ConnectivityNotifier extends $Notifier<bool> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<bool, bool>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<bool, bool>, bool, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

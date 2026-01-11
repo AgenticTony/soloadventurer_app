@@ -349,7 +349,7 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
 /// Provider for MissedCheckInDetectorImpl
 @riverpod
 MissedCheckInDetector missedCheckInDetectorImpl(
-  MissedCheckInDetectorImplRef ref,
+  Ref ref,
 ) {
   final safetyRepository = ref.watch(safetyRepositoryProvider);
   final locationService = ref.watch(locationServiceImplProvider);
@@ -373,7 +373,7 @@ MissedCheckInDetector missedCheckInDetectorImpl(
 /// Provider override for MissedCheckInDetector interface
 @riverpod
 MissedCheckInDetector missedCheckInDetectorOverride(
-  MissedCheckInDetectorOverrideRef ref,
+  Ref ref,
 ) {
   return ref.watch(missedCheckInDetectorImplProvider);
 }

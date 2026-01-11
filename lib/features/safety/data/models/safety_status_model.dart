@@ -6,8 +6,7 @@ part 'safety_status_model.g.dart';
 
 /// Model for [SafetyStatus] with JSON serialization
 @freezed
-class SafetyStatusModel with _$SafetyStatusModel {
-
+sealed class SafetyStatusModel with _$SafetyStatusModel {
   const factory SafetyStatusModel({
     required String id,
     required String userId,

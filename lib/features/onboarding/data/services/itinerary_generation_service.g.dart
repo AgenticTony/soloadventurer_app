@@ -11,7 +11,7 @@ part of 'itinerary_generation_service.dart';
 /// Provider for the itinerary generation service implementation
 
 @ProviderFor(itineraryGenerationService)
-final itineraryGenerationServiceProvider =
+const itineraryGenerationServiceProvider =
     ItineraryGenerationServiceProvider._();
 
 /// Provider for the itinerary generation service implementation
@@ -21,7 +21,7 @@ final class ItineraryGenerationServiceProvider extends $FunctionalProvider<
     ItineraryGenerationService,
     ItineraryGenerationService> with $Provider<ItineraryGenerationService> {
   /// Provider for the itinerary generation service implementation
-  ItineraryGenerationServiceProvider._()
+  const ItineraryGenerationServiceProvider._()
       : super(
           from: null,
           argument: null,

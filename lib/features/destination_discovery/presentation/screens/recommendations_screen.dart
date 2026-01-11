@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import '../../domain/models/personalized_recommendation.dart';
 import '../../application/providers/recommendation_provider.dart';
 import '../../application/providers/saved_destinations_provider.dart';
+import '../../application/state/recommendation_state.dart';
+import '../../application/state/saved_destinations_state.dart';
 import '../../domain/models/saved_destination.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
@@ -364,7 +367,8 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
           Text(
             recommendation.summary ?? 'Based on your preferences',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer.withValues(alpha:0.8),
+              color:
+                  theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 8),
@@ -372,7 +376,8 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
             '${recommendation.recommendations.length} destinations • '
             'Updated ${_formatTimestamp(recommendation.generatedAt)}',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer.withValues(alpha:0.6),
+              color:
+                  theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -599,8 +604,10 @@ class _RecommendationCard extends StatelessWidget {
   final bool isSaved;
   final VoidCallback onTap;
   final VoidCallback onBookmarkTap;
+  final Key? key;
 
   const _RecommendationCard({
+    this.key,
     required this.recommendedDestination,
     required this.isSaved,
     required this.onTap,
@@ -640,7 +647,7 @@ class _RecommendationCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: _getMatchScoreColor().withValues(alpha:0.1),
+                      color: _getMatchScoreColor().withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: _getMatchScoreColor(),

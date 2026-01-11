@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/page_info.dart';
 import '../models/paginated_data.dart';
 import '../utils/preloading_strategy.dart';
 import 'virtual_list_view.dart';

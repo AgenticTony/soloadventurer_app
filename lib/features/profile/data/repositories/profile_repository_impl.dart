@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as path;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
@@ -46,6 +49,9 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
   /// Sync queue service for queuing offline operations
   final SyncQueueService _syncQueueService;
 
+  /// Supabase client for Storage operations (avatar upload)
+  final SupabaseClient _supabaseClient;
+
   /// UUID generator for temporary IDs
   final Uuid _uuid = const Uuid();
 
@@ -55,11 +61,13 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
   ProfileRepositoryImpl({
     required UserDao userDao,
     required DioApiService apiService,
+    required SupabaseClient supabaseClient,
     required super.syncQueueService,
     required super.connectivityService,
     super.config,
   })  : _userDao = userDao,
         _apiService = apiService,
+        _supabaseClient = supabaseClient,
         _syncQueueService = syncQueueService;
 
   // ==============================================================================
@@ -395,21 +403,98 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
   Future<RepositoryOperationResult<String>> uploadAvatar(
       String userId, String filePath) async {
     try {
-      // This is a special case - we need to upload the file first
-      // Avatar upload is typically done via a separate file upload endpoint
-      // For now, we'll update the avatarUrl field directly
+      // ============================================================
+      // AVATAR UPLOAD IMPLEMENTATION
+      // ============================================================
+      // Official Supabase Storage Documentation:
+      // https://supabase.com/docs/reference/dart/storage-from-upload
+      //
+      // Storage bucket name: 'avatars'
+      // - Files are stored at: {userId}/{filename}
+      // - Public URLs are automatically generated
+      // ============================================================
 
-      // In a real implementation, you would:
-      // 1. Upload the file to a storage service (S3, etc.)
-      // 2. Get the URL back
-      // 3. Update the profile with the new URL
+      final isConnected = await isOnline;
 
-      // For this implementation, we'll simulate the upload by updating the avatarUrl
-      // In production, replace this with actual file upload logic
+      if (!isConnected) {
+        // Offline: Queue for sync when connection is available
+        final localProfile = await readFromLocal(userId);
+        if (localProfile != null) {
+          // Update local with pending avatar path
+          final updated = localProfile.copyWith(avatarUrl: filePath);
+          await writeToLocal(updated);
+        }
 
-      throw UnimplementedError(
-        'Avatar upload requires file storage service integration',
+        await _syncQueueService.enqueueOperation(
+          entityType: entityType,
+          entityId: userId,
+          operation: SyncOperationType.update,
+          data: {'avatarFilePath': filePath},
+          priority: config.defaultSyncPriority,
+          maxRetries: config.maxSyncRetries,
+        );
+
+        return RepositoryOperationResult.queued(filePath);
+      }
+
+      // Online: Upload file to Supabase Storage
+      final file = File(filePath);
+
+      if (!file.existsSync()) {
+        throw const ServerException(
+          message: 'Avatar file does not exist',
+          code: 'FILE_NOT_FOUND',
+        );
+      }
+
+      // Get file extension for proper MIME type handling
+      final ext = path.extension(filePath);
+      final fileName = 'avatar_$userId${DateTime.now().millisecondsSinceEpoch}$ext';
+      final storagePath = '$userId/$fileName';
+
+      // Upload to Supabase Storage 'avatars' bucket
+      debugPrint('📤 userProfile: Uploading avatar to: avatars/$storagePath');
+
+      await _supabaseClient.storage.from('avatars').upload(
+            storagePath,
+            file,
+            fileOptions: const FileOptions(
+              cacheControl: '3600',
+              upsert: true, // Allow overwriting existing avatar
+            ),
+          );
+
+      // Get public URL for the uploaded avatar
+      final avatarUrl = _supabaseClient.storage
+          .from('avatars')
+          .getPublicUrl(storagePath);
+
+      debugPrint('✅ userProfile: Avatar uploaded successfully: $avatarUrl');
+
+      // Update profile with new avatar URL
+      final fields = {'avatarUrl': avatarUrl};
+
+      final updateResponse = await _apiService.dio.post(
+        '/graphql',
+        data: {
+          'query': GraphQLQueries.updateUserProfile,
+          'variables': {
+            'userId': userId,
+            ...fields,
+          },
+        },
       );
+
+      if (updateResponse.data['errors'] != null) {
+        throw ServerException(
+          message: updateResponse.data['errors'][0]['message'],
+        );
+      }
+
+      // Update local cache
+      await _userDao.updateAvatar(userId, avatarUrl);
+
+      return RepositoryOperationResult.immediate(avatarUrl);
     } catch (e) {
       debugPrint('❌ userProfile: Error uploading avatar: ${e.toString()}');
       if (e is AppException) {

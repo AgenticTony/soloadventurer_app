@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/core/services/location_service.dart' as core;
 import '../../domain/entities/check_in.dart';
-import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
 import '../state/trusted_contacts_state.dart';
 
@@ -630,7 +630,7 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
     try {
       final locationService = ref.read(locationServiceProvider);
       final locationData = await locationService.getCurrentLocation(
-        accuracy: LocationAccuracy.high,
+        accuracy: core.LocationAccuracy.high,
       );
 
       setState(() {

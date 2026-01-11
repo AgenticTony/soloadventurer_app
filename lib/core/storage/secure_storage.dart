@@ -132,6 +132,6 @@ class SecureStorage {
 
 /// Provider for SecureStorage
 @riverpod
-SecureStorage secureStorage(SecureStorageRef ref) {
+SecureStorage secureStorage(Ref ref) {
   return SecureStorage();
 }

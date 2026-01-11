@@ -17,7 +17,7 @@ part of 'safety_provider.dart';
 /// - Dependencies accessed via ref.watch() in methods
 
 @ProviderFor(Safety)
-final safetyProvider = SafetyProvider._();
+const safetyProvider = SafetyProvider._();
 
 /// Notifier for managing overall safety state
 /// Handles safety status, emergency SOS, and safety alerts
@@ -34,7 +34,7 @@ final class SafetyProvider extends $NotifierProvider<Safety, SafetyState> {
   /// - Uses @riverpod annotation with code generation
   /// - Uses Notifier base class instead of StateNotifier
   /// - Dependencies accessed via ref.watch() in methods
-  SafetyProvider._()
+  const SafetyProvider._()
       : super(
           from: null,
           argument: null,
@@ -76,9 +76,10 @@ abstract class _$Safety extends $Notifier<SafetyState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SafetyState, SafetyState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SafetyState, SafetyState>, SafetyState, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

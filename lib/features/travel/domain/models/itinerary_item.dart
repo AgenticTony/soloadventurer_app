@@ -10,7 +10,6 @@ part 'itinerary_item.g.dart';
 /// Each type has its own specific fields while sharing common properties.
 @freezed
 sealed class ItineraryItem with _$ItineraryItem {
-
   /// Flight arrival at the destination
   ///
   /// Used on the first day of the trip to track when the user lands.

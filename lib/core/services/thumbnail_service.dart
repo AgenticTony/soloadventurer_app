@@ -369,7 +369,7 @@ class ThumbnailService {
   ) async {
     // Create a recorder for the resized image
     final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
+    final canvas = ui.Canvas(recorder);
 
     // Calculate scaling to maintain aspect ratio
     final scaleX = targetWidth / image.width;
@@ -380,7 +380,7 @@ class ThumbnailService {
     final scaledHeight = image.height * scale;
 
     // Draw the scaled image
-    final paint = Paint()..filterQuality = ui.FilterQuality.medium;
+    final paint = ui.Paint()..filterQuality = ui.FilterQuality.medium;
     canvas.drawImageRect(
       image,
       ui.Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),

@@ -83,4 +83,14 @@ abstract class AuthRepository {
   /// Register a new user with email and password
   Future<User> registerWithEmailAndPassword(
       String email, String password, String username);
+
+  /// Delete the current user's account
+  ///
+  /// This will:
+  /// 1. Delete the user's authentication data
+  /// 2. Sign the user out
+  ///
+  /// Note: This requires server-side coordination via Edge Function
+  /// since admin privileges are needed to delete users.
+  Future<void> deleteAccount();
 }

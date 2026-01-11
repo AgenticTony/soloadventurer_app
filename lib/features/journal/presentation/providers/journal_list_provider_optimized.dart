@@ -234,7 +234,8 @@ class OptimizedJournalList extends _$OptimizedJournalList {
 
       final result = await queryOptimizer.execute<List<JournalEntry>>(
         'journal_entries_page_$nextPage',
-        () => _fetchEntriesPage(repository, nextPage, _paginationConfig.pageSize),
+        () =>
+            _fetchEntriesPage(repository, nextPage, _paginationConfig.pageSize),
         ttl: const Duration(minutes: 2),
       );
 

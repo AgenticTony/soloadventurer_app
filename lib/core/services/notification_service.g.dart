@@ -9,18 +9,27 @@ part of 'notification_service.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Provider for the notification service implementation
+///
+/// This provider returns the actual implementation from notification_service_impl.dart.
+/// The notificationServiceOverrideProvider handles the proper instantiation and disposal.
 
 @ProviderFor(notificationService)
-final notificationServiceProvider = NotificationServiceProvider._();
+const notificationServiceProvider = NotificationServiceProvider._();
 
 /// Provider for the notification service implementation
+///
+/// This provider returns the actual implementation from notification_service_impl.dart.
+/// The notificationServiceOverrideProvider handles the proper instantiation and disposal.
 
 final class NotificationServiceProvider extends $FunctionalProvider<
     NotificationService,
     NotificationService,
     NotificationService> with $Provider<NotificationService> {
   /// Provider for the notification service implementation
-  NotificationServiceProvider._()
+  ///
+  /// This provider returns the actual implementation from notification_service_impl.dart.
+  /// The notificationServiceOverrideProvider handles the proper instantiation and disposal.
+  const NotificationServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,4 +64,4 @@ final class NotificationServiceProvider extends $FunctionalProvider<
 }
 
 String _$notificationServiceHash() =>
-    r'e8e65b0356034645a62c729c5271e3eaa84ad3b8';
+    r'4fcc2de3743ae5366a0f4459f6969dc074d9b226';

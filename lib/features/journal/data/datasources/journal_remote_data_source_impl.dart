@@ -477,7 +477,7 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
       final response = await _client
           .from('media_items')
           .select()
-          .in_('journal_entry_id', entryIds)
+          .inFilter('journal_entry_id', entryIds)
           .order('created_at', ascending: false);
 
       return (response as List)

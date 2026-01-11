@@ -1,7 +1,8 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 import '../../domain/models/destination.dart';
-import '../../domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
+import '../../domain/models/destination_filter.dart'
+    hide BudgetLevel, ActivityLevel;
 import '../../domain/models/curated_list.dart';
 import '../../domain/models/personalized_recommendation.dart';
 import '../../domain/models/saved_destination.dart';

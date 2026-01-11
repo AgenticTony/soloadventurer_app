@@ -11,7 +11,7 @@ part of 'token_audit_logger.dart';
 /// Provides comprehensive audit logging for token operations
 
 @ProviderFor(tokenAuditLogger)
-final tokenAuditLoggerProvider = TokenAuditLoggerProvider._();
+const tokenAuditLoggerProvider = TokenAuditLoggerProvider._();
 
 /// Provides comprehensive audit logging for token operations
 
@@ -19,7 +19,7 @@ final class TokenAuditLoggerProvider
     extends $FunctionalProvider<LoggingService, LoggingService, LoggingService>
     with $Provider<LoggingService> {
   /// Provides comprehensive audit logging for token operations
-  TokenAuditLoggerProvider._()
+  const TokenAuditLoggerProvider._()
       : super(
           from: null,
           argument: null,
@@ -52,4 +52,4 @@ final class TokenAuditLoggerProvider
   }
 }
 
-String _$tokenAuditLoggerHash() => r'4e6398ef4b2a71f698502b732f4c45a36afa19ff';
+String _$tokenAuditLoggerHash() => r'7c53bf38a0d3637c40426d3978f7ed11bdb8e9b9';

@@ -41,7 +41,7 @@ enum SafetyAlertStatus {
 
 /// Represents a safety alert sent to trusted contacts
 @freezed
-class SafetyAlert with _$SafetyAlert {
+sealed class SafetyAlert with _$SafetyAlert {
   const factory SafetyAlert({
     /// Unique identifier for the safety alert
     required String id,
@@ -104,7 +104,7 @@ class SafetyAlert with _$SafetyAlert {
 
 /// Location data associated with a safety alert
 @freezed
-class SafetyAlertLocation with _$SafetyAlertLocation {
+sealed class SafetyAlertLocation with _$SafetyAlertLocation {
   const factory SafetyAlertLocation({
     /// Latitude
     required double latitude,

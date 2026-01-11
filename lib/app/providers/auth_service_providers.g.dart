@@ -13,7 +13,7 @@ part of 'auth_service_providers.dart';
 /// Handles local storage of auth data using SecureStorage and SharedPreferences.
 
 @ProviderFor(authLocalDataSource)
-final authLocalDataSourceProvider = AuthLocalDataSourceProvider._();
+const authLocalDataSourceProvider = AuthLocalDataSourceProvider._();
 
 /// Provider for AuthLocalDataSource
 ///
@@ -26,7 +26,7 @@ final class AuthLocalDataSourceProvider extends $FunctionalProvider<
   /// Provider for AuthLocalDataSource
   ///
   /// Handles local storage of auth data using SecureStorage and SharedPreferences.
-  AuthLocalDataSourceProvider._()
+  const AuthLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -65,16 +65,24 @@ String _$authLocalDataSourceHash() =>
 
 /// Provider for AuthRemoteDataSource
 ///
-/// In production, uses the real AWS Cognito implementation.
+/// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
 /// In tests, this can be overridden with the mock implementation.
+///
+/// The auth provider is selected based on AppConfig.useSupabaseAuth:
+/// - true: Uses SupabaseAuthRemoteDataSourceImpl
+/// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
 
 @ProviderFor(authRemoteDataSource)
-final authRemoteDataSourceProvider = AuthRemoteDataSourceProvider._();
+const authRemoteDataSourceProvider = AuthRemoteDataSourceProvider._();
 
 /// Provider for AuthRemoteDataSource
 ///
-/// In production, uses the real AWS Cognito implementation.
+/// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
 /// In tests, this can be overridden with the mock implementation.
+///
+/// The auth provider is selected based on AppConfig.useSupabaseAuth:
+/// - true: Uses SupabaseAuthRemoteDataSourceImpl
+/// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
 
 final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
     AuthRemoteDataSource,
@@ -82,9 +90,13 @@ final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
     AuthRemoteDataSource> with $Provider<AuthRemoteDataSource> {
   /// Provider for AuthRemoteDataSource
   ///
-  /// In production, uses the real AWS Cognito implementation.
+  /// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
   /// In tests, this can be overridden with the mock implementation.
-  AuthRemoteDataSourceProvider._()
+  ///
+  /// The auth provider is selected based on AppConfig.useSupabaseAuth:
+  /// - true: Uses SupabaseAuthRemoteDataSourceImpl
+  /// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
+  const AuthRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -119,14 +131,14 @@ final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$authRemoteDataSourceHash() =>
-    r'7a5133a8ee90af602656a66ab6bc9e8db07ba463';
+    r'ad511c0375da5ae6e7394768c5a275c275504fcc';
 
 /// Mock provider for AuthRemoteDataSource
 ///
 /// Used for testing. Override authRemoteDataSourceProvider with this in tests.
 
 @ProviderFor(mockAuthRemoteDataSource)
-final mockAuthRemoteDataSourceProvider = MockAuthRemoteDataSourceProvider._();
+const mockAuthRemoteDataSourceProvider = MockAuthRemoteDataSourceProvider._();
 
 /// Mock provider for AuthRemoteDataSource
 ///
@@ -139,7 +151,7 @@ final class MockAuthRemoteDataSourceProvider extends $FunctionalProvider<
   /// Mock provider for AuthRemoteDataSource
   ///
   /// Used for testing. Override authRemoteDataSourceProvider with this in tests.
-  MockAuthRemoteDataSourceProvider._()
+  const MockAuthRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -181,7 +193,7 @@ String _$mockAuthRemoteDataSourceHash() =>
 /// Coordinates between remote and local data sources with security management.
 
 @ProviderFor(authRepository)
-final authRepositoryProvider = AuthRepositoryProvider._();
+const authRepositoryProvider = AuthRepositoryProvider._();
 
 /// Provider for AuthRepository
 ///
@@ -193,7 +205,7 @@ final class AuthRepositoryProvider
   /// Provider for AuthRepository
   ///
   /// Coordinates between remote and local data sources with security management.
-  AuthRepositoryProvider._()
+  const AuthRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -231,7 +243,7 @@ String _$authRepositoryHash() => r'6199cad95f340b31cc46ff5d534f9f9c0da89346';
 /// Provider for GetCurrentUser use case
 
 @ProviderFor(getCurrentUserUseCase)
-final getCurrentUserUseCaseProvider = GetCurrentUserUseCaseProvider._();
+const getCurrentUserUseCaseProvider = GetCurrentUserUseCaseProvider._();
 
 /// Provider for GetCurrentUser use case
 
@@ -239,7 +251,7 @@ final class GetCurrentUserUseCaseProvider
     extends $FunctionalProvider<GetCurrentUser, GetCurrentUser, GetCurrentUser>
     with $Provider<GetCurrentUser> {
   /// Provider for GetCurrentUser use case
-  GetCurrentUserUseCaseProvider._()
+  const GetCurrentUserUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -278,7 +290,7 @@ String _$getCurrentUserUseCaseHash() =>
 /// Provider for IsSignedIn use case
 
 @ProviderFor(isSignedInUseCase)
-final isSignedInUseCaseProvider = IsSignedInUseCaseProvider._();
+const isSignedInUseCaseProvider = IsSignedInUseCaseProvider._();
 
 /// Provider for IsSignedIn use case
 
@@ -286,7 +298,7 @@ final class IsSignedInUseCaseProvider
     extends $FunctionalProvider<IsSignedIn, IsSignedIn, IsSignedIn>
     with $Provider<IsSignedIn> {
   /// Provider for IsSignedIn use case
-  IsSignedInUseCaseProvider._()
+  const IsSignedInUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -324,7 +336,7 @@ String _$isSignedInUseCaseHash() => r'402f91ef15c335033a4c951087127d68dad70c17';
 /// Provider for LoginUseCase
 
 @ProviderFor(loginUseCase)
-final loginUseCaseProvider = LoginUseCaseProvider._();
+const loginUseCaseProvider = LoginUseCaseProvider._();
 
 /// Provider for LoginUseCase
 
@@ -332,7 +344,7 @@ final class LoginUseCaseProvider
     extends $FunctionalProvider<LoginUseCase, LoginUseCase, LoginUseCase>
     with $Provider<LoginUseCase> {
   /// Provider for LoginUseCase
-  LoginUseCaseProvider._()
+  const LoginUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -370,14 +382,14 @@ String _$loginUseCaseHash() => r'c1d38f2bd23500953dbb22d11f783dc5875793bf';
 /// Provider for SignUp use case
 
 @ProviderFor(signUpUseCase)
-final signUpUseCaseProvider = SignUpUseCaseProvider._();
+const signUpUseCaseProvider = SignUpUseCaseProvider._();
 
 /// Provider for SignUp use case
 
 final class SignUpUseCaseProvider
     extends $FunctionalProvider<SignUp, SignUp, SignUp> with $Provider<SignUp> {
   /// Provider for SignUp use case
-  SignUpUseCaseProvider._()
+  const SignUpUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -415,7 +427,7 @@ String _$signUpUseCaseHash() => r'9cc757dacc0e5a3ee89002cbb3f853973bad3573';
 /// Provider for SignOut use case
 
 @ProviderFor(signOutUseCase)
-final signOutUseCaseProvider = SignOutUseCaseProvider._();
+const signOutUseCaseProvider = SignOutUseCaseProvider._();
 
 /// Provider for SignOut use case
 
@@ -423,7 +435,7 @@ final class SignOutUseCaseProvider
     extends $FunctionalProvider<SignOut, SignOut, SignOut>
     with $Provider<SignOut> {
   /// Provider for SignOut use case
-  SignOutUseCaseProvider._()
+  const SignOutUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -461,7 +473,7 @@ String _$signOutUseCaseHash() => r'6a32a9a05051b79329e66fa6ef97edb2e4789e0d';
 /// Provider for VerifyEmail use case
 
 @ProviderFor(verifyEmailUseCase)
-final verifyEmailUseCaseProvider = VerifyEmailUseCaseProvider._();
+const verifyEmailUseCaseProvider = VerifyEmailUseCaseProvider._();
 
 /// Provider for VerifyEmail use case
 
@@ -469,7 +481,7 @@ final class VerifyEmailUseCaseProvider
     extends $FunctionalProvider<VerifyEmail, VerifyEmail, VerifyEmail>
     with $Provider<VerifyEmail> {
   /// Provider for VerifyEmail use case
-  VerifyEmailUseCaseProvider._()
+  const VerifyEmailUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -508,7 +520,7 @@ String _$verifyEmailUseCaseHash() =>
 /// Provider for ResendVerificationEmail use case
 
 @ProviderFor(resendVerificationEmailUseCase)
-final resendVerificationEmailUseCaseProvider =
+const resendVerificationEmailUseCaseProvider =
     ResendVerificationEmailUseCaseProvider._();
 
 /// Provider for ResendVerificationEmail use case
@@ -519,7 +531,7 @@ final class ResendVerificationEmailUseCaseProvider extends $FunctionalProvider<
         resend.ResendVerificationEmail>
     with $Provider<resend.ResendVerificationEmail> {
   /// Provider for ResendVerificationEmail use case
-  ResendVerificationEmailUseCaseProvider._()
+  const ResendVerificationEmailUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -560,7 +572,7 @@ String _$resendVerificationEmailUseCaseHash() =>
 /// Provider for ForgotPassword use case
 
 @ProviderFor(forgotPasswordUseCase)
-final forgotPasswordUseCaseProvider = ForgotPasswordUseCaseProvider._();
+const forgotPasswordUseCaseProvider = ForgotPasswordUseCaseProvider._();
 
 /// Provider for ForgotPassword use case
 
@@ -568,7 +580,7 @@ final class ForgotPasswordUseCaseProvider
     extends $FunctionalProvider<ForgotPassword, ForgotPassword, ForgotPassword>
     with $Provider<ForgotPassword> {
   /// Provider for ForgotPassword use case
-  ForgotPasswordUseCaseProvider._()
+  const ForgotPasswordUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -607,7 +619,7 @@ String _$forgotPasswordUseCaseHash() =>
 /// Provider for ConfirmPasswordReset use case
 
 @ProviderFor(confirmPasswordResetUseCase)
-final confirmPasswordResetUseCaseProvider =
+const confirmPasswordResetUseCaseProvider =
     ConfirmPasswordResetUseCaseProvider._();
 
 /// Provider for ConfirmPasswordReset use case
@@ -617,7 +629,7 @@ final class ConfirmPasswordResetUseCaseProvider extends $FunctionalProvider<
     ConfirmPasswordReset,
     ConfirmPasswordReset> with $Provider<ConfirmPasswordReset> {
   /// Provider for ConfirmPasswordReset use case
-  ConfirmPasswordResetUseCaseProvider._()
+  const ConfirmPasswordResetUseCaseProvider._()
       : super(
           from: null,
           argument: null,

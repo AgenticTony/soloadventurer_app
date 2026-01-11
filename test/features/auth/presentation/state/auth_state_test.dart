@@ -5,7 +5,7 @@ import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart'
 void main() {
   group('AuthState', () {
     test('initial state has correct values', () {
-      const state = AuthState.initial();
+      final state = AuthState.initial();
       expect(state.user, null);
       expect(state.isAuthenticated, false);
       expect(state.requiresMFA, false);
@@ -86,7 +86,7 @@ void main() {
         username: 'test',
         createdAt: DateTime.now(),
       );
-      const state = AuthState.initial();
+      final state = AuthState.initial();
       final newState = state.copyWith(
         user: user,
         isAuthenticated: true,

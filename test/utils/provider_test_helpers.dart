@@ -19,15 +19,17 @@ import 'provider_container_utils.dart';
 /// [testCases] - A list of test cases to run.
 /// [setUp] - An optional function to run before each test.
 /// [tearDown] - An optional function to run after each test.
-@Deprecated('Use Notifier instead of StateNotifier. See: https://riverpod.dev/docs/3.0_migration')
-void testStateNotifierProvider<Notifier extends riverpod.StateNotifier<State>, State>({
+@Deprecated(
+    'Use Notifier instead of StateNotifier. See: https://riverpod.dev/docs/3.0_migration')
+void testStateNotifierProvider<Notifier extends riverpod.StateNotifier<State>,
+    State>({
   required Object provider, // StateNotifierProvider
   required List<Function> buildMocks,
   required List<StateNotifierTestCase<State>> testCases,
   Function()? setUp,
   Function()? tearDown,
 }) {
-  group('${provider.toString()}', () {
+  group(provider.toString(), () {
     for (final testCase in testCases) {
       test(testCase.description, () async {
         // Run setup if provided
@@ -95,7 +97,7 @@ void testFutureProvider<T>({
   Function()? setUp,
   Function()? tearDown,
 }) {
-  group('${provider.toString()}', () {
+  group(provider.toString(), () {
     for (final testCase in testCases) {
       test(testCase.description, () async {
         // Run setup if provided
@@ -174,7 +176,7 @@ void testStreamProvider<T>({
   Function()? setUp,
   Function()? tearDown,
 }) {
-  group('${provider.toString()}', () {
+  group(provider.toString(), () {
     for (final testCase in testCases) {
       test(testCase.description, () async {
         // Run setup if provided

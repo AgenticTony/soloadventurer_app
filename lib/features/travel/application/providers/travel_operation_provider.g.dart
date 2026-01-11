@@ -17,7 +17,7 @@ part of 'travel_operation_provider.dart';
 /// Provider for the travel operation repository
 
 @ProviderFor(travelOperationRepository)
-final travelOperationRepositoryProvider = TravelOperationRepositoryProvider._();
+const travelOperationRepositoryProvider = TravelOperationRepositoryProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier to @riverpod Notifier
@@ -38,7 +38,7 @@ final class TravelOperationRepositoryProvider extends $FunctionalProvider<
   /// - Initialization logic moved from constructor to build() method
   ///
   /// Provider for the travel operation repository
-  TravelOperationRepositoryProvider._()
+  const TravelOperationRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -80,7 +80,7 @@ String _$travelOperationRepositoryHash() =>
 /// Riverpod 3.0: Uses @riverpod annotation for FutureProvider
 
 @ProviderFor(pendingOperations)
-final pendingOperationsProvider = PendingOperationsProvider._();
+const pendingOperationsProvider = PendingOperationsProvider._();
 
 /// Provider for pending operations
 ///
@@ -96,7 +96,7 @@ final class PendingOperationsProvider extends $FunctionalProvider<
   /// Provider for pending operations
   ///
   /// Riverpod 3.0: Uses @riverpod annotation for FutureProvider
-  PendingOperationsProvider._()
+  const PendingOperationsProvider._()
       : super(
           from: null,
           argument: null,
@@ -142,7 +142,7 @@ String _$pendingOperationsHash() => r'c234fed25378e7172626194f479fc72f9fadbb34';
 /// ```
 
 @ProviderFor(TravelOperation)
-final travelOperationProvider = TravelOperationProvider._();
+const travelOperationProvider = TravelOperationProvider._();
 
 /// Provider for managing travel operation state
 ///
@@ -178,7 +178,7 @@ final class TravelOperationProvider
   /// // Process operation
   /// await operationNotifier.processOperation(operationId);
   /// ```
-  TravelOperationProvider._()
+  const TravelOperationProvider._()
       : super(
           from: null,
           argument: null,
@@ -229,12 +229,13 @@ abstract class _$TravelOperation extends $Notifier<AsyncValue<void>> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AsyncValue<void>, AsyncValue<void>>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, AsyncValue<void>>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

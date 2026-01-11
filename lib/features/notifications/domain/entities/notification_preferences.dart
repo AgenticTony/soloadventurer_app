@@ -9,7 +9,6 @@ part 'notification_preferences.g.dart';
 /// and how they are delivered.
 @freezed
 abstract class NotificationPreferences with _$NotificationPreferences {
-
   const factory NotificationPreferences({
     // Flight notifications
     @Default(true) bool flightCheckInReminders,

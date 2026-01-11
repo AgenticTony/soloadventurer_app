@@ -8,6 +8,7 @@ part 'notification_model.g.dart';
 /// Model for [TravelNotification] with JSON serialization
 @freezed
 abstract class NotificationModel with _$NotificationModel {
+  const NotificationModel._();
 
   const factory NotificationModel({
     required String id,

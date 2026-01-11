@@ -13,7 +13,7 @@ part of 'sync_settings_provider.dart';
 /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
 
 @ProviderFor(SyncSettings)
-final syncSettingsProvider = SyncSettingsProvider._();
+const syncSettingsProvider = SyncSettingsProvider._();
 
 /// Notifier for sync settings
 ///
@@ -23,7 +23,7 @@ final class SyncSettingsProvider
   /// Notifier for sync settings
   ///
   /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
-  SyncSettingsProvider._()
+  const SyncSettingsProvider._()
       : super(
           from: null,
           argument: null,
@@ -61,20 +61,21 @@ abstract class _$SyncSettings extends $Notifier<SyncSettingsData> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SyncSettingsData, SyncSettingsData>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SyncSettingsData, SyncSettingsData>,
         SyncSettingsData,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for SharedPreferences instance
 
 @ProviderFor(sharedPreferences)
-final sharedPreferencesProvider = SharedPreferencesProvider._();
+const sharedPreferencesProvider = SharedPreferencesProvider._();
 
 /// Provider for SharedPreferences instance
 
@@ -83,7 +84,7 @@ final class SharedPreferencesProvider extends $FunctionalProvider<
     SharedPreferences,
     SharedPreferences> with $Provider<SharedPreferences> {
   /// Provider for SharedPreferences instance
-  SharedPreferencesProvider._()
+  const SharedPreferencesProvider._()
       : super(
           from: null,
           argument: null,
@@ -122,14 +123,14 @@ String _$sharedPreferencesHash() => r'fae80ab617db0b1ad9094ee01e7c9665b96a107c';
 /// Provider for sync enabled boolean (for easy access)
 
 @ProviderFor(syncEnabled)
-final syncEnabledProvider = SyncEnabledProvider._();
+const syncEnabledProvider = SyncEnabledProvider._();
 
 /// Provider for sync enabled boolean (for easy access)
 
 final class SyncEnabledProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Provider for sync enabled boolean (for easy access)
-  SyncEnabledProvider._()
+  const SyncEnabledProvider._()
       : super(
           from: null,
           argument: null,
@@ -167,14 +168,14 @@ String _$syncEnabledHash() => r'53f176e6a4d76bec16fa5b0194dd938116713185';
 /// Provider for WiFi-only sync boolean (for easy access)
 
 @ProviderFor(syncOnlyOnWifi)
-final syncOnlyOnWifiProvider = SyncOnlyOnWifiProvider._();
+const syncOnlyOnWifiProvider = SyncOnlyOnWifiProvider._();
 
 /// Provider for WiFi-only sync boolean (for easy access)
 
 final class SyncOnlyOnWifiProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Provider for WiFi-only sync boolean (for easy access)
-  SyncOnlyOnWifiProvider._()
+  const SyncOnlyOnWifiProvider._()
       : super(
           from: null,
           argument: null,

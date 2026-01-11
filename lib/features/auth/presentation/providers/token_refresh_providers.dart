@@ -8,6 +8,6 @@ part 'token_refresh_providers.g.dart';
 
 /// Provider for the TokenRefreshService from the service locator
 @riverpod
-TokenRefreshService tokenRefreshService(TokenRefreshServiceRef ref) {
+TokenRefreshService tokenRefreshService(Ref ref) {
   return getIt<TokenRefreshService>();
 }

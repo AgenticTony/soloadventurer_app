@@ -17,7 +17,7 @@ enum LocationSharingStatus {
 
 /// Represents a location update shared with trusted contacts
 @freezed
-class LocationUpdate with _$LocationUpdate {
+sealed class LocationUpdate with _$LocationUpdate {
   const factory LocationUpdate({
     /// Unique identifier for the location update
     required String id,

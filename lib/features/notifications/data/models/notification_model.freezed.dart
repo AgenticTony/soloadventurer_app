@@ -467,7 +467,7 @@ extension NotificationModelPatterns on NotificationModel {
 
 /// @nodoc
 @JsonSerializable()
-class _NotificationModel implements NotificationModel {
+class _NotificationModel extends NotificationModel {
   const _NotificationModel(
       {required this.id,
       required this.type,
@@ -485,7 +485,8 @@ class _NotificationModel implements NotificationModel {
       this.imageUrl,
       this.isOngoing = false})
       : _data = data,
-        _actions = actions;
+        _actions = actions,
+        super._();
   factory _NotificationModel.fromJson(Map<String, dynamic> json) =>
       _$NotificationModelFromJson(json);
 

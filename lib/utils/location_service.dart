@@ -129,15 +129,11 @@ class LocationCaptureConfig {
   /// Maximum distance in meters that location can move to trigger updates
   final double? distanceFilter;
 
-  /// Whether to request high accuracy location (uses more battery)
-  final bool forceAndroidLocationManager;
-
   const LocationCaptureConfig({
     this.desiredAccuracy = LocationAccuracy.best,
     this.maxAge,
     this.timeLimit = const Duration(seconds: 10),
     this.distanceFilter,
-    this.forceAndroidLocationManager = false,
   });
 
   /// Predefined configuration for travel journal entries
@@ -181,7 +177,7 @@ class LocationService {
     try {
       return await Geolocator.isLocationServiceEnabled();
     } catch (e) {
-      throw LocationException(
+      throw LocationException(message:
         'Failed to check location service status: ${e.toString()}',
       );
     }
@@ -192,7 +188,7 @@ class LocationService {
     try {
       return await Geolocator.checkPermission();
     } catch (e) {
-      throw LocationException(
+      throw LocationException(message:
         'Failed to check location permission: ${e.toString()}',
       );
     }
@@ -203,7 +199,7 @@ class LocationService {
     try {
       return await Geolocator.requestPermission();
     } catch (e) {
-      throw LocationException(
+      throw LocationException(message:
         'Failed to request location permission: ${e.toString()}',
       );
     }
@@ -216,7 +212,7 @@ class LocationService {
     final isEnabled = await isLocationServiceEnabled();
     if (!isEnabled) {
       throw const LocationException(
-        'Location services are disabled. Please enable them in settings.',
+        message: 'Location services are disabled. Please enable them in settings.',
       );
     }
 
@@ -227,14 +223,14 @@ class LocationService {
       permission = await requestPermission();
       if (permission == LocationPermission.denied) {
         throw const LocationException(
-          'Location permissions are denied. Please grant permission in settings.',
+          message: 'Location permissions are denied. Please grant permission in settings.',
         );
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
       throw const LocationException(
-        'Location permissions are permanently denied. Please enable them in app settings.',
+        message: 'Location permissions are permanently denied. Please enable them in app settings.',
       );
     }
   }
@@ -255,18 +251,17 @@ class LocationService {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: config.desiredAccuracy,
         timeLimit: config.timeLimit,
-        forceAndroidLocationManager: config.forceAndroidLocationManager,
       );
 
       // Check if position is within max age
-      if (config.maxAge != null) {
+      final maxAge = config.maxAge;
+      if (maxAge != null) {
         final age = DateTime.now().difference(position.timestamp);
-        if (age > config.maxAge) {
+        if (age > maxAge) {
           // Position is too old, get fresh location
           final freshPosition = await Geolocator.getCurrentPosition(
             desiredAccuracy: config.desiredAccuracy,
             timeLimit: config.timeLimit,
-            forceAndroidLocationManager: config.forceAndroidLocationManager,
           );
           return LocationData.fromPosition(freshPosition);
         }
@@ -276,7 +271,7 @@ class LocationService {
     } on LocationException {
       rethrow;
     } catch (e) {
-      throw LocationException(
+      throw LocationException(message:
         'Failed to get current location: ${e.toString()}',
       );
     }
@@ -293,7 +288,7 @@ class LocationService {
       }
       return LocationData.fromPosition(position);
     } catch (e) {
-      throw LocationException(
+      throw LocationException(message:
         'Failed to get last known location: ${e.toString()}',
       );
     }
@@ -334,9 +329,10 @@ class LocationService {
     return Geolocator.getPositionStream(
       locationSettings: LocationSettings(
         accuracy: config.desiredAccuracy,
-        distanceFilter: config.distanceFilter,
+        distanceFilter: config.distanceFilter == null
+            ? 100
+            : config.distanceFilter!.toInt(),
         timeLimit: config.timeLimit,
-        forceAndroidLocationManager: config.forceAndroidLocationManager,
       ),
     ).map((position) => LocationData.fromPosition(position));
   }

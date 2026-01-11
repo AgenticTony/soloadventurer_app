@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:soloadventurer/core/widgets/spacing.dart';
@@ -72,61 +74,65 @@ class RichTextViewer extends StatelessWidget {
           : null,
       child: quill.QuillEditor.basic(
         controller: controller,
-        readOnly: true,
-        configurations: quill.QuillEditorConfigurations(
+        config: quill.QuillEditorConfig(
           padding: EdgeInsets.zero,
-          customStyles: DefaultStyles(
-            paragraph: DefaultTextBlockStyle(
+          customStyles: quill.DefaultStyles(
+            paragraph: quill.DefaultTextBlockStyle(
               textStyle ?? theme.textTheme.bodyLarge!,
+              const quill.HorizontalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               null,
             ),
-            h1: DefaultTextBlockStyle(
+            h1: quill.DefaultTextBlockStyle(
               theme.textTheme.headlineMedium!,
-              const quill.VerticalSpacing(16, 8),
+              const quill.HorizontalSpacing(16, 8),
+              const quill.VerticalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               null,
             ),
-            h2: DefaultTextBlockStyle(
+            h2: quill.DefaultTextBlockStyle(
               theme.textTheme.titleLarge!,
-              const quill.VerticalSpacing(12, 6),
+              const quill.HorizontalSpacing(12, 6),
+              const quill.VerticalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               null,
             ),
-            h3: DefaultTextBlockStyle(
+            h3: quill.DefaultTextBlockStyle(
               theme.textTheme.titleMedium!,
-              const quill.VerticalSpacing(8, 4),
+              const quill.HorizontalSpacing(8, 4),
+              const quill.VerticalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               null,
             ),
-            lists: DefaultTextBlockStyle(
+            lists: quill.DefaultListBlockStyle(
               theme.textTheme.bodyLarge!,
-              const quill.VerticalSpacing(0, 4),
+              const quill.HorizontalSpacing(0, 4),
+              const quill.VerticalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               null,
+              null,
             ),
-            quote: DefaultTextBlockStyle(
-              theme.textTheme.bodyMedium?.copyWith(
+            quote: quill.DefaultTextBlockStyle(
+              theme.textTheme.bodyMedium!.copyWith(
                 fontStyle: FontStyle.italic,
-                color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
               ),
-              const quill.VerticalSpacing(8, 4),
+              const quill.HorizontalSpacing(8, 4),
+              const quill.VerticalSpacing(0, 0),
               const quill.VerticalSpacing(0, 0),
               null,
             ),
-            code: DefaultTextBlockStyle(
+            code: quill.DefaultTextBlockStyle(
               TextStyle(
                 fontFamily: 'monospace',
                 fontSize: theme.textTheme.bodyMedium?.fontSize,
                 color: theme.colorScheme.primary,
               ),
-              const quill.VerticalSpacing(8, 4),
+              const quill.HorizontalSpacing(8, 4),
               const quill.VerticalSpacing(0, 0),
-              BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(4),
-              ),
+              const quill.VerticalSpacing(0, 0),
+              null,
             ),
           ),
         ),
@@ -134,14 +140,33 @@ class RichTextViewer extends StatelessWidget {
     );
   }
 
-  /// Parse Delta JSON string into a Map
-  /// Handles both JSON string and already parsed formats
-  Map<String, dynamic> _parseDeltaJson(String jsonString) {
+  /// Parse Delta JSON string
+  /// Returns a List of delta operations as expected by Document.fromJson
+  List<dynamic> _parseDeltaJson(String jsonString) {
     if (jsonString.startsWith('{') && jsonString.endsWith('}')) {
-      // Direct JSON object - wrap in document format expected by Quill
-      return {'document': jsonString};
+      // Direct JSON object - needs to be wrapped in a list format
+      // Delta format is [{"insert": "text"}] or similar
+      try {
+        final decoded = jsonDecode(jsonString);
+        if (decoded is Map) {
+          return [decoded];
+        }
+        return decoded as List<dynamic>;
+      } catch (_) {
+        return [{'insert': jsonString}];
+      }
     }
-    // Already formatted or plain text
-    return {'document': jsonString};
+    try {
+      final decoded = jsonDecode(jsonString);
+      if (decoded is List) {
+        return decoded as List<dynamic>;
+      }
+      if (decoded is Map) {
+        return [decoded];
+      }
+      return [{'insert': jsonString}];
+    } catch (_) {
+      return [{'insert': jsonString}];
+    }
   }
 }

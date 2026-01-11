@@ -67,8 +67,10 @@ void main() {
       });
 
       test('hasQueue is true only when queueSize > 0', () {
-        const emptyState = SyncState(status: SyncOperationStatus.idle, queueSize: 0);
-        const queueState = SyncState(status: SyncOperationStatus.idle, queueSize: 5);
+        const emptyState =
+            SyncState(status: SyncOperationStatus.idle, queueSize: 0);
+        const queueState =
+            SyncState(status: SyncOperationStatus.idle, queueSize: 5);
 
         expect(emptyState.hasQueue, false);
         expect(queueState.hasQueue, true);
@@ -152,8 +154,8 @@ void main() {
       });
 
       test('copyWith can update lastError with new value', () {
-        const state =
-            SyncState(status: SyncOperationStatus.failed, lastError: 'Old error');
+        const state = SyncState(
+            status: SyncOperationStatus.failed, lastError: 'Old error');
         final updated = state.copyWith(lastError: 'New error');
 
         expect(updated.lastError, 'New error');
@@ -161,8 +163,8 @@ void main() {
 
       test('copyWith with clearLastError=true overrides lastError parameter',
           () {
-        const state =
-            SyncState(status: SyncOperationStatus.failed, lastError: 'Old error');
+        const state = SyncState(
+            status: SyncOperationStatus.failed, lastError: 'Old error');
         final updated = state.copyWith(
           lastError: 'New error',
           clearLastError: true,
@@ -190,8 +192,10 @@ void main() {
       });
 
       test('two states with different values are not equal', () {
-        const state1 = SyncState(status: SyncOperationStatus.idle, queueSize: 0);
-        const state2 = SyncState(status: SyncOperationStatus.syncing, queueSize: 5);
+        const state1 =
+            SyncState(status: SyncOperationStatus.idle, queueSize: 0);
+        const state2 =
+            SyncState(status: SyncOperationStatus.syncing, queueSize: 5);
 
         expect(state1, isNot(equals(state2)));
       });

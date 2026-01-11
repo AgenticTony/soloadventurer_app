@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:riverpod/riverpod.dart';
 import 'package:workmanager/workmanager.dart';
 import 'background_checkin_service.dart';
 
@@ -221,7 +220,7 @@ class BackgroundCheckInServiceException implements Exception {
 /// Provider for BackgroundCheckInServiceImpl
 @riverpod
 BackgroundCheckInService backgroundCheckInServiceImpl(
-  BackgroundCheckInServiceImplRef ref,
+  Ref ref,
 ) {
   final service = BackgroundCheckInServiceImpl();
 
@@ -234,7 +233,7 @@ BackgroundCheckInService backgroundCheckInServiceImpl(
 /// Provider override for BackgroundCheckInService interface
 @riverpod
 BackgroundCheckInService backgroundCheckInServiceOverride(
-  BackgroundCheckInServiceOverrideRef ref,
+  Ref ref,
 ) {
   return ref.watch(backgroundCheckInServiceImplProvider);
 }

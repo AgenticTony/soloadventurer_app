@@ -150,8 +150,6 @@ extension ActivitySuggestionPatterns on ActivitySuggestion {
     switch (_that) {
       case _ActivitySuggestion():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -229,8 +227,6 @@ extension ActivitySuggestionPatterns on ActivitySuggestion {
     switch (_that) {
       case _ActivitySuggestion():
         return $default(_that.activity, _that.reason, _that.score);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

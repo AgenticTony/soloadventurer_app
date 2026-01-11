@@ -8,8 +8,7 @@ part 'weather_forecast.g.dart';
 /// Used during itinerary generation to provide weather-based
 /// activity recommendations and packing suggestions.
 @freezed
-class WeatherForecast with _$WeatherForecast {
-
+sealed class WeatherForecast with _$WeatherForecast {
   /// Creates a weather forecast with all required fields
   ///
   /// [date] The date for this forecast

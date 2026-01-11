@@ -419,8 +419,6 @@ extension CuratedListPatterns on CuratedList {
     switch (_that) {
       case _CuratedList():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -594,8 +592,6 @@ extension CuratedListPatterns on CuratedList {
             _that.updatedAt,
             _that.publishedAt,
             _that.isPublished);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -677,7 +673,7 @@ extension CuratedListPatterns on CuratedList {
 /// @nodoc
 @JsonSerializable()
 class _CuratedList extends CuratedList {
-  const _CuratedList(
+  _CuratedList(
       {required this.id,
       required this.name,
       required this.description,

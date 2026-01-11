@@ -298,8 +298,6 @@ extension DestinationFilterPatterns on DestinationFilter {
     switch (_that) {
       case _DestinationFilter():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -433,8 +431,6 @@ extension DestinationFilterPatterns on DestinationFilter {
             _that.sortBy,
             _that.offset,
             _that.limit);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -496,7 +492,7 @@ extension DestinationFilterPatterns on DestinationFilter {
 /// @nodoc
 @JsonSerializable()
 class _DestinationFilter extends DestinationFilter {
-  const _DestinationFilter(
+  _DestinationFilter(
       {this.searchQuery,
       this.budgetLevel,
       this.minSafetyScore,

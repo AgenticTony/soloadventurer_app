@@ -11,7 +11,7 @@ part of 'recommendations_screen.dart';
 /// Provider for recommendations for a specific itinerary
 
 @ProviderFor(recommendationsForItinerary)
-final recommendationsForItineraryProvider =
+const recommendationsForItineraryProvider =
     RecommendationsForItineraryFamily._();
 
 /// Provider for recommendations for a specific itinerary
@@ -24,7 +24,7 @@ final class RecommendationsForItineraryProvider extends $FunctionalProvider<
         $FutureModifier<List<PersonalizedRecommendation>>,
         $FutureProvider<List<PersonalizedRecommendation>> {
   /// Provider for recommendations for a specific itinerary
-  RecommendationsForItineraryProvider._(
+  const RecommendationsForItineraryProvider._(
       {required RecommendationsForItineraryFamily super.from,
       required String super.argument})
       : super(
@@ -81,7 +81,7 @@ final class RecommendationsForItineraryFamily extends $Family
     with
         $FunctionalFamilyOverride<FutureOr<List<PersonalizedRecommendation>>,
             String> {
-  RecommendationsForItineraryFamily._()
+  const RecommendationsForItineraryFamily._()
       : super(
           retry: null,
           name: r'recommendationsForItineraryProvider',
@@ -104,7 +104,7 @@ final class RecommendationsForItineraryFamily extends $Family
 /// Provider for getting an itinerary
 
 @ProviderFor(itinerary)
-final itineraryProvider = ItineraryFamily._();
+const itineraryProvider = ItineraryFamily._();
 
 /// Provider for getting an itinerary
 
@@ -112,7 +112,7 @@ final class ItineraryProvider extends $FunctionalProvider<AsyncValue<Itinerary>,
         Itinerary, FutureOr<Itinerary>>
     with $FutureModifier<Itinerary>, $FutureProvider<Itinerary> {
   /// Provider for getting an itinerary
-  ItineraryProvider._(
+  const ItineraryProvider._(
       {required ItineraryFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -163,7 +163,7 @@ String _$itineraryHash() => r'a7e19284f3eee684643f28fc4b9e356bc9c5ba93';
 
 final class ItineraryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Itinerary>, String> {
-  ItineraryFamily._()
+  const ItineraryFamily._()
       : super(
           retry: null,
           name: r'itineraryProvider',

@@ -6,8 +6,7 @@ part 'location_update_model.g.dart';
 
 /// Model for [LocationUpdate] with JSON serialization
 @freezed
-class LocationUpdateModel with _$LocationUpdateModel {
-
+sealed class LocationUpdateModel with _$LocationUpdateModel {
   const factory LocationUpdateModel({
     required String id,
     required String userId,

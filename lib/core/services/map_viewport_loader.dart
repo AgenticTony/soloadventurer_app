@@ -15,10 +15,10 @@ class ViewportLoadResult {
   final int totalMarkers;
 
   /// Current viewport bounds
-  final Bounds viewportBounds;
+  final LatLngBounds viewportLatLngBounds;
 
   /// Extended bounds including buffer zone
-  final Bounds extendedBounds;
+  final LatLngBounds extendedLatLngBounds;
 
   /// Whether this result is from a cache
   final bool isFromCache;
@@ -27,8 +27,8 @@ class ViewportLoadResult {
     required this.visibleMarkers,
     required this.preloadedMarkers,
     required this.totalMarkers,
-    required this.viewportBounds,
-    required this.extendedBounds,
+    required this.viewportLatLngBounds,
+    required this.extendedLatLngBounds,
     this.isFromCache = false,
   });
 
@@ -48,16 +48,16 @@ class ViewportLoadResult {
 
   /// Create empty result
   factory ViewportLoadResult.empty({
-    required Bounds viewportBounds,
-    required Bounds extendedBounds,
+    required LatLngBounds viewportLatLngBounds,
+    required LatLngBounds extendedLatLngBounds,
     required int totalMarkers,
   }) {
     return ViewportLoadResult(
       visibleMarkers: [],
       preloadedMarkers: [],
       totalMarkers: totalMarkers,
-      viewportBounds: viewportBounds,
-      extendedBounds: extendedBounds,
+      viewportLatLngBounds: viewportLatLngBounds,
+      extendedLatLngBounds: extendedLatLngBounds,
       isFromCache: false,
     );
   }
@@ -67,16 +67,16 @@ class ViewportLoadResult {
     List<MapMarker>? visibleMarkers,
     List<MapMarker>? preloadedMarkers,
     int? totalMarkers,
-    Bounds? viewportBounds,
-    Bounds? extendedBounds,
+    LatLngBounds? viewportLatLngBounds,
+    LatLngBounds? extendedLatLngBounds,
     bool? isFromCache,
   }) {
     return ViewportLoadResult(
       visibleMarkers: visibleMarkers ?? this.visibleMarkers,
       preloadedMarkers: preloadedMarkers ?? this.preloadedMarkers,
       totalMarkers: totalMarkers ?? this.totalMarkers,
-      viewportBounds: viewportBounds ?? this.viewportBounds,
-      extendedBounds: extendedBounds ?? this.extendedBounds,
+      viewportLatLngBounds: viewportLatLngBounds ?? this.viewportLatLngBounds,
+      extendedLatLngBounds: extendedLatLngBounds ?? this.extendedLatLngBounds,
       isFromCache: isFromCache ?? this.isFromCache,
     );
   }
@@ -103,10 +103,10 @@ class MapViewportLoader {
   final List<MapMarker> _allMarkers;
 
   /// Current viewport bounds
-  Bounds? _currentBounds;
+  LatLngBounds? _currentLatLngBounds;
 
   /// Extended bounds including buffer zone
-  Bounds? _extendedBounds;
+  LatLngBounds? _extendedLatLngBounds;
 
   /// Current load result
   ViewportLoadResult? _currentResult;
@@ -161,8 +161,8 @@ class MapViewportLoader {
         _cache = _ViewportCache(maxSize: maxCacheSize);
 
   /// Initialize loader with initial viewport bounds
-  Future<ViewportLoadResult> initialize(Bounds initialBounds) async {
-    return updateBounds(initialBounds, force: true);
+  Future<ViewportLoadResult> initialize(LatLngBounds initialLatLngBounds) async {
+    return updateLatLngBounds(initialLatLngBounds, force: true);
   }
 
   /// Update viewport bounds and reload markers
@@ -175,18 +175,18 @@ class MapViewportLoader {
   /// - [force]: If true, bypasses debounce and forces immediate reload
   ///
   /// Returns the load result (or current result if debounced).
-  Future<ViewportLoadResult> updateBounds(
-    Bounds bounds, {
+  Future<ViewportLoadResult> updateLatLngBounds(
+    LatLngBounds bounds, {
     bool force = false,
   }) async {
     // Check if bounds changed significantly
-    if (_currentBounds != null &&
-        !_boundsChangedSignificantly(_currentBounds!, bounds) &&
+    if (_currentLatLngBounds != null &&
+        !_boundsChangedSignificantly(_currentLatLngBounds!, bounds) &&
         !force) {
       return _currentResult!;
     }
 
-    _currentBounds = bounds;
+    _currentLatLngBounds = bounds;
 
     // If not forcing, debounce the reload
     if (!force) {
@@ -206,20 +206,20 @@ class MapViewportLoader {
   ///
   /// Useful for peeking at markers for a viewport without affecting
   /// the current loaded state.
-  ViewportLoadResult peekViewport(Bounds bounds) {
-    final extendedBounds = _calculateExtendedBounds(bounds);
-    final markersInBounds = _filterMarkersInBounds(_allMarkers, extendedBounds);
+  ViewportLoadResult peekViewport(LatLngBounds bounds) {
+    final extendedLatLngBounds = _calculateExtendedLatLngBounds(bounds);
+    final markersInLatLngBounds = _filterMarkersInLatLngBounds(_allMarkers, extendedLatLngBounds);
 
-    final visibleMarkers = _filterMarkersInBounds(_allMarkers, bounds);
+    final visibleMarkers = _filterMarkersInLatLngBounds(_allMarkers, bounds);
     final preloadedMarkers =
-        markersInBounds.where((m) => !visibleMarkers.contains(m)).toList();
+        markersInLatLngBounds.where((m) => !visibleMarkers.contains(m)).toList();
 
     return ViewportLoadResult(
       visibleMarkers: visibleMarkers,
       preloadedMarkers: preloadedMarkers,
       totalMarkers: _allMarkers.length,
-      viewportBounds: bounds,
-      extendedBounds: extendedBounds,
+      viewportLatLngBounds: bounds,
+      extendedLatLngBounds: extendedLatLngBounds,
       isFromCache: false,
     );
   }
@@ -271,20 +271,20 @@ class MapViewportLoader {
   // Private methods
 
   /// Perform actual marker loading for bounds
-  ViewportLoadResult _performLoad(Bounds bounds) {
+  ViewportLoadResult _performLoad(LatLngBounds bounds) {
     _totalLoads++;
 
     // Calculate extended bounds with buffer zone
-    final extendedBounds = _calculateExtendedBounds(bounds);
-    _extendedBounds = extendedBounds;
+    final extendedLatLngBounds = _calculateExtendedLatLngBounds(bounds);
+    _extendedLatLngBounds = extendedLatLngBounds;
 
     // Check cache first
-    final cached = _cache.get(extendedBounds);
+    final cached = _cache.get(extendedLatLngBounds);
     if (cached != null) {
       _cacheHits++;
       _currentResult = cached.copyWith(
-        viewportBounds: bounds,
-        extendedBounds: extendedBounds,
+        viewportLatLngBounds: bounds,
+        extendedLatLngBounds: extendedLatLngBounds,
       );
       _resultController.add(_currentResult!);
       return _currentResult!;
@@ -293,12 +293,12 @@ class MapViewportLoader {
     _cacheMisses++;
 
     // Filter markers in extended bounds (visible + buffer zone)
-    final markersInExtendedBounds =
-        _filterMarkersInBounds(_allMarkers, extendedBounds);
+    final markersInExtendedLatLngBounds =
+        _filterMarkersInLatLngBounds(_allMarkers, extendedLatLngBounds);
 
     // Split into visible and preloaded markers
-    final visibleMarkers = _filterMarkersInBounds(_allMarkers, bounds);
-    final preloadedMarkers = markersInExtendedBounds
+    final visibleMarkers = _filterMarkersInLatLngBounds(_allMarkers, bounds);
+    final preloadedMarkers = markersInExtendedLatLngBounds
         .where((m) => !visibleMarkers.contains(m))
         .toList();
 
@@ -307,15 +307,15 @@ class MapViewportLoader {
       visibleMarkers: visibleMarkers,
       preloadedMarkers: preloadedMarkers,
       totalMarkers: _allMarkers.length,
-      viewportBounds: bounds,
-      extendedBounds: extendedBounds,
+      viewportLatLngBounds: bounds,
+      extendedLatLngBounds: extendedLatLngBounds,
       isFromCache: false,
     );
 
     _currentResult = result;
 
     // Cache the result
-    _cache.put(extendedBounds, result);
+    _cache.put(extendedLatLngBounds, result);
 
     // Emit result
     _resultController.add(result);
@@ -324,11 +324,11 @@ class MapViewportLoader {
   }
 
   /// Calculate extended bounds with buffer zone
-  Bounds _calculateExtendedBounds(Bounds bounds) {
+  LatLngBounds _calculateExtendedLatLngBounds(LatLngBounds bounds) {
     final latDelta = (bounds.north - bounds.south) * bufferRatio;
     final lngDelta = (bounds.east - bounds.west) * bufferRatio;
 
-    return Bounds(
+    return LatLngBounds(
       LatLng(bounds.south - latDelta, bounds.west - lngDelta),
       LatLng(bounds.north + latDelta, bounds.east + lngDelta),
     );
@@ -336,33 +336,33 @@ class MapViewportLoader {
 
   /// Check if bounds changed significantly (more than 10%)
   bool _boundsChangedSignificantly(
-    Bounds oldBounds,
-    Bounds newBounds,
+    LatLngBounds oldLatLngBounds,
+    LatLngBounds newLatLngBounds,
   ) {
     const threshold = 0.1; // 10% change threshold
 
     final centerChanged = _distanceBetweenPoints(
-              oldBounds.center,
-              newBounds.center,
+              oldLatLngBounds.center,
+              newLatLngBounds.center,
             ) >
-            _calculateBoundsSize(oldBounds) * threshold ||
+            _calculateLatLngBoundsSize(oldLatLngBounds) * threshold ||
         _distanceBetweenPoints(
-              oldBounds.center,
-              newBounds.center,
+              oldLatLngBounds.center,
+              newLatLngBounds.center,
             ) >
-            _calculateBoundsSize(newBounds) * threshold;
+            _calculateLatLngBoundsSize(newLatLngBounds) * threshold;
 
     final sizeChanged =
-        (_calculateBoundsSize(newBounds) - _calculateBoundsSize(oldBounds))
+        (_calculateLatLngBoundsSize(newLatLngBounds) - _calculateLatLngBoundsSize(oldLatLngBounds))
                     .abs() /
-                _calculateBoundsSize(oldBounds) >
+                _calculateLatLngBoundsSize(oldLatLngBounds) >
             threshold;
 
     return centerChanged || sizeChanged;
   }
 
   /// Calculate approximate size of bounds in meters
-  double _calculateBoundsSize(Bounds bounds) {
+  double _calculateLatLngBoundsSize(LatLngBounds bounds) {
     const Distance distance = Distance();
     return distance.as(
       LengthUnit.Meter,
@@ -378,19 +378,19 @@ class MapViewportLoader {
   }
 
   /// Filter markers that are within bounds
-  List<MapMarker> _filterMarkersInBounds(
+  List<MapMarker> _filterMarkersInLatLngBounds(
     List<MapMarker> markers,
-    Bounds bounds,
+    LatLngBounds bounds,
   ) {
     return markers.where((marker) => bounds.contains(marker.position)).toList();
   }
 
   /// Create empty result for uninitialized state
-  ViewportLoadResult _createEmptyResult(Bounds bounds) {
-    final extendedBounds = _calculateExtendedBounds(bounds);
+  ViewportLoadResult _createEmptyResult(LatLngBounds bounds) {
+    final extendedLatLngBounds = _calculateExtendedLatLngBounds(bounds);
     return ViewportLoadResult.empty(
-      viewportBounds: bounds,
-      extendedBounds: extendedBounds,
+      viewportLatLngBounds: bounds,
+      extendedLatLngBounds: extendedLatLngBounds,
       totalMarkers: _allMarkers.length,
     );
   }
@@ -404,7 +404,7 @@ class _ViewportCache {
   _ViewportCache({required this.maxSize});
 
   /// Get cached result for bounds
-  ViewportLoadResult? get(Bounds bounds) {
+  ViewportLoadResult? get(LatLngBounds bounds) {
     for (final entry in _entries) {
       if (_boundsEqual(entry.bounds, bounds)) {
         // Move to end (most recently used)
@@ -417,7 +417,7 @@ class _ViewportCache {
   }
 
   /// Put result in cache
-  void put(Bounds bounds, ViewportLoadResult result) {
+  void put(LatLngBounds bounds, ViewportLoadResult result) {
     // Remove existing entry if present
     _entries.removeWhere((e) => _boundsEqual(e.bounds, bounds));
 
@@ -439,7 +439,7 @@ class _ViewportCache {
   }
 
   /// Check if two bounds are approximately equal
-  bool _boundsEqual(Bounds a, Bounds b) {
+  bool _boundsEqual(LatLngBounds a, LatLngBounds b) {
     const epsilon = 0.0001; // ~11 meters at equator
     return (a.south - b.south).abs() < epsilon &&
         (a.north - b.north).abs() < epsilon &&
@@ -450,7 +450,7 @@ class _ViewportCache {
 
 /// Cache entry combining bounds and result
 class _CacheEntry {
-  final Bounds bounds;
+  final LatLngBounds bounds;
   final ViewportLoadResult result;
 
   _CacheEntry(this.bounds, this.result);

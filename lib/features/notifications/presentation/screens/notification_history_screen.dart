@@ -10,7 +10,7 @@ class NotificationHistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notificationsAsync = ref.watch(notificationsNotifierProvider);
+    final notificationsAsync = ref.watch(notificationsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -25,7 +25,7 @@ class NotificationHistoryScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () =>
-            ref.read(notificationsNotifierProvider.notifier).refresh(),
+            ref.read(notificationsProvider.notifier).refresh(),
         child: notificationsAsync.when(
           data: (notifications) {
             if (notifications.isEmpty) {
@@ -44,7 +44,7 @@ class NotificationHistoryScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => ref
-                      .read(notificationsNotifierProvider.notifier)
+                      .read(notificationsProvider.notifier)
                       .refresh(),
                   child: const Text('Retry'),
                 ),
@@ -228,7 +228,7 @@ class NotificationHistoryScreen extends ConsumerWidget {
         icon: const Icon(Icons.check_circle_outline),
         onPressed: () async {
           await ref
-              .read(notificationsNotifierProvider.notifier)
+              .read(notificationsProvider.notifier)
               .markAsRead(notification.id);
         },
         tooltip: 'Mark as read',
@@ -239,7 +239,7 @@ class NotificationHistoryScreen extends ConsumerWidget {
       icon: const Icon(Icons.delete_outline),
       onPressed: () async {
         await ref
-            .read(notificationsNotifierProvider.notifier)
+            .read(notificationsProvider.notifier)
             .dismiss(notification.id);
       },
       tooltip: 'Dismiss',
@@ -274,7 +274,7 @@ class NotificationHistoryScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               await ref
-                  .read(notificationsNotifierProvider.notifier)
+                  .read(notificationsProvider.notifier)
                   .clearHistory();
             },
             child: const Text('Clear'),

@@ -23,7 +23,9 @@ enum ContactPermission {
 
 /// Represents a trusted emergency contact
 @freezed
-class TrustedContact with _$TrustedContact {
+sealed class TrustedContact with _$TrustedContact {
+  const TrustedContact._();
+
   const factory TrustedContact({
     /// Unique identifier for the trusted contact
     required String id,

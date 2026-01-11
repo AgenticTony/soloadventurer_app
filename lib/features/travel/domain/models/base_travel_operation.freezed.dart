@@ -172,8 +172,6 @@ extension BaseTravelOperationPatterns on BaseTravelOperation {
     switch (_that) {
       case _BaseTravelOperation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -255,8 +253,6 @@ extension BaseTravelOperationPatterns on BaseTravelOperation {
       case _BaseTravelOperation():
         return $default(_that.id, _that.type, _that.timestamp, _that.priority,
             _that.requiresNetwork, _that.data);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

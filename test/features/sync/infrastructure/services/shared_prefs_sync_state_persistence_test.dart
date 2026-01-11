@@ -3,7 +3,6 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
-import 'package:soloadventurer/features/sync/domain/services/sync_state_persistence.dart';
 import 'package:soloadventurer/features/sync/infrastructure/services/shared_prefs_sync_state_persistence.dart';
 import 'package:soloadventurer/features/sync/presentation/state/sync_state.dart';
 

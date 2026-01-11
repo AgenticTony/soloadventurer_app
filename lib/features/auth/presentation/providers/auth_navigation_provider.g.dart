@@ -14,7 +14,7 @@ part of 'auth_navigation_provider.dart';
 /// Monitors auth state changes and handles navigation accordingly.
 
 @ProviderFor(AuthNavigation)
-final authNavigationProvider = AuthNavigationProvider._();
+const authNavigationProvider = AuthNavigationProvider._();
 
 /// Provider for handling auth-related navigation state
 ///
@@ -26,7 +26,7 @@ final class AuthNavigationProvider
   ///
   /// Uses Riverpod 3.0 @riverpod annotation with Notifier pattern.
   /// Monitors auth state changes and handles navigation accordingly.
-  AuthNavigationProvider._()
+  const AuthNavigationProvider._()
       : super(
           from: null,
           argument: null,
@@ -53,7 +53,7 @@ final class AuthNavigationProvider
   }
 }
 
-String _$authNavigationHash() => r'5992c99d9ad999d8f182377fea78a98e60d1ef0a';
+String _$authNavigationHash() => r'7153f8550d7b9e77a5041b71ef552e877549f203';
 
 /// Provider for handling auth-related navigation state
 ///
@@ -65,20 +65,21 @@ abstract class _$AuthNavigation extends $Notifier<AuthNavigationState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AuthNavigationState, AuthNavigationState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AuthNavigationState, AuthNavigationState>,
         AuthNavigationState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Global navigator key for handling navigation from providers
 
 @ProviderFor(navigatorKey)
-final navigatorKeyProvider = NavigatorKeyProvider._();
+const navigatorKeyProvider = NavigatorKeyProvider._();
 
 /// Global navigator key for handling navigation from providers
 
@@ -87,7 +88,7 @@ final class NavigatorKeyProvider extends $FunctionalProvider<
     GlobalKey<NavigatorState>,
     GlobalKey<NavigatorState>> with $Provider<GlobalKey<NavigatorState>> {
   /// Global navigator key for handling navigation from providers
-  NavigatorKeyProvider._()
+  const NavigatorKeyProvider._()
       : super(
           from: null,
           argument: null,
@@ -121,4 +122,4 @@ final class NavigatorKeyProvider extends $FunctionalProvider<
   }
 }
 
-String _$navigatorKeyHash() => r'8b4dbfb31d887f8bbb1a13b7214b897e71dac1f7';
+String _$navigatorKeyHash() => r'6e9d7249fe86101ea2092a8617d10993370d5975';

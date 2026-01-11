@@ -20,7 +20,7 @@ part of 'manual_sync_notifier.dart';
 /// and provides state updates for UI components.
 
 @ProviderFor(ManualSyncNotifier)
-final manualSyncProvider = ManualSyncNotifierProvider._();
+const manualSyncProvider = ManualSyncNotifierProvider._();
 
 /// Notifier for managing manual sync operations
 ///
@@ -44,7 +44,7 @@ final class ManualSyncNotifierProvider
   ///
   /// Handles manual sync triggers, tracks sync progress,
   /// and provides state updates for UI components.
-  ManualSyncNotifierProvider._()
+  const ManualSyncNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -72,7 +72,7 @@ final class ManualSyncNotifierProvider
 }
 
 String _$manualSyncNotifierHash() =>
-    r'de230942da04c0d3ba59ba1af4be822fd84441d1';
+    r'c926b6b0daae70a046778f0ca1fe8f5e1f2f66a4';
 
 /// Notifier for managing manual sync operations
 ///
@@ -90,12 +90,13 @@ abstract class _$ManualSyncNotifier extends $Notifier<ManualSyncState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<ManualSyncState, ManualSyncState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ManualSyncState, ManualSyncState>,
         ManualSyncState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

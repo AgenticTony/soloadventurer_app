@@ -358,7 +358,7 @@ class OperationQueue extends _$OperationQueue {
     );
 
     // Watch connectivity and token state
-    ref.watch(connectivityNotifierProvider);
+    ref.watch(connectivityProvider);
     ref.watch(tokenManagerProvider);
 
     // Initialize storage service and load saved queue
@@ -461,7 +461,7 @@ class OperationQueue extends _$OperationQueue {
 
     try {
       final tokenManager = ref.read(tokenManagerProvider);
-      final isOnline = ref.read(connectivityNotifierProvider);
+      final isOnline = ref.read(connectivityProvider);
 
       // Process operations in effective priority order (with aging boost)
       final operations = _pendingOperations.toList()
@@ -558,7 +558,7 @@ class OperationQueue extends _$OperationQueue {
 
   bool _canProcess(QueueableOperation operation) {
     final tokenManager = ref.read(tokenManagerProvider);
-    final isOnline = ref.read(connectivityNotifierProvider);
+    final isOnline = ref.read(connectivityProvider);
 
     // Check network and token requirements
     if (operation.requiresNetwork) {

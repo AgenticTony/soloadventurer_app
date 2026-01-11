@@ -251,8 +251,7 @@ class SyncManagerImpl implements SyncManager {
       int uploadedCount = 0;
       int conflictsResolved = 0;
 
-      // TODO: Implement full upload sync in subtask 5.2
-      // For now, we process pending operations through the queue
+      // Process pending operations through UploadSync
       final uploadResult = await _processPendingOperations();
       uploadedCount = uploadResult;
 

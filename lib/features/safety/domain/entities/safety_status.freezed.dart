@@ -262,8 +262,6 @@ extension SafetyStatusPatterns on SafetyStatus {
     switch (_that) {
       case _SafetyStatus():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -385,8 +383,6 @@ extension SafetyStatusPatterns on SafetyStatus {
             _that.safetyAlertId,
             _that.checkInId,
             _that.metadata);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -869,8 +865,6 @@ extension SafetyStatusLocationPatterns on SafetyStatusLocation {
     switch (_that) {
       case _SafetyStatusLocation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -964,8 +958,6 @@ extension SafetyStatusLocationPatterns on SafetyStatusLocation {
       case _SafetyStatusLocation():
         return $default(_that.latitude, _that.longitude, _that.accuracy,
             _that.altitude, _that.address, _that.placeName, _that.timestamp);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

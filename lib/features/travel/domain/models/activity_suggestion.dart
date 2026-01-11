@@ -17,8 +17,7 @@ part 'activity_suggestion.freezed.dart';
 /// );
 ///
 @freezed
-class ActivitySuggestion with _$ActivitySuggestion {
-
+sealed class ActivitySuggestion with _$ActivitySuggestion {
   /// Creates an activity suggestion
   ///
   /// The [activity] parameter is the place/activity being suggested.

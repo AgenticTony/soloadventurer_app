@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../notifiers/manual_sync_notifier.dart' show manualSyncProvider;
 import '../providers/sync_providers.dart';
 
 /// Button widget for triggering manual sync operations
@@ -67,8 +68,8 @@ class ManualSyncButton extends ConsumerWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: _getBackgroundColor(theme, state),
             foregroundColor: _getForegroundColor(theme, state),
-            disabledBackgroundColor:
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
+            disabledBackgroundColor: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.5),
           ),
         );
 
@@ -94,14 +95,14 @@ class ManualSyncButton extends ConsumerWidget {
     }
   }
 
-  void _handleSyncPress(BuildContextContext ref, dynamic state) {
+  void _handleSyncPress(WidgetRef ref, dynamic state) {
     // Clear previous error if any
     if (state?.errorMessage != null) {
-      ref.read(manualSyncNotifierProvider.notifier).clearError();
+      ref.read(manualSyncProvider.notifier).clearError();
     }
 
     // Trigger sync
-    ref.read(manualSyncNotifierProvider.notifier).triggerSync();
+    ref.read(manualSyncProvider.notifier).triggerSync();
   }
 
   String _getLabel(dynamic state, int pendingCount) {

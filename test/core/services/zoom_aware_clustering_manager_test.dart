@@ -165,7 +165,7 @@ void main() {
       await manager.initialize();
 
       // Set bounds to only include San Francisco
-      final sfBounds = LatLngBounds(
+      final sfBounds = Bounds(
         southwest: const LatLng(37.4, -122.5),
         northeast: const LatLng(37.8, -122.0),
       );

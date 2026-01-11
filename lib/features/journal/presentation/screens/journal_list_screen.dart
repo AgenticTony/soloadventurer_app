@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_list_provider.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/journal_entry_card.dart';
 
@@ -51,19 +52,10 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
             Tab(
               text: 'By Date',
               icon: Icon(Icons.calendar_today),
-              child: Semantics(
-                label: 'By Date',
-                selected: true,
-                child: Text('By Date'),
-              ),
             ),
             Tab(
               text: 'By Trip',
               icon: Icon(Icons.flight_takeoff),
-              child: Semantics(
-                label: 'By Trip',
-                child: Text('By Trip'),
-              ),
             ),
           ],
         ),
@@ -72,10 +64,9 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              Navigator.pushNamed(context, '/journal/search');
+              context.push('/journal/search');
             },
             tooltip: 'Search entries',
-            label: 'Search entries',
           ),
         ],
       ),
@@ -94,7 +85,7 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
                     ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.pushNamed(context, '/journal/create');
+          context.push('/journal/create');
         },
         icon: const Icon(Icons.add),
         label: const Text('New Entry'),
@@ -157,7 +148,10 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
               child: Icon(
                 Icons.book_outlined,
                 size: 80,
-                color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.5),
               ),
             ),
             const SizedBox(height: 24),
@@ -174,7 +168,7 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                Navigator.pushNamed(context, '/journal/create');
+                context.push('/journal/create');
               },
               icon: const Icon(Icons.add),
               label: const Text('Create First Entry'),
@@ -283,8 +277,8 @@ class _DateGroup extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color:
-                        theme.colorScheme.secondaryContainer.withValues(alpha:0.5),
+                    color: theme.colorScheme.secondaryContainer
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -381,8 +375,8 @@ class _TripGroup extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color:
-                        theme.colorScheme.secondaryContainer.withValues(alpha:0.5),
+                    color: theme.colorScheme.secondaryContainer
+                        .withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

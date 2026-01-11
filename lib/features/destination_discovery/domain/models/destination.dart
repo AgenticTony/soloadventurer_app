@@ -5,7 +5,7 @@ part 'destination.g.dart';
 
 /// Represents solo suitability factors with individual scores
 @freezed
-class SoloSuitabilityFactors with _$SoloSuitabilityFactors {
+sealed class SoloSuitabilityFactors with _$SoloSuitabilityFactors {
   const factory SoloSuitabilityFactors({
     /// Safety score for solo travelers (1-10)
     required double safety,
@@ -35,7 +35,7 @@ class SoloSuitabilityFactors with _$SoloSuitabilityFactors {
 
 /// Represents a safety insight for a destination
 @freezed
-class SafetyInsight with _$SafetyInsight {
+sealed class SafetyInsight with _$SafetyInsight {
   const factory SafetyInsight({
     /// Category of the safety insight (e.g., "theft", "transportation", "nightlife")
     required String category,
@@ -56,7 +56,7 @@ class SafetyInsight with _$SafetyInsight {
 
 /// Represents a popular activity at a destination
 @freezed
-class Activity with _$Activity {
+sealed class Activity with _$Activity {
   const factory Activity({
     /// Activity ID
     required String id,
@@ -110,7 +110,7 @@ enum ActivityLevel {
 
 /// Represents a destination with solo-travel-specific information
 @freezed
-class Destination with _$Destination {
+sealed class Destination with _$Destination {
   const factory Destination({
     /// Unique identifier
     required String id,

@@ -13,7 +13,8 @@ part 'travel_operation_provider.g.dart';
 ///
 /// Provider for the travel operation repository
 @riverpod
-TravelOperationRepository travelOperationRepository(TravelOperationRepositoryRef ref) {
+TravelOperationRepository travelOperationRepository(
+    TravelOperationRepositoryRef ref) {
   throw UnimplementedError(
       'Repository must be initialized with SharedPreferences');
 }
@@ -22,7 +23,8 @@ TravelOperationRepository travelOperationRepository(TravelOperationRepositoryRef
 ///
 /// Riverpod 3.0: Uses @riverpod annotation for FutureProvider
 @riverpod
-Future<List<BaseTravelOperation>> pendingOperations(PendingOperationsRef ref) async {
+Future<List<BaseTravelOperation>> pendingOperations(
+    PendingOperationsRef ref) async {
   final repository = ref.watch(travelOperationRepositoryProvider);
   return repository.getPendingOperations();
 }

@@ -114,7 +114,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
     final confirmed = await _showCountdownDialog();
     if (!confirmed || !mounted) return;
 
-    final notifier = ref.read(safetyNotifierProvider);
+    final notifier = ref.read(safetyProvider.notifier);
 
     try {
       await notifier.triggerEmergencySOS(
@@ -125,7 +125,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
             : _messageController.text.trim(),
         notifyContactIds:
             null, // Will notify all contacts with emergency alerts enabled
-        batteryLevel: await ref.read(safetyNotifierProvider).getBatteryLevel(),
+        batteryLevel: await ref.read(safetyProvider.notifier).getBatteryLevel(),
       );
 
       if (mounted) {
@@ -246,7 +246,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
 
     if (!confirmed) return;
 
-    final notifier = ref.read(safetyNotifierProvider);
+    final notifier = ref.read(safetyProvider.notifier);
     await notifier.cancelAlert(alert.id);
 
     if (mounted) {
@@ -262,10 +262,10 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyState = ref.watch(safetyStateProvider);
+    final safetyState = ref.watch(safetyProvider);
     final contactsState = ref.watch(trustedContactsProvider);
-    final isProcessing = ref.watch(safetyProcessingProvider);
-    final hasActiveEmergency = ref.watch(hasActiveEmergencyProvider);
+    final isProcessing = ref.watch(safetyProvider.select((state) => state.isProcessing));
+    final hasActiveEmergency = ref.watch(safetyProvider.select((state) => state.activeAlerts.isNotEmpty));
 
     // Get contacts who will be notified
     final emergencyContacts =
@@ -781,10 +781,10 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
             const SizedBox(height: 8),
             OutlinedButton.icon(
               onPressed: () {
-                ref.read(safetyNotifierProvider).markAsSafe(
+                ref.read(safetyProvider.notifier).markAsSafe(
                       message: 'I\'m safe now',
                     );
-                ref.read(safetyNotifierProvider).resolveAlert(alert.id);
+                ref.read(safetyProvider.notifier).resolveAlert(alert.id);
               },
               icon: const Icon(Icons.check_circle),
               label: const Text('Mark as Safe & Resolve'),

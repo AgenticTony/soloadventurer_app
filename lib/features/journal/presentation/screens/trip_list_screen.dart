@@ -94,7 +94,8 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
             Icon(
               Icons.flight_takeoff,
               size: 64,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -240,14 +241,16 @@ class _TripCard extends StatelessWidget {
                       Icon(
                         Icons.calendar_today,
                         size: 16,
-                        color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDateRange(
                             trip.startDate, trip.endDate, dateFormat),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -266,7 +269,7 @@ class _TripCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.green.withValues(alpha:0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.green),
                           ),
@@ -285,13 +288,15 @@ class _TripCard extends StatelessWidget {
                       Icon(
                         Icons.schedule,
                         size: 14,
-                        color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         _formatDuration(trip.duration),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
 
@@ -324,8 +329,8 @@ class _TripCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withValues(alpha:0.3),
-            Theme.of(context).colorScheme.secondary.withValues(alpha:0.3),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
           ],
         ),
       ),

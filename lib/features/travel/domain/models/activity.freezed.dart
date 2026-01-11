@@ -410,8 +410,6 @@ extension ActivityPatterns on Activity {
     switch (_that) {
       case _Activity():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -589,8 +587,6 @@ extension ActivityPatterns on Activity {
             _that.tags,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

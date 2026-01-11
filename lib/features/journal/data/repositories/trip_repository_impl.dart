@@ -21,7 +21,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to create trip: $e');
+      throw ServerException(message: 'Failed to create trip: $e');
     }
   }
 
@@ -33,7 +33,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get trip: $e');
+      throw ServerException(message: 'Failed to get trip: $e');
     }
   }
 
@@ -45,7 +45,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get trips: $e');
+      throw ServerException(message: 'Failed to get trips: $e');
     }
   }
 
@@ -63,7 +63,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get trips by date range: $e');
+      throw ServerException(message: 'Failed to get trips by date range: $e');
     }
   }
 
@@ -75,7 +75,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get ongoing trips: $e');
+      throw ServerException(message: 'Failed to get ongoing trips: $e');
     }
   }
 
@@ -88,7 +88,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to update trip: $e');
+      throw ServerException(message: 'Failed to update trip: $e');
     }
   }
 
@@ -99,7 +99,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to delete trip: $e');
+      throw ServerException(message: 'Failed to delete trip: $e');
     }
   }
 
@@ -110,7 +110,7 @@ class TripRepositoryImpl implements TripRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to get entry count: $e');
+      throw ServerException(message: 'Failed to get entry count: $e');
     }
   }
 }

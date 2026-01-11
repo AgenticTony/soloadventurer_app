@@ -13,8 +13,7 @@ part 'recommendation_request.g.dart';
 /// Contains all the context needed to generate relevant recommendations
 /// including trip details, user interests, and preferences.
 @freezed
-class RecommendationRequest with _$RecommendationRequest {
-
+sealed class RecommendationRequest with _$RecommendationRequest {
   /// Creates a recommendation request
   ///
   /// [itineraryId] ID of the itinerary to get recommendations for
@@ -69,8 +68,7 @@ class RecommendationRequest with _$RecommendationRequest {
 
 /// Location of user's accommodation
 @freezed
-class HotelLocation with _$HotelLocation {
-
+sealed class HotelLocation with _$HotelLocation {
   /// Creates a hotel location
   ///
   /// [name] Name of hotel/accommodation
@@ -91,8 +89,7 @@ class HotelLocation with _$HotelLocation {
 
 /// Budget range for filtering recommendations
 @freezed
-class BudgetRange with _$BudgetRange {
-
+sealed class BudgetRange with _$BudgetRange {
   /// Creates a budget range
   ///
   /// [min] Minimum amount (null = no minimum)

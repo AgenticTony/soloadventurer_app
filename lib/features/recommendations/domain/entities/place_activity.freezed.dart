@@ -294,8 +294,6 @@ extension PlaceActivityPatterns on PlaceActivity {
     switch (_that) {
       case _PlaceActivity():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -445,8 +443,6 @@ extension PlaceActivityPatterns on PlaceActivity {
             _that.bookingUrl,
             _that.requiresBooking,
             _that.openingHours);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

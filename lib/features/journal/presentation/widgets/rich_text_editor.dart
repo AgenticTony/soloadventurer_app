@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,7 +53,7 @@ class RichTextEditor extends ConsumerStatefulWidget {
 
 class _RichTextEditorState extends ConsumerState<RichTextEditor> {
   late final quill.QuillController _controller;
-  late final quill.QuillSimpleToolbarConfigurations _toolbarConfig;
+  late final quill.QuillSimpleToolbarConfig _toolbarConfig;
 
   @override
   void initState() {
@@ -83,22 +85,18 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
     _controller.addListener(_onControllerChanged);
   }
 
-  quill.QuillSimpleToolbarConfigurations _createToolbarConfig() {
-    return quill.QuillSimpleToolbarConfigurations(
+  quill.QuillSimpleToolbarConfig _createToolbarConfig() {
+    return quill.QuillSimpleToolbarConfig(
       // Show formatting options
       showDividers: true,
-      showAlignment: false,
-      showBackgroundColor: false,
       showClearFormat: true,
       showCodeBlock: true,
       showDirection: false,
       showFontFamily: false,
       showHeaderStyle: true,
       showIndent: false,
-      showLineHeight: false,
       showLink: true,
       showListBullets: true,
-      showListChecklists: false,
       showListNumbers: true,
       showQuote: true,
       showSearchButton: false,
@@ -106,7 +104,6 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
       showStrikeThrough: true,
       showSubscript: false,
       showSuperscript: false,
-      showUnderline: true,
       multiRowsDisplay: false,
       toolbarIconAlignment: WrapAlignment.start,
     );
@@ -120,13 +117,33 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
   }
 
   /// Parse Delta JSON string
-  Map<String, dynamic> _parseDeltaJson(String jsonString) {
+  /// Returns a List of delta operations as expected by Document.fromJson
+  List<dynamic> _parseDeltaJson(String jsonString) {
     if (jsonString.startsWith('{') && jsonString.endsWith('}')) {
-      // Direct JSON object
-      return {'document': jsonString};
+      // Direct JSON object - needs to be wrapped in a list format
+      // Delta format is [{"insert": "text"}] or similar
+      try {
+        final decoded = jsonDecode(jsonString);
+        if (decoded is Map) {
+          return [decoded];
+        }
+        return decoded as List<dynamic>;
+      } catch (_) {
+        return [{'insert': jsonString}];
+      }
     }
-    // Already formatted
-    return {'document': jsonString};
+    try {
+      final decoded = jsonDecode(jsonString);
+      if (decoded is List) {
+        return decoded as List<dynamic>;
+      }
+      if (decoded is Map) {
+        return [decoded];
+      }
+      return [{'insert': jsonString}];
+    } catch (_) {
+      return [{'insert': jsonString}];
+    }
   }
 
   /// Get the current content as Delta JSON string
@@ -153,7 +170,7 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
   }
 
   /// Check if the editor is empty
-  bool get isEmpty => _controller.document.isEmpty;
+  bool get isEmpty => _controller.document.isEmpty();
 
   @override
   void didUpdateWidget(RichTextEditor oldWidget) {
@@ -183,7 +200,7 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
         if (widget.enabled)
           quill.QuillSimpleToolbar(
             controller: _controller,
-            configurations: _toolbarConfig,
+            config: _toolbarConfig,
           ),
 
         // Editor
@@ -204,9 +221,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
             padding: widget.padding,
             child: quill.QuillEditor.basic(
               controller: _controller,
-              configurations: quill.QuillEditorConfigurations(
+              config: quill.QuillEditorConfig(
                 placeholder: widget.placeholder,
-                readOnly: !widget.enabled,
                 autoFocus: false,
                 expands: false,
                 padding: EdgeInsets.zero,
@@ -217,6 +233,7 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       height: 1.5,
                       color: Colors.black87,
                     ),
+                    const quill.HorizontalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     null,
@@ -228,7 +245,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: theme.colorScheme.primary,
                       height: 1.3,
                     ),
-                    const quill.VerticalSpacing(16, 8),
+                    const quill.HorizontalSpacing(16, 8),
+                    const quill.VerticalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     null,
                   ),
@@ -239,7 +257,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: theme.colorScheme.primary,
                       height: 1.3,
                     ),
-                    const quill.VerticalSpacing(12, 6),
+                    const quill.HorizontalSpacing(12, 6),
+                    const quill.VerticalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     null,
                   ),
@@ -250,18 +269,21 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: Colors.black87,
                       height: 1.3,
                     ),
-                    const quill.VerticalSpacing(8, 4),
+                    const quill.HorizontalSpacing(8, 4),
+                    const quill.VerticalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     null,
                   ),
-                  lists: quill.DefaultTextBlockStyle(
+                  lists: quill.DefaultListBlockStyle(
                     const TextStyle(
                       fontSize: 16,
                       height: 1.5,
                       color: Colors.black87,
                     ),
-                    const quill.VerticalSpacing(0, 4),
+                    const quill.HorizontalSpacing(0, 4),
                     const quill.VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(0, 0),
+                    null,
                     null,
                   ),
                   quote: quill.DefaultTextBlockStyle(
@@ -271,7 +293,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: Colors.grey[700],
                       height: 1.5,
                     ),
-                    const quill.VerticalSpacing(8, 4),
+                    const quill.HorizontalSpacing(8, 4),
+                    const quill.VerticalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     null,
                   ),
@@ -282,7 +305,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       backgroundColor: Colors.grey[200],
                       color: Colors.black87,
                     ),
-                    const quill.VerticalSpacing(8, 4),
+                    const quill.HorizontalSpacing(8, 4),
+                    const quill.VerticalSpacing(0, 0),
                     const quill.VerticalSpacing(0, 0),
                     null,
                   ),

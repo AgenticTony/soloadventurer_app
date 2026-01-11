@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -14,70 +15,25 @@ import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart'
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/resend_verification_email.dart'
     as resend;
+import 'package:soloadventurer/app/providers/auth_service_providers.dart'
+    show
+        getCurrentUserUseCaseProvider,
+        isSignedInUseCaseProvider,
+        loginUseCaseProvider,
+        signUpUseCaseProvider,
+        signOutUseCaseProvider,
+        verifyEmailUseCaseProvider,
+        resendVerificationEmailUseCaseProvider,
+        forgotPasswordUseCaseProvider,
+        confirmPasswordResetUseCaseProvider;
+import 'package:soloadventurer/features/core/infrastructure/providers/core_providers.dart'
+    show loggingServiceProvider;
+import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
 
 part 'auth_notifier_provider.g.dart';
 
-/// Provider for GetCurrentUser use case
-@riverpod
-GetCurrentUser getCurrentUser(GetCurrentUserRef ref) {
-  throw UnimplementedError('getCurrentUserProvider must be overridden');
-}
-
-/// Provider for IsSignedIn use case
-@riverpod
-IsSignedIn isSignedIn(IsSignedInRef ref) {
-  throw UnimplementedError('isSignedInProvider must be overridden');
-}
-
-/// Provider for LoginUseCase
-@riverpod
-LoginUseCase loginUseCase(LoginUseCaseRef ref) {
-  throw UnimplementedError('loginUseCaseProvider must be overridden');
-}
-
-/// Provider for SignUp use case
-@riverpod
-SignUp signUp(SignUpRef ref) {
-  throw UnimplementedError('signUpProvider must be overridden');
-}
-
-/// Provider for SignOut use case
-@riverpod
-SignOut signOut(SignOutRef ref) {
-  throw UnimplementedError('signOutProvider must be overridden');
-}
-
-/// Provider for VerifyEmail use case
-@riverpod
-VerifyEmail verifyEmail(VerifyEmailRef ref) {
-  throw UnimplementedError('verifyEmailProvider must be overridden');
-}
-
-/// Provider for ResendVerificationEmail use case
-@riverpod
-resend.ResendVerificationEmail resendVerificationEmail(
-    ResendVerificationEmailRef ref) {
-  throw UnimplementedError(
-      'resendVerificationEmailProvider must be overridden');
-}
-
-/// Provider for ForgotPassword use case
-@riverpod
-ForgotPassword forgotPassword(ForgotPasswordRef ref) {
-  throw UnimplementedError('forgotPasswordProvider must be overridden');
-}
-
-/// Provider for ConfirmPasswordReset use case
-@riverpod
-ConfirmPasswordReset confirmPasswordReset(ConfirmPasswordResetRef ref) {
-  throw UnimplementedError('confirmPasswordResetProvider must be overridden');
-}
-
-/// Provider for LoggingService
-@riverpod
-LoggingService loggingService(LoggingServiceRef ref) {
-  throw UnimplementedError('loggingServiceProvider must be overridden');
-}
+// Note: The use case providers are now imported from auth_service_providers.dart
+// The auth_notifier_provider.dart no longer defines duplicate providers
 
 /// AuthNotifier - manages authentication state using AsyncNotifier pattern
 ///
@@ -90,17 +46,20 @@ LoggingService loggingService(LoggingServiceRef ref) {
 class AuthNotifier extends _$AuthNotifier {
   LoggingService get _logger => ref.watch(loggingServiceProvider);
 
-  GetCurrentUser get _getCurrentUser => ref.watch(getCurrentUserProvider);
-  IsSignedIn get _isSignedIn => ref.watch(isSignedInProvider);
+  GetCurrentUser get _getCurrentUser => ref.watch(getCurrentUserUseCaseProvider);
+  IsSignedIn get _isSignedIn => ref.watch(isSignedInUseCaseProvider);
   LoginUseCase get _login => ref.watch(loginUseCaseProvider);
-  SignUp get _signUp => ref.watch(signUpProvider);
-  SignOut get _signOut => ref.watch(signOutProvider);
-  VerifyEmail get _verifyEmail => ref.watch(verifyEmailProvider);
+  SignUp get _signUp => ref.watch(signUpUseCaseProvider);
+  SignOut get _signOut => ref.watch(signOutUseCaseProvider);
+  VerifyEmail get _verifyEmail => ref.watch(verifyEmailUseCaseProvider);
   resend.ResendVerificationEmail get _resendVerificationEmail =>
-      ref.watch(resendVerificationEmailProvider);
-  ForgotPassword get _forgotPassword => ref.watch(forgotPasswordProvider);
+      ref.watch(resendVerificationEmailUseCaseProvider);
+  ForgotPassword get _forgotPassword => ref.watch(forgotPasswordUseCaseProvider);
   ConfirmPasswordReset get _confirmPasswordReset =>
-      ref.watch(confirmPasswordResetProvider);
+      ref.watch(confirmPasswordResetUseCaseProvider);
+
+  /// TokenManager for updating token state after authentication
+  TokenManager get _tokenManager => ref.watch(tokenManagerProvider.notifier);
 
   @override
   FutureOr<AuthState> build() async {
@@ -167,6 +126,9 @@ class AuthNotifier extends _$AuthNotifier {
           status: 'Success',
           metadata: {'user_id': user.id},
         );
+
+        // Update TokenManager state with newly stored tokens
+        unawaited(_tokenManager.refreshState());
 
         return AuthState.authenticated(user: user);
       } on ValidationException catch (e, stack) {
@@ -262,6 +224,8 @@ class AuthNotifier extends _$AuthNotifier {
             status: 'Success',
             metadata: {'user_id': user.id},
           );
+          // Update TokenManager state with newly stored tokens
+          unawaited(_tokenManager.refreshState());
           return AuthState.authenticated(user: user);
         }
       } on ValidationException catch (e) {
@@ -343,10 +307,14 @@ class AuthNotifier extends _$AuthNotifier {
         await _verifyEmail(VerifyEmailParams(code: code, email: email));
 
         if (currentUser != null) {
+          // Update TokenManager state with newly stored tokens
+          unawaited(_tokenManager.refreshState());
           return AuthState.authenticated(user: currentUser);
         } else {
           final user = await _getCurrentUser();
           if (user != null) {
+            // Update TokenManager state with newly stored tokens
+            unawaited(_tokenManager.refreshState());
             return AuthState.authenticated(user: user);
           } else {
             return AuthState.initial();

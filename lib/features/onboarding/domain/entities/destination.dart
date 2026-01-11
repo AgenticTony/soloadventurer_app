@@ -10,7 +10,6 @@ part 'destination.g.dart';
 /// place details, and metadata needed for itinerary generation.
 @freezed
 abstract class Destination with _$Destination {
-
   /// Creates a Destination with all required fields
   ///
   /// [placeId] Unique Google Places identifier

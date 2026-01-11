@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/core/providers/core_providers.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart'
+    show sharedPreferencesProvider;
 import 'package:soloadventurer/features/notifications/data/datasources/notification_local_data_source.dart';
 import 'package:soloadventurer/features/notifications/data/datasources/notification_local_data_source_impl.dart';
 import 'package:soloadventurer/features/notifications/data/repositories/notification_repository_impl.dart';

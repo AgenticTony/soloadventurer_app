@@ -195,8 +195,6 @@ extension SoloSuitabilityFactorsPatterns on SoloSuitabilityFactors {
     switch (_that) {
       case _SoloSuitabilityFactors():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -302,8 +300,6 @@ extension SoloSuitabilityFactorsPatterns on SoloSuitabilityFactors {
             _that.soloDining,
             _that.communication,
             _that.overall);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -659,8 +655,6 @@ extension SafetyInsightPatterns on SafetyInsight {
     switch (_that) {
       case _SafetyInsight():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -742,8 +736,6 @@ extension SafetyInsightPatterns on SafetyInsight {
       case _SafetyInsight():
         return $default(
             _that.category, _that.description, _that.severity, _that.tips);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1085,8 +1077,6 @@ extension ActivityPatterns on Activity {
     switch (_that) {
       case _Activity():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1180,8 +1170,6 @@ extension ActivityPatterns on Activity {
       case _Activity():
         return $default(_that.id, _that.name, _that.description, _that.category,
             _that.soloFriendly, _that.costLevel, _that.imageUrl);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1804,8 +1792,6 @@ extension DestinationPatterns on Destination {
     switch (_that) {
       case _Destination():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1987,8 +1973,6 @@ extension DestinationPatterns on Destination {
             _that.popularityScore,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

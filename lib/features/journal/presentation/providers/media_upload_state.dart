@@ -37,5 +37,9 @@ class MediaUploadState {
   }
 
   /// Initial state
-  const MediaUploadState.initial() : isInitialized = false, tasks = const [], isUploading = false, error = null;
+  const MediaUploadState.initial()
+      : isInitialized = false,
+        tasks = const [],
+        isUploading = false,
+        error = null;
 }

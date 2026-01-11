@@ -11,13 +11,13 @@ part of 'alert_manager.dart';
 /// Manager responsible for handling security alerts and notifications
 
 @ProviderFor(AlertManager)
-final alertManagerProvider = AlertManagerProvider._();
+const alertManagerProvider = AlertManagerProvider._();
 
 /// Manager responsible for handling security alerts and notifications
 final class AlertManagerProvider
     extends $AsyncNotifierProvider<AlertManager, void> {
   /// Manager responsible for handling security alerts and notifications
-  AlertManagerProvider._()
+  const AlertManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -45,12 +45,13 @@ abstract class _$AlertManager extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
+    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, void>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, null);
   }
 }

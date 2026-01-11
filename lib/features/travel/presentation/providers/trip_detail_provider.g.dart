@@ -17,7 +17,7 @@ part of 'trip_detail_provider.dart';
 /// Provider for the destination repository from the destination discovery feature
 
 @ProviderFor(tripDestinationRepository)
-final tripDestinationRepositoryProvider = TripDestinationRepositoryProvider._();
+const tripDestinationRepositoryProvider = TripDestinationRepositoryProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier to @riverpod Notifier
@@ -38,7 +38,7 @@ final class TripDestinationRepositoryProvider extends $FunctionalProvider<
   /// - Initialization logic moved from constructor to build() method
   ///
   /// Provider for the destination repository from the destination discovery feature
-  TripDestinationRepositoryProvider._()
+  const TripDestinationRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -96,7 +96,7 @@ String _$tripDestinationRepositoryHash() =>
 /// ```
 
 @ProviderFor(TripDetail)
-final tripDetailProvider = TripDetailFamily._();
+const tripDetailProvider = TripDetailFamily._();
 
 /// Provider for managing trip detail state
 ///
@@ -138,7 +138,7 @@ final class TripDetailProvider
   /// // Refresh trip data
   /// await tripDetailNotifier.refresh();
   /// ```
-  TripDetailProvider._(
+  const TripDetailProvider._(
       {required TripDetailFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -207,7 +207,7 @@ final class TripDetailFamily extends $Family
     with
         $ClassFamilyOverride<TripDetail, TripDetailState, TripDetailState,
             TripDetailState, String> {
-  TripDetailFamily._()
+  const TripDetailFamily._()
       : super(
           retry: null,
           name: r'tripDetailProvider',
@@ -275,16 +275,15 @@ abstract class _$TripDetail extends $Notifier<TripDetailState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<TripDetailState, TripDetailState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TripDetailState, TripDetailState>,
         TripDetailState,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

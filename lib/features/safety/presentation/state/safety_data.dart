@@ -9,8 +9,7 @@ part 'safety_data.g.dart';
 
 /// Data class for safety feature state
 @freezed
-class SafetyData with _$SafetyData {
-
+sealed class SafetyData with _$SafetyData {
   const factory SafetyData({
     /// Current safety status of the user
     SafetyStatus? currentStatus,

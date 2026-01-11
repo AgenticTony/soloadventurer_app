@@ -310,8 +310,6 @@ extension SafetyAlertModelPatterns on SafetyAlertModel {
     switch (_that) {
       case _SafetyAlertModel():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -461,8 +459,6 @@ extension SafetyAlertModelPatterns on SafetyAlertModel {
             _that.metadata,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

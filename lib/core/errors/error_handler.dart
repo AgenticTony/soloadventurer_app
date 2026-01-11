@@ -124,7 +124,7 @@ class ErrorHandler {
       );
     } else {
       error = AppError(
-        id: AppError._generateErrorId(),
+        id: 'err_${DateTime.now().millisecondsSinceEpoch}_${Object().hashCode}',
         message: 'An unexpected error occurred. Please try again.',
         technicalMessage: exception?.toString(),
         code: 'unknown_error',

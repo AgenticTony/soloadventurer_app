@@ -367,12 +367,12 @@ class _PerformanceOverlayState extends State<_PerformanceOverlay> {
           constraints: const BoxConstraints(maxWidth: 180),
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha:0.95),
+            color: theme.colorScheme.surface.withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: meetsTargets
-                  ? Colors.green.withValues(alpha:0.5)
-                  : Colors.orange.withValues(alpha:0.5),
+                  ? Colors.green.withValues(alpha: 0.5)
+                  : Colors.orange.withValues(alpha: 0.5),
               width: 2,
             ),
           ),

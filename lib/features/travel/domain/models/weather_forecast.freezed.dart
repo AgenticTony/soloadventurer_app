@@ -211,8 +211,6 @@ extension WeatherForecastPatterns on WeatherForecast {
     switch (_that) {
       case _WeatherForecast():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -326,8 +324,6 @@ extension WeatherForecastPatterns on WeatherForecast {
             _that.precipitationProbability,
             _that.windSpeed,
             _that.description);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

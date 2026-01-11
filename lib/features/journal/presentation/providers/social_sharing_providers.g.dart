@@ -11,7 +11,7 @@ part of 'social_sharing_providers.dart';
 /// Provider for the social sharing service
 
 @ProviderFor(socialSharingService)
-final socialSharingServiceProvider = SocialSharingServiceProvider._();
+const socialSharingServiceProvider = SocialSharingServiceProvider._();
 
 /// Provider for the social sharing service
 
@@ -20,7 +20,7 @@ final class SocialSharingServiceProvider extends $FunctionalProvider<
     SocialSharingService,
     SocialSharingService> with $Provider<SocialSharingService> {
   /// Provider for the social sharing service
-  SocialSharingServiceProvider._()
+  const SocialSharingServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -60,13 +60,13 @@ String _$socialSharingServiceHash() =>
 /// Notifier for social sharing state management
 
 @ProviderFor(SocialSharingNotifier)
-final socialSharingProvider = SocialSharingNotifierProvider._();
+const socialSharingProvider = SocialSharingNotifierProvider._();
 
 /// Notifier for social sharing state management
 final class SocialSharingNotifierProvider
     extends $NotifierProvider<SocialSharingNotifier, SocialSharingState> {
   /// Notifier for social sharing state management
-  SocialSharingNotifierProvider._()
+  const SocialSharingNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -103,20 +103,21 @@ abstract class _$SocialSharingNotifier extends $Notifier<SocialSharingState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SocialSharingState, SocialSharingState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SocialSharingState, SocialSharingState>,
         SocialSharingState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for share configuration of an entry
 
 @ProviderFor(entryShareConfig)
-final entryShareConfigProvider = EntryShareConfigFamily._();
+const entryShareConfigProvider = EntryShareConfigFamily._();
 
 /// Provider for share configuration of an entry
 
@@ -124,7 +125,7 @@ final class EntryShareConfigProvider
     extends $FunctionalProvider<ShareConfig, ShareConfig, ShareConfig>
     with $Provider<ShareConfig> {
   /// Provider for share configuration of an entry
-  EntryShareConfigProvider._(
+  const EntryShareConfigProvider._(
       {required EntryShareConfigFamily super.from,
       required (
         JournalEntry, {
@@ -214,7 +215,7 @@ final class EntryShareConfigFamily extends $Family
               bool includeDate,
               bool includeMood,
             })> {
-  EntryShareConfigFamily._()
+  const EntryShareConfigFamily._()
       : super(
           retry: null,
           name: r'entryShareConfigProvider',
@@ -249,7 +250,7 @@ final class EntryShareConfigFamily extends $Family
 /// Provider for share configuration of a media item
 
 @ProviderFor(mediaShareConfig)
-final mediaShareConfigProvider = MediaShareConfigFamily._();
+const mediaShareConfigProvider = MediaShareConfigFamily._();
 
 /// Provider for share configuration of a media item
 
@@ -257,7 +258,7 @@ final class MediaShareConfigProvider
     extends $FunctionalProvider<ShareConfig, ShareConfig, ShareConfig>
     with $Provider<ShareConfig> {
   /// Provider for share configuration of a media item
-  MediaShareConfigProvider._(
+  const MediaShareConfigProvider._(
       {required MediaShareConfigFamily super.from,
       required (
         MediaItem, {
@@ -339,7 +340,7 @@ final class MediaShareConfigFamily extends $Family
               List<String>? customHashtags,
               String? messageTemplate,
             })> {
-  MediaShareConfigFamily._()
+  const MediaShareConfigFamily._()
       : super(
           retry: null,
           name: r'mediaShareConfigProvider',
@@ -370,7 +371,7 @@ final class MediaShareConfigFamily extends $Family
 /// Provider for share configuration of a trip
 
 @ProviderFor(tripShareConfig)
-final tripShareConfigProvider = TripShareConfigFamily._();
+const tripShareConfigProvider = TripShareConfigFamily._();
 
 /// Provider for share configuration of a trip
 
@@ -378,7 +379,7 @@ final class TripShareConfigProvider
     extends $FunctionalProvider<ShareConfig, ShareConfig, ShareConfig>
     with $Provider<ShareConfig> {
   /// Provider for share configuration of a trip
-  TripShareConfigProvider._(
+  const TripShareConfigProvider._(
       {required TripShareConfigFamily super.from,
       required (
         Trip, {
@@ -460,7 +461,7 @@ final class TripShareConfigFamily extends $Family
               List<String>? customHashtags,
               String? messageTemplate,
             })> {
-  TripShareConfigFamily._()
+  const TripShareConfigFamily._()
       : super(
           retry: null,
           name: r'tripShareConfigProvider',
@@ -491,7 +492,7 @@ final class TripShareConfigFamily extends $Family
 /// Provider for available share platforms
 
 @ProviderFor(availableSharePlatforms)
-final availableSharePlatformsProvider = AvailableSharePlatformsProvider._();
+const availableSharePlatformsProvider = AvailableSharePlatformsProvider._();
 
 /// Provider for available share platforms
 
@@ -503,7 +504,7 @@ final class AvailableSharePlatformsProvider extends $FunctionalProvider<
         $FutureModifier<List<SharePlatform>>,
         $FutureProvider<List<SharePlatform>> {
   /// Provider for available share platforms
-  AvailableSharePlatformsProvider._()
+  const AvailableSharePlatformsProvider._()
       : super(
           from: null,
           argument: null,

@@ -11,13 +11,13 @@ part of 'token_manager.dart';
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
 
 @ProviderFor(TokenManager)
-final tokenManagerProvider = TokenManagerProvider._();
+const tokenManagerProvider = TokenManagerProvider._();
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
 final class TokenManagerProvider
     extends $NotifierProvider<TokenManager, FeatureAvailability> {
   /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
-  TokenManagerProvider._()
+  const TokenManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -53,12 +53,13 @@ abstract class _$TokenManager extends $Notifier<FeatureAvailability> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<FeatureAvailability, FeatureAvailability>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<FeatureAvailability, FeatureAvailability>,
         FeatureAvailability,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

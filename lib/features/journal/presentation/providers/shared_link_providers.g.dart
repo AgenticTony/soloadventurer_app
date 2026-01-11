@@ -11,7 +11,7 @@ part of 'shared_link_providers.dart';
 /// Provider for SharedLinkService
 
 @ProviderFor(sharedLinkService)
-final sharedLinkServiceProvider = SharedLinkServiceProvider._();
+const sharedLinkServiceProvider = SharedLinkServiceProvider._();
 
 /// Provider for SharedLinkService
 
@@ -20,7 +20,7 @@ final class SharedLinkServiceProvider extends $FunctionalProvider<
     SharedLinkService,
     SharedLinkService> with $Provider<SharedLinkService> {
   /// Provider for SharedLinkService
-  SharedLinkServiceProvider._()
+  const SharedLinkServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -62,7 +62,7 @@ String _$sharedLinkServiceHash() => r'241bc04c9bb4b792e69767c5cb55a3832f076740';
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(SharedLinks)
-final sharedLinksProvider = SharedLinksProvider._();
+const sharedLinksProvider = SharedLinksProvider._();
 
 /// Notifier for managing shared links
 ///
@@ -74,7 +74,7 @@ final class SharedLinksProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  SharedLinksProvider._()
+  const SharedLinksProvider._()
       : super(
           from: null,
           argument: null,
@@ -113,13 +113,14 @@ abstract class _$SharedLinks extends $Notifier<SharedLinkState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SharedLinkState, SharedLinkState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SharedLinkState, SharedLinkState>,
         SharedLinkState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -129,7 +130,7 @@ abstract class _$SharedLinks extends $Notifier<SharedLinkState> {
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(CreateSharedLink)
-final createSharedLinkProvider = CreateSharedLinkProvider._();
+const createSharedLinkProvider = CreateSharedLinkProvider._();
 
 /// Notifier for creating shared links
 ///
@@ -141,7 +142,7 @@ final class CreateSharedLinkProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  CreateSharedLinkProvider._()
+  const CreateSharedLinkProvider._()
       : super(
           from: null,
           argument: null,
@@ -180,13 +181,14 @@ abstract class _$CreateSharedLink extends $Notifier<CreateSharedLinkState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<CreateSharedLinkState, CreateSharedLinkState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<CreateSharedLinkState, CreateSharedLinkState>,
         CreateSharedLinkState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -196,7 +198,7 @@ abstract class _$CreateSharedLink extends $Notifier<CreateSharedLinkState> {
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(ValidateLink)
-final validateLinkProvider = ValidateLinkProvider._();
+const validateLinkProvider = ValidateLinkProvider._();
 
 /// Notifier for validating shared link access
 ///
@@ -208,7 +210,7 @@ final class ValidateLinkProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  ValidateLinkProvider._()
+  const ValidateLinkProvider._()
       : super(
           from: null,
           argument: null,
@@ -247,20 +249,21 @@ abstract class _$ValidateLink extends $Notifier<ValidateLinkState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<ValidateLinkState, ValidateLinkState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ValidateLinkState, ValidateLinkState>,
         ValidateLinkState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for shared links for a specific trip
 
 @ProviderFor(tripSharedLinks)
-final tripSharedLinksProvider = TripSharedLinksFamily._();
+const tripSharedLinksProvider = TripSharedLinksFamily._();
 
 /// Provider for shared links for a specific trip
 
@@ -270,7 +273,7 @@ final class TripSharedLinksProvider extends $FunctionalProvider<
         FutureOr<List<SharedLink>>>
     with $FutureModifier<List<SharedLink>>, $FutureProvider<List<SharedLink>> {
   /// Provider for shared links for a specific trip
-  TripSharedLinksProvider._(
+  const TripSharedLinksProvider._(
       {required TripSharedLinksFamily super.from,
       required String super.argument})
       : super(
@@ -323,7 +326,7 @@ String _$tripSharedLinksHash() => r'1b3354b9d5144c60ee3a8c306e68d71fdb48f51f';
 
 final class TripSharedLinksFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<SharedLink>>, String> {
-  TripSharedLinksFamily._()
+  const TripSharedLinksFamily._()
       : super(
           retry: null,
           name: r'tripSharedLinksProvider',
@@ -346,7 +349,7 @@ final class TripSharedLinksFamily extends $Family
 /// Provider for a single shared link by ID
 
 @ProviderFor(sharedLink)
-final sharedLinkProvider = SharedLinkFamily._();
+const sharedLinkProvider = SharedLinkFamily._();
 
 /// Provider for a single shared link by ID
 
@@ -354,7 +357,7 @@ final class SharedLinkProvider extends $FunctionalProvider<
         AsyncValue<SharedLink?>, SharedLink?, FutureOr<SharedLink?>>
     with $FutureModifier<SharedLink?>, $FutureProvider<SharedLink?> {
   /// Provider for a single shared link by ID
-  SharedLinkProvider._(
+  const SharedLinkProvider._(
       {required SharedLinkFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -406,7 +409,7 @@ String _$sharedLinkHash() => r'fb1dacb0239272e29450ca2f26d34749f142c702';
 
 final class SharedLinkFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<SharedLink?>, String> {
-  SharedLinkFamily._()
+  const SharedLinkFamily._()
       : super(
           retry: null,
           name: r'sharedLinkProvider',
@@ -429,7 +432,7 @@ final class SharedLinkFamily extends $Family
 /// Provider for a shared link by slug
 
 @ProviderFor(sharedLinkBySlug)
-final sharedLinkBySlugProvider = SharedLinkBySlugFamily._();
+const sharedLinkBySlugProvider = SharedLinkBySlugFamily._();
 
 /// Provider for a shared link by slug
 
@@ -437,7 +440,7 @@ final class SharedLinkBySlugProvider extends $FunctionalProvider<
         AsyncValue<SharedLink?>, SharedLink?, FutureOr<SharedLink?>>
     with $FutureModifier<SharedLink?>, $FutureProvider<SharedLink?> {
   /// Provider for a shared link by slug
-  SharedLinkBySlugProvider._(
+  const SharedLinkBySlugProvider._(
       {required SharedLinkBySlugFamily super.from,
       required String super.argument})
       : super(
@@ -490,7 +493,7 @@ String _$sharedLinkBySlugHash() => r'd9c36426a646ec2435b3da748cc9959cd43cebeb';
 
 final class SharedLinkBySlugFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<SharedLink?>, String> {
-  SharedLinkBySlugFamily._()
+  const SharedLinkBySlugFamily._()
       : super(
           retry: null,
           name: r'sharedLinkBySlugProvider',
@@ -513,7 +516,7 @@ final class SharedLinkBySlugFamily extends $Family
 /// Provider for shared link statistics
 
 @ProviderFor(sharedLinkStatistics)
-final sharedLinkStatisticsProvider = SharedLinkStatisticsFamily._();
+const sharedLinkStatisticsProvider = SharedLinkStatisticsFamily._();
 
 /// Provider for shared link statistics
 
@@ -525,7 +528,7 @@ final class SharedLinkStatisticsProvider extends $FunctionalProvider<
         $FutureModifier<SharedLinkStatistics>,
         $FutureProvider<SharedLinkStatistics> {
   /// Provider for shared link statistics
-  SharedLinkStatisticsProvider._(
+  const SharedLinkStatisticsProvider._(
       {required SharedLinkStatisticsFamily super.from,
       required String super.argument})
       : super(
@@ -579,7 +582,7 @@ String _$sharedLinkStatisticsHash() =>
 
 final class SharedLinkStatisticsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<SharedLinkStatistics>, String> {
-  SharedLinkStatisticsFamily._()
+  const SharedLinkStatisticsFamily._()
       : super(
           retry: null,
           name: r'sharedLinkStatisticsProvider',
@@ -602,7 +605,7 @@ final class SharedLinkStatisticsFamily extends $Family
 /// Provider for active shared links only
 
 @ProviderFor(activeSharedLinks)
-final activeSharedLinksProvider = ActiveSharedLinksProvider._();
+const activeSharedLinksProvider = ActiveSharedLinksProvider._();
 
 /// Provider for active shared links only
 
@@ -611,7 +614,7 @@ final class ActiveSharedLinksProvider extends $FunctionalProvider<
     List<SharedLink>,
     List<SharedLink>> with $Provider<List<SharedLink>> {
   /// Provider for active shared links only
-  ActiveSharedLinksProvider._()
+  const ActiveSharedLinksProvider._()
       : super(
           from: null,
           argument: null,
@@ -649,7 +652,7 @@ String _$activeSharedLinksHash() => r'5b5b12d0204b7aa9184cb3a8c516b5c63299ebd7';
 /// Provider for expired shared links
 
 @ProviderFor(expiredSharedLinks)
-final expiredSharedLinksProvider = ExpiredSharedLinksProvider._();
+const expiredSharedLinksProvider = ExpiredSharedLinksProvider._();
 
 /// Provider for expired shared links
 
@@ -658,7 +661,7 @@ final class ExpiredSharedLinksProvider extends $FunctionalProvider<
     List<SharedLink>,
     List<SharedLink>> with $Provider<List<SharedLink>> {
   /// Provider for expired shared links
-  ExpiredSharedLinksProvider._()
+  const ExpiredSharedLinksProvider._()
       : super(
           from: null,
           argument: null,
@@ -697,7 +700,7 @@ String _$expiredSharedLinksHash() =>
 /// Provider for password-protected links
 
 @ProviderFor(protectedSharedLinks)
-final protectedSharedLinksProvider = ProtectedSharedLinksProvider._();
+const protectedSharedLinksProvider = ProtectedSharedLinksProvider._();
 
 /// Provider for password-protected links
 
@@ -706,7 +709,7 @@ final class ProtectedSharedLinksProvider extends $FunctionalProvider<
     List<SharedLink>,
     List<SharedLink>> with $Provider<List<SharedLink>> {
   /// Provider for password-protected links
-  ProtectedSharedLinksProvider._()
+  const ProtectedSharedLinksProvider._()
       : super(
           from: null,
           argument: null,
@@ -745,7 +748,7 @@ String _$protectedSharedLinksHash() =>
 /// Provider for public (no password) links
 
 @ProviderFor(publicSharedLinks)
-final publicSharedLinksProvider = PublicSharedLinksProvider._();
+const publicSharedLinksProvider = PublicSharedLinksProvider._();
 
 /// Provider for public (no password) links
 
@@ -754,7 +757,7 @@ final class PublicSharedLinksProvider extends $FunctionalProvider<
     List<SharedLink>,
     List<SharedLink>> with $Provider<List<SharedLink>> {
   /// Provider for public (no password) links
-  PublicSharedLinksProvider._()
+  const PublicSharedLinksProvider._()
       : super(
           from: null,
           argument: null,
@@ -792,14 +795,14 @@ String _$publicSharedLinksHash() => r'5c8e0125e5a3eeb0b2d0fd3f75cbc35933a3047d';
 /// Provider for shared links count
 
 @ProviderFor(sharedLinksCount)
-final sharedLinksCountProvider = SharedLinksCountProvider._();
+const sharedLinksCountProvider = SharedLinksCountProvider._();
 
 /// Provider for shared links count
 
 final class SharedLinksCountProvider extends $FunctionalProvider<int, int, int>
     with $Provider<int> {
   /// Provider for shared links count
-  SharedLinksCountProvider._()
+  const SharedLinksCountProvider._()
       : super(
           from: null,
           argument: null,
@@ -837,14 +840,14 @@ String _$sharedLinksCountHash() => r'3c91aa12c8d0585f84f1b2c20898a64a7da54460';
 /// Provider for active links count
 
 @ProviderFor(activeLinksCount)
-final activeLinksCountProvider = ActiveLinksCountProvider._();
+const activeLinksCountProvider = ActiveLinksCountProvider._();
 
 /// Provider for active links count
 
 final class ActiveLinksCountProvider extends $FunctionalProvider<int, int, int>
     with $Provider<int> {
   /// Provider for active links count
-  ActiveLinksCountProvider._()
+  const ActiveLinksCountProvider._()
       : super(
           from: null,
           argument: null,

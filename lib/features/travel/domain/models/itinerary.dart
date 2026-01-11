@@ -13,7 +13,6 @@ part 'itinerary.g.dart';
 /// a customized itinerary created by the user.
 @freezed
 abstract class Itinerary with _$Itinerary {
-
   /// Creates a complete itinerary
   ///
   /// [id] Unique identifier for this itinerary

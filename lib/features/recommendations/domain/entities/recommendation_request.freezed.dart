@@ -281,8 +281,6 @@ extension RecommendationRequestPatterns on RecommendationRequest {
     switch (_that) {
       case _RecommendationRequest():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -404,8 +402,6 @@ extension RecommendationRequestPatterns on RecommendationRequest {
             _that.maxDistance,
             _that.limit,
             _that.excludeItineraryItems);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -885,8 +881,6 @@ extension HotelLocationPatterns on HotelLocation {
     switch (_that) {
       case _HotelLocation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -968,8 +962,6 @@ extension HotelLocationPatterns on HotelLocation {
       case _HotelLocation():
         return $default(
             _that.name, _that.address, _that.latitude, _that.longitude);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1239,8 +1231,6 @@ extension BudgetRangePatterns on BudgetRange {
     switch (_that) {
       case _BudgetRange():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1316,8 +1306,6 @@ extension BudgetRangePatterns on BudgetRange {
     switch (_that) {
       case _BudgetRange():
         return $default(_that.min, _that.max, _that.currency);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

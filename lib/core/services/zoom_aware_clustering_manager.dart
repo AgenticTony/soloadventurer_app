@@ -31,10 +31,10 @@ class ZoomAwareClusteringManager {
   final int debounceDelayMs;
 
   /// Whether to use bounds-based clustering
-  final bool useBoundsBasedClustering;
+  final bool useLatLngBoundsBasedClustering;
 
   /// Current map bounds (if using bounds-based clustering)
-  Bounds? _currentBounds;
+  LatLngBounds? _currentLatLngBounds;
 
   /// Clustering history for zoom changes (undo/redo support)
   final List<_ClusteringSnapshot> _history = [];
@@ -64,14 +64,14 @@ class ZoomAwareClusteringManager {
   /// - [markers]: Initial list of markers to cluster
   /// - [initialZoom]: Initial zoom level (default: 12.0)
   /// - [debounceDelayMs]: Delay before re-clustering after zoom change (default: 300ms)
-  /// - [useBoundsBasedClustering]: Whether to cluster only visible markers (default: false)
+  /// - [useLatLngBoundsBasedClustering]: Whether to cluster only visible markers (default: false)
   /// - [params]: Optional custom clustering parameters
   /// - [maxHistorySize]: Maximum number of clustering snapshots to keep (default: 20)
   ZoomAwareClusteringManager({
     required List<MapMarker> markers,
     double initialZoom = 12.0,
     this.debounceDelayMs = 300,
-    this.useBoundsBasedClustering = false,
+    this.useLatLngBoundsBasedClustering = false,
     ClusteringParams? params,
     this.maxHistorySize = 20,
   })  : _allMarkers = markers,
@@ -108,20 +108,20 @@ class ZoomAwareClusteringManager {
 
   /// Update map bounds (for bounds-based clustering)
   ///
-  /// Only has an effect if [useBoundsBasedClustering] is true.
-  void updateMapBounds(Bounds bounds, {bool force = false}) {
-    if (!useBoundsBasedClustering) return;
+  /// Only has an effect if [useLatLngBoundsBasedClustering] is true.
+  void updateMapLatLngBounds(LatLngBounds bounds, {bool force = false}) {
+    if (!useLatLngBoundsBasedClustering) return;
 
-    if (_currentBounds != null &&
-        _currentBounds!.south == bounds.south &&
-        _currentBounds!.north == bounds.north &&
-        _currentBounds!.west == bounds.west &&
-        _currentBounds!.east == bounds.east &&
+    if (_currentLatLngBounds != null &&
+        _currentLatLngBounds!.south == bounds.south &&
+        _currentLatLngBounds!.north == bounds.north &&
+        _currentLatLngBounds!.west == bounds.west &&
+        _currentLatLngBounds!.east == bounds.east &&
         !force) {
       return;
     }
 
-    _currentBounds = bounds;
+    _currentLatLngBounds = bounds;
 
     // Re-cluster with new bounds
     _debounceTimer?.cancel();
@@ -192,7 +192,7 @@ class ZoomAwareClusteringManager {
       'algorithm': _clusteringService.params.algorithm.name,
       'clusterRadius': _clusteringService.params.clusterRadius,
       'historySize': _history.length,
-      'usingBoundsBasedClustering': useBoundsBasedClustering,
+      'usingLatLngBoundsBasedClustering': useLatLngBoundsBasedClustering,
     };
   }
 
@@ -232,11 +232,11 @@ class ZoomAwareClusteringManager {
   ClusteringResult _performClustering({bool saveSnapshot = true}) {
     ClusteringResult result;
 
-    if (useBoundsBasedClustering && _currentBounds != null) {
-      // Bounds-based clustering
-      result = _clusteringService.clusterMarkersInBounds(
+    if (useLatLngBoundsBasedClustering && _currentLatLngBounds != null) {
+      // LatLngBounds-based clustering
+      result = _clusteringService.clusterMarkersInLatLngBounds(
         _allMarkers,
-        _currentBounds!,
+        _currentLatLngBounds!,
       );
     } else {
       // Standard clustering
@@ -308,13 +308,13 @@ class ClusteringManagerFactories {
     required List<MapMarker> markers,
     double initialZoom = 14.0,
     int debounceDelayMs = 300,
-    bool useBoundsBasedClustering = true,
+    bool useLatLngBoundsBasedClustering = true,
   }) {
     return ZoomAwareClusteringManager(
       markers: markers,
       initialZoom: initialZoom,
       debounceDelayMs: debounceDelayMs,
-      useBoundsBasedClustering: useBoundsBasedClustering,
+      useLatLngBoundsBasedClustering: useLatLngBoundsBasedClustering,
       params: const ClusteringParams.highDensity(),
     );
   }
@@ -324,13 +324,13 @@ class ClusteringManagerFactories {
     required List<MapMarker> markers,
     double initialZoom = 10.0,
     int debounceDelayMs = 300,
-    bool useBoundsBasedClustering = false,
+    bool useLatLngBoundsBasedClustering = false,
   }) {
     return ZoomAwareClusteringManager(
       markers: markers,
       initialZoom: initialZoom,
       debounceDelayMs: debounceDelayMs,
-      useBoundsBasedClustering: useBoundsBasedClustering,
+      useLatLngBoundsBasedClustering: useLatLngBoundsBasedClustering,
       params: const ClusteringParams.lowDensity(),
     );
   }
@@ -340,13 +340,13 @@ class ClusteringManagerFactories {
     required List<MapMarker> markers,
     double initialZoom = 10.0,
     int debounceDelayMs = 200, // Faster response
-    bool useBoundsBasedClustering = true, // Only cluster visible
+    bool useLatLngBoundsBasedClustering = true, // Only cluster visible
   }) {
     return ZoomAwareClusteringManager(
       markers: markers,
       initialZoom: initialZoom,
       debounceDelayMs: debounceDelayMs,
-      useBoundsBasedClustering: useBoundsBasedClustering,
+      useLatLngBoundsBasedClustering: useLatLngBoundsBasedClustering,
       params: const ClusteringParams(
         algorithm: ClusteringAlgorithm.grid, // Fastest algorithm
         gridCellSize: 100,

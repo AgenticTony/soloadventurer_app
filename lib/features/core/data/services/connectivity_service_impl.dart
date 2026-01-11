@@ -72,7 +72,7 @@ class ConnectivityServiceImpl implements ConnectivityService {
 }
 
 @riverpod
-ConnectivityService connectivityServiceImpl(ConnectivityServiceImplRef ref) {
+ConnectivityService connectivityServiceImpl(Ref ref) {
   final service = ConnectivityServiceImpl();
   ref.onDispose(() => service.dispose());
   return service;

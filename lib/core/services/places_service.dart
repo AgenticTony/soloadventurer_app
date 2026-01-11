@@ -2,6 +2,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/destination.dart';
 import 'package:soloadventurer/features/travel/domain/models/place_activity.dart';
 
+// Import for the implementation provider
+import 'places_service_impl.dart' show placesServiceOverrideProvider;
+
 part 'places_service.g.dart';
 
 /// Service for finding and searching places/activities
@@ -70,10 +73,10 @@ abstract class PlacesService {
 }
 
 /// Provider for the places service implementation
+///
+/// This provider returns the actual implementation from places_service_impl.dart.
+/// The placesServiceOverrideProvider handles the proper instantiation.
 @Riverpod(keepAlive: true)
 PlacesService placesService(Ref ref) {
-  throw UnimplementedError(
-    'PlacesService implementation not provided. '
-    'Use placesServiceProvider from places_service_impl.dart',
-  );
+  return ref.watch(placesServiceOverrideProvider);
 }

@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
@@ -8,7 +10,6 @@ import 'package:soloadventurer/features/core/presentation/widgets/queue_status_i
 import 'package:soloadventurer/features/offline/presentation/widgets/connectivity_indicator.dart';
 import 'package:soloadventurer/features/offline/presentation/widgets/sync_status_banner.dart';
 import 'package:soloadventurer/features/offline/presentation/widgets/offline_banner.dart';
-import 'package:soloadventurer/features/offline/presentation/routes/offline_routes.dart';
 import 'package:soloadventurer/features/safety/presentation/widgets/sos_button_widget.dart';
 import 'package:soloadventurer/features/home/presentation/widgets/quick_sos_button.dart';
 import 'package:soloadventurer/features/destination_discovery/presentation/routes/destination_discovery_routes.dart';
@@ -97,7 +98,7 @@ class HomeScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              Navigator.pushNamed(context, OfflineRoutes.syncSettings);
+              context.push('/settings/sync');
             },
             tooltip: 'Settings',
           ),
@@ -151,8 +152,8 @@ class HomeScreen extends ConsumerWidget {
   }
 
   /// Builds the welcome section
-  Widget _buildWelcomeSection(
-      BuildContext context, WidgetRef ref, ThemeData theme, AuthState authState) {
+  Widget _buildWelcomeSection(BuildContext context, WidgetRef ref,
+      ThemeData theme, AuthState authState) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -275,7 +276,7 @@ class HomeScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, AuthRoutes.cloudWatchTest);
+                      context.push('/cloudwatch-test');
                     },
                     child: const Text('Test CloudWatch Logging'),
                   ),
@@ -300,7 +301,7 @@ class HomeScreen extends ConsumerWidget {
         ),
         child: InkWell(
           onTap: () {
-            Navigator.pushNamed(context, DestinationDiscoveryRoutes.discovery);
+            context.push(DestinationDiscoveryRoutes.discovery);
           },
           child: Stack(
             children: [
@@ -340,7 +341,7 @@ class HomeScreen extends ConsumerWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withValues(alpha:0.7),
+                            Colors.black.withValues(alpha: 0.7),
                           ],
                         ),
                       ),
@@ -374,7 +375,7 @@ class HomeScreen extends ConsumerWidget {
                     Text(
                       'Explore safe and exciting places perfect for solo travelers',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha:0.9),
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
                     ),
                   ],
@@ -439,10 +440,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.recommendations,
-                  );
+                  context.push(DestinationDiscoveryRoutes.recommendations);
                 },
                 child: const Text('See All'),
               ),
@@ -465,10 +463,7 @@ class HomeScreen extends ConsumerWidget {
                 subtitle: 'Based on your preferences',
                 color: theme.colorScheme.primary,
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.recommendations,
-                  );
+                  context.push(DestinationDiscoveryRoutes.recommendations);
                 },
               ),
               _buildQuickActionCard(
@@ -479,10 +474,7 @@ class HomeScreen extends ConsumerWidget {
                 subtitle: 'Popular this week',
                 color: theme.colorScheme.secondary,
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.discovery,
-                  );
+                  context.push(DestinationDiscoveryRoutes.discovery);
                 },
               ),
               _buildQuickActionCard(
@@ -493,10 +485,7 @@ class HomeScreen extends ConsumerWidget {
                 subtitle: 'Unique discoveries',
                 color: Colors.amber,
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.curatedLists,
-                  );
+                  context.push(DestinationDiscoveryRoutes.curatedLists);
                 },
               ),
             ],
@@ -525,10 +514,7 @@ class HomeScreen extends ConsumerWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.curatedLists,
-                  );
+                  context.push(DestinationDiscoveryRoutes.curatedLists);
                 },
                 child: const Text('See All'),
               ),
@@ -553,10 +539,7 @@ class HomeScreen extends ConsumerWidget {
                 imageUrl:
                     'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400',
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.curatedLists,
-                  );
+                  context.push(DestinationDiscoveryRoutes.curatedLists);
                 },
               ),
               _buildCollectionCard(
@@ -569,10 +552,7 @@ class HomeScreen extends ConsumerWidget {
                 imageUrl:
                     'https://images.unsplash.com/photo-1506869640319-fe1a24fd76dc?w=400',
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.curatedLists,
-                  );
+                  context.push(DestinationDiscoveryRoutes.curatedLists);
                 },
               ),
               _buildCollectionCard(
@@ -585,10 +565,7 @@ class HomeScreen extends ConsumerWidget {
                 imageUrl:
                     'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400',
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.curatedLists,
-                  );
+                  context.push(DestinationDiscoveryRoutes.curatedLists);
                 },
               ),
             ],
@@ -627,10 +604,7 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.bookmark,
                 color: theme.colorScheme.primary,
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.savedDestinations,
-                  );
+                  context.push(DestinationDiscoveryRoutes.savedDestinations);
                 },
               ),
               _buildQuickAccessCard(
@@ -640,10 +614,7 @@ class HomeScreen extends ConsumerWidget {
                 icon: Icons.search,
                 color: theme.colorScheme.secondary,
                 onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    DestinationDiscoveryRoutes.discovery,
-                  );
+                  context.push(DestinationDiscoveryRoutes.discovery);
                 },
               ),
             ],
@@ -680,7 +651,7 @@ class HomeScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha:0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -767,7 +738,7 @@ class HomeScreen extends ConsumerWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withValues(alpha:0.8),
+                      Colors.black.withValues(alpha: 0.8),
                     ],
                   ),
                 ),
@@ -803,7 +774,7 @@ class HomeScreen extends ConsumerWidget {
                     Text(
                       subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha:0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -837,8 +808,8 @@ class HomeScreen extends ConsumerWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withValues(alpha:0.1),
-                color.withValues(alpha:0.05),
+                color.withValues(alpha: 0.1),
+                color.withValues(alpha: 0.05),
               ],
             ),
           ),

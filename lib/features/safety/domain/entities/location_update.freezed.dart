@@ -330,8 +330,6 @@ extension LocationUpdatePatterns on LocationUpdate {
     switch (_that) {
       case _LocationUpdate():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -481,8 +479,6 @@ extension LocationUpdatePatterns on LocationUpdate {
             _that.checkInId,
             _that.metadata,
             _that.createdAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

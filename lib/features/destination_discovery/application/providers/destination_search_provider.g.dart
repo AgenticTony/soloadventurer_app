@@ -41,7 +41,7 @@ part of 'destination_search_provider.dart';
 /// ```
 
 @ProviderFor(DestinationSearch)
-final destinationSearchProvider = DestinationSearchProvider._();
+const destinationSearchProvider = DestinationSearchProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -107,7 +107,7 @@ final class DestinationSearchProvider
   /// // Clear search
   /// searchNotifier.clear();
   /// ```
-  DestinationSearchProvider._()
+  const DestinationSearchProvider._()
       : super(
           from: null,
           argument: null,
@@ -126,7 +126,7 @@ final class DestinationSearchProvider
   DestinationSearch create() => DestinationSearch();
 }
 
-String _$destinationSearchHash() => r'b7dab0173341f923833bcbbfa966e1c33b2efc4c';
+String _$destinationSearchHash() => r'52ac8964e026d4e41172a0ee533ba12654e8f7d8';
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -166,6 +166,7 @@ abstract class _$DestinationSearch
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref
         as $Ref<AsyncValue<DestinationSearchState>, DestinationSearchState>;
     final element = ref.element as $ClassProviderElement<
@@ -173,6 +174,6 @@ abstract class _$DestinationSearch
         AsyncValue<DestinationSearchState>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

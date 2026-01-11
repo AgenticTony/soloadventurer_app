@@ -16,7 +16,7 @@ class _NotificationSettingsScreenState
     extends ConsumerState<NotificationSettingsScreen> {
   @override
   Widget build(BuildContext context) {
-    final prefsAsync = ref.watch(notificationPreferencesNotifierProvider);
+    final prefsAsync = ref.watch(notificationPreferencesProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +42,7 @@ class _NotificationSettingsScreenState
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref
-                    .read(notificationPreferencesNotifierProvider.notifier)
+                    .read(notificationPreferencesProvider.notifier)
                     .resetToDefaults(),
                 child: const Text('Reset to Defaults'),
               ),
@@ -401,7 +401,7 @@ class _NotificationSettingsScreenState
 
   Future<void> _updatePreference(NotificationPreferences updated) async {
     await ref
-        .read(notificationPreferencesNotifierProvider.notifier)
+        .read(notificationPreferencesProvider.notifier)
         .updatePreferences(updated);
   }
 
@@ -422,7 +422,7 @@ class _NotificationSettingsScreenState
             onPressed: () {
               Navigator.pop(context);
               ref
-                  .read(notificationPreferencesNotifierProvider.notifier)
+                  .read(notificationPreferencesProvider.notifier)
                   .resetToDefaults();
             },
             child: const Text('Reset'),

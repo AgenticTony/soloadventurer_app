@@ -167,138 +167,138 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                // App logo or image
-                const Icon(
-                  Icons.hiking,
-                  size: 80,
-                  color: Colors.blue,
-                ),
-
-                const SizedBox(height: 24),
-
-                // App name
-                const Text(
-                  'Join SoloAdventurer',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // Name field
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Full Name',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(),
-                  ),
-                  textInputAction: TextInputAction.next,
-                  validator: _validateName,
-                  enabled: !isLoading,
-                ),
-
-                const SizedBox(height: 16),
-
-                // Email field
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  validator: _validateEmail,
-                  enabled: !isLoading,
-                ),
-
-                const SizedBox(height: 16),
-
-                // Password field
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                      // App logo or image
+                      const Icon(
+                        Icons.hiking,
+                        size: 80,
+                        color: Colors.blue,
                       ),
-                      onPressed: _togglePasswordVisibility,
-                    ),
-                    border: const OutlineInputBorder(),
-                  ),
-                  obscureText: !_isPasswordVisible,
-                  textInputAction: TextInputAction.next,
-                  validator: _validatePassword,
-                  enabled: !isLoading,
-                ),
 
-                const SizedBox(height: 16),
+                      const SizedBox(height: 24),
 
-                // Confirm password field
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isConfirmPasswordVisible
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                      ),
-                      onPressed: _toggleConfirmPasswordVisibility,
-                    ),
-                    border: const OutlineInputBorder(),
-                  ),
-                  obscureText: !_isConfirmPasswordVisible,
-                  textInputAction: TextInputAction.done,
-                  validator: _validateConfirmPassword,
-                  enabled: !isLoading,
-                ),
-
-                const SizedBox(height: 24),
-
-                // Sign up button
-                ElevatedButton(
-                  onPressed: isLoading ? null : _signUp,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: isLoading
-                      ? const CircularProgressIndicator()
-                      : const Text(
-                          'Sign Up',
-                          style: TextStyle(fontSize: 16),
+                      // App name
+                      const Text(
+                        'Join SoloAdventurer',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
-                ),
+                      ),
 
-                const SizedBox(height: 16),
+                      const SizedBox(height: 48),
 
-                // Login link
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Already have an account?'),
-                    TextButton(
-                      onPressed: isLoading ? null : _navigateToLogin,
-                      child: const Text('Login'),
-                    ),
-                  ],
+                      // Name field
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Full Name',
+                          prefixIcon: Icon(Icons.person),
+                          border: OutlineInputBorder(),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        validator: _validateName,
+                        enabled: !isLoading,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Email field
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: Icon(Icons.email),
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        validator: _validateEmail,
+                        enabled: !isLoading,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Password field
+                      TextFormField(
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          prefixIcon: const Icon(Icons.lock),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
+                          border: const OutlineInputBorder(),
+                        ),
+                        obscureText: !_isPasswordVisible,
+                        textInputAction: TextInputAction.next,
+                        validator: _validatePassword,
+                        enabled: !isLoading,
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Confirm password field
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        decoration: InputDecoration(
+                          labelText: 'Confirm Password',
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isConfirmPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: _toggleConfirmPasswordVisibility,
+                          ),
+                          border: const OutlineInputBorder(),
+                        ),
+                        obscureText: !_isConfirmPasswordVisible,
+                        textInputAction: TextInputAction.done,
+                        validator: _validateConfirmPassword,
+                        enabled: !isLoading,
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Sign up button
+                      ElevatedButton(
+                        onPressed: isLoading ? null : _signUp,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: isLoading
+                            ? const CircularProgressIndicator()
+                            : const Text(
+                                'Sign Up',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // Login link
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Already have an account?'),
+                          TextButton(
+                            onPressed: isLoading ? null : _navigateToLogin,
+                            child: const Text('Login'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-        ),
           ),
         ],
       ),

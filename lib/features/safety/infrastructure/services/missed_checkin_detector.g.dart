@@ -11,7 +11,7 @@ part of 'missed_checkin_detector.dart';
 /// Provider for the missed check-in detector implementation
 
 @ProviderFor(missedCheckInDetector)
-final missedCheckInDetectorProvider = MissedCheckInDetectorProvider._();
+const missedCheckInDetectorProvider = MissedCheckInDetectorProvider._();
 
 /// Provider for the missed check-in detector implementation
 
@@ -20,7 +20,7 @@ final class MissedCheckInDetectorProvider extends $FunctionalProvider<
     MissedCheckInDetector,
     MissedCheckInDetector> with $Provider<MissedCheckInDetector> {
   /// Provider for the missed check-in detector implementation
-  MissedCheckInDetectorProvider._()
+  const MissedCheckInDetectorProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,4 +55,4 @@ final class MissedCheckInDetectorProvider extends $FunctionalProvider<
 }
 
 String _$missedCheckInDetectorHash() =>
-    r'83f81250920b487c80f870bbd05bb2765dee97fc';
+    r'de62f3c06f65e686c6624c777fdef0e2b63f673b';

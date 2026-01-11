@@ -6,6 +6,7 @@ targets:
       include:
         - lib/**
         - test/**
+        - $package$
       exclude:
         - .worktrees/**
         - .auto-claude/**

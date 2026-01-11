@@ -11,8 +11,7 @@ part 'trusted_contacts_state.freezed.dart';
 /// - isLoading and error are ALWAYS fields on state
 /// - State is NEVER nullable
 @freezed
-class TrustedContactsState with _$TrustedContactsState {
-
+sealed class TrustedContactsState with _$TrustedContactsState {
   const factory TrustedContactsState({
     /// Loading indicator - always a field on State
     @Default(false) bool isLoading,

@@ -13,7 +13,7 @@ part of 'core_service_providers.dart';
 /// Keeps a single instance alive for the app lifetime.
 
 @ProviderFor(flutterSecureStorage)
-final flutterSecureStorageProvider = FlutterSecureStorageProvider._();
+const flutterSecureStorageProvider = FlutterSecureStorageProvider._();
 
 /// Provider for FlutterSecureStorage
 ///
@@ -26,7 +26,7 @@ final class FlutterSecureStorageProvider extends $FunctionalProvider<
   /// Provider for FlutterSecureStorage
   ///
   /// Keeps a single instance alive for the app lifetime.
-  FlutterSecureStorageProvider._()
+  const FlutterSecureStorageProvider._()
       : super(
           from: null,
           argument: null,
@@ -68,7 +68,7 @@ String _$flutterSecureStorageHash() =>
 /// Provides a type-safe wrapper around FlutterSecureStorage.
 
 @ProviderFor(secureStorage)
-final secureStorageProvider = SecureStorageProvider._();
+const secureStorageProvider = SecureStorageProvider._();
 
 /// Provider for SecureStorage wrapper
 ///
@@ -80,7 +80,7 @@ final class SecureStorageProvider
   /// Provider for SecureStorage wrapper
   ///
   /// Provides a type-safe wrapper around FlutterSecureStorage.
-  SecureStorageProvider._()
+  const SecureStorageProvider._()
       : super(
           from: null,
           argument: null,
@@ -120,7 +120,7 @@ String _$secureStorageHash() => r'5c9908c0046ad0e39469ee7acbb5540397b36693';
 /// Provides access to application configuration including AWS Cognito settings.
 
 @ProviderFor(appConfig)
-final appConfigProvider = AppConfigProvider._();
+const appConfigProvider = AppConfigProvider._();
 
 /// Provider for AppConfig
 ///
@@ -132,7 +132,7 @@ final class AppConfigProvider
   /// Provider for AppConfig
   ///
   /// Provides access to application configuration including AWS Cognito settings.
-  AppConfigProvider._()
+  const AppConfigProvider._()
       : super(
           from: null,
           argument: null,
@@ -173,7 +173,7 @@ String _$appConfigHash() => r'6989be971ffe295fb8fd413a9b6dfe4377d3e6f5';
 /// This provider is overridden with the actual instance in bootstrap.dart.
 
 @ProviderFor(sharedPreferences)
-final sharedPreferencesProvider = SharedPreferencesProvider._();
+const sharedPreferencesProvider = SharedPreferencesProvider._();
 
 /// Provider for SharedPreferences
 ///
@@ -188,7 +188,7 @@ final class SharedPreferencesProvider extends $FunctionalProvider<
   ///
   /// Must be initialized in bootstrap before use.
   /// This provider is overridden with the actual instance in bootstrap.dart.
-  SharedPreferencesProvider._()
+  const SharedPreferencesProvider._()
       : super(
           from: null,
           argument: null,
@@ -229,7 +229,7 @@ String _$sharedPreferencesHash() => r'14dd3863ff829056bf2edaa3e9041d73490ea87d';
 /// Monitors network connectivity state changes.
 
 @ProviderFor(connectivity)
-final connectivityProvider = ConnectivityProvider._();
+const connectivityProvider = ConnectivityProvider._();
 
 /// Provider for Connectivity plugin
 ///
@@ -241,7 +241,7 @@ final class ConnectivityProvider
   /// Provider for Connectivity plugin
   ///
   /// Monitors network connectivity state changes.
-  ConnectivityProvider._()
+  const ConnectivityProvider._()
       : super(
           from: null,
           argument: null,
@@ -281,7 +281,7 @@ String _$connectivityHash() => r'15246627d0ae599bcd01382c80d3d25b9e9b4e18';
 /// Manages the local SQLite database lifecycle and provides access to database instances.
 
 @ProviderFor(databaseService)
-final databaseServiceProvider = DatabaseServiceProvider._();
+const databaseServiceProvider = DatabaseServiceProvider._();
 
 /// Provider for DatabaseService
 ///
@@ -292,7 +292,7 @@ final class DatabaseServiceProvider extends $FunctionalProvider<DatabaseService,
   /// Provider for DatabaseService
   ///
   /// Manages the local SQLite database lifecycle and provides access to database instances.
-  DatabaseServiceProvider._()
+  const DatabaseServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -332,7 +332,7 @@ String _$databaseServiceHash() => r'323927c4138725be4427216964fece6d70043b46';
 /// Provides the AWS Cognito user pool ID from AppConfig.
 
 @ProviderFor(cognitoUserPoolId)
-final cognitoUserPoolIdProvider = CognitoUserPoolIdProvider._();
+const cognitoUserPoolIdProvider = CognitoUserPoolIdProvider._();
 
 /// Provider for Cognito User Pool ID
 ///
@@ -343,7 +343,7 @@ final class CognitoUserPoolIdProvider
   /// Provider for Cognito User Pool ID
   ///
   /// Provides the AWS Cognito user pool ID from AppConfig.
-  CognitoUserPoolIdProvider._()
+  const CognitoUserPoolIdProvider._()
       : super(
           from: null,
           argument: null,
@@ -383,7 +383,7 @@ String _$cognitoUserPoolIdHash() => r'21772e7f1ed3dbe6a1aa124d87de8bfc4ea5217f';
 /// Provides the AWS Cognito client ID from AppConfig.
 
 @ProviderFor(cognitoClientId)
-final cognitoClientIdProvider = CognitoClientIdProvider._();
+const cognitoClientIdProvider = CognitoClientIdProvider._();
 
 /// Provider for Cognito Client ID
 ///
@@ -394,7 +394,7 @@ final class CognitoClientIdProvider
   /// Provider for Cognito Client ID
   ///
   /// Provides the AWS Cognito client ID from AppConfig.
-  CognitoClientIdProvider._()
+  const CognitoClientIdProvider._()
       : super(
           from: null,
           argument: null,
@@ -434,7 +434,7 @@ String _$cognitoClientIdHash() => r'fac71643cdb3479be60b3d7424d75f1304179b93';
 /// Provides the base URL for API requests from AppConfig.
 
 @ProviderFor(apiBaseUrl)
-final apiBaseUrlProvider = ApiBaseUrlProvider._();
+const apiBaseUrlProvider = ApiBaseUrlProvider._();
 
 /// Provider for API Base URL
 ///
@@ -445,7 +445,7 @@ final class ApiBaseUrlProvider
   /// Provider for API Base URL
   ///
   /// Provides the base URL for API requests from AppConfig.
-  ApiBaseUrlProvider._()
+  const ApiBaseUrlProvider._()
       : super(
           from: null,
           argument: null,
@@ -485,7 +485,7 @@ String _$apiBaseUrlHash() => r'77dc5bba93004c423575357f387ca93805600f69';
 /// Provides the AWS Cognito User Pool instance from AppConfig.
 
 @ProviderFor(cognitoUserPool)
-final cognitoUserPoolProvider = CognitoUserPoolProvider._();
+const cognitoUserPoolProvider = CognitoUserPoolProvider._();
 
 /// Provider for Cognito User Pool
 ///
@@ -496,7 +496,7 @@ final class CognitoUserPoolProvider extends $FunctionalProvider<CognitoUserPool,
   /// Provider for Cognito User Pool
   ///
   /// Provides the AWS Cognito User Pool instance from AppConfig.
-  CognitoUserPoolProvider._()
+  const CognitoUserPoolProvider._()
       : super(
           from: null,
           argument: null,

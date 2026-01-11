@@ -22,8 +22,8 @@ enum SaveType {
 /// wishlist for future reference or to a specific trip they're planning.
 /// Users can add notes to saved destinations for personal reference.
 @freezed
-class SavedDestination with _$SavedDestination {
-  const factory SavedDestination({
+sealed class SavedDestination with _$SavedDestination {
+  factory SavedDestination({
     /// Unique identifier for this save entry
     required String id,
 

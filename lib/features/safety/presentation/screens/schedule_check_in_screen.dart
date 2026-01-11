@@ -202,7 +202,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
       return;
     }
 
-    final notifier = ref.read(checkInNotifierProvider.notifier);
+    final notifier = ref.read(checkInProvider.notifier);
 
     try {
       await notifier.scheduleCheckIn(
@@ -249,7 +249,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final contactsState = ref.watch(trustedContactsProvider);
-    final checkInState = ref.watch(checkInNotifierProvider);
+    final checkInState = ref.watch(checkInProvider);
     final isScheduling = checkInState.isCreating;
 
     return Scaffold(

@@ -44,7 +44,7 @@ part of 'destination_detail_provider.dart';
 /// The [destinationId] parameter is the unique identifier of the destination to load.
 
 @ProviderFor(DestinationDetail)
-final destinationDetailProvider = DestinationDetailFamily._();
+const destinationDetailProvider = DestinationDetailFamily._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -116,7 +116,7 @@ final class DestinationDetailProvider
   /// ```
   ///
   /// The [destinationId] parameter is the unique identifier of the destination to load.
-  DestinationDetailProvider._(
+  const DestinationDetailProvider._(
       {required DestinationDetailFamily super.from,
       required String super.argument})
       : super(
@@ -197,7 +197,7 @@ final class DestinationDetailFamily extends $Family
             DestinationDetailState,
             FutureOr<DestinationDetailState>,
             String> {
-  DestinationDetailFamily._()
+  const DestinationDetailFamily._()
       : super(
           retry: null,
           name: r'destinationDetailProvider',
@@ -296,6 +296,9 @@ abstract class _$DestinationDetail
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref
         as $Ref<AsyncValue<DestinationDetailState>, DestinationDetailState>;
     final element = ref.element as $ClassProviderElement<
@@ -303,10 +306,6 @@ abstract class _$DestinationDetail
         AsyncValue<DestinationDetailState>,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

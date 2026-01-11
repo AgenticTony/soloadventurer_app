@@ -6,9 +6,7 @@ library;
 
 // Auth Repository
 export 'package:soloadventurer/app/providers/auth_service_providers.dart'
-    show
-        authRepositoryProvider,
-        AuthRepository;
+    show authRepositoryProvider, AuthRepository;
 
 // Auth Use Cases
 export 'package:soloadventurer/app/providers/auth_service_providers.dart'
@@ -25,14 +23,11 @@ export 'package:soloadventurer/app/providers/auth_service_providers.dart'
 
 // Auth State Management
 export 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart'
-    show
-        authProvider,
-        authProvider,
-        AuthNotifier;
+    show authProvider, authProvider, AuthNotifier;
 
-// Token Management
-export 'package:soloadventurer/features/auth/presentation/providers/token_manager_provider.dart'
-    show tokenManagerProvider;
+// Token Management (Domain service with FeatureAvailability state)
+export 'package:soloadventurer/features/auth/domain/services/token_manager.dart'
+    show tokenManagerProvider, TokenManager, FeatureAvailability, FeatureAvailabilityX;
 
 // Navigation
 export 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart'

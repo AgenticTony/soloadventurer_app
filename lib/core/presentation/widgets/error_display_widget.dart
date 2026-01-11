@@ -74,7 +74,7 @@ class ErrorDisplayWidget extends StatelessWidget {
         iconData = Icons.info_outline;
         break;
       case ErrorSeverity.warning:
-        backgroundColor = colorScheme.errorContainer.withValues(alpha:0.3);
+        backgroundColor = colorScheme.errorContainer.withValues(alpha: 0.3);
         iconColor = Colors.orange.shade700;
         iconData = Icons.warning_amber_outlined;
         break;
@@ -95,7 +95,7 @@ class ErrorDisplayWidget extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: iconColor.withValues(alpha:0.3),
+          color: iconColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -147,7 +147,7 @@ class ErrorDisplayWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: iconColor.withValues(alpha:0.1),
+        color: iconColor.withValues(alpha: 0.1),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(12),
           topRight: Radius.circular(12),
@@ -172,7 +172,7 @@ class ErrorDisplayWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha:0.2),
+                color: iconColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
@@ -222,15 +222,15 @@ class ErrorDisplayWidget extends StatelessWidget {
       title: Text(
         'Technical Details',
         style: theme.textTheme.labelSmall?.copyWith(
-          color: colorScheme.onSurface.withValues(alpha:0.6),
+          color: colorScheme.onSurface.withValues(alpha: 0.6),
         ),
       ),
-      iconColor: colorScheme.onSurface.withValues(alpha:0.6),
+      iconColor: colorScheme.onSurface.withValues(alpha: 0.6),
       children: [
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
+            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -272,7 +272,7 @@ class ErrorDisplayWidget extends StatelessWidget {
                 Text(
                   'Error ID: ${error.id}',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha:0.5),
+                    color: colorScheme.onSurface.withValues(alpha: 0.5),
                     fontFamily: 'monospace',
                   ),
                 ),

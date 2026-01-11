@@ -4,7 +4,7 @@ part 'base_travel_operation.freezed.dart';
 part 'base_travel_operation.g.dart';
 
 @freezed
-class BaseTravelOperation with _$BaseTravelOperation {
+sealed class BaseTravelOperation with _$BaseTravelOperation {
   const factory BaseTravelOperation({
     required String id,
     required String type,

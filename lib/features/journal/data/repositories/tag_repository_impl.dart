@@ -19,7 +19,7 @@ class TagRepositoryImpl implements TagRepository {
       final createdTag = await remoteDataSource.createTag(tagModel);
       return Right(createdTag.toEntity());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -31,7 +31,7 @@ class TagRepositoryImpl implements TagRepository {
       final tag = await remoteDataSource.getTag(tagId);
       return Right(tag.toEntity());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -43,7 +43,7 @@ class TagRepositoryImpl implements TagRepository {
       final tags = await remoteDataSource.getTags();
       return Right(tags.map((t) => t.toEntity()).toList());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -55,7 +55,7 @@ class TagRepositoryImpl implements TagRepository {
       final tags = await remoteDataSource.getTagsForEntry(entryId);
       return Right(tags.map((t) => t.toEntity()).toList());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -68,7 +68,7 @@ class TagRepositoryImpl implements TagRepository {
       final updatedTag = await remoteDataSource.updateTag(tagModel);
       return Right(updatedTag.toEntity());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -80,7 +80,7 @@ class TagRepositoryImpl implements TagRepository {
       await remoteDataSource.deleteTag(tagId);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -95,7 +95,7 @@ class TagRepositoryImpl implements TagRepository {
       await remoteDataSource.addTagToEntry(entryId, tagId);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -110,7 +110,7 @@ class TagRepositoryImpl implements TagRepository {
       await remoteDataSource.removeTagFromEntry(entryId, tagId);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -125,7 +125,7 @@ class TagRepositoryImpl implements TagRepository {
       await remoteDataSource.updateTagsForEntry(entryId, tagIds);
       return const Right(null);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -137,7 +137,7 @@ class TagRepositoryImpl implements TagRepository {
       final tags = await remoteDataSource.getPopularTags(limit: limit);
       return Right(tags.map((t) => t.toEntity()).toList());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -149,7 +149,7 @@ class TagRepositoryImpl implements TagRepository {
       final tags = await remoteDataSource.searchTags(query);
       return Right(tags.map((t) => t.toEntity()).toList());
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      return Left(ServerFailure(message: e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }

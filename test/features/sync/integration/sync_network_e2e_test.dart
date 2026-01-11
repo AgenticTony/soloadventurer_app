@@ -352,7 +352,8 @@ void main() {
       await syncService.processQueue();
 
       // Assert: Sync should have started when coming online
-      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
+      expect(syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
     test('should handle offline mode with persistence across restarts',
@@ -447,7 +448,8 @@ void main() {
       await syncService.processQueue();
 
       // Assert: Sync should complete (conflict detection handled by service)
-      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
+      expect(syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
     test('should handle multiple offline to online transitions', () async {
@@ -479,7 +481,8 @@ void main() {
 
       // Assert: All operations should sync
       expect(syncService.queueSize, equals(0));
-      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
+      expect(syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
   });
 
@@ -790,7 +793,8 @@ void main() {
       await syncService.processQueue();
 
       // Assert: Sync should complete
-      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
+      expect(syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
     test('should handle manual sync trigger while auto-sync is running',
@@ -914,7 +918,8 @@ void main() {
 
       // Assert: Sync should complete (conflict resolved)
       expect(syncService.queueSize, equals(0));
-      expect(syncService.status, anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
+      expect(syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle));
     });
 
     test('should handle manual sync cancellation', () async {

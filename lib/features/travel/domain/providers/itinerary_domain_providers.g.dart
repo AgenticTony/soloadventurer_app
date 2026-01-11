@@ -11,7 +11,7 @@ part of 'itinerary_domain_providers.dart';
 /// Provider for the AppDatabase
 
 @ProviderFor(appDatabase)
-final appDatabaseProvider = AppDatabaseProvider._();
+const appDatabaseProvider = AppDatabaseProvider._();
 
 /// Provider for the AppDatabase
 
@@ -19,7 +19,7 @@ final class AppDatabaseProvider
     extends $FunctionalProvider<AppDatabase, AppDatabase, AppDatabase>
     with $Provider<AppDatabase> {
   /// Provider for the AppDatabase
-  AppDatabaseProvider._()
+  const AppDatabaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -57,7 +57,7 @@ String _$appDatabaseHash() => r'ce844862e38d714cf6ce7ffb7730dcbaca6dd188';
 /// Provider for the ItineraryDao
 
 @ProviderFor(itineraryDao)
-final itineraryDaoProvider = ItineraryDaoProvider._();
+const itineraryDaoProvider = ItineraryDaoProvider._();
 
 /// Provider for the ItineraryDao
 
@@ -65,7 +65,7 @@ final class ItineraryDaoProvider
     extends $FunctionalProvider<ItineraryDao, ItineraryDao, ItineraryDao>
     with $Provider<ItineraryDao> {
   /// Provider for the ItineraryDao
-  ItineraryDaoProvider._()
+  const ItineraryDaoProvider._()
       : super(
           from: null,
           argument: null,
@@ -103,7 +103,7 @@ String _$itineraryDaoHash() => r'496946c4379d739d1c1ef867c19f487220e7c8fd';
 /// Provider for the ItineraryRepository
 
 @ProviderFor(itineraryRepository)
-final itineraryRepositoryProvider = ItineraryRepositoryProvider._();
+const itineraryRepositoryProvider = ItineraryRepositoryProvider._();
 
 /// Provider for the ItineraryRepository
 
@@ -112,7 +112,7 @@ final class ItineraryRepositoryProvider extends $FunctionalProvider<
     ItineraryRepository,
     ItineraryRepository> with $Provider<ItineraryRepository> {
   /// Provider for the ItineraryRepository
-  ItineraryRepositoryProvider._()
+  const ItineraryRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -152,7 +152,7 @@ String _$itineraryRepositoryHash() =>
 /// Provider for GetItinerary use case
 
 @ProviderFor(getItinerary)
-final getItineraryProvider = GetItineraryProvider._();
+const getItineraryProvider = GetItineraryProvider._();
 
 /// Provider for GetItinerary use case
 
@@ -160,7 +160,7 @@ final class GetItineraryProvider
     extends $FunctionalProvider<GetItinerary, GetItinerary, GetItinerary>
     with $Provider<GetItinerary> {
   /// Provider for GetItinerary use case
-  GetItineraryProvider._()
+  const GetItineraryProvider._()
       : super(
           from: null,
           argument: null,
@@ -198,7 +198,7 @@ String _$getItineraryHash() => r'dba056e5d8ddea88dedcb4dc4052ca2c29a02d6a';
 /// Provider for GetItineraries use case
 
 @ProviderFor(getItineraries)
-final getItinerariesProvider = GetItinerariesProvider._();
+const getItinerariesProvider = GetItinerariesProvider._();
 
 /// Provider for GetItineraries use case
 
@@ -206,7 +206,7 @@ final class GetItinerariesProvider
     extends $FunctionalProvider<GetItineraries, GetItineraries, GetItineraries>
     with $Provider<GetItineraries> {
   /// Provider for GetItineraries use case
-  GetItinerariesProvider._()
+  const GetItinerariesProvider._()
       : super(
           from: null,
           argument: null,
@@ -244,14 +244,14 @@ String _$getItinerariesHash() => r'8ebc8f454ba27a4d31620c64d558e2a5ba72ca3b';
 /// Provider for CreateItinerary use case
 
 @ProviderFor(createItinerary)
-final createItineraryProvider = CreateItineraryProvider._();
+const createItineraryProvider = CreateItineraryProvider._();
 
 /// Provider for CreateItinerary use case
 
 final class CreateItineraryProvider extends $FunctionalProvider<CreateItinerary,
     CreateItinerary, CreateItinerary> with $Provider<CreateItinerary> {
   /// Provider for CreateItinerary use case
-  CreateItineraryProvider._()
+  const CreateItineraryProvider._()
       : super(
           from: null,
           argument: null,
@@ -289,7 +289,7 @@ String _$createItineraryHash() => r'7cad32c131ff97045128821e41cc7486c72c206c';
 /// Provider for AddItineraryItem use case
 
 @ProviderFor(addItineraryItem)
-final addItineraryItemProvider = AddItineraryItemProvider._();
+const addItineraryItemProvider = AddItineraryItemProvider._();
 
 /// Provider for AddItineraryItem use case
 
@@ -298,7 +298,7 @@ final class AddItineraryItemProvider extends $FunctionalProvider<
     AddItineraryItem,
     AddItineraryItem> with $Provider<AddItineraryItem> {
   /// Provider for AddItineraryItem use case
-  AddItineraryItemProvider._()
+  const AddItineraryItemProvider._()
       : super(
           from: null,
           argument: null,
@@ -336,7 +336,7 @@ String _$addItineraryItemHash() => r'9349e663256d5b1eac20e076389a3f4b6d8f3642';
 /// Provider for UpdateItineraryItem use case
 
 @ProviderFor(updateItineraryItem)
-final updateItineraryItemProvider = UpdateItineraryItemProvider._();
+const updateItineraryItemProvider = UpdateItineraryItemProvider._();
 
 /// Provider for UpdateItineraryItem use case
 
@@ -345,7 +345,7 @@ final class UpdateItineraryItemProvider extends $FunctionalProvider<
     UpdateItineraryItem,
     UpdateItineraryItem> with $Provider<UpdateItineraryItem> {
   /// Provider for UpdateItineraryItem use case
-  UpdateItineraryItemProvider._()
+  const UpdateItineraryItemProvider._()
       : super(
           from: null,
           argument: null,
@@ -385,7 +385,7 @@ String _$updateItineraryItemHash() =>
 /// Provider for RemoveItineraryItem use case
 
 @ProviderFor(removeItineraryItem)
-final removeItineraryItemProvider = RemoveItineraryItemProvider._();
+const removeItineraryItemProvider = RemoveItineraryItemProvider._();
 
 /// Provider for RemoveItineraryItem use case
 
@@ -394,7 +394,7 @@ final class RemoveItineraryItemProvider extends $FunctionalProvider<
     RemoveItineraryItem,
     RemoveItineraryItem> with $Provider<RemoveItineraryItem> {
   /// Provider for RemoveItineraryItem use case
-  RemoveItineraryItemProvider._()
+  const RemoveItineraryItemProvider._()
       : super(
           from: null,
           argument: null,
@@ -434,7 +434,7 @@ String _$removeItineraryItemHash() =>
 /// Provider for ReorderItineraryItems use case
 
 @ProviderFor(reorderItineraryItems)
-final reorderItineraryItemsProvider = ReorderItineraryItemsProvider._();
+const reorderItineraryItemsProvider = ReorderItineraryItemsProvider._();
 
 /// Provider for ReorderItineraryItems use case
 
@@ -443,7 +443,7 @@ final class ReorderItineraryItemsProvider extends $FunctionalProvider<
     ReorderItineraryItems,
     ReorderItineraryItems> with $Provider<ReorderItineraryItems> {
   /// Provider for ReorderItineraryItems use case
-  ReorderItineraryItemsProvider._()
+  const ReorderItineraryItemsProvider._()
       : super(
           from: null,
           argument: null,
@@ -483,7 +483,7 @@ String _$reorderItineraryItemsHash() =>
 /// Provider for ToggleItemCompletion use case
 
 @ProviderFor(toggleItemCompletion)
-final toggleItemCompletionProvider = ToggleItemCompletionProvider._();
+const toggleItemCompletionProvider = ToggleItemCompletionProvider._();
 
 /// Provider for ToggleItemCompletion use case
 
@@ -492,7 +492,7 @@ final class ToggleItemCompletionProvider extends $FunctionalProvider<
     ToggleItemCompletion,
     ToggleItemCompletion> with $Provider<ToggleItemCompletion> {
   /// Provider for ToggleItemCompletion use case
-  ToggleItemCompletionProvider._()
+  const ToggleItemCompletionProvider._()
       : super(
           from: null,
           argument: null,
@@ -532,7 +532,7 @@ String _$toggleItemCompletionHash() =>
 /// Provider for GetItemsForDay use case
 
 @ProviderFor(getItemsForDay)
-final getItemsForDayProvider = GetItemsForDayProvider._();
+const getItemsForDayProvider = GetItemsForDayProvider._();
 
 /// Provider for GetItemsForDay use case
 
@@ -540,7 +540,7 @@ final class GetItemsForDayProvider
     extends $FunctionalProvider<GetItemsForDay, GetItemsForDay, GetItemsForDay>
     with $Provider<GetItemsForDay> {
   /// Provider for GetItemsForDay use case
-  GetItemsForDayProvider._()
+  const GetItemsForDayProvider._()
       : super(
           from: null,
           argument: null,

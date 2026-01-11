@@ -267,8 +267,6 @@ extension PhotoPatterns on Photo {
     switch (_that) {
       case _Photo():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -398,8 +396,6 @@ extension PhotoPatterns on Photo {
             _that.height,
             _that.sizeInBytes,
             _that.createdAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

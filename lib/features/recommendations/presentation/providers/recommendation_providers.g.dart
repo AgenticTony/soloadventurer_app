@@ -14,7 +14,7 @@ part of 'recommendation_providers.dart';
 /// In production, Google Places API integration should be completed.
 
 @ProviderFor(placesRemoteDataSource)
-final placesRemoteDataSourceProvider = PlacesRemoteDataSourceProvider._();
+const placesRemoteDataSourceProvider = PlacesRemoteDataSourceProvider._();
 
 /// Provider for places remote data source
 ///
@@ -29,7 +29,7 @@ final class PlacesRemoteDataSourceProvider extends $FunctionalProvider<
   ///
   /// Uses PlacesRemoteDataSourceImpl with ApiClient for real API calls.
   /// In production, Google Places API integration should be completed.
-  PlacesRemoteDataSourceProvider._()
+  const PlacesRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -69,7 +69,7 @@ String _$placesRemoteDataSourceHash() =>
 /// Provider for places repository
 
 @ProviderFor(placesRepository)
-final placesRepositoryProvider = PlacesRepositoryProvider._();
+const placesRepositoryProvider = PlacesRepositoryProvider._();
 
 /// Provider for places repository
 
@@ -78,7 +78,7 @@ final class PlacesRepositoryProvider extends $FunctionalProvider<
     PlacesRepository,
     PlacesRepository> with $Provider<PlacesRepository> {
   /// Provider for places repository
-  PlacesRepositoryProvider._()
+  const PlacesRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -116,7 +116,7 @@ String _$placesRepositoryHash() => r'f43f194ce08c16a9807bbb2cc0739c63ef41e186';
 /// Provider for recommendation local data source
 
 @ProviderFor(recommendationLocalDataSource)
-final recommendationLocalDataSourceProvider =
+const recommendationLocalDataSourceProvider =
     RecommendationLocalDataSourceProvider._();
 
 /// Provider for recommendation local data source
@@ -127,7 +127,7 @@ final class RecommendationLocalDataSourceProvider extends $FunctionalProvider<
         RecommendationLocalDataSource>
     with $Provider<RecommendationLocalDataSource> {
   /// Provider for recommendation local data source
-  RecommendationLocalDataSourceProvider._()
+  const RecommendationLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -168,7 +168,7 @@ String _$recommendationLocalDataSourceHash() =>
 /// Provider for recommendation repository
 
 @ProviderFor(recommendationRepository)
-final recommendationRepositoryProvider = RecommendationRepositoryProvider._();
+const recommendationRepositoryProvider = RecommendationRepositoryProvider._();
 
 /// Provider for recommendation repository
 
@@ -177,7 +177,7 @@ final class RecommendationRepositoryProvider extends $FunctionalProvider<
     RecommendationRepository,
     RecommendationRepository> with $Provider<RecommendationRepository> {
   /// Provider for recommendation repository
-  RecommendationRepositoryProvider._()
+  const RecommendationRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -219,7 +219,7 @@ String _$recommendationRepositoryHash() =>
 /// Uses ItineraryLocalDataSourceImpl with ItineraryDao for real database operations.
 
 @ProviderFor(itineraryLocalDataSource)
-final itineraryLocalDataSourceProvider = ItineraryLocalDataSourceProvider._();
+const itineraryLocalDataSourceProvider = ItineraryLocalDataSourceProvider._();
 
 /// Provider for itinerary local data source
 ///
@@ -232,7 +232,7 @@ final class ItineraryLocalDataSourceProvider extends $FunctionalProvider<
   /// Provider for itinerary local data source
   ///
   /// Uses ItineraryLocalDataSourceImpl with ItineraryDao for real database operations.
-  ItineraryLocalDataSourceProvider._()
+  const ItineraryLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -272,7 +272,7 @@ String _$itineraryLocalDataSourceHash() =>
 /// Provider for itinerary repository
 
 @ProviderFor(itineraryRepository)
-final itineraryRepositoryProvider = ItineraryRepositoryProvider._();
+const itineraryRepositoryProvider = ItineraryRepositoryProvider._();
 
 /// Provider for itinerary repository
 
@@ -281,7 +281,7 @@ final class ItineraryRepositoryProvider extends $FunctionalProvider<
     ItineraryRepository,
     ItineraryRepository> with $Provider<ItineraryRepository> {
   /// Provider for itinerary repository
-  ItineraryRepositoryProvider._()
+  const ItineraryRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -321,7 +321,7 @@ String _$itineraryRepositoryHash() =>
 /// Provider for recommendation service
 
 @ProviderFor(recommendationService)
-final recommendationServiceProvider = RecommendationServiceProvider._();
+const recommendationServiceProvider = RecommendationServiceProvider._();
 
 /// Provider for recommendation service
 
@@ -330,7 +330,7 @@ final class RecommendationServiceProvider extends $FunctionalProvider<
     RecommendationService,
     RecommendationService> with $Provider<RecommendationService> {
   /// Provider for recommendation service
-  RecommendationServiceProvider._()
+  const RecommendationServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -370,7 +370,7 @@ String _$recommendationServiceHash() =>
 /// Provider for GetPersonalizedRecommendations use case
 
 @ProviderFor(getPersonalizedRecommendations)
-final getPersonalizedRecommendationsProvider =
+const getPersonalizedRecommendationsProvider =
     GetPersonalizedRecommendationsProvider._();
 
 /// Provider for GetPersonalizedRecommendations use case
@@ -381,7 +381,7 @@ final class GetPersonalizedRecommendationsProvider extends $FunctionalProvider<
         GetPersonalizedRecommendations>
     with $Provider<GetPersonalizedRecommendations> {
   /// Provider for GetPersonalizedRecommendations use case
-  GetPersonalizedRecommendationsProvider._()
+  const GetPersonalizedRecommendationsProvider._()
       : super(
           from: null,
           argument: null,
@@ -422,7 +422,7 @@ String _$getPersonalizedRecommendationsHash() =>
 /// Provider for GetRecommendationsForDate use case
 
 @ProviderFor(getRecommendationsForDate)
-final getRecommendationsForDateProvider = GetRecommendationsForDateProvider._();
+const getRecommendationsForDateProvider = GetRecommendationsForDateProvider._();
 
 /// Provider for GetRecommendationsForDate use case
 
@@ -431,7 +431,7 @@ final class GetRecommendationsForDateProvider extends $FunctionalProvider<
     GetRecommendationsForDate,
     GetRecommendationsForDate> with $Provider<GetRecommendationsForDate> {
   /// Provider for GetRecommendationsForDate use case
-  GetRecommendationsForDateProvider._()
+  const GetRecommendationsForDateProvider._()
       : super(
           from: null,
           argument: null,
@@ -471,7 +471,7 @@ String _$getRecommendationsForDateHash() =>
 /// Provider for AddRecommendationToItinerary use case
 
 @ProviderFor(addRecommendationToItinerary)
-final addRecommendationToItineraryProvider =
+const addRecommendationToItineraryProvider =
     AddRecommendationToItineraryProvider._();
 
 /// Provider for AddRecommendationToItinerary use case
@@ -481,7 +481,7 @@ final class AddRecommendationToItineraryProvider extends $FunctionalProvider<
     AddRecommendationToItinerary,
     AddRecommendationToItinerary> with $Provider<AddRecommendationToItinerary> {
   /// Provider for AddRecommendationToItinerary use case
-  AddRecommendationToItineraryProvider._()
+  const AddRecommendationToItineraryProvider._()
       : super(
           from: null,
           argument: null,
@@ -521,7 +521,7 @@ String _$addRecommendationToItineraryHash() =>
 /// Provider for ProvideRecommendationFeedback use case
 
 @ProviderFor(provideRecommendationFeedback)
-final provideRecommendationFeedbackProvider =
+const provideRecommendationFeedbackProvider =
     ProvideRecommendationFeedbackProvider._();
 
 /// Provider for ProvideRecommendationFeedback use case
@@ -532,7 +532,7 @@ final class ProvideRecommendationFeedbackProvider extends $FunctionalProvider<
         ProvideRecommendationFeedback>
     with $Provider<ProvideRecommendationFeedback> {
   /// Provider for ProvideRecommendationFeedback use case
-  ProvideRecommendationFeedbackProvider._()
+  const ProvideRecommendationFeedbackProvider._()
       : super(
           from: null,
           argument: null,
@@ -574,7 +574,7 @@ String _$provideRecommendationFeedbackHash() =>
 /// TODO: Implement actual weather service integration
 
 @ProviderFor(weatherService)
-final weatherServiceProvider = WeatherServiceProvider._();
+const weatherServiceProvider = WeatherServiceProvider._();
 
 /// Provider for weather service - uses stub implementation
 /// TODO: Implement actual weather service integration
@@ -584,7 +584,7 @@ final class WeatherServiceProvider
     with $Provider<WeatherService> {
   /// Provider for weather service - uses stub implementation
   /// TODO: Implement actual weather service integration
-  WeatherServiceProvider._()
+  const WeatherServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -622,14 +622,14 @@ String _$weatherServiceHash() => r'a869ce7c09091bbc9a31d86d8d962c9d5603b49b';
 /// Provider for location service - uses implementation from core services
 
 @ProviderFor(locationService)
-final locationServiceProvider = LocationServiceProvider._();
+const locationServiceProvider = LocationServiceProvider._();
 
 /// Provider for location service - uses implementation from core services
 
 final class LocationServiceProvider extends $FunctionalProvider<LocationService,
     LocationService, LocationService> with $Provider<LocationService> {
   /// Provider for location service - uses implementation from core services
-  LocationServiceProvider._()
+  const LocationServiceProvider._()
       : super(
           from: null,
           argument: null,

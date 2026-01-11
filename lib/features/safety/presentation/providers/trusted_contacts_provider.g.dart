@@ -18,7 +18,7 @@ part of 'trusted_contacts_provider.dart';
 /// - UI calls methods via ref.read(provider.notifier)
 
 @ProviderFor(TrustedContacts)
-final trustedContactsProvider = TrustedContactsProvider._();
+const trustedContactsProvider = TrustedContactsProvider._();
 
 /// Notifier for managing trusted contacts state
 /// Handles CRUD operations for trusted contacts
@@ -38,7 +38,7 @@ final class TrustedContactsProvider
   /// - NO getters in state - all derived values are fields
   /// - UI reads STATE only via ref.watch()
   /// - UI calls methods via ref.read(provider.notifier)
-  TrustedContactsProvider._()
+  const TrustedContactsProvider._()
       : super(
           from: null,
           argument: null,
@@ -81,12 +81,13 @@ abstract class _$TrustedContacts extends $Notifier<TrustedContactsState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<TrustedContactsState, TrustedContactsState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TrustedContactsState, TrustedContactsState>,
         TrustedContactsState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

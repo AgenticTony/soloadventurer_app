@@ -34,10 +34,10 @@ class ConflictBanner extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: severityColor.withValues(alpha:0.1),
+        color: severityColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: severityColor.withValues(alpha:0.5),
+          color: severityColor.withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -47,7 +47,7 @@ class ConflictBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: severityColor.withValues(alpha:0.2),
+              color: severityColor.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -90,7 +90,7 @@ class ConflictBanner extends StatelessWidget {
               FilledButton.tonal(
                 onPressed: onResolve,
                 style: FilledButton.styleFrom(
-                  backgroundColor: severityColor.withValues(alpha:0.2),
+                  backgroundColor: severityColor.withValues(alpha: 0.2),
                   foregroundColor: severityColor,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -106,7 +106,7 @@ class ConflictBanner extends StatelessWidget {
                 IconButton(
                   onPressed: onDismiss,
                   icon: const Icon(Icons.close),
-                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
@@ -182,15 +182,15 @@ class MultipleConflictsBanner extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            highestSeverity.withValues(alpha:0.15),
-            highestSeverity.withValues(alpha:0.05),
+            highestSeverity.withValues(alpha: 0.15),
+            highestSeverity.withValues(alpha: 0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: highestSeverity.withValues(alpha:0.5),
+          color: highestSeverity.withValues(alpha: 0.5),
           width: 1,
         ),
       ),
@@ -200,7 +200,7 @@ class MultipleConflictsBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: highestSeverity.withValues(alpha:0.2),
+              color: highestSeverity.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -241,7 +241,7 @@ class MultipleConflictsBanner extends StatelessWidget {
               FilledButton.tonal(
                 onPressed: onViewAll,
                 style: FilledButton.styleFrom(
-                  backgroundColor: highestSeverity.withValues(alpha:0.2),
+                  backgroundColor: highestSeverity.withValues(alpha: 0.2),
                   foregroundColor: highestSeverity,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -257,7 +257,7 @@ class MultipleConflictsBanner extends StatelessWidget {
                 IconButton(
                   onPressed: onDismiss,
                   icon: const Icon(Icons.close),
-                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),

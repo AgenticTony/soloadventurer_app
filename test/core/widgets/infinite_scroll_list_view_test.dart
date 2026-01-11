@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/core/models/paginated_data.dart';
-import 'package:soloadventurer/core/models/page_info.dart';
 import 'package:soloadventurer/core/widgets/infinite_scroll_list_view.dart';
 
 void main() {

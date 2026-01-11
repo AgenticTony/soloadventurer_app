@@ -346,8 +346,10 @@ void main() {
 
       // Assert
       verify(mockNetworkConnectivity.onOnline).called(greaterThanOrEqualTo(1));
-      expect(syncService.status,
-          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle, SyncOperationStatus.pending));
+      expect(
+          syncService.status,
+          anyOf(SyncOperationStatus.success, SyncOperationStatus.idle,
+              SyncOperationStatus.pending));
 
       await connectivityController.close();
       syncService.dispose();

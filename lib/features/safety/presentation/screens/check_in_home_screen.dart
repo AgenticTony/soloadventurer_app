@@ -21,13 +21,13 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
     super.initState();
     // Load upcoming check-ins when screen initializes
     Future.microtask(() {
-      ref.read(checkInNotifierProvider.notifier).loadUpcomingCheckIns();
+      ref.read(checkInProvider.notifier).loadUpcomingCheckIns();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final checkInState = ref.watch(checkInNotifierProvider);
+    final checkInState = ref.watch(checkInProvider);
     final upcomingCheckIns = checkInState.upcomingCheckIns;
     final nextCheckIn = checkInState.nextCheckIn;
     final isLoading = checkInState.isLoading;
@@ -450,7 +450,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
             ElevatedButton.icon(
               onPressed: () {
                 ref
-                    .read(checkInNotifierProvider.notifier)
+                    .read(checkInProvider.notifier)
                     .loadUpcomingCheckIns();
               },
               icon: const Icon(Icons.refresh),

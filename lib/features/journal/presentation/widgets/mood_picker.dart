@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/core/utils/string_extensions.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 
 /// Predefined mood options with emoji and label
@@ -132,7 +133,7 @@ class MoodPicker extends ConsumerWidget {
         decoration: BoxDecoration(
           border: Border.all(
             color: selectedMoodId != null
-                ? theme.colorScheme.primary.withValues(alpha:0.5)
+                ? theme.colorScheme.primary.withValues(alpha: 0.5)
                 : theme.dividerColor,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -172,8 +173,8 @@ class MoodPicker extends ConsumerWidget {
                         icon: const Icon(Icons.clear, size: 16),
                         label: const Text('Clear'),
                         style: TextButton.styleFrom(
-                          foregroundColor:
-                              theme.colorScheme.onSurface.withValues(alpha:0.6),
+                          foregroundColor: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -245,7 +246,8 @@ class _MoodTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? theme.colorScheme.primaryContainer
-                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+                  : theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
@@ -324,7 +326,7 @@ class MoodPickerButton extends ConsumerWidget {
                       color: Theme.of(context)
                           .colorScheme
                           .onSurface
-                          .withValues(alpha:0.2),
+                          .withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -432,7 +434,7 @@ class MoodPickerButton extends ConsumerWidget {
                       : Icons.add,
                   color: selectedMood != null
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurface.withValues(alpha:0.6),
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -449,7 +451,7 @@ class MoodPickerButton extends ConsumerWidget {
                 const Spacer(),
                 Icon(
                   Icons.arrow_drop_down,
-                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ],
             ),
@@ -492,7 +494,8 @@ class _MoodTileForBottomSheet extends ConsumerWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? theme.colorScheme.primaryContainer
-                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+                  : theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color:
@@ -528,10 +531,4 @@ class _MoodTileForBottomSheet extends ConsumerWidget {
       ),
     );
   }
-}
-
-/// Extension for string capitalization
-extension StringCapitalization on String {
-  String toCapitalized() =>
-      length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : this;
 }

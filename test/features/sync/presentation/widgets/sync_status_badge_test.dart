@@ -239,7 +239,8 @@ void main() {
         ),
       );
 
-      expect(find.byType(SyncOperationStatusBadgeWithIndicator), findsOneWidget);
+      expect(
+          find.byType(SyncOperationStatusBadgeWithIndicator), findsOneWidget);
       expect(find.text('3'), findsOneWidget);
       expect(find.textContaining('pending'), findsOneWidget);
     });
@@ -284,7 +285,8 @@ void main() {
         ),
       );
 
-      expect(find.byType(SyncOperationStatusBadgeWithIndicator), findsOneWidget);
+      expect(
+          find.byType(SyncOperationStatusBadgeWithIndicator), findsOneWidget);
     });
 
     testWidgets('hides count circle when count is 0', (tester) async {
@@ -320,8 +322,10 @@ void main() {
             body: ListView(
               children: const [
                 SyncOperationStatusBadge(count: 1, child: Icon(Icons.mail)),
-                SyncOperationStatusBadge(count: 5, child: Icon(Icons.notifications)),
-                SyncOperationStatusBadge(count: 10, child: Icon(Icons.calendar)),
+                SyncOperationStatusBadge(
+                    count: 5, child: Icon(Icons.notifications)),
+                SyncOperationStatusBadge(
+                    count: 10, child: Icon(Icons.calendar)),
               ],
             ),
           ),

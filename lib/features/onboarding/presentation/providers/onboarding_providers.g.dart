@@ -20,7 +20,7 @@ part of 'onboarding_providers.dart';
 /// is complete.
 
 @ProviderFor(itineraryGenerationRepository)
-final itineraryGenerationRepositoryProvider =
+const itineraryGenerationRepositoryProvider =
     ItineraryGenerationRepositoryProvider._();
 
 /// Provider for the itinerary generation repository
@@ -49,7 +49,7 @@ final class ItineraryGenerationRepositoryProvider extends $FunctionalProvider<
   /// In production, this should be replaced with GetIt injection of the
   /// actual service implementation when the itinerary generation service
   /// is complete.
-  ItineraryGenerationRepositoryProvider._()
+  const ItineraryGenerationRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -93,7 +93,7 @@ String _$itineraryGenerationRepositoryHash() =>
 /// from onboarding data.
 
 @ProviderFor(generateStarterItinerary)
-final generateStarterItineraryProvider = GenerateStarterItineraryProvider._();
+const generateStarterItineraryProvider = GenerateStarterItineraryProvider._();
 
 /// Provider for the generate starter itinerary use case
 ///
@@ -108,7 +108,7 @@ final class GenerateStarterItineraryProvider extends $FunctionalProvider<
   ///
   /// Provides the use case that orchestrates itinerary generation
   /// from onboarding data.
-  GenerateStarterItineraryProvider._()
+  const GenerateStarterItineraryProvider._()
       : super(
           from: null,
           argument: null,
@@ -151,7 +151,7 @@ String _$generateStarterItineraryHash() =>
 /// from the OnboardingState.
 
 @ProviderFor(currentOnboardingData)
-final currentOnboardingDataProvider = CurrentOnboardingDataProvider._();
+const currentOnboardingDataProvider = CurrentOnboardingDataProvider._();
 
 /// Provider for accessing the current onboarding data
 ///
@@ -166,7 +166,7 @@ final class CurrentOnboardingDataProvider extends $FunctionalProvider<
   ///
   /// Convenience provider that extracts the current OnboardingData
   /// from the OnboardingState.
-  CurrentOnboardingDataProvider._()
+  const CurrentOnboardingDataProvider._()
       : super(
           from: null,
           argument: null,
@@ -200,7 +200,7 @@ final class CurrentOnboardingDataProvider extends $FunctionalProvider<
 }
 
 String _$currentOnboardingDataHash() =>
-    r'af0fca7afb96ebbb8b483bc88dc8d8bb19710a40';
+    r'a69ef526c34f66061f973682c18ff68d86b936f3';
 
 /// Provider for checking if the form is valid
 ///
@@ -208,7 +208,7 @@ String _$currentOnboardingDataHash() =>
 /// from the OnboardingState.
 
 @ProviderFor(isOnboardingFormValid)
-final isOnboardingFormValidProvider = IsOnboardingFormValidProvider._();
+const isOnboardingFormValidProvider = IsOnboardingFormValidProvider._();
 
 /// Provider for checking if the form is valid
 ///
@@ -221,7 +221,7 @@ final class IsOnboardingFormValidProvider
   ///
   /// Convenience provider that extracts the validation status
   /// from the OnboardingState.
-  IsOnboardingFormValidProvider._()
+  const IsOnboardingFormValidProvider._()
       : super(
           from: null,
           argument: null,
@@ -255,7 +255,7 @@ final class IsOnboardingFormValidProvider
 }
 
 String _$isOnboardingFormValidHash() =>
-    r'ca61be0d40894ec7366ed6aed3eb3af38b6d4063';
+    r'dbe5fc012b12179471324e4cb32e30a244090620';
 
 /// Provider for accessing validation errors
 ///
@@ -263,7 +263,7 @@ String _$isOnboardingFormValidHash() =>
 /// from the OnboardingState.
 
 @ProviderFor(onboardingValidationErrors)
-final onboardingValidationErrorsProvider =
+const onboardingValidationErrorsProvider =
     OnboardingValidationErrorsProvider._();
 
 /// Provider for accessing validation errors
@@ -278,7 +278,7 @@ final class OnboardingValidationErrorsProvider
   ///
   /// Convenience provider that extracts validation errors
   /// from the OnboardingState.
-  OnboardingValidationErrorsProvider._()
+  const OnboardingValidationErrorsProvider._()
       : super(
           from: null,
           argument: null,
@@ -312,7 +312,7 @@ final class OnboardingValidationErrorsProvider
 }
 
 String _$onboardingValidationErrorsHash() =>
-    r'70df35f149943252bb026d86f7f8770d225edbe9';
+    r'ede8108d582704c1fbe41d24f9362d5cfe6a1a5c';
 
 /// Provider for checking if the form is submitting
 ///
@@ -320,7 +320,7 @@ String _$onboardingValidationErrorsHash() =>
 /// from the OnboardingState.
 
 @ProviderFor(isOnboardingSubmitting)
-final isOnboardingSubmittingProvider = IsOnboardingSubmittingProvider._();
+const isOnboardingSubmittingProvider = IsOnboardingSubmittingProvider._();
 
 /// Provider for checking if the form is submitting
 ///
@@ -333,7 +333,7 @@ final class IsOnboardingSubmittingProvider
   ///
   /// Convenience provider that extracts the submitting status
   /// from the OnboardingState.
-  IsOnboardingSubmittingProvider._()
+  const IsOnboardingSubmittingProvider._()
       : super(
           from: null,
           argument: null,
@@ -367,7 +367,7 @@ final class IsOnboardingSubmittingProvider
 }
 
 String _$isOnboardingSubmittingHash() =>
-    r'07314e8cfa63c5d06fe010ce887c91e362564f1f';
+    r'6d0293904b9c34c471a9d359752cb3ae19764011';
 
 /// Provider for accessing the generated itinerary
 ///
@@ -375,7 +375,7 @@ String _$isOnboardingSubmittingHash() =>
 /// OnboardingState when available.
 
 @ProviderFor(generatedItinerary)
-final generatedItineraryProvider = GeneratedItineraryProvider._();
+const generatedItineraryProvider = GeneratedItineraryProvider._();
 
 /// Provider for accessing the generated itinerary
 ///
@@ -390,7 +390,7 @@ final class GeneratedItineraryProvider extends $FunctionalProvider<
   ///
   /// Convenience provider that extracts the itinerary from the
   /// OnboardingState when available.
-  GeneratedItineraryProvider._()
+  const GeneratedItineraryProvider._()
       : super(
           from: null,
           argument: null,
@@ -425,7 +425,7 @@ final class GeneratedItineraryProvider extends $FunctionalProvider<
 }
 
 String _$generatedItineraryHash() =>
-    r'950cba847cdea72feef66253db09c69e6e260e14';
+    r'65d886619937282e15d3277f5506d989678a979b';
 
 /// Provider for accessing the error message
 ///
@@ -433,7 +433,7 @@ String _$generatedItineraryHash() =>
 /// from the OnboardingState when available.
 
 @ProviderFor(onboardingErrorMessage)
-final onboardingErrorMessageProvider = OnboardingErrorMessageProvider._();
+const onboardingErrorMessageProvider = OnboardingErrorMessageProvider._();
 
 /// Provider for accessing the error message
 ///
@@ -447,7 +447,7 @@ final class OnboardingErrorMessageProvider
   ///
   /// Convenience provider that extracts the error message
   /// from the OnboardingState when available.
-  OnboardingErrorMessageProvider._()
+  const OnboardingErrorMessageProvider._()
       : super(
           from: null,
           argument: null,
@@ -481,4 +481,4 @@ final class OnboardingErrorMessageProvider
 }
 
 String _$onboardingErrorMessageHash() =>
-    r'c6a9c99278347d32a4b7de50b7500bc525a53aaf';
+    r'fec5d127282c5e5d061f045fd70643102c24b5e9';

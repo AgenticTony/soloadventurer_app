@@ -640,7 +640,7 @@ class NotificationServiceImpl implements NotificationService {
 
 /// Provider for NotificationServiceImpl
 @riverpod
-NotificationService notificationServiceImpl(NotificationServiceImplRef ref) {
+NotificationService notificationServiceImpl(Ref ref) {
   final service = NotificationServiceImpl();
 
   // Initialize the service
@@ -652,6 +652,6 @@ NotificationService notificationServiceImpl(NotificationServiceImplRef ref) {
 /// Provider override for NotificationService interface
 @riverpod
 NotificationService notificationServiceOverride(
-    NotificationServiceOverrideRef ref) {
+    Ref ref) {
   return ref.watch(notificationServiceImplProvider);
 }

@@ -1,3 +1,4 @@
+import 'package:soloadventurer/core/utils/string_extensions.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -70,7 +71,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             Text(
               error,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -99,7 +100,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
           Icon(
             Icons.not_interested,
             size: 64,
-            color: theme.colorScheme.onSurface.withValues(alpha:0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 16),
           Text(
@@ -110,7 +111,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
           Text(
             'The journal entry you\'re looking for doesn\'t exist.',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -301,7 +302,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
         Text(
           '${dateFormatter.format(entry.entryDate)} at ${timeFormatter.format(entry.entryDate)}',
           style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha:0.8),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -316,7 +317,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
           Text(
             entry.locationName ?? 'Unknown location',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha:0.8),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -334,7 +335,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -380,7 +381,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             Text(
               '(${mediaItems.length})',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -390,7 +391,8 @@ class JournalEntryDetailScreen extends ConsumerWidget {
         Container(
           height: 200,
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+            color: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
@@ -400,13 +402,13 @@ class JournalEntryDetailScreen extends ConsumerWidget {
                 Icon(
                   Icons.photo_library_outlined,
                   size: 48,
-                  color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Media viewer coming in Phase 3',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ],
@@ -444,7 +446,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
                   Text(
                     'Trip ID: $tripId',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -452,7 +454,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             ),
             Icon(
               Icons.chevron_right,
-              color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
             ),
           ],
         ),
@@ -490,9 +492,9 @@ class JournalEntryDetailScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha:0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha:0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -518,7 +520,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -528,14 +530,14 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             'Entry Info',
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Created ${createdFormatter.format(entry.createdAt)}',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
           if (entry.updatedAt != entry.createdAt) ...[
@@ -543,7 +545,7 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             Text(
               'Updated ${createdFormatter.format(entry.updatedAt)}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -631,10 +633,4 @@ class JournalEntryDetailScreen extends ConsumerWidget {
     }
     return '😊'; // Default
   }
-}
-
-/// Extension to capitalize the first letter of a string
-extension StringCapitalization on String {
-  String toCapitalized() =>
-      length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : this;
 }

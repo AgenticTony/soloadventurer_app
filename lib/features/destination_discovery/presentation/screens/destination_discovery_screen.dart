@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/destination.dart';
+import '../../domain/models/destination_filter.dart';
+import '../../application/state/destination_search_state.dart';
 import '../../application/providers/destination_search_provider.dart';
 import '../../application/providers/filter_provider.dart';
 import '../widgets/destination_card.dart';
@@ -276,7 +279,7 @@ class _DestinationDiscoveryScreenState
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: theme.colorScheme.outline.withValues(alpha:0.5),
+                color: theme.colorScheme.outline.withValues(alpha: 0.5),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -287,8 +290,8 @@ class _DestinationDiscoveryScreenState
               ),
             ),
             filled: true,
-            fillColor:
-                theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
+            fillColor: theme.colorScheme.surfaceContainerHighest
+                .withValues(alpha: 0.3),
           ),
         ),
       ),
@@ -330,11 +333,6 @@ class _DestinationDiscoveryScreenState
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
               childAspectRatio: 0.75,
-            ),
-            // Add estimated item extent for better scroll performance
-            prototypeItem: const SizedBox(
-              width: 200,
-              height: 280,
             ),
             itemCount: state.resultCount + (state.hasMore ? 1 : 0),
             itemBuilder: (context, index) {

@@ -15,7 +15,7 @@ part of 'journal_list_provider.dart';
 /// - Automatic provider generation via @riverpod annotation
 
 @ProviderFor(JournalList)
-final journalListProvider = JournalListProvider._();
+const journalListProvider = JournalListProvider._();
 
 /// Notifier for managing journal list state
 /// MIGRATION: StateNotifier → Notifier pattern
@@ -29,7 +29,7 @@ final class JournalListProvider
   /// - Constructor logic moved to build() method
   /// - Dependencies accessed via ref.watch() in methods
   /// - Automatic provider generation via @riverpod annotation
-  JournalListProvider._()
+  const JournalListProvider._()
       : super(
           from: null,
           argument: null,
@@ -69,13 +69,14 @@ abstract class _$JournalList extends $Notifier<JournalListState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<JournalListState, JournalListState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<JournalListState, JournalListState>,
         JournalListState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -83,7 +84,7 @@ abstract class _$JournalList extends $Notifier<JournalListState> {
 /// Computed from the main journalListProvider state
 
 @ProviderFor(journalEntriesByTrip)
-final journalEntriesByTripProvider = JournalEntriesByTripProvider._();
+const journalEntriesByTripProvider = JournalEntriesByTripProvider._();
 
 /// Provider for entries grouped by trip
 /// Computed from the main journalListProvider state
@@ -95,7 +96,7 @@ final class JournalEntriesByTripProvider extends $FunctionalProvider<
     with $Provider<Map<String?, List<JournalEntry>>> {
   /// Provider for entries grouped by trip
   /// Computed from the main journalListProvider state
-  JournalEntriesByTripProvider._()
+  const JournalEntriesByTripProvider._()
       : super(
           from: null,
           argument: null,
@@ -137,7 +138,7 @@ String _$journalEntriesByTripHash() =>
 /// Computed from the main journalListProvider state
 
 @ProviderFor(journalEntriesByDate)
-final journalEntriesByDateProvider = JournalEntriesByDateProvider._();
+const journalEntriesByDateProvider = JournalEntriesByDateProvider._();
 
 /// Provider for entries grouped by date
 /// Computed from the main journalListProvider state
@@ -149,7 +150,7 @@ final class JournalEntriesByDateProvider extends $FunctionalProvider<
     with $Provider<Map<String, List<JournalEntry>>> {
   /// Provider for entries grouped by date
   /// Computed from the main journalListProvider state
-  JournalEntriesByDateProvider._()
+  const JournalEntriesByDateProvider._()
       : super(
           from: null,
           argument: null,

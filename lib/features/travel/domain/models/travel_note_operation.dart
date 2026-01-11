@@ -16,9 +16,12 @@ enum NoteType {
 }
 
 @freezed
-class TravelNoteOperation
+sealed class TravelNoteOperation
     with _$TravelNoteOperation
     implements QueueableOperation {
+  // Private constructor for freezed with custom members
+  const TravelNoteOperation._();
+
   const factory TravelNoteOperation({
     required String id,
     required String tripId,
@@ -39,7 +42,6 @@ class TravelNoteOperation
 
   factory TravelNoteOperation.fromJson(Map<String, dynamic> json) =>
       _$TravelNoteOperationFromJson(json);
-
 
   /// Create a text note
   factory TravelNoteOperation.text({
@@ -156,7 +158,4 @@ class TravelNoteOperation
       lastError: null,
     );
   }
-
-  // Private constructor for freezed getters
-  const TravelNoteOperation._();
 }

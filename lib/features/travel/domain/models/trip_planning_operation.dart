@@ -17,9 +17,12 @@ enum TripPlanningType {
 }
 
 @freezed
-class TripPlanningOperation
+sealed class TripPlanningOperation
     with _$TripPlanningOperation
     implements QueueableOperation {
+  // Private constructor for freezed with custom members
+  const TripPlanningOperation._();
+
   const factory TripPlanningOperation({
     required String id,
     required String tripId,
@@ -38,9 +41,6 @@ class TripPlanningOperation
 
   factory TripPlanningOperation.fromJson(Map<String, dynamic> json) =>
       _$TripPlanningOperationFromJson(json);
-
-  const TripPlanningOperation._();
-
 
   /// Create a new trip planning operation
   factory TripPlanningOperation.create({

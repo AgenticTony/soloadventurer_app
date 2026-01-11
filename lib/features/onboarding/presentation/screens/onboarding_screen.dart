@@ -72,11 +72,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     // Watch for state changes to get isSubmitting status
-    final state = ref.watch(onboardingNotifierProvider);
+    final state = ref.watch(onboardingProvider);
     final isSubmitting = state.isSubmitting;
 
     // Listen for state changes
-    ref.listen<OnboardingState>(onboardingNotifierProvider, (previous, next) {
+    ref.listen<OnboardingState>(onboardingProvider, (previous, next) {
       switch (next) {
         case OnboardingInitial():
         case OnboardingInProgress():
@@ -214,7 +214,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             setState(() {
               _nameError = null;
             });
-            ref.read(onboardingNotifierProvider.notifier).updateName(value);
+            ref.read(onboardingProvider.notifier).updateName(value);
           },
         ),
       ],
@@ -283,7 +283,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       _destinationError = null;
                     });
                     ref
-                        .read(onboardingNotifierProvider.notifier)
+                        .read(onboardingProvider.notifier)
                         .updateDestination(_selectedDestination!);
                   },
                 ),
@@ -442,7 +442,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               _interestsError = null;
             });
             ref
-                .read(onboardingNotifierProvider.notifier)
+                .read(onboardingProvider.notifier)
                 .updateInterests(_selectedInterests);
           },
           enabled: !ref.watch(isOnboardingSubmittingProvider),
@@ -484,7 +484,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             setState(() {
               _selectedBudget = budget;
             });
-            ref.read(onboardingNotifierProvider.notifier).updateBudget(budget);
+            ref.read(onboardingProvider.notifier).updateBudget(budget);
           },
           isRequired: false,
           showSkipOption: true,
@@ -551,7 +551,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         _dateRangeError = null;
       });
       ref
-          .read(onboardingNotifierProvider.notifier)
+          .read(onboardingProvider.notifier)
           .updateDateRange(_selectedDateRange!);
     }
   }
@@ -617,7 +617,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     }
 
     // Generate itinerary
-    ref.read(onboardingNotifierProvider.notifier).submitForm(
+    ref.read(onboardingProvider.notifier).submitForm(
           ref.read(generateStarterItineraryProvider),
         );
   }

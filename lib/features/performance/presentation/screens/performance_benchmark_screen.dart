@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
+import 'package:soloadventurer/features/performance/utils/performance_utils.dart';
 
 /// Performance benchmark dashboard screen
 ///
@@ -19,10 +20,10 @@ class PerformanceBenchmarkScreen extends ConsumerStatefulWidget {
 class _PerformanceBenchmarkScreenState
     extends ConsumerState<PerformanceBenchmarkScreen> {
   /// Current performance metrics
-  PerformanceMetrics? _currentMetrics;
+  BenchmarkPerformanceMetrics? _currentMetrics;
 
   /// Baseline metrics for comparison
-  PerformanceMetrics? _baselineMetrics;
+  BenchmarkPerformanceMetrics? _baselineMetrics;
 
   /// Test execution status
   bool _isRunningTest = false;
@@ -130,7 +131,7 @@ class _PerformanceBenchmarkScreenState
   }
 
   /// Execute the selected test type
-  Future<PerformanceMetrics> _executeTest(String testType) async {
+  Future<BenchmarkPerformanceMetrics> _executeTest(String testType) async {
     switch (testType) {
       case 'Memory Test (500 trips)':
         return await _runMemoryTest();
@@ -147,7 +148,7 @@ class _PerformanceBenchmarkScreenState
   }
 
   /// Memory test with 500 trips
-  Future<PerformanceMetrics> _runMemoryTest() async {
+  Future<BenchmarkPerformanceMetrics> _runMemoryTest() async {
     final initialMemory = await PerformanceReporter.captureMemoryUsage();
 
     // Generate and load 500 trips
@@ -171,7 +172,7 @@ class _PerformanceBenchmarkScreenState
   }
 
   /// Memory test with 500 photos
-  Future<PerformanceMetrics> _runPhotoMemoryTest() async {
+  Future<BenchmarkPerformanceMetrics> _runPhotoMemoryTest() async {
     final initialMemory = await PerformanceReporter.captureMemoryUsage();
 
     // Generate and load 500 photo metadata
@@ -194,7 +195,7 @@ class _PerformanceBenchmarkScreenState
   }
 
   /// List rendering performance test
-  Future<PerformanceMetrics> _runListRenderingTest() async {
+  Future<BenchmarkPerformanceMetrics> _runListRenderingTest() async {
     // Generate test data
     final trips =
         PerformanceTestDataGenerator.generateLargeTripList(count: 500);
@@ -234,7 +235,7 @@ class _PerformanceBenchmarkScreenState
   }
 
   /// Data generation performance test
-  Future<PerformanceMetrics> _runDataGenerationTest() async {
+  Future<BenchmarkPerformanceMetrics> _runDataGenerationTest() async {
     const iterations = 10;
     final timings = <int>[];
 
@@ -265,7 +266,7 @@ class _PerformanceBenchmarkScreenState
   }
 
   /// Comprehensive performance baseline test
-  Future<PerformanceMetrics> _runComprehensiveTest() async {
+  Future<BenchmarkPerformanceMetrics> _runComprehensiveTest() async {
     // Generate test data
     final trips =
         PerformanceTestDataGenerator.generateLargeTripList(count: 500);
@@ -608,7 +609,7 @@ class _PerformanceBenchmarkScreenState
 
             // Information
             Card(
-              color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

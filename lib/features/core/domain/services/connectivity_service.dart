@@ -31,7 +31,7 @@ abstract class ConnectivityService {
 
 /// Provider for the connectivity service implementation
 @riverpod
-ConnectivityService connectivityService(ConnectivityServiceRef ref) {
+ConnectivityService connectivityService(Ref ref) {
   throw UnimplementedError('Connectivity service implementation not provided');
 }
 

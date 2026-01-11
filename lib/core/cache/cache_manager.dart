@@ -256,7 +256,7 @@ class CacheManager<K, V> {
     }
 
     // Check disk cache
-    final diskValue = await _getFromDisk<K, V>(key);
+    final diskValue = await _getFromDisk(key);
     if (diskValue != null) {
       // Promote to memory cache if enabled
       if (config.promoteDiskHits) {
@@ -279,7 +279,7 @@ class CacheManager<K, V> {
     }
 
     // Check disk cache
-    final diskValue = await _getFromDisk<K, V>(key);
+    final diskValue = await _getFromDisk(key);
     if (diskValue != null) {
       return CacheResult.diskHit(diskValue);
     }
@@ -312,7 +312,7 @@ class CacheManager<K, V> {
   }
 
   /// Get value from disk cache with deserialization
-  Future<V?> _getFromDisk<T>(K key) async {
+  Future<V?> _getFromDisk(K key) async {
     final keyString = key.toString();
     final jsonString = await _diskCache.get(keyString);
     if (jsonString == null) return null;

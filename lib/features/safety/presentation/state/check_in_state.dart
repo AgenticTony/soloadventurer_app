@@ -11,8 +11,7 @@ part 'check_in_state.freezed.dart';
 /// - isLoading and error are ALWAYS fields on state
 /// - State is NEVER nullable
 @freezed
-class CheckInState with _$CheckInState {
-
+sealed class CheckInState with _$CheckInState {
   const factory CheckInState({
     /// Loading indicator - always a field on State
     @Default(false) bool isLoading,

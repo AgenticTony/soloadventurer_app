@@ -220,8 +220,6 @@ extension SavedDestinationPatterns on SavedDestination {
     switch (_that) {
       case _SavedDestination():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -331,8 +329,6 @@ extension SavedDestinationPatterns on SavedDestination {
             _that.notes,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -382,7 +378,7 @@ extension SavedDestinationPatterns on SavedDestination {
 /// @nodoc
 @JsonSerializable()
 class _SavedDestination extends SavedDestination {
-  const _SavedDestination(
+  _SavedDestination(
       {required this.id,
       required this.userId,
       required this.destination,

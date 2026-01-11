@@ -17,7 +17,7 @@ part of 'operation_queue_provider.dart';
 /// or processed. The state does not auto-update to avoid excessive rebuilds.
 
 @ProviderFor(OperationQueueNotifier)
-final operationQueueProvider = OperationQueueNotifierProvider._();
+const operationQueueProvider = OperationQueueNotifierProvider._();
 
 /// Provider that exposes the operation queue state to the UI
 ///
@@ -35,7 +35,7 @@ final class OperationQueueNotifierProvider
   ///
   /// Note: Call refreshState() to update the state after operations are added
   /// or processed. The state does not auto-update to avoid excessive rebuilds.
-  OperationQueueNotifierProvider._()
+  const OperationQueueNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -63,7 +63,7 @@ final class OperationQueueNotifierProvider
 }
 
 String _$operationQueueNotifierHash() =>
-    r'3ce94f895390e0387a91fb64f0d1ec3e391de1cc';
+    r'b711819be69eaea0cd457e7062d1020b5fb8cb6d';
 
 /// Provider that exposes the operation queue state to the UI
 ///
@@ -78,12 +78,13 @@ abstract class _$OperationQueueNotifier extends $Notifier<OperationQueueState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<OperationQueueState, OperationQueueState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<OperationQueueState, OperationQueueState>,
         OperationQueueState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

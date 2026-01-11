@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/sync_queue_dao.dart';
@@ -174,14 +175,13 @@ void registerOfflineModule(GetIt getIt, {bool isTest = false}) {
   );
   //
   // Register UploadSync for syncing queued operations to server
-  // This service processes pending sync operations and uploads them to the server
-  // using GraphQL mutations. It handles create, update, and delete operations for
+  // This service processes pending sync operations and uploads them to Supabase
+  // using PostgREST API. It handles create, update, and delete operations for
   // trips, journals, and user profiles.
   getIt.registerLazySingleton<UploadSync>(
     () => UploadSync(
-      dio: getIt<DioApiService>().dio,
+      client: Supabase.instance.client,
       syncQueueRepository: getIt<SyncQueueRepository>(),
-      graphqlEndpoint: '/graphql',
     ),
   );
   //

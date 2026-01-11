@@ -31,7 +31,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void initState() {
     super.initState();
 
-    final profileState = ref.read(profileUIProvider('current'));
+    final profileState = ref.read(profileDomainProvider('current'));
     final profile = profileState.profile;
 
     if (profile != null) {
@@ -52,8 +52,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   Future<void> _saveChanges() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final currentState = ref.read(profileUIProvider('current'));
-      final notifier = ref.read(profileUIProvider('current').notifier);
+      final currentState = ref.read(profileDomainProvider('current'));
+      final notifier = ref.read(profileDomainProvider('current').notifier);
 
       final profile = currentState.profile?.copyWith(
             displayName: _displayNameController.text,
@@ -73,12 +73,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             updatedAt: DateTime.now(),
           );
 
-      await notifier.updateProfile({
-        'displayName': _displayNameController.text,
-        'email': _emailController.text,
-        'bio': _bioController.text,
-        'isPublic': _isPublic
-      });
+      await notifier.updateProfile(profile);
 
       if (mounted) {
         if (widget.isInitialSetup) {

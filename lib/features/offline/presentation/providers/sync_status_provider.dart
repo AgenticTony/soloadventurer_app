@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/app/di/service_locator.dart';
-import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart' show SyncManager, SyncStatus, SyncResult, SyncState, SyncPhase;
+import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart'
+    show SyncManager, SyncStatus, SyncResult, SyncState, SyncPhase;
 
 part 'sync_status_provider.g.dart';
 

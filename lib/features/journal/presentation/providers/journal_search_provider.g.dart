@@ -14,7 +14,7 @@ part of 'journal_search_provider.dart';
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(JournalSearch)
-final journalSearchProvider = JournalSearchProvider._();
+const journalSearchProvider = JournalSearchProvider._();
 
 /// Notifier for journal search
 ///
@@ -26,7 +26,7 @@ final class JournalSearchProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  JournalSearchProvider._()
+  const JournalSearchProvider._()
       : super(
           from: null,
           argument: null,
@@ -65,12 +65,13 @@ abstract class _$JournalSearch extends $Notifier<JournalSearchState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<JournalSearchState, JournalSearchState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<JournalSearchState, JournalSearchState>,
         JournalSearchState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

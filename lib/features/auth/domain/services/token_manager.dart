@@ -37,7 +37,10 @@ extension FeatureAvailabilityX on FeatureAvailability {
 }
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
-@riverpod
+///
+/// This provider must be kept alive to prevent disposal during async operations.
+/// It's initialized in bootstrap.dart before the app runs.
+@Riverpod(keepAlive: true)
 class TokenManager extends _$TokenManager {
   Timer? _refreshTimer;
   Timer? _recoveryTimer;
@@ -657,6 +660,77 @@ class TokenManager extends _$TokenManager {
     } else {
       debugPrint('TokenManager: No valid local session');
       state = FeatureAvailability.unauthorized;
+    }
+  }
+
+  /// Refreshes the TokenManager state by reloading tokens from storage.
+  ///
+  /// This should be called after authentication events (login, signup, etc.)
+  /// to update the TokenManager's state with the newly stored tokens.
+  Future<void> refreshState() async {
+    if (_isDisposed) return;
+
+    debugPrint('TokenManager: Refreshing state');
+
+    try {
+      final connectivityService = ref.read(connectivityServiceImplProvider);
+
+      // Load tokens from storage
+      final storage = ref.read(authLocalDataSourceProvider);
+      final sessionData = await Future.wait([
+        storage.getAuthToken(),
+        storage.getIdToken(),
+        storage.getRefreshToken(),
+        storage.getTokenExpiration(),
+      ]);
+
+      final accessToken = sessionData[0] as String?;
+      final idToken = sessionData[1] as String?;
+      final refreshToken = sessionData[2] as String?;
+      final expiresAt = sessionData[3] as DateTime?;
+
+      debugPrint('TokenManager: Loaded session data during refresh:');
+      debugPrint('  - Has access token: ${accessToken != null}');
+      debugPrint('  - Has ID token: ${idToken != null}');
+      debugPrint('  - Has refresh token: ${refreshToken != null}');
+      debugPrint('  - Expires at: $expiresAt');
+
+      if (accessToken != null &&
+          idToken != null &&
+          refreshToken != null &&
+          expiresAt != null) {
+        debugPrint('TokenManager: Creating cached session from loaded data');
+        _cachedSession = AuthSession(
+          accessToken: accessToken,
+          idToken: idToken,
+          refreshToken: refreshToken,
+          expiresAt: expiresAt,
+        );
+        _scheduleTokenRefresh();
+      } else {
+        debugPrint(
+            'TokenManager: Incomplete session data during refresh, clearing cache');
+        _cachedSession = null;
+      }
+
+      // Get current connectivity status
+      final networkStatus = await connectivityService.checkConnectivity();
+      final isConnected = networkStatus == NetworkStatus.connected;
+      final hasValidTokens = _cachedSession?.expiresAt
+              .isAfter(DateTime.now().add(_minValidityThreshold)) ??
+          false;
+
+      // Calculate and update state
+      final newState = _calculateState(isConnected, hasValidTokens);
+      debugPrint('TokenManager: Refreshed state: $newState');
+      state = newState;
+    } catch (e, stackTrace) {
+      debugPrint('TokenManager: Failed to refresh state: $e');
+      debugPrint('TokenManager: Stack trace: $stackTrace');
+      // On error, set state to unauthorized
+      if (!_isDisposed) {
+        state = FeatureAvailability.unauthorized;
+      }
     }
   }
 }

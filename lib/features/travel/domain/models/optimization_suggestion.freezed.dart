@@ -204,8 +204,6 @@ extension OptimizationSuggestionPatterns on OptimizationSuggestion {
     switch (_that) {
       case _OptimizationSuggestion():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -319,8 +317,6 @@ extension OptimizationSuggestionPatterns on OptimizationSuggestion {
             _that.reasoning,
             _that.timeSaved,
             _that.costSaved);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

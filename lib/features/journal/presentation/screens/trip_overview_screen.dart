@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:soloadventurer/core/utils/string_extensions.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
@@ -66,7 +67,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
       BuildContext context, Trip trip, TripOverviewState overviewState) {
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(tripOverviewProvider(widget.tripId).notifier).refresh();
+        await ref.read(tripOverviewProvider(widget.tripId).notifier).refresh(widget.tripId);
       },
       child: CustomScrollView(
         slivers: [
@@ -138,8 +139,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
-            Theme.of(context).colorScheme.secondary.withValues(alpha:0.5),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
           ],
         ),
       ),
@@ -225,7 +226,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
               Icon(
                 Icons.note_alt_outlined,
                 size: 48,
-                color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               ),
               const SizedBox(height: 16),
               Text(
@@ -236,7 +237,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
               Text(
                 'Start documenting your trip adventures',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -265,7 +266,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
             Text(
               '(${overviewState.entryCount})',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -334,7 +335,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
                       Text(
                         '${dateFormat.format(entry.entryDate)} at ${timeFormat.format(entry.entryDate)}',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -352,7 +354,8 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
                         Text(
                           entry.locationName ?? 'Unknown location',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha:0.7),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -385,7 +388,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
                 Text(
                   _getContentPreview(entry.content),
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.8),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -435,7 +438,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
             Text(
               '(${overviewState.mediaCount})',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ],
@@ -489,7 +492,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha:0.6),
+                  color: Colors.black.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Icon(
@@ -503,7 +506,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
           // Upload status overlay
           if (media.uploadStatus != UploadStatus.completed)
             Container(
-              color: Colors.black.withValues(alpha:0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               child: Center(
                 child: _buildUploadStatusIcon(context, media.uploadStatus),
               ),
@@ -524,7 +527,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
               ? Icons.videocam_outlined
               : Icons.image_outlined,
           size: 32,
-          color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
         ),
       ),
     );
@@ -609,7 +612,7 @@ class _StatItem extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -617,8 +620,3 @@ class _StatItem extends StatelessWidget {
   }
 }
 
-/// Extension to capitalize the first letter of a string
-extension StringCapitalization on String {
-  String toCapitalized() =>
-      length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : this;
-}

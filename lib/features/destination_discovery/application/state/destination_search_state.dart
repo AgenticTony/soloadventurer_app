@@ -75,9 +75,9 @@ class DestinationSearchState {
   /// This constructor creates a state with empty results, default filter,
   /// pagination reset, and isInitial set to true. Use this to reset the
   /// search to its initial state.
-  const DestinationSearchState.initial()
+  DestinationSearchState.initial()
       : results = const [],
-        filter = const DestinationFilter(),
+        filter = DestinationFilter(),
         hasMore = true,
         currentOffset = 0,
         totalCount = null,

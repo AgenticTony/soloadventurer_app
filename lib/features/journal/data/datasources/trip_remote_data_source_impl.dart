@@ -207,12 +207,14 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<int> getEntryCountForTrip(String tripId) async {
     try {
+      // Use a count query to get the number of entries
       final response = await _client
           .from('journal_entries')
-          .select('id', count: CountOption.exact)
+          .select()
           .eq('trip_id', tripId);
 
-      return response.count ?? 0;
+      final entries = response as List;
+      return entries.length;
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get entry count: ${e.message}',

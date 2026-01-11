@@ -186,8 +186,6 @@ extension OnboardingDataPatterns on OnboardingData {
     switch (_that) {
       case _OnboardingData():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -269,8 +267,6 @@ extension OnboardingDataPatterns on OnboardingData {
       case _OnboardingData():
         return $default(_that.name, _that.destination, _that.dateRange,
             _that.interests, _that.budget);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

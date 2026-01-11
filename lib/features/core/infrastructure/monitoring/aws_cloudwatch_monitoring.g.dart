@@ -11,7 +11,7 @@ part of 'aws_cloudwatch_monitoring.dart';
 /// Provider for AWS CloudWatch monitoring service
 
 @ProviderFor(awsCloudWatchMonitoring)
-final awsCloudWatchMonitoringProvider = AwsCloudWatchMonitoringProvider._();
+const awsCloudWatchMonitoringProvider = AwsCloudWatchMonitoringProvider._();
 
 /// Provider for AWS CloudWatch monitoring service
 
@@ -20,7 +20,7 @@ final class AwsCloudWatchMonitoringProvider extends $FunctionalProvider<
     AwsCloudWatchMonitoring,
     AwsCloudWatchMonitoring> with $Provider<AwsCloudWatchMonitoring> {
   /// Provider for AWS CloudWatch monitoring service
-  AwsCloudWatchMonitoringProvider._()
+  const AwsCloudWatchMonitoringProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,4 +55,4 @@ final class AwsCloudWatchMonitoringProvider extends $FunctionalProvider<
 }
 
 String _$awsCloudWatchMonitoringHash() =>
-    r'430cc0d683fc55ae0f3b09d079311b8ad04eb7c8';
+    r'b65e8f5f36e6c8127dabb49e3deb6de14c8b6fc6';

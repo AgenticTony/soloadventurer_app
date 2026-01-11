@@ -8,7 +8,7 @@ part 'journal.g.dart';
 /// This entity represents a single journal entry associated with a trip.
 /// Journals can contain text, images, location data, mood, and tags.
 @freezed
-class Journal with _$Journal {
+sealed class Journal with _$Journal {
   const factory Journal({
     /// Unique identifier for the journal
     required String id,

@@ -16,7 +16,7 @@ part of 'trip_overview_provider.dart';
 /// Usage: ref.watch(tripOverviewProvider(tripId))
 
 @ProviderFor(TripOverview)
-final tripOverviewProvider = TripOverviewFamily._();
+const tripOverviewProvider = TripOverviewFamily._();
 
 /// Notifier for managing trip overview state
 /// MIGRATION: StateNotifier → Notifier pattern with family parameter
@@ -32,7 +32,7 @@ final class TripOverviewProvider
   /// - Dependencies accessed via ref.watch() in methods
   /// - Automatic provider generation via @riverpod annotation
   /// Usage: ref.watch(tripOverviewProvider(tripId))
-  TripOverviewProvider._(
+  const TripOverviewProvider._(
       {required TripOverviewFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -88,7 +88,7 @@ final class TripOverviewFamily extends $Family
     with
         $ClassFamilyOverride<TripOverview, TripOverviewState, TripOverviewState,
             TripOverviewState, String> {
-  TripOverviewFamily._()
+  const TripOverviewFamily._()
       : super(
           retry: null,
           name: r'tripOverviewProvider',
@@ -130,16 +130,15 @@ abstract class _$TripOverview extends $Notifier<TripOverviewState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<TripOverviewState, TripOverviewState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TripOverviewState, TripOverviewState>,
         TripOverviewState,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

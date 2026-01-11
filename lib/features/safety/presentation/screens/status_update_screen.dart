@@ -114,7 +114,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
       return;
     }
 
-    final notifier = ref.read(safetyNotifierProvider);
+    final notifier = ref.read(safetyProvider.notifier);
 
     try {
       await notifier.updateSafetyStatus(
@@ -241,7 +241,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyState = ref.watch(safetyStateProvider);
+    final safetyState = ref.watch(safetyProvider);
     final contactsState = ref.watch(trustedContactsProvider);
     final isProcessing = safetyState.isProcessing;
 

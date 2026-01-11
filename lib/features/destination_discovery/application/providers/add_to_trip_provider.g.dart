@@ -11,7 +11,7 @@ part of 'add_to_trip_provider.dart';
 /// Provider for the travel operation repository from the travel feature
 
 @ProviderFor(travelOperationRepository)
-final travelOperationRepositoryProvider = TravelOperationRepositoryProvider._();
+const travelOperationRepositoryProvider = TravelOperationRepositoryProvider._();
 
 /// Provider for the travel operation repository from the travel feature
 
@@ -20,7 +20,7 @@ final class TravelOperationRepositoryProvider extends $FunctionalProvider<
     TravelOperationRepository,
     TravelOperationRepository> with $Provider<TravelOperationRepository> {
   /// Provider for the travel operation repository from the travel feature
-  TravelOperationRepositoryProvider._()
+  const TravelOperationRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -107,7 +107,7 @@ String _$travelOperationRepositoryHash() =>
 /// ```
 
 @ProviderFor(AddToTripNotifier)
-final addToTripProvider = AddToTripNotifierProvider._();
+const addToTripProvider = AddToTripNotifierProvider._();
 
 /// Provider for managing add to trip operations
 ///
@@ -207,7 +207,7 @@ final class AddToTripNotifierProvider
   ///   // Show error message
   /// }
   /// ```
-  AddToTripNotifierProvider._()
+  const AddToTripNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -290,12 +290,13 @@ abstract class _$AddToTripNotifier extends $Notifier<AddToTripState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AddToTripState, AddToTripState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AddToTripState, AddToTripState>,
         AddToTripState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

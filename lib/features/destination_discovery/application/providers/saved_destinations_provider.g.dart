@@ -56,7 +56,7 @@ part of 'saved_destinations_provider.dart';
 /// The [userId] parameter is the user ID to manage saved destinations for.
 
 @ProviderFor(SavedDestinations)
-final savedDestinationsProvider = SavedDestinationsFamily._();
+const savedDestinationsProvider = SavedDestinationsFamily._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -152,7 +152,7 @@ final class SavedDestinationsProvider
   /// ```
   ///
   /// The [userId] parameter is the user ID to manage saved destinations for.
-  SavedDestinationsProvider._(
+  const SavedDestinationsProvider._(
       {required SavedDestinationsFamily super.from,
       required String super.argument})
       : super(
@@ -188,7 +188,7 @@ final class SavedDestinationsProvider
   }
 }
 
-String _$savedDestinationsHash() => r'33981066d204b9fd2f0791508d893e2b3e223a2b';
+String _$savedDestinationsHash() => r'e991f28dd18ca9ceddf424eab36ae2b547f1d655';
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -245,7 +245,7 @@ final class SavedDestinationsFamily extends $Family
             SavedDestinationsState,
             FutureOr<SavedDestinationsState>,
             String> {
-  SavedDestinationsFamily._()
+  const SavedDestinationsFamily._()
       : super(
           retry: null,
           name: r'savedDestinationsProvider',
@@ -368,6 +368,9 @@ abstract class _$SavedDestinations
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref
         as $Ref<AsyncValue<SavedDestinationsState>, SavedDestinationsState>;
     final element = ref.element as $ClassProviderElement<
@@ -375,10 +378,6 @@ abstract class _$SavedDestinations
         AsyncValue<SavedDestinationsState>,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

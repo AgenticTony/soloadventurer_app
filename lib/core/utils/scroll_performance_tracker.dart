@@ -278,7 +278,9 @@ class _FrameTracker {
 
   void stop() {
     _isTracking = false;
-    SchedulerBinding.instance.removePersistentFrameCallback(_onFrame);
+    // Note: Persistent frame callbacks cannot be directly removed
+    // We use the _isTracking flag to effectively disable tracking
+    // The callback will check this flag and return early
   }
 
   void reset() {

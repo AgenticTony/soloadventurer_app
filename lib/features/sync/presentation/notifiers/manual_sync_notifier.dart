@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/services/sync_service.dart';
 import '../../domain/models/sync_status.dart';
 import '../state/manual_sync_state.dart';
 import '../../../core/domain/services/logging_service.dart';
-import '../providers/sync_providers.dart';
+import '../providers/service_providers.dart';
 
 part 'manual_sync_notifier.g.dart';
 
@@ -129,7 +127,7 @@ class ManualSyncNotifier extends _$ManualSyncNotifier {
           status: SyncOperationStatus.failed,
         );
       }
-    } catch (e, stack) {
+    } catch (e) {
       final logger = ref.read(loggingServiceProvider);
       final completedAt = DateTime.now();
       // logging

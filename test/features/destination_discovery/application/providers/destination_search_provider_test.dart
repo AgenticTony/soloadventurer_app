@@ -3,7 +3,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/destination_discovery/application/providers/destination_search_provider.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart'
+    hide BudgetLevel, ActivityLevel;
 import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
 
 // Mock classes

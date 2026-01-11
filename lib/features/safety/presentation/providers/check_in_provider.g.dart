@@ -18,7 +18,7 @@ part of 'check_in_provider.dart';
 /// - UI calls methods via ref.read(provider.notifier)
 
 @ProviderFor(CheckInNotifier)
-final checkInProvider = CheckInNotifierProvider._();
+const checkInProvider = CheckInNotifierProvider._();
 
 /// Notifier for managing check-in state
 /// Handles check-in creation, completion, scheduling, and cancellation
@@ -38,7 +38,7 @@ final class CheckInNotifierProvider
   /// - NO getters in state - all derived values are fields
   /// - UI reads STATE only via ref.watch()
   /// - UI calls methods via ref.read(provider.notifier)
-  CheckInNotifierProvider._()
+  const CheckInNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -65,7 +65,7 @@ final class CheckInNotifierProvider
   }
 }
 
-String _$checkInNotifierHash() => r'973c682ad5755e9c70bae01201ffda32126b75e8';
+String _$checkInNotifierHash() => r'5f03485d2f8003002814898dac134ba82296eacf';
 
 /// Notifier for managing check-in state
 /// Handles check-in creation, completion, scheduling, and cancellation
@@ -81,12 +81,13 @@ abstract class _$CheckInNotifier extends $Notifier<CheckInState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<CheckInState, CheckInState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<CheckInState, CheckInState>,
         CheckInState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

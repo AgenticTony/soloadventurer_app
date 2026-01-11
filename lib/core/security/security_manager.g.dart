@@ -11,13 +11,13 @@ part of 'security_manager.dart';
 /// Manages security-related features like rate limiting and device tracking
 
 @ProviderFor(SecurityManager)
-final securityManagerProvider = SecurityManagerProvider._();
+const securityManagerProvider = SecurityManagerProvider._();
 
 /// Manages security-related features like rate limiting and device tracking
 final class SecurityManagerProvider
     extends $NotifierProvider<SecurityManager, SecurityManager> {
   /// Manages security-related features like rate limiting and device tracking
-  SecurityManagerProvider._()
+  const SecurityManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -53,12 +53,13 @@ abstract class _$SecurityManager extends $Notifier<SecurityManager> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SecurityManager, SecurityManager>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SecurityManager, SecurityManager>,
         SecurityManager,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

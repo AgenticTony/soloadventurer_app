@@ -15,7 +15,7 @@ import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/resend_verification_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
-import 'package:soloadventurer/features/core/config/app_config.dart';
+import 'package:soloadventurer/core/config/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
@@ -23,9 +23,19 @@ import 'package:soloadventurer/features/auth/infrastructure/services/token_refre
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/refresh_queue_manager.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
+import 'package:flutter/foundation.dart';
 
 /// Register all auth feature dependencies
 void registerAuthModule(GetIt getIt, {bool isTest = false}) {
+  // Debug logging
+  debugPrint('========================================');
+  debugPrint('AuthModule: Registering auth dependencies');
+  debugPrint('AuthModule: AppConfig.useSupabaseAuth = ${AppConfig.useSupabaseAuth}');
+  debugPrint('AuthModule: AppConfig.useCognitoAuth = ${AppConfig.useCognitoAuth}');
+  debugPrint('AuthModule: AppConfig.authProvider = ${AppConfig.authProvider}');
+  debugPrint('AuthModule: isTest = $isTest');
+  debugPrint('========================================');
+
   // Register data sources
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(
@@ -37,14 +47,17 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
   getIt.registerLazySingleton<AuthRemoteDataSource>(
     () => isTest
         ? MockAuthRemoteDataSource(getIt<ApiClient>())
-        : AuthRemoteDataSourceImpl(
-            userPool: AppConfig.awsConfig.userPool,
-            clientSecret:
-                AppConfig.awsConfig.clientId, // Using clientId as fallback
-            client: getIt<http.Client>(),
-            baseUrl: AppConfig.apiBaseUrl,
-          ),
+        : AppConfig.useSupabaseAuth
+            ? SupabaseAuthRemoteDataSourceImpl()
+            : AuthRemoteDataSourceImpl(
+                userPool: AppConfig.awsConfig.userPool,
+                clientSecret: AppConfig.awsConfig.clientSecretValue,
+                client: getIt<http.Client>(),
+                baseUrl: AppConfig.apiBaseUrl,
+              ),
   );
+
+  debugPrint('AuthModule: Registered ${getIt<AuthRemoteDataSource>().runtimeType}');
 
   // Register repository
   getIt.registerLazySingleton<AuthRepository>(

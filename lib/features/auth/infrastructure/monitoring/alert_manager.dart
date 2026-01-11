@@ -95,13 +95,13 @@ class AlertManager extends _$AlertManager implements AlertRepository {
       // await _cloudWatch.log(logMessage.toString());
 
       ref.read(tokenAuditLoggerProvider).logTokenEvent(
-            event: 'security_alert_sent',
-            status: 'warning',
-            metadata: {
-              ...alert.toJson(),
-              'cloudwatch_disabled': true,
-            },
-          );
+        event: 'security_alert_sent',
+        status: 'warning',
+        metadata: {
+          ...alert.toJson(),
+          'cloudwatch_disabled': true,
+        },
+      );
     } catch (e, stack) {
       ref.read(tokenAuditLoggerProvider).logError(
             feature: 'alert_manager',

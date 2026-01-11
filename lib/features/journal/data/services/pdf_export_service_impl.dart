@@ -454,7 +454,7 @@ class PdfExportServiceImpl implements PdfExportService {
             'Generated on ${DateFormat.yMMMMd('en_US').add_jm().format(DateTime.now())}',
             style: pw.TextStyle(
               fontSize: config.captionFontSize,
-              color: theme.defaultTextStyle.color?.withValues(alpha:0.6),
+              color: theme.defaultTextStyle.color?.withValues(alpha: 0.6),
             ),
           ),
         ],
@@ -488,7 +488,7 @@ class PdfExportServiceImpl implements PdfExportService {
               dateFormat.format(entry.entryDate),
               style: pw.TextStyle(
                 fontSize: config.captionFontSize,
-                color: theme.defaultTextStyle.color?.withValues(alpha:0.7),
+                color: theme.defaultTextStyle.color?.withValues(alpha: 0.7),
               ),
             ),
           pw.SizedBox(height: 8),
@@ -499,7 +499,7 @@ class PdfExportServiceImpl implements PdfExportService {
               '📍 ${entry.locationName}',
               style: pw.TextStyle(
                 fontSize: config.captionFontSize,
-                color: theme.defaultTextStyle.color?.withValues(alpha:0.7),
+                color: theme.defaultTextStyle.color?.withValues(alpha: 0.7),
               ),
             ),
           pw.SizedBox(height: 8),
@@ -510,7 +510,7 @@ class PdfExportServiceImpl implements PdfExportService {
               'Mood: ${entry.mood}',
               style: pw.TextStyle(
                 fontSize: config.captionFontSize,
-                color: theme.defaultTextStyle.color?.withValues(alpha:0.7),
+                color: theme.defaultTextStyle.color?.withValues(alpha: 0.7),
               ),
             ),
           pw.SizedBox(height: 24),

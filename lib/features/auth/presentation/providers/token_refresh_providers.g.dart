@@ -11,7 +11,7 @@ part of 'token_refresh_providers.dart';
 /// Provider for the TokenRefreshService from the service locator
 
 @ProviderFor(tokenRefreshService)
-final tokenRefreshServiceProvider = TokenRefreshServiceProvider._();
+const tokenRefreshServiceProvider = TokenRefreshServiceProvider._();
 
 /// Provider for the TokenRefreshService from the service locator
 
@@ -20,7 +20,7 @@ final class TokenRefreshServiceProvider extends $FunctionalProvider<
     TokenRefreshService,
     TokenRefreshService> with $Provider<TokenRefreshService> {
   /// Provider for the TokenRefreshService from the service locator
-  TokenRefreshServiceProvider._()
+  const TokenRefreshServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,4 +55,4 @@ final class TokenRefreshServiceProvider extends $FunctionalProvider<
 }
 
 String _$tokenRefreshServiceHash() =>
-    r'422d19f1f754a2f72688dc580377ad40036ad923';
+    r'6e5f7037431d85fa4b8d388ad8d7045617a44ef1';

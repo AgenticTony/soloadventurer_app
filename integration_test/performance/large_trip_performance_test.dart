@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:soloadventurer/core/monitoring/performance/memory_profiler.dart';
 import 'package:soloadventurer/core/monitoring/performance/performance_monitor.dart';
-import 'package:soloadventurer/core/monitoring/performance/performance_metrics.dart';
 import 'package:soloadventurer/features/travel/domain/models/activity.dart';
 import 'package:soloadventurer/features/travel/domain/models/photo.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';

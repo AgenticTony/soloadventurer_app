@@ -11,13 +11,13 @@ part of 'unread_notifications_notifier.dart';
 /// Notifier for unread notifications
 
 @ProviderFor(UnreadNotificationsNotifier)
-final unreadNotificationsProvider = UnreadNotificationsNotifierProvider._();
+const unreadNotificationsProvider = UnreadNotificationsNotifierProvider._();
 
 /// Notifier for unread notifications
 final class UnreadNotificationsNotifierProvider extends $NotifierProvider<
     UnreadNotificationsNotifier, AsyncValue<List<TravelNotification>>> {
   /// Notifier for unread notifications
-  UnreadNotificationsNotifierProvider._()
+  const UnreadNotificationsNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -56,6 +56,7 @@ abstract class _$UnreadNotificationsNotifier
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AsyncValue<List<TravelNotification>>,
         AsyncValue<List<TravelNotification>>>;
     final element = ref.element as $ClassProviderElement<
@@ -64,6 +65,6 @@ abstract class _$UnreadNotificationsNotifier
         AsyncValue<List<TravelNotification>>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

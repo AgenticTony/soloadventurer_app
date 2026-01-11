@@ -1,5 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+// Import for the implementation provider
+import 'location_service_impl.dart' show locationServiceOverrideProvider;
+
 part 'location_service.g.dart';
 
 /// Accuracy level for location tracking
@@ -157,10 +160,10 @@ abstract class LocationService {
 }
 
 /// Provider for the location service implementation
+///
+/// This provider returns the actual implementation from location_service_impl.dart.
+/// The locationServiceOverrideProvider handles the proper instantiation and disposal.
 @riverpod
-LocationService locationService(LocationServiceRef ref) {
-  throw UnimplementedError(
-    'LocationService implementation not provided. '
-    'Use locationServiceProvider from location_service_impl.dart',
-  );
+LocationService locationService(Ref ref) {
+  return ref.watch(locationServiceOverrideProvider);
 }

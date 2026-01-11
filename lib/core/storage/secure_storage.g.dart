@@ -11,7 +11,7 @@ part of 'secure_storage.dart';
 /// Provider for SecureStorage
 
 @ProviderFor(secureStorage)
-final secureStorageProvider = SecureStorageProvider._();
+const secureStorageProvider = SecureStorageProvider._();
 
 /// Provider for SecureStorage
 
@@ -19,7 +19,7 @@ final class SecureStorageProvider
     extends $FunctionalProvider<SecureStorage, SecureStorage, SecureStorage>
     with $Provider<SecureStorage> {
   /// Provider for SecureStorage
-  SecureStorageProvider._()
+  const SecureStorageProvider._()
       : super(
           from: null,
           argument: null,
@@ -52,4 +52,4 @@ final class SecureStorageProvider
   }
 }
 
-String _$secureStorageHash() => r'd32760aa1df15788290100a01b620a556d1c50cb';
+String _$secureStorageHash() => r'493c5de81d0d8c369c4450c51217fdecea2f7a69';

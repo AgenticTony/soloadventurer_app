@@ -38,7 +38,7 @@ enum CheckInTriggerType {
 
 /// Represents a check-in (manual or scheduled)
 @freezed
-class CheckIn with _$CheckIn {
+sealed class CheckIn with _$CheckIn {
   const factory CheckIn({
     /// Unique identifier for the check-in
     required String id,
@@ -95,7 +95,7 @@ class CheckIn with _$CheckIn {
 
 /// Location data associated with a check-in
 @freezed
-class CheckInLocation with _$CheckInLocation {
+sealed class CheckInLocation with _$CheckInLocation {
   const factory CheckInLocation({
     /// Latitude
     required double latitude,

@@ -189,8 +189,6 @@ extension RecommendedDestinationPatterns on RecommendedDestination {
     switch (_that) {
       case _RecommendedDestination():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -272,8 +270,6 @@ extension RecommendedDestinationPatterns on RecommendedDestination {
       case _RecommendedDestination():
         return $default(_that.destination, _that.matchScore, _that.reason,
             _that.matchingFactors, _that.isHiddenGemMatch);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -308,14 +304,15 @@ extension RecommendedDestinationPatterns on RecommendedDestination {
 
 /// @nodoc
 @JsonSerializable()
-class _RecommendedDestination implements RecommendedDestination {
+class _RecommendedDestination extends RecommendedDestination {
   const _RecommendedDestination(
       {required this.destination,
       required this.matchScore,
       required this.reason,
       required final List<String> matchingFactors,
       this.isHiddenGemMatch = false})
-      : _matchingFactors = matchingFactors;
+      : _matchingFactors = matchingFactors,
+        super._();
   factory _RecommendedDestination.fromJson(Map<String, dynamic> json) =>
       _$RecommendedDestinationFromJson(json);
 
@@ -697,8 +694,6 @@ extension PersonalizedRecommendationPatterns on PersonalizedRecommendation {
     switch (_that) {
       case _PersonalizedRecommendation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -816,8 +811,6 @@ extension PersonalizedRecommendationPatterns on PersonalizedRecommendation {
             _that.expiresAt,
             _that.preferenceSnapshot,
             _that.relatedRecommendationIds);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

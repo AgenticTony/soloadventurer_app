@@ -9,9 +9,6 @@ import 'package:soloadventurer/features/onboarding/presentation/notifiers/onboar
 import 'package:soloadventurer/features/onboarding/presentation/state/onboarding_state.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
 
-// Export the generated onboardingNotifierProvider for convenience
-export 'onboarding_notifier.g.dart' show onboardingNotifierProvider;
-
 part 'onboarding_providers.g.dart';
 
 /// Provider for the itinerary generation repository
@@ -89,7 +86,7 @@ GenerateStarterItinerary generateStarterItinerary(
 /// from the OnboardingState.
 @riverpod
 OnboardingData? currentOnboardingData(Ref ref) {
-  final state = ref.watch(onboardingNotifierProvider);
+  final state = ref.watch(onboardingProvider);
   return state.data;
 }
 
@@ -99,7 +96,7 @@ OnboardingData? currentOnboardingData(Ref ref) {
 /// from the OnboardingState.
 @riverpod
 bool isOnboardingFormValid(Ref ref) {
-  final state = ref.watch(onboardingNotifierProvider);
+  final state = ref.watch(onboardingProvider);
   return switch (state) {
     OnboardingInProgress(isValid: final isValid) => isValid,
     OnboardingInitial() => false,
@@ -115,7 +112,7 @@ bool isOnboardingFormValid(Ref ref) {
 /// from the OnboardingState.
 @riverpod
 List<String> onboardingValidationErrors(Ref ref) {
-  final state = ref.watch(onboardingNotifierProvider);
+  final state = ref.watch(onboardingProvider);
   return switch (state) {
     OnboardingInProgress(validationErrors: final errors) => errors,
     OnboardingInitial() => [],
@@ -131,7 +128,7 @@ List<String> onboardingValidationErrors(Ref ref) {
 /// from the OnboardingState.
 @riverpod
 bool isOnboardingSubmitting(Ref ref) {
-  final state = ref.watch(onboardingNotifierProvider);
+  final state = ref.watch(onboardingProvider);
   return state.isSubmitting;
 }
 
@@ -141,7 +138,7 @@ bool isOnboardingSubmitting(Ref ref) {
 /// OnboardingState when available.
 @riverpod
 Map<String, dynamic>? generatedItinerary(Ref ref) {
-  final state = ref.watch(onboardingNotifierProvider);
+  final state = ref.watch(onboardingProvider);
   return switch (state) {
     OnboardingSuccess(itinerary: final itinerary) => itinerary.toJson(),
     OnboardingInitial() => null,
@@ -157,7 +154,7 @@ Map<String, dynamic>? generatedItinerary(Ref ref) {
 /// from the OnboardingState when available.
 @riverpod
 String? onboardingErrorMessage(Ref ref) {
-  final state = ref.watch(onboardingNotifierProvider);
+  final state = ref.watch(onboardingProvider);
   return switch (state) {
     OnboardingError(message: final message) => message,
     OnboardingInitial() => null,

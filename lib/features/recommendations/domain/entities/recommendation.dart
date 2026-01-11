@@ -10,8 +10,7 @@ part 'recommendation.g.dart';
 /// Unlike the basic Recommendation class in core/services, this includes
 /// personalization metadata, scoring details, and transparent reasoning.
 @freezed
-class PersonalizedRecommendation with _$PersonalizedRecommendation {
-
+sealed class PersonalizedRecommendation with _$PersonalizedRecommendation {
   /// Creates a personalized recommendation
   ///
   /// [id] Unique identifier for this recommendation
@@ -55,8 +54,7 @@ enum ScoreColor {
 
 /// Metadata about why and when to recommend something
 @freezed
-class RecommendationMetadata with _$RecommendationMetadata {
-
+sealed class RecommendationMetadata with _$RecommendationMetadata {
   /// Creates recommendation metadata
   ///
   /// [matchedInterests] Which user interests this matches
@@ -91,8 +89,7 @@ class RecommendationMetadata with _$RecommendationMetadata {
 
 /// Time of day for a suggestion
 @freezed
-class TimeOfDay with _$TimeOfDay {
-
+sealed class TimeOfDay with _$TimeOfDay {
   /// Creates a time of day
   ///
   /// [hour] Hour (0-23)
@@ -125,8 +122,7 @@ class TimeOfDay with _$TimeOfDay {
 
 /// Represents a monetary amount
 @freezed
-class Money with _$Money {
-
+sealed class Money with _$Money {
   /// Creates a money value
   ///
   /// [amount] The numeric amount

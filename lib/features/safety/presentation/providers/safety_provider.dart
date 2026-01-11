@@ -29,7 +29,8 @@ class Safety extends _$Safety {
       ref.watch(updateSafetyStatusUseCaseProvider);
   GetSafetyStatusUseCase get _getStatus =>
       ref.watch(getSafetyStatusUseCaseProvider);
-  SafetyRepository get _repository => ref.watch(data.safetyRepositoryOverrideProvider);
+  SafetyRepository get _repository =>
+      ref.watch(data.safetyRepositoryOverrideProvider);
 
   /// Initialize safety state by loading current status and alerts
   Future<void> initialize() async {

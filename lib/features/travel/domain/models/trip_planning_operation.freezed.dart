@@ -238,8 +238,6 @@ extension TripPlanningOperationPatterns on TripPlanningOperation {
     switch (_that) {
       case _TripPlanningOperation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -365,8 +363,6 @@ extension TripPlanningOperationPatterns on TripPlanningOperation {
             _that.attemptCount,
             _that.lastError,
             _that.maxRetries);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

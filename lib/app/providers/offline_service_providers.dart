@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/services/connectivity_service.dart'
     as core_connectivity;
 import 'package:soloadventurer/core/network/network_reachability.dart';
@@ -170,15 +171,13 @@ ConflictResolver conflictResolver(Ref ref) {
 
 /// Provider for UploadSync
 ///
-/// Syncs queued operations from local database to server via GraphQL.
+/// Syncs queued operations from local database to server via Supabase PostgREST API.
 @Riverpod(keepAlive: true)
 UploadSync uploadSync(Ref ref) {
-  final dio = ref.watch(dioProvider);
   final syncQueueRepository = ref.watch(syncQueueRepositoryProvider);
   return UploadSync(
-    dio: dio,
+    client: Supabase.instance.client,
     syncQueueRepository: syncQueueRepository,
-    graphqlEndpoint: '/graphql',
   );
 }
 

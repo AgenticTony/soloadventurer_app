@@ -75,7 +75,8 @@ void main() {
         final result = await historyService.updateEntry('test-1', updated);
 
         expect(result, isTrue);
-        expect(historyService.entries.first.status, SyncOperationStatus.success);
+        expect(
+            historyService.entries.first.status, SyncOperationStatus.success);
       });
 
       test('updateEntry returns false for non-existent entry', () async {
@@ -146,8 +147,10 @@ void main() {
       });
 
       test('getEntriesByStatus filters correctly', () {
-        final successEntries = historyService.getEntriesByStatus(SyncOperationStatus.success);
-        final failedEntries = historyService.getEntriesByStatus(SyncOperationStatus.failed);
+        final successEntries =
+            historyService.getEntriesByStatus(SyncOperationStatus.success);
+        final failedEntries =
+            historyService.getEntriesByStatus(SyncOperationStatus.failed);
 
         expect(successEntries, hasLength(2));
         expect(failedEntries, hasLength(1));
@@ -295,10 +298,12 @@ void main() {
           ),
         );
 
-        final deleted = await historyService.deleteEntriesByStatus(SyncOperationStatus.failed);
+        final deleted = await historyService
+            .deleteEntriesByStatus(SyncOperationStatus.failed);
 
         expect(deleted, 1);
-        expect(historyService.getEntriesByStatus(SyncOperationStatus.failed), isEmpty);
+        expect(historyService.getEntriesByStatus(SyncOperationStatus.failed),
+            isEmpty);
       });
 
       test('clearHistory removes all entries', () async {

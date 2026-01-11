@@ -9,21 +9,30 @@ part of 'token_manager.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
+///
+/// This provider must be kept alive to prevent disposal during async operations.
+/// It's initialized in bootstrap.dart before the app runs.
 
 @ProviderFor(TokenManager)
-final tokenManagerProvider = TokenManagerProvider._();
+const tokenManagerProvider = TokenManagerProvider._();
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
+///
+/// This provider must be kept alive to prevent disposal during async operations.
+/// It's initialized in bootstrap.dart before the app runs.
 final class TokenManagerProvider
     extends $NotifierProvider<TokenManager, FeatureAvailability> {
   /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
-  TokenManagerProvider._()
+  ///
+  /// This provider must be kept alive to prevent disposal during async operations.
+  /// It's initialized in bootstrap.dart before the app runs.
+  const TokenManagerProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
           name: r'tokenManagerProvider',
-          isAutoDispose: true,
+          isAutoDispose: false,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
@@ -44,21 +53,25 @@ final class TokenManagerProvider
   }
 }
 
-String _$tokenManagerHash() => r'bb2d64986f9ad8aef188a4999e6d7b94b1f85424';
+String _$tokenManagerHash() => r'1860ed64a0a44c8ac637e0a25a44cc316f5e48c8';
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
+///
+/// This provider must be kept alive to prevent disposal during async operations.
+/// It's initialized in bootstrap.dart before the app runs.
 
 abstract class _$TokenManager extends $Notifier<FeatureAvailability> {
   FeatureAvailability build();
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<FeatureAvailability, FeatureAvailability>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<FeatureAvailability, FeatureAvailability>,
         FeatureAvailability,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

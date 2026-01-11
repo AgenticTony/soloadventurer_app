@@ -61,7 +61,7 @@ part of 'filter_provider.dart';
 /// - Providing helper methods to check filter status
 
 @ProviderFor(Filter)
-final filterProvider = FilterProvider._();
+const filterProvider = FilterProvider._();
 
 /// Provider for destination filter state management
 ///
@@ -167,7 +167,7 @@ final class FilterProvider
   /// - Updating the entire filter at once
   /// - Resetting filters to default values
   /// - Providing helper methods to check filter status
-  FilterProvider._()
+  const FilterProvider._()
       : super(
           from: null,
           argument: null,
@@ -194,7 +194,7 @@ final class FilterProvider
   }
 }
 
-String _$filterHash() => r'9b2e9b887f90955077f1920262e28bdb7aeafee6';
+String _$filterHash() => r'093f02c9cc513e8b2be731436726e144d1a30c47';
 
 /// Provider for destination filter state management
 ///
@@ -253,12 +253,13 @@ abstract class _$Filter extends $Notifier<DestinationFilter> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<DestinationFilter, DestinationFilter>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<DestinationFilter, DestinationFilter>,
         DestinationFilter,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

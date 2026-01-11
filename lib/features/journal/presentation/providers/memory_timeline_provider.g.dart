@@ -15,7 +15,7 @@ part of 'memory_timeline_provider.dart';
 /// - Automatic provider generation via @riverpod annotation
 
 @ProviderFor(MemoryTimeline)
-final memoryTimelineProvider = MemoryTimelineProvider._();
+const memoryTimelineProvider = MemoryTimelineProvider._();
 
 /// Notifier for managing memory timeline state
 /// MIGRATION: StateNotifier → Notifier pattern
@@ -29,7 +29,7 @@ final class MemoryTimelineProvider
   /// - Constructor logic moved to build() method
   /// - Dependencies accessed via ref.watch() in methods
   /// - Automatic provider generation via @riverpod annotation
-  MemoryTimelineProvider._()
+  const MemoryTimelineProvider._()
       : super(
           from: null,
           argument: null,
@@ -69,12 +69,13 @@ abstract class _$MemoryTimeline extends $Notifier<MemoryTimelineState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<MemoryTimelineState, MemoryTimelineState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<MemoryTimelineState, MemoryTimelineState>,
         MemoryTimelineState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

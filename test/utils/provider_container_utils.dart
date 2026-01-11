@@ -102,7 +102,7 @@ class ProviderListener<T> {
       provider,
       (previous, value) {
         if (value is T) {
-          _values.add(value as T);
+          _values.add(value);
         }
       },
       fireImmediately: true,

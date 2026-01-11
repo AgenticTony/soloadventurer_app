@@ -287,11 +287,11 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
       right: 16,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withValues(alpha:0.9),
+          color: theme.colorScheme.surface.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha:0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -967,7 +967,7 @@ class _MarkerListItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: _getMarkerColor(context).withValues(alpha:0.1),
+                color: _getMarkerColor(context).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

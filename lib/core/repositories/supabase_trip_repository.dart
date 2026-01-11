@@ -76,7 +76,7 @@ class SupabaseTripRepository
     final lastSortValue = cursorData?['lastSortValue'];
 
     // Build Supabase query
-    var query = _client.from('trips').select().eq('userId', userId);
+    dynamic query = _client.from('trips').select().eq('userId', userId);
 
     // Add additional filters
     if (filters != null) {
@@ -172,7 +172,7 @@ class SupabaseTripRepository
     final offset = (page - 1) * validatedPageSize;
 
     // Build Supabase query
-    var query = _client.from('trips').select().eq('userId', userId);
+    dynamic query = _client.from('trips').select().eq('userId', userId);
 
     // Add additional filters
     if (filters != null) {
@@ -235,7 +235,7 @@ class SupabaseTripRepository
     final lastId = cursorData?['lastId'] as String?;
 
     // Build query with only metadata fields
-    var query = _client
+    dynamic query = _client
         .from('trips')
         .select('id, title, destination, startDate, endDate, coverImageUrl')
         .eq('userId', userId);
@@ -366,7 +366,7 @@ class SupabaseTripRepository
     final offset = (currentPage - 1) * validatedPageSize;
 
     // Build search query using ILIKE for case-insensitive search
-    var queryBuilder = _client.from('trips').select().eq('userId', userId);
+    dynamic queryBuilder = _client.from('trips').select().eq('userId', userId);
 
     // Search across multiple fields
     queryBuilder = queryBuilder.or(
@@ -406,7 +406,7 @@ class SupabaseTripRepository
     required String userId,
     Map<String, dynamic>? filters,
   }) async {
-    var query = _client.from('trips').select().eq('userId', userId);
+    dynamic query = _client.from('trips').select().eq('userId', userId);
 
     if (filters != null) {
       if (filters.containsKey('status')) {

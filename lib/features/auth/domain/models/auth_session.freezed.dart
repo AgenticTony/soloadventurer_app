@@ -154,8 +154,6 @@ extension AuthSessionPatterns on AuthSession {
     switch (_that) {
       case _AuthSession():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -237,8 +235,6 @@ extension AuthSessionPatterns on AuthSession {
       case _AuthSession():
         return $default(_that.accessToken, _that.idToken, _that.refreshToken,
             _that.expiresAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

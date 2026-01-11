@@ -61,7 +61,7 @@ class Filter extends _$Filter {
   @override
   DestinationFilter build() {
     // The filter starts with default values (no filters applied)
-    return const DestinationFilter();
+    return DestinationFilter();
   }
 
   /// Update the entire filter at once
@@ -232,7 +232,7 @@ class Filter extends _$Filter {
   /// The search query, budget, safety scores, location, tags, and other
   /// filters will all be reset to their default (null/empty) values.
   void reset() {
-    state = const DestinationFilter();
+    state = DestinationFilter();
   }
 
   /// Reset only the soft filters (keeps location and budget)

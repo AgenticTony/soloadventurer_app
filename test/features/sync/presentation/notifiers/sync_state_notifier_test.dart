@@ -11,7 +11,6 @@ import 'package:soloadventurer/features/core/domain/services/logging_service.dar
 import 'sync_state_notifier_test.mocks.dart';
 
 @GenerateMocks([SyncService, LoggingService])
-
 void main() {
   late MockSyncService mockSyncService;
   late MockLoggingService mockLogger;

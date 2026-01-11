@@ -364,7 +364,6 @@ class StatusSelectorDropdown extends StatelessWidget {
               }
             }
           : null,
-      enabled: enabled,
       style: ButtonStyle(
         backgroundColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {

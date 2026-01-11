@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
 import '../../domain/entities/profile_state.dart';
 import '../../domain/repositories/profile_repository.dart';
@@ -29,6 +30,7 @@ ProfileRepository profileRepository(Ref ref) {
   return ProfileRepositoryImpl(
     userDao: getIt<UserDao>(),
     apiService: getIt<DioApiService>(),
+    supabaseClient: Supabase.instance.client,
     connectivityService: getIt<ConnectivityService>(),
     syncQueueService: getIt<SyncQueueService>(),
   );

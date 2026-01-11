@@ -1,5 +1,4 @@
 import '../models/paginated_data.dart';
-import '../models/page_info.dart';
 
 /// Mixin providing common pagination functionality for repositories
 ///

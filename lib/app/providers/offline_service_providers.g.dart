@@ -13,7 +13,7 @@ part of 'offline_service_providers.dart';
 /// Provides access to sync queue database operations.
 
 @ProviderFor(syncQueueDao)
-final syncQueueDaoProvider = SyncQueueDaoProvider._();
+const syncQueueDaoProvider = SyncQueueDaoProvider._();
 
 /// Provider for SyncQueueDao
 ///
@@ -25,7 +25,7 @@ final class SyncQueueDaoProvider
   /// Provider for SyncQueueDao
   ///
   /// Provides access to sync queue database operations.
-  SyncQueueDaoProvider._()
+  const SyncQueueDaoProvider._()
       : super(
           from: null,
           argument: null,
@@ -65,7 +65,7 @@ String _$syncQueueDaoHash() => r'95aec30f102c3f1776139137e1577c4b3695026b';
 /// Provides access to user profile database operations.
 
 @ProviderFor(userDao)
-final userDaoProvider = UserDaoProvider._();
+const userDaoProvider = UserDaoProvider._();
 
 /// Provider for UserDao
 ///
@@ -77,7 +77,7 @@ final class UserDaoProvider
   /// Provider for UserDao
   ///
   /// Provides access to user profile database operations.
-  UserDaoProvider._()
+  const UserDaoProvider._()
       : super(
           from: null,
           argument: null,
@@ -117,7 +117,7 @@ String _$userDaoHash() => r'46593c2743833cbec31bb9ba6b39656bfbfa03a8';
 /// Provides access to trip database operations.
 
 @ProviderFor(tripDao)
-final tripDaoProvider = TripDaoProvider._();
+const tripDaoProvider = TripDaoProvider._();
 
 /// Provider for TripDao
 ///
@@ -129,7 +129,7 @@ final class TripDaoProvider
   /// Provider for TripDao
   ///
   /// Provides access to trip database operations.
-  TripDaoProvider._()
+  const TripDaoProvider._()
       : super(
           from: null,
           argument: null,
@@ -169,7 +169,7 @@ String _$tripDaoHash() => r'e30e79bfc6f51bc84047a33248d1f515aa6904c4';
 /// Provides access to journal database operations.
 
 @ProviderFor(journalDao)
-final journalDaoProvider = JournalDaoProvider._();
+const journalDaoProvider = JournalDaoProvider._();
 
 /// Provider for JournalDao
 ///
@@ -181,7 +181,7 @@ final class JournalDaoProvider
   /// Provider for JournalDao
   ///
   /// Provides access to journal database operations.
-  JournalDaoProvider._()
+  const JournalDaoProvider._()
       : super(
           from: null,
           argument: null,
@@ -221,7 +221,7 @@ String _$journalDaoHash() => r'a5133fea0423f59741e5fd2aeb1dfe92806564a5';
 /// Provides access to itinerary database operations.
 
 @ProviderFor(itineraryDao)
-final itineraryDaoProvider = ItineraryDaoProvider._();
+const itineraryDaoProvider = ItineraryDaoProvider._();
 
 /// Provider for ItineraryDao
 ///
@@ -233,7 +233,7 @@ final class ItineraryDaoProvider
   /// Provider for ItineraryDao
   ///
   /// Provides access to itinerary database operations.
-  ItineraryDaoProvider._()
+  const ItineraryDaoProvider._()
       : super(
           from: null,
           argument: null,
@@ -273,7 +273,7 @@ String _$itineraryDaoHash() => r'2d6963ea4ae7d9f77bb8c65afa3414c169d24822';
 /// Monitors device connectivity state changes with debouncing.
 
 @ProviderFor(connectivityService)
-final connectivityServiceProvider = ConnectivityServiceProvider._();
+const connectivityServiceProvider = ConnectivityServiceProvider._();
 
 /// Provider for ConnectivityService
 ///
@@ -287,7 +287,7 @@ final class ConnectivityServiceProvider extends $FunctionalProvider<
   /// Provider for ConnectivityService
   ///
   /// Monitors device connectivity state changes with debouncing.
-  ConnectivityServiceProvider._()
+  const ConnectivityServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -330,7 +330,7 @@ String _$connectivityServiceHash() =>
 /// Tests actual API server reachability beyond just device connectivity.
 
 @ProviderFor(networkReachabilityService)
-final networkReachabilityServiceProvider =
+const networkReachabilityServiceProvider =
     NetworkReachabilityServiceProvider._();
 
 /// Provider for NetworkReachabilityService
@@ -344,7 +344,7 @@ final class NetworkReachabilityServiceProvider extends $FunctionalProvider<
   /// Provider for NetworkReachabilityService
   ///
   /// Tests actual API server reachability beyond just device connectivity.
-  NetworkReachabilityServiceProvider._()
+  const NetworkReachabilityServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -386,7 +386,7 @@ String _$networkReachabilityServiceHash() =>
 /// High-level operations for managing sync queue in the database.
 
 @ProviderFor(syncQueueRepository)
-final syncQueueRepositoryProvider = SyncQueueRepositoryProvider._();
+const syncQueueRepositoryProvider = SyncQueueRepositoryProvider._();
 
 /// Provider for SyncQueueRepository
 ///
@@ -399,7 +399,7 @@ final class SyncQueueRepositoryProvider extends $FunctionalProvider<
   /// Provider for SyncQueueRepository
   ///
   /// High-level operations for managing sync queue in the database.
-  SyncQueueRepositoryProvider._()
+  const SyncQueueRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -441,7 +441,7 @@ String _$syncQueueRepositoryHash() =>
 /// Manages sync queue lifecycle with retry logic and cleanup.
 
 @ProviderFor(syncQueueService)
-final syncQueueServiceProvider = SyncQueueServiceProvider._();
+const syncQueueServiceProvider = SyncQueueServiceProvider._();
 
 /// Provider for SyncQueueService
 ///
@@ -454,7 +454,7 @@ final class SyncQueueServiceProvider extends $FunctionalProvider<
   /// Provider for SyncQueueService
   ///
   /// Manages sync queue lifecycle with retry logic and cleanup.
-  SyncQueueServiceProvider._()
+  const SyncQueueServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -494,7 +494,7 @@ String _$syncQueueServiceHash() => r'f1d0963f4413e614f1c8aecac43c26a1549a8ac6';
 /// Can be used by repositories to intercept operations for offline support.
 
 @ProviderFor(offlineInterceptor)
-final offlineInterceptorProvider = OfflineInterceptorProvider._();
+const offlineInterceptorProvider = OfflineInterceptorProvider._();
 
 /// Provider for OfflineInterceptor
 ///
@@ -507,7 +507,7 @@ final class OfflineInterceptorProvider extends $FunctionalProvider<
   /// Provider for OfflineInterceptor
   ///
   /// Can be used by repositories to intercept operations for offline support.
-  OfflineInterceptorProvider._()
+  const OfflineInterceptorProvider._()
       : super(
           from: null,
           argument: null,
@@ -549,7 +549,7 @@ String _$offlineInterceptorHash() =>
 /// Handles sync conflicts with configurable resolution strategies.
 
 @ProviderFor(conflictResolver)
-final conflictResolverProvider = ConflictResolverProvider._();
+const conflictResolverProvider = ConflictResolverProvider._();
 
 /// Provider for ConflictResolver
 ///
@@ -562,7 +562,7 @@ final class ConflictResolverProvider extends $FunctionalProvider<
   /// Provider for ConflictResolver
   ///
   /// Handles sync conflicts with configurable resolution strategies.
-  ConflictResolverProvider._()
+  const ConflictResolverProvider._()
       : super(
           from: null,
           argument: null,
@@ -599,22 +599,22 @@ String _$conflictResolverHash() => r'9c5a3256b74109b50fe3d373008442e2588ac7e3';
 
 /// Provider for UploadSync
 ///
-/// Syncs queued operations from local database to server via GraphQL.
+/// Syncs queued operations from local database to server via Supabase PostgREST API.
 
 @ProviderFor(uploadSync)
-final uploadSyncProvider = UploadSyncProvider._();
+const uploadSyncProvider = UploadSyncProvider._();
 
 /// Provider for UploadSync
 ///
-/// Syncs queued operations from local database to server via GraphQL.
+/// Syncs queued operations from local database to server via Supabase PostgREST API.
 
 final class UploadSyncProvider
     extends $FunctionalProvider<UploadSync, UploadSync, UploadSync>
     with $Provider<UploadSync> {
   /// Provider for UploadSync
   ///
-  /// Syncs queued operations from local database to server via GraphQL.
-  UploadSyncProvider._()
+  /// Syncs queued operations from local database to server via Supabase PostgREST API.
+  const UploadSyncProvider._()
       : super(
           from: null,
           argument: null,
@@ -647,14 +647,14 @@ final class UploadSyncProvider
   }
 }
 
-String _$uploadSyncHash() => r'4f8678e39f3708a3f37d1382b9193eacd3c89078';
+String _$uploadSyncHash() => r'27c6ea3a8a5cdf9c5dff06438795b638dfa5d65a';
 
 /// Provider for DownloadSync
 ///
 /// Syncs server data to local database with conflict resolution.
 
 @ProviderFor(downloadSync)
-final downloadSyncProvider = DownloadSyncProvider._();
+const downloadSyncProvider = DownloadSyncProvider._();
 
 /// Provider for DownloadSync
 ///
@@ -666,7 +666,7 @@ final class DownloadSyncProvider
   /// Provider for DownloadSync
   ///
   /// Syncs server data to local database with conflict resolution.
-  DownloadSyncProvider._()
+  const DownloadSyncProvider._()
       : super(
           from: null,
           argument: null,
@@ -706,7 +706,7 @@ String _$downloadSyncHash() => r'3e0b24e4e0b5744b843b5c34701c2915624a5b8d';
 /// Efficient delta sync with fallback to full sync.
 
 @ProviderFor(incrementalSync)
-final incrementalSyncProvider = IncrementalSyncProvider._();
+const incrementalSyncProvider = IncrementalSyncProvider._();
 
 /// Provider for IncrementalSync
 ///
@@ -717,7 +717,7 @@ final class IncrementalSyncProvider extends $FunctionalProvider<IncrementalSync,
   /// Provider for IncrementalSync
   ///
   /// Efficient delta sync with fallback to full sync.
-  IncrementalSyncProvider._()
+  const IncrementalSyncProvider._()
       : super(
           from: null,
           argument: null,
@@ -760,7 +760,7 @@ String _$incrementalSyncHash() => r'e767d59773a6691e9e366eec8f5e62fa5f9d5045';
 /// This should be overridden in a provider where auth state is accessible.
 
 @ProviderFor(syncManager)
-final syncManagerProvider = SyncManagerProvider._();
+const syncManagerProvider = SyncManagerProvider._();
 
 /// Provider for SyncManager
 ///
@@ -778,7 +778,7 @@ final class SyncManagerProvider
   ///
   /// Note: The getCurrentUserId callback returns an empty string placeholder.
   /// This should be overridden in a provider where auth state is accessible.
-  SyncManagerProvider._()
+  const SyncManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -818,7 +818,7 @@ String _$syncManagerHash() => r'37ee43ab2fa9f8ad20cb784654dfe38e5127bea2';
 /// Tracks optimistic UI updates with rollback capability.
 
 @ProviderFor(optimisticUpdateHandler)
-final optimisticUpdateHandlerProvider = OptimisticUpdateHandlerProvider._();
+const optimisticUpdateHandlerProvider = OptimisticUpdateHandlerProvider._();
 
 /// Provider for OptimisticUpdateHandler
 ///
@@ -831,7 +831,7 @@ final class OptimisticUpdateHandlerProvider extends $FunctionalProvider<
   /// Provider for OptimisticUpdateHandler
   ///
   /// Tracks optimistic UI updates with rollback capability.
-  OptimisticUpdateHandlerProvider._()
+  const OptimisticUpdateHandlerProvider._()
       : super(
           from: null,
           argument: null,
@@ -873,7 +873,7 @@ String _$optimisticUpdateHandlerHash() =>
 /// Configures Workmanager for periodic background sync tasks.
 
 @ProviderFor(backgroundSyncService)
-final backgroundSyncServiceProvider = BackgroundSyncServiceProvider._();
+const backgroundSyncServiceProvider = BackgroundSyncServiceProvider._();
 
 /// Provider for BackgroundSyncService
 ///
@@ -886,7 +886,7 @@ final class BackgroundSyncServiceProvider extends $FunctionalProvider<
   /// Provider for BackgroundSyncService
   ///
   /// Configures Workmanager for periodic background sync tasks.
-  BackgroundSyncServiceProvider._()
+  const BackgroundSyncServiceProvider._()
       : super(
           from: null,
           argument: null,

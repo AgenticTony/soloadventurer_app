@@ -15,7 +15,7 @@ part of 'sync_manager_provider.dart';
 /// the current user ID without requiring a ProviderContainer at construction time.
 
 @ProviderFor(syncManager)
-final syncManagerProvider = SyncManagerProvider._();
+const syncManagerProvider = SyncManagerProvider._();
 
 /// Provider for the SyncManager that properly provides the userId callback
 ///
@@ -31,7 +31,7 @@ final class SyncManagerProvider
   /// This provider creates a SyncManagerImpl with a getCurrentUserId callback
   /// that reads from the auth state. This allows the sync manager to access
   /// the current user ID without requiring a ProviderContainer at construction time.
-  SyncManagerProvider._()
+  const SyncManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -64,4 +64,4 @@ final class SyncManagerProvider
   }
 }
 
-String _$syncManagerHash() => r'aac841f16f44149030e0fbda1712ba01d592bf65';
+String _$syncManagerHash() => r'db65d51e6de7bafb3edd1012760ecef9e77dee88';

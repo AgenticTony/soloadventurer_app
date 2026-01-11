@@ -14,7 +14,7 @@ part of 'journal_list_provider_optimized.dart';
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(OptimizedJournalList)
-final optimizedJournalListProvider = OptimizedJournalListProvider._();
+const optimizedJournalListProvider = OptimizedJournalListProvider._();
 
 /// Optimized notifier for managing journal list with pagination and caching
 ///
@@ -26,7 +26,7 @@ final class OptimizedJournalListProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  OptimizedJournalListProvider._()
+  const OptimizedJournalListProvider._()
       : super(
           from: null,
           argument: null,
@@ -67,6 +67,7 @@ abstract class _$OptimizedJournalList
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref =
         this.ref as $Ref<OptimizedJournalListState, OptimizedJournalListState>;
     final element = ref.element as $ClassProviderElement<
@@ -74,14 +75,14 @@ abstract class _$OptimizedJournalList
         OptimizedJournalListState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for query optimizer
 
 @ProviderFor(journalQueryOptimizer)
-final journalQueryOptimizerProvider = JournalQueryOptimizerProvider._();
+const journalQueryOptimizerProvider = JournalQueryOptimizerProvider._();
 
 /// Provider for query optimizer
 
@@ -89,7 +90,7 @@ final class JournalQueryOptimizerProvider
     extends $FunctionalProvider<QueryOptimizer, QueryOptimizer, QueryOptimizer>
     with $Provider<QueryOptimizer> {
   /// Provider for query optimizer
-  JournalQueryOptimizerProvider._()
+  const JournalQueryOptimizerProvider._()
       : super(
           from: null,
           argument: null,
@@ -128,7 +129,7 @@ String _$journalQueryOptimizerHash() =>
 /// Provider for entries grouped by trip (optimized)
 
 @ProviderFor(optimizedJournalEntriesByTrip)
-final optimizedJournalEntriesByTripProvider =
+const optimizedJournalEntriesByTripProvider =
     OptimizedJournalEntriesByTripProvider._();
 
 /// Provider for entries grouped by trip (optimized)
@@ -139,7 +140,7 @@ final class OptimizedJournalEntriesByTripProvider extends $FunctionalProvider<
         Map<String?, List<JournalEntry>>>
     with $Provider<Map<String?, List<JournalEntry>>> {
   /// Provider for entries grouped by trip (optimized)
-  OptimizedJournalEntriesByTripProvider._()
+  const OptimizedJournalEntriesByTripProvider._()
       : super(
           from: null,
           argument: null,
@@ -180,7 +181,7 @@ String _$optimizedJournalEntriesByTripHash() =>
 /// Provider for entries grouped by date (optimized)
 
 @ProviderFor(optimizedJournalEntriesByDate)
-final optimizedJournalEntriesByDateProvider =
+const optimizedJournalEntriesByDateProvider =
     OptimizedJournalEntriesByDateProvider._();
 
 /// Provider for entries grouped by date (optimized)
@@ -191,7 +192,7 @@ final class OptimizedJournalEntriesByDateProvider extends $FunctionalProvider<
         Map<String, List<JournalEntry>>>
     with $Provider<Map<String, List<JournalEntry>>> {
   /// Provider for entries grouped by date (optimized)
-  OptimizedJournalEntriesByDateProvider._()
+  const OptimizedJournalEntriesByDateProvider._()
       : super(
           from: null,
           argument: null,

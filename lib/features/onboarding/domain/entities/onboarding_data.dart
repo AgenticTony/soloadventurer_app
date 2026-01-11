@@ -13,8 +13,7 @@ part 'onboarding_data.g.dart';
 /// including the user's name, destination, travel dates, interests, and budget.
 /// It serves as input for generating a personalized starter itinerary.
 @freezed
-class OnboardingData with _$OnboardingData {
-
+sealed class OnboardingData with _$OnboardingData {
   /// Creates complete onboarding data
   ///
   /// [name] The user's name for personalization

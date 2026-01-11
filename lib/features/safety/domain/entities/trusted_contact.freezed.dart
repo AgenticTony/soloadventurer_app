@@ -294,8 +294,6 @@ extension TrustedContactPatterns on TrustedContact {
     switch (_that) {
       case _TrustedContact():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -433,8 +431,6 @@ extension TrustedContactPatterns on TrustedContact {
             _that.updatedAt,
             _that.revokedAt,
             _that.notes);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -497,7 +493,7 @@ extension TrustedContactPatterns on TrustedContact {
 
 /// @nodoc
 @JsonSerializable()
-class _TrustedContact implements TrustedContact {
+class _TrustedContact extends TrustedContact {
   const _TrustedContact(
       {required this.id,
       required this.userId,
@@ -513,7 +509,8 @@ class _TrustedContact implements TrustedContact {
       required this.addedAt,
       this.updatedAt,
       this.revokedAt,
-      this.notes});
+      this.notes})
+      : super._();
   factory _TrustedContact.fromJson(Map<String, dynamic> json) =>
       _$TrustedContactFromJson(json);
 

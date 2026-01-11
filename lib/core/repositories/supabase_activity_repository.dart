@@ -78,8 +78,8 @@ class SupabaseActivityRepository
     final lastId = cursorData?['lastId'] as String?;
     final lastSortValue = cursorData?['lastSortValue'];
 
-    // Build Supabase query
-    var query = _client.from('activities').select().eq('userId', userId);
+    // Build Supabase query - use dynamic to handle type changes through method chaining
+    dynamic query = _client.from('activities').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -180,8 +180,8 @@ class SupabaseActivityRepository
     // Calculate offset
     final offset = (page - 1) * validatedPageSize;
 
-    // Build Supabase query
-    var query = _client.from('activities').select().eq('userId', userId);
+    // Build Supabase query - use dynamic for type handling through method chain
+    dynamic query = _client.from('activities').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -247,7 +247,7 @@ class SupabaseActivityRepository
     final lastId = cursorData?['lastId'] as String?;
 
     // Build query with only metadata fields (more efficient)
-    var query = _client
+    dynamic query = _client
         .from('activities')
         .select(
             'id, title, category, startDateTime, locationName, isCompleted, isPriority')
@@ -406,7 +406,7 @@ class SupabaseActivityRepository
     final offset = (currentPage - 1) * validatedPageSize;
 
     // Build search query using text search or ILIKE
-    var queryBuilder = _client.from('activities').select().eq('userId', userId);
+    dynamic queryBuilder = _client.from('activities').select().eq('userId', userId);
 
     if (tripId != null) {
       queryBuilder = queryBuilder.eq('tripId', tripId);
@@ -731,7 +731,7 @@ class SupabaseActivityRepository
       final jsonStr = String.fromCharCodes(base64.decode(cursor));
       final decoded = Uri.decodeComponent(jsonStr);
       // Parse the map string back to Map
-      return Map<String, dynamic>.from(
+      return Map<String, dynamic>.fromEntries(
         decoded.replaceAll(RegExp('[{}]'), '').split(',').map((pair) {
           final parts = pair.split(':');
           return MapEntry(parts[0].trim(), parts[1].trim());

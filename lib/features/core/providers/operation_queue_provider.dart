@@ -1,13 +1,14 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../services/operation_queue.dart';
+import '../services/operation_queue.dart' show QueueableOperation;
+import '../services/operation_queue.dart' as services;
 
 part 'operation_queue_provider.freezed.dart';
 part 'operation_queue_provider.g.dart';
 
 /// State of the operation queue
 @freezed
-class OperationQueueState with _$OperationQueueState {
+sealed class OperationQueueState with _$OperationQueueState {
   const factory OperationQueueState({
     /// List of pending operations waiting to be processed
     @Default([]) List<QueueableOperation> pendingOperations,
@@ -24,7 +25,6 @@ class OperationQueueState with _$OperationQueueState {
     /// Count of failed operations
     @Default(0) int failedCount,
   }) = _OperationQueueState;
-
 }
 
 /// Provider that exposes the operation queue state to the UI
@@ -55,7 +55,7 @@ class OperationQueueNotifier extends _$OperationQueueNotifier {
   /// Call this method after performing actions that modify the queue
   /// to ensure the UI reflects the latest state.
   void refreshState() {
-    final queue = ref.read(operationQueueProvider.notifier);
+    final queue = ref.read(services.operationQueueProvider.notifier);
     final pendingOps = queue.getPendingOperations();
     final failedOps = queue.getFailedOperations();
 
@@ -70,35 +70,35 @@ class OperationQueueNotifier extends _$OperationQueueNotifier {
 
   /// Retry a specific failed operation by ID
   Future<void> retryOperation(String id) async {
-    final queue = ref.read(operationQueueProvider.notifier);
+    final queue = ref.read(services.operationQueueProvider.notifier);
     await queue.retryOperation(id);
     refreshState();
   }
 
   /// Retry all failed operations
   Future<void> retryAllFailed() async {
-    final queue = ref.read(operationQueueProvider.notifier);
+    final queue = ref.read(services.operationQueueProvider.notifier);
     await queue.retryAllFailed();
     refreshState();
   }
 
   /// Clear all failed operations
   Future<void> clearFailedOperations() async {
-    final queue = ref.read(operationQueueProvider.notifier);
+    final queue = ref.read(services.operationQueueProvider.notifier);
     await queue.clearFailedOperations();
     refreshState();
   }
 
   /// Remove a specific failed operation by ID
   Future<void> removeFailedOperation(String id) async {
-    final queue = ref.read(operationQueueProvider.notifier);
+    final queue = ref.read(services.operationQueueProvider.notifier);
     await queue.removeFailedOperation(id);
     refreshState();
   }
 
   /// Process the queue manually
   Future<void> processQueue() async {
-    final queue = ref.read(operationQueueProvider.notifier);
+    final queue = ref.read(services.operationQueueProvider.notifier);
     await queue.processQueue();
     refreshState();
   }

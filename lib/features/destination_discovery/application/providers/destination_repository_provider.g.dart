@@ -17,7 +17,7 @@ part of 'destination_repository_provider.dart';
 /// The provider is defined here for shared use across all destination discovery providers.
 
 @ProviderFor(destinationRepository)
-final destinationRepositoryProvider = DestinationRepositoryProvider._();
+const destinationRepositoryProvider = DestinationRepositoryProvider._();
 
 /// Provider for the destination repository
 ///
@@ -38,7 +38,7 @@ final class DestinationRepositoryProvider extends $FunctionalProvider<
   ///
   /// Riverpod 3.0: Uses @riverpod annotation with code generation.
   /// The provider is defined here for shared use across all destination discovery providers.
-  DestinationRepositoryProvider._()
+  const DestinationRepositoryProvider._()
       : super(
           from: null,
           argument: null,

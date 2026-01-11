@@ -66,8 +66,8 @@ typedef ActivityLevel = FilterActivityLevel;
 /// Used to query and filter destinations based on various criteria
 /// including budget, safety, activity level, and solo-friendliness.
 @freezed
-class DestinationFilter with _$DestinationFilter {
-  const factory DestinationFilter({
+sealed class DestinationFilter with _$DestinationFilter {
+  factory DestinationFilter({
     /// Text search query to filter destinations by name or description
     String? searchQuery,
 
@@ -131,7 +131,7 @@ class DestinationFilter with _$DestinationFilter {
       _$DestinationFilterFromJson(json);
 
   /// Creates a default filter with no filters applied
-  factory DestinationFilter.defaultFilter() => const DestinationFilter();
+  factory DestinationFilter.defaultFilter() => DestinationFilter();
 
   /// Creates a copy of this filter with pagination reset
   /// Useful for restarting a search with the same filters

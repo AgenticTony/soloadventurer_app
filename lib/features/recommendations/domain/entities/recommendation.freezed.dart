@@ -210,8 +210,6 @@ extension PersonalizedRecommendationPatterns on PersonalizedRecommendation {
     switch (_that) {
       case _PersonalizedRecommendation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -321,8 +319,6 @@ extension PersonalizedRecommendationPatterns on PersonalizedRecommendation {
             _that.source,
             _that.isSaved,
             _that.isAddedToItinerary);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -792,8 +788,6 @@ extension RecommendationMetadataPatterns on RecommendationMetadata {
     switch (_that) {
       case _RecommendationMetadata():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -915,8 +909,6 @@ extension RecommendationMetadataPatterns on RecommendationMetadata {
             _that.bookingUrl,
             _that.requiresAdvanceBooking,
             _that.isIndoor);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1330,8 +1322,6 @@ extension TimeOfDayPatterns on TimeOfDay {
     switch (_that) {
       case _TimeOfDay():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1407,8 +1397,6 @@ extension TimeOfDayPatterns on TimeOfDay {
     switch (_that) {
       case _TimeOfDay():
         return $default(_that.hour, _that.minute);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1644,8 +1632,6 @@ extension MoneyPatterns on Money {
     switch (_that) {
       case _Money():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -1721,8 +1707,6 @@ extension MoneyPatterns on Money {
     switch (_that) {
       case _Money():
         return $default(_that.amount, _that.currency);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

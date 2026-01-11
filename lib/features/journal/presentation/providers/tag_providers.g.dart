@@ -11,7 +11,7 @@ part of 'tag_providers.dart';
 /// Provider for Supabase client
 
 @ProviderFor(tagSupabaseClient)
-final tagSupabaseClientProvider = TagSupabaseClientProvider._();
+const tagSupabaseClientProvider = TagSupabaseClientProvider._();
 
 /// Provider for Supabase client
 
@@ -19,7 +19,7 @@ final class TagSupabaseClientProvider
     extends $FunctionalProvider<SupabaseClient, SupabaseClient, SupabaseClient>
     with $Provider<SupabaseClient> {
   /// Provider for Supabase client
-  TagSupabaseClientProvider._()
+  const TagSupabaseClientProvider._()
       : super(
           from: null,
           argument: null,
@@ -57,7 +57,7 @@ String _$tagSupabaseClientHash() => r'a8e848c86657267e44b53742ac981fb1555669e5';
 /// Provides the TagRemoteDataSource implementation
 
 @ProviderFor(tagRemoteDataSource)
-final tagRemoteDataSourceProvider = TagRemoteDataSourceProvider._();
+const tagRemoteDataSourceProvider = TagRemoteDataSourceProvider._();
 
 /// Provides the TagRemoteDataSource implementation
 
@@ -66,7 +66,7 @@ final class TagRemoteDataSourceProvider extends $FunctionalProvider<
     TagRemoteDataSourceImpl,
     TagRemoteDataSourceImpl> with $Provider<TagRemoteDataSourceImpl> {
   /// Provides the TagRemoteDataSource implementation
-  TagRemoteDataSourceProvider._()
+  const TagRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -106,7 +106,7 @@ String _$tagRemoteDataSourceHash() =>
 /// Provides the TagRepository implementation
 
 @ProviderFor(tagRepository)
-final tagRepositoryProvider = TagRepositoryProvider._();
+const tagRepositoryProvider = TagRepositoryProvider._();
 
 /// Provides the TagRepository implementation
 
@@ -114,7 +114,7 @@ final class TagRepositoryProvider
     extends $FunctionalProvider<TagRepository, TagRepository, TagRepository>
     with $Provider<TagRepository> {
   /// Provides the TagRepository implementation
-  TagRepositoryProvider._()
+  const TagRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -155,7 +155,7 @@ String _$tagRepositoryHash() => r'01bfa3e939bb8a30a2ac2163464cef7068b4ce9a';
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(TagList)
-final tagListProvider = TagListProvider._();
+const tagListProvider = TagListProvider._();
 
 /// Notifier for managing tag list state
 ///
@@ -166,7 +166,7 @@ final class TagListProvider extends $NotifierProvider<TagList, TagListState> {
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  TagListProvider._()
+  const TagListProvider._()
       : super(
           from: null,
           argument: null,
@@ -205,13 +205,14 @@ abstract class _$TagList extends $Notifier<TagListState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<TagListState, TagListState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TagListState, TagListState>,
         TagListState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -221,7 +222,7 @@ abstract class _$TagList extends $Notifier<TagListState> {
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(TagForm)
-final tagFormProvider = TagFormProvider._();
+const tagFormProvider = TagFormProvider._();
 
 /// Notifier for managing tag creation/editing state
 ///
@@ -232,7 +233,7 @@ final class TagFormProvider extends $NotifierProvider<TagForm, TagFormState> {
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  TagFormProvider._()
+  const TagFormProvider._()
       : super(
           from: null,
           argument: null,
@@ -271,13 +272,14 @@ abstract class _$TagForm extends $Notifier<TagFormState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<TagFormState, TagFormState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TagFormState, TagFormState>,
         TagFormState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -287,7 +289,7 @@ abstract class _$TagForm extends $Notifier<TagFormState> {
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(EntryTags)
-final entryTagsProvider = EntryTagsProvider._();
+const entryTagsProvider = EntryTagsProvider._();
 
 /// Notifier for managing entry tags
 ///
@@ -299,7 +301,7 @@ final class EntryTagsProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  EntryTagsProvider._()
+  const EntryTagsProvider._()
       : super(
           from: null,
           argument: null,
@@ -338,12 +340,13 @@ abstract class _$EntryTags extends $Notifier<EntryTagsState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<EntryTagsState, EntryTagsState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<EntryTagsState, EntryTagsState>,
         EntryTagsState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

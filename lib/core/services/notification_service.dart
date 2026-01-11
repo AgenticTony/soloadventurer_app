@@ -1,6 +1,9 @@
 import 'dart:typed_data';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+// Import for the implementation provider
+import 'notification_service_impl.dart' show notificationServiceOverrideProvider;
+
 part 'notification_service.g.dart';
 
 /// Notification types for safety features
@@ -323,10 +326,10 @@ class PendingNotification {
 }
 
 /// Provider for the notification service implementation
+///
+/// This provider returns the actual implementation from notification_service_impl.dart.
+/// The notificationServiceOverrideProvider handles the proper instantiation and disposal.
 @riverpod
-NotificationService notificationService(NotificationServiceRef ref) {
-  throw UnimplementedError(
-    'NotificationService implementation not provided. '
-    'Use notificationServiceProvider from notification_service_impl.dart',
-  );
+NotificationService notificationService(Ref ref) {
+  return ref.watch(notificationServiceOverrideProvider);
 }

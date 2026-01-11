@@ -149,7 +149,7 @@ class TripDetailScreen extends ConsumerWidget {
                     if (trip.isOngoing)
                       Chip(
                         label: const Text('Ongoing'),
-                        backgroundColor: Colors.green.withValues(alpha:0.1),
+                        backgroundColor: Colors.green.withValues(alpha: 0.1),
                         avatar: const Icon(Icons.flight_takeoff, size: 16),
                       ),
 
@@ -157,7 +157,7 @@ class TripDetailScreen extends ConsumerWidget {
                     if (trip.isPublic)
                       Chip(
                         label: const Text('Public'),
-                        backgroundColor: Colors.blue.withValues(alpha:0.1),
+                        backgroundColor: Colors.blue.withValues(alpha: 0.1),
                         avatar: const Icon(Icons.public, size: 16),
                       ),
 
@@ -247,8 +247,8 @@ class TripDetailScreen extends ConsumerWidget {
                     leading: const Icon(Icons.article),
                     title: Text('Journal Entries ($entryCount)'),
                     subtitle: entryCount > 0
-                        ? 'View all entries for this trip'
-                        : 'No entries yet',
+                        ? const Text('View all entries for this trip')
+                        : const Text('No entries yet'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
                       Navigator.push(
@@ -329,8 +329,8 @@ class TripDetailScreen extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
-            Theme.of(context).colorScheme.secondary.withValues(alpha:0.5),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5),
           ],
         ),
       ),

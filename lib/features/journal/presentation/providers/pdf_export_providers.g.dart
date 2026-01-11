@@ -11,7 +11,7 @@ part of 'pdf_export_providers.dart';
 /// Provider for the PDF export service
 
 @ProviderFor(pdfExportService)
-final pdfExportServiceProvider = PdfExportServiceProvider._();
+const pdfExportServiceProvider = PdfExportServiceProvider._();
 
 /// Provider for the PDF export service
 
@@ -20,7 +20,7 @@ final class PdfExportServiceProvider extends $FunctionalProvider<
     PdfExportService,
     PdfExportService> with $Provider<PdfExportService> {
   /// Provider for the PDF export service
-  PdfExportServiceProvider._()
+  const PdfExportServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -58,13 +58,13 @@ String _$pdfExportServiceHash() => r'4dd842389229e81a6d2df1107868ac430f442c73';
 /// Notifier for PDF export state management
 
 @ProviderFor(PdfExportNotifier)
-final pdfExportProvider = PdfExportNotifierProvider._();
+const pdfExportProvider = PdfExportNotifierProvider._();
 
 /// Notifier for PDF export state management
 final class PdfExportNotifierProvider
     extends $NotifierProvider<PdfExportNotifier, PdfExportState> {
   /// Notifier for PDF export state management
-  PdfExportNotifierProvider._()
+  const PdfExportNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -100,20 +100,21 @@ abstract class _$PdfExportNotifier extends $Notifier<PdfExportState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<PdfExportState, PdfExportState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<PdfExportState, PdfExportState>,
         PdfExportState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for PDF export statistics
 
 @ProviderFor(pdfExportStats)
-final pdfExportStatsProvider = PdfExportStatsFamily._();
+const pdfExportStatsProvider = PdfExportStatsFamily._();
 
 /// Provider for PDF export statistics
 
@@ -125,7 +126,7 @@ final class PdfExportStatsProvider extends $FunctionalProvider<
         $FutureModifier<Map<String, dynamic>>,
         $FutureProvider<Map<String, dynamic>> {
   /// Provider for PDF export statistics
-  PdfExportStatsProvider._(
+  const PdfExportStatsProvider._(
       {required PdfExportStatsFamily super.from,
       required String super.argument})
       : super(
@@ -178,7 +179,7 @@ String _$pdfExportStatsHash() => r'fc7c0884a233e32cef19f87cabfa070d09914d5d';
 
 final class PdfExportStatsFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<Map<String, dynamic>>, String> {
-  PdfExportStatsFamily._()
+  const PdfExportStatsFamily._()
       : super(
           retry: null,
           name: r'pdfExportStatsProvider',
@@ -201,7 +202,7 @@ final class PdfExportStatsFamily extends $Family
 /// Provider for estimated file size
 
 @ProviderFor(estimatedPdfSize)
-final estimatedPdfSizeProvider = EstimatedPdfSizeFamily._();
+const estimatedPdfSizeProvider = EstimatedPdfSizeFamily._();
 
 /// Provider for estimated file size
 
@@ -209,7 +210,7 @@ final class EstimatedPdfSizeProvider
     extends $FunctionalProvider<AsyncValue<int>, int, FutureOr<int>>
     with $FutureModifier<int>, $FutureProvider<int> {
   /// Provider for estimated file size
-  EstimatedPdfSizeProvider._(
+  const EstimatedPdfSizeProvider._(
       {required EstimatedPdfSizeFamily super.from,
       required String super.argument})
       : super(
@@ -261,7 +262,7 @@ String _$estimatedPdfSizeHash() => r'1f533715b3705e0ca1f76934d2fc4961f22c3d70';
 
 final class EstimatedPdfSizeFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<int>, String> {
-  EstimatedPdfSizeFamily._()
+  const EstimatedPdfSizeFamily._()
       : super(
           retry: null,
           name: r'estimatedPdfSizeProvider',
@@ -284,7 +285,7 @@ final class EstimatedPdfSizeFamily extends $Family
 /// Provider for default output path
 
 @ProviderFor(defaultPdfPath)
-final defaultPdfPathProvider = DefaultPdfPathFamily._();
+const defaultPdfPathProvider = DefaultPdfPathFamily._();
 
 /// Provider for default output path
 
@@ -292,7 +293,7 @@ final class DefaultPdfPathProvider
     extends $FunctionalProvider<AsyncValue<String>, String, FutureOr<String>>
     with $FutureModifier<String>, $FutureProvider<String> {
   /// Provider for default output path
-  DefaultPdfPathProvider._(
+  const DefaultPdfPathProvider._(
       {required DefaultPdfPathFamily super.from,
       required String super.argument})
       : super(
@@ -344,7 +345,7 @@ String _$defaultPdfPathHash() => r'a881497f671c4a9536dae68d28d618321d1e9af0';
 
 final class DefaultPdfPathFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<String>, String> {
-  DefaultPdfPathFamily._()
+  const DefaultPdfPathFamily._()
       : super(
           retry: null,
           name: r'defaultPdfPathProvider',

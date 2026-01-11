@@ -6,4 +6,8 @@ library;
 
 // Export Riverpod 3.0 providers (from @riverpod annotations)
 export 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart'
-    show trustedContactsProvider, checkInProvider, safetyProvider, locationSharingProvider;
+    show
+        trustedContactsProvider,
+        checkInProvider,
+        safetyProvider,
+        locationSharingProvider;

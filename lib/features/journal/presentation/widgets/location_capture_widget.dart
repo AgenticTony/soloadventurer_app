@@ -34,11 +34,11 @@ class LocationCaptureWidget extends ConsumerWidget {
         border: Border.all(
           color: creationState.latitude != null
               ? theme.colorScheme.primary
-              : theme.colorScheme.outline.withValues(alpha:0.3),
+              : theme.colorScheme.outline.withValues(alpha: 0.3),
         ),
         borderRadius: BorderRadius.circular(12),
         color: creationState.latitude != null
-            ? theme.colorScheme.primaryContainer.withValues(alpha:0.1)
+            ? theme.colorScheme.primaryContainer.withValues(alpha: 0.1)
             : null,
       ),
       child: Column(
@@ -271,7 +271,7 @@ class _LocationDetails extends StatelessWidget {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha:0.2),
+          color: theme.colorScheme.outline.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -347,7 +347,7 @@ class _LocationDetails extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.withValues(alpha:0.1),
+                        color: Colors.green.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -364,7 +364,7 @@ class _LocationDetails extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withValues(alpha:0.1),
+                        color: Colors.orange.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(

@@ -16,7 +16,7 @@ part of 'journal_entry_detail_provider.dart';
 /// Usage: ref.watch(journalEntryDetailProvider(entryId))
 
 @ProviderFor(JournalEntryDetail)
-final journalEntryDetailProvider = JournalEntryDetailFamily._();
+const journalEntryDetailProvider = JournalEntryDetailFamily._();
 
 /// Notifier for managing journal entry detail state
 /// MIGRATION: StateNotifier → Notifier pattern with family parameter
@@ -32,7 +32,7 @@ final class JournalEntryDetailProvider
   /// - Dependencies accessed via ref.watch() in methods
   /// - Automatic provider generation via @riverpod annotation
   /// Usage: ref.watch(journalEntryDetailProvider(entryId))
-  JournalEntryDetailProvider._(
+  const JournalEntryDetailProvider._(
       {required JournalEntryDetailFamily super.from,
       required String super.argument})
       : super(
@@ -90,7 +90,7 @@ final class JournalEntryDetailFamily extends $Family
     with
         $ClassFamilyOverride<JournalEntryDetail, JournalEntryDetailState,
             JournalEntryDetailState, JournalEntryDetailState, String> {
-  JournalEntryDetailFamily._()
+  const JournalEntryDetailFamily._()
       : super(
           retry: null,
           name: r'journalEntryDetailProvider',
@@ -132,6 +132,9 @@ abstract class _$JournalEntryDetail extends $Notifier<JournalEntryDetailState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref =
         this.ref as $Ref<JournalEntryDetailState, JournalEntryDetailState>;
     final element = ref.element as $ClassProviderElement<
@@ -139,10 +142,6 @@ abstract class _$JournalEntryDetail extends $Notifier<JournalEntryDetailState> {
         JournalEntryDetailState,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

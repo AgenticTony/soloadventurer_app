@@ -1,15 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:dio/dio.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
-import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
@@ -88,7 +84,8 @@ void main() {
       // Verify that expiration check indicates refresh should happen
       final expirationResult = expirationTracker.checkExpiration(session);
       expect(expirationResult.timeUntilRefresh, isNotNull);
-      expect(expirationResult.timeUntilRefresh!.inMinutes, lessThanOrEqualTo(45));
+      expect(
+          expirationResult.timeUntilRefresh!.inMinutes, lessThanOrEqualTo(45));
     });
 
     test('should trigger immediate refresh for expiring token', () async {
@@ -97,11 +94,13 @@ void main() {
         accessToken: 'test_access_token',
         idToken: 'test_id_token',
         refreshToken: 'test_refresh_token',
-        expiresAt: DateTime.now().add(const Duration(minutes: 3)), // Less than 5 min threshold
+        expiresAt: DateTime.now()
+            .add(const Duration(minutes: 3)), // Less than 5 min threshold
       );
 
       bool refreshStarted = false;
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         refreshStarted = true;
         return AuthSession(
           accessToken: 'new_access_token',
@@ -119,7 +118,8 @@ void main() {
 
       // Assert
       expect(refreshStarted, isTrue);
-      verify(() => mockAuthRepository.performBasicTokenRefresh()).called(greaterThan(0));
+      verify(() => mockAuthRepository.performBasicTokenRefresh())
+          .called(greaterThan(0));
     });
 
     test('should handle session update and reschedule refresh', () async {
@@ -169,7 +169,8 @@ void main() {
 
       // Assert
       expect(scheduler.isPaused, isTrue);
-      expect(expirationTracker.isMonitoring, isFalse); // Timer should be stopped
+      expect(
+          expirationTracker.isMonitoring, isFalse); // Timer should be stopped
     });
 
     test('should resume tracking when app returns to foreground', () {
@@ -190,7 +191,8 @@ void main() {
 
       // Assert
       expect(scheduler.isRunning, isTrue);
-      expect(expirationTracker.isMonitoring, isTrue); // Timer should be restarted
+      expect(
+          expirationTracker.isMonitoring, isTrue); // Timer should be restarted
     });
 
     test('should check expiration immediately on resume', () async {
@@ -203,7 +205,8 @@ void main() {
       );
 
       bool refreshTriggered = false;
-      when(() => mockAuthRepository.performBasicTokenRefresh()).thenAnswer((_) async {
+      when(() => mockAuthRepository.performBasicTokenRefresh())
+          .thenAnswer((_) async {
         refreshTriggered = true;
         return AuthSession(
           accessToken: 'new_token',
@@ -346,7 +349,8 @@ void main() {
       // Assert
       final currentExpiration = scheduler.checkExpiration();
       expect(currentExpiration, isNotNull);
-      expect(currentExpiration!.expirationTime, equals(refreshedSession.expiresAt));
+      expect(currentExpiration!.expirationTime,
+          equals(refreshedSession.expiresAt));
     });
   });
 }

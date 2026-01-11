@@ -164,7 +164,7 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
           side: BorderSide(
-            color: severityColor.withValues(alpha:0.3),
+            color: severityColor.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -265,7 +265,7 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
-        color: severityColor.withValues(alpha:0.05),
+        color: severityColor.withValues(alpha: 0.05),
         borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(12),
         ),

@@ -300,8 +300,6 @@ extension CheckInStatePatterns on CheckInState {
     switch (_that) {
       case _CheckInState():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -431,8 +429,6 @@ extension CheckInStatePatterns on CheckInState {
             _that.dueSoonCount,
             _that.missedCount,
             _that.nextCheckIn);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

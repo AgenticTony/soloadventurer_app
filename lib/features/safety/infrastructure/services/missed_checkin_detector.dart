@@ -153,7 +153,7 @@ abstract class MissedCheckInDetector {
 
 /// Provider for the missed check-in detector implementation
 @riverpod
-MissedCheckInDetector missedCheckInDetector(MissedCheckInDetectorRef ref) {
+MissedCheckInDetector missedCheckInDetector(Ref ref) {
   throw UnimplementedError(
     'MissedCheckInDetector implementation not provided. '
     'Use missedCheckInDetectorProvider from missed_checkin_detector_impl.dart',

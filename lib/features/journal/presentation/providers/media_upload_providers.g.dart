@@ -11,7 +11,7 @@ part of 'media_upload_providers.dart';
 /// Provider for SharedPreferences
 
 @ProviderFor(sharedPreferences)
-final sharedPreferencesProvider = SharedPreferencesProvider._();
+const sharedPreferencesProvider = SharedPreferencesProvider._();
 
 /// Provider for SharedPreferences
 
@@ -23,7 +23,7 @@ final class SharedPreferencesProvider extends $FunctionalProvider<
         $FutureModifier<SharedPreferences>,
         $FutureProvider<SharedPreferences> {
   /// Provider for SharedPreferences
-  SharedPreferencesProvider._()
+  const SharedPreferencesProvider._()
       : super(
           from: null,
           argument: null,
@@ -54,7 +54,7 @@ String _$sharedPreferencesHash() => r'dc403fbb1d968c7d5ab4ae1721a29ffe173701c7';
 /// Provider for MediaUploadService
 
 @ProviderFor(mediaUploadService)
-final mediaUploadServiceProvider = MediaUploadServiceProvider._();
+const mediaUploadServiceProvider = MediaUploadServiceProvider._();
 
 /// Provider for MediaUploadService
 
@@ -63,7 +63,7 @@ final class MediaUploadServiceProvider extends $FunctionalProvider<
     MediaUploadService,
     MediaUploadService> with $Provider<MediaUploadService> {
   /// Provider for MediaUploadService
-  MediaUploadServiceProvider._()
+  const MediaUploadServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -103,7 +103,7 @@ String _$mediaUploadServiceHash() =>
 /// Provider for upload statistics
 
 @ProviderFor(uploadStatistics)
-final uploadStatisticsProvider = UploadStatisticsProvider._();
+const uploadStatisticsProvider = UploadStatisticsProvider._();
 
 /// Provider for upload statistics
 
@@ -113,7 +113,7 @@ final class UploadStatisticsProvider extends $FunctionalProvider<
         FutureOr<UploadStatistics>>
     with $FutureModifier<UploadStatistics>, $FutureProvider<UploadStatistics> {
   /// Provider for upload statistics
-  UploadStatisticsProvider._()
+  const UploadStatisticsProvider._()
       : super(
           from: null,
           argument: null,
@@ -144,7 +144,7 @@ String _$uploadStatisticsHash() => r'79c4c4817b0ba429e0636631d1aceed72e3c830c';
 /// Provider for all upload tasks
 
 @ProviderFor(uploadTasks)
-final uploadTasksProvider = UploadTasksProvider._();
+const uploadTasksProvider = UploadTasksProvider._();
 
 /// Provider for all upload tasks
 
@@ -154,7 +154,7 @@ final class UploadTasksProvider extends $FunctionalProvider<
         FutureOr<List<UploadTask>>>
     with $FutureModifier<List<UploadTask>>, $FutureProvider<List<UploadTask>> {
   /// Provider for all upload tasks
-  UploadTasksProvider._()
+  const UploadTasksProvider._()
       : super(
           from: null,
           argument: null,
@@ -185,7 +185,7 @@ String _$uploadTasksHash() => r'1e11d2889adce3ca8e7eba254fd54f6e75f1203d';
 /// Provider for tasks of a specific journal entry
 
 @ProviderFor(uploadTasksForEntry)
-final uploadTasksForEntryProvider = UploadTasksForEntryFamily._();
+const uploadTasksForEntryProvider = UploadTasksForEntryFamily._();
 
 /// Provider for tasks of a specific journal entry
 
@@ -195,7 +195,7 @@ final class UploadTasksForEntryProvider extends $FunctionalProvider<
         FutureOr<List<UploadTask>>>
     with $FutureModifier<List<UploadTask>>, $FutureProvider<List<UploadTask>> {
   /// Provider for tasks of a specific journal entry
-  UploadTasksForEntryProvider._(
+  const UploadTasksForEntryProvider._(
       {required UploadTasksForEntryFamily super.from,
       required String super.argument})
       : super(
@@ -249,7 +249,7 @@ String _$uploadTasksForEntryHash() =>
 
 final class UploadTasksForEntryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<UploadTask>>, String> {
-  UploadTasksForEntryFamily._()
+  const UploadTasksForEntryFamily._()
       : super(
           retry: null,
           name: r'uploadTasksForEntryProvider',
@@ -272,7 +272,7 @@ final class UploadTasksForEntryFamily extends $Family
 /// Provider for a specific upload task
 
 @ProviderFor(uploadTask)
-final uploadTaskProvider = UploadTaskFamily._();
+const uploadTaskProvider = UploadTaskFamily._();
 
 /// Provider for a specific upload task
 
@@ -280,7 +280,7 @@ final class UploadTaskProvider extends $FunctionalProvider<
         AsyncValue<UploadTask?>, UploadTask?, FutureOr<UploadTask?>>
     with $FutureModifier<UploadTask?>, $FutureProvider<UploadTask?> {
   /// Provider for a specific upload task
-  UploadTaskProvider._(
+  const UploadTaskProvider._(
       {required UploadTaskFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -332,7 +332,7 @@ String _$uploadTaskHash() => r'f326dd7476915fff1a03f30d8be1bcf5292349a2';
 
 final class UploadTaskFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<UploadTask?>, String> {
-  UploadTaskFamily._()
+  const UploadTaskFamily._()
       : super(
           retry: null,
           name: r'uploadTaskProvider',
@@ -355,7 +355,7 @@ final class UploadTaskFamily extends $Family
 /// Provider for upload queue status stream
 
 @ProviderFor(uploadQueueStatus)
-final uploadQueueStatusProvider = UploadQueueStatusProvider._();
+const uploadQueueStatusProvider = UploadQueueStatusProvider._();
 
 /// Provider for upload queue status stream
 
@@ -365,7 +365,7 @@ final class UploadQueueStatusProvider extends $FunctionalProvider<
         Stream<List<UploadTask>>>
     with $FutureModifier<List<UploadTask>>, $StreamProvider<List<UploadTask>> {
   /// Provider for upload queue status stream
-  UploadQueueStatusProvider._()
+  const UploadQueueStatusProvider._()
       : super(
           from: null,
           argument: null,
@@ -396,7 +396,7 @@ String _$uploadQueueStatusHash() => r'70762d138b10892c1af730c83c9b48aada7e2f9c';
 /// Provider for upload progress of a specific task
 
 @ProviderFor(uploadTaskProgress)
-final uploadTaskProgressProvider = UploadTaskProgressFamily._();
+const uploadTaskProgressProvider = UploadTaskProgressFamily._();
 
 /// Provider for upload progress of a specific task
 
@@ -404,7 +404,7 @@ final class UploadTaskProgressProvider extends $FunctionalProvider<
         AsyncValue<UploadTask>, UploadTask, Stream<UploadTask>>
     with $FutureModifier<UploadTask>, $StreamProvider<UploadTask> {
   /// Provider for upload progress of a specific task
-  UploadTaskProgressProvider._(
+  const UploadTaskProgressProvider._(
       {required UploadTaskProgressFamily super.from,
       required String super.argument})
       : super(
@@ -457,7 +457,7 @@ String _$uploadTaskProgressHash() =>
 
 final class UploadTaskProgressFamily extends $Family
     with $FunctionalFamilyOverride<Stream<UploadTask>, String> {
-  UploadTaskProgressFamily._()
+  const UploadTaskProgressFamily._()
       : super(
           retry: null,
           name: r'uploadTaskProgressProvider',
@@ -480,13 +480,13 @@ final class UploadTaskProgressFamily extends $Family
 /// Notifier for managing media uploads
 
 @ProviderFor(MediaUploadNotifier)
-final mediaUploadProvider = MediaUploadNotifierProvider._();
+const mediaUploadProvider = MediaUploadNotifierProvider._();
 
 /// Notifier for managing media uploads
 final class MediaUploadNotifierProvider
     extends $AsyncNotifierProvider<MediaUploadNotifier, void> {
   /// Notifier for managing media uploads
-  MediaUploadNotifierProvider._()
+  const MediaUploadNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -515,12 +515,13 @@ abstract class _$MediaUploadNotifier extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
+    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, void>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, null);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
+import 'package:soloadventurer/features/travel/application/providers/itinerary_providers.dart';
 import 'package:soloadventurer/features/travel/presentation/widgets/add_itinerary_item_modal.dart';
 import 'package:soloadventurer/features/travel/presentation/widgets/ai_suggestions_bottom_sheet.dart';
 import 'package:soloadventurer/features/travel/presentation/widgets/day_expansion_tile.dart';
@@ -26,7 +27,7 @@ class ItineraryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final itineraryAsync = ref.watch(itineraryProvider(itineraryId));
-    final isReorderMode = ref.watch(isReorderModeNotifierProvider);
+    final isReorderMode = ref.watch(isReorderModeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -38,7 +39,7 @@ class ItineraryScreen extends ConsumerWidget {
           IconButton(
             icon: Icon(isReorderMode ? Icons.check : Icons.swap_vert),
             onPressed: () {
-              ref.read(isReorderModeNotifierProvider.notifier).toggle();
+              ref.read(isReorderModeProvider.notifier).toggle();
             },
           ),
           // AI Suggestions Button
@@ -176,7 +177,7 @@ class ItineraryScreen extends ConsumerWidget {
   }
 
   Widget _buildViewModeTabs(BuildContext context, WidgetRef ref) {
-    final viewMode = ref.watch(viewModeNotifierProvider);
+    final viewMode = ref.watch(viewModeProvider);
     return SegmentedButton<ViewMode>(
       segments: const [
         ButtonSegment(
@@ -197,7 +198,7 @@ class ItineraryScreen extends ConsumerWidget {
       ],
       selected: {viewMode},
       onSelectionChanged: (Set<ViewMode> newSelection) {
-        ref.read(viewModeNotifierProvider.notifier).setMode(newSelection.first);
+        ref.read(viewModeProvider.notifier).setMode(newSelection.first);
       },
     );
   }

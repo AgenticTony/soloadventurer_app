@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import '../../domain/models/saved_destination.dart';
 import '../../domain/models/destination.dart';
 import '../../application/providers/saved_destinations_provider.dart';
+import '../../application/state/saved_destinations_state.dart';
 import '../widgets/add_to_trip_flow.dart';
 import '../widgets/safety_score_badge.dart';
 import '../widgets/solo_suitability_badge.dart';
@@ -613,21 +615,32 @@ class _SavedDestinationCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   // Image
-                  Image.network(
-                    destination.coverImageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        child: Icon(
-                          Icons.place,
-                          size: 64,
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha:0.3),
-                        ),
-                      );
-                    },
-                  ),
+                  if (destination.coverImageUrl != null)
+                    Image.network(
+                      destination.coverImageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          child: Icon(
+                            Icons.place,
+                            size: 64,
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.3),
+                          ),
+                        );
+                      },
+                    )
+                  else
+                    Container(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Icons.place,
+                        size: 64,
+                        color: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.3),
+                      ),
+                    ),
 
                   // Save type badge
                   Positioned(
@@ -640,8 +653,8 @@ class _SavedDestinationCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: savedDestination.isWishlist
-                            ? Colors.purple.withValues(alpha:0.9)
-                            : Colors.orange.withValues(alpha:0.9),
+                            ? Colors.purple.withValues(alpha: 0.9)
+                            : Colors.orange.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(

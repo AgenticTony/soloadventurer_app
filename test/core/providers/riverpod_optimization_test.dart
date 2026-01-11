@@ -27,7 +27,8 @@ class TestUserRepository extends UserRepository {
   }
 
   @override
-  Future<User> updateUserProfile(String userId, Map<String, dynamic> data) async {
+  Future<User> updateUserProfile(
+      String userId, Map<String, dynamic> data) async {
     return User(
       id: userId,
       email: 'test@test.com',
@@ -65,7 +66,12 @@ void main() {
 
       test('should check mounted before state update in loadProfile', () async {
         // Arrange
-        final user = User(id: '123', email: 'test@test.com', username: 'test', createdAt: DateTime.now(), lastLoginAt: null);
+        final user = User(
+            id: '123',
+            email: 'test@test.com',
+            username: 'test',
+            createdAt: DateTime.now(),
+            lastLoginAt: null);
         when(() => mockRepository.getUserProfile('user123'))
             .thenAnswer((_) async => user);
 
@@ -81,7 +87,12 @@ void main() {
       test('should check mounted before state update in updateProfile',
           () async {
         // Arrange
-        final user = User(id: '123', email: 'test@test.com', username: 'test', createdAt: DateTime.now(), lastLoginAt: null);
+        final user = User(
+            id: '123',
+            email: 'test@test.com',
+            username: 'test',
+            createdAt: DateTime.now(),
+            lastLoginAt: null);
         when(() => mockRepository.updateUserProfile('user123', {}))
             .thenAnswer((_) async => user);
 
@@ -294,8 +305,12 @@ void main() {
 
         // Act - Rapid state changes
         for (int i = 0; i < 100; i++) {
-          notifier.state =
-              AsyncValue.data(User(id: '$i', email: 'test$i@test.com', username: 'test', createdAt: DateTime.now(), lastLoginAt: null));
+          notifier.state = AsyncValue.data(User(
+              id: '$i',
+              email: 'test$i@test.com',
+              username: 'test',
+              createdAt: DateTime.now(),
+              lastLoginAt: null));
         }
 
         // Assert - Should not throw

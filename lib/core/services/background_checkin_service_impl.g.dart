@@ -11,7 +11,7 @@ part of 'background_checkin_service_impl.dart';
 /// Provider for BackgroundCheckInServiceImpl
 
 @ProviderFor(backgroundCheckInServiceImpl)
-final backgroundCheckInServiceImplProvider =
+const backgroundCheckInServiceImplProvider =
     BackgroundCheckInServiceImplProvider._();
 
 /// Provider for BackgroundCheckInServiceImpl
@@ -21,7 +21,7 @@ final class BackgroundCheckInServiceImplProvider extends $FunctionalProvider<
     BackgroundCheckInService,
     BackgroundCheckInService> with $Provider<BackgroundCheckInService> {
   /// Provider for BackgroundCheckInServiceImpl
-  BackgroundCheckInServiceImplProvider._()
+  const BackgroundCheckInServiceImplProvider._()
       : super(
           from: null,
           argument: null,
@@ -56,12 +56,12 @@ final class BackgroundCheckInServiceImplProvider extends $FunctionalProvider<
 }
 
 String _$backgroundCheckInServiceImplHash() =>
-    r'b0414c4402613432af4af91942513b6e10e35bbd';
+    r'a7ffe15f166efdd79297e09d7dba7e4af02014aa';
 
 /// Provider override for BackgroundCheckInService interface
 
 @ProviderFor(backgroundCheckInServiceOverride)
-final backgroundCheckInServiceOverrideProvider =
+const backgroundCheckInServiceOverrideProvider =
     BackgroundCheckInServiceOverrideProvider._();
 
 /// Provider override for BackgroundCheckInService interface
@@ -72,7 +72,7 @@ final class BackgroundCheckInServiceOverrideProvider
         BackgroundCheckInService,
         BackgroundCheckInService> with $Provider<BackgroundCheckInService> {
   /// Provider override for BackgroundCheckInService interface
-  BackgroundCheckInServiceOverrideProvider._()
+  const BackgroundCheckInServiceOverrideProvider._()
       : super(
           from: null,
           argument: null,
@@ -107,4 +107,4 @@ final class BackgroundCheckInServiceOverrideProvider
 }
 
 String _$backgroundCheckInServiceOverrideHash() =>
-    r'bd0a92262eae07e8830f805d56dc1d97df1083d6';
+    r'53d3dad7313db656e9aae070b546393abc57a0a3';

@@ -11,14 +11,14 @@ part of 'background_token_refresh_service.dart';
 /// Service responsible for managing background token refresh operations
 
 @ProviderFor(BackgroundTokenRefreshService)
-final backgroundTokenRefreshServiceProvider =
+const backgroundTokenRefreshServiceProvider =
     BackgroundTokenRefreshServiceProvider._();
 
 /// Service responsible for managing background token refresh operations
 final class BackgroundTokenRefreshServiceProvider
     extends $AsyncNotifierProvider<BackgroundTokenRefreshService, void> {
   /// Service responsible for managing background token refresh operations
-  BackgroundTokenRefreshServiceProvider._()
+  const BackgroundTokenRefreshServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -47,12 +47,13 @@ abstract class _$BackgroundTokenRefreshService extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
+    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, void>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, null);
   }
 }

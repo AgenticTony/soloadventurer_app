@@ -258,8 +258,6 @@ extension TravelNoteOperationPatterns on TravelNoteOperation {
     switch (_that) {
       case _TravelNoteOperation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -393,8 +391,6 @@ extension TravelNoteOperationPatterns on TravelNoteOperation {
             _that.attemptCount,
             _that.lastError,
             _that.maxRetries);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

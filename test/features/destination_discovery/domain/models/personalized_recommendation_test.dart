@@ -97,8 +97,10 @@ void main() {
 
       expect(recommendedDest.destination, testDestination);
       expect(recommendedDest.matchScore, 0.85);
-      expect(recommendedDest.reason, 'Perfect for your love of cultural experiences');
-      expect(recommendedDest.matchingFactors, ['high solo suitability', 'cultural activities']);
+      expect(recommendedDest.reason,
+          'Perfect for your love of cultural experiences');
+      expect(recommendedDest.matchingFactors,
+          ['high solo suitability', 'cultural activities']);
       expect(recommendedDest.isHiddenGemMatch, false);
     });
 
@@ -285,7 +287,8 @@ void main() {
         preferenceSnapshot: {'budget': 'moderate', 'activity': 'cultural'},
       );
 
-      expect(recommendation.summary, 'Based on your love for cultural immersion');
+      expect(
+          recommendation.summary, 'Based on your love for cultural immersion');
       expect(recommendation.totalCount, 10);
       expect(recommendation.preferenceSnapshot, isNotNull);
       expect(recommendation.preferenceSnapshot!['budget'], 'moderate');
@@ -342,7 +345,8 @@ void main() {
       expect(deserialized.id, recommendation.id);
       expect(deserialized.userId, recommendation.userId);
       expect(deserialized.source, recommendation.source);
-      expect(deserialized.recommendations.length, recommendation.recommendations.length);
+      expect(deserialized.recommendations.length,
+          recommendation.recommendations.length);
       expect(deserialized.generatedAt, recommendation.generatedAt);
       expect(deserialized.expiresAt, recommendation.expiresAt);
     });
@@ -533,7 +537,9 @@ void main() {
       expect(hiddenGems.first.isHiddenGemMatch, true);
     });
 
-    test('sortedByMatchScore should return recommendations sorted by match score', () {
+    test(
+        'sortedByMatchScore should return recommendations sorted by match score',
+        () {
       final now = DateTime.now();
       final unsortedRec = PersonalizedRecommendation(
         id: 'rec_1',

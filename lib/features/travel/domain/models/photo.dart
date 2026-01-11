@@ -9,7 +9,7 @@ part 'photo.g.dart';
 /// location, timestamp, and size information for optimal rendering.
 /// Uses Freezed for immutability and efficient copyWith operations.
 @freezed
-class Photo with _$Photo {
+sealed class Photo with _$Photo {
   const factory Photo({
     /// Unique identifier for the photo
     required String id,

@@ -104,10 +104,11 @@ class SyncErrorDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
+                  color:
+                      theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: theme.colorScheme.primary.withValues(alpha:0.3),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -205,10 +206,11 @@ class SyncErrorDialog extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.errorContainer.withValues(alpha:0.1),
+                      color: theme.colorScheme.errorContainer
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: theme.colorScheme.error.withValues(alpha:0.2),
+                        color: theme.colorScheme.error.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Text(
@@ -226,8 +228,8 @@ class SyncErrorDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color:
-                    theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -235,13 +237,13 @@ class SyncErrorDialog extends StatelessWidget {
                   Icon(
                     Icons.tag,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Error ID: ${error.errorId}',
                     style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       fontFamily: 'monospace',
                     ),
                   ),
@@ -277,7 +279,7 @@ class SyncErrorDialog extends StatelessWidget {
             icon: const Icon(Icons.refresh),
             label: const Text('Retry'),
             style: FilledButton.styleFrom(
-              backgroundColor: severityColor.withValues(alpha:0.2),
+              backgroundColor: severityColor.withValues(alpha: 0.2),
               foregroundColor: severityColor,
             ),
           ),
@@ -343,7 +345,7 @@ class SyncErrorDialog extends StatelessWidget {
             child: Text(
               '$label:',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),
@@ -370,9 +372,9 @@ class SyncErrorDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withValues(alpha:0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha:0.5)),
+        border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
         text,

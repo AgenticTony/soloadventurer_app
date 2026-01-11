@@ -118,10 +118,10 @@ class ConflictComparisonView extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: color.withValues(alpha:0.05),
+        color: color.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: color.withValues(alpha:0.3),
+          color: color.withValues(alpha: 0.3),
           width: 2,
         ),
       ),
@@ -132,7 +132,7 @@ class ConflictComparisonView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: color.withValues(alpha:0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(10),
                 topRight: Radius.circular(10),
@@ -170,7 +170,7 @@ class ConflictComparisonView extends StatelessWidget {
                 // Data fields
                 if (data != null && data.isNotEmpty) ...[
                   Divider(
-                    color: color.withValues(alpha:0.2),
+                    color: color.withValues(alpha: 0.2),
                     height: 1,
                   ),
                   const SizedBox(height: 12),
@@ -179,7 +179,7 @@ class ConflictComparisonView extends StatelessWidget {
                   Text(
                     'No data available',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha:0.5),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -254,13 +254,13 @@ class ConflictComparisonView extends StatelessWidget {
         Icon(
           icon,
           size: 14,
-          color: color.withValues(alpha:0.7),
+          color: color.withValues(alpha: 0.7),
         ),
         const SizedBox(width: 6),
         Text(
           '$label:',
           style: theme.textTheme.bodySmall?.copyWith(
-            color: color.withValues(alpha:0.7),
+            color: color.withValues(alpha: 0.7),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -312,7 +312,7 @@ class ConflictComparisonView extends StatelessWidget {
           Text(
             '... and ${data.length - 10} more fields',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurface.withValues(alpha:0.5),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               fontStyle: FontStyle.italic,
             ),
           ),
@@ -353,7 +353,7 @@ class ConflictComparisonView extends StatelessWidget {
                 Text(
                   key,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: color.withValues(alpha:0.8),
+                    color: color.withValues(alpha: 0.8),
                     fontWeight: FontWeight.w500,
                   ),
                 ),

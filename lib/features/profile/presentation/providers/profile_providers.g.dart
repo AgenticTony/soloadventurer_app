@@ -14,7 +14,7 @@ part of 'profile_providers.dart';
 /// - Profile entity imported with alias to avoid conflicts
 
 @ProviderFor(profileRepository)
-final profileRepositoryProvider = ProfileRepositoryProvider._();
+const profileRepositoryProvider = ProfileRepositoryProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Repository and use case providers converted to @riverpod
@@ -29,7 +29,7 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   /// - Repository and use case providers converted to @riverpod
   /// - ProfileNavigationNotifier migrated from StateNotifier to Notifier
   /// - Profile entity imported with alias to avoid conflicts
-  ProfileRepositoryProvider._()
+  const ProfileRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -63,16 +63,16 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$profileRepositoryHash() => r'f08e1d61df7f839b31491869430a3cdca5afb06e';
+String _$profileRepositoryHash() => r'45bd3a1bbd53c4a3198803ee58b6aa1fbe913c7b';
 
 @ProviderFor(getCurrentProfileUseCase)
-final getCurrentProfileUseCaseProvider = GetCurrentProfileUseCaseProvider._();
+const getCurrentProfileUseCaseProvider = GetCurrentProfileUseCaseProvider._();
 
 final class GetCurrentProfileUseCaseProvider extends $FunctionalProvider<
     GetCurrentProfileUseCase,
     GetCurrentProfileUseCase,
     GetCurrentProfileUseCase> with $Provider<GetCurrentProfileUseCase> {
-  GetCurrentProfileUseCaseProvider._()
+  const GetCurrentProfileUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -110,13 +110,13 @@ String _$getCurrentProfileUseCaseHash() =>
     r'5075f969d48893d39ec0b466a9577179353e5491';
 
 @ProviderFor(updateProfileUseCase)
-final updateProfileUseCaseProvider = UpdateProfileUseCaseProvider._();
+const updateProfileUseCaseProvider = UpdateProfileUseCaseProvider._();
 
 final class UpdateProfileUseCaseProvider extends $FunctionalProvider<
     UpdateProfileUseCase,
     UpdateProfileUseCase,
     UpdateProfileUseCase> with $Provider<UpdateProfileUseCase> {
-  UpdateProfileUseCaseProvider._()
+  const UpdateProfileUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -154,13 +154,13 @@ String _$updateProfileUseCaseHash() =>
     r'463ad3491acffdf79b7ea55b3c4bc170e3aeec1f';
 
 @ProviderFor(manageAvatarUseCase)
-final manageAvatarUseCaseProvider = ManageAvatarUseCaseProvider._();
+const manageAvatarUseCaseProvider = ManageAvatarUseCaseProvider._();
 
 final class ManageAvatarUseCaseProvider extends $FunctionalProvider<
     ManageAvatarUseCase,
     ManageAvatarUseCase,
     ManageAvatarUseCase> with $Provider<ManageAvatarUseCase> {
-  ManageAvatarUseCaseProvider._()
+  const ManageAvatarUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -198,13 +198,13 @@ String _$manageAvatarUseCaseHash() =>
     r'ecd6996d6cf1b85d41560db1a2ec5f9275918468';
 
 @ProviderFor(deleteProfileUseCase)
-final deleteProfileUseCaseProvider = DeleteProfileUseCaseProvider._();
+const deleteProfileUseCaseProvider = DeleteProfileUseCaseProvider._();
 
 final class DeleteProfileUseCaseProvider extends $FunctionalProvider<
     DeleteProfileUseCase,
     DeleteProfileUseCase,
     DeleteProfileUseCase> with $Provider<DeleteProfileUseCase> {
-  DeleteProfileUseCaseProvider._()
+  const DeleteProfileUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -242,13 +242,13 @@ String _$deleteProfileUseCaseHash() =>
     r'387b660bb112bd6c7b99aa58db7c073fbcf8912d';
 
 @ProviderFor(createProfileUseCase)
-final createProfileUseCaseProvider = CreateProfileUseCaseProvider._();
+const createProfileUseCaseProvider = CreateProfileUseCaseProvider._();
 
 final class CreateProfileUseCaseProvider extends $FunctionalProvider<
     CreateProfileUseCase,
     CreateProfileUseCase,
     CreateProfileUseCase> with $Provider<CreateProfileUseCase> {
-  CreateProfileUseCaseProvider._()
+  const CreateProfileUseCaseProvider._()
       : super(
           from: null,
           argument: null,
@@ -286,11 +286,11 @@ String _$createProfileUseCaseHash() =>
     r'b0c1c2aff19f9445c50d7112f7ec9a2b11e17d0e';
 
 @ProviderFor(ProfileDomain)
-final profileDomainProvider = ProfileDomainFamily._();
+const profileDomainProvider = ProfileDomainFamily._();
 
 final class ProfileDomainProvider
     extends $NotifierProvider<ProfileDomain, ProfileDomainState> {
-  ProfileDomainProvider._(
+  const ProfileDomainProvider._(
       {required ProfileDomainFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -339,7 +339,7 @@ final class ProfileDomainFamily extends $Family
     with
         $ClassFamilyOverride<ProfileDomain, ProfileDomainState,
             ProfileDomainState, ProfileDomainState, String> {
-  ProfileDomainFamily._()
+  const ProfileDomainFamily._()
       : super(
           retry: null,
           name: r'profileDomainProvider',
@@ -367,26 +367,25 @@ abstract class _$ProfileDomain extends $Notifier<ProfileDomainState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<ProfileDomainState, ProfileDomainState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ProfileDomainState, ProfileDomainState>,
         ProfileDomainState,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }
 
 @ProviderFor(ProfileNavigationHistory)
-final profileNavigationHistoryProvider = ProfileNavigationHistoryProvider._();
+const profileNavigationHistoryProvider = ProfileNavigationHistoryProvider._();
 
 final class ProfileNavigationHistoryProvider extends $NotifierProvider<
     ProfileNavigationHistory, ProfileNavigationState> {
-  ProfileNavigationHistoryProvider._()
+  const ProfileNavigationHistoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -422,6 +421,7 @@ abstract class _$ProfileNavigationHistory
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref =
         this.ref as $Ref<ProfileNavigationState, ProfileNavigationState>;
     final element = ref.element as $ClassProviderElement<
@@ -429,6 +429,6 @@ abstract class _$ProfileNavigationHistory
         ProfileNavigationState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

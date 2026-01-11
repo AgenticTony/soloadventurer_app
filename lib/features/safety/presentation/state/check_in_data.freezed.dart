@@ -164,8 +164,6 @@ extension CheckInDataPatterns on CheckInData {
     switch (_that) {
       case _CheckInData():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -247,8 +245,6 @@ extension CheckInDataPatterns on CheckInData {
       case _CheckInData():
         return $default(
             _that.checkIns, _that.upcomingCheckIns, _that.selectedCheckIn);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

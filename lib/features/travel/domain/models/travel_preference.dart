@@ -4,7 +4,7 @@ part 'travel_preference.freezed.dart';
 part 'travel_preference.g.dart';
 
 @freezed
-class TravelPreference with _$TravelPreference {
+sealed class TravelPreference with _$TravelPreference {
   const factory TravelPreference({
     required String id,
     required String userId,

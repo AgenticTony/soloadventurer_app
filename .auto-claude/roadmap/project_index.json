@@ -154,6 +154,20 @@
             "sensitive": false,
             "required": false
           },
+          "SUPABASE_URL": {
+            "value": "https://bfzdljnalladqtdoaijb.supabase.co",
+            "source": "../.env",
+            "type": "url",
+            "sensitive": false,
+            "required": false
+          },
+          "SUPABASE_SERVICE_KEY": {
+            "value": "<REDACTED>",
+            "source": "../.env",
+            "type": "string",
+            "sensitive": true,
+            "required": false
+          },
           "BASE_URL": {
             "value": "https://openrouter.ai/api/v1",
             "source": "../.env",
@@ -195,32 +209,11 @@
             "type": "string",
             "sensitive": false,
             "required": false
-          },
-          "SUPABASE_URL": {
-            "value": "https://bfzdljnalladqtdoaijb.supabase.co",
-            "source": "../.env",
-            "type": "url",
-            "sensitive": false,
-            "required": false
-          },
-          "SUPABASE_SERVICE_KEY": {
-            "value": "<REDACTED>",
-            "source": "../.env",
-            "type": "string",
-            "sensitive": true,
-            "required": false
-          },
-          "SUPABASE_ENV": {
-            "value": "dev",
-            "source": "../.env",
-            "type": "string",
-            "sensitive": false,
-            "required": false
           }
         },
         "required_count": 0,
         "optional_count": 0,
-        "detected_count": 28
+        "detected_count": 27
       }
     }
   },

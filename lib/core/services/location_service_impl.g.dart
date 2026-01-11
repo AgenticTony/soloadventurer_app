@@ -11,7 +11,7 @@ part of 'location_service_impl.dart';
 /// Provider for LocationServiceImpl
 
 @ProviderFor(locationServiceImpl)
-final locationServiceImplProvider = LocationServiceImplProvider._();
+const locationServiceImplProvider = LocationServiceImplProvider._();
 
 /// Provider for LocationServiceImpl
 
@@ -20,7 +20,7 @@ final class LocationServiceImplProvider extends $FunctionalProvider<
     LocationService,
     LocationService> with $Provider<LocationService> {
   /// Provider for LocationServiceImpl
-  LocationServiceImplProvider._()
+  const LocationServiceImplProvider._()
       : super(
           from: null,
           argument: null,
@@ -59,7 +59,7 @@ String _$locationServiceImplHash() =>
 /// Provider override for LocationService interface
 
 @ProviderFor(locationServiceOverride)
-final locationServiceOverrideProvider = LocationServiceOverrideProvider._();
+const locationServiceOverrideProvider = LocationServiceOverrideProvider._();
 
 /// Provider override for LocationService interface
 
@@ -68,7 +68,7 @@ final class LocationServiceOverrideProvider extends $FunctionalProvider<
     LocationService,
     LocationService> with $Provider<LocationService> {
   /// Provider override for LocationService interface
-  LocationServiceOverrideProvider._()
+  const LocationServiceOverrideProvider._()
       : super(
           from: null,
           argument: null,

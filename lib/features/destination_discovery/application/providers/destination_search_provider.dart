@@ -52,7 +52,7 @@ class DestinationSearch extends _$DestinationSearch {
     ref.watch(destinationRepositoryProvider);
 
     // Return initial state (no auto-load for search provider)
-    return const DestinationSearchState.initial();
+    return DestinationSearchState.initial();
   }
 
   /// Search for destinations with the given filter
@@ -157,7 +157,7 @@ class DestinationSearch extends _$DestinationSearch {
   /// This method resets the state to initial, clearing all results
   /// and filter settings.
   void clear() {
-    state = const AsyncValue.data(DestinationSearchState.initial());
+    state = AsyncValue.data(DestinationSearchState.initial());
   }
 
   /// Update the filter without performing a search
@@ -186,7 +186,7 @@ class DestinationSearch extends _$DestinationSearch {
     }
 
     state = AsyncValue.data(currentState.copyWith(
-      filter: const DestinationFilter(),
+      filter: DestinationFilter(),
     ));
   }
 

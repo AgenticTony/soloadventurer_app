@@ -11,7 +11,7 @@ part of 'safety_providers.dart';
 /// Provider for SafetyLocalDataSource
 
 @ProviderFor(safetyLocalDataSource)
-final safetyLocalDataSourceProvider = SafetyLocalDataSourceProvider._();
+const safetyLocalDataSourceProvider = SafetyLocalDataSourceProvider._();
 
 /// Provider for SafetyLocalDataSource
 
@@ -20,7 +20,7 @@ final class SafetyLocalDataSourceProvider extends $FunctionalProvider<
     SafetyLocalDataSource,
     SafetyLocalDataSource> with $Provider<SafetyLocalDataSource> {
   /// Provider for SafetyLocalDataSource
-  SafetyLocalDataSourceProvider._()
+  const SafetyLocalDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,13 +55,13 @@ final class SafetyLocalDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$safetyLocalDataSourceHash() =>
-    r'b2f4d063bf9b05e7a081ba1f0beab38a31f4b599';
+    r'79415e99fd9d58ba60962156fafdbc84ddc155a6';
 
 /// Provider for SafetyRemoteDataSource
 /// Uses mock implementation for now, should be replaced with real implementation
 
 @ProviderFor(safetyRemoteDataSource)
-final safetyRemoteDataSourceProvider = SafetyRemoteDataSourceProvider._();
+const safetyRemoteDataSourceProvider = SafetyRemoteDataSourceProvider._();
 
 /// Provider for SafetyRemoteDataSource
 /// Uses mock implementation for now, should be replaced with real implementation
@@ -72,7 +72,7 @@ final class SafetyRemoteDataSourceProvider extends $FunctionalProvider<
     SafetyRemoteDataSource> with $Provider<SafetyRemoteDataSource> {
   /// Provider for SafetyRemoteDataSource
   /// Uses mock implementation for now, should be replaced with real implementation
-  SafetyRemoteDataSourceProvider._()
+  const SafetyRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -107,12 +107,12 @@ final class SafetyRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$safetyRemoteDataSourceHash() =>
-    r'f4fd7b20bcf5aaedea42c60f5d85f2e93522d842';
+    r'7621d34a6ff8d6d730188d1a4b8cd4420ec7ab40';
 
 /// Provider for SafetyRepository implementation
 
 @ProviderFor(safetyRepository)
-final safetyRepositoryProvider = SafetyRepositoryProvider._();
+const safetyRepositoryProvider = SafetyRepositoryProvider._();
 
 /// Provider for SafetyRepository implementation
 
@@ -121,7 +121,7 @@ final class SafetyRepositoryProvider extends $FunctionalProvider<
     SafetyRepository,
     SafetyRepository> with $Provider<SafetyRepository> {
   /// Provider for SafetyRepository implementation
-  SafetyRepositoryProvider._()
+  const SafetyRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -154,12 +154,12 @@ final class SafetyRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$safetyRepositoryHash() => r'e1a315acdacc7114f4d12a4fc64196288a5925f3';
+String _$safetyRepositoryHash() => r'148e97810d9d39ab7699de8fad18b3645c20d405';
 
 /// Provider override for SafetyRepository interface
 
 @ProviderFor(safetyRepositoryOverride)
-final safetyRepositoryOverrideProvider = SafetyRepositoryOverrideProvider._();
+const safetyRepositoryOverrideProvider = SafetyRepositoryOverrideProvider._();
 
 /// Provider override for SafetyRepository interface
 
@@ -168,7 +168,7 @@ final class SafetyRepositoryOverrideProvider extends $FunctionalProvider<
     SafetyRepository,
     SafetyRepository> with $Provider<SafetyRepository> {
   /// Provider override for SafetyRepository interface
-  SafetyRepositoryOverrideProvider._()
+  const SafetyRepositoryOverrideProvider._()
       : super(
           from: null,
           argument: null,
@@ -202,4 +202,4 @@ final class SafetyRepositoryOverrideProvider extends $FunctionalProvider<
 }
 
 String _$safetyRepositoryOverrideHash() =>
-    r'37da08e4b3b89d25fdfd236ae654390847db14e3';
+    r'534dc8abaeac33619e8751dd1800128d4f5860ab';

@@ -1,9 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/usecases/get_current_profile_use_case.dart';
-import '../../domain/usecases/update_profile_use_case.dart';
-import '../../domain/usecases/manage_avatar_use_case.dart';
-import '../../domain/usecases/delete_profile_use_case.dart';
 import '../state/profile_state.dart';
 import '../../domain/entities/profile_state.dart';
 import '../providers/profile_providers.dart';
@@ -59,7 +54,9 @@ class Profile extends _$Profile {
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
-    if (authState == null || !authState.isAuthenticated || authState.user == null) {
+    if (authState == null ||
+        !authState.isAuthenticated ||
+        authState.user == null) {
       state = state.copyWith(
         isLoading: false,
         error: 'Not authenticated',
@@ -104,7 +101,9 @@ class Profile extends _$Profile {
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
-    if (authState == null || !authState.isAuthenticated || authState.user == null) {
+    if (authState == null ||
+        !authState.isAuthenticated ||
+        authState.user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -156,7 +155,9 @@ class Profile extends _$Profile {
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
-    if (authState == null || !authState.isAuthenticated || authState.user == null) {
+    if (authState == null ||
+        !authState.isAuthenticated ||
+        authState.user == null) {
       state = state.copyWith(
         isUploading: false,
         error: 'Not authenticated',
@@ -201,7 +202,9 @@ class Profile extends _$Profile {
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
-    if (authState == null || !authState.isAuthenticated || authState.user == null) {
+    if (authState == null ||
+        !authState.isAuthenticated ||
+        authState.user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',
@@ -234,7 +237,9 @@ class Profile extends _$Profile {
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
-    if (authState == null || !authState.isAuthenticated || authState.user == null) {
+    if (authState == null ||
+        !authState.isAuthenticated ||
+        authState.user == null) {
       state = state.copyWith(
         isUpdating: false,
         error: 'Not authenticated',

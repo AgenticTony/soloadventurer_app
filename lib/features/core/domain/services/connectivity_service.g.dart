@@ -11,7 +11,7 @@ part of 'connectivity_service.dart';
 /// Provider for the connectivity service implementation
 
 @ProviderFor(connectivityService)
-final connectivityServiceProvider = ConnectivityServiceProvider._();
+const connectivityServiceProvider = ConnectivityServiceProvider._();
 
 /// Provider for the connectivity service implementation
 
@@ -20,7 +20,7 @@ final class ConnectivityServiceProvider extends $FunctionalProvider<
     ConnectivityService,
     ConnectivityService> with $Provider<ConnectivityService> {
   /// Provider for the connectivity service implementation
-  ConnectivityServiceProvider._()
+  const ConnectivityServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,18 +55,18 @@ final class ConnectivityServiceProvider extends $FunctionalProvider<
 }
 
 String _$connectivityServiceHash() =>
-    r'5b7e4948cef2ab1c6394bec82a52f9b8b8c94263';
+    r'811bf8f1e3129c38cf832dc965131ce338ce74e3';
 
 /// Provider that exposes the current network status
 
 @ProviderFor(NetworkStatusNotifier)
-final networkStatusProvider = NetworkStatusNotifierProvider._();
+const networkStatusProvider = NetworkStatusNotifierProvider._();
 
 /// Provider that exposes the current network status
 final class NetworkStatusNotifierProvider
     extends $AsyncNotifierProvider<NetworkStatusNotifier, NetworkStatus> {
   /// Provider that exposes the current network status
-  NetworkStatusNotifierProvider._()
+  const NetworkStatusNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -95,12 +95,13 @@ abstract class _$NetworkStatusNotifier extends $AsyncNotifier<NetworkStatus> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<AsyncValue<NetworkStatus>, NetworkStatus>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<NetworkStatus>, NetworkStatus>,
         AsyncValue<NetworkStatus>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

@@ -31,18 +31,18 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
     // Load all safety data when screen initializes
     Future.microtask(() {
       ref.read(trustedContactsProvider.notifier).loadContacts();
-      ref.read(checkInNotifierProvider.notifier).loadUpcomingCheckIns();
-      ref.read(locationSharingNotifierProvider).loadActiveShares();
-      ref.read(safetyNotifierProvider).initialize();
+      ref.read(checkInProvider.notifier).loadUpcomingCheckIns();
+      ref.read(locationSharingProvider.notifier).loadActiveShares();
+      ref.read(safetyProvider.notifier).initialize();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final trustedContactsState = ref.watch(trustedContactsProvider);
-    final checkInState = ref.watch(checkInNotifierProvider);
-    final locationSharingState = ref.watch(locationSharingStateProvider);
-    final safetyState = ref.watch(safetyStateProvider);
+    final checkInState = ref.watch(checkInProvider);
+    final locationSharingState = ref.watch(locationSharingProvider);
+    final safetyState = ref.watch(safetyProvider);
 
     final contactsCount = trustedContactsState.contacts.length;
     final upcomingCheckInsCount = checkInState.upcomingCheckIns.length;

@@ -9,6 +9,7 @@ import 'package:soloadventurer/features/auth/presentation/screens/verify_email_s
 import 'package:soloadventurer/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/confirm_password_reset_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/pages/cloudwatch_test_page.dart';
+import 'package:soloadventurer/features/performance/presentation/screens/performance_benchmark_screen.dart';
 import 'package:soloadventurer/features/home/presentation/screens/home_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/screens/profile_screen.dart';
 import 'package:soloadventurer/features/profile/presentation/screens/edit_profile_screen.dart';
@@ -33,6 +34,23 @@ import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
 import 'package:soloadventurer/features/travel/presentation/screens/itinerary_screen.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/screens/destination_discovery_screen.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/screens/destination_detail_screen.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/screens/recommendations_screen.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/screens/curated_lists_screen.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/screens/curated_list_detail_screen.dart';
+import 'package:soloadventurer/features/destination_discovery/presentation/screens/saved_destinations_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/journal_list_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/journal_entry_detail_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/create_journal_entry_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/journal_search_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/trip_list_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/trip_detail_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/trip_overview_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/create_trip_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/journal_map_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/memory_timeline_screen.dart';
+import 'package:soloadventurer/features/journal/presentation/screens/tag_list_screen.dart';
 import 'package:soloadventurer/app/router/go_router_service.dart';
 
 /// Global navigator key for go_router
@@ -186,6 +204,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             const MaterialPage(child: CloudWatchTestPage()),
       ),
 
+      GoRoute(
+        path: '/performance/benchmark',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: PerformanceBenchmarkScreen()),
+      ),
+
       // ============================================================
       // TRAVEL/ITINERARY ROUTES
       // ============================================================
@@ -332,6 +356,150 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/notifications/history',
         pageBuilder: (context, state) =>
             const MaterialPage(child: NotificationHistoryScreen()),
+      ),
+
+      // ============================================================
+      // DESTINATION DISCOVERY ROUTES
+      // ============================================================
+
+      GoRoute(
+        path: '/destinations',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: DestinationDiscoveryScreen()),
+        routes: [
+          // Destination detail
+          GoRoute(
+            path: 'detail/:id',
+            pageBuilder: (context, state) {
+              final destinationId = state.pathParameters['id'] ?? '';
+              return MaterialPage(
+                child: DestinationDetailScreen(
+                    key: ValueKey(destinationId), destinationId: destinationId),
+              );
+            },
+          ),
+          // Recommendations
+          GoRoute(
+            path: 'recommendations',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: RecommendationsScreen()),
+          ),
+          // Curated lists
+          GoRoute(
+            path: 'curated-lists',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: CuratedListsScreen()),
+            routes: [
+              GoRoute(
+                path: 'detail/:id',
+                pageBuilder: (context, state) {
+                  final listId = state.pathParameters['id'] ?? '';
+                  return MaterialPage(
+                    child: CuratedListDetailScreen(
+                        key: ValueKey(listId), listId: listId),
+                  );
+                },
+              ),
+            ],
+          ),
+          // Saved destinations
+          GoRoute(
+            path: 'saved',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: SavedDestinationsScreen()),
+          ),
+        ],
+      ),
+
+      // ============================================================
+      // JOURNAL ROUTES
+      // ============================================================
+
+      GoRoute(
+        path: '/journal',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: JournalListScreen()),
+        routes: [
+          // Journal search
+          GoRoute(
+            path: 'search',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: JournalSearchScreen()),
+          ),
+          // Create journal entry
+          GoRoute(
+            path: 'create',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: CreateJournalEntryScreen()),
+          ),
+          // Create trip
+          GoRoute(
+            path: 'trips/create',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: CreateTripScreen()),
+          ),
+          // Journal entry detail
+          GoRoute(
+            path: 'entry/:id',
+            pageBuilder: (context, state) {
+              final entryId = state.pathParameters['id'] ?? '';
+              return MaterialPage(
+                child: JournalEntryDetailScreen(
+                    key: ValueKey(entryId), entryId: entryId),
+              );
+            },
+          ),
+          // Trip list
+          GoRoute(
+            path: 'trips',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: TripListScreen()),
+            routes: [
+              // Trip detail
+              GoRoute(
+                path: ':id',
+                pageBuilder: (context, state) {
+                  final tripId = state.pathParameters['id'] ?? '';
+                  return MaterialPage(
+                    child: TripDetailScreen(
+                        key: ValueKey(tripId), tripId: tripId),
+                  );
+                },
+                routes: [
+                  // Trip overview
+                  GoRoute(
+                    path: 'overview',
+                    pageBuilder: (context, state) {
+                      final tripId = state.pathParameters['id'] ?? '';
+                      return MaterialPage(
+                        child: TripOverviewScreen(
+                            key: ValueKey(tripId), tripId: tripId),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // Journal map
+          GoRoute(
+            path: 'map',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: JournalMapScreen()),
+          ),
+          // Memory timeline
+          GoRoute(
+            path: 'memory-timeline',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: MemoryTimelineScreen()),
+          ),
+          // Tags
+          GoRoute(
+            path: 'tags',
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: TagListScreen()),
+          ),
+        ],
       ),
     ],
 

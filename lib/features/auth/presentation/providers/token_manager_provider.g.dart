@@ -8,13 +8,41 @@ part of 'token_manager_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// DEPRECATED: This presentation layer TokenManager is deprecated.
+///
+/// Please use the domain layer TokenManager instead:
+/// `lib/features/auth/domain/services/token_manager.dart`
+///
+/// The domain TokenManager uses FeatureAvailability enum and is properly
+/// initialized in bootstrap. This presentation layer wrapper is kept for
+/// backward compatibility but should not be used for new code.
 
 @ProviderFor(TokenManager)
-final tokenManagerProvider = TokenManagerProvider._();
+@Deprecated(
+    'Use domain TokenManager from lib/features/auth/domain/services/token_manager.dart instead. This wrapper is deprecated and will be removed in a future version.')
+const tokenManagerProvider = TokenManagerProvider._();
 
+/// DEPRECATED: This presentation layer TokenManager is deprecated.
+///
+/// Please use the domain layer TokenManager instead:
+/// `lib/features/auth/domain/services/token_manager.dart`
+///
+/// The domain TokenManager uses FeatureAvailability enum and is properly
+/// initialized in bootstrap. This presentation layer wrapper is kept for
+/// backward compatibility but should not be used for new code.
+@Deprecated(
+    'Use domain TokenManager from lib/features/auth/domain/services/token_manager.dart instead. This wrapper is deprecated and will be removed in a future version.')
 final class TokenManagerProvider
     extends $NotifierProvider<TokenManager, AsyncValue<TokenState>> {
-  TokenManagerProvider._()
+  /// DEPRECATED: This presentation layer TokenManager is deprecated.
+  ///
+  /// Please use the domain layer TokenManager instead:
+  /// `lib/features/auth/domain/services/token_manager.dart`
+  ///
+  /// The domain TokenManager uses FeatureAvailability enum and is properly
+  /// initialized in bootstrap. This presentation layer wrapper is kept for
+  /// backward compatibility but should not be used for new code.
+  const TokenManagerProvider._()
       : super(
           from: null,
           argument: null,
@@ -41,13 +69,25 @@ final class TokenManagerProvider
   }
 }
 
-String _$tokenManagerHash() => r'8f81e9dbcbfa9dae4a912694c6233ff9489ce54b';
+String _$tokenManagerHash() => r'18a970f6eb6a824d9cc95b747bcb3c54713deb1e';
 
+/// DEPRECATED: This presentation layer TokenManager is deprecated.
+///
+/// Please use the domain layer TokenManager instead:
+/// `lib/features/auth/domain/services/token_manager.dart`
+///
+/// The domain TokenManager uses FeatureAvailability enum and is properly
+/// initialized in bootstrap. This presentation layer wrapper is kept for
+/// backward compatibility but should not be used for new code.
+
+@Deprecated(
+    'Use domain TokenManager from lib/features/auth/domain/services/token_manager.dart instead. This wrapper is deprecated and will be removed in a future version.')
 abstract class _$TokenManager extends $Notifier<AsyncValue<TokenState>> {
   AsyncValue<TokenState> build();
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref =
         this.ref as $Ref<AsyncValue<TokenState>, AsyncValue<TokenState>>;
     final element = ref.element as $ClassProviderElement<
@@ -55,6 +95,6 @@ abstract class _$TokenManager extends $Notifier<AsyncValue<TokenState>> {
         AsyncValue<TokenState>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

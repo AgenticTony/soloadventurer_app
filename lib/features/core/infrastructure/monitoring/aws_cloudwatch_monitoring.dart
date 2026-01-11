@@ -34,8 +34,7 @@ class Dimension {
 
 /// Provider for AWS CloudWatch monitoring service
 @riverpod
-AwsCloudWatchMonitoring awsCloudWatchMonitoring(
-    AwsCloudWatchMonitoringRef ref) {
+AwsCloudWatchMonitoring awsCloudWatchMonitoring(Ref ref) {
   final cloudWatch = CloudWatch(
     region: dotenv.env['AWS_REGION'] ?? 'us-east-1',
     accessKeyId: dotenv.env['AWS_ACCESS_KEY_ID'] ?? '',

@@ -19,7 +19,7 @@ part of 'profile_notifier.dart';
 /// Maps domain state to presentation state and handles user profile operations.
 
 @ProviderFor(Profile)
-final profileProvider = ProfileProvider._();
+const profileProvider = ProfileProvider._();
 
 /// Notifier for managing profile state and user interactions
 ///
@@ -40,7 +40,7 @@ final class ProfileProvider extends $NotifierProvider<Profile, ProfileState> {
   /// - Initialization logic moved from constructor to build() method
   ///
   /// Maps domain state to presentation state and handles user profile operations.
-  ProfileProvider._()
+  const ProfileProvider._()
       : super(
           from: null,
           argument: null,
@@ -84,12 +84,13 @@ abstract class _$Profile extends $Notifier<ProfileState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<ProfileState, ProfileState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ProfileState, ProfileState>,
         ProfileState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

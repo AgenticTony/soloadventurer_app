@@ -9,16 +9,25 @@ part of 'location_service.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Provider for the location service implementation
+///
+/// This provider returns the actual implementation from location_service_impl.dart.
+/// The locationServiceOverrideProvider handles the proper instantiation and disposal.
 
 @ProviderFor(locationService)
-final locationServiceProvider = LocationServiceProvider._();
+const locationServiceProvider = LocationServiceProvider._();
 
 /// Provider for the location service implementation
+///
+/// This provider returns the actual implementation from location_service_impl.dart.
+/// The locationServiceOverrideProvider handles the proper instantiation and disposal.
 
 final class LocationServiceProvider extends $FunctionalProvider<LocationService,
     LocationService, LocationService> with $Provider<LocationService> {
   /// Provider for the location service implementation
-  LocationServiceProvider._()
+  ///
+  /// This provider returns the actual implementation from location_service_impl.dart.
+  /// The locationServiceOverrideProvider handles the proper instantiation and disposal.
+  const LocationServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -51,4 +60,4 @@ final class LocationServiceProvider extends $FunctionalProvider<LocationService,
   }
 }
 
-String _$locationServiceHash() => r'4f72933a79fccd7f9342da6d8ccd8559f44054c9';
+String _$locationServiceHash() => r'bbc0fea5c5c76cdfb4d184396d5583049e291838';

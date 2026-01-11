@@ -3,8 +3,8 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
-import 'package:soloadventurer/features/auth/domain/entities/auth_tokens.dart';
-import 'package:soloadventurer/features/auth/domain/entities/credentials.dart';
+import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
+import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {

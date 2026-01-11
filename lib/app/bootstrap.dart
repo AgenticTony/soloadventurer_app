@@ -4,12 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/config/app_config.dart';
 import 'package:soloadventurer/core/config/image_cache_config.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/token_manager_provider.dart';
+import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
 import 'package:soloadventurer/app/providers/core_service_providers.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
@@ -26,24 +27,17 @@ Future<void> bootstrap() async {
     // Start framework initialization phase
     AppStartTracker.startPhase('framework_init');
 
-    // Load environment variables with fallback
-    // Try environment-specific .env file first, then fall back to .env
+    // Load environment variables from .env file
     try {
-      await dotenv.load(fileName: '.env.${AppConfig.environment}');
+      await dotenv.load(fileName: '.env');
     } catch (e) {
-      debugPrint('Warning: Failed to load .env.${AppConfig.environment} file.');
-      // Fall back to default .env file
+      debugPrint('Warning: Failed to load .env file. Using default values.');
+      // Load example environment file as fallback
       try {
-        await dotenv.load(fileName: '.env');
+        await dotenv.load(fileName: '.env.example');
       } catch (e) {
-        debugPrint('Warning: Failed to load .env file. Using default values.');
-        // Load example environment file as fallback
-        try {
-          await dotenv.load(fileName: '.env.example');
-        } catch (e) {
-          debugPrint(
-              'Warning: Failed to load .env.example file. Using hardcoded defaults.');
-        }
+        debugPrint(
+            'Warning: Failed to load .env.example file. Using hardcoded defaults.');
       }
     }
 
@@ -79,15 +73,20 @@ Future<void> bootstrap() async {
 
     // Initialize auth based on feature flag
     if (AppConfig.useSupabaseAuth) {
-      // Supabase auth initialization is currently disabled
-      // To enable: add supabase_flutter to pubspec.yaml and uncomment below
-      debugPrint('⚠️ Supabase auth is configured but not available');
-      debugPrint('  To use Supabase, add supabase_flutter to pubspec.yaml');
-      // final supabaseUrl = AppConfig.supabaseUrl;
-      // final supabaseAnonKey = AppConfig.supabaseAnonKey;
-      // if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
-      //   await Supabase.initialize(...);
-      // }
+      // Supabase auth initialization
+      final supabaseUrl = AppConfig.supabaseUrl;
+      final supabaseAnonKey = AppConfig.supabaseAnonKey;
+      if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
+        await Supabase.initialize(
+          url: supabaseUrl,
+          anonKey: supabaseAnonKey,
+          debug: true,
+        );
+        debugPrint('✅ Supabase initialized successfully');
+      } else {
+        debugPrint('⚠️ Supabase auth enabled but credentials missing');
+        debugPrint('  Set SUPABASE_URL and SUPABASE_ANON_KEY in .env');
+      }
     } else {
       // AWS Cognito initialization
       debugPrint('ℹ️ Auth: Using AWS Cognito');
@@ -107,8 +106,8 @@ Future<void> bootstrap() async {
       ],
     );
 
-    // Initialize TokenManager
-    await container.read(tokenManagerProvider.notifier).initializeToken();
+    // Initialize TokenManager (domain service with FeatureAvailability state)
+    await container.read(tokenManagerProvider.notifier).initialize();
 
     AppStartTracker.endPhase('provider_init');
 

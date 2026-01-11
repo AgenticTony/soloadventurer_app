@@ -11,7 +11,7 @@ part of 'backup_providers.dart';
 /// Provider for the backup service
 
 @ProviderFor(backupService)
-final backupServiceProvider = BackupServiceProvider._();
+const backupServiceProvider = BackupServiceProvider._();
 
 /// Provider for the backup service
 
@@ -19,7 +19,7 @@ final class BackupServiceProvider
     extends $FunctionalProvider<BackupService, BackupService, BackupService>
     with $Provider<BackupService> {
   /// Provider for the backup service
-  BackupServiceProvider._()
+  const BackupServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -57,13 +57,13 @@ String _$backupServiceHash() => r'c867b3873e1e36a2c7e9199d962c9d8dcae1b5aa';
 /// Notifier for backup state management
 
 @ProviderFor(BackupNotifier)
-final backupProvider = BackupNotifierProvider._();
+const backupProvider = BackupNotifierProvider._();
 
 /// Notifier for backup state management
 final class BackupNotifierProvider
     extends $NotifierProvider<BackupNotifier, BackupState> {
   /// Notifier for backup state management
-  BackupNotifierProvider._()
+  const BackupNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -99,23 +99,24 @@ abstract class _$BackupNotifier extends $Notifier<BackupState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<BackupState, BackupState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<BackupState, BackupState>, BackupState, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Notifier for restore state management
 
 @ProviderFor(RestoreNotifier)
-final restoreProvider = RestoreNotifierProvider._();
+const restoreProvider = RestoreNotifierProvider._();
 
 /// Notifier for restore state management
 final class RestoreNotifierProvider
     extends $NotifierProvider<RestoreNotifier, RestoreState> {
   /// Notifier for restore state management
-  RestoreNotifierProvider._()
+  const RestoreNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -151,20 +152,21 @@ abstract class _$RestoreNotifier extends $Notifier<RestoreState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<RestoreState, RestoreState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<RestoreState, RestoreState>,
         RestoreState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Provider for available backups list
 
 @ProviderFor(availableBackups)
-final availableBackupsProvider = AvailableBackupsProvider._();
+const availableBackupsProvider = AvailableBackupsProvider._();
 
 /// Provider for available backups list
 
@@ -174,7 +176,7 @@ final class AvailableBackupsProvider extends $FunctionalProvider<
         FutureOr<List<BackupInfo>>>
     with $FutureModifier<List<BackupInfo>>, $FutureProvider<List<BackupInfo>> {
   /// Provider for available backups list
-  AvailableBackupsProvider._()
+  const AvailableBackupsProvider._()
       : super(
           from: null,
           argument: null,
@@ -205,7 +207,7 @@ String _$availableBackupsHash() => r'515c7f5312cf9164537a8ed2d3f8e55f85771384';
 /// Provider for estimated backup size
 
 @ProviderFor(estimatedBackupSize)
-final estimatedBackupSizeProvider = EstimatedBackupSizeFamily._();
+const estimatedBackupSizeProvider = EstimatedBackupSizeFamily._();
 
 /// Provider for estimated backup size
 
@@ -213,7 +215,7 @@ final class EstimatedBackupSizeProvider
     extends $FunctionalProvider<AsyncValue<int>, int, FutureOr<int>>
     with $FutureModifier<int>, $FutureProvider<int> {
   /// Provider for estimated backup size
-  EstimatedBackupSizeProvider._(
+  const EstimatedBackupSizeProvider._(
       {required EstimatedBackupSizeFamily super.from,
       required bool super.argument})
       : super(
@@ -266,7 +268,7 @@ String _$estimatedBackupSizeHash() =>
 
 final class EstimatedBackupSizeFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<int>, bool> {
-  EstimatedBackupSizeFamily._()
+  const EstimatedBackupSizeFamily._()
       : super(
           retry: null,
           name: r'estimatedBackupSizeProvider',
@@ -289,7 +291,7 @@ final class EstimatedBackupSizeFamily extends $Family
 /// Provider for backup directory path
 
 @ProviderFor(backupDirectoryPath)
-final backupDirectoryPathProvider = BackupDirectoryPathProvider._();
+const backupDirectoryPathProvider = BackupDirectoryPathProvider._();
 
 /// Provider for backup directory path
 
@@ -297,7 +299,7 @@ final class BackupDirectoryPathProvider
     extends $FunctionalProvider<AsyncValue<String>, String, FutureOr<String>>
     with $FutureModifier<String>, $FutureProvider<String> {
   /// Provider for backup directory path
-  BackupDirectoryPathProvider._()
+  const BackupDirectoryPathProvider._()
       : super(
           from: null,
           argument: null,
@@ -328,7 +330,7 @@ String _$backupDirectoryPathHash() =>
 /// Family provider for getting info about a specific backup
 
 @ProviderFor(backupInfo)
-final backupInfoProvider = BackupInfoFamily._();
+const backupInfoProvider = BackupInfoFamily._();
 
 /// Family provider for getting info about a specific backup
 
@@ -336,7 +338,7 @@ final class BackupInfoProvider extends $FunctionalProvider<
         AsyncValue<BackupInfo>, BackupInfo, FutureOr<BackupInfo>>
     with $FutureModifier<BackupInfo>, $FutureProvider<BackupInfo> {
   /// Family provider for getting info about a specific backup
-  BackupInfoProvider._(
+  const BackupInfoProvider._(
       {required BackupInfoFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -387,7 +389,7 @@ String _$backupInfoHash() => r'02fde272061af61659bfa0a15483f20a5017d5aa';
 
 final class BackupInfoFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<BackupInfo>, String> {
-  BackupInfoFamily._()
+  const BackupInfoFamily._()
       : super(
           retry: null,
           name: r'backupInfoProvider',

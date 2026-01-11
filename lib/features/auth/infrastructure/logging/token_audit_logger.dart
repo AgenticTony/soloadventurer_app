@@ -8,7 +8,7 @@ part 'token_audit_logger.g.dart';
 
 /// Provides comprehensive audit logging for token operations
 @riverpod
-LoggingService tokenAuditLogger(TokenAuditLoggerRef ref) {
+LoggingService tokenAuditLogger(Ref ref) {
   final monitoring = ref.watch(awsCloudWatchMonitoringProvider);
   return _TokenAuditLoggerImpl(monitoring);
 }

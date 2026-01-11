@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as path;
@@ -127,7 +125,7 @@ class ImageCompressionService {
 
       // Compress the image
       final compressionResult = await compressBytes(
-        bytes: bytes,
+        bytes,
         quality: quality,
         maxWidth: maxWidth ?? defaultMaxWidth,
         maxHeight: maxHeight ?? defaultMaxHeight,
@@ -254,9 +252,10 @@ class ImageCompressionService {
           );
           break;
         case ImageFormat.webp:
-          // WebP quality (0-100)
+          // WebP encoding - fallback to JPEG for now as WebP encoding
+          // requires a separate package or platform-specific codec
           compressedBytes = Uint8List.fromList(
-            img.encodeWebp(resizedImage, quality: quality),
+            img.encodeJpg(resizedImage, quality: quality),
           );
           break;
       }

@@ -1,12 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import '../../domain/entities/journal_entry.dart';
-import '../../domain/entities/trip.dart';
 import '../../domain/services/pdf_export_service.dart';
 import '../../data/services/pdf_export_service_impl.dart';
-import '../../domain/repositories/journal_repository.dart';
-import '../../domain/repositories/trip_repository.dart';
 import 'trip_providers.dart';
 import 'journal_entry_providers.dart';
 
@@ -220,8 +216,7 @@ class PdfExportNotifier extends _$PdfExportNotifier {
     );
 
     try {
-      final entry =
-          await ref.read(journalRepositoryProvider).getEntry(entryId);
+      final entry = await ref.read(journalRepositoryProvider).getEntry(entryId);
 
       final result = await service.exportEntryToPdf(
         entry: entry,
@@ -277,8 +272,7 @@ class PdfExportNotifier extends _$PdfExportNotifier {
 
     try {
       final entries = await Future.wait<JournalEntry>(
-        entryIds
-            .map((id) => ref.read(journalRepositoryProvider).getEntry(id)),
+        entryIds.map((id) => ref.read(journalRepositoryProvider).getEntry(id)),
       );
 
       final result = await service.exportEntriesToPdf(
@@ -331,8 +325,7 @@ class PdfExportNotifier extends _$PdfExportNotifier {
 
 /// Provider for PDF export statistics
 @riverpod
-Future<Map<String, dynamic>> pdfExportStats(
-    Ref ref, String tripId) async {
+Future<Map<String, dynamic>> pdfExportStats(Ref ref, String tripId) async {
   final service = ref.read(pdfExportServiceProvider);
   final trip = await ref.read(tripRepositoryProvider).getTrip(tripId);
   return service.getExportStats(trip: trip);

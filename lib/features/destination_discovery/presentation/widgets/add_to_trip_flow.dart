@@ -115,7 +115,7 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
     final authState = ref.watch(authProvider);
 
     // Check authentication
-    if (!authState.value?.isAuthenticated ?? false) {
+    if (!(authState.value?.isAuthenticated ?? false)) {
       return _buildSignInPrompt(context, theme);
     }
 
@@ -209,7 +209,7 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.4),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -963,7 +963,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
                       ? theme.colorScheme.primary
                       : isActive
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
+                          : theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
@@ -975,7 +976,8 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   color: isCompleted
                       ? theme.colorScheme.primary
-                      : theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
+                      : theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.3),
                 ),
             ],
           );
@@ -995,7 +997,7 @@ class _AddToTripFlowState extends ConsumerState<AddToTripFlow> {
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withValues(alpha:0.1),
+            color: theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

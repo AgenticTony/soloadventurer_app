@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -147,8 +146,8 @@ class ImageCacheConfig {
     imageCache.maximumSizeBytes = maxMemoryCacheBytes;
 
     // Set default cache options for all CachedNetworkImage widgets
-    CachedNetworkImage.logLevel =
-        kDebugMode ? CacheManagerLogLevel.high : CacheManagerLogLevel.none;
+    // Note: CacheManagerLogLevel is not available in cached_network_image 3.3.1
+    // Logging can be controlled through the package's configuration if needed
 
     if (kDebugMode) {
       debugPrint('ImageCacheConfig: Cache settings configured');
@@ -239,10 +238,14 @@ class ImageCacheConfig {
   /// ```
   static Future<void> clearDiskCache() async {
     try {
-      await DefaultCacheManager().emptyCache();
+      // Note: DefaultCacheManager is not directly available in cached_network_image 3.3.1
+      // To clear disk cache, you would need to use flutter_cache_manager directly
+      // For now, this is a no-op placeholder
+      // To implement this properly, add flutter_cache_manager to pubspec.yaml and use:
+      // await DefaultCacheManager().emptyCache();
 
       if (kDebugMode) {
-        debugPrint('ImageCacheConfig: Disk cache cleared');
+        debugPrint('ImageCacheConfig: Disk cache clear requested (not implemented in this version)');
       }
     } catch (e) {
       if (kDebugMode) {

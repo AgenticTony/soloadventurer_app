@@ -10,13 +10,13 @@ part of 'connectivity_service_impl.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(connectivityServiceImpl)
-final connectivityServiceImplProvider = ConnectivityServiceImplProvider._();
+const connectivityServiceImplProvider = ConnectivityServiceImplProvider._();
 
 final class ConnectivityServiceImplProvider extends $FunctionalProvider<
     ConnectivityService,
     ConnectivityService,
     ConnectivityService> with $Provider<ConnectivityService> {
-  ConnectivityServiceImplProvider._()
+  const ConnectivityServiceImplProvider._()
       : super(
           from: null,
           argument: null,
@@ -51,4 +51,4 @@ final class ConnectivityServiceImplProvider extends $FunctionalProvider<
 }
 
 String _$connectivityServiceImplHash() =>
-    r'0c2a75789ba70b0a87bc1d133bc2bb1b2d0de9bf';
+    r'1e3bb17f717818c5dc0328c4a71bc3c900782d3b';

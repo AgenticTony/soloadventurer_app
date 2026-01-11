@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/core/widgets/widgets.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
-import 'package:soloadventurer/features/sync/presentation/providers/sync_providers.dart' hide syncStatusProvider;
-import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
+import 'package:soloadventurer/features/sync/presentation/providers/sync_providers.dart';
+import 'package:soloadventurer/features/sync/presentation/widgets/manual_sync_button.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/loading_view.dart';
 
@@ -16,17 +16,17 @@ class ProfileSettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(profileUIProvider('current'));
+    final state = ref.watch(profileDomainProvider('current'));
     final theme = Theme.of(context);
 
-    if (state.isProcessing) {
+    if (state.isLoading) {
       return const LoadingView();
     }
 
-    if (!state.isInitialized) {
-      return const Scaffold(
+    if (state.error != null) {
+      return Scaffold(
         body: Center(
-          child: Text('No profile data available'),
+          child: Text('Error: ${state.error}'),
         ),
       );
     }
@@ -66,11 +66,10 @@ class ProfileSettingsScreen extends ConsumerWidget {
                     ),
                     value: profile.isPublic,
                     onChanged: (value) {
+                      final updatedProfile = profile.copyWith(isPublic: value);
                       ref
-                          .read(profileUIProvider('current').notifier)
-                          .updateProfile({
-                        'isPublic': value,
-                      });
+                          .read(profileDomainProvider('current').notifier)
+                          .updateProfile(updatedProfile);
                     },
                   ),
                 ],
@@ -106,7 +105,7 @@ class ProfileSettingsScreen extends ConsumerWidget {
                               onPressed: () {
                                 Navigator.pop(context);
                                 ref
-                                    .read(profileUIProvider('current').notifier)
+                                    .read(profileDomainProvider('current').notifier)
                                     .deleteProfile();
                                 Navigator.pop(context); // Pop settings screen
                               },
@@ -122,7 +121,7 @@ class ProfileSettingsScreen extends ConsumerWidget {
                   ),
                 ],
               ),
-              if (state.hasError)
+              if (state.error != null)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(

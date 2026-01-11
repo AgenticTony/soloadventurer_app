@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models/destination.dart';
-import '../../domain/models/destination_filter.dart';
+import '../../domain/models/destination.dart'
+    hide ActivityLevel, BudgetLevel; // Hide to avoid conflicts with filter types
+import '../../domain/models/destination_filter.dart' show FilterBudgetLevel, FilterActivityLevel, DestinationFilter;
 import '../../application/providers/filter_provider.dart';
 
 /// A horizontally scrollable list of filter chips for quick filtering.
@@ -76,28 +77,28 @@ class FilterChips extends ConsumerWidget {
           // Budget level chips
           if (showBudgetChips) ...[
             _BudgetChip(
-              budgetLevel: BudgetLevel.budget,
-              isSelected: filterState.budgetLevel == BudgetLevel.budget,
+              budgetLevel: FilterBudgetLevel.budget,
+              isSelected: filterState.budgetLevel == FilterBudgetLevel.budget,
               onTap: () {
-                _toggleBudget(filterNotifier, BudgetLevel.budget);
+                _toggleBudget(filterNotifier, FilterBudgetLevel.budget);
                 onFilterChanged?.call();
               },
             ),
             SizedBox(width: chipSpacing),
             _BudgetChip(
-              budgetLevel: BudgetLevel.moderate,
-              isSelected: filterState.budgetLevel == BudgetLevel.moderate,
+              budgetLevel: FilterBudgetLevel.midRange,
+              isSelected: filterState.budgetLevel == FilterBudgetLevel.midRange,
               onTap: () {
-                _toggleBudget(filterNotifier, BudgetLevel.moderate);
+                _toggleBudget(filterNotifier, FilterBudgetLevel.midRange);
                 onFilterChanged?.call();
               },
             ),
             SizedBox(width: chipSpacing),
             _BudgetChip(
-              budgetLevel: BudgetLevel.expensive,
-              isSelected: filterState.budgetLevel == BudgetLevel.expensive,
+              budgetLevel: FilterBudgetLevel.luxury,
+              isSelected: filterState.budgetLevel == FilterBudgetLevel.luxury,
               onTap: () {
-                _toggleBudget(filterNotifier, BudgetLevel.expensive);
+                _toggleBudget(filterNotifier, FilterBudgetLevel.luxury);
                 onFilterChanged?.call();
               },
             ),
@@ -107,29 +108,29 @@ class FilterChips extends ConsumerWidget {
           // Activity level chips
           if (showActivityChips) ...[
             _ActivityChip(
-              activityLevel: ActivityLevel.relaxed,
-              isSelected: filterState.activityLevel == ActivityLevel.relaxed,
+              activityLevel: FilterActivityLevel.relaxed,
+              isSelected: filterState.activityLevel == FilterActivityLevel.relaxed,
               onTap: () {
-                _toggleActivity(filterNotifier, ActivityLevel.relaxed);
+                _toggleActivity(filterNotifier, FilterActivityLevel.relaxed);
                 onFilterChanged?.call();
               },
             ),
             SizedBox(width: chipSpacing),
             _ActivityChip(
-              activityLevel: ActivityLevel.moderate,
-              isSelected: filterState.activityLevel == ActivityLevel.moderate,
+              activityLevel: FilterActivityLevel.moderate,
+              isSelected: filterState.activityLevel == FilterActivityLevel.moderate,
               onTap: () {
-                _toggleActivity(filterNotifier, ActivityLevel.moderate);
+                _toggleActivity(filterNotifier, FilterActivityLevel.moderate);
                 onFilterChanged?.call();
               },
             ),
             SizedBox(width: chipSpacing),
             _ActivityChip(
-              activityLevel: ActivityLevel.adventurous,
+              activityLevel: FilterActivityLevel.active,
               isSelected:
-                  filterState.activityLevel == ActivityLevel.adventurous,
+                  filterState.activityLevel == FilterActivityLevel.active,
               onTap: () {
-                _toggleActivity(filterNotifier, ActivityLevel.adventurous);
+                _toggleActivity(filterNotifier, FilterActivityLevel.active);
                 onFilterChanged?.call();
               },
             ),
@@ -181,7 +182,7 @@ class FilterChips extends ConsumerWidget {
   }
 
   /// Toggles budget level filter
-  void _toggleBudget(FilterNotifier notifier, FilterBudgetLevel level) {
+  void _toggleBudget(Filter notifier, FilterBudgetLevel level) {
     // If already selected, deselect it; otherwise, select it
     if (notifier.budgetLevel == level) {
       notifier.updateBudgetLevel(null);
@@ -191,7 +192,7 @@ class FilterChips extends ConsumerWidget {
   }
 
   /// Toggles activity level filter
-  void _toggleActivity(FilterNotifier notifier, FilterActivityLevel level) {
+  void _toggleActivity(Filter notifier, FilterActivityLevel level) {
     // If already selected, deselect it; otherwise, select it
     if (notifier.activityLevel == level) {
       notifier.updateActivityLevel(null);
@@ -360,7 +361,7 @@ class _ActivityChip extends StatelessWidget {
       case FilterActivityLevel.active:
         return Icons.terrain;
       case FilterActivityLevel.intense:
-        return Icons.fire_mode;
+        return Icons.whatshot;
       case FilterActivityLevel.extreme:
         return Icons.warning;
     }
@@ -399,7 +400,7 @@ class _HiddenGemChip extends StatelessWidget {
         ),
         selected: isSelected,
         onSelected: (_) => onTap(),
-        selectedColor: Colors.amber.withValues(alpha:0.2),
+        selectedColor: Colors.amber.withValues(alpha: 0.2),
         checkmarkColor: Colors.amber.shade700,
         labelStyle: theme.textTheme.labelMedium?.copyWith(
           color: isSelected
@@ -409,7 +410,7 @@ class _HiddenGemChip extends StatelessWidget {
         side: BorderSide(
           color: isSelected
               ? Colors.amber.shade700
-              : theme.colorScheme.outline.withValues(alpha:0.5),
+              : theme.colorScheme.outline.withValues(alpha: 0.5),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
@@ -483,12 +484,13 @@ class _ClearAllChip extends StatelessWidget {
         ),
         selected: false,
         onSelected: (_) => onTap(),
-        backgroundColor: theme.colorScheme.errorContainer.withValues(alpha:0.3),
+        backgroundColor:
+            theme.colorScheme.errorContainer.withValues(alpha: 0.3),
         labelStyle: theme.textTheme.labelMedium?.copyWith(
           color: theme.colorScheme.onErrorContainer,
         ),
         side: BorderSide(
-          color: theme.colorScheme.error.withValues(alpha:0.5),
+          color: theme.colorScheme.error.withValues(alpha: 0.5),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),

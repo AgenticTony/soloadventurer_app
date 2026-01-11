@@ -157,7 +157,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.2),
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(2),
           ),
         ),

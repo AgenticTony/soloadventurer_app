@@ -51,7 +51,7 @@ class ConflictListView extends StatelessWidget {
               Text(
                 'All your data is in sync',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -168,7 +168,8 @@ class _ConflictCard extends StatelessWidget {
                         Text(
                           conflict.description,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                            color: theme.colorScheme.onSurface
+                                .withValues(alpha: 0.6),
                           ),
                         ),
                       ],
@@ -176,7 +177,7 @@ class _ConflictCard extends StatelessWidget {
                   ),
                   Icon(
                     Icons.chevron_right,
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                 ],
               ),
@@ -208,26 +209,26 @@ class _ConflictCard extends StatelessWidget {
                   Icon(
                     Icons.access_time,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Local: ${_formatRelativeTime(conflict.localVersion.lastModified)}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Icon(
                     Icons.cloud,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     'Remote: ${_formatRelativeTime(conflict.remoteVersion.lastModified)}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -247,15 +248,16 @@ class _ConflictCard extends StatelessWidget {
     Color? color,
   }) {
     final theme = Theme.of(context);
-    final chipColor = color ?? theme.colorScheme.onSurface.withValues(alpha:0.6);
+    final chipColor =
+        color ?? theme.colorScheme.onSurface.withValues(alpha: 0.6);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: chipColor.withValues(alpha:0.1),
+        color: chipColor.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: chipColor.withValues(alpha:0.3),
+          color: chipColor.withValues(alpha: 0.3),
           width: 1,
         ),
       ),

@@ -95,7 +95,7 @@ void main() {
   group('Auth Flow Integration Tests', () {
     test('full authentication flow', () async {
       // Initial state should be unauthenticated
-      final initialState = container.read(authNotifierProvider).value;
+      final initialState = container.read(authProvider).value;
       expect(initialState, isNotNull);
       expect(initialState!.isLoggedIn, false);
       expect(initialState.user, isNull);
@@ -118,11 +118,11 @@ void main() {
 
       // Sign in
       await container
-          .read(authNotifierProvider.notifier)
+          .read(authProvider.notifier)
           .signIn('test@test.com', 'password');
 
       // Should be authenticated with token
-      final authState = container.read(authNotifierProvider).value;
+      final authState = container.read(authProvider).value;
       expect(authState, isNotNull);
       expect(authState!.isLoggedIn, true);
       expect(authState.user?.email, 'test@test.com');
@@ -133,10 +133,10 @@ void main() {
       when(() => mockIsSignedIn()).thenAnswer((_) async => false);
       when(() => mockGetCurrentUser()).thenAnswer((_) async => null);
 
-      await container.read(authNotifierProvider.notifier).signOut();
+      await container.read(authProvider.notifier).signOut();
 
       // Should be unauthenticated
-      final signedOutState = container.read(authNotifierProvider).value;
+      final signedOutState = container.read(authProvider).value;
       expect(signedOutState, isNotNull);
       expect(signedOutState!.isLoggedIn, false);
       expect(signedOutState.user, isNull);
@@ -154,14 +154,14 @@ void main() {
 
       when(() => mockSignUp(any())).thenAnswer((_) async => (user, true));
 
-      await container.read(authNotifierProvider.notifier).signUp(
+      await container.read(authProvider.notifier).signUp(
             email: 'test@test.com',
             password: 'password',
             name: 'Test User',
           );
 
       // Should be unverified
-      final unverifiedState = container.read(authNotifierProvider).value;
+      final unverifiedState = container.read(authProvider).value;
       expect(unverifiedState, isNotNull);
       expect(unverifiedState!.requiresEmailVerification, true);
       expect(unverifiedState.user?.email, 'test@test.com');
@@ -172,11 +172,11 @@ void main() {
       when(() => mockVerifyEmail(any())).thenAnswer((_) async {});
 
       await container
-          .read(authNotifierProvider.notifier)
+          .read(authProvider.notifier)
           .verifyEmail('123456', 'test@test.com');
 
       // After verification, should be authenticated
-      final verifiedState = container.read(authNotifierProvider).value;
+      final verifiedState = container.read(authProvider).value;
       expect(verifiedState, isNotNull);
       expect(verifiedState!.isLoggedIn, true);
       expect(verifiedState.user?.email, 'test@test.com');
@@ -187,11 +187,11 @@ void main() {
       when(() => mockForgotPassword(any())).thenAnswer((_) async {});
 
       await container
-          .read(authNotifierProvider.notifier)
+          .read(authProvider.notifier)
           .forgotPassword('test@test.com');
 
       // Should be in password reset state
-      final resetState = container.read(authNotifierProvider).value;
+      final resetState = container.read(authProvider).value;
       expect(resetState, isNotNull);
       expect(resetState!.requiresPasswordReset, true);
       expect(resetState.user?.email, 'test@test.com');
@@ -199,14 +199,14 @@ void main() {
       // Confirm password reset
       when(() => mockConfirmPasswordReset(any())).thenAnswer((_) async {});
 
-      await container.read(authNotifierProvider.notifier).confirmPasswordReset(
+      await container.read(authProvider.notifier).confirmPasswordReset(
             code: '123456',
             newPassword: 'newpassword',
             email: 'test@test.com',
           );
 
       // Should return to initial state after password reset
-      final completeState = container.read(authNotifierProvider).value;
+      final completeState = container.read(authProvider).value;
       expect(completeState, isNotNull);
       expect(completeState!.requiresPasswordReset, false);
       expect(completeState.isLoggedIn, false);
@@ -223,19 +223,19 @@ void main() {
 
       // Start sign in - state should be loading
       final signInFuture = container
-          .read(authNotifierProvider.notifier)
+          .read(authProvider.notifier)
           .signIn('test@test.com', 'wrong');
 
       // Check loading state
       await Future.delayed(const Duration(milliseconds: 10));
-      final loadingState = container.read(authNotifierProvider);
+      final loadingState = container.read(authProvider);
       expect(loadingState.isLoading, true);
 
       // Wait for error
       await signInFuture;
 
       // Should have error
-      final errorState = container.read(authNotifierProvider);
+      final errorState = container.read(authProvider);
       expect(errorState.hasError, true);
       expect(errorState.error, isA<AuthException>());
     });

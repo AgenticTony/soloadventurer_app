@@ -240,7 +240,7 @@ class _MediaGalleryState extends State<MediaGallery> {
                   Icon(
                     Icons.photo_library_outlined,
                     size: 48,
-                    color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -251,7 +251,7 @@ class _MediaGalleryState extends State<MediaGallery> {
                   Text(
                     'Photos and videos will appear here',
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha:0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -351,7 +351,7 @@ class _MediaGridItem extends StatelessWidget {
             if (isSelected)
               Positioned.fill(
                 child: Container(
-                  color: theme.colorScheme.primary.withValues(alpha:0.3),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
                   child: Center(
                     child: Icon(
                       Icons.check_circle,
@@ -370,7 +370,7 @@ class _MediaGridItem extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha:0.6),
+                    color: Colors.black.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Icon(
@@ -386,7 +386,7 @@ class _MediaGridItem extends StatelessWidget {
                 media.uploadStatus != UploadStatus.completed)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withValues(alpha:0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   child: Center(
                     child: _buildUploadStatusIcon(media.uploadStatus),
                   ),
@@ -410,7 +410,7 @@ class _MediaGridItem extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withValues(alpha:0.7),
+                        Colors.black.withValues(alpha: 0.7),
                       ],
                     ),
                   ),
@@ -439,7 +439,7 @@ class _MediaGridItem extends StatelessWidget {
         child: Icon(
           media.isVideo ? Icons.videocam_outlined : Icons.image_outlined,
           size: 32,
-          color: theme.colorScheme.onSurface.withValues(alpha:0.4),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
         ),
       ),
     );

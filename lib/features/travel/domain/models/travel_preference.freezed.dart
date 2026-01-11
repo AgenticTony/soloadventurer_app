@@ -259,8 +259,6 @@ extension TravelPreferencePatterns on TravelPreference {
     switch (_that) {
       case _TravelPreference():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -394,8 +392,6 @@ extension TravelPreferencePatterns on TravelPreference {
             _that.isFlexibleDates,
             _that.createdAt,
             _that.updatedAt);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

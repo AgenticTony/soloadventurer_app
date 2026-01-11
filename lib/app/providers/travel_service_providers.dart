@@ -104,8 +104,7 @@ NotificationLocalDataSource notificationLocalDataSource(Ref ref) {
 @Riverpod(keepAlive: true)
 NotificationRepository notificationRepository(Ref ref) {
   final localDataSource = ref.watch(notificationLocalDataSourceProvider);
-  final connectivityService =
-      ref.watch(connectivityServiceProvider);
+  final connectivityService = ref.watch(connectivityServiceProvider);
   return NotificationRepositoryImpl(
     localDataSource,
     connectivityService,

@@ -1,9 +1,11 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/profile.dart';
 import '../state/profile_state.dart';
 
+part 'test_profile_provider.g.dart';
+
 /// Test profile data
-final testProfile = Profile(
+final testProfileData = Profile(
   id: 'test-123',
   userId: 'user-123',
   username: 'TestUser',
@@ -17,11 +19,12 @@ final testProfile = Profile(
 );
 
 /// Test profile provider that returns mock data
-final testProfileProvider = StateProvider<ProfileState>((ref) {
+@riverpod
+ProfileState testProfile(Ref ref) {
   return ProfileState(
-    profile: testProfile,
+    profile: testProfileData,
     isLoading: false,
     error: null,
     hasChanges: false,
   );
-});
+}

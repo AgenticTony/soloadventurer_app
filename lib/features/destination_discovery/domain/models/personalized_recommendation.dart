@@ -34,7 +34,9 @@ enum RecommendationSource {
 
 /// Represents a single destination recommendation with its relevance score
 @freezed
-class RecommendedDestination with _$RecommendedDestination {
+sealed class RecommendedDestination with _$RecommendedDestination {
+  const RecommendedDestination._();
+
   const factory RecommendedDestination({
     /// The destination being recommended
     required Destination destination,
@@ -65,7 +67,10 @@ class RecommendedDestination with _$RecommendedDestination {
 /// preferences, travel history, and behavior. Recommendations are generated
 /// using AI/ML algorithms that analyze multiple factors.
 @freezed
-class PersonalizedRecommendation with _$PersonalizedRecommendation {
+sealed class PersonalizedRecommendation with _$PersonalizedRecommendation {
+  // Private constructor for freezed with custom members
+  const PersonalizedRecommendation._();
+
   factory PersonalizedRecommendation({
     /// Unique identifier for this recommendation set
     required String id,
@@ -102,8 +107,6 @@ class PersonalizedRecommendation with _$PersonalizedRecommendation {
     /// Example: ["rec_123", "rec_456"] for different categories
     List<String>? relatedRecommendationIds,
   }) = _PersonalizedRecommendation;
-
-  PersonalizedRecommendation._();
 
   factory PersonalizedRecommendation.fromJson(Map<String, dynamic> json) =>
       _$PersonalizedRecommendationFromJson(json);

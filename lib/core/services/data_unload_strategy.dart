@@ -569,7 +569,8 @@ class DataUnloadStrategy {
 
       // Then by visibility (off-screen first)
       if (_instance!._config.prioritizeByVisibility) {
-        final visibilityCompare = a.isVisible.compareTo(b.isVisible);
+        // Convert bool to int for comparison: false (0) < true (1)
+        final visibilityCompare = (a.isVisible ? 1 : 0).compareTo(b.isVisible ? 1 : 0);
         if (visibilityCompare != 0) return visibilityCompare;
       }
 

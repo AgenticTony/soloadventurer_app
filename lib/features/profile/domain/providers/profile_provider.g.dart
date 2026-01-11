@@ -15,7 +15,7 @@ part of 'profile_provider.dart';
 /// - Constructor auto-load moved to build() method
 
 @ProviderFor(ProfileDomain)
-final profileDomainProvider = ProfileDomainProvider._();
+const profileDomainProvider = ProfileDomainProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
@@ -29,7 +29,7 @@ final class ProfileDomainProvider
   /// - Dependencies injected via ref.watch() in build() method
   /// - build() returns ProfileDomainState not AsyncValue
   /// - Constructor auto-load moved to build() method
-  ProfileDomainProvider._()
+  const ProfileDomainProvider._()
       : super(
           from: null,
           argument: null,
@@ -69,12 +69,13 @@ abstract class _$ProfileDomain extends $Notifier<ProfileDomainState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<ProfileDomainState, ProfileDomainState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ProfileDomainState, ProfileDomainState>,
         ProfileDomainState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

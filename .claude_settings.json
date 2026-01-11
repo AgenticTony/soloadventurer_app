@@ -1,4 +1,9 @@
 {
+  "mcpServers": {
+    "supabase": {
+      "url": "https://mcp.supabase.com/mcp"
+    }
+  },
   "sandbox": {
     "enabled": true,
     "autoAllowBashIfSandboxed": true
@@ -16,9 +21,9 @@
       "Edit(/Users/anthonyforan/SoloAdventurer_app/**)",
       "Glob(/Users/anthonyforan/SoloAdventurer_app/**)",
       "Grep(/Users/anthonyforan/SoloAdventurer_app/**)",
-      "Read(/Users/anthonyforan/SoloAdventurer_app/.auto-claude/specs/013-fix-the-6-files-with-syntax-errors-blocking-code-g/**)",
-      "Write(/Users/anthonyforan/SoloAdventurer_app/.auto-claude/specs/013-fix-the-6-files-with-syntax-errors-blocking-code-g/**)",
-      "Edit(/Users/anthonyforan/SoloAdventurer_app/.auto-claude/specs/013-fix-the-6-files-with-syntax-errors-blocking-code-g/**)",
+      "Read(/Users/anthonyforan/SoloAdventurer_app/.auto-claude/roadmap/**)",
+      "Write(/Users/anthonyforan/SoloAdventurer_app/.auto-claude/roadmap/**)",
+      "Edit(/Users/anthonyforan/SoloAdventurer_app/.auto-claude/roadmap/**)",
       "Bash(*)",
       "WebFetch(*)",
       "WebSearch(*)",

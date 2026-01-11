@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/profile_providers.dart';
-import '../state/profile_state.dart';
+import '../../domain/entities/profile_state.dart';
+import '../state/profile_state.dart' as presentation;
 import '../widgets/error_view.dart';
 import 'package:soloadventurer/features/profile/presentation/state/profile_navigation_state.dart';
 
@@ -35,11 +36,11 @@ abstract class ProfileRouteGuard extends ConsumerWidget {
   });
 
   /// Check if the route should be guarded
-  Future<GuardResult> checkGuard(ProfileState state);
+  Future<GuardResult> checkGuard(ProfileDomainState state);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(profileUIProvider('current'));
+    final state = ref.watch(profileDomainProvider('current'));
 
     if (state.isLoading) {
       return const Scaffold(
@@ -52,7 +53,7 @@ abstract class ProfileRouteGuard extends ConsumerWidget {
     if (state.hasError) {
       return ErrorView(
         error: state.error.toString(),
-        onRetry: () => ref.refresh(profileUIProvider('current')),
+        onRetry: () => ref.refresh(profileDomainProvider('current')),
       );
     }
 
@@ -70,7 +71,7 @@ abstract class ProfileRouteGuard extends ConsumerWidget {
         if (snapshot.hasError) {
           return ErrorView(
             error: snapshot.error.toString(),
-            onRetry: () => ref.refresh(profileUIProvider('current')),
+            onRetry: () => ref.refresh(profileDomainProvider('current')),
           );
         }
 
@@ -94,7 +95,7 @@ abstract class ProfileRouteGuard extends ConsumerWidget {
           case GuardAction.block:
             return ErrorView(
               error: guardResult.errorMessage!,
-              onRetry: () => ref.refresh(profileUIProvider('current')),
+              onRetry: () => ref.refresh(profileDomainProvider('current')),
             );
         }
       },
@@ -104,7 +105,7 @@ abstract class ProfileRouteGuard extends ConsumerWidget {
 
 /// Observer for profile route navigation
 class ProfileRouteObserver extends NavigatorObserver {
-  final ProfileNavigationNotifier _navigationNotifier;
+  final ProfileNavigationHistory _navigationNotifier;
 
   /// Creates a new [ProfileRouteObserver]
   ProfileRouteObserver(this._navigationNotifier);

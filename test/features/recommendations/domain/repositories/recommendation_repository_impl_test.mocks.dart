@@ -3,15 +3,16 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i3;
 
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i5;
 import 'package:soloadventurer/features/recommendations/data/datasources/recommendation_local_data_source.dart'
-    as _i3;
-import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart'
     as _i2;
+import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart'
+    as _i4;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart'
-    as _i5;
+    as _i6;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -28,26 +29,15 @@ import 'package:soloadventurer/features/recommendations/domain/entities/recommen
 // ignore_for_file: subtype_of_sealed_class
 // ignore_for_file: invalid_use_of_internal_member
 
-class _FakePersonalizedRecommendation_0 extends _i1.SmartFake
-    implements _i2.PersonalizedRecommendation {
-  _FakePersonalizedRecommendation_0(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
 /// A class which mocks [RecommendationLocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockRecommendationLocalDataSource extends _i1.Mock
-    implements _i3.RecommendationLocalDataSource {
+    implements _i2.RecommendationLocalDataSource {
   @override
-  _i4.Future<_i2.PersonalizedRecommendation> saveRecommendation(
+  _i3.Future<_i4.PersonalizedRecommendation> saveRecommendation(
     String? userId,
-    _i2.PersonalizedRecommendation? recommendation,
+    _i4.PersonalizedRecommendation? recommendation,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -57,8 +47,8 @@ class MockRecommendationLocalDataSource extends _i1.Mock
             recommendation,
           ],
         ),
-        returnValue: _i4.Future<_i2.PersonalizedRecommendation>.value(
-            _FakePersonalizedRecommendation_0(
+        returnValue: _i3.Future<_i4.PersonalizedRecommendation>.value(
+            _i5.dummyValue<_i4.PersonalizedRecommendation>(
           this,
           Invocation.method(
             #saveRecommendation,
@@ -69,8 +59,8 @@ class MockRecommendationLocalDataSource extends _i1.Mock
           ),
         )),
         returnValueForMissingStub:
-            _i4.Future<_i2.PersonalizedRecommendation>.value(
-                _FakePersonalizedRecommendation_0(
+            _i3.Future<_i4.PersonalizedRecommendation>.value(
+                _i5.dummyValue<_i4.PersonalizedRecommendation>(
           this,
           Invocation.method(
             #saveRecommendation,
@@ -80,25 +70,25 @@ class MockRecommendationLocalDataSource extends _i1.Mock
             ],
           ),
         )),
-      ) as _i4.Future<_i2.PersonalizedRecommendation>);
+      ) as _i3.Future<_i4.PersonalizedRecommendation>);
 
   @override
-  _i4.Future<List<_i2.PersonalizedRecommendation>> getSavedRecommendations(
+  _i3.Future<List<_i4.PersonalizedRecommendation>> getSavedRecommendations(
           String? userId) =>
       (super.noSuchMethod(
         Invocation.method(
           #getSavedRecommendations,
           [userId],
         ),
-        returnValue: _i4.Future<List<_i2.PersonalizedRecommendation>>.value(
-            <_i2.PersonalizedRecommendation>[]),
+        returnValue: _i3.Future<List<_i4.PersonalizedRecommendation>>.value(
+            <_i4.PersonalizedRecommendation>[]),
         returnValueForMissingStub:
-            _i4.Future<List<_i2.PersonalizedRecommendation>>.value(
-                <_i2.PersonalizedRecommendation>[]),
-      ) as _i4.Future<List<_i2.PersonalizedRecommendation>>);
+            _i3.Future<List<_i4.PersonalizedRecommendation>>.value(
+                <_i4.PersonalizedRecommendation>[]),
+      ) as _i3.Future<List<_i4.PersonalizedRecommendation>>);
 
   @override
-  _i4.Future<void> dismissRecommendation(
+  _i3.Future<void> dismissRecommendation(
     String? userId,
     String? recommendationId,
   ) =>
@@ -110,14 +100,14 @@ class MockRecommendationLocalDataSource extends _i1.Mock
             recommendationId,
           ],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
 
   @override
-  _i4.Future<void> recordFeedback(
+  _i3.Future<void> recordFeedback(
     String? recommendationId,
-    _i5.RecommendationFeedback? feedback,
+    _i6.RecommendationFeedback? feedback,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -127,23 +117,23 @@ class MockRecommendationLocalDataSource extends _i1.Mock
             feedback,
           ],
         ),
-        returnValue: _i4.Future<void>.value(),
-        returnValueForMissingStub: _i4.Future<void>.value(),
-      ) as _i4.Future<void>);
+        returnValue: _i3.Future<void>.value(),
+        returnValueForMissingStub: _i3.Future<void>.value(),
+      ) as _i3.Future<void>);
 
   @override
-  _i4.Future<Set<String>> getDismissedRecommendations(String? userId) =>
+  _i3.Future<Set<String>> getDismissedRecommendations(String? userId) =>
       (super.noSuchMethod(
         Invocation.method(
           #getDismissedRecommendations,
           [userId],
         ),
-        returnValue: _i4.Future<Set<String>>.value(<String>{}),
-        returnValueForMissingStub: _i4.Future<Set<String>>.value(<String>{}),
-      ) as _i4.Future<Set<String>>);
+        returnValue: _i3.Future<Set<String>>.value(<String>{}),
+        returnValueForMissingStub: _i3.Future<Set<String>>.value(<String>{}),
+      ) as _i3.Future<Set<String>>);
 
   @override
-  _i4.Future<int> clearOldDismissals({
+  _i3.Future<int> clearOldDismissals({
     required String? userId,
     required Duration? olderThan,
   }) =>
@@ -156,7 +146,7 @@ class MockRecommendationLocalDataSource extends _i1.Mock
             #olderThan: olderThan,
           },
         ),
-        returnValue: _i4.Future<int>.value(0),
-        returnValueForMissingStub: _i4.Future<int>.value(0),
-      ) as _i4.Future<int>);
+        returnValue: _i3.Future<int>.value(0),
+        returnValueForMissingStub: _i3.Future<int>.value(0),
+      ) as _i3.Future<int>);
 }

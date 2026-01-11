@@ -269,7 +269,7 @@ class _MediaViewerState extends State<MediaViewer> {
                 Text(
                   'Failed to load image',
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha:0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -320,7 +320,7 @@ class _MediaViewerState extends State<MediaViewer> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withValues(alpha:0.7),
+                Colors.black.withValues(alpha: 0.7),
                 Colors.transparent,
               ],
             ),
@@ -342,7 +342,7 @@ class _MediaViewerState extends State<MediaViewer> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha:0.5),
+                    color: Colors.black.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -399,7 +399,7 @@ class _MediaViewerState extends State<MediaViewer> {
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha:0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -424,7 +424,7 @@ class _MediaViewerState extends State<MediaViewer> {
             child: Center(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha:0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -468,7 +468,7 @@ class _MediaViewerState extends State<MediaViewer> {
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
               colors: [
-                Colors.black.withValues(alpha:0.7),
+                Colors.black.withValues(alpha: 0.7),
                 Colors.transparent,
               ],
             ),
@@ -525,7 +525,7 @@ class _MediaViewerState extends State<MediaViewer> {
       margin: const EdgeInsets.only(right: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha:0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -623,7 +623,7 @@ class _BuildPhotoViewState extends State<BuildPhotoView> {
                       Text(
                         'Failed to load image',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha:0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],

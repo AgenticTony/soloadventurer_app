@@ -186,7 +186,7 @@ class FieldSelector {
   static const all = FieldSelector(fields: []);
 
   /// Common field selections for activities
-  static const activityMetadata = FieldSelector.include([
+  static FieldSelector get activityMetadata => FieldSelector.include([
     'id',
     'title',
     'category',
@@ -195,7 +195,7 @@ class FieldSelector {
   ]);
 
   /// Common field selections for trips
-  static const tripMetadata = FieldSelector.include([
+  static FieldSelector get tripMetadata => FieldSelector.include([
     'id',
     'title',
     'destination',
@@ -205,7 +205,7 @@ class FieldSelector {
   ]);
 
   /// Common field selections for photos
-  static const photoMetadata = FieldSelector.include([
+  static FieldSelector get photoMetadata => FieldSelector.include([
     'id',
     'url',
     'thumbnailUrl',
@@ -338,8 +338,9 @@ class QueryOptimizer {
 
     // Check cache first
     if (_cacheManager != null) {
-      final cacheResult = await _cacheManager.get<T>(
-        key: key,
+      final cacheResult = await _cacheManager.get(
+        key,
+        networkFetcher: (_) => throw Exception('Cache miss'),
         strategy: CacheStrategy.cacheOnly,
       );
 
@@ -370,7 +371,7 @@ class QueryOptimizer {
       }
 
       try {
-        final data = await _pendingQueries[key] as Future<T>;
+        final data = await _pendingQueries[key] as T;
         stopwatch.stop();
 
         return OptimizedQueryResult(
@@ -404,10 +405,10 @@ class QueryOptimizer {
 
       // Cache the result
       if (_cacheManager != null) {
-        await _cacheManager.set(
-          key: key,
-          value: filteredData as T,
-          ttl: ttl ?? config.defaultCacheTtl,
+        await _cacheManager.put(
+          key,
+          filteredData as T,
+          memoryTtl: ttl ?? config.defaultCacheTtl,
         );
       }
 
@@ -478,12 +479,12 @@ class QueryOptimizer {
     if (_cacheManager == null) return;
 
     if (key != null) {
-      await _cacheManager.delete(key: key);
+      await _cacheManager.invalidate(key);
       if (debug) {
         debugPrint('[QueryOptimizer] Invalidated cache for "$key"');
       }
     } else {
-      await _cacheManager.clear();
+      await _cacheManager.clearAll();
       if (debug) {
         debugPrint('[QueryOptimizer] Invalidated all cache');
       }
@@ -542,7 +543,7 @@ class QueryOptimizer {
 
   /// Get combined cache statistics (if cache manager is available)
   CombinedCacheStats? get cacheStats {
-    return _cacheManager?.stats;
+    return _cacheManager?.getStats();
   }
 
   /// Reset statistics

@@ -17,7 +17,7 @@ part of 'location_sharing_provider.dart';
 /// - Dependencies accessed via ref.watch() in methods
 
 @ProviderFor(LocationSharing)
-final locationSharingProvider = LocationSharingProvider._();
+const locationSharingProvider = LocationSharingProvider._();
 
 /// Notifier for managing location sharing state
 /// Handles starting, stopping, and monitoring location shares
@@ -35,7 +35,7 @@ final class LocationSharingProvider
   /// - Uses @riverpod annotation with code generation
   /// - Uses Notifier base class instead of StateNotifier
   /// - Dependencies accessed via ref.watch() in methods
-  LocationSharingProvider._()
+  const LocationSharingProvider._()
       : super(
           from: null,
           argument: null,
@@ -77,12 +77,13 @@ abstract class _$LocationSharing extends $Notifier<LocationSharingState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<LocationSharingState, LocationSharingState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<LocationSharingState, LocationSharingState>,
         LocationSharingState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

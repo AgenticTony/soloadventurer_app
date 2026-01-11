@@ -499,16 +499,16 @@ class MapMarkerClusteringService {
   }
 
   /// Cluster markers within a specific geographic bounds
-  ClusteringResult clusterMarkersInBounds(
+  ClusteringResult clusterMarkersInLatLngBounds(
     List<MapMarker> markers,
-    Bounds bounds,
+    LatLngBounds bounds,
   ) {
     // Filter markers within bounds
-    final markersInBounds = markers.where((marker) {
+    final markersInLatLngBounds = markers.where((marker) {
       return bounds.contains(marker.position);
     }).toList();
 
-    return clusterMarkers(markersInBounds);
+    return clusterMarkers(markersInLatLngBounds);
   }
 
   /// Incremental clustering for real-time updates
@@ -689,12 +689,12 @@ class MapMarkerClusteringService {
   ///
   /// Convenience method that performs bounds-based clustering and then limits
   /// the visible items to [maxVisibleItems] for optimal performance.
-  ClusteringResult clusterMarkersInBoundsWithLimit(
+  ClusteringResult clusterMarkersInLatLngBoundsWithLimit(
     List<MapMarker> markers,
-    Bounds bounds, {
+    LatLngBounds bounds, {
     int maxVisibleItems = 50,
   }) {
-    final result = clusterMarkersInBounds(markers, bounds);
+    final result = clusterMarkersInLatLngBounds(markers, bounds);
     return limitVisibleItems(result, maxVisibleItems: maxVisibleItems);
   }
 }

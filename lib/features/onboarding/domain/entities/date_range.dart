@@ -9,7 +9,6 @@ part 'date_range.g.dart';
 /// Includes validation logic to ensure the end date is after the start date.
 @freezed
 abstract class DateRange with _$DateRange {
-
   /// Creates a DateRange with start and end dates
   ///
   /// [start] The first day of the trip (inclusive)

@@ -14,7 +14,8 @@ part 'trip_detail_provider.g.dart';
 ///
 /// Provider for the destination repository from the destination discovery feature
 @riverpod
-DestinationRepository tripDestinationRepository(TripDestinationRepositoryRef ref) {
+DestinationRepository tripDestinationRepository(
+    TripDestinationRepositoryRef ref) {
   throw UnimplementedError(
       'tripDestinationRepositoryProvider must be overridden in main app');
 }
@@ -75,7 +76,8 @@ class TripDetail extends _$TripDetail {
       // Fetch destinations if trip has destination IDs
       List<Destination> destinations = [];
       if (trip.destinationIds.isNotEmpty) {
-        destinations = await _fetchDestinations(trip.destinationIds, destinationRepository);
+        destinations = await _fetchDestinations(
+            trip.destinationIds, destinationRepository);
       }
 
       // Update state with loaded data
@@ -121,9 +123,9 @@ class TripDetail extends _$TripDetail {
   ///
   /// Throws an exception if fetching fails.
   Future<List<Destination>> _fetchDestinations(
-      List<String> destinationIds,
-      DestinationRepository destinationRepository,
-      ) async {
+    List<String> destinationIds,
+    DestinationRepository destinationRepository,
+  ) async {
     try {
       final destinations = <Destination>[];
 

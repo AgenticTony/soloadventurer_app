@@ -20,7 +20,7 @@ enum SafetyStatusType {
 
 /// Represents the user's current safety status
 @freezed
-class SafetyStatus with _$SafetyStatus {
+sealed class SafetyStatus with _$SafetyStatus {
   const factory SafetyStatus({
     /// Unique identifier for the safety status
     required String id,
@@ -62,7 +62,7 @@ class SafetyStatus with _$SafetyStatus {
 
 /// Location data associated with a safety status
 @freezed
-class SafetyStatusLocation with _$SafetyStatusLocation {
+sealed class SafetyStatusLocation with _$SafetyStatusLocation {
   const factory SafetyStatusLocation({
     /// Latitude
     required double latitude,

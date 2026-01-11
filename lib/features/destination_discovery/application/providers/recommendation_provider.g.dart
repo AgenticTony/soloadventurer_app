@@ -45,7 +45,7 @@ part of 'recommendation_provider.dart';
 /// The [userId] parameter is the user ID to load recommendations for.
 
 @ProviderFor(Recommendation)
-final recommendationProvider = RecommendationFamily._();
+const recommendationProvider = RecommendationFamily._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
@@ -119,7 +119,7 @@ final class RecommendationProvider
   /// ```
   ///
   /// The [userId] parameter is the user ID to load recommendations for.
-  RecommendationProvider._(
+  const RecommendationProvider._(
       {required RecommendationFamily super.from,
       required String super.argument})
       : super(
@@ -197,7 +197,7 @@ final class RecommendationFamily extends $Family
     with
         $ClassFamilyOverride<Recommendation, AsyncValue<RecommendationState>,
             RecommendationState, FutureOr<RecommendationState>, String> {
-  RecommendationFamily._()
+  const RecommendationFamily._()
       : super(
           retry: null,
           name: r'recommendationProvider',
@@ -297,6 +297,9 @@ abstract class _$Recommendation extends $AsyncNotifier<RecommendationState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref =
         this.ref as $Ref<AsyncValue<RecommendationState>, RecommendationState>;
     final element = ref.element as $ClassProviderElement<
@@ -304,10 +307,6 @@ abstract class _$Recommendation extends $AsyncNotifier<RecommendationState> {
         AsyncValue<RecommendationState>,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }

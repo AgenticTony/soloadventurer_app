@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/operation_queue_provider.dart';
 
 /// A persistent indicator that shows the number of pending operations in the queue
@@ -23,7 +24,7 @@ class QueueStatusIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final queueState = ref.watch(operationQueueNotifierProvider);
+    final queueState = ref.watch(operationQueueProvider);
     final pendingCount = queueState.pendingCount;
 
     // Hide indicator when there are no pending operations
@@ -43,7 +44,7 @@ class QueueStatusIndicator extends ConsumerWidget {
         child: const Icon(Icons.cloud_sync),
       ),
       onPressed: () {
-        Navigator.pushNamed(context, '/operation-queue');
+        context.push('/operation-queue');
       },
       tooltip: 'View operation queue ($pendingCount pending)',
     );

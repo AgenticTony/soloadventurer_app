@@ -246,8 +246,6 @@ extension SafetyDataPatterns on SafetyData {
     switch (_that) {
       case _SafetyData():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -353,8 +351,6 @@ extension SafetyDataPatterns on SafetyData {
             _that.activeAlerts,
             _that.selectedCheckIn,
             _that.selectedAlert);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

@@ -262,8 +262,6 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
     switch (_that) {
       case _TrustedContactsState():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -385,8 +383,6 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
             _that.isProcessing,
             _that.emergencyContactsCount,
             _that.locationSharingCount);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

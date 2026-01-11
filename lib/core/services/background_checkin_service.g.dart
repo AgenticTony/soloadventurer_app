@@ -11,7 +11,7 @@ part of 'background_checkin_service.dart';
 /// Provider for the background check-in service implementation
 
 @ProviderFor(backgroundCheckInService)
-final backgroundCheckInServiceProvider = BackgroundCheckInServiceProvider._();
+const backgroundCheckInServiceProvider = BackgroundCheckInServiceProvider._();
 
 /// Provider for the background check-in service implementation
 
@@ -20,7 +20,7 @@ final class BackgroundCheckInServiceProvider extends $FunctionalProvider<
     BackgroundCheckInService,
     BackgroundCheckInService> with $Provider<BackgroundCheckInService> {
   /// Provider for the background check-in service implementation
-  BackgroundCheckInServiceProvider._()
+  const BackgroundCheckInServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,4 +55,4 @@ final class BackgroundCheckInServiceProvider extends $FunctionalProvider<
 }
 
 String _$backgroundCheckInServiceHash() =>
-    r'7a11a29c3aeb0930c7e25ad9d219649526957fc3';
+    r'3093a349ebf02f6d029db5fe8fefadfaad8f85e6';

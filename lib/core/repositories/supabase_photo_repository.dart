@@ -81,7 +81,7 @@ class SupabasePhotoRepository
 
     // Build Supabase query
     // Assuming photos table has a userId foreign key or join table
-    var query = _client.from('photos').select().eq('userId', userId);
+    dynamic query = _client.from('photos').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -186,7 +186,7 @@ class SupabasePhotoRepository
     final offset = (page - 1) * validatedPageSize;
 
     // Build Supabase query
-    var query = _client.from('photos').select().eq('userId', userId);
+    dynamic query = _client.from('photos').select().eq('userId', userId);
 
     // Add trip filter if provided
     if (tripId != null) {
@@ -253,7 +253,7 @@ class SupabasePhotoRepository
     final lastId = cursorData?['lastId'] as String?;
 
     // Build query with only metadata fields
-    var query = _client
+    dynamic query = _client
         .from('photos')
         .select('id, thumbnailUrl, takenAt, width, height, location')
         .eq('userId', userId);
@@ -391,7 +391,7 @@ class SupabasePhotoRepository
     final offset = (currentPage - 1) * validatedPageSize;
 
     // Build search query using ILIKE
-    var queryBuilder = _client.from('photos').select().eq('userId', userId);
+    dynamic queryBuilder = _client.from('photos').select().eq('userId', userId);
 
     if (tripId != null) {
       queryBuilder = queryBuilder.eq('tripId', tripId);
@@ -475,7 +475,7 @@ class SupabasePhotoRepository
     required String userId,
     Map<String, dynamic>? filters,
   }) async {
-    var query = _client.from('photos').select().eq('userId', userId);
+    dynamic query = _client.from('photos').select().eq('userId', userId);
 
     if (tripId != null) {
       query = query.eq('tripId', tripId);

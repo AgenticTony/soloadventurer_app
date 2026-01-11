@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:dio/dio.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
-import 'package:soloadventurer/features/core/infrastructure/graphql/graphql_queries.dart';
 
 /// Result of an upload sync operation
 class UploadSyncResult {
@@ -36,12 +35,12 @@ class UploadSyncResult {
   }
 }
 
-/// Service to sync queued operations from local database to server
+/// Service to sync queued operations from local database to Supabase
 ///
 /// This service handles the upload phase of synchronization by:
 /// - Processing pending operations from the sync queue
-/// - Converting operations to GraphQL mutations or REST API calls
-/// - Executing mutations against the server
+/// - Converting operations to Supabase PostgREST API calls
+/// - Executing mutations against Supabase
 /// - Updating local database with server IDs on success
 /// - Marking operations as completed or failed
 /// - Handling retries with exponential backoff
@@ -52,7 +51,7 @@ class UploadSyncResult {
 /// Example usage:
 /// ```dart
 /// final uploadSync = UploadSync(
-///   dio: dio,
+///   client: Supabase.instance.client,
 ///   syncQueueRepository: syncQueueRepository,
 /// );
 ///
@@ -66,27 +65,21 @@ class UploadSyncResult {
 /// print('Uploaded ${result.successCount} operations');
 /// ```
 class UploadSync {
-  /// Dio HTTP client for API requests
-  final Dio _dio;
+  /// Supabase client for API requests
+  final SupabaseClient _client;
 
   /// Repository for sync queue operations
   final SyncQueueRepository _syncQueueRepository;
 
-  /// GraphQL API endpoint
-  final String _graphqlEndpoint;
-
   /// Creates a new [UploadSync] instance
   ///
-  /// [dio] - Dio HTTP client for making API requests
+  /// [client] - Supabase client for making API requests
   /// [syncQueueRepository] - Repository for managing sync queue
-  /// [graphqlEndpoint] - GraphQL API endpoint (default: '/graphql')
   UploadSync({
-    required Dio dio,
+    required SupabaseClient client,
     required SyncQueueRepository syncQueueRepository,
-    String graphqlEndpoint = '/graphql',
-  })  : _dio = dio,
-        _syncQueueRepository = syncQueueRepository,
-        _graphqlEndpoint = graphqlEndpoint;
+  })  : _client = client,
+        _syncQueueRepository = syncQueueRepository;
 
   // ==============================================================================
   // PUBLIC API
@@ -248,6 +241,7 @@ class UploadSync {
         case 'trip':
           return await _executeTripOperation(operation);
         case 'journal':
+        case 'journalentry':
           return await _executeJournalOperation(operation);
         case 'user':
         case 'profile':
@@ -275,7 +269,10 @@ class UploadSync {
         case SyncOperationType.delete:
           return await _deleteTrip(operation);
       }
-    } on Object catch (e) {
+    } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException executing trip operation: ${e.message}');
+      return false;
+    } catch (e) {
       debugPrint('❌ Error executing trip operation: $e');
       return false;
     }
@@ -292,7 +289,10 @@ class UploadSync {
         case SyncOperationType.delete:
           return await _deleteJournal(operation);
       }
-    } on Object catch (e) {
+    } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException executing journal operation: ${e.message}');
+      return false;
+    } catch (e) {
       debugPrint('❌ Error executing journal operation: $e');
       return false;
     }
@@ -313,7 +313,10 @@ class UploadSync {
           debugPrint('⚠️ User deletion through sync not supported');
           return false;
       }
-    } on Object catch (e) {
+    } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException executing user operation: ${e.message}');
+      return false;
+    } catch (e) {
       debugPrint('❌ Error executing user operation: $e');
       return false;
     }
@@ -333,38 +336,32 @@ class UploadSync {
           debugPrint('⚠️ Travel preference deletion not supported');
           return false;
       }
-    } on Object catch (e) {
+    } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException executing travel preference operation: ${e.message}');
+      return false;
+    } catch (e) {
       debugPrint('❌ Error executing travel preference operation: $e');
       return false;
     }
   }
 
   // ==============================================================================
-  // PRIVATE METHODS - GRAPHQL MUTATIONS
+  // PRIVATE METHODS - SUPABASE POSTGREST OPERATIONS
   // ==============================================================================
 
   /// Creates a trip on the server
   Future<bool> _createTrip(SyncOperationEntity operation) async {
     try {
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': GraphQLQueries.createTrip,
-          'variables': operation.data,
-        },
-      );
+      final response = await _client
+          .from('trips')
+          .insert(operation.data)
+          .select()
+          .single();
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final createdTrip = response.data['data']['createTrip'];
-        debugPrint('✅ Trip created on server: ${createdTrip['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to create trip: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException creating trip: ${e.message}');
+      debugPrint('✅ Trip created on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException creating trip: ${e.message}');
       return false;
     }
   }
@@ -372,28 +369,17 @@ class UploadSync {
   /// Updates a trip on the server
   Future<bool> _updateTrip(SyncOperationEntity operation) async {
     try {
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': GraphQLQueries.updateTrip,
-          'variables': {
-            'id': operation.entityId,
-            ...operation.data,
-          },
-        },
-      );
+      final response = await _client
+          .from('trips')
+          .update(operation.data)
+          .eq('id', operation.entityId)
+          .select()
+          .single();
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final updatedTrip = response.data['data']['updateTrip'];
-        debugPrint('✅ Trip updated on server: ${updatedTrip['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to update trip: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException updating trip: ${e.message}');
+      debugPrint('✅ Trip updated on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException updating trip: ${e.message}');
       return false;
     }
   }
@@ -401,35 +387,15 @@ class UploadSync {
   /// Deletes a trip on the server
   Future<bool> _deleteTrip(SyncOperationEntity operation) async {
     try {
-      // Note: Assuming there's a deleteTrip mutation, if not this would need
-      // to be added to GraphQLQueries
-      const deleteMutation = '''
-        mutation DeleteTrip(\$id: ID!) {
-          deleteTrip(id: \$id) {
-            id
-            success
-          }
-        }
-      ''';
+      await _client
+          .from('trips')
+          .delete()
+          .eq('id', operation.entityId);
 
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': deleteMutation,
-          'variables': {'id': operation.entityId},
-        },
-      );
-
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        debugPrint('✅ Trip deleted on server: ${operation.entityId}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to delete trip: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException deleting trip: ${e.message}');
+      debugPrint('✅ Trip deleted on server: ${operation.entityId}');
+      return true;
+    } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException deleting trip: ${e.message}');
       return false;
     }
   }
@@ -437,62 +403,16 @@ class UploadSync {
   /// Creates a journal on the server
   Future<bool> _createJournal(SyncOperationEntity operation) async {
     try {
-      // Note: Assuming there's a createJournal mutation
-      const createMutation = '''
-        mutation CreateJournal(
-          \$tripId: ID!
-          \$title: String!
-          \$content: String!
-          \$entryDate: String!
-          \$mood: String
-          \$location: String
-          \$tags: [String!]
-          \$images: [String!]
-        ) {
-          createJournal(
-            tripId: \$tripId
-            title: \$title
-            content: \$content
-            entryDate: \$entryDate
-            mood: \$mood
-            location: \$location
-            tags: \$tags
-            images: \$images
-          ) {
-            id
-            tripId
-            title
-            content
-            entryDate
-            mood
-            location
-            tags
-            images
-            createdAt
-            updatedAt
-          }
-        }
-      ''';
+      final response = await _client
+          .from('journal_entries')
+          .insert(operation.data)
+          .select()
+          .single();
 
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': createMutation,
-          'variables': operation.data,
-        },
-      );
-
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final createdJournal = response.data['data']['createJournal'];
-        debugPrint('✅ Journal created on server: ${createdJournal['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to create journal: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException creating journal: ${e.message}');
+      debugPrint('✅ Journal created on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException creating journal: ${e.message}');
       return false;
     }
   }
@@ -500,65 +420,17 @@ class UploadSync {
   /// Updates a journal on the server
   Future<bool> _updateJournal(SyncOperationEntity operation) async {
     try {
-      // Note: Assuming there's an updateJournal mutation
-      const updateMutation = '''
-        mutation UpdateJournal(
-          \$id: ID!
-          \$title: String
-          \$content: String
-          \$entryDate: String
-          \$mood: String
-          \$location: String
-          \$tags: [String!]
-          \$images: [String!]
-        ) {
-          updateJournal(
-            id: \$id
-            title: \$title
-            content: \$content
-            entryDate: \$entryDate
-            mood: \$mood
-            location: \$location
-            tags: \$tags
-            images: \$images
-          ) {
-            id
-            tripId
-            title
-            content
-            entryDate
-            mood
-            location
-            tags
-            images
-            createdAt
-            updatedAt
-          }
-        }
-      ''';
+      final response = await _client
+          .from('journal_entries')
+          .update(operation.data)
+          .eq('id', operation.entityId)
+          .select()
+          .single();
 
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': updateMutation,
-          'variables': {
-            'id': operation.entityId,
-            ...operation.data,
-          },
-        },
-      );
-
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final updatedJournal = response.data['data']['updateJournal'];
-        debugPrint('✅ Journal updated on server: ${updatedJournal['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to update journal: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException updating journal: ${e.message}');
+      debugPrint('✅ Journal updated on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException updating journal: ${e.message}');
       return false;
     }
   }
@@ -566,34 +438,15 @@ class UploadSync {
   /// Deletes a journal on the server
   Future<bool> _deleteJournal(SyncOperationEntity operation) async {
     try {
-      // Note: Assuming there's a deleteJournal mutation
-      const deleteMutation = '''
-        mutation DeleteJournal(\$id: ID!) {
-          deleteJournal(id: \$id) {
-            id
-            success
-          }
-        }
-      ''';
+      await _client
+          .from('journal_entries')
+          .delete()
+          .eq('id', operation.entityId);
 
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': deleteMutation,
-          'variables': {'id': operation.entityId},
-        },
-      );
-
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        debugPrint('✅ Journal deleted on server: ${operation.entityId}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to delete journal: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException deleting journal: ${e.message}');
+      debugPrint('✅ Journal deleted on server: ${operation.entityId}');
+      return true;
+    } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException deleting journal: ${e.message}');
       return false;
     }
   }
@@ -601,28 +454,17 @@ class UploadSync {
   /// Updates user profile on the server
   Future<bool> _updateUserProfile(SyncOperationEntity operation) async {
     try {
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': GraphQLQueries.updateUserProfile,
-          'variables': {
-            'userId': operation.entityId,
-            ...operation.data,
-          },
-        },
-      );
+      final response = await _client
+          .from('profiles')
+          .update(operation.data)
+          .eq('id', operation.entityId)
+          .select()
+          .single();
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final updatedProfile = response.data['data']['updateUserProfile'];
-        debugPrint('✅ User profile updated on server: ${updatedProfile['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to update user profile: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException updating user profile: ${e.message}');
+      debugPrint('✅ User profile updated on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException updating user profile: ${e.message}');
       return false;
     }
   }
@@ -630,26 +472,17 @@ class UploadSync {
   /// Creates travel preference on the server
   Future<bool> _createTravelPreference(SyncOperationEntity operation) async {
     try {
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': GraphQLQueries.createTravelPreference,
-          'variables': operation.data,
-        },
-      );
+      final response = await _client
+          .from('travel_preferences')
+          .insert(operation.data)
+          .select()
+          .single();
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final createdPref = response.data['data']['createTravelPreference'];
-        debugPrint(
-            '✅ Travel preference created on server: ${createdPref['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to create travel preference: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException creating travel preference: ${e.message}');
+      debugPrint(
+          '✅ Travel preference created on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException creating travel preference: ${e.message}');
       return false;
     }
   }
@@ -657,29 +490,18 @@ class UploadSync {
   /// Updates travel preference on the server
   Future<bool> _updateTravelPreference(SyncOperationEntity operation) async {
     try {
-      final response = await _dio.post(
-        _graphqlEndpoint,
-        data: {
-          'query': GraphQLQueries.updateTravelPreference,
-          'variables': {
-            'id': operation.entityId,
-            ...operation.data,
-          },
-        },
-      );
+      final response = await _client
+          .from('travel_preferences')
+          .update(operation.data)
+          .eq('id', operation.entityId)
+          .select()
+          .single();
 
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final updatedPref = response.data['data']['updateTravelPreference'];
-        debugPrint(
-            '✅ Travel preference updated on server: ${updatedPref['id']}');
-        return true;
-      } else {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to update travel preference: $errors');
-        return false;
-      }
-    } on DioException catch (e) {
-      debugPrint('❌ DioException updating travel preference: ${e.message}');
+      debugPrint(
+          '✅ Travel preference updated on server: ${response['id']}');
+      return true;
+        } on PostgrestException catch (e) {
+      debugPrint('❌ PostgrestException updating travel preference: ${e.message}');
       return false;
     }
   }

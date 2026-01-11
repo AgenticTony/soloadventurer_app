@@ -18,7 +18,7 @@ part of 'user_profile_provider.dart';
 /// Provider for the API service
 
 @ProviderFor(apiService)
-final apiServiceProvider = ApiServiceProvider._();
+const apiServiceProvider = ApiServiceProvider._();
 
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier<AsyncValue<User?>> to AsyncNotifier<User?>
@@ -40,7 +40,7 @@ final class ApiServiceProvider
   /// - build() returns Future<User?> not AsyncValue
   /// - State is automatically AsyncValue<User?> when consumed
   /// Provider for the API service
-  ApiServiceProvider._()
+  const ApiServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -78,7 +78,7 @@ String _$apiServiceHash() => r'9097e8469243290aea60ba3d86bfe8333c22d995';
 /// Provider for user repository
 
 @ProviderFor(userRepository)
-final userRepositoryProvider = UserRepositoryProvider._();
+const userRepositoryProvider = UserRepositoryProvider._();
 
 /// Provider for user repository
 
@@ -86,7 +86,7 @@ final class UserRepositoryProvider
     extends $FunctionalProvider<UserRepository, UserRepository, UserRepository>
     with $Provider<UserRepository> {
   /// Provider for user repository
-  UserRepositoryProvider._()
+  const UserRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -128,7 +128,7 @@ String _$userRepositoryHash() => r'728063be6de078c53370398d20f4215f6b3575b6';
 /// Auto-dispose behavior enabled.
 
 @ProviderFor(UserProfile)
-final userProfileProvider = UserProfileFamily._();
+const userProfileProvider = UserProfileFamily._();
 
 /// Notifier for updating user profile
 ///
@@ -142,7 +142,7 @@ final class UserProfileProvider
   /// Riverpod 3.0: Uses @riverpod annotation with AsyncNotifier pattern.
   /// Family provider with userId parameter.
   /// Auto-dispose behavior enabled.
-  UserProfileProvider._(
+  const UserProfileProvider._(
       {required UserProfileFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -189,7 +189,7 @@ final class UserProfileFamily extends $Family
     with
         $ClassFamilyOverride<UserProfile, AsyncValue<User?>, User?,
             FutureOr<User?>, String> {
-  UserProfileFamily._()
+  const UserProfileFamily._()
       : super(
           retry: null,
           name: r'userProfileProvider',
@@ -229,31 +229,30 @@ abstract class _$UserProfile extends $AsyncNotifier<User?> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<AsyncValue<User?>, User?>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<User?>, User?>,
         AsyncValue<User?>,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }
 
 /// Selector provider for user profile loading state
 
 @ProviderFor(userProfileLoading)
-final userProfileLoadingProvider = UserProfileLoadingFamily._();
+const userProfileLoadingProvider = UserProfileLoadingFamily._();
 
 /// Selector provider for user profile loading state
 
 final class UserProfileLoadingProvider
     extends $FunctionalProvider<bool, bool, bool> with $Provider<bool> {
   /// Selector provider for user profile loading state
-  UserProfileLoadingProvider._(
+  const UserProfileLoadingProvider._(
       {required UserProfileLoadingFamily super.from,
       required String super.argument})
       : super(
@@ -314,7 +313,7 @@ String _$userProfileLoadingHash() =>
 
 final class UserProfileLoadingFamily extends $Family
     with $FunctionalFamilyOverride<bool, String> {
-  UserProfileLoadingFamily._()
+  const UserProfileLoadingFamily._()
       : super(
           retry: null,
           name: r'userProfileLoadingProvider',
@@ -337,7 +336,7 @@ final class UserProfileLoadingFamily extends $Family
 /// Selector provider for user profile error state
 
 @ProviderFor(userProfileError)
-final userProfileErrorProvider = UserProfileErrorFamily._();
+const userProfileErrorProvider = UserProfileErrorFamily._();
 
 /// Selector provider for user profile error state
 
@@ -345,7 +344,7 @@ final class UserProfileErrorProvider
     extends $FunctionalProvider<String?, String?, String?>
     with $Provider<String?> {
   /// Selector provider for user profile error state
-  UserProfileErrorProvider._(
+  const UserProfileErrorProvider._(
       {required UserProfileErrorFamily super.from,
       required String super.argument})
       : super(
@@ -405,7 +404,7 @@ String _$userProfileErrorHash() => r'8036ade535fb87555770c6ba80ecb2cb0826facf';
 
 final class UserProfileErrorFamily extends $Family
     with $FunctionalFamilyOverride<String?, String> {
-  UserProfileErrorFamily._()
+  const UserProfileErrorFamily._()
       : super(
           retry: null,
           name: r'userProfileErrorProvider',

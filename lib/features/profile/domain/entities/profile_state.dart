@@ -30,4 +30,5 @@ class ProfileDomainState extends Equatable {
   }
 
   bool get isAuthenticated => profile != null;
+  bool get hasError => error != null;
 }

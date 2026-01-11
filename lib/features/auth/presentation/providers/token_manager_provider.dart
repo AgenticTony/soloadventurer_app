@@ -6,6 +6,18 @@ import '../../data/providers/auth_data_providers.dart';
 
 part 'token_manager_provider.g.dart';
 
+/// DEPRECATED: This presentation layer TokenManager is deprecated.
+///
+/// Please use the domain layer TokenManager instead:
+/// `lib/features/auth/domain/services/token_manager.dart`
+///
+/// The domain TokenManager uses FeatureAvailability enum and is properly
+/// initialized in bootstrap. This presentation layer wrapper is kept for
+/// backward compatibility but should not be used for new code.
+@Deprecated(
+  'Use domain TokenManager from lib/features/auth/domain/services/token_manager.dart instead. '
+  'This wrapper is deprecated and will be removed in a future version.',
+)
 @riverpod
 class TokenManager extends _$TokenManager {
   late final AuthRepository _authRepository;

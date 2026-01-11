@@ -220,8 +220,6 @@ extension LocationUpdateOperationPatterns on LocationUpdateOperation {
     switch (_that) {
       case _LocationUpdateOperation():
         return $default(_that);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 
@@ -339,8 +337,6 @@ extension LocationUpdateOperationPatterns on LocationUpdateOperation {
             _that.attemptCount,
             _that.lastError,
             _that.maxRetries);
-      case _:
-        throw StateError('Unexpected subclass');
     }
   }
 

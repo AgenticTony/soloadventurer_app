@@ -11,7 +11,7 @@ part of 'missed_checkin_detector_impl.dart';
 /// Provider for MissedCheckInDetectorImpl
 
 @ProviderFor(missedCheckInDetectorImpl)
-final missedCheckInDetectorImplProvider = MissedCheckInDetectorImplProvider._();
+const missedCheckInDetectorImplProvider = MissedCheckInDetectorImplProvider._();
 
 /// Provider for MissedCheckInDetectorImpl
 
@@ -20,7 +20,7 @@ final class MissedCheckInDetectorImplProvider extends $FunctionalProvider<
     MissedCheckInDetector,
     MissedCheckInDetector> with $Provider<MissedCheckInDetector> {
   /// Provider for MissedCheckInDetectorImpl
-  MissedCheckInDetectorImplProvider._()
+  const MissedCheckInDetectorImplProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,12 +55,12 @@ final class MissedCheckInDetectorImplProvider extends $FunctionalProvider<
 }
 
 String _$missedCheckInDetectorImplHash() =>
-    r'da602ed511e2fdd5705607cbc3831bcad0ef28b9';
+    r'308187d203317709ecb46799c0a15ecc2c8a3df8';
 
 /// Provider override for MissedCheckInDetector interface
 
 @ProviderFor(missedCheckInDetectorOverride)
-final missedCheckInDetectorOverrideProvider =
+const missedCheckInDetectorOverrideProvider =
     MissedCheckInDetectorOverrideProvider._();
 
 /// Provider override for MissedCheckInDetector interface
@@ -70,7 +70,7 @@ final class MissedCheckInDetectorOverrideProvider extends $FunctionalProvider<
     MissedCheckInDetector,
     MissedCheckInDetector> with $Provider<MissedCheckInDetector> {
   /// Provider override for MissedCheckInDetector interface
-  MissedCheckInDetectorOverrideProvider._()
+  const MissedCheckInDetectorOverrideProvider._()
       : super(
           from: null,
           argument: null,
@@ -105,4 +105,4 @@ final class MissedCheckInDetectorOverrideProvider extends $FunctionalProvider<
 }
 
 String _$missedCheckInDetectorOverrideHash() =>
-    r'e1b5f45eb419c17abb73efd84fbd7da1a9b03265';
+    r'7c26af930b4e6743c22675fbe27d21e0ba05a261';

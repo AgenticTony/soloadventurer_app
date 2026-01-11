@@ -23,7 +23,7 @@ part of 'itinerary_providers.dart';
 ///
 
 @ProviderFor(ItineraryNotifier)
-final itineraryProvider = ItineraryNotifierFamily._();
+const itineraryProvider = ItineraryNotifierFamily._();
 
 /// Provider for ItineraryNotifier - manages itinerary state
 ///
@@ -53,7 +53,7 @@ final class ItineraryNotifierProvider
   /// ref.read(itineraryNotifierProvider('itinerary-').notifier)
   ///     .toggleItemCompletion('item-');
   ///
-  ItineraryNotifierProvider._(
+  const ItineraryNotifierProvider._(
       {required ItineraryNotifierFamily super.from,
       required String super.argument})
       : super(
@@ -109,7 +109,7 @@ final class ItineraryNotifierFamily extends $Family
     with
         $ClassFamilyOverride<ItineraryNotifier, AsyncValue<Itinerary>,
             Itinerary, FutureOr<Itinerary>, String> {
-  ItineraryNotifierFamily._()
+  const ItineraryNotifierFamily._()
       : super(
           retry: null,
           name: r'itineraryProvider',
@@ -165,17 +165,16 @@ abstract class _$ItineraryNotifier extends $AsyncNotifier<Itinerary> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<AsyncValue<Itinerary>, Itinerary>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<Itinerary>, Itinerary>,
         AsyncValue<Itinerary>,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }
 
@@ -187,7 +186,7 @@ abstract class _$ItineraryNotifier extends $AsyncNotifier<Itinerary> {
 ///
 
 @ProviderFor(itineraries)
-final itinerariesProvider = ItinerariesFamily._();
+const itinerariesProvider = ItinerariesFamily._();
 
 /// Provider for watching all itineraries
 ///
@@ -209,7 +208,7 @@ final class ItinerariesProvider extends $FunctionalProvider<
   /// dart
   /// final itinerariesAsync = ref.watch(itinerariesProvider(userId: 'user-'));
   ///
-  ItinerariesProvider._(
+  const ItinerariesProvider._(
       {required ItinerariesFamily super.from, required String? super.argument})
       : super(
           retry: null,
@@ -267,7 +266,7 @@ String _$itinerariesHash() => r'42f718cf502d290192c096df1c99cbcf8f9206ba';
 final class ItinerariesFamily extends $Family
     with
         $FunctionalFamilyOverride<FutureOr<List<ItineraryListState>>, String?> {
-  ItinerariesFamily._()
+  const ItinerariesFamily._()
       : super(
           retry: null,
           name: r'itinerariesProvider',

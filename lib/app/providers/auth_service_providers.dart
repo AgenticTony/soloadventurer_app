@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:soloadventurer/core/security/security_manager.dart';
+import 'package:soloadventurer/core/config/app_config.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
@@ -37,14 +39,31 @@ AuthLocalDataSource authLocalDataSource(Ref ref) {
 
 /// Provider for AuthRemoteDataSource
 ///
-/// In production, uses the real AWS Cognito implementation.
+/// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
 /// In tests, this can be overridden with the mock implementation.
+///
+/// The auth provider is selected based on AppConfig.useSupabaseAuth:
+/// - true: Uses SupabaseAuthRemoteDataSourceImpl
+/// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
 @Riverpod(keepAlive: true)
 AuthRemoteDataSource authRemoteDataSource(Ref ref) {
+  debugPrint('========================================');
+  debugPrint('auth_service_providers: Initializing AuthRemoteDataSource');
+  debugPrint('auth_service_providers: AppConfig.useSupabaseAuth = ${AppConfig.useSupabaseAuth}');
+  debugPrint('auth_service_providers: AppConfig.useCognitoAuth = ${AppConfig.useCognitoAuth}');
+  debugPrint('auth_service_providers: AppConfig.authProvider = ${AppConfig.authProvider}');
+  debugPrint('========================================');
+
+  if (AppConfig.useSupabaseAuth) {
+    debugPrint('auth_service_providers: Using SupabaseAuthRemoteDataSourceImpl');
+    return SupabaseAuthRemoteDataSourceImpl();
+  }
+
+  // Use AWS Cognito implementation (legacy)
+  debugPrint('auth_service_providers: Using AuthRemoteDataSourceImpl (AWS Cognito)');
   final apiBaseUrl = ref.watch(apiBaseUrlProvider);
   final http.Client client = http.Client();
 
-  // Use the real implementation for production
   return AuthRemoteDataSourceImpl(
     userPool: ref.watch(cognitoUserPoolProvider),
     clientSecret: ref.watch(cognitoClientIdProvider),

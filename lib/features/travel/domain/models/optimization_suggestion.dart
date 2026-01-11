@@ -43,8 +43,7 @@ enum OptimizationType {
 /// );
 /// ```
 @freezed
-class OptimizationSuggestion with _$OptimizationSuggestion {
-
+sealed class OptimizationSuggestion with _$OptimizationSuggestion {
   /// Creates an optimization suggestion
   ///
   /// The [id] parameter is a unique identifier for this suggestion.

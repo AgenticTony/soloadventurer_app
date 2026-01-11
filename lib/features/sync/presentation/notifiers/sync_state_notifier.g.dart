@@ -22,7 +22,7 @@ part of 'sync_state_notifier.dart';
 /// Optionally persists state across app restarts.
 
 @ProviderFor(SyncStateNotifier)
-final syncStateProvider = SyncStateNotifierProvider._();
+const syncStateProvider = SyncStateNotifierProvider._();
 
 /// Notifier for managing comprehensive sync state
 ///
@@ -50,7 +50,7 @@ final class SyncStateNotifierProvider
   /// providing reactive state for UI components to consume.
   /// Ensures all status indicators update immediately when sync state changes.
   /// Optionally persists state across app restarts.
-  SyncStateNotifierProvider._()
+  const SyncStateNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -97,9 +97,10 @@ abstract class _$SyncStateNotifier extends $Notifier<SyncState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<SyncState, SyncState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<SyncState, SyncState>, SyncState, Object?, Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }

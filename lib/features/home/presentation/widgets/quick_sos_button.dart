@@ -37,7 +37,7 @@ class QuickSOSButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final safetyState = ref.watch(safetyStateProvider);
+    final safetyState = ref.watch(safetyProvider);
     final hasActiveEmergency = safetyState.hasActiveEmergency;
     final isProcessing = safetyState.isProcessing;
 

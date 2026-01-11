@@ -11,7 +11,7 @@ part of 'weather_service.dart';
 /// Provider for the weather service implementation
 
 @ProviderFor(weatherService)
-final weatherServiceProvider = WeatherServiceProvider._();
+const weatherServiceProvider = WeatherServiceProvider._();
 
 /// Provider for the weather service implementation
 
@@ -19,7 +19,7 @@ final class WeatherServiceProvider
     extends $FunctionalProvider<WeatherService, WeatherService, WeatherService>
     with $Provider<WeatherService> {
   /// Provider for the weather service implementation
-  WeatherServiceProvider._()
+  const WeatherServiceProvider._()
       : super(
           from: null,
           argument: null,

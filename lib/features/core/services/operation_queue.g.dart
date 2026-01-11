@@ -46,7 +46,7 @@ part of 'operation_queue.dart';
 /// See [QueueableOperation] for creating custom operations.
 
 @ProviderFor(OperationQueue)
-final operationQueueProvider = OperationQueueProvider._();
+const operationQueueProvider = OperationQueueProvider._();
 
 /// A persistent priority queue for managing offline-capable operations.
 ///
@@ -122,7 +122,7 @@ final class OperationQueueProvider
   /// ```
   ///
   /// See [QueueableOperation] for creating custom operations.
-  OperationQueueProvider._()
+  const OperationQueueProvider._()
       : super(
           from: null,
           argument: null,
@@ -141,7 +141,7 @@ final class OperationQueueProvider
   OperationQueue create() => OperationQueue();
 }
 
-String _$operationQueueHash() => r'f08a656cc5fb22a52e23a77be0c5c14e0ac2e150';
+String _$operationQueueHash() => r'118a13fe289ae88ab5509d08c0a8a36123e8f961';
 
 /// A persistent priority queue for managing offline-capable operations.
 ///
@@ -185,12 +185,13 @@ abstract class _$OperationQueue extends $AsyncNotifier<void> {
   @$mustCallSuper
   @override
   void runBuild() {
+    build();
     final ref = this.ref as $Ref<AsyncValue<void>, void>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<AsyncValue<void>, void>,
         AsyncValue<void>,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, null);
   }
 }

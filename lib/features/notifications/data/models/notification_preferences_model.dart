@@ -8,6 +8,7 @@ part 'notification_preferences_model.g.dart';
 @freezed
 abstract class NotificationPreferencesModel
     with _$NotificationPreferencesModel {
+  const NotificationPreferencesModel._();
 
   const factory NotificationPreferencesModel({
     // Flight notifications

@@ -10,13 +10,13 @@ part of 'connectivity_provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(connectivityService)
-final connectivityServiceProvider = ConnectivityServiceProvider._();
+const connectivityServiceProvider = ConnectivityServiceProvider._();
 
 final class ConnectivityServiceProvider extends $FunctionalProvider<
     ConnectivityService,
     ConnectivityService,
     ConnectivityService> with $Provider<ConnectivityService> {
-  ConnectivityServiceProvider._()
+  const ConnectivityServiceProvider._()
       : super(
           from: null,
           argument: null,
@@ -54,11 +54,11 @@ String _$connectivityServiceHash() =>
     r'6176a137dc83b81479363eb81f447438e9e20df4';
 
 @ProviderFor(ConnectivityNotifier)
-final connectivityProvider = ConnectivityNotifierProvider._();
+const connectivityProvider = ConnectivityNotifierProvider._();
 
 final class ConnectivityNotifierProvider
     extends $NotifierProvider<ConnectivityNotifier, ConnectivityState> {
-  ConnectivityNotifierProvider._()
+  const ConnectivityNotifierProvider._()
       : super(
           from: null,
           argument: null,
@@ -93,27 +93,28 @@ abstract class _$ConnectivityNotifier extends $Notifier<ConnectivityState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<ConnectivityState, ConnectivityState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<ConnectivityState, ConnectivityState>,
         ConnectivityState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
 /// Selector provider for connection status
 
 @ProviderFor(isConnected)
-final isConnectedProvider = IsConnectedProvider._();
+const isConnectedProvider = IsConnectedProvider._();
 
 /// Selector provider for connection status
 
 final class IsConnectedProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Selector provider for connection status
-  IsConnectedProvider._()
+  const IsConnectedProvider._()
       : super(
           from: null,
           argument: null,
@@ -151,7 +152,7 @@ String _$isConnectedHash() => r'db7edf9daf8e02d7f84bc136be7109023f299b76';
 /// Selector provider for connection type
 
 @ProviderFor(connectionType)
-final connectionTypeProvider = ConnectionTypeProvider._();
+const connectionTypeProvider = ConnectionTypeProvider._();
 
 /// Selector provider for connection type
 
@@ -159,7 +160,7 @@ final class ConnectionTypeProvider
     extends $FunctionalProvider<ConnectionType, ConnectionType, ConnectionType>
     with $Provider<ConnectionType> {
   /// Selector provider for connection type
-  ConnectionTypeProvider._()
+  const ConnectionTypeProvider._()
       : super(
           from: null,
           argument: null,
@@ -197,14 +198,14 @@ String _$connectionTypeHash() => r'4dd371882a90d1510affd54102b374fc4f1edfe5';
 /// Selector provider for offline status
 
 @ProviderFor(isOffline)
-final isOfflineProvider = IsOfflineProvider._();
+const isOfflineProvider = IsOfflineProvider._();
 
 /// Selector provider for offline status
 
 final class IsOfflineProvider extends $FunctionalProvider<bool, bool, bool>
     with $Provider<bool> {
   /// Selector provider for offline status
-  IsOfflineProvider._()
+  const IsOfflineProvider._()
       : super(
           from: null,
           argument: null,

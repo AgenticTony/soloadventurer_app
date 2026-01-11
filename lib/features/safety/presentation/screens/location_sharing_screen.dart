@@ -21,13 +21,13 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
     super.initState();
     // Load active location shares when screen initializes
     Future.microtask(() {
-      ref.read(locationSharingNotifierProvider).loadActiveShares();
+      ref.read(locationSharingProvider.notifier).loadActiveShares();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final locationSharingState = ref.watch(locationSharingStateProvider);
+    final locationSharingState = ref.watch(locationSharingProvider);
     final activeShares = locationSharingState.activeShares;
     final latestLocation = locationSharingState.latestLocation;
     final isLoading = locationSharingState.isLoading;
@@ -480,7 +480,7 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(locationSharingNotifierProvider).loadActiveShares();
+                ref.read(locationSharingProvider.notifier).loadActiveShares();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
@@ -567,7 +567,7 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
 
       if (!mounted) return;
 
-      await ref.read(locationSharingNotifierProvider).shareWithContact(
+      await ref.read(locationSharingProvider.notifier).shareWithContact(
             latitude: location.latitude,
             longitude: location.longitude,
             contactId: contact.id,
@@ -619,7 +619,7 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
 
       final contactIds = contacts.map((c) => c.id).toList();
 
-      await ref.read(locationSharingNotifierProvider).shareLocation(
+      await ref.read(locationSharingProvider.notifier).shareLocation(
             latitude: location.latitude,
             longitude: location.longitude,
             shareWithContactIds: contactIds,
@@ -734,7 +734,7 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
     List<String> contactIds,
     List<String> contactNames,
   ) {
-    ref.read(locationSharingNotifierProvider).stopSharing(contactIds);
+    ref.read(locationSharingProvider.notifier).stopSharing(contactIds);
 
     final namesText = contactNames.isEmpty
         ? '${contactIds.length} contact(s)'
@@ -754,7 +754,7 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
   }
 
   void _stopAllSharing(BuildContext context) {
-    ref.read(locationSharingNotifierProvider).stopAllSharing();
+    ref.read(locationSharingProvider.notifier).stopAllSharing();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

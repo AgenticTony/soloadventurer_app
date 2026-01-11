@@ -240,20 +240,56 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String> enableTwoFactor() async {
-    throw UnimplementedError(
-        'Two-factor authentication is not supported with Cognito');
+    try {
+      debugPrint('AuthRepositoryImpl: Enabling MFA');
+
+      // Setup MFA - returns (factorId, qrCode, secret)
+      final (factorId, qrCode, secret) = await remoteDataSource.setupMFA();
+
+      debugPrint('AuthRepositoryImpl: MFA enabled, factorId: $factorId');
+
+      // Return the factorId for reference
+      // The QR code and secret can be obtained from the data source if needed for UI
+      return factorId;
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Error enabling MFA: $e');
+      throw AuthException('Failed to enable two-factor authentication: ${e.toString()}');
+    }
   }
 
   @override
   Future<void> disableTwoFactor(String code) async {
-    throw UnimplementedError(
-        'Two-factor authentication is not supported with Cognito');
+    try {
+      debugPrint('AuthRepositoryImpl: Disabling MFA for factor: $code');
+
+      // Note: The interface parameter is named "code" but it's actually the factorId
+      // This is a naming inconsistency in the original interface
+      await remoteDataSource.disableMFA(code);
+
+      debugPrint('AuthRepositoryImpl: MFA disabled successfully');
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Error disabling MFA: $e');
+      throw AuthException('Failed to disable two-factor authentication: ${e.toString()}');
+    }
   }
 
   @override
   Future<void> verifyTwoFactor(String code) async {
-    throw UnimplementedError(
-        'Two-factor authentication is not supported with Cognito');
+    try {
+      debugPrint('AuthRepositoryImpl: Verifying MFA code');
+
+      // Verify the MFA code
+      final success = await remoteDataSource.verifyMFA(code);
+
+      if (!success) {
+        throw AuthException('Invalid verification code');
+      }
+
+      debugPrint('AuthRepositoryImpl: MFA verification successful');
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Error verifying MFA: $e');
+      throw AuthException('Failed to verify two-factor authentication: ${e.toString()}');
+    }
   }
 
   @override
@@ -397,6 +433,26 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       debugPrint('AuthRepositoryImpl: Error getting session: $e');
       return null;
+    }
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      debugPrint('AuthRepositoryImpl: Starting account deletion');
+
+      // Call remote data source to delete account
+      // This will invoke an Edge Function for Supabase implementation
+      await remoteDataSource.deleteAccount();
+
+      // Sign out the user and clear local data
+      await localDataSource.clearCache();
+      await securityManager.resetLoginAttempts();
+
+      debugPrint('AuthRepositoryImpl: Account deleted successfully');
+    } catch (e) {
+      debugPrint('AuthRepositoryImpl: Error deleting account: $e');
+      throw AuthException('Failed to delete account: ${e.toString()}');
     }
   }
 }

@@ -56,7 +56,6 @@ sealed class OnboardingState with _$OnboardingState {
     String? details,
   }) = OnboardingError;
 
-
   /// Whether the form is in initial state
   bool get isInitial => this is OnboardingInitial;
 

@@ -11,7 +11,7 @@ part of 'notification_service_impl.dart';
 /// Provider for NotificationServiceImpl
 
 @ProviderFor(notificationServiceImpl)
-final notificationServiceImplProvider = NotificationServiceImplProvider._();
+const notificationServiceImplProvider = NotificationServiceImplProvider._();
 
 /// Provider for NotificationServiceImpl
 
@@ -20,7 +20,7 @@ final class NotificationServiceImplProvider extends $FunctionalProvider<
     NotificationService,
     NotificationService> with $Provider<NotificationService> {
   /// Provider for NotificationServiceImpl
-  NotificationServiceImplProvider._()
+  const NotificationServiceImplProvider._()
       : super(
           from: null,
           argument: null,
@@ -55,12 +55,12 @@ final class NotificationServiceImplProvider extends $FunctionalProvider<
 }
 
 String _$notificationServiceImplHash() =>
-    r'7a8adc335aa8163fa148250cdd29479e4e3ce670';
+    r'c1cc12c813dd721f44e1f079ff6e7da58aa5f764';
 
 /// Provider override for NotificationService interface
 
 @ProviderFor(notificationServiceOverride)
-final notificationServiceOverrideProvider =
+const notificationServiceOverrideProvider =
     NotificationServiceOverrideProvider._();
 
 /// Provider override for NotificationService interface
@@ -70,7 +70,7 @@ final class NotificationServiceOverrideProvider extends $FunctionalProvider<
     NotificationService,
     NotificationService> with $Provider<NotificationService> {
   /// Provider override for NotificationService interface
-  NotificationServiceOverrideProvider._()
+  const NotificationServiceOverrideProvider._()
       : super(
           from: null,
           argument: null,
@@ -105,4 +105,4 @@ final class NotificationServiceOverrideProvider extends $FunctionalProvider<
 }
 
 String _$notificationServiceOverrideHash() =>
-    r'971575e37490fb33f62436fb64e2ab8605b8b384';
+    r'30769e08cbcbd2363fc3824ea7e8e25771427b30';

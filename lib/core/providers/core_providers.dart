@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../network/api_client.dart';
 import '../storage/secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(
@@ -11,9 +10,4 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 
 final secureStorageProvider = Provider<SecureStorage>((ref) {
   return SecureStorage();
-});
-
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
-  throw UnimplementedError(
-      'SharedPreferences must be initialized in bootstrap');
 });

@@ -11,7 +11,7 @@ part of 'trip_providers.dart';
 /// Provides the Supabase client instance
 
 @ProviderFor(supabaseClient)
-final supabaseClientProvider = SupabaseClientProvider._();
+const supabaseClientProvider = SupabaseClientProvider._();
 
 /// Provides the Supabase client instance
 
@@ -19,7 +19,7 @@ final class SupabaseClientProvider
     extends $FunctionalProvider<SupabaseClient, SupabaseClient, SupabaseClient>
     with $Provider<SupabaseClient> {
   /// Provides the Supabase client instance
-  SupabaseClientProvider._()
+  const SupabaseClientProvider._()
       : super(
           from: null,
           argument: null,
@@ -57,7 +57,7 @@ String _$supabaseClientHash() => r'834a58d6ae4b94e36f4e04a10d8a7684b929310e';
 /// Provides the TripRemoteDataSource implementation
 
 @ProviderFor(tripRemoteDataSource)
-final tripRemoteDataSourceProvider = TripRemoteDataSourceProvider._();
+const tripRemoteDataSourceProvider = TripRemoteDataSourceProvider._();
 
 /// Provides the TripRemoteDataSource implementation
 
@@ -66,7 +66,7 @@ final class TripRemoteDataSourceProvider extends $FunctionalProvider<
     TripRemoteDataSourceImpl,
     TripRemoteDataSourceImpl> with $Provider<TripRemoteDataSourceImpl> {
   /// Provides the TripRemoteDataSource implementation
-  TripRemoteDataSourceProvider._()
+  const TripRemoteDataSourceProvider._()
       : super(
           from: null,
           argument: null,
@@ -106,7 +106,7 @@ String _$tripRemoteDataSourceHash() =>
 /// Provides the TripRepository implementation
 
 @ProviderFor(tripRepository)
-final tripRepositoryProvider = TripRepositoryProvider._();
+const tripRepositoryProvider = TripRepositoryProvider._();
 
 /// Provides the TripRepository implementation
 
@@ -114,7 +114,7 @@ final class TripRepositoryProvider
     extends $FunctionalProvider<TripRepository, TripRepository, TripRepository>
     with $Provider<TripRepository> {
   /// Provides the TripRepository implementation
-  TripRepositoryProvider._()
+  const TripRepositoryProvider._()
       : super(
           from: null,
           argument: null,
@@ -155,7 +155,7 @@ String _$tripRepositoryHash() => r'54e94780ba1de59dba8b2820832b0cad9a80fd2b';
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(TripList)
-final tripListProvider = TripListProvider._();
+const tripListProvider = TripListProvider._();
 
 /// Notifier for managing trip list state
 ///
@@ -167,7 +167,7 @@ final class TripListProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  TripListProvider._()
+  const TripListProvider._()
       : super(
           from: null,
           argument: null,
@@ -206,13 +206,14 @@ abstract class _$TripList extends $Notifier<TripListState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<TripListState, TripListState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TripListState, TripListState>,
         TripListState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -222,7 +223,7 @@ abstract class _$TripList extends $Notifier<TripListState> {
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 
 @ProviderFor(TripForm)
-final tripFormProvider = TripFormProvider._();
+const tripFormProvider = TripFormProvider._();
 
 /// Notifier for managing trip form state
 ///
@@ -234,7 +235,7 @@ final class TripFormProvider
   ///
   /// Migration from StateNotifier to Notifier (Riverpod 3.0)
   /// See: https://riverpod.dev/docs/migration/from_state_notifier
-  TripFormProvider._()
+  const TripFormProvider._()
       : super(
           from: null,
           argument: null,
@@ -273,13 +274,14 @@ abstract class _$TripForm extends $Notifier<TripFormState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build();
     final ref = this.ref as $Ref<TripFormState, TripFormState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TripFormState, TripFormState>,
         TripFormState,
         Object?,
         Object?>;
-    element.handleCreate(ref, build);
+    element.handleValue(ref, created);
   }
 }
 
@@ -292,7 +294,7 @@ abstract class _$TripForm extends $Notifier<TripFormState> {
 /// Usage: ref.watch(tripDetailProvider(tripId))
 
 @ProviderFor(TripDetail)
-final tripDetailProvider = TripDetailFamily._();
+const tripDetailProvider = TripDetailFamily._();
 
 /// Notifier for managing trip detail state
 ///
@@ -310,7 +312,7 @@ final class TripDetailProvider
   ///
   /// Family provider pattern: pass tripId as parameter
   /// Usage: ref.watch(tripDetailProvider(tripId))
-  TripDetailProvider._(
+  const TripDetailProvider._(
       {required TripDetailFamily super.from, required String super.argument})
       : super(
           retry: null,
@@ -367,7 +369,7 @@ final class TripDetailFamily extends $Family
     with
         $ClassFamilyOverride<TripDetail, TripDetailState, TripDetailState,
             TripDetailState, String> {
-  TripDetailFamily._()
+  const TripDetailFamily._()
       : super(
           retry: null,
           name: r'tripDetailProvider',
@@ -411,16 +413,15 @@ abstract class _$TripDetail extends $Notifier<TripDetailState> {
   @$mustCallSuper
   @override
   void runBuild() {
+    final created = build(
+      _$args,
+    );
     final ref = this.ref as $Ref<TripDetailState, TripDetailState>;
     final element = ref.element as $ClassProviderElement<
         AnyNotifier<TripDetailState, TripDetailState>,
         TripDetailState,
         Object?,
         Object?>;
-    element.handleCreate(
-        ref,
-        () => build(
-              _$args,
-            ));
+    element.handleValue(ref, created);
   }
 }
