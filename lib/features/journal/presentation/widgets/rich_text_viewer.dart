@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:soloadventurer/core/widgets/spacing.dart';
 
 /// A read-only viewer for rich text content in journal entries
 ///
@@ -77,41 +78,41 @@ class RichTextViewer extends StatelessWidget {
           customStyles: DefaultStyles(
             paragraph: DefaultTextBlockStyle(
               textStyle ?? theme.textTheme.bodyLarge!,
-              const VerticalSpacing(0, 0),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(0, 0),
               null,
             ),
             h1: DefaultTextBlockStyle(
               theme.textTheme.headlineMedium!,
-              const VerticalSpacing(16, 8),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(16, 8),
+              const quill.VerticalSpacing(0, 0),
               null,
             ),
             h2: DefaultTextBlockStyle(
               theme.textTheme.titleLarge!,
-              const VerticalSpacing(12, 6),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(12, 6),
+              const quill.VerticalSpacing(0, 0),
               null,
             ),
             h3: DefaultTextBlockStyle(
               theme.textTheme.titleMedium!,
-              const VerticalSpacing(8, 4),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(8, 4),
+              const quill.VerticalSpacing(0, 0),
               null,
             ),
             lists: DefaultTextBlockStyle(
               theme.textTheme.bodyLarge!,
-              const VerticalSpacing(0, 4),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(0, 4),
+              const quill.VerticalSpacing(0, 0),
               null,
             ),
             quote: DefaultTextBlockStyle(
               theme.textTheme.bodyMedium?.copyWith(
                 fontStyle: FontStyle.italic,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha:0.7),
               ),
-              const VerticalSpacing(8, 4),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(8, 4),
+              const quill.VerticalSpacing(0, 0),
               null,
             ),
             code: DefaultTextBlockStyle(
@@ -120,8 +121,8 @@ class RichTextViewer extends StatelessWidget {
                 fontSize: theme.textTheme.bodyMedium?.fontSize,
                 color: theme.colorScheme.primary,
               ),
-              const VerticalSpacing(8, 4),
-              const VerticalSpacing(0, 0),
+              const quill.VerticalSpacing(8, 4),
+              const quill.VerticalSpacing(0, 0),
               BoxDecoration(
                 color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(4),

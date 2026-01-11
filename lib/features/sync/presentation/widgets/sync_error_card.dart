@@ -63,7 +63,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: severityColor.withOpacity(0.3),
+          color: severityColor.withValues(alpha:0.3),
           width: 1,
         ),
       ),
@@ -83,7 +83,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: severityColor.withOpacity(0.1),
+                      color: severityColor.withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
@@ -116,7 +116,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                                   : Icons.expand_more,
                               size: 20,
                               color:
-                                  theme.colorScheme.onSurface.withOpacity(0.5),
+                                  theme.colorScheme.onSurface.withValues(alpha:0.5),
                             ),
                           ],
                         ),
@@ -145,14 +145,14 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                               Icons.access_time,
                               size: 12,
                               color:
-                                  theme.colorScheme.onSurface.withOpacity(0.5),
+                                  theme.colorScheme.onSurface.withValues(alpha:0.5),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               _getTimeAgo(),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.colorScheme.onSurface
-                                    .withOpacity(0.6),
+                                    .withValues(alpha:0.6),
                               ),
                             ),
 
@@ -163,14 +163,14 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                                 Icons.refresh,
                                 size: 12,
                                 color: theme.colorScheme.onSurface
-                                    .withOpacity(0.5),
+                                    .withValues(alpha:0.5),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 '${widget.error.retryCount} attempt${widget.error.retryCount > 1 ? 's' : ''}',
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.colorScheme.onSurface
-                                      .withOpacity(0.6),
+                                      .withValues(alpha:0.6),
                                 ),
                               ),
                             ],
@@ -196,7 +196,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
           // Divider
           Divider(
             height: 1,
-            color: severityColor.withOpacity(0.2),
+            color: severityColor.withValues(alpha:0.2),
           ),
 
           // Expanded details section
@@ -301,7 +301,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                     Text(
                       'Additional Details:',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withValues(alpha:0.7),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -309,7 +309,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color:
-                            theme.colorScheme.errorContainer.withOpacity(0.1),
+                            theme.colorScheme.errorContainer.withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
@@ -334,7 +334,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                           icon: const Icon(Icons.refresh, size: 18),
                           label: const Text('Retry'),
                           style: FilledButton.styleFrom(
-                            backgroundColor: severityColor.withOpacity(0.2),
+                            backgroundColor: severityColor.withValues(alpha:0.2),
                             foregroundColor: severityColor,
                           ),
                         ),
@@ -379,7 +379,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
           Icon(
             icon,
             size: 16,
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withValues(alpha:0.5),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -389,7 +389,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
                 Text(
                   title,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withValues(alpha:0.7),
                   ),
                 ),
                 Text(
@@ -422,7 +422,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
             child: Text(
               '$label:',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha:0.6),
               ),
             ),
           ),
@@ -451,7 +451,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha:0.2),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(

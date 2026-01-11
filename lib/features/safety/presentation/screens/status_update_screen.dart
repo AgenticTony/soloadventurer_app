@@ -88,7 +88,7 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
       return;
     }
 
-    final user = ref.read(authNotifierProvider).value?.user;
+    final user = ref.read(authProvider).value?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

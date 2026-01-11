@@ -20,10 +20,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     // Listen for password reset success and navigate
-    ref.listen(authNotifierProvider, (previous, next) {
+    ref.listen(authProvider, (previous, next) {
       next.when(
         data: (authState) {
           // Only navigate if we just completed password reset
@@ -125,6 +125,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     }
 
     final email = _emailController.text.trim();
-    await ref.read(authNotifierProvider.notifier).forgotPassword(email);
+    await ref.read(authProvider.notifier).forgotPassword(email);
   }
 }

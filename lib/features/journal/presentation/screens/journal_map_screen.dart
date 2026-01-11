@@ -150,7 +150,7 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withOpacity(0.5),
+                        .withValues(alpha:0.5),
                   ),
                 ],
               ),
@@ -197,7 +197,7 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
                 height: isSelected ? 40 : 30,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha:0.2),
                 ),
               ),
               // Marker icon
@@ -407,7 +407,7 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
           Icon(
             Icons.map_outlined,
             size: 80,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
           ),
           const SizedBox(height: 24),
           Text(

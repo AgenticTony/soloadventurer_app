@@ -7,7 +7,7 @@ class AuthTestScreen extends ConsumerWidget {
 
   Future<void> _signIn(WidgetRef ref) async {
     try {
-      await ref.read(authNotifierProvider.notifier).signIn(
+      await ref.read(authProvider.notifier).signIn(
             'test@example.com', // Replace with your test email
             'Test123!', // Replace with your test password
           );
@@ -18,7 +18,7 @@ class AuthTestScreen extends ConsumerWidget {
 
   Future<void> _signOut(WidgetRef ref) async {
     try {
-      await ref.read(authNotifierProvider.notifier).signOut();
+      await ref.read(authProvider.notifier).signOut();
     } catch (e) {
       debugPrint('Sign out failed: ${e.toString()}');
     }
@@ -26,7 +26,7 @@ class AuthTestScreen extends ConsumerWidget {
 
   Future<void> _register(WidgetRef ref) async {
     try {
-      await ref.read(authNotifierProvider.notifier).signUp(
+      await ref.read(authProvider.notifier).signUp(
             email: 'test@example.com', // Replace with your test email
             password: 'Test123!', // Replace with your test password
             name: 'Test User', // Replace with your test name
@@ -38,7 +38,7 @@ class AuthTestScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -59,7 +59,7 @@ class AuthTestScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => ref.invalidate(authNotifierProvider),
+                onPressed: () => ref.invalidate(authProvider),
                 child: const Text('Retry'),
               ),
             ],

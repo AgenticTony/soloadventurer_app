@@ -276,7 +276,7 @@ class _DestinationDiscoveryScreenState
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: theme.colorScheme.outline.withOpacity(0.5),
+                color: theme.colorScheme.outline.withValues(alpha:0.5),
               ),
             ),
             focusedBorder: OutlineInputBorder(
@@ -288,7 +288,7 @@ class _DestinationDiscoveryScreenState
             ),
             filled: true,
             fillColor:
-                theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
           ),
         ),
       ),

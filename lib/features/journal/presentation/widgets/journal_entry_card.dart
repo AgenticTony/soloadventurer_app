@@ -73,26 +73,26 @@ class JournalEntryCard extends StatelessWidget {
                       Icon(
                         Icons.calendar_today,
                         size: 14,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         dateFormat.format(entry.entryDate),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Icon(
                         Icons.access_time,
                         size: 14,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         timeFormat.format(entry.entryDate),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                         ),
                       ),
                     ],
@@ -143,7 +143,7 @@ class JournalEntryCard extends StatelessWidget {
                       child: Text(
                         _getContentPreview(),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.8),
+                          color: theme.colorScheme.onSurface.withValues(alpha:0.8),
                         ),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
@@ -200,7 +200,7 @@ class _MoodIndicator extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+          color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

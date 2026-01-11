@@ -70,10 +70,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     // Listen for auth state changes to show error messages
-    ref.listen(authNotifierProvider, (previous, next) {
+    ref.listen(authProvider, (previous, next) {
       next.when(
         data: (authState) {
           // Don't show snackbar - errors are handled by UI
@@ -134,7 +134,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => ref.invalidate(authNotifierProvider),
+                  onPressed: () => ref.invalidate(authProvider),
                   child: const Text('Retry'),
                 ),
               ],
@@ -308,14 +308,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       _clearError();
 
       try {
-        await ref.read(authNotifierProvider.notifier).signIn(
+        await ref.read(authProvider.notifier).signIn(
               email,
               password,
             );
 
         // Only navigate to home if we're still mounted and the login was successful
         if (mounted) {
-          final authAsync = ref.read(authNotifierProvider);
+          final authAsync = ref.read(authProvider);
           authAsync.whenData((authState) {
             if (authState.isLoggedIn) {
               ref

@@ -25,7 +25,7 @@ import '../utils/error_handler.dart';
 /// The screen integrates with:
 /// - [RecommendationProvider] for recommendation data
 /// - [SavedDestinationsProvider] for bookmark functionality
-/// - [authNotifierProvider] for current user authentication
+/// - [authProvider] for current user authentication
 class RecommendationsScreen extends ConsumerStatefulWidget {
   /// Creates a new [RecommendationsScreen]
   const RecommendationsScreen({super.key});
@@ -50,7 +50,7 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
 
   /// Refresh recommendations
   Future<void> _refreshRecommendations() async {
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       return;
@@ -83,7 +83,7 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
     String destinationId,
     String destinationName,
   ) async {
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       if (mounted) {
@@ -178,7 +178,7 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -364,7 +364,7 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
           Text(
             recommendation.summary ?? 'Based on your preferences',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8),
+              color: theme.colorScheme.onPrimaryContainer.withValues(alpha:0.8),
             ),
           ),
           const SizedBox(height: 8),
@@ -372,7 +372,7 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
             '${recommendation.recommendations.length} destinations • '
             'Updated ${_formatTimestamp(recommendation.generatedAt)}',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer.withOpacity(0.6),
+              color: theme.colorScheme.onPrimaryContainer.withValues(alpha:0.6),
             ),
           ),
         ],
@@ -640,7 +640,7 @@ class _RecommendationCard extends StatelessWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: _getMatchScoreColor().withOpacity(0.1),
+                      color: _getMatchScoreColor().withValues(alpha:0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: _getMatchScoreColor(),

@@ -113,7 +113,7 @@ class _SyncHistoryScreenState extends State<SyncHistoryScreen> {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

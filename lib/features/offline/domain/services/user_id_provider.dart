@@ -28,7 +28,7 @@ class UserIdProvider {
   /// - User is not available (returns empty string)
   String getCurrentUserId() {
     try {
-      final authState = _container.read(authNotifierProvider);
+      final authState = _container.read(authProvider);
 
       // With new AuthState pattern, we directly access fields
       if (authState.isAuthenticated && authState.user != null) {

@@ -51,7 +51,7 @@ final goRouterServiceProvider = Provider<GoRouterService>((ref) {
 /// This provider creates and configures the go_router with all app routes,
 /// auth redirects, and error handling.
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authNotifierProvider);
+  final authState = ref.watch(authProvider);
 
   return GoRouter(
     debugLogDiagnostics: true,

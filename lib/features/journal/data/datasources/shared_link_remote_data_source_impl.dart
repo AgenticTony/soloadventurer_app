@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/utils/json_helpers.dart';
 import 'package:soloadventurer/features/journal/data/datasources/shared_link_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/shared_link_model.dart';
 
@@ -31,7 +32,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to create shared link: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -57,7 +58,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
       }
       throw ServerException(
         message: 'Failed to get shared link: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -83,7 +84,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
       }
       throw ServerException(
         message: 'Failed to get shared link by slug: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -108,7 +109,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get shared links for trip: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -133,7 +134,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get user shared links: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -189,7 +190,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update shared link: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -208,7 +209,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to deactivate shared link: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -225,7 +226,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to delete shared link: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -266,7 +267,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to validate shared link access: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -285,7 +286,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to record view: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -308,7 +309,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to check slug availability: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -326,7 +327,7 @@ class SharedLinkRemoteDataSourceImpl implements SharedLinkRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to generate unique slug: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(

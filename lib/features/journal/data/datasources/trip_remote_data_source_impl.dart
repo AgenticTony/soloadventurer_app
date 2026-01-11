@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/utils/json_helpers.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
 
@@ -19,7 +20,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to create trip: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -45,7 +46,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       }
       throw ServerException(
         message: 'Failed to get trip: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -78,7 +79,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get trips: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -116,7 +117,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get trips by date range: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -152,7 +153,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get ongoing trips: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -176,7 +177,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update trip: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -193,7 +194,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to delete trip: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -215,7 +216,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get entry count: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(

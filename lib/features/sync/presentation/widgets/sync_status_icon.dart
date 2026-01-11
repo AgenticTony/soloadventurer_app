@@ -69,7 +69,7 @@ class SyncOperationStatusIcon extends StatelessWidget {
         width: size + 16,
         height: size + 16,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
+          color: color.withValues(alpha:0.15),
           shape: BoxShape.circle,
         ),
         child: Center(
@@ -203,7 +203,7 @@ class SyncOperationStatusIndicator extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(value * 0.5),
+                color: color.withValues(alpha:value * 0.5),
                 blurRadius: size * value,
                 spreadRadius: size * 0.2 * value,
               ),

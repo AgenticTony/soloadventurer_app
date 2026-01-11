@@ -48,15 +48,15 @@ class SyncErrorBanner extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            severityColor.withOpacity(0.15),
-            severityColor.withOpacity(0.05),
+            severityColor.withValues(alpha:0.15),
+            severityColor.withValues(alpha:0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: severityColor.withOpacity(0.5),
+          color: severityColor.withValues(alpha:0.5),
           width: 1,
         ),
       ),
@@ -67,7 +67,7 @@ class SyncErrorBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: severityColor.withOpacity(0.2),
+              color: severityColor.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -101,7 +101,7 @@ class SyncErrorBanner extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: severityColor.withOpacity(0.2),
+                          color: severityColor.withValues(alpha:0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -133,7 +133,7 @@ class SyncErrorBanner extends StatelessWidget {
                   Text(
                     error.suggestion,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withValues(alpha:0.7),
                       fontStyle: FontStyle.italic,
                     ),
                     maxLines: 2,
@@ -172,7 +172,7 @@ class SyncErrorBanner extends StatelessWidget {
                           label: const Text('Details'),
                           style: TextButton.styleFrom(
                             foregroundColor:
-                                theme.colorScheme.onSurface.withOpacity(0.7),
+                                theme.colorScheme.onSurface.withValues(alpha:0.7),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
@@ -194,7 +194,7 @@ class SyncErrorBanner extends StatelessWidget {
             IconButton(
               onPressed: onDismiss,
               icon: const Icon(Icons.close),
-              color: theme.colorScheme.onSurface.withOpacity(0.6),
+              color: theme.colorScheme.onSurface.withValues(alpha:0.6),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
@@ -304,15 +304,15 @@ class MultipleSyncErrorsBanner extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            severityColor.withOpacity(0.15),
-            severityColor.withOpacity(0.05),
+            severityColor.withValues(alpha:0.15),
+            severityColor.withValues(alpha:0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: severityColor.withOpacity(0.5),
+          color: severityColor.withValues(alpha:0.5),
           width: 1,
         ),
       ),
@@ -322,7 +322,7 @@ class MultipleSyncErrorsBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: severityColor.withOpacity(0.2),
+              color: severityColor.withValues(alpha:0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -363,7 +363,7 @@ class MultipleSyncErrorsBanner extends StatelessWidget {
               FilledButton.tonal(
                 onPressed: onViewAll,
                 style: FilledButton.styleFrom(
-                  backgroundColor: severityColor.withOpacity(0.2),
+                  backgroundColor: severityColor.withValues(alpha:0.2),
                   foregroundColor: severityColor,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -379,7 +379,7 @@ class MultipleSyncErrorsBanner extends StatelessWidget {
                 IconButton(
                   onPressed: onDismiss,
                   icon: const Icon(Icons.close),
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),

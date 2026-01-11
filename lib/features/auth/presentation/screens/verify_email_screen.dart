@@ -21,7 +21,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authAsync = ref.read(authNotifierProvider);
+      final authAsync = ref.read(authProvider);
       final authState = authAsync.value;
       debugPrint('VerifyEmailScreen: Auth state on init: $authState');
       debugPrint(
@@ -106,13 +106,13 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
 
       debugPrint(
           'VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
-      await ref.read(authNotifierProvider.notifier).verifyEmail(code, _email!);
+      await ref.read(authProvider.notifier).verifyEmail(code, _email!);
       debugPrint('VerifyEmailScreen: Verification completed successfully');
     }
   }
 
   Future<void> _resendCode() async {
-    await ref.read(authNotifierProvider.notifier).resendVerificationEmail();
+    await ref.read(authProvider.notifier).resendVerificationEmail();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -125,7 +125,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     return authAsync.when(
       loading: () => Scaffold(
@@ -162,7 +162,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => ref.invalidate(authNotifierProvider),
+                onPressed: () => ref.invalidate(authProvider),
                 child: const Text('Retry'),
               ),
             ],
@@ -185,7 +185,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              ref.read(authNotifierProvider.notifier).signOut();
+              ref.read(authProvider.notifier).signOut();
             },
           ),
         ],

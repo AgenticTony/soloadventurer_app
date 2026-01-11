@@ -501,7 +501,7 @@ class MapMarkerClusteringService {
   /// Cluster markers within a specific geographic bounds
   ClusteringResult clusterMarkersInBounds(
     List<MapMarker> markers,
-    LatLngBounds bounds,
+    Bounds bounds,
   ) {
     // Filter markers within bounds
     final markersInBounds = markers.where((marker) {
@@ -691,7 +691,7 @@ class MapMarkerClusteringService {
   /// the visible items to [maxVisibleItems] for optimal performance.
   ClusteringResult clusterMarkersInBoundsWithLimit(
     List<MapMarker> markers,
-    LatLngBounds bounds, {
+    Bounds bounds, {
     int maxVisibleItems = 50,
   }) {
     final result = clusterMarkersInBounds(markers, bounds);

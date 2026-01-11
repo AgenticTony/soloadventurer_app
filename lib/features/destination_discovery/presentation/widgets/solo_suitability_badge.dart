@@ -69,7 +69,7 @@ class SoloSuitabilityBadge extends StatelessWidget {
       child: Container(
         padding: padding,
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha:0.1),
           borderRadius: BorderRadius.circular(borderRadius),
           border: Border.all(
             color: color,

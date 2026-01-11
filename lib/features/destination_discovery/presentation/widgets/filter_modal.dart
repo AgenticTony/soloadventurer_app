@@ -298,7 +298,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
         width: 40,
         height: 4,
         decoration: BoxDecoration(
-          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.4),
           borderRadius: BorderRadius.circular(2),
         ),
       ),
@@ -352,7 +352,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.1),
+            color: theme.shadowColor.withValues(alpha:0.1),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

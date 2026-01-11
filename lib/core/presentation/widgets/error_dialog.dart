@@ -97,7 +97,7 @@ class ErrorDialog extends StatelessWidget {
                 fontFamily: 'monospace',
               ),
             ),
-            backgroundColor: iconColor.withOpacity(0.1),
+            backgroundColor: iconColor.withValues(alpha:0.1),
           ),
       ],
     );
@@ -141,7 +141,7 @@ class ErrorDialog extends StatelessWidget {
             color: Theme.of(context)
                 .colorScheme
                 .surfaceContainerHighest
-                .withOpacity(0.5),
+                .withValues(alpha:0.5),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -186,7 +186,7 @@ class ErrorDialog extends StatelessWidget {
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.5),
+                            .withValues(alpha:0.5),
                         fontFamily: 'monospace',
                       ),
                 ),
@@ -303,7 +303,7 @@ class _ActionButton extends StatelessWidget {
 
     return Material(
       color: isPrimary
-          ? colorScheme.primary.withOpacity(0.1)
+          ? colorScheme.primary.withValues(alpha:0.1)
           : colorScheme.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
@@ -317,8 +317,8 @@ class _ActionButton extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: isPrimary
-                      ? colorScheme.primary.withOpacity(0.2)
-                      : colorScheme.onSurfaceVariant.withOpacity(0.1),
+                      ? colorScheme.primary.withValues(alpha:0.2)
+                      : colorScheme.onSurfaceVariant.withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -343,7 +343,7 @@ class _ActionButton extends StatelessWidget {
                       Text(
                         description,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onSurface.withOpacity(0.6),
+                          color: colorScheme.onSurface.withValues(alpha:0.6),
                         ),
                       ),
                   ],
@@ -500,7 +500,7 @@ class ErrorBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+              color: colorScheme.onSurfaceVariant.withValues(alpha:0.4),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

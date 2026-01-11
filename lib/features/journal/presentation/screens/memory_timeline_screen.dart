@@ -95,7 +95,7 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
           Icon(
             Icons.timeline_outlined,
             size: 80,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
           ),
           const SizedBox(height: 24),
           Text(
@@ -178,13 +178,13 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            theme.colorScheme.primary.withOpacity(0.1),
-            theme.colorScheme.secondary.withOpacity(0.1),
+            theme.colorScheme.primary.withValues(alpha:0.1),
+            theme.colorScheme.secondary.withValues(alpha:0.1),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.2),
+          color: theme.colorScheme.outline.withValues(alpha:0.2),
         ),
       ),
       child: Row(
@@ -292,7 +292,7 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
                     group.subtitle!,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSecondaryContainer
-                          .withOpacity(0.8),
+                          .withValues(alpha:0.8),
                     ),
                   ),
               ],
@@ -301,7 +301,7 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: theme.colorScheme.onSecondaryContainer.withOpacity(0.1),
+              color: theme.colorScheme.onSecondaryContainer.withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
@@ -331,8 +331,8 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              theme.colorScheme.primary.withOpacity(0.3),
-              theme.colorScheme.primary.withOpacity(0.1),
+              theme.colorScheme.primary.withValues(alpha:0.3),
+              theme.colorScheme.primary.withValues(alpha:0.1),
             ],
           ),
         ),

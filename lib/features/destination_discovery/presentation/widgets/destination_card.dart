@@ -300,7 +300,7 @@ class DestinationCard extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: theme.colorScheme.surface.withOpacity(0.9),
+              color: theme.colorScheme.surface.withValues(alpha:0.9),
             ),
             child: Icon(
               isSaved ? Icons.bookmark : Icons.bookmark_border,
@@ -323,7 +323,7 @@ class DestinationCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.amber.withOpacity(0.9),
+          color: Colors.amber.withValues(alpha:0.9),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(

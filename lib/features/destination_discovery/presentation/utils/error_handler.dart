@@ -169,7 +169,7 @@ class DestinationErrorWidget extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isNetworkError
-                    ? theme.colorScheme.errorContainer.withOpacity(0.3)
+                    ? theme.colorScheme.errorContainer.withValues(alpha:0.3)
                     : theme.colorScheme.errorContainer,
                 shape: BoxShape.circle,
               ),

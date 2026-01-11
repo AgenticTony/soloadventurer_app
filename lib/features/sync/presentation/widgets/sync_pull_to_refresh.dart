@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/sync_providers.dart';
+import '../state/manual_sync_state.dart';
 
 /// Wrapper widget that adds pull-to-refresh sync functionality
 ///

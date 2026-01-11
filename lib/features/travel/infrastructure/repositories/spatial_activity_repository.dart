@@ -13,7 +13,7 @@ class SpatialQueryResult {
   final int totalActivities;
 
   /// Query bounds
-  final LatLngBounds bounds;
+  final Bounds bounds;
 
   /// Whether result is from cache
   final bool isFromCache;
@@ -60,7 +60,7 @@ class SpatialQueryResult {
 
   /// Create empty result
   factory SpatialQueryResult.empty({
-    required LatLngBounds bounds,
+    required Bounds bounds,
     required int totalActivities,
   }) {
     return SpatialQueryResult(
@@ -74,7 +74,7 @@ class SpatialQueryResult {
   SpatialQueryResult copyWith({
     List<Activity>? activities,
     int? totalActivities,
-    LatLngBounds? bounds,
+    Bounds? bounds,
     bool? isFromCache,
     bool? isLimited,
   }) {
@@ -106,7 +106,7 @@ class SpatialQueryResult {
 
 /// Cache entry for viewport query results
 class _ViewportCacheEntry {
-  final LatLngBounds bounds;
+  final Bounds bounds;
   final SpatialQueryResult result;
   final DateTime timestamp;
 
@@ -129,7 +129,7 @@ class _ViewportCache {
   }) : _ttl = ttl;
 
   /// Get cached result for bounds
-  SpatialQueryResult? get(LatLngBounds bounds) {
+  SpatialQueryResult? get(Bounds bounds) {
     _removeExpired();
 
     // Find exact or very similar bounds (within 5% tolerance)
@@ -147,7 +147,7 @@ class _ViewportCache {
   }
 
   /// Put result in cache
-  void put(LatLngBounds bounds, SpatialQueryResult result) {
+  void put(Bounds bounds, SpatialQueryResult result) {
     _removeExpired();
 
     // Remove existing entry if present
@@ -180,7 +180,7 @@ class _ViewportCache {
   }
 
   /// Check if bounds match within tolerance
-  bool _boundsMatch(LatLngBounds a, LatLngBounds b, {double tolerance = 0.05}) {
+  bool _boundsMatch(Bounds a, Bounds b, {double tolerance = 0.05}) {
     final latTolerance = (a.north - a.south) * tolerance;
     final lngTolerance = (a.east - a.west) * tolerance;
 
@@ -223,7 +223,7 @@ class _ViewportCache {
 ///
 /// // Query activities within viewport
 /// final result = await spatialRepo.getActivitiesInBounds(
-///   bounds: LatLngBounds(
+///   bounds: Bounds(
 ///     south: 37.7,
 ///     west: -122.5,
 ///     north: 37.8,
@@ -251,7 +251,7 @@ class SpatialActivityRepository {
   StreamController<SpatialQueryResult>? _resultController;
 
   /// Pending query to execute after debounce
-  LatLngBounds? _pendingBounds;
+  Bounds? _pendingBounds;
   String? _pendingUserId;
   String? _pendingTripId;
 
@@ -299,7 +299,7 @@ class SpatialActivityRepository {
   ///
   /// Returns activities within bounds, limited to [maxMarkers].
   Future<SpatialQueryResult> getActivitiesInBounds({
-    required LatLngBounds bounds,
+    required Bounds bounds,
     required String userId,
     String? tripId,
     bool useCache = true,
@@ -343,7 +343,7 @@ class SpatialActivityRepository {
   ///
   /// Use the [resultStream] to receive debounced results.
   void queryActivitiesInBoundsDebounced({
-    required LatLngBounds bounds,
+    required Bounds bounds,
     required String userId,
     String? tripId,
   }) {
@@ -435,7 +435,7 @@ class SpatialActivityRepository {
 
   /// Execute spatial query against database
   Future<SpatialQueryResult> _executeSpatialQuery({
-    required LatLngBounds bounds,
+    required Bounds bounds,
     required String userId,
     String? tripId,
   }) async {

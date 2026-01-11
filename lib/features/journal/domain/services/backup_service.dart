@@ -214,7 +214,7 @@ class BackupResult {
   /// When the backup was created
   final DateTime createdAt;
 
-  const BackupResult({
+  BackupResult({
     required this.success,
     this.backupPath,
     this.entryCount = 0,
@@ -227,7 +227,7 @@ class BackupResult {
     this.errorMessage,
     this.checksum,
     DateTime? createdAt,
-  }) : createdAt = createdAt ?? const Duration();
+  }) : createdAt = createdAt ?? DateTime.now();
 
   /// Create a failed backup result
   factory BackupResult.failed({

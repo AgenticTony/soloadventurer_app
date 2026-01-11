@@ -296,11 +296,11 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
         border: Border.all(
           color: hasLocation
               ? theme.colorScheme.primary
-              : theme.colorScheme.outline.withOpacity(0.3),
+              : theme.colorScheme.outline.withValues(alpha:0.3),
         ),
         borderRadius: BorderRadius.circular(12),
         color: hasLocation
-            ? theme.colorScheme.primaryContainer.withOpacity(0.1)
+            ? theme.colorScheme.primaryContainer.withValues(alpha:0.1)
             : null,
       ),
       child: Column(
@@ -412,7 +412,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
                 color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha:0.2),
                 ),
               ),
               child: ListView.separated(
@@ -420,7 +420,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
                 itemCount: _searchResults.length,
                 separatorBuilder: (context, index) => Divider(
                   height: 1,
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha:0.2),
                 ),
                 itemBuilder: (context, index) {
                   final result = _searchResults[index];
@@ -458,7 +458,7 @@ class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
                 color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.2),
+                  color: theme.colorScheme.outline.withValues(alpha:0.2),
                 ),
               ),
               child: Column(
@@ -624,11 +624,11 @@ class LocationPickerButton extends StatelessWidget {
           border: Border.all(
             color: hasLocation
                 ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withOpacity(0.3),
+                : theme.colorScheme.outline.withValues(alpha:0.3),
           ),
           borderRadius: BorderRadius.circular(8),
           color: hasLocation
-              ? theme.colorScheme.primaryContainer.withOpacity(0.1)
+              ? theme.colorScheme.primaryContainer.withValues(alpha:0.1)
               : null,
         ),
         child: Row(

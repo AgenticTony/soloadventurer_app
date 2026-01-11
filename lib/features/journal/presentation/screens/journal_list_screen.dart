@@ -157,7 +157,7 @@ class _JournalListScreenState extends ConsumerState<JournalListScreen>
               child: Icon(
                 Icons.book_outlined,
                 size: 80,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
               ),
             ),
             const SizedBox(height: 24),
@@ -284,7 +284,7 @@ class _DateGroup extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color:
-                        theme.colorScheme.secondaryContainer.withOpacity(0.5),
+                        theme.colorScheme.secondaryContainer.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -382,7 +382,7 @@ class _TripGroup extends StatelessWidget {
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color:
-                        theme.colorScheme.secondaryContainer.withOpacity(0.5),
+                        theme.colorScheme.secondaryContainer.withValues(alpha:0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

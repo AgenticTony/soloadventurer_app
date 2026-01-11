@@ -23,7 +23,7 @@ import '../utils/error_handler.dart';
 ///
 /// The screen integrates with:
 /// - [SavedDestinationsProvider] for saved destinations data
-/// - [authNotifierProvider] for current user authentication
+/// - [authProvider] for current user authentication
 class SavedDestinationsScreen extends ConsumerStatefulWidget {
   /// Creates a new [SavedDestinationsScreen]
   const SavedDestinationsScreen({super.key});
@@ -60,7 +60,7 @@ class _SavedDestinationsScreenState
 
   /// Refresh saved destinations
   Future<void> _refreshSavedDestinations() async {
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       return;
@@ -91,7 +91,7 @@ class _SavedDestinationsScreenState
   Future<void> _onRemoveSaved(
     SavedDestination savedDest,
   ) async {
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       if (mounted) {
@@ -166,7 +166,7 @@ class _SavedDestinationsScreenState
 
   /// Handle edit notes
   Future<void> _onEditNotes(SavedDestination savedDest) async {
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       return;
@@ -259,7 +259,7 @@ class _SavedDestinationsScreenState
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -623,7 +623,7 @@ class _SavedDestinationCard extends StatelessWidget {
                           Icons.place,
                           size: 64,
                           color: theme.colorScheme.onSurfaceVariant
-                              .withOpacity(0.3),
+                              .withValues(alpha:0.3),
                         ),
                       );
                     },
@@ -640,8 +640,8 @@ class _SavedDestinationCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: savedDestination.isWishlist
-                            ? Colors.purple.withOpacity(0.9)
-                            : Colors.orange.withOpacity(0.9),
+                            ? Colors.purple.withValues(alpha:0.9)
+                            : Colors.orange.withValues(alpha:0.9),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(

@@ -193,8 +193,8 @@ class _PerformanceDashboardScreenState
             // Debug Mode Notice
             Card(
               color: kDebugMode
-                  ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-                  : theme.colorScheme.errorContainer.withOpacity(0.3),
+                  ? theme.colorScheme.primaryContainer.withValues(alpha:0.3)
+                  : theme.colorScheme.errorContainer.withValues(alpha:0.3),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -409,7 +409,7 @@ class _PerformanceDashboardScreenState
 
             // Information Card
             Card(
-              color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+              color: theme.colorScheme.primaryContainer.withValues(alpha:0.3),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

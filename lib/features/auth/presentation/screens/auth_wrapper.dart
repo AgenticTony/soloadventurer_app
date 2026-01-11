@@ -20,7 +20,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     debugPrint('AuthWrapper build - authAsync: $authAsync');
 
@@ -41,7 +41,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    ref.invalidate(authNotifierProvider);
+                    ref.invalidate(authProvider);
                   },
                   child: const Text('Try Again'),
                 ),

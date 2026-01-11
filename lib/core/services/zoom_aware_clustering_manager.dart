@@ -34,7 +34,7 @@ class ZoomAwareClusteringManager {
   final bool useBoundsBasedClustering;
 
   /// Current map bounds (if using bounds-based clustering)
-  LatLngBounds? _currentBounds;
+  Bounds? _currentBounds;
 
   /// Clustering history for zoom changes (undo/redo support)
   final List<_ClusteringSnapshot> _history = [];
@@ -109,7 +109,7 @@ class ZoomAwareClusteringManager {
   /// Update map bounds (for bounds-based clustering)
   ///
   /// Only has an effect if [useBoundsBasedClustering] is true.
-  void updateMapBounds(LatLngBounds bounds, {bool force = false}) {
+  void updateMapBounds(Bounds bounds, {bool force = false}) {
     if (!useBoundsBasedClustering) return;
 
     if (_currentBounds != null &&

@@ -118,7 +118,7 @@ class _DestinationDetailScreenState
   /// Handle save/bookmark destination
   Future<void> _toggleBookmark(Destination destination) async {
     // Get current user from auth state
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       if (mounted) {
@@ -232,7 +232,7 @@ class _DestinationDetailScreenState
         ref.watch(destinationDetailProvider(widget.destinationId));
 
     // Get auth state for save functionality
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
     final userId = authState.value?.user?.id;
     final savedState =
         userId != null ? ref.watch(savedDestinationsProvider(userId)) : null;
@@ -420,7 +420,7 @@ class _DestinationDetailScreenState
         child: Icon(
           Icons.place,
           size: 80,
-          color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
         ),
       ),
     );
@@ -449,7 +449,7 @@ class _DestinationDetailScreenState
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.2),
+                    color: Colors.amber.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: Colors.amber,
@@ -519,7 +519,7 @@ class _DestinationDetailScreenState
   Widget _buildScoresSection(Destination destination, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
       child: Row(
         children: [
           // Safety score

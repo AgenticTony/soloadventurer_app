@@ -10,7 +10,7 @@ class AuthWrapper extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     return authAsync.when(
       loading: () {
@@ -37,7 +37,7 @@ class AuthWrapper extends ConsumerWidget {
                 Text('Error: $error'),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => ref.invalidate(authNotifierProvider),
+                  onPressed: () => ref.invalidate(authProvider),
                   child: const Text('Retry'),
                 ),
               ],

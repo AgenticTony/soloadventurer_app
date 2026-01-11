@@ -145,12 +145,12 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
   }
 
   /// Calculate initial viewport bounds centered on map center
-  LatLngBounds _calculateInitialBounds() {
+  Bounds _calculateInitialBounds() {
     // Approximate bounds for zoom level 12 (San Francisco bay area)
     const double latDelta = 0.2; // ~22km
     const double lngDelta = 0.3; // ~24km at this latitude
 
-    return LatLngBounds(
+    return Bounds(
       LatLng(_mapCenter.latitude - latDelta / 2,
           _mapCenter.longitude - lngDelta / 2),
       LatLng(_mapCenter.latitude + latDelta / 2,
@@ -181,7 +181,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
   }
 
   /// Handle map bounds change (for viewport-based loading)
-  void _onMapBoundsChanged(LatLngBounds bounds) {
+  void _onMapBoundsChanged(Bounds bounds) {
     if (_viewportLoader == null) return;
 
     // Update viewport loader to load only visible + buffered markers
@@ -217,14 +217,14 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
   }
 
   /// Calculate bounds for a cluster
-  LatLngBounds _calculateBoundsForCluster(MapCluster cluster) {
+  Bounds _calculateBoundsForCluster(MapCluster cluster) {
     final allMarkers = ref.read(tripMapMarkersProvider);
     final clusterMarkers = allMarkers
         .where((marker) => cluster.markerIds.contains(marker.id))
         .toList();
 
     if (clusterMarkers.isEmpty) {
-      return LatLngBounds(cluster.position, cluster.position);
+      return Bounds(cluster.position, cluster.position);
     }
 
     double minLat = cluster.position.latitude;
@@ -239,7 +239,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
       maxLng = math.max(maxLng, marker.position.longitude);
     }
 
-    return LatLngBounds(
+    return Bounds(
       LatLng(minLat, minLng),
       LatLng(maxLat, maxLng),
     );
@@ -287,11 +287,11 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
       right: 16,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface.withOpacity(0.9),
+          color: theme.colorScheme.surface.withValues(alpha:0.9),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha:0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -967,7 +967,7 @@ class _MarkerListItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: _getMarkerColor(context).withOpacity(0.1),
+                color: _getMarkerColor(context).withValues(alpha:0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

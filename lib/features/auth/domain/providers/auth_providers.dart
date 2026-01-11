@@ -26,7 +26,7 @@ export 'package:soloadventurer/app/providers/auth_service_providers.dart'
 // Auth State Management
 export 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart'
     show
-        authNotifierProvider,
+        authProvider,
         authProvider,
         AuthNotifier;
 

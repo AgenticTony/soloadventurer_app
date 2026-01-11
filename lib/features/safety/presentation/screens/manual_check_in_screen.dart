@@ -95,7 +95,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
       return;
     }
 
-    final user = ref.read(authNotifierProvider).value?.user;
+    final user = ref.read(authProvider).value?.user;
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -293,7 +293,7 @@ class _AuthRetryButtonState extends ConsumerState<AuthRetryButton> {
       return Text(
         'Max Attempts Reached',
         style: TextStyle(
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha:0.6),
         ),
       );
     }
@@ -306,10 +306,10 @@ class _AuthRetryButtonState extends ConsumerState<AuthRetryButton> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: theme.colorScheme.outline.withOpacity(0.3),
+          color: theme.colorScheme.outline.withValues(alpha:0.3),
         ),
       ),
       child: Column(
@@ -508,7 +508,7 @@ class _AuthRetryButtonAutomaticState
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.5),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(

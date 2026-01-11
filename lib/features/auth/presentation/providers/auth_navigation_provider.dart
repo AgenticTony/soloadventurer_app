@@ -23,7 +23,7 @@ class AuthNavigation extends _$AuthNavigation {
   @override
   AuthNavigationState build() {
     // Listen to auth state changes
-    ref.listen(authNotifierProvider, (previous, next) {
+    ref.listen(authProvider, (previous, next) {
       final authState = next.value;
       if (authState == null) return;
 
@@ -101,7 +101,7 @@ class AuthNavigation extends _$AuthNavigation {
 
   /// Check if navigation to a route is allowed
   bool _canNavigate(String route) {
-    final authState = ref.read(authNotifierProvider).value;
+    final authState = ref.read(authProvider).value;
     if (authState == null) return false;
 
     switch (route) {

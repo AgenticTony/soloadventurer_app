@@ -84,8 +84,8 @@ LoggingService loggingService(LoggingServiceRef ref) {
 /// Riverpod 3.0 AsyncNotifier Compliant:
 /// - Uses AsyncNotifier<AuthState> with AsyncValue wrapper
 /// - Loading/error states handled by AsyncValue, NOT manual state fields
-/// - UI reads STATE via ref.watch(authNotifierProvider)
-/// - UI calls methods via ref.read(authNotifierProvider.notifier)
+/// - UI reads STATE via ref.watch(authProvider)
+/// - UI calls methods via ref.read(authProvider.notifier)
 @riverpod
 class AuthNotifier extends _$AuthNotifier {
   LoggingService get _logger => ref.watch(loggingServiceProvider);
@@ -472,8 +472,8 @@ class AuthNotifier extends _$AuthNotifier {
 
 /// Provider alias for backward compatibility - using the generated provider name
 @Deprecated('Use authProvider instead, will be removed in future version')
-const authNotifierProvider = authProvider;
+final authNotifierProvider = authProvider;
 
 /// Provider alias for backward compatibility with tests
-/// Maps authStateProvider to authNotifierProvider for consistency
-final authStateProvider = authNotifierProvider;
+/// Maps authStateProvider to authProvider for consistency
+final authStateProvider = authProvider;

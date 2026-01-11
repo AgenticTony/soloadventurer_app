@@ -23,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     return authAsync.when(
       loading: () => const Scaffold(
@@ -46,7 +46,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  ref.invalidate(authNotifierProvider);
+                  ref.invalidate(authProvider);
                 },
                 child: const Text('Retry'),
               ),
@@ -111,7 +111,7 @@ class HomeScreen extends ConsumerWidget {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               debugPrint('Logout button pressed');
-              await ref.read(authNotifierProvider.notifier).signOut();
+              await ref.read(authProvider.notifier).signOut();
               debugPrint('Sign out completed');
 
               if (context.mounted) {
@@ -340,7 +340,7 @@ class HomeScreen extends ConsumerWidget {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.7),
+                            Colors.black.withValues(alpha:0.7),
                           ],
                         ),
                       ),
@@ -374,7 +374,7 @@ class HomeScreen extends ConsumerWidget {
                     Text(
                       'Explore safe and exciting places perfect for solo travelers',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withValues(alpha:0.9),
                       ),
                     ),
                   ],
@@ -680,7 +680,7 @@ class HomeScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha:0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -767,7 +767,7 @@ class HomeScreen extends ConsumerWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha:0.8),
                     ],
                   ),
                 ),
@@ -803,7 +803,7 @@ class HomeScreen extends ConsumerWidget {
                     Text(
                       subtitle,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha:0.8),
                       ),
                     ),
                   ],
@@ -837,8 +837,8 @@ class HomeScreen extends ConsumerWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
+                color.withValues(alpha:0.1),
+                color.withValues(alpha:0.05),
               ],
             ),
           ),

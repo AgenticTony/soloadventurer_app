@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/core/widgets/spacing.dart';
 
 /// A rich text editor widget for journal entries
 ///
@@ -216,8 +217,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       height: 1.5,
                       color: Colors.black87,
                     ),
-                    const VerticalSpacing(0, 0),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                   h1: quill.DefaultTextBlockStyle(
@@ -227,8 +228,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: theme.colorScheme.primary,
                       height: 1.3,
                     ),
-                    const VerticalSpacing(16, 8),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(16, 8),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                   h2: quill.DefaultTextBlockStyle(
@@ -238,8 +239,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: theme.colorScheme.primary,
                       height: 1.3,
                     ),
-                    const VerticalSpacing(12, 6),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(12, 6),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                   h3: quill.DefaultTextBlockStyle(
@@ -249,8 +250,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: Colors.black87,
                       height: 1.3,
                     ),
-                    const VerticalSpacing(8, 4),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(8, 4),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                   lists: quill.DefaultTextBlockStyle(
@@ -259,8 +260,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       height: 1.5,
                       color: Colors.black87,
                     ),
-                    const VerticalSpacing(0, 4),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(0, 4),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                   quote: quill.DefaultTextBlockStyle(
@@ -270,8 +271,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       color: Colors.grey[700],
                       height: 1.5,
                     ),
-                    const VerticalSpacing(8, 4),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(8, 4),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                   code: quill.DefaultTextBlockStyle(
@@ -281,8 +282,8 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
                       backgroundColor: Colors.grey[200],
                       color: Colors.black87,
                     ),
-                    const VerticalSpacing(8, 4),
-                    const VerticalSpacing(0, 0),
+                    const quill.VerticalSpacing(8, 4),
+                    const quill.VerticalSpacing(0, 0),
                     null,
                   ),
                 ),

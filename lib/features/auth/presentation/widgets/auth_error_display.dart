@@ -60,10 +60,10 @@ class AuthErrorDisplay extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _getErrorColor(context, errorInfo.category).withOpacity(0.1),
+        color: _getErrorColor(context, errorInfo.category).withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _getErrorColor(context, errorInfo.category).withOpacity(0.3),
+          color: _getErrorColor(context, errorInfo.category).withValues(alpha:0.3),
           width: 1,
         ),
       ),
@@ -285,18 +285,18 @@ class AuthErrorBanner extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Material(
-      color: _getErrorColor(context, errorInfo.category).withOpacity(0.1),
+      color: _getErrorColor(context, errorInfo.category).withValues(alpha:0.1),
       child: SafeArea(
         bottom: false,
         child: Container(
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: _getErrorColor(context, errorInfo.category).withOpacity(0.1),
+            color: _getErrorColor(context, errorInfo.category).withValues(alpha:0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color:
-                  _getErrorColor(context, errorInfo.category).withOpacity(0.5),
+                  _getErrorColor(context, errorInfo.category).withValues(alpha:0.5),
             ),
           ),
           child: Row(
@@ -323,7 +323,7 @@ class AuthErrorBanner extends StatelessWidget {
                       Text(
                         errorInfo.recovery.secondaryAction!,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          color: theme.colorScheme.onSurface.withValues(alpha:0.7),
                         ),
                       ),
                     ],

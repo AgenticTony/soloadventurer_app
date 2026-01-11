@@ -65,10 +65,10 @@ class ConflictResolutionDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _getSeverityColor(theme).withOpacity(0.1),
+                  color: _getSeverityColor(theme).withValues(alpha:0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: _getSeverityColor(theme).withOpacity(0.3),
+                    color: _getSeverityColor(theme).withValues(alpha:0.3),
                     width: 1,
                   ),
                 ),
@@ -146,7 +146,7 @@ class ConflictResolutionDialog extends StatelessWidget {
   Widget _buildEntityInfo(BuildContext context, ThemeData theme) {
     return Card(
       elevation: 0,
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -198,13 +198,13 @@ class ConflictResolutionDialog extends StatelessWidget {
         Icon(
           icon,
           size: 16,
-          color: theme.colorScheme.onSurface.withOpacity(0.6),
+          color: theme.colorScheme.onSurface.withValues(alpha:0.6),
         ),
         const SizedBox(width: 8),
         Text(
           '$label:',
           style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha:0.6),
           ),
         ),
         const SizedBox(width: 4),
@@ -226,10 +226,10 @@ class ConflictResolutionDialog extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: color.withOpacity(0.3),
+          color: color.withValues(alpha:0.3),
           width: 1,
         ),
       ),

@@ -29,7 +29,7 @@ SyncManager syncManager(SyncManagerRef ref) {
 
   // Create a function to get the current user ID from auth state
   String getCurrentUserId() {
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
 
     // With new AuthState pattern, we directly access fields
     if (authState.isAuthenticated && authState.user != null) {

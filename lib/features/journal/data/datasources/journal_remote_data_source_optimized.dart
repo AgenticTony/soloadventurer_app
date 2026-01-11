@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:soloadventurer/core/utils/json_helpers.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
@@ -32,7 +33,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to create journal entry: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -264,7 +265,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to search entries: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -343,7 +344,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update journal entry: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -363,7 +364,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to delete journal entry: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -482,7 +483,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to get entries near location: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -505,7 +506,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to add media: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -529,7 +530,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update media: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -546,7 +547,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to delete media: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -674,7 +675,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update upload progress: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -706,7 +707,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to complete upload: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -736,7 +737,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to mark upload as failed: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -798,7 +799,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to add tag to entry: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -822,7 +823,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to remove tag from entry: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(
@@ -858,7 +859,7 @@ class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {
     } on PostgrestException catch (e) {
       throw ServerException(
         message: 'Failed to update tags for entry: ${e.message}',
-        statusCode: e.code ?? 500,
+        statusCode: JsonHelpers.parseIntOrDefault(e.code, defaultValue: 500),
       );
     } catch (e) {
       throw ServerException(

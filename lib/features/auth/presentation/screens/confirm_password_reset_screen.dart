@@ -102,10 +102,10 @@ class _ConfirmPasswordResetScreenState
 
   @override
   Widget build(BuildContext context) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
 
     // Listen for password reset success
-    ref.listen(authNotifierProvider, (previous, next) {
+    ref.listen(authProvider, (previous, next) {
       next.when(
         data: (authState) {
           // If password reset is no longer required (success), show message and navigate
@@ -156,7 +156,7 @@ class _ConfirmPasswordResetScreenState
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    ref.invalidate(authNotifierProvider);
+                    ref.invalidate(authProvider);
                   },
                   child: const Text('Try Again'),
                 ),
@@ -289,7 +289,7 @@ class _ConfirmPasswordResetScreenState
     }
 
     if (_formKey.currentState?.validate() ?? false) {
-      await ref.read(authNotifierProvider.notifier).confirmPasswordReset(
+      await ref.read(authProvider.notifier).confirmPasswordReset(
             code: _codeController.text.trim(),
             newPassword: _passwordController.text,
             email: _email!,

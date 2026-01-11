@@ -257,7 +257,7 @@ class _CreateJournalEntryScreenState
                           const Spacer(),
                           Icon(
                             Icons.arrow_drop_down,
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                           ),
                         ],
                       ),
@@ -327,7 +327,7 @@ class _CreateJournalEntryScreenState
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: creationState.content.trim().isEmpty
-                          ? theme.colorScheme.error.withOpacity(0.5)
+                          ? theme.colorScheme.error.withValues(alpha:0.5)
                           : theme.dividerColor,
                     ),
                     borderRadius: BorderRadius.circular(8),
@@ -353,7 +353,7 @@ class _CreateJournalEntryScreenState
               Text(
                 'Tip: Use the toolbar above to format your text with bold, italics, headings, and more.',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha:0.6),
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -394,7 +394,7 @@ class _CreateJournalEntryScreenState
                                 : Icons.favorite_border,
                             color: creationState.isFavorite
                                 ? Colors.red
-                                : theme.colorScheme.onSurface.withOpacity(0.6),
+                                : theme.colorScheme.onSurface.withValues(alpha:0.6),
                           ),
                           const SizedBox(width: 12),
                           Text(
@@ -433,7 +433,7 @@ class _CreateJournalEntryScreenState
               Semantics(
                 container: true,
                 child: Card(
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -462,7 +462,7 @@ class _CreateJournalEntryScreenState
                           '• Organize entries by trips',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color:
-                                theme.colorScheme.onSurface.withOpacity(0.7),
+                                theme.colorScheme.onSurface.withValues(alpha:0.7),
                             height: 1.5,
                           ),
                         ),

@@ -149,7 +149,7 @@ class TripDetailScreen extends ConsumerWidget {
                     if (trip.isOngoing)
                       Chip(
                         label: const Text('Ongoing'),
-                        backgroundColor: Colors.green.withOpacity(0.1),
+                        backgroundColor: Colors.green.withValues(alpha:0.1),
                         avatar: const Icon(Icons.flight_takeoff, size: 16),
                       ),
 
@@ -157,7 +157,7 @@ class TripDetailScreen extends ConsumerWidget {
                     if (trip.isPublic)
                       Chip(
                         label: const Text('Public'),
-                        backgroundColor: Colors.blue.withOpacity(0.1),
+                        backgroundColor: Colors.blue.withValues(alpha:0.1),
                         avatar: const Icon(Icons.public, size: 16),
                       ),
 
@@ -329,8 +329,8 @@ class TripDetailScreen extends ConsumerWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.5),
-            Theme.of(context).colorScheme.secondary.withOpacity(0.5),
+            Theme.of(context).colorScheme.primary.withValues(alpha:0.5),
+            Theme.of(context).colorScheme.secondary.withValues(alpha:0.5),
           ],
         ),
       ),

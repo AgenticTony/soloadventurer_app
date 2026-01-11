@@ -181,15 +181,15 @@ class _TagChip extends StatelessWidget {
       ),
       selected: isSelected,
       onSelected: (_) => onToggle(),
-      selectedColor: color.withOpacity(0.3),
+      selectedColor: color.withValues(alpha:0.3),
       checkmarkColor: color,
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha:0.1),
       labelStyle: TextStyle(
-        color: isSelected ? color : color.withOpacity(0.8),
+        color: isSelected ? color : color.withValues(alpha:0.8),
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       side: BorderSide(
-        color: color.withOpacity(0.5),
+        color: color.withValues(alpha:0.5),
         width: 1,
       ),
     );
@@ -359,7 +359,7 @@ class _TagListTile extends StatelessWidget {
 
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: color.withOpacity(0.2),
+        backgroundColor: color.withValues(alpha:0.2),
         child: tag.hasIcon
             ? Text(
                 tag.icon!,

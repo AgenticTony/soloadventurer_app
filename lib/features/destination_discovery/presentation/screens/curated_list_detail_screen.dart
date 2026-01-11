@@ -92,7 +92,7 @@ class _CuratedListDetailScreenState
   /// Handle save/bookmark destination
   Future<void> _toggleBookmark(Destination destination) async {
     // Get current user from auth state
-    final authState = ref.read(authNotifierProvider);
+    final authState = ref.read(authProvider);
 
     if (!authState.hasValue || authState.value!.user == null) {
       if (mounted) {
@@ -178,7 +178,7 @@ class _CuratedListDetailScreenState
     final curatedListsState = ref.watch(curatedListsProvider);
 
     // Get auth state for save functionality
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
     final userId = authState.value?.user?.id;
     final savedState =
         userId != null ? ref.watch(savedDestinationsProvider(userId)) : null;
@@ -285,7 +285,7 @@ class _CuratedListDetailScreenState
                       Icons.collections_bookmark,
                       size: 80,
                       color:
-                          theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+                          theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
                     ),
                   ),
                 ),
@@ -296,7 +296,7 @@ class _CuratedListDetailScreenState
                   child: Icon(
                     Icons.collections_bookmark,
                     size: 80,
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.3),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha:0.3),
                   ),
                 ),
               ),
@@ -388,7 +388,7 @@ class _CuratedListDetailScreenState
   Widget _buildScoresSection(CuratedList curatedList, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha:0.3),
       child: Row(
         children: [
           // Safety score

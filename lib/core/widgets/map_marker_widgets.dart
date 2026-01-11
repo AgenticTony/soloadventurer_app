@@ -48,12 +48,12 @@ class MapMarkerWidget extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: marker.color != null
-            ? Color(marker.color!).withOpacity(0.9)
-            : markerColor.withOpacity(0.9),
+            ? Color(marker.color!).withValues(alpha:0.9)
+            : markerColor.withValues(alpha:0.9),
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha:0.2),
             blurRadius: 4,
             offset: const Offset(0, 2),
           ),
@@ -88,7 +88,7 @@ class MapMarkerWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.7),
+              color: Colors.black.withValues(alpha:0.7),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
@@ -383,7 +383,7 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha:0.3),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -399,7 +399,7 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
                   fontWeight: FontWeight.bold,
                   shadows: [
                     Shadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha:0.3),
                       offset: const Offset(0, 1),
                       blurRadius: 2,
                     ),
@@ -681,11 +681,11 @@ class ClusterColorScheme {
   factory ClusterColorScheme.monochrome({Color baseColor = Colors.blue}) {
     return ClusterColorScheme(
       thresholds: {
-        100: baseColor.withOpacity(0.9),
-        50: baseColor.withOpacity(0.7),
-        10: baseColor.withOpacity(0.5),
+        100: baseColor.withValues(alpha:0.9),
+        50: baseColor.withValues(alpha:0.7),
+        10: baseColor.withValues(alpha:0.5),
       },
-      defaultColor: baseColor.withOpacity(0.3),
+      defaultColor: baseColor.withValues(alpha:0.3),
       useGradient: true,
     );
   }

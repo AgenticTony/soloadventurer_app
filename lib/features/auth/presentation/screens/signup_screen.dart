@@ -104,7 +104,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authAsync = ref.watch(authNotifierProvider);
+    final authAsync = ref.watch(authProvider);
     // Watch the navigation provider to ensure it's instantiated and listening
     ref.watch(authNavigationProvider);
 
@@ -126,7 +126,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  ref.invalidate(authNotifierProvider);
+                  ref.invalidate(authProvider);
                 },
                 child: const Text('Try Again'),
               ),
@@ -315,7 +315,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       _clearError();
 
       try {
-        await ref.read(authNotifierProvider.notifier).signUp(
+        await ref.read(authProvider.notifier).signUp(
               email: email,
               password: password,
               name: name,
@@ -323,7 +323,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
         // Only navigate if we're still mounted and the signup was successful
         if (mounted) {
-          final authAsync = ref.read(authNotifierProvider);
+          final authAsync = ref.read(authProvider);
           authAsync.whenData((authState) {
             if (authState.requiresEmailVerification) {
               ref

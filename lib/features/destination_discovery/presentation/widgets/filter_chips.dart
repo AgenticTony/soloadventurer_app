@@ -399,7 +399,7 @@ class _HiddenGemChip extends StatelessWidget {
         ),
         selected: isSelected,
         onSelected: (_) => onTap(),
-        selectedColor: Colors.amber.withOpacity(0.2),
+        selectedColor: Colors.amber.withValues(alpha:0.2),
         checkmarkColor: Colors.amber.shade700,
         labelStyle: theme.textTheme.labelMedium?.copyWith(
           color: isSelected
@@ -409,7 +409,7 @@ class _HiddenGemChip extends StatelessWidget {
         side: BorderSide(
           color: isSelected
               ? Colors.amber.shade700
-              : theme.colorScheme.outline.withOpacity(0.5),
+              : theme.colorScheme.outline.withValues(alpha:0.5),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),
@@ -483,12 +483,12 @@ class _ClearAllChip extends StatelessWidget {
         ),
         selected: false,
         onSelected: (_) => onTap(),
-        backgroundColor: theme.colorScheme.errorContainer.withOpacity(0.3),
+        backgroundColor: theme.colorScheme.errorContainer.withValues(alpha:0.3),
         labelStyle: theme.textTheme.labelMedium?.copyWith(
           color: theme.colorScheme.onErrorContainer,
         ),
         side: BorderSide(
-          color: theme.colorScheme.error.withOpacity(0.5),
+          color: theme.colorScheme.error.withValues(alpha:0.5),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       ),

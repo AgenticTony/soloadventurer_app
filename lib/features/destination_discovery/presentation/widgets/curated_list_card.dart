@@ -403,7 +403,7 @@ class CuratedListCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: theme.colorScheme.primary.withOpacity(0.9),
+          color: theme.colorScheme.primary.withValues(alpha:0.9),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -436,7 +436,7 @@ class CuratedListCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: Colors.amber.withOpacity(0.9),
+          color: Colors.amber.withValues(alpha:0.9),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -506,7 +506,7 @@ class CuratedListCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
-          color: (typeInfo['color'] as Color).withOpacity(0.1),
+          color: (typeInfo['color'] as Color).withValues(alpha:0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: typeInfo['color'] as Color,

@@ -141,7 +141,7 @@ class CheckInNotifier extends _$CheckInNotifier {
     state = state.copyWith(isCreating: true, error: null, isProcessing: true);
     try {
       // Get current user ID from auth state
-      final authAsync = ref.read(authNotifierProvider);
+      final authAsync = ref.read(authProvider);
       final userId = authAsync.value?.user?.id ?? '';
 
       if (userId.isEmpty) {
@@ -211,7 +211,7 @@ class CheckInNotifier extends _$CheckInNotifier {
     state = state.copyWith(isCreating: true, error: null, isProcessing: true);
     try {
       // Get current user ID from auth state
-      final authAsync = ref.read(authNotifierProvider);
+      final authAsync = ref.read(authProvider);
       final userId = authAsync.value?.user?.id ?? '';
 
       if (userId.isEmpty) {
