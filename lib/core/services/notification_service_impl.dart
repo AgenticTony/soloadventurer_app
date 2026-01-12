@@ -551,6 +551,7 @@ class NotificationServiceImpl implements NotificationService {
         return SafetyNotificationConfig.locationChannelId;
       case SafetyNotificationType.safetyStatusUpdate:
       case SafetyNotificationType.generalAlert:
+      case SafetyNotificationType.backgroundSync:
         return SafetyNotificationConfig.generalChannelId;
     }
   }
@@ -600,6 +601,7 @@ class NotificationServiceImpl implements NotificationService {
         return Importance.defaultImportance;
       case SafetyNotificationType.safetyStatusUpdate:
       case SafetyNotificationType.generalAlert:
+      case SafetyNotificationType.backgroundSync:
         return Importance.defaultImportance;
     }
   }

@@ -1,6 +1,6 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../features/core/infrastructure/monitoring/aws_cloudwatch_monitoring.dart';
 import '../../../../features/core/domain/services/logging_service.dart';
 import '../../../../core/security/security_manager.dart';
 import '../logging/token_audit_logger.dart';
@@ -13,7 +13,6 @@ part 'suspicious_activity_detector.g.dart';
 class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
   late final SecurityManager _securityManager;
   late final LoggingService _tokenAuditLogger;
-  late final AwsCloudWatchMonitoring _monitoring;
 
   // Thresholds for suspicious activity detection
   static const int _loginAttemptThreshold = 5;
@@ -44,7 +43,6 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
   SuspiciousActivityDetector build() {
     _securityManager = ref.watch(securityManagerProvider);
     _tokenAuditLogger = ref.watch(tokenAuditLoggerProvider);
-    _monitoring = ref.watch(awsCloudWatchMonitoringProvider);
     return this;
   }
 
@@ -187,15 +185,8 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       );
 
       // Instead of immediate token revocation, flag for review
-      _monitoring.recordMetric(
-        'RapidLocationChanges',
-        1.0,
-        dimensions: {
-          'UserId': userId,
-          'LocationCount': uniqueLocationsInWindow.length.toString(),
-          'TimeWindowHours': _locationTimeWindow.inHours.toString(),
-        },
-      );
+      debugPrint('Rapid location changes detected for user $userId: '
+          '${uniqueLocationsInWindow.length} locations in ${_locationTimeWindow.inHours} hours');
     }
   }
 
@@ -252,15 +243,8 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       );
 
       // Monitor instead of immediate revocation
-      _monitoring.recordMetric(
-        'ConcurrentTokenUsage',
-        1.0,
-        dimensions: {
-          'UserId': userId,
-          'TokenId': tokenId,
-          'ConcurrentUses': currentUsage.toString(),
-        },
-      );
+      debugPrint('Concurrent token usage detected for user $userId: '
+          '$currentUsage concurrent uses for token $tokenId');
     }
   }
 
@@ -329,15 +313,8 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
         );
 
         // Log for review instead of immediate token revocation
-        _monitoring.recordMetric(
-          'HighSensitiveEndpointAccess',
-          1.0,
-          dimensions: {
-            'UserId': userId,
-            'Endpoint': endpoint,
-            'AccessCount': sensitiveAccessesInWindow.toString(),
-          },
-        );
+        debugPrint('High sensitive endpoint access detected for user $userId: '
+            '$sensitiveAccessesInWindow accesses to $endpoint in ${_sensitiveEndpointWindow.inHours} hours');
       }
     }
   }

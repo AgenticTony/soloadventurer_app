@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import './auth_service.dart';
 import '../../../../features/core/infrastructure/storage/secure_storage_service.dart';
 
 /// A service for managing user sessions, including automatic token refreshing.
+///
+/// NOTE: This service has been stubbed out after removing AWS Cognito dependencies.
+/// The actual session management should be handled by Supabase's built-in session handling.
 class SessionManager {
   final AuthService _authService;
   final SecureStorageService _secureStorage;
@@ -15,11 +17,6 @@ class SessionManager {
   // Default token refresh interval (45 minutes)
   static const int _defaultRefreshIntervalMinutes = 45;
 
-  // AWS Cognito configuration
-  static const String _userPoolId = 'YOUR_USER_POOL_ID';
-  static const String _clientId = 'YOUR_CLIENT_ID';
-  static const String _region = 'YOUR_REGION';
-
   // Singleton pattern
   static final SessionManager _instance = SessionManager._internal();
 
@@ -28,13 +25,7 @@ class SessionManager {
   }
 
   SessionManager._internal()
-      : _authService = AuthService(
-          userPool: CognitoUserPool(
-            _userPoolId,
-            _clientId,
-            endpoint: 'cognito-idp.$_region.amazonaws.com',
-          ),
-        ),
+      : _authService = AuthService(),
         _secureStorage = SecureStorageService();
 
   /// Initializes the session manager.

@@ -6,7 +6,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../domain/services/token_manager.dart';
-import '../monitoring/aws_cloudwatch_monitoring.dart';
 import '../logging/token_audit_logger.dart';
 
 part 'background_token_refresh_service.g.dart';
@@ -126,24 +125,23 @@ void callbackDispatcher() {
         final container = ProviderContainer();
 
         // Show notification for foreground service (Android requirement)
+        int? notificationId;
         if (Platform.isAndroid) {
-          await container
+          final result = await container
               .read(notificationServiceProvider)
-              .showForegroundNotification(
+              .showNotification(
                 title: BackgroundRefreshConfig.notificationTitle,
                 body: BackgroundRefreshConfig.notificationMessage,
+                type: SafetyNotificationType.backgroundSync,
               );
+          // Extract notification ID from result
+          notificationId = result.notificationId;
         }
 
         // Perform token refresh
         await container.read(tokenManagerProvider.notifier).refreshToken();
 
-        // Record successful refresh metric
-        container.read(awsCloudWatchMonitoringProvider).recordMetric(
-          'BackgroundTokenRefresh',
-          1.0,
-          dimensions: {'Status': 'Success'},
-        );
+        debugPrint('Background token refresh completed successfully');
 
         // Log successful refresh
         container.read(tokenAuditLoggerProvider).logTokenEvent(
@@ -152,10 +150,10 @@ void callbackDispatcher() {
             );
 
         // Clear the notification
-        if (Platform.isAndroid) {
+        if (Platform.isAndroid && notificationId != null) {
           await container
               .read(notificationServiceProvider)
-              .clearForegroundNotification();
+              .cancelNotification(notificationId);
         }
 
         return true;
@@ -172,12 +170,7 @@ void callbackDispatcher() {
             stackTrace: stack,
           );
 
-      // Record failure metric
-      container.read(awsCloudWatchMonitoringProvider).recordMetric(
-        'BackgroundTokenRefresh',
-        1.0,
-        dimensions: {'Status': 'Failure'},
-      );
+      debugPrint('Background token refresh failed: $e');
 
       return false;
     }

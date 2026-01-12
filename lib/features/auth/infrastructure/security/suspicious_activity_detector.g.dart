@@ -46,7 +46,7 @@ final class SuspiciousActivityDetectorProvider extends $NotifierProvider<
 }
 
 String _$suspiciousActivityDetectorHash() =>
-    r'21bc6b55570c17e7cd644a4c6229ad1163adcc93';
+    r'fcb930700cac4a85960d70a9811b7427abb8b762';
 
 /// Detects and logs suspicious activity patterns related to authentication and API usage
 

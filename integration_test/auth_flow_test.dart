@@ -30,7 +30,7 @@ import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
 import 'package:soloadventurer/core/security/security_manager.dart';
 import 'test_config.dart';
-import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart'
+import 'package:soloadventurer/app/providers/auth_service_providers.dart'
     as auth_providers;
 
 class MockProfileRemoteDataSource implements ProfileRemoteDataSource {

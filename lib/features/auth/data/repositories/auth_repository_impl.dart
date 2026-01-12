@@ -1,5 +1,5 @@
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/security/security_manager.dart';
+import 'package:soloadventurer/core/storage/secure_storage_adapter.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
@@ -12,7 +12,7 @@ import 'package:soloadventurer/features/auth/infrastructure/services/refresh_que
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
   final AuthLocalDataSource localDataSource;
-  final SecurityManager securityManager;
+  final SecurityManagerAdapter securityManager;
   final RefreshQueueManager? refreshQueueManager;
 
   /// Creates a new [AuthRepositoryImpl] with the given data sources
@@ -33,7 +33,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // Check for rate limiting
       await securityManager.checkLoginAttempts();
 
-      final (user, token) = await remoteDataSource.signIn(email, password);
+      final (user, session) = await remoteDataSource.signIn(email, password);
 
       // Check if this is a new device
       if (!await securityManager.isKnownDevice()) {
@@ -41,8 +41,13 @@ class AuthRepositoryImpl implements AuthRepository {
         await securityManager.registerDevice();
       }
 
-      // With Cognito, we don't need to store refresh tokens as the SDK handles that
-      await localDataSource.saveAuthData(token, token);
+      // Save complete session data including expiresAt
+      await localDataSource.saveAuthData(
+        session.accessToken,
+        session.refreshToken,
+        expiresAt: session.expiresAt,
+        idToken: session.idToken,
+      );
       await localDataSource.cacheUser(user);
       await securityManager.resetLoginAttempts();
       return user;

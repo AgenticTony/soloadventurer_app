@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_search_provider.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/journal_entry_detail_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/journal_search_filter_sheet.dart';
 
 /// Screen for searching and filtering journal entries
@@ -330,14 +330,7 @@ class _JournalSearchScreenState extends ConsumerState<JournalSearchScreen> {
                       return _SearchResultCard(
                         entry: entry,
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => JournalEntryDetailScreen(
-                                entryId: entry.id,
-                              ),
-                            ),
-                          );
+                          context.push('/journal/entry/${entry.id}');
                         },
                       );
                     },

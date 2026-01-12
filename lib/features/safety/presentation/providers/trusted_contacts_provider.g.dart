@@ -11,8 +11,8 @@ part of 'trusted_contacts_provider.dart';
 /// Notifier for managing trusted contacts state
 /// Handles CRUD operations for trusted contacts
 ///
-/// Riverpod 2 Compliant:
-/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// Riverpod 3.0 Compliant:
+/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
 /// - NO getters in state - all derived values are fields
 /// - UI reads STATE only via ref.watch()
 /// - UI calls methods via ref.read(provider.notifier)
@@ -23,8 +23,8 @@ const trustedContactsProvider = TrustedContactsProvider._();
 /// Notifier for managing trusted contacts state
 /// Handles CRUD operations for trusted contacts
 ///
-/// Riverpod 2 Compliant:
-/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// Riverpod 3.0 Compliant:
+/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
 /// - NO getters in state - all derived values are fields
 /// - UI reads STATE only via ref.watch()
 /// - UI calls methods via ref.read(provider.notifier)
@@ -33,8 +33,8 @@ final class TrustedContactsProvider
   /// Notifier for managing trusted contacts state
   /// Handles CRUD operations for trusted contacts
   ///
-  /// Riverpod 2 Compliant:
-  /// - Uses AutoDisposeNotifier (auto-disposes when unused)
+  /// Riverpod 3.0 Compliant:
+  /// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
   /// - NO getters in state - all derived values are fields
   /// - UI reads STATE only via ref.watch()
   /// - UI calls methods via ref.read(provider.notifier)
@@ -70,8 +70,8 @@ String _$trustedContactsHash() => r'1e279e949c721c57383773d4adb6bcad3accde4a';
 /// Notifier for managing trusted contacts state
 /// Handles CRUD operations for trusted contacts
 ///
-/// Riverpod 2 Compliant:
-/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// Riverpod 3.0 Compliant:
+/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
 /// - NO getters in state - all derived values are fields
 /// - UI reads STATE only via ref.watch()
 /// - UI calls methods via ref.read(provider.notifier)

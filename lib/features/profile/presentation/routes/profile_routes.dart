@@ -4,7 +4,10 @@ class ProfileRoutes {
   static const profile = '/profile';
 
   /// Route for edit profile screen
-  static const editProfile = '/profile/edit';
+  static const editProfile = '/edit-profile';
+
+  /// Route for profile settings screen
+  static const profileSettings = '/profile-settings';
 
   // Private constructor to prevent instantiation
   ProfileRoutes._();

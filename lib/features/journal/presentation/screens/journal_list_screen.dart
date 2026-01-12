@@ -300,10 +300,7 @@ class _DateGroup extends StatelessWidget {
                 child: JournalEntryCard(
                   entry: entry,
                   onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/journal/entry/${entry.id}',
-                    );
+                    context.push('/journal/entry/${entry.id}');
                   },
                 ),
               )),
@@ -398,10 +395,7 @@ class _TripGroup extends StatelessWidget {
                 child: JournalEntryCard(
                   entry: entry,
                   onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/journal/entry/${entry.id}',
-                    );
+                    context.push('/journal/entry/${entry.id}');
                   },
                 ),
               )),

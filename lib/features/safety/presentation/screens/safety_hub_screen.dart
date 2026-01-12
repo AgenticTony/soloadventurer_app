@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
 import '../providers/safety_providers.dart';
 import '../../domain/entities/safety_status.dart';
-import 'trusted_contacts_screen.dart';
-import 'check_in_home_screen.dart';
-import 'emergency_sos_screen.dart';
-import 'location_sharing_screen.dart';
-import 'status_update_screen.dart';
-import 'manual_check_in_screen.dart';
 
 /// Main safety hub screen serving as the entry point for all safety features
 ///
@@ -356,51 +352,27 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
   // Navigation methods
 
   void _navigateToTrustedContacts(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const TrustedContactsScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.trustedContacts);
   }
 
   void _navigateToCheckIns(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const CheckInHomeScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.checkInHome);
   }
 
   void _navigateToLocationSharing(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const LocationSharingScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.locationSharing);
   }
 
   void _navigateToEmergencySOS(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const EmergencySOSScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.emergencySOS);
   }
 
   void _navigateToUpdateStatus(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const StatusUpdateScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.statusUpdate);
   }
 
   void _navigateToManualCheckIn(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ManualCheckInScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.manualCheckIn);
   }
 
   // Helper methods

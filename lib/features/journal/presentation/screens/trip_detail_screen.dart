@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/create_trip_screen.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/trip_overview_screen.dart';
 
 /// Screen displaying trip details
 class TripDetailScreen extends ConsumerWidget {
@@ -93,12 +92,7 @@ class TripDetailScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CreateTripScreen(tripId: trip.id),
-                  ),
-                );
+                final result = await context.push('/journal/trips/create');
 
                 if (result != null) {
                   // Reload trip details
@@ -251,13 +245,7 @@ class TripDetailScreen extends ConsumerWidget {
                         : const Text('No entries yet'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              TripOverviewScreen(tripId: trip.id),
-                        ),
-                      );
+                      context.push('/journal/trips/${trip.id}/overview');
                     },
                   ),
                 ),
@@ -272,13 +260,7 @@ class TripDetailScreen extends ConsumerWidget {
                     subtitle: const Text('View all photos and videos'),
                     trailing: const Icon(Icons.chevron_right),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              TripOverviewScreen(tripId: trip.id),
-                        ),
-                      );
+                      context.push('/journal/trips/${trip.id}/overview');
                     },
                   ),
                 ),

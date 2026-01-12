@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/memory_timeline_provider.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/journal_entry_detail_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/timeline_item.dart';
 import 'package:intl/intl.dart';
 
@@ -365,11 +364,6 @@ class _MemoryTimelineScreenState extends ConsumerState<MemoryTimelineScreen> {
 
   /// Navigate to entry detail
   void _navigateToEntryDetail(JournalEntry entry) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => JournalEntryDetailScreen(entryId: entry.id),
-      ),
-    );
+    context.push('/journal/entry/${entry.id}');
   }
 }

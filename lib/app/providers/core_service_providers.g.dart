@@ -117,21 +117,21 @@ String _$secureStorageHash() => r'5c9908c0046ad0e39469ee7acbb5540397b36693';
 
 /// Provider for AppConfig
 ///
-/// Provides access to application configuration including AWS Cognito settings.
+/// Provides access to application configuration.
 
 @ProviderFor(appConfig)
 const appConfigProvider = AppConfigProvider._();
 
 /// Provider for AppConfig
 ///
-/// Provides access to application configuration including AWS Cognito settings.
+/// Provides access to application configuration.
 
 final class AppConfigProvider
     extends $FunctionalProvider<AppConfig, AppConfig, AppConfig>
     with $Provider<AppConfig> {
   /// Provider for AppConfig
   ///
-  /// Provides access to application configuration including AWS Cognito settings.
+  /// Provides access to application configuration.
   const AppConfigProvider._()
       : super(
           from: null,
@@ -327,108 +327,6 @@ final class DatabaseServiceProvider extends $FunctionalProvider<DatabaseService,
 
 String _$databaseServiceHash() => r'323927c4138725be4427216964fece6d70043b46';
 
-/// Provider for Cognito User Pool ID
-///
-/// Provides the AWS Cognito user pool ID from AppConfig.
-
-@ProviderFor(cognitoUserPoolId)
-const cognitoUserPoolIdProvider = CognitoUserPoolIdProvider._();
-
-/// Provider for Cognito User Pool ID
-///
-/// Provides the AWS Cognito user pool ID from AppConfig.
-
-final class CognitoUserPoolIdProvider
-    extends $FunctionalProvider<String, String, String> with $Provider<String> {
-  /// Provider for Cognito User Pool ID
-  ///
-  /// Provides the AWS Cognito user pool ID from AppConfig.
-  const CognitoUserPoolIdProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'cognitoUserPoolIdProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$cognitoUserPoolIdHash();
-
-  @$internal
-  @override
-  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String create(Ref ref) {
-    return cognitoUserPoolId(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String>(value),
-    );
-  }
-}
-
-String _$cognitoUserPoolIdHash() => r'21772e7f1ed3dbe6a1aa124d87de8bfc4ea5217f';
-
-/// Provider for Cognito Client ID
-///
-/// Provides the AWS Cognito client ID from AppConfig.
-
-@ProviderFor(cognitoClientId)
-const cognitoClientIdProvider = CognitoClientIdProvider._();
-
-/// Provider for Cognito Client ID
-///
-/// Provides the AWS Cognito client ID from AppConfig.
-
-final class CognitoClientIdProvider
-    extends $FunctionalProvider<String, String, String> with $Provider<String> {
-  /// Provider for Cognito Client ID
-  ///
-  /// Provides the AWS Cognito client ID from AppConfig.
-  const CognitoClientIdProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'cognitoClientIdProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$cognitoClientIdHash();
-
-  @$internal
-  @override
-  $ProviderElement<String> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  String create(Ref ref) {
-    return cognitoClientId(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(String value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<String>(value),
-    );
-  }
-}
-
-String _$cognitoClientIdHash() => r'fac71643cdb3479be60b3d7424d75f1304179b93';
-
 /// Provider for API Base URL
 ///
 /// Provides the base URL for API requests from AppConfig.
@@ -479,54 +377,3 @@ final class ApiBaseUrlProvider
 }
 
 String _$apiBaseUrlHash() => r'77dc5bba93004c423575357f387ca93805600f69';
-
-/// Provider for Cognito User Pool
-///
-/// Provides the AWS Cognito User Pool instance from AppConfig.
-
-@ProviderFor(cognitoUserPool)
-const cognitoUserPoolProvider = CognitoUserPoolProvider._();
-
-/// Provider for Cognito User Pool
-///
-/// Provides the AWS Cognito User Pool instance from AppConfig.
-
-final class CognitoUserPoolProvider extends $FunctionalProvider<CognitoUserPool,
-    CognitoUserPool, CognitoUserPool> with $Provider<CognitoUserPool> {
-  /// Provider for Cognito User Pool
-  ///
-  /// Provides the AWS Cognito User Pool instance from AppConfig.
-  const CognitoUserPoolProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'cognitoUserPoolProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$cognitoUserPoolHash();
-
-  @$internal
-  @override
-  $ProviderElement<CognitoUserPool> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  CognitoUserPool create(Ref ref) {
-    return cognitoUserPool(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(CognitoUserPool value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<CognitoUserPool>(value),
-    );
-  }
-}
-
-String _$cognitoUserPoolHash() => r'7a7c3e87513e89af33281fbda1560bf7ea131bfd';

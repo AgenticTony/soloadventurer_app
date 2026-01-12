@@ -5,7 +5,7 @@ import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_so
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_manager.dart';
-import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart';
+import 'package:soloadventurer/app/providers/auth_service_providers.dart';
 import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
 import 'package:soloadventurer/features/core/data/services/connectivity_service_impl.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';

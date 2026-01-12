@@ -28,6 +28,9 @@ enum SafetyNotificationType {
 
   /// General safety alert
   generalAlert,
+
+  /// Background sync or system operation (e.g., token refresh)
+  backgroundSync,
 }
 
 /// Notification channel IDs
@@ -43,6 +46,9 @@ class NotificationChannels {
 
   /// General safety notifications
   static const String general = 'general_safety';
+
+  /// Background sync and system operations
+  static const String backgroundSync = 'background_sync';
 }
 
 /// Configuration for safety notifications

@@ -1,10 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import 'package:soloadventurer/core/security/security_manager.dart';
-import 'package:soloadventurer/core/config/app_config.dart';
+import 'package:soloadventurer/core/storage/secure_storage_adapter.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
@@ -32,44 +32,19 @@ part 'auth_service_providers.g.dart';
 /// Handles local storage of auth data using SecureStorage and SharedPreferences.
 @Riverpod(keepAlive: true)
 AuthLocalDataSource authLocalDataSource(Ref ref) {
-  final securityManager = ref.watch(securityManagerProvider);
+  final secureStorage = ref.watch(secureStorageProvider);
   final sharedPreferences = ref.watch(sharedPreferencesProvider);
-  return AuthLocalDataSourceImpl(securityManager, sharedPreferences);
+  return AuthLocalDataSourceImpl(secureStorage, sharedPreferences);
 }
 
 /// Provider for AuthRemoteDataSource
 ///
-/// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
+/// Uses Supabase Auth for authentication.
 /// In tests, this can be overridden with the mock implementation.
-///
-/// The auth provider is selected based on AppConfig.useSupabaseAuth:
-/// - true: Uses SupabaseAuthRemoteDataSourceImpl
-/// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
 @Riverpod(keepAlive: true)
 AuthRemoteDataSource authRemoteDataSource(Ref ref) {
-  debugPrint('========================================');
-  debugPrint('auth_service_providers: Initializing AuthRemoteDataSource');
-  debugPrint('auth_service_providers: AppConfig.useSupabaseAuth = ${AppConfig.useSupabaseAuth}');
-  debugPrint('auth_service_providers: AppConfig.useCognitoAuth = ${AppConfig.useCognitoAuth}');
-  debugPrint('auth_service_providers: AppConfig.authProvider = ${AppConfig.authProvider}');
-  debugPrint('========================================');
-
-  if (AppConfig.useSupabaseAuth) {
-    debugPrint('auth_service_providers: Using SupabaseAuthRemoteDataSourceImpl');
-    return SupabaseAuthRemoteDataSourceImpl();
-  }
-
-  // Use AWS Cognito implementation (legacy)
-  debugPrint('auth_service_providers: Using AuthRemoteDataSourceImpl (AWS Cognito)');
-  final apiBaseUrl = ref.watch(apiBaseUrlProvider);
-  final http.Client client = http.Client();
-
-  return AuthRemoteDataSourceImpl(
-    userPool: ref.watch(cognitoUserPoolProvider),
-    clientSecret: ref.watch(cognitoClientIdProvider),
-    client: client,
-    baseUrl: apiBaseUrl,
-  );
+  debugPrint('auth_service_providers: Initializing SupabaseAuthRemoteDataSource');
+  return SupabaseAuthRemoteDataSourceImpl();
 }
 
 /// Mock provider for AuthRemoteDataSource
@@ -93,10 +68,16 @@ AuthRepository authRepository(Ref ref) {
   final remoteDataSource = ref.watch(authRemoteDataSourceProvider);
   final localDataSource = ref.watch(authLocalDataSourceProvider);
   final securityManager = ref.watch(securityManagerProvider);
+
+  // Create SecurityManagerAdapter to bridge Riverpod's SecurityManager
+  // with the GetIt-based AuthRepository
+  SecurityManagerAdapter.setSecurityManager(securityManager);
+  final adapter = SecurityManagerAdapter();
+
   return AuthRepositoryImpl(
     remoteDataSource: remoteDataSource,
     localDataSource: localDataSource,
-    securityManager: securityManager,
+    securityManager: adapter,
   );
 }
 

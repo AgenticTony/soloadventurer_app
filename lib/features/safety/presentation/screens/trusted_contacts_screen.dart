@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
 import '../../domain/entities/trusted_contact.dart';
 import '../providers/safety_providers.dart';
-import 'add_edit_trusted_contact_screen.dart';
 
 /// Screen to display and manage trusted contacts
 /// Shows list of contacts with options to add, edit, or remove them
@@ -332,21 +333,11 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
   }
 
   void _navigateToAddContact(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const AddEditTrustedContactScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.addEditTrustedContact);
   }
 
   void _navigateToEditContact(BuildContext context, TrustedContact contact) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => AddEditTrustedContactScreen(
-          contact: contact,
-        ),
-      ),
-    );
+    context.push(SafetyRoutes.editTrustedContact, extra: contact);
   }
 
   void _viewContactDetails(BuildContext context, TrustedContact contact) {

@@ -17,7 +17,7 @@ import 'package:soloadventurer/features/core/data/services/connectivity_service_
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
-import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart';
+import 'package:soloadventurer/app/providers/auth_service_providers.dart';
 
 class MockConnectivityService implements ConnectivityService {
   final _statusController = StreamController<NetworkStatus>.broadcast();

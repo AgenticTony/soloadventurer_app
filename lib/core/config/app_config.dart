@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:soloadventurer/core/config/cognito_config.dart';
 
 /// Application configuration class
 ///
@@ -60,25 +59,6 @@ class AppConfig {
   static bool get isDevelopment => environment == 'development';
 
   // ============================================================
-  // AUTH PROVIDER SELECTION
-  // ============================================================
-
-  /// Which authentication provider to use
-  ///
-  /// - 'supabase': Use Supabase Auth (new, recommended)
-  /// - 'cognito': Use AWS Cognito (legacy, being phased out)
-  ///
-  /// Set via: `flutter run --dart-define=AUTH_PROVIDER=cognito`
-  static String get authProvider =>
-      const String.fromEnvironment('AUTH_PROVIDER', defaultValue: 'supabase');
-
-  /// Whether to use Supabase for authentication
-  static bool get useSupabaseAuth => authProvider == 'supabase';
-
-  /// Whether to use AWS Cognito for authentication (legacy)
-  static bool get useCognitoAuth => authProvider == 'cognito';
-
-  // ============================================================
   // SECURITY FEATURES
   // ============================================================
 
@@ -100,13 +80,11 @@ class AppConfig {
 
   /// Supabase project URL from environment variables
   ///
-  /// Required when `useSupabaseAuth` is true.
   /// Set in `.env` file: `SUPABASE_URL=https://your-project.supabase.co`
   static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? '';
 
   /// Supabase anonymous key from environment variables
   ///
-  /// Required when `useSupabaseAuth` is true.
   /// Set in `.env` file: `SUPABASE_ANON_KEY=your-anon-key`
   static String get supabaseAnonKey =>
       dotenv.env['SUPABASE_ANON_KEY'] ??
@@ -117,16 +95,6 @@ class AppConfig {
   ///
   /// Automatically disabled in production, enabled in other environments.
   static bool get supabaseDebugMode => !isProduction;
-
-  // ============================================================
-  // COGNITO CONFIGURATION (LEGACY)
-  // ============================================================
-
-  /// AWS Cognito configuration for legacy authentication
-  ///
-  /// Only used when `useCognitoAuth` is true.
-  /// See [CognitoConfig] for individual settings.
-  static CognitoConfig get awsConfig => CognitoConfig();
 
   // ============================================================
   // API CONFIGURATION
@@ -170,11 +138,7 @@ class AppConfig {
   ///
   /// Returns true if configuration is valid, false otherwise.
   static bool validate() {
-    if (useSupabaseAuth) {
-      return supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
-    }
-    // Cognito validation is handled by CognitoConfig class
-    return true;
+    return supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
   }
 
   /// Throws an exception if required configuration is missing
@@ -183,15 +147,13 @@ class AppConfig {
   /// required configuration is not present.
   static void validateOrThrow() {
     if (!validate()) {
-      if (useSupabaseAuth) {
-        final missing = <String>[];
-        if (supabaseUrl.isEmpty) missing.add('SUPABASE_URL');
-        if (supabaseAnonKey.isEmpty) missing.add('SUPABASE_ANON_KEY');
-        throw Exception(
-          'Missing required Supabase configuration: ${missing.join(', ')}. '
-          'Please add these to your .env file.',
-        );
-      }
+      final missing = <String>[];
+      if (supabaseUrl.isEmpty) missing.add('SUPABASE_URL');
+      if (supabaseAnonKey.isEmpty) missing.add('SUPABASE_ANON_KEY');
+      throw Exception(
+        'Missing required Supabase configuration: ${missing.join(', ')}. '
+        'Please add these to your .env file.',
+      );
     }
   }
 
@@ -202,11 +164,9 @@ class AppConfig {
     return '''
 AppConfig Summary:
   Environment: $environment
-  Auth Provider: $authProvider
   SSL Pinning: $enableSSLPinning
   Debug Mode: $debugMode
-  Supabase: ${useSupabaseAuth ? 'Enabled (URL: ${_redactUrl(supabaseUrl)})' : 'Disabled'}
-  Cognito: ${useCognitoAuth ? 'Enabled' : 'Disabled'}''';
+  Supabase: Enabled (URL: ${_redactUrl(supabaseUrl)})''';
   }
 
   /// Redacts sensitive information from URLs for logging

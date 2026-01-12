@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/auth_session.dart';
-import '../../data/providers/auth_data_providers.dart';
+import '../../../../app/providers/auth_service_providers.dart';
 import '../../../core/domain/services/connectivity_service.dart';
 import '../../../core/domain/services/logging_service.dart';
 import '../../../core/data/services/connectivity_service_impl.dart';

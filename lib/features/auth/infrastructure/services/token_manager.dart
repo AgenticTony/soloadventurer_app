@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
-import 'package:soloadventurer/features/auth/data/providers/auth_data_providers.dart';
+import 'package:soloadventurer/app/providers/auth_service_providers.dart';
 import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_blacklist_manager.dart'

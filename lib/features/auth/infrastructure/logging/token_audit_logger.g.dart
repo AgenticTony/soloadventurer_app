@@ -9,16 +9,25 @@ part of 'token_audit_logger.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Provides comprehensive audit logging for token operations
+///
+/// NOTE: This service has been stubbed out after removing AWS CloudWatch dependencies.
+/// The actual monitoring should be handled by a different monitoring service.
 
 @ProviderFor(tokenAuditLogger)
 const tokenAuditLoggerProvider = TokenAuditLoggerProvider._();
 
 /// Provides comprehensive audit logging for token operations
+///
+/// NOTE: This service has been stubbed out after removing AWS CloudWatch dependencies.
+/// The actual monitoring should be handled by a different monitoring service.
 
 final class TokenAuditLoggerProvider
     extends $FunctionalProvider<LoggingService, LoggingService, LoggingService>
     with $Provider<LoggingService> {
   /// Provides comprehensive audit logging for token operations
+  ///
+  /// NOTE: This service has been stubbed out after removing AWS CloudWatch dependencies.
+  /// The actual monitoring should be handled by a different monitoring service.
   const TokenAuditLoggerProvider._()
       : super(
           from: null,
@@ -52,4 +61,4 @@ final class TokenAuditLoggerProvider
   }
 }
 
-String _$tokenAuditLoggerHash() => r'7c53bf38a0d3637c40426d3978f7ed11bdb8e9b9';
+String _$tokenAuditLoggerHash() => r'4aebea3ead2a470055c5d5dd49f37084c4ceab13';

@@ -3,10 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_map_provider.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/journal_entry_detail_screen.dart';
 
 /// Screen displaying all journal locations on an interactive map
 class JournalMapScreen extends ConsumerStatefulWidget {
@@ -505,11 +505,6 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
 
   /// Navigate to entry detail screen
   void _navigateToEntry(entry) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => JournalEntryDetailScreen(entryId: entry.id),
-      ),
-    );
+    context.push('/journal/entry/${entry.id}');
   }
 }

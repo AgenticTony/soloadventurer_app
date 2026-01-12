@@ -1,8 +1,10 @@
 import 'package:get_it/get_it.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
-import 'package:soloadventurer/core/security/security_manager.dart';
+import 'package:soloadventurer/core/storage/secure_storage.dart';
+import 'package:soloadventurer/core/storage/secure_storage_adapter.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
@@ -15,9 +17,7 @@ import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/resend_verification_email.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
-import 'package:soloadventurer/core/config/app_config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
@@ -30,16 +30,14 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
   // Debug logging
   debugPrint('========================================');
   debugPrint('AuthModule: Registering auth dependencies');
-  debugPrint('AuthModule: AppConfig.useSupabaseAuth = ${AppConfig.useSupabaseAuth}');
-  debugPrint('AuthModule: AppConfig.useCognitoAuth = ${AppConfig.useCognitoAuth}');
-  debugPrint('AuthModule: AppConfig.authProvider = ${AppConfig.authProvider}');
+  debugPrint('AuthModule: Using Supabase Auth');
   debugPrint('AuthModule: isTest = $isTest');
   debugPrint('========================================');
 
   // Register data sources
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(
-      getIt<SecurityManager>(),
+      getIt<SecureStorage>(),
       getIt<SharedPreferences>(),
     ),
   );
@@ -47,34 +45,31 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
   getIt.registerLazySingleton<AuthRemoteDataSource>(
     () => isTest
         ? MockAuthRemoteDataSource(getIt<ApiClient>())
-        : AppConfig.useSupabaseAuth
-            ? SupabaseAuthRemoteDataSourceImpl()
-            : AuthRemoteDataSourceImpl(
-                userPool: AppConfig.awsConfig.userPool,
-                clientSecret: AppConfig.awsConfig.clientSecretValue,
-                client: getIt<http.Client>(),
-                baseUrl: AppConfig.apiBaseUrl,
-              ),
+        : SupabaseAuthRemoteDataSourceImpl(),
   );
 
   debugPrint('AuthModule: Registered ${getIt<AuthRemoteDataSource>().runtimeType}');
 
   // Register repository
+  // Note: RefreshQueueManager is not injected here to break circular dependency.
+  // The repository will use GetIt to access it when needed via lazy resolution.
+  // SecurityManagerAdapter provides all SecurityManager methods, so we cast it to dynamic
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
       remoteDataSource: getIt<AuthRemoteDataSource>(),
       localDataSource: getIt<AuthLocalDataSource>(),
-      securityManager: getIt<SecurityManager>(),
-      refreshQueueManager: getIt<RefreshQueueManager>(),
+      securityManager: getIt<SecurityManagerAdapter>() as dynamic,
+      refreshQueueManager: null, // Will be accessed via GetIt when needed
     ),
   );
 
   // Register token refresh infrastructure services
-  getIt.registerLazySingleton<TokenExpirationTracker>(
-    () => TokenExpirationTracker(
-      refreshService: getIt<TokenRefreshService>(),
-    ),
-  );
+  // Note: These are registered in a specific order to break circular dependencies:
+  // 1. AuthRepository (without RefreshQueueManager)
+  // 2. TokenRefreshService (depends on AuthRepository)
+  // 3. RefreshQueueManager (depends on TokenRefreshService)
+  // 4. TokenExpirationTracker (depends on TokenRefreshService)
+  // 5. TokenRefreshScheduler (depends on TokenExpirationTracker)
 
   getIt.registerLazySingleton<TokenRefreshService>(
     () => TokenRefreshService(
@@ -84,6 +79,12 @@ void registerAuthModule(GetIt getIt, {bool isTest = false}) {
 
   getIt.registerLazySingleton<RefreshQueueManager>(
     () => RefreshQueueManager(
+      refreshService: getIt<TokenRefreshService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<TokenExpirationTracker>(
+    () => TokenExpirationTracker(
       refreshService: getIt<TokenRefreshService>(),
     ),
   );

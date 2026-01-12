@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/app/di/modules/auth_module.dart';
 import 'package:soloadventurer/app/di/modules/core_module.dart';
@@ -39,14 +40,18 @@ Future<void> _registerIndependentServices() async {
 
   // Register app configuration
   getIt.registerLazySingleton(() => AppConfig());
+
+  // Register SharedPreferences (async initialization)
+  // This is registered here for GetIt-based services that need it
+  final sharedPreferences = await SharedPreferences.getInstance();
+  getIt.registerLazySingleton<SharedPreferences>(
+    () => sharedPreferences,
+  );
 }
 
 /// Register services that depend on other services
 Future<void> _registerDependentServices() async {
-  // Register monitoring service
-  getIt.registerLazySingleton(
-    () => AppConfig.awsConfig.userPool,
-  );
+  // No dependent services to register
 }
 
 /// Register all feature modules

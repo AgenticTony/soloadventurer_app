@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
 import '../../domain/entities/check_in.dart';
 import '../providers/safety_providers.dart';
-import 'manual_check_in_screen.dart';
-import 'schedule_check_in_screen.dart';
-import 'check_in_history_screen.dart';
 
 /// Main check-in screen showing active and upcoming check-ins
 /// Provides quick actions to create manual check-ins, schedule check-ins, and view history
@@ -494,13 +493,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
   }
 
   void _completeCheckIn(BuildContext context, CheckIn checkIn) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ManualCheckInScreen(
-          existingCheckIn: checkIn,
-        ),
-      ),
-    );
+    context.push(SafetyRoutes.manualCheckIn, extra: checkIn);
   }
 
   void _viewCheckInDetails(BuildContext context, CheckIn checkIn) {
@@ -511,27 +504,15 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
   }
 
   void _navigateToManualCheckIn(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ManualCheckInScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.manualCheckIn);
   }
 
   void _navigateToScheduleCheckIn(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const ScheduleCheckInScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.scheduleCheckIn);
   }
 
   void _navigateToHistory(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const CheckInHistoryScreen(),
-      ),
-    );
+    context.push(SafetyRoutes.checkInHistory);
   }
 
   void _showInfoDialog(BuildContext context) {

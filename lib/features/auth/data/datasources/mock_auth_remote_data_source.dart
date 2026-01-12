@@ -17,7 +17,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   MockAuthRemoteDataSource(this._apiClient);
 
   @override
-  Future<(UserModel, String)> signIn(String email, String password) async {
+  Future<(UserModel, AuthSession)> signIn(String email, String password) async {
     if (_apiClient.isOffline) {
       throw const NetworkConnectivityException(
           message: 'No internet connection');
@@ -31,7 +31,14 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
         username: email.split('@')[0],
         createdAt: DateTime.now(),
       );
-      return (_currentUser!, 'mock-auth-token');
+      // Create a mock session with proper expiration
+      final session = AuthSession(
+        accessToken: 'mock-access-token',
+        idToken: 'mock-id-token',
+        refreshToken: 'mock-refresh-token',
+        expiresAt: DateTime.now().add(const Duration(hours: 1)),
+      );
+      return (_currentUser!, session);
     }
     throw const AuthException('Invalid credentials');
   }

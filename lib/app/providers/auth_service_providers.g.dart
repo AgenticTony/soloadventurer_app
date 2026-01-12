@@ -61,28 +61,20 @@ final class AuthLocalDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$authLocalDataSourceHash() =>
-    r'3ce364c8e6eeb048f53e2fce26963fee03455998';
+    r'48ed8dbbd7d27c5e663d0ebaa93fe078a56a56ce';
 
 /// Provider for AuthRemoteDataSource
 ///
-/// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
+/// Uses Supabase Auth for authentication.
 /// In tests, this can be overridden with the mock implementation.
-///
-/// The auth provider is selected based on AppConfig.useSupabaseAuth:
-/// - true: Uses SupabaseAuthRemoteDataSourceImpl
-/// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
 
 @ProviderFor(authRemoteDataSource)
 const authRemoteDataSourceProvider = AuthRemoteDataSourceProvider._();
 
 /// Provider for AuthRemoteDataSource
 ///
-/// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
+/// Uses Supabase Auth for authentication.
 /// In tests, this can be overridden with the mock implementation.
-///
-/// The auth provider is selected based on AppConfig.useSupabaseAuth:
-/// - true: Uses SupabaseAuthRemoteDataSourceImpl
-/// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
 
 final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
     AuthRemoteDataSource,
@@ -90,12 +82,8 @@ final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
     AuthRemoteDataSource> with $Provider<AuthRemoteDataSource> {
   /// Provider for AuthRemoteDataSource
   ///
-  /// In production, uses Supabase Auth (new, recommended) or AWS Cognito (legacy).
+  /// Uses Supabase Auth for authentication.
   /// In tests, this can be overridden with the mock implementation.
-  ///
-  /// The auth provider is selected based on AppConfig.useSupabaseAuth:
-  /// - true: Uses SupabaseAuthRemoteDataSourceImpl
-  /// - false: Uses AuthRemoteDataSourceImpl (AWS Cognito)
   const AuthRemoteDataSourceProvider._()
       : super(
           from: null,
@@ -131,7 +119,7 @@ final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$authRemoteDataSourceHash() =>
-    r'ad511c0375da5ae6e7394768c5a275c275504fcc';
+    r'0b79e7c0116c98f41dec60ea530fe433479f5547';
 
 /// Mock provider for AuthRemoteDataSource
 ///
@@ -238,7 +226,7 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'6199cad95f340b31cc46ff5d534f9f9c0da89346';
+String _$authRepositoryHash() => r'7bbdb33601efd172a72aeca58aa4c0857f535d4e';
 
 /// Provider for GetCurrentUser use case
 

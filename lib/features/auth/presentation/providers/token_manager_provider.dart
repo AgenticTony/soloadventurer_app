@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/token_state.dart';
 import '../../domain/repositories/auth_repository.dart';
-import '../../data/providers/auth_data_providers.dart';
+import '../../../../app/providers/auth_service_providers.dart';
 
 part 'token_manager_provider.g.dart';
 

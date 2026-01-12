@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/create_trip_screen.dart';
+import 'create_trip_screen.dart';
 
 /// Screen displaying a list of all trips
 class TripListScreen extends ConsumerStatefulWidget {
@@ -39,12 +40,7 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
       body: _buildBody(tripListState),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final result = await Navigator.push<Trip>(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CreateTripScreen(),
-            ),
-          );
+          final result = await context.push<Trip>('/journal/trips/create');
 
           if (result != null) {
             // Refresh the trip list after creating a new trip
@@ -111,7 +107,7 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
                 final result = await Navigator.push<Trip>(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CreateTripScreen(),
+                    builder: (context) => CreateTripScreen(),
                   ),
                 );
 
@@ -139,10 +135,7 @@ class _TripListScreenState extends ConsumerState<TripListScreen> {
           return _TripCard(
             trip: trip,
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/trip/${trip.id}',
-              );
+              context.push('/journal/trips/${trip.id}');
             },
           );
         },

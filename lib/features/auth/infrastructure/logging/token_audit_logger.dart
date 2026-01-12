@@ -1,23 +1,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../features/core/domain/services/logging_service.dart';
-import '../../../../features/core/infrastructure/monitoring/aws_cloudwatch_monitoring.dart';
 import '../../domain/models/auth_session.dart';
 
 part 'token_audit_logger.g.dart';
 
 /// Provides comprehensive audit logging for token operations
+///
+/// NOTE: This service has been stubbed out after removing AWS CloudWatch dependencies.
+/// The actual monitoring should be handled by a different monitoring service.
 @riverpod
 LoggingService tokenAuditLogger(Ref ref) {
-  final monitoring = ref.watch(awsCloudWatchMonitoringProvider);
-  return _TokenAuditLoggerImpl(monitoring);
+  return _TokenAuditLoggerImpl();
 }
 
 class _TokenAuditLoggerImpl implements LoggingService {
-  final AwsCloudWatchMonitoring _monitoring;
   static const String _logPrefix = '[TokenAudit]';
 
-  _TokenAuditLoggerImpl(this._monitoring);
+  _TokenAuditLoggerImpl();
 
   /// Log token lifecycle events with detailed metadata
   @override
@@ -37,13 +37,7 @@ class _TokenAuditLoggerImpl implements LoggingService {
       if (stackTrace != null) 'stack_trace': stackTrace.toString(),
     };
 
-    // Log to CloudWatch
-    _monitoring.recordEvent(
-      'TokenOperation',
-      attributes: logData,
-    );
-
-    // Debug logging
+    // Debug logging only (CloudWatch removed)
     debugPrint('$_logPrefix Token Event: $logData');
   }
 
@@ -154,18 +148,6 @@ class _TokenAuditLoggerImpl implements LoggingService {
       status: 'alert',
       metadata: metadata,
     );
-
-    // For high-severity security events, also record a metric
-    if (severity == 'high') {
-      _monitoring.recordMetric(
-        'SecurityEvent',
-        1.0,
-        dimensions: {
-          'EventType': event,
-          'Severity': severity,
-        },
-      );
-    }
   }
 
   @override
@@ -211,16 +193,6 @@ class _TokenAuditLoggerImpl implements LoggingService {
       status: 'error',
       metadata: logData,
       stackTrace: stackTrace,
-    );
-
-    // Also record error metric
-    _monitoring.recordMetric(
-      'TokenError',
-      1.0,
-      dimensions: {
-        'Feature': feature,
-        'ErrorCode': code ?? 'unknown',
-      },
     );
   }
 

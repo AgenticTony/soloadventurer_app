@@ -95,33 +95,63 @@ class HomeScreen extends ConsumerWidget {
         actions: [
           const QueueStatusIndicator(),
           const ConnectivityIndicator(),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              context.push('/settings/sync');
-            },
-            tooltip: 'Settings',
-          ),
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () =>
-                ref.read(authNavigationProvider.notifier).navigateToProfile(),
-            tooltip: 'Profile',
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              debugPrint('Logout button pressed');
-              await ref.read(authProvider.notifier).signOut();
-              debugPrint('Sign out completed');
-
-              if (context.mounted) {
-                ref
-                    .read(authNavigationProvider.notifier)
-                    .navigateToLogin(context);
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'More options',
+            onSelected: (value) {
+              switch (value) {
+                case 'settings':
+                  context.push('/settings/sync');
+                  break;
+                case 'profile':
+                  ref.read(authNavigationProvider.notifier).navigateToProfile();
+                  break;
+                case 'logout':
+                  ref.read(authProvider.notifier).signOut().then((_) {
+                    if (context.mounted) {
+                      ref
+                          .read(authNavigationProvider.notifier)
+                          .navigateToLogin(context);
+                    }
+                  });
+                  break;
               }
             },
-            tooltip: 'Sign Out',
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.settings),
+                    SizedBox(width: 12),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.person),
+                    SizedBox(width: 12),
+                    Text('Profile'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.logout, color: Colors.red),
+                    SizedBox(width: 12),
+                    Text('Sign Out', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -165,124 +195,119 @@ class HomeScreen extends ConsumerWidget {
           // Sync status banner (shows during sync, errors, or pending operations)
           const SyncStatusBanner(),
 
-          // Main content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          // Main content - removed Expanded and nested SingleChildScrollView
+          // since parent already has SingleChildScrollView
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome, ${authState.user?.username ?? 'Adventurer'}!',
+                key: const Key('home_screen_title'),
+                style: const TextStyle(
+                    fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Ready for your next adventure?',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Safety Section
+              Text(
+                'Safety',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Safety Hub Card
+              Card(
+                elevation: 2,
+                child: ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Colors.green,
+                    child: Icon(Icons.shield, color: Colors.white),
+                  ),
+                  title: const Text('Safety Hub'),
+                  subtitle: const Text(
+                    'Trusted contacts, check-ins, and emergency features',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => ref
+                      .read(authNavigationProvider.notifier)
+                      .navigateToSafetyHub(),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Quick Actions Grid
+              Row(
                 children: [
-                  Text(
-                    'Welcome, ${authState.user?.username ?? 'Adventurer'}!',
-                    key: const Key('home_screen_title'),
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Safety Section
-                  const Text(
-                    'Safety',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Safety Hub Card
-                  Card(
-                    elevation: 2,
-                    child: ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Colors.green,
-                        child: Icon(Icons.shield, color: Colors.white),
+                  Expanded(
+                    child: Card(
+                      elevation: 2,
+                      child: InkWell(
+                        onTap: () => ref
+                            .read(authNavigationProvider.notifier)
+                            .navigateToCheckInHome(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Icon(Icons.check_circle,
+                                  size: 32,
+                                  color: Theme.of(context).primaryColor),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Check In',
+                                style:
+                                    TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      title: const Text('Safety Hub'),
-                      subtitle: const Text(
-                        'Trusted contacts, check-ins, and emergency features',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => ref
-                          .read(authNavigationProvider.notifier)
-                          .navigateToSafetyHub(),
                     ),
                   ),
-
-                  const SizedBox(height: 8),
-
-                  // Quick Actions Grid
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Card(
-                          elevation: 2,
-                          child: InkWell(
-                            onTap: () => ref
-                                .read(authNavigationProvider.notifier)
-                                .navigateToCheckInHome(),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                children: [
-                                  Icon(Icons.check_circle,
-                                      size: 32,
-                                      color: Theme.of(context).primaryColor),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Check In',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                ],
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Card(
+                      elevation: 2,
+                      child: InkWell(
+                        onTap: () => ref
+                            .read(authNavigationProvider.notifier)
+                            .navigateToEmergencySOS(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              Icon(Icons.emergency,
+                                  size: 32, color: Colors.red.shade700),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Emergency',
+                                style:
+                                    TextStyle(fontWeight: FontWeight.w600),
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Card(
-                          elevation: 2,
-                          child: InkWell(
-                            onTap: () => ref
-                                .read(authNavigationProvider.notifier)
-                                .navigateToEmergencySOS(),
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                children: [
-                                  Icon(Icons.emergency,
-                                      size: 32, color: Colors.red.shade700),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Emergency',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Debug Section
-                  const Text(
-                    'Debug',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.push('/cloudwatch-test');
-                    },
-                    child: const Text('Test CloudWatch Logging'),
+                    ),
                   ),
                 ],
               ),
-            ),
+
+              const SizedBox(height: 24),
+            ],
           ),
         ],
       ),
@@ -643,13 +668,14 @@ class HomeScreen extends ConsumerWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -657,22 +683,28 @@ class HomeScreen extends ConsumerWidget {
                   child: Icon(
                     icon,
                     color: color,
-                    size: 24,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   title,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    fontSize: 13,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   subtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
+                    fontSize: 11,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

@@ -46,7 +46,6 @@ dependencies:
   dio: ^5.4.1
 
   # Authentication
-  amazon_cognito_identity_dart_2: ^3.6.0
   flutter_dotenv: ^6.0.0
   supabase_flutter: ^2.12.0
 
@@ -126,12 +125,6 @@ dependencies:
   fpdart: ^1.2.0
   google_places_flutter: ^2.1.1
   confetti: ^0.8.0
-
-  # AWS SDK
-  # Note: aws_cloudwatch packages temporarily disabled due to dependency conflicts
-  # aws_cloudwatch: ^1.0.1
-  # aws_request: ^1.0.1
-  # aws_cloudwatch_api: ^2.0.0
 
 dev_dependencies:
   flutter_test:

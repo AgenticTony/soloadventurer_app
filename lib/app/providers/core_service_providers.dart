@@ -5,7 +5,6 @@ import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/features/core/config/app_config.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 
 part 'core_service_providers.g.dart';
 
@@ -27,7 +26,7 @@ SecureStorage secureStorage(Ref ref) {
 
 /// Provider for AppConfig
 ///
-/// Provides access to application configuration including AWS Cognito settings.
+/// Provides access to application configuration.
 @Riverpod(keepAlive: true)
 AppConfig appConfig(Ref ref) {
   return AppConfig();
@@ -60,34 +59,10 @@ DatabaseService databaseService(Ref ref) {
   return DatabaseService();
 }
 
-/// Provider for Cognito User Pool ID
-///
-/// Provides the AWS Cognito user pool ID from AppConfig.
-@Riverpod(keepAlive: true)
-String cognitoUserPoolId(Ref ref) {
-  return AppConfig.awsConfig.userPoolId;
-}
-
-/// Provider for Cognito Client ID
-///
-/// Provides the AWS Cognito client ID from AppConfig.
-@Riverpod(keepAlive: true)
-String cognitoClientId(Ref ref) {
-  return AppConfig.awsConfig.clientId;
-}
-
 /// Provider for API Base URL
 ///
 /// Provides the base URL for API requests from AppConfig.
 @Riverpod(keepAlive: true)
 String apiBaseUrl(Ref ref) {
   return AppConfig.apiBaseUrl;
-}
-
-/// Provider for Cognito User Pool
-///
-/// Provides the AWS Cognito User Pool instance from AppConfig.
-@Riverpod(keepAlive: true)
-CognitoUserPool cognitoUserPool(Ref ref) {
-  return AppConfig.awsConfig.userPool;
 }

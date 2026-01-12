@@ -15,8 +15,8 @@ part 'check_in_provider.g.dart';
 /// Notifier for managing check-in state
 /// Handles check-in creation, completion, scheduling, and cancellation
 ///
-/// Riverpod 2 Compliant:
-/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// Riverpod 3.0 Compliant:
+/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
 /// - NO getters in state - all derived values are fields
 /// - UI reads STATE only via ref.watch()
 /// - UI calls methods via ref.read(provider.notifier)

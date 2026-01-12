@@ -12,8 +12,8 @@ part 'trusted_contacts_provider.g.dart';
 /// Notifier for managing trusted contacts state
 /// Handles CRUD operations for trusted contacts
 ///
-/// Riverpod 2 Compliant:
-/// - Uses AutoDisposeNotifier (auto-disposes when unused)
+/// Riverpod 3.0 Compliant:
+/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
 /// - NO getters in state - all derived values are fields
 /// - UI reads STATE only via ref.watch()
 /// - UI calls methods via ref.read(provider.notifier)

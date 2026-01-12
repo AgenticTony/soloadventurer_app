@@ -1,427 +1,315 @@
 import 'package:flutter/foundation.dart';
-import 'package:amazon_cognito_identity_dart_2/cognito.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthException;
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
 import 'package:soloadventurer/features/auth/data/models/credentials.dart';
-import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final CognitoUserPool _userPool;
-  CognitoUser? _cognitoUser;
-  CognitoUserSession? _session;
-  int _failedAttempts = 0;
-  DateTime? _lastFailedAttempt;
+/// Implementation of [AuthRemoteDataSource] using Supabase Auth
+///
+/// Official Documentation Verified:
+/// - https://supabase.com/docs/guides/getting-started/quickstarts/flutter
+/// - https://supabase.com/docs/guides/auth
+/// - Package: supabase_flutter ^2.0.0
+///
+/// Key implementation details based on official docs:
+/// - signUp() for user registration
+/// - signInWithPassword() for email/password authentication
+/// - currentSession provides access to tokens
+/// - Session persistence handled by supabase_flutter package
+class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  /// Get the Supabase client instance
+  SupabaseClient get client => Supabase.instance.client;
 
-  AuthRemoteDataSourceImpl({
-    required CognitoUserPool userPool,
-  }) : _userPool = userPool;
-
-  /// Maps Cognito exceptions to domain-specific AuthExceptions
-  /// Enhanced with comprehensive AWS Cognito error codes
-  AuthException _mapCognitoException(Exception e) {
-    final errorMessage =
-        (e is CognitoUserException ? (e.message ?? '') : e.toString())
-            .toLowerCase();
-
-    // Extract error code from message if possible
-    String? errorCode;
-    final errorCodeMatch = RegExp(r'\b([A-Z][a-zA-Z]+Exception)\b')
-        .firstMatch(e is CognitoUserException ? e.message ?? '' : e.toString());
-    if (errorCodeMatch != null) {
-      errorCode = errorCodeMatch.group(1);
-    }
-
-    debugPrint('Mapping Cognito error: $errorMessage');
-    debugPrint('Extracted error code: $errorCode');
-
-    // Handle specific AWS Cognito error codes first (most precise)
-    if (errorCode != null) {
-      switch (errorCode) {
-        case 'UserNotFoundException':
-          return const AuthException(
-            'No account found with this email address.',
-            code: 'USER_NOT_FOUND',
-          );
-
-        case 'NotAuthorizedException':
-          return const AuthException(
-            'Incorrect email or password. Please try again.',
-            code: 'INVALID_CREDENTIALS',
-          );
-
-        case 'UserNotConfirmedException':
-          return const AuthException(
-            'Please verify your email address before signing in.',
-            code: 'EMAIL_NOT_VERIFIED',
-          );
-
-        case 'PasswordResetRequiredException':
-          return const AuthException(
-            'You need to reset your password before continuing.',
-            code: 'PASSWORD_RESET_REQUIRED',
-          );
-
-        case 'LimitExceededException':
-          return const AuthException(
-            'Too many attempts. Please try again later.',
-            code: 'RATE_LIMIT_EXCEEDED',
-          );
-
-        case 'TooManyRequestsException':
-          return const AuthException(
-            'Too many requests. Please try again later.',
-            code: 'TOO_MANY_REQUESTS',
-          );
-
-        case 'InvalidPasswordException':
-          return const AuthException(
-            'Password does not meet the requirements. Please use a stronger password.',
-            code: 'INVALID_PASSWORD',
-          );
-
-        case 'CodeMismatchException':
-          return const AuthException(
-            'Invalid verification code. Please try again.',
-            code: 'INVALID_CODE',
-          );
-
-        case 'ExpiredCodeException':
-          return const AuthException(
-            'Verification code has expired. Please request a new code.',
-            code: 'EXPIRED_CODE',
-          );
-
-        case 'InvalidParameterException':
-          return const AuthException(
-            'Invalid parameter provided. Please check your input.',
-            code: 'INVALID_PARAMETER',
-          );
-
-        case 'MFAMethodNotFoundException':
-          return const AuthException(
-            'MFA method not found. Please set up MFA for your account.',
-            code: 'MFA_METHOD_NOT_FOUND',
-          );
-
-        case 'SoftwareTokenMFANotFoundException':
-          return const AuthException(
-            'Software token MFA not found. Please set up MFA for your account.',
-            code: 'SOFTWARE_TOKEN_MFA_NOT_FOUND',
-          );
-
-        case 'AliasExistsException':
-          return const AuthException(
-            'This email is already associated with another account.',
-            code: 'EMAIL_EXISTS',
-          );
-
-        case 'InternalErrorException':
-          return const AuthException(
-            'An internal error occurred. Please try again later.',
-            code: 'INTERNAL_ERROR',
-          );
-      }
-    }
-
-    // Fallback to message pattern matching for older SDK versions or unhandled codes
-
-    // User not found cases
-    if (_containsAny(errorMessage, [
-      'user does not exist',
-      'user not found',
-      'username/client id combination not found',
-      'usernotfoundexception'
-    ])) {
-      return const AuthException(
-        'No account found with this email address.',
-        code: 'USER_NOT_FOUND',
-      );
-    }
-
-    // Authentication/password issues
-    if (_containsAny(errorMessage, [
-      'not authorized',
-      'incorrect username or password',
-      'password incorrect',
-      'notauthorizedexception'
-    ])) {
-      return const AuthException(
-        'Incorrect email or password. Please try again.',
-        code: 'INVALID_CREDENTIALS',
-      );
-    }
-
-    // Email verification
-    if (_containsAny(
-        errorMessage, ['user is not confirmed', 'usernotconfirmedexception'])) {
-      return const AuthException(
-        'Please verify your email address before signing in.',
-        code: 'EMAIL_NOT_VERIFIED',
-      );
-    }
-
-    // Password reset required
-    if (_containsAny(errorMessage,
-        ['password reset required', 'passwordresetrequiredexception'])) {
-      return const AuthException(
-        'You need to reset your password before continuing.',
-        code: 'PASSWORD_RESET_REQUIRED',
-      );
-    }
-
-    // Rate limiting
-    if (_containsAny(errorMessage, ['limitexceededexception'])) {
-      return const AuthException(
-        'Too many attempts. Please try again later.',
-        code: 'RATE_LIMIT_EXCEEDED',
-      );
-    }
-
-    // Network issues
-    if (_containsAny(
-        errorMessage, ['network', 'connection', 'timeout', 'unreachable'])) {
-      return const AuthException(
-        'Network error. Please check your internet connection and try again.',
-        code: 'NETWORK_ERROR',
-      );
-    }
-
-    // Session expired
-    if (_containsAny(errorMessage, ['invalid session'])) {
-      return const AuthException('Session expired. Please sign in again.');
-    }
-
-    debugPrint('Unhandled Cognito error: $errorMessage');
-    return AuthException(
-      'Authentication failed: ${e is CognitoUserException ? e.message : e.toString()}',
-      code: 'AUTHENTICATION_FAILED',
+  /// Helper method to convert Supabase User to UserModel
+  UserModel _userModelFromUser(User user) {
+    return UserModel(
+      id: user.id,
+      email: user.email ?? '',
+      username: user.userMetadata?['name'] as String? ??
+          ((user.email?.isNotEmpty ?? false) ? user.email!.split('@')[0] : 'User'),
+      createdAt: DateTime.tryParse(user.createdAt) ?? DateTime.now(),
+      lastLoginAt: DateTime.now(),
     );
   }
 
-  /// Helper method to check if a string contains any of the given patterns
-  bool _containsAny(String source, List<String> patterns) {
-    return patterns.any((pattern) => source.contains(pattern));
+  /// Helper method to convert Supabase Session to AuthSession
+  /// Note: Session doesn't have idToken directly, using accessToken as fallback
+  AuthSession _authSessionFromSession(Session session) {
+    return AuthSession(
+      accessToken: session.accessToken,
+      idToken: session.accessToken, // Supabase uses accessToken for both
+      refreshToken: session.refreshToken ?? '',
+      expiresAt: session.expiresAt is DateTime
+          ? session.expiresAt as DateTime
+          : DateTime.now().add(const Duration(hours: 1)),
+    );
   }
 
-  // This method is not part of the interface
   @override
-  Future<AuthTokens> refreshTokenWithString(String refreshToken) async {
+  Future<(UserModel, bool)> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
     try {
-      _cognitoUser ??= CognitoUser('', _userPool);
-      _session =
-          await _cognitoUser!.refreshSession(CognitoRefreshToken(refreshToken));
+      debugPrint('SupabaseAuth: Starting sign up for $email');
 
-      final accessToken = _session!.getAccessToken().getJwtToken() ?? '';
-      final idToken = _session!.getIdToken().getJwtToken() ?? '';
-      final refreshTokenValue = _session!.getRefreshToken()?.getToken() ?? '';
-      final expiration = _session!.getAccessToken().getExpiration();
-
-      return AuthTokens(
-        accessToken: accessToken,
-        idToken: idToken,
-        refreshToken: refreshTokenValue,
-        expiration: DateTime.fromMillisecondsSinceEpoch(expiration * 1000),
+      final response = await client.auth.signUp(
+        email: email,
+        password: password,
+        data: {'name': name},
       );
-    } on CognitoUserException catch (e) {
-      throw _mapCognitoException(e);
+
+      if (response.user == null) {
+        throw AuthException(
+          'Registration failed',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      final user = _userModelFromUser(response.user!);
+
+      // Supabase requires email verification by default
+      // The user won't be fully signed in until verified
+      final needsVerification = response.session == null;
+
+      debugPrint('SupabaseAuth: Sign up successful, needs verification: $needsVerification');
+
+      return (user, needsVerification);
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during sign up: $e');
+      throw AuthException(
+        'Registration failed: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<(UserModel, AuthSession)> signIn(String email, String password) async {
+    try {
+      debugPrint('SupabaseAuth: Starting sign in for $email');
+
+      final response = await client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (response.session == null || response.user == null) {
+        throw AuthException(
+          'Authentication failed',
+          type: AuthErrorType.invalidCredentials,
+        );
+      }
+
+      final user = _userModelFromUser(response.user!);
+      final session = _authSessionFromSession(response.session!);
+
+      debugPrint('SupabaseAuth: Sign in successful for user ${user.id}');
+      debugPrint('SupabaseAuth: Session expires at ${session.expiresAt}');
+
+      return (user, session);
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during sign in: $e');
+
+      // Map Supabase auth errors to app-specific error types
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('invalid') ||
+          errorStr.contains('not found') ||
+          errorStr.contains('wrong')) {
+        throw AuthException(
+          'Invalid email or password',
+          type: AuthErrorType.invalidCredentials,
+        );
+      } else if (errorStr.contains('email not confirmed') ||
+          errorStr.contains('not verified')) {
+        throw AuthException(
+          'Email not verified. Please check your email for verification instructions.',
+          type: AuthErrorType.emailNotVerified,
+        );
+      }
+      throw AuthException(
+        'Authentication failed: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    try {
+      debugPrint('SupabaseAuth: Signing out');
+      await client.auth.signOut();
+      debugPrint('SupabaseAuth: Sign out successful');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during sign out: $e');
+      // Don't throw - sign out should always clear local state
+    }
+  }
+
+  @override
+  Future<UserModel?> getCurrentUser() async {
+    try {
+      final session = client.auth.currentSession;
+      if (session == null) {
+        debugPrint('SupabaseAuth: No current user session');
+        return null;
+      }
+
+      return _userModelFromUser(session.user);
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error getting current user: $e');
+      return null;
+    }
+  }
+
+  @override
+  Future<bool> isSignedIn() async {
+    try {
+      return client.auth.currentSession != null;
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error checking signed in status: $e');
+      return false;
     }
   }
 
   @override
   Future<AuthSession> refreshToken() async {
-    if (_cognitoUser == null || _session?.getRefreshToken() == null) {
-      throw const AuthException('No refresh token available');
-    }
-
     try {
-      _session =
-          await _cognitoUser!.refreshSession(_session!.getRefreshToken()!);
-
-      return AuthSession(
-        accessToken: _session!.getAccessToken().getJwtToken()!,
-        idToken: _session!.getIdToken().getJwtToken()!,
-        refreshToken: _session!.getRefreshToken()!.getToken()!,
-        expiresAt: DateTime.fromMillisecondsSinceEpoch(
-          _session!.getAccessToken().getExpiration() * 1000,
-        ),
-      );
-    } on CognitoUserException catch (e) {
-      throw _mapCognitoException(e);
-    }
-  }
-
-  // This method is not part of the interface
-  @override
-  Future<AuthTokens> reauthenticate(Credentials credentials) async {
-    try {
-      _cognitoUser = CognitoUser(credentials.username, _userPool);
-      final authDetails = AuthenticationDetails(
-        username: credentials.username,
-        password: credentials.password,
-      );
-
-      _session = await _cognitoUser!.authenticateUser(authDetails);
-
-      final accessToken = _session!.getAccessToken().getJwtToken() ?? '';
-      final idToken = _session!.getIdToken().getJwtToken() ?? '';
-      final refreshTokenValue = _session!.getRefreshToken()?.getToken() ?? '';
-      final expiration = _session!.getAccessToken().getExpiration();
-
-      return AuthTokens(
-        accessToken: accessToken,
-        idToken: idToken,
-        refreshToken: refreshTokenValue,
-        expiration: DateTime.fromMillisecondsSinceEpoch(expiration * 1000),
-      );
-    } on CognitoUserException catch (e) {
-      throw _mapCognitoException(e);
-    }
-  }
-
-  // This is an additional method not in the interface
-  Future<void> forgotPasswordSMS({
-    required String email,
-    required String phoneNumber,
-  }) async {
-    debugPrint('Starting SMS password reset process for: $email');
-
-    // Track failed attempts for rate limiting
-    final now = DateTime.now();
-    if (_lastFailedAttempt != null &&
-        now.difference(_lastFailedAttempt!).inHours >= 1) {
-      _failedAttempts = 0;
-    }
-
-    // Cognito allows between 5-20 attempts per hour
-    if (_failedAttempts >= 5) {
-      throw const AuthException(
-        'Too many password reset attempts. Please try again later.',
-        code: 'RESET_ATTEMPT_LIMIT',
-      );
-    }
-
-    try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(email, _userPool);
-
-      // Get user attributes to verify phone number
-      final attributes = await _cognitoUser!.getUserAttributes();
-      final userPhoneNumber = attributes
-          ?.firstWhere((attr) => attr.name == 'phone_number',
-              orElse: () =>
-                  CognitoUserAttribute(name: 'phone_number', value: ''))
-          .value;
-
-      // Verify phone number matches
-      if (userPhoneNumber != phoneNumber) {
-        throw const AuthException(
-          'Phone number does not match our records',
-          code: 'INVALID_PHONE_NUMBER',
-        );
-      }
-
-      // Request password reset via SMS
-      await _cognitoUser!.forgotPassword();
-
-      debugPrint('Password reset code sent successfully via SMS');
-      _failedAttempts = 0;
-    } on CognitoClientException catch (e) {
-      debugPrint('Cognito forgot password SMS error: $e');
-      _failedAttempts++;
-      _lastFailedAttempt = now;
-
-      final errorMessage = e.toString().toLowerCase();
-
-      if (errorMessage.contains('limitexceededexception')) {
-        throw const AuthException(
-          'Too many password reset attempts. Please try again later.',
-          code: 'RESET_ATTEMPT_LIMIT',
-        );
-      } else if (errorMessage.contains('usernotfoundexception')) {
-        throw const AuthException(
-          'No account found with this email address.',
-          code: 'USER_NOT_FOUND',
-        );
-      } else if (errorMessage.contains('invalidparameterexception')) {
-        throw const AuthException(
-          'Invalid phone number format.',
-          code: 'INVALID_PHONE_NUMBER',
-        );
-      } else {
+      final session = client.auth.currentSession;
+      if (session == null) {
         throw AuthException(
-          'Failed to initiate password reset: ${e.message}',
-          code: 'FORGOT_PASSWORD_ERROR',
+          'No active session to refresh',
+          type: AuthErrorType.unauthorized,
         );
       }
+
+      // Supabase auto-refreshes tokens, but we can force a refresh
+      await client.auth.refreshSession();
+      final newSession = client.auth.currentSession;
+
+      if (newSession == null) {
+        throw AuthException(
+          'Failed to refresh session',
+          type: AuthErrorType.tokenExpired,
+        );
+      }
+
+      return _authSessionFromSession(newSession);
     } catch (e) {
-      debugPrint('Unexpected error during SMS password reset: $e');
-      _failedAttempts++;
-      _lastFailedAttempt = now;
+      debugPrint('SupabaseAuth: Error refreshing token: $e');
       throw AuthException(
-        'Failed to initiate password reset: $e',
-        code: 'UNKNOWN_ERROR',
+        'Failed to refresh token: ${e.toString()}',
+        type: AuthErrorType.tokenExpired,
+      );
+    }
+  }
+
+  @override
+  Future<void> verifyEmail(String code, String email) async {
+    try {
+      debugPrint('SupabaseAuth: Verifying email with OTP: $code');
+
+      // Supabase uses OTP (one-time password) for email verification
+      final response = await client.auth.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.signup,
+      );
+
+      if (response.session == null) {
+        throw AuthException(
+          'Verification failed',
+          type: AuthErrorType.invalidCode,
+        );
+      }
+
+      debugPrint('SupabaseAuth: Email verification successful');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during verify: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('expired')) {
+        throw AuthException(
+          'Verification code has expired',
+          type: AuthErrorType.codeExpired,
+        );
+      } else if (errorStr.contains('invalid')) {
+        throw AuthException(
+          'Invalid verification code',
+          type: AuthErrorType.invalidCode,
+        );
+      }
+      throw AuthException(
+        'Failed to verify email: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<void> resendVerificationEmail() async {
+    try {
+      final currentUser = client.auth.currentUser;
+      if (currentUser == null || currentUser.email == null) {
+        throw AuthException(
+          'No user to resend verification email',
+          type: AuthErrorType.userNotFound,
+        );
+      }
+
+      // For Supabase, we need to use OTP for resending verification
+      await client.auth.signInWithOtp(
+        email: currentUser.email!,
+      );
+
+      debugPrint('SupabaseAuth: Verification email resent');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error resending verification: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('limit')) {
+        throw AuthException(
+          'Too many attempts. Please try again later',
+          type: AuthErrorType.limitExceeded,
+        );
+      }
+      throw AuthException(
+        'Failed to resend verification email: ${e.toString()}',
+        type: AuthErrorType.unknown,
       );
     }
   }
 
   @override
   Future<void> forgotPassword(String email) async {
-    debugPrint('Starting password reset process for: $email');
-
-    // Track failed attempts for rate limiting
-    final now = DateTime.now();
-    if (_lastFailedAttempt != null &&
-        now.difference(_lastFailedAttempt!).inHours >= 1) {
-      _failedAttempts = 0;
-    }
-
-    // Cognito allows between 5-20 attempts per hour
-    if (_failedAttempts >= 5) {
-      throw const AuthException(
-        'Too many password reset attempts. Please try again later.',
-        code: 'RESET_ATTEMPT_LIMIT',
-      );
-    }
-
     try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(email, _userPool);
+      debugPrint('SupabaseAuth: Requesting password reset for $email');
 
-      await _cognitoUser!.forgotPassword();
-      debugPrint('Password reset code sent successfully');
-      _failedAttempts = 0;
-    } on CognitoClientException catch (e) {
-      debugPrint('Cognito forgot password error: $e');
-      _failedAttempts++;
-      _lastFailedAttempt = now;
+      await client.auth.resetPasswordForEmail(email);
 
-      final errorMessage = e.toString().toLowerCase();
+      debugPrint('SupabaseAuth: Password reset email sent');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during forgot password: $e');
 
-      if (errorMessage.contains('limitexceededexception')) {
-        throw const AuthException(
-          'Too many password reset attempts. Please try again later.',
-          code: 'RESET_ATTEMPT_LIMIT',
-        );
-      } else if (errorMessage.contains('usernotfoundexception')) {
-        throw const AuthException(
-          'No account found with this email address.',
-          code: 'USER_NOT_FOUND',
-        );
-      } else {
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('limit') || errorStr.contains('too many')) {
         throw AuthException(
-          'Failed to initiate password reset: ${e.message}',
-          code: 'FORGOT_PASSWORD_ERROR',
+          'Too many password reset attempts. Please try again later.',
+          type: AuthErrorType.limitExceeded,
+        );
+      } else if (errorStr.contains('not found')) {
+        throw AuthException(
+          'No account found with this email address.',
+          type: AuthErrorType.userNotFound,
         );
       }
-    } catch (e) {
-      debugPrint('Unexpected error during password reset: $e');
-      _failedAttempts++;
-      _lastFailedAttempt = now;
       throw AuthException(
-        'Failed to initiate password reset: $e',
-        code: 'UNKNOWN_ERROR',
+        'Failed to initiate password reset: ${e.toString()}',
+        type: AuthErrorType.unknown,
       );
     }
   }
@@ -432,276 +320,403 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String code,
     String newPassword,
   ) async {
-    debugPrint('Confirming password reset for: $email');
-
     try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(email, _userPool);
+      debugPrint('SupabaseAuth: Confirming password reset');
 
-      final result = await _cognitoUser!.confirmPassword(code, newPassword);
-      debugPrint('Password reset confirmation result: $result');
+      // Supabase uses OTP for password reset confirmation
+      await client.auth.verifyOTP(
+        email: email,
+        token: code,
+        type: OtpType.recovery,
+      );
 
-      if (!result) {
-        throw const AuthException(
+      // After verifying the OTP, update the password
+      final response = await client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+
+      if (response.user == null) {
+        throw AuthException(
           'Failed to reset password',
-          code: 'RESET_FAILED',
+          type: AuthErrorType.resetFailed,
         );
       }
-      debugPrint('Password reset successful');
-    } on CognitoClientException catch (e) {
-      debugPrint('Cognito confirm password error: $e');
-      final errorMessage = e.toString().toLowerCase();
 
-      if (errorMessage.contains('codemismatchexception')) {
-        throw const AuthException(
+      debugPrint('SupabaseAuth: Password reset successful');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during confirm reset: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('invalid') && errorStr.contains('code')) {
+        throw AuthException(
           'Invalid verification code. Please try again.',
-          code: 'INVALID_CODE',
+          type: AuthErrorType.invalidCode,
         );
-      } else if (errorMessage.contains('expiredcodexception')) {
-        throw const AuthException(
+      } else if (errorStr.contains('expired')) {
+        throw AuthException(
           'Verification code has expired. Please request a new code.',
-          code: 'CODE_EXPIRED',
+          type: AuthErrorType.codeExpired,
         );
-      } else if (errorMessage.contains('invalidpasswordexception')) {
+      } else if (errorStr.contains('password')) {
         throw AuthException(
-          'Password does not meet requirements: ${e.message}',
-          code: 'INVALID_PASSWORD',
-        );
-      } else {
-        throw AuthException(
-          'Failed to reset password: ${e.message}',
-          code: 'RESET_PASSWORD_ERROR',
+          'Password does not meet requirements: ${e.toString()}',
+          type: AuthErrorType.invalidPassword,
         );
       }
-    } catch (e) {
-      debugPrint('Unexpected error during password reset confirmation: $e');
       throw AuthException(
-        'Failed to reset password: $e',
-        code: 'UNKNOWN_ERROR',
+        'Failed to reset password: ${e.toString()}',
+        type: AuthErrorType.resetFailed,
       );
     }
   }
 
   @override
-  Future<void> adminSetUserPassword(String email, String newPassword,
-      {bool permanent = false}) async {
-    debugPrint('Setting password for user: $email');
-
-    try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(email, _userPool);
-
-      // For admin operations, we'll use forgotPassword
-      // In a real implementation, this would require admin credentials
-      await _cognitoUser!.forgotPassword();
-      debugPrint('Password reset initiated successfully');
-    } on CognitoClientException catch (e) {
-      debugPrint('Cognito admin set password error: $e');
-      final errorMessage = e.toString().toLowerCase();
-
-      if (errorMessage.contains('usernotfoundexception')) {
-        throw const AuthException(
-          'User not found',
-          code: 'USER_NOT_FOUND',
-        );
-      } else if (errorMessage.contains('notauthorizedexception')) {
-        throw const AuthException(
-          'Not authorized to perform this action',
-          code: 'NOT_AUTHORIZED',
-        );
-      } else {
-        throw AuthException(
-          'Failed to set password: ${e.message}',
-          code: 'ADMIN_SET_PASSWORD_ERROR',
-        );
-      }
-    } catch (e) {
-      debugPrint('Unexpected error during admin password set: $e');
-      throw AuthException(
-        'Failed to set password: $e',
-        code: 'UNKNOWN_ERROR',
-      );
-    }
+  Future<void> adminSetUserPassword(
+    String email,
+    String newPassword, {
+    bool permanent = false,
+  }) async {
+    // Admin operations require service role key
+    // This should be called from a server-side function
+    throw UnimplementedError(
+      'Admin operations must be performed server-side with service role key',
+    );
   }
 
   @override
   Future<void> adminResetUserPassword(String email) async {
-    debugPrint('Starting admin password reset for user: $email');
-
-    try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(email, _userPool);
-
-      // For admin operations, we'll use forgotPassword
-      // In a real implementation, this would require admin credentials
-      await _cognitoUser!.forgotPassword();
-      debugPrint('Admin password reset initiated successfully');
-    } on CognitoClientException catch (e) {
-      debugPrint('Cognito admin reset password error: $e');
-      final errorMessage = e.toString().toLowerCase();
-
-      if (errorMessage.contains('usernotfoundexception')) {
-        throw const AuthException(
-          'User not found',
-          code: 'USER_NOT_FOUND',
-        );
-      } else if (errorMessage.contains('notauthorizedexception')) {
-        throw const AuthException(
-          'Not authorized to perform this action',
-          code: 'NOT_AUTHORIZED',
-        );
-      } else {
-        throw AuthException(
-          'Failed to reset password: ${e.message}',
-          code: 'ADMIN_RESET_PASSWORD_ERROR',
-        );
-      }
-    } catch (e) {
-      debugPrint('Unexpected error during admin password reset: $e');
-      throw AuthException(
-        'Failed to reset password: $e',
-        code: 'UNKNOWN_ERROR',
-      );
-    }
+    // Admin operations require service role key
+    // This should be called from a server-side function
+    throw UnimplementedError(
+      'Admin operations must be performed server-side with service role key',
+    );
   }
 
   @override
   Future<void> sendPasswordResetEmail(String email) async {
-    debugPrint('Sending password reset email to: $email');
+    // Alias for forgotPassword
+    return forgotPassword(email);
+  }
+
+  @override
+  Future<AuthTokens> refreshTokenWithString(String refreshToken) async {
     try {
-      // Create a new Cognito user instance if needed
-      _cognitoUser ??= CognitoUser(email, _userPool);
-      await _cognitoUser!.forgotPassword();
-      debugPrint('Password reset email sent successfully');
+      final response = await client.auth.refreshSession();
+
+      final session = response.session;
+      if (session == null) {
+        throw AuthException(
+          'Failed to refresh token',
+          type: AuthErrorType.tokenExpired,
+        );
+      }
+
+      return AuthTokens(
+        accessToken: session.accessToken,
+        idToken: session.accessToken, // Supabase uses accessToken for both
+        refreshToken: session.refreshToken ?? '',
+        expiration: session.expiresAt is DateTime
+            ? (session.expiresAt as DateTime)
+            : DateTime.now().add(const Duration(hours: 1)),
+      );
     } catch (e) {
-      debugPrint('Error sending password reset email: $e');
-      throw AuthException('Failed to send password reset email: $e');
-    }
-  }
-
-  @override
-  Future<void> signOut() async {
-    await _cognitoUser?.signOut();
-    _cognitoUser = null;
-    _session = null;
-  }
-
-  @override
-  Future<UserModel?> getCurrentUser() async {
-    if (_cognitoUser == null) return null;
-
-    final attributes = await _cognitoUser!.getUserAttributes();
-    final email = _cognitoUser!.username ?? '';
-    final name = _getAttributeValue(attributes, 'name', email);
-
-    return UserModel(
-      id: email,
-      email: email,
-      username: name,
-      createdAt: DateTime.now(),
-      lastLoginAt: DateTime.now(),
-    );
-  }
-
-  @override
-  Future<bool> isSignedIn() async {
-    return _cognitoUser != null && _session?.isValid() == true;
-  }
-
-  @override
-  Future<void> verifyEmail(String code, String email) async {
-    try {
-      _cognitoUser ??= CognitoUser(email, _userPool);
-      await _cognitoUser!.verifyAttribute('email', code);
-    } on CognitoUserException catch (e) {
-      throw _mapCognitoException(e);
-    }
-  }
-
-  @override
-  Future<void> resendVerificationEmail() async {
-    if (_cognitoUser == null) {
-      throw const AuthException('No user session found');
-    }
-
-    try {
-      await _cognitoUser!.getAttributeVerificationCode('email');
-    } on CognitoUserException catch (e) {
-      throw _mapCognitoException(e);
-    }
-  }
-
-  @override
-  Future<(UserModel, bool)> register({
-    required String email,
-    required String password,
-    required String name,
-  }) async {
-    try {
-      final userAttributes = [
-        CognitoUserAttribute(name: 'email', value: email),
-        CognitoUserAttribute(name: 'name', value: name),
-      ];
-
-      // Convert CognitoUserAttribute to AttributeArg
-      final attributeArgs = userAttributes
-          .map((attr) => AttributeArg(name: attr.name, value: attr.value ?? ''))
-          .toList();
-
-      final result = await _userPool.signUp(email, password,
-          userAttributes: attributeArgs);
-
-      return (
-        UserModel(
-          id: email,
-          email: email,
-          username: name,
-          createdAt: DateTime.now(),
-          lastLoginAt: DateTime.now(),
-        ),
-        result.userConfirmed!
+      throw AuthException(
+        'Failed to refresh token: ${e.toString()}',
+        type: AuthErrorType.tokenExpired,
       );
-    } on CognitoClientException catch (e) {
-      throw _mapCognitoException(e);
     }
   }
 
   @override
-  Future<(UserModel, String)> signIn(String email, String password) async {
+  Future<AuthTokens> reauthenticate(Credentials credentials) async {
+    // Re-authenticate by signing in again
     try {
-      _cognitoUser = CognitoUser(email, _userPool);
-      final authDetails = AuthenticationDetails(
-        username: email,
-        password: password,
+      final (user, authSession) = await signIn(
+        credentials.username,
+        credentials.password,
       );
 
-      _session = await _cognitoUser!.authenticateUser(authDetails);
-
-      final tokens = AuthTokens(
-        accessToken: _session!.getAccessToken().getJwtToken()!,
-        idToken: _session!.getIdToken().getJwtToken()!,
-        refreshToken: _session!.getRefreshToken()!.getToken()!,
-        expiration: DateTime.fromMillisecondsSinceEpoch(
-          _session!.getAccessToken().getExpiration() * 1000,
-        ),
+      // Convert AuthSession to AuthTokens
+      return AuthTokens(
+        accessToken: authSession.accessToken,
+        idToken: authSession.idToken,
+        refreshToken: authSession.refreshToken,
+        expiration: authSession.expiresAt,
       );
-
-      final user = await getCurrentUser();
-
-      return (user!, tokens.refreshToken);
-    } on CognitoUserException catch (e) {
-      throw _mapCognitoException(e);
+    } catch (e) {
+      throw AuthException(
+        'Re-authentication failed: ${e.toString()}',
+        type: AuthErrorType.unauthorized,
+      );
     }
   }
 
-  String _getAttributeValue(List<CognitoUserAttribute>? attributes,
-      String attributeName, String defaultValue) {
-    if (attributes == null) return defaultValue;
-    final attribute = attributes.firstWhere(
-      (attr) => attr.name == attributeName,
-      orElse: () =>
-          CognitoUserAttribute(name: attributeName, value: defaultValue),
-    );
-    return attribute.value!;
+  // ============================================================
+  // MULTI-FACTOR AUTHENTICATION (MFA) IMPLEMENTATION
+  // ============================================================
+  //
+  // Official Supabase MFA Documentation:
+  // - https://supabase.com/docs/guides/auth/auth-mfa
+  // - https://supabase.com/docs/guides/auth/auth-mfa/totp
+  //
+  // MFA Flow:
+  // 1. setupMFA() - Enroll a TOTP factor, returns QR code and secret
+  // 2. verifyMFA() - Verify the TOTP code during setup or login
+  // 3. listMFAFactors() - Get all enrolled factors for the user
+  // 4. disableMFA() - Unenroll a factor by ID
+  // ============================================================
+
+  @override
+  Future<(String factorId, String qrCode, String secret)> setupMFA() async {
+    try {
+      debugPrint('SupabaseAuth: Starting MFA enrollment');
+
+      // Step 1: Enroll a TOTP factor
+      final response = await client.auth.mfa.enroll();
+
+      if (response.totp == null) {
+        throw AuthException(
+          'Failed to enroll MFA factor',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      final factorId = response.id;
+      final qrCode = response.totp!.qrCode ?? '';
+      final secret = response.totp!.secret ?? '';
+
+      debugPrint('SupabaseAuth: MFA enrollment successful, factorId: $factorId');
+
+      return (factorId, qrCode, secret);
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during MFA enrollment: $e');
+      throw AuthException(
+        'Failed to setup MFA: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<bool> verifyMFA(String code, {String? factorId}) async {
+    try {
+      debugPrint('SupabaseAuth: Verifying MFA code');
+
+      // If no factorId provided, get the first available TOTP factor
+      final targetFactorId = factorId ?? await _getFirstTOTPFactorId();
+
+      if (targetFactorId == null) {
+        throw AuthException(
+          'No MFA factor found. Please setup MFA first.',
+          type: AuthErrorType.mfaRequired,
+        );
+      }
+
+      // Step 1: Create a challenge for the factor
+      final challengeResponse = await client.auth.mfa.challenge(
+        factorId: targetFactorId,
+      );
+
+      final challengeId = challengeResponse.id;
+
+      // Step 2: Verify the code with the challenge
+      final verifyResponse = await client.auth.mfa.verify(
+        factorId: targetFactorId,
+        challengeId: challengeId,
+        code: code,
+      );
+
+      final success = verifyResponse != null;
+
+      if (success) {
+        debugPrint('SupabaseAuth: MFA verification successful');
+      } else {
+        debugPrint('SupabaseAuth: MFA verification failed');
+      }
+
+      return success;
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error during MFA verification: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('invalid') && errorStr.contains('code')) {
+        throw AuthException(
+          'Invalid verification code. Please try again.',
+          type: AuthErrorType.invalidCode,
+        );
+      } else if (errorStr.contains('expired')) {
+        throw AuthException(
+          'Verification code has expired.',
+          type: AuthErrorType.codeExpired,
+        );
+      }
+
+      throw AuthException(
+        'Failed to verify MFA: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<List<String>> listMFAFactors() async {
+    try {
+      debugPrint('SupabaseAuth: Listing MFA factors');
+
+      final response = await client.auth.mfa.listFactors();
+
+      // Combine TOTP and phone factors
+      final totpFactors = response.totp.map((f) => f.id).toList();
+      final phoneFactors = response.phone.map((f) => f.id).toList();
+
+      final allFactors = [...totpFactors, ...phoneFactors];
+
+      debugPrint('SupabaseAuth: Found ${allFactors.length} MFA factors');
+
+      return allFactors;
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error listing MFA factors: $e');
+      throw AuthException(
+        'Failed to list MFA factors: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  @override
+  Future<void> disableMFA(String factorId) async {
+    try {
+      debugPrint('SupabaseAuth: Disabling MFA factor: $factorId');
+
+      // unenroll takes a single positional parameter (factorId as string)
+      await client.auth.mfa.unenroll(factorId);
+
+      debugPrint('SupabaseAuth: MFA factor disabled successfully');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error disabling MFA: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('not found')) {
+        throw AuthException(
+          'MFA factor not found',
+          type: AuthErrorType.notAuthorized,
+        );
+      }
+
+      throw AuthException(
+        'Failed to disable MFA: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
+  }
+
+  /// Helper method to get the first TOTP factor ID
+  /// Returns null if no TOTP factors are enrolled
+  Future<String?> _getFirstTOTPFactorId() async {
+    try {
+      final response = await client.auth.mfa.listFactors();
+
+      if (response.totp.isEmpty) {
+        return null;
+      }
+
+      return response.totp.first.id;
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error getting TOTP factor: $e');
+      return null;
+    }
+  }
+
+  // ============================================================
+  // ACCOUNT MANAGEMENT
+  // ============================================================
+
+  @override
+  Future<void> deleteAccount() async {
+    try {
+      debugPrint('SupabaseAuth: Deleting user account');
+
+      // Get current user ID before deleting
+      final user = client.auth.currentUser;
+      if (user == null) {
+        throw const AuthException(
+          'No authenticated user found',
+          type: AuthErrorType.notAuthorized,
+        );
+      }
+
+      final userId = user.id;
+
+      // ============================================================
+      // IMPORTANT: Account deletion requires admin privileges
+      // ============================================================
+      // Supabase's auth.admin.deleteUser() requires service role key,
+      // which should NEVER be exposed to client applications.
+      //
+      // The proper pattern is to call an Edge Function that:
+      // 1. Validates the user's session
+      // 2. Deletes the user's data (profile, storage files, etc.)
+      // 3. Calls auth.admin.deleteUser() with service role key
+      //
+      // Edge Function: 'delete-user-account'
+      // - Expected to return: { success: true } or { error: string }
+      // ============================================================
+
+      debugPrint(
+          'SupabaseAuth: Calling Edge Function to delete account: $userId');
+
+      final response = await client.functions.invoke(
+        'delete-user-account',
+        method: HttpMethod.post,
+      );
+
+      final data = response.data;
+
+      // Check for errors from Edge Function
+      if (data == null) {
+        throw AuthException(
+          'Failed to delete account: No response from server',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      if (data['error'] != null) {
+        throw AuthException(
+          'Failed to delete account: ${data['error']}',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      if (data['success'] != true) {
+        throw AuthException(
+          'Failed to delete account: Unknown error',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      debugPrint('SupabaseAuth: Account deleted successfully');
+    } catch (e) {
+      debugPrint('SupabaseAuth: Error deleting account: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('not authenticated') ||
+          errorStr.contains('not authorized')) {
+        throw AuthException(
+          'You must be logged in to delete your account',
+          type: AuthErrorType.notAuthorized,
+        );
+      } else if (errorStr.contains('edge function') ||
+          errorStr.contains('function not found')) {
+        throw AuthException(
+          'Account deletion service not available. Please contact support.',
+          type: AuthErrorType.unknown,
+        );
+      }
+
+      throw AuthException(
+        'Failed to delete account: ${e.toString()}',
+        type: AuthErrorType.unknown,
+      );
+    }
   }
 }

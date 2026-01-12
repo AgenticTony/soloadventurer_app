@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/core/utils/string_extensions.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
@@ -7,7 +8,6 @@ import 'package:soloadventurer/features/journal/domain/entities/media_item.dart'
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/trip_overview_provider.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
-import 'package:soloadventurer/features/journal/presentation/screens/journal_entry_detail_screen.dart';
 
 /// Screen displaying all entries and media for a specific trip
 class TripOverviewScreen extends ConsumerStatefulWidget {
@@ -287,12 +287,7 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => JournalEntryDetailScreen(entryId: entry.id),
-            ),
-          );
+          context.push('/journal/entry/${entry.id}');
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
