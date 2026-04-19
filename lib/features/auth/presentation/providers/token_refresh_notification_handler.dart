@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'token_refresh_providers.dart';
@@ -133,7 +131,6 @@ class TokenRefreshNotificationHandler extends _$TokenRefreshNotificationHandler 
     _statusSubscription = tokenRefreshService.statusStream.listen(
       _handleRefreshStatus,
       onError: (error, stack) {
-        debugPrint('TokenRefreshNotificationHandler: Error in status stream: $error');
       },
     );
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import '../../domain/models/sync_operation.dart';
 import '../../domain/models/sync_status.dart';
 import '../../domain/models/sync_error.dart';
@@ -113,7 +112,6 @@ class SyncServiceImpl implements SyncService {
     if (!_persistenceEnabled) return;
 
     try {
-      debugPrint('SyncService: Loading queue from persistence...');
       final persistedQueue = await _persistence!.loadQueue();
 
       if (persistedQueue.isNotEmpty) {
@@ -129,19 +127,14 @@ class SyncServiceImpl implements SyncService {
         _notifyQueueChanged();
         _updateStatus(SyncOperationStatus.pending);
 
-        debugPrint(
-            'SyncService: Loaded ${_queue.length} operations from persistence');
-
         // Auto-process if enabled
         if (_config.autoProcess && !_isPaused) {
           _scheduleProcessing();
         }
       } else {
-        debugPrint('SyncService: No persisted operations found');
       }
-    } catch (e, stackTrace) {
-      debugPrint('SyncService: Error loading from persistence: $e');
-      debugPrint(stackTrace.toString());
+    } catch (e) {
+    // intentional silent catch
     }
   }
 
@@ -153,24 +146,17 @@ class SyncServiceImpl implements SyncService {
       // Subscribe to online events to trigger sync when connection is restored
       _networkOnlineSubscription = _networkConnectivity!.onOnline.listen(
         (_) {
-          debugPrint('SyncService: Network connection restored');
           // Trigger sync processing when coming back online
           if (_queue.isNotEmpty && !_isPaused && _config.autoProcess) {
-            debugPrint(
-                'SyncService: Auto-triggering sync due to connection restoration');
             _scheduleProcessing();
           }
         },
         onError: (error, stackTrace) {
-          debugPrint('SyncService: Error in network monitoring stream: $error');
-          debugPrint(stackTrace.toString());
         },
       );
 
-      debugPrint('SyncService: Network connectivity monitoring initialized');
-    } catch (e, stackTrace) {
-      debugPrint('SyncService: Error initializing network monitoring: $e');
-      debugPrint(stackTrace.toString());
+    } catch (e) {
+    // intentional silent catch
     }
   }
 
@@ -178,13 +164,11 @@ class SyncServiceImpl implements SyncService {
   Future<bool> enqueueOperation(SyncOperation operation) async {
     // Validate queue size
     if (_queue.length >= _config.maxQueueSize) {
-      debugPrint('SyncService: Queue is full, rejecting operation');
       return false;
     }
 
     // Check for duplicate operations
     if (_queue.any((op) => op.id == operation.id)) {
-      debugPrint('SyncService: Operation ${operation.id} already in queue');
       return false;
     }
 
@@ -214,9 +198,6 @@ class SyncServiceImpl implements SyncService {
       _scheduleProcessing();
     }
 
-    debugPrint('SyncService: Enqueued operation ${operation.id} '
-        '(type: ${operation.entityType}, queue size: ${_queue.length})');
-
     return true;
   }
 
@@ -232,8 +213,6 @@ class SyncServiceImpl implements SyncService {
       }
     }
 
-    debugPrint('SyncService: Enqueued $added/${operations.length} operations');
-
     return added;
   }
 
@@ -247,7 +226,6 @@ class SyncServiceImpl implements SyncService {
       await _persistQueue();
 
       _notifyQueueChanged();
-      debugPrint('SyncService: Removed operation $operationId');
       return true;
     }
 
@@ -256,7 +234,7 @@ class SyncServiceImpl implements SyncService {
 
   @override
   Future<void> clearQueue() async {
-    final count = _queue.length;
+    _queue.length;
     _queue.clear();
 
     // Clear persisted queue
@@ -264,7 +242,7 @@ class SyncServiceImpl implements SyncService {
       try {
         await _persistence!.clearQueue();
       } catch (e) {
-        debugPrint('SyncService: Error clearing persisted queue: $e');
+      // intentional silent catch
       }
     }
 
@@ -274,13 +252,11 @@ class SyncServiceImpl implements SyncService {
       _updateStatus(SyncOperationStatus.idle);
     }
 
-    debugPrint('SyncService: Cleared $count operations from queue');
   }
 
   @override
   Future<SyncResult> processQueue() async {
     if (_isPaused) {
-      debugPrint('SyncService: Processing is paused');
       return SyncResult.failure(
         'Processing is paused',
         code: 'PAUSED',
@@ -288,7 +264,6 @@ class SyncServiceImpl implements SyncService {
     }
 
     if (_processingLock) {
-      debugPrint('SyncService: Already processing queue');
       return SyncResult.failure(
         'Queue processing already in progress',
         code: 'ALREADY_PROCESSING',
@@ -296,7 +271,6 @@ class SyncServiceImpl implements SyncService {
     }
 
     if (_queue.isEmpty) {
-      debugPrint('SyncService: Queue is empty');
       _updateStatus(SyncOperationStatus.idle);
       return SyncResult.success();
     }
@@ -317,7 +291,6 @@ class SyncServiceImpl implements SyncService {
         connectionType: connectionType,
       );
       await _historyService!.addEntry(entry);
-      debugPrint('SyncService: Created history entry $entryId');
     }
 
     int successCount = 0;
@@ -326,8 +299,6 @@ class SyncServiceImpl implements SyncService {
     String? lastErrorCode;
 
     try {
-      debugPrint(
-          'SyncService: Starting queue processing (${_queue.length} operations)');
 
       // Process operations in FIFO order (already sorted by priority)
       while (_queue.isNotEmpty && !_isPaused) {
@@ -336,10 +307,6 @@ class SyncServiceImpl implements SyncService {
         if (!operation.isReadyForRetry) {
           // Put it back in the queue
           _queue.insert(0, operation);
-
-          debugPrint(
-              'SyncService: Operation ${operation.id} not ready for retry yet, '
-              'will retry at ${operation.nextRetryAt?.toIso8601String()}');
 
           // Calculate delay until next retry and schedule processing
           final delayUntilRetry = operation.timeUntilRetry;
@@ -380,22 +347,13 @@ class SyncServiceImpl implements SyncService {
               );
               _queue.add(retryOp);
 
-              debugPrint('SyncService: Re-queueing operation ${operation.id} '
-                  '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
             } else {
-              debugPrint(
-                  'SyncService: Operation ${operation.id} exceeded max retry attempts '
-                  '(${operation.retryCount}/${_config.maxRetryAttempts})');
             }
           }
-        } catch (e, stackTrace) {
+        } catch (e) {
           failureCount++;
           lastError = e.toString();
           lastErrorCode = 'OPERATION_ERROR';
-
-          debugPrint(
-              'SyncService: Error processing operation ${operation.id}: $e');
-          debugPrint(stackTrace.toString());
 
           // Re-queue for retry if applicable
           if (operation.shouldRetry(_config.maxRetryAttempts)) {
@@ -408,12 +366,7 @@ class SyncServiceImpl implements SyncService {
             );
             _queue.add(retryOp);
 
-            debugPrint('SyncService: Re-queueing operation ${operation.id} '
-                '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
           } else {
-            debugPrint(
-                'SyncService: Operation ${operation.id} exceeded max retry attempts '
-                '(${operation.retryCount}/${_config.maxRetryAttempts})');
           }
         }
       }
@@ -461,9 +414,7 @@ class SyncServiceImpl implements SyncService {
           failureCount: failureCount,
         );
       }
-    } catch (e, stackTrace) {
-      debugPrint('SyncService: Fatal error during queue processing: $e');
-      debugPrint(stackTrace.toString());
+    } catch (e) {
 
       _updateStatus(SyncOperationStatus.failed);
 
@@ -488,8 +439,6 @@ class SyncServiceImpl implements SyncService {
       _processingLock = false;
       _isProcessing = false;
 
-      debugPrint('SyncService: Queue processing completed '
-          '(success: $successCount, failed: $failureCount, remaining: ${_queue.length})');
     }
   }
 
@@ -553,8 +502,6 @@ class SyncServiceImpl implements SyncService {
     String? lastErrorCode;
 
     try {
-      debugPrint(
-          'SyncService: Processing batch of ${operationsToProcess.length} operations');
 
       for (final operation in operationsToProcess) {
         try {
@@ -577,12 +524,7 @@ class SyncServiceImpl implements SyncService {
               );
               _queue.add(retryOp);
 
-              debugPrint('SyncService: Re-queueing operation ${operation.id} '
-                  '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
             } else {
-              debugPrint(
-                  'SyncService: Operation ${operation.id} exceeded max retry attempts '
-                  '(${operation.retryCount}/${_config.maxRetryAttempts})');
             }
           }
         } catch (e) {
@@ -601,12 +543,7 @@ class SyncServiceImpl implements SyncService {
             );
             _queue.add(retryOp);
 
-            debugPrint('SyncService: Re-queueing operation ${operation.id} '
-                '(attempt $nextRetryCount, next retry at ${nextRetryAt.toIso8601String()})');
           } else {
-            debugPrint(
-                'SyncService: Operation ${operation.id} exceeded max retry attempts '
-                '(${operation.retryCount}/${_config.maxRetryAttempts})');
           }
         }
       }
@@ -660,17 +597,15 @@ class SyncServiceImpl implements SyncService {
       _processingLock = false;
       _isProcessing = false;
 
-      debugPrint('SyncService: Batch processing completed '
-          '(success: $successCount, failed: $failureCount)');
     }
   }
 
   @override
   Future<int> retryFailedOperations() async {
-    final failedOps = _queue.where((op) => op.retryCount > 0).toList();
+    final failedOps = _queue
+        .where((op) => op.retryCount > 0 && op.retryCount < _config.maxRetryAttempts)
+        .toList();
     final retryCount = failedOps.length;
-
-    debugPrint('SyncService: Re-queueing $retryCount failed operations');
 
     // Reset retry count to allow retry
     for (final op in failedOps) {
@@ -710,13 +645,11 @@ class SyncServiceImpl implements SyncService {
   @override
   void pauseProcessing() {
     _isPaused = true;
-    debugPrint('SyncService: Processing paused');
   }
 
   @override
   void resumeProcessing() {
     _isPaused = false;
-    debugPrint('SyncService: Processing resumed');
 
     if (_queue.isNotEmpty && _config.autoProcess) {
       _scheduleProcessing();
@@ -726,16 +659,17 @@ class SyncServiceImpl implements SyncService {
   @override
   void updateConfig(SyncQueueConfig config) {
     _config = config;
-    debugPrint('SyncService: Configuration updated');
   }
+
+  bool _isDisposed = false;
 
   @override
   void dispose() {
+    _isDisposed = true;
     _networkOnlineSubscription?.cancel();
     _networkOnlineSubscription = null;
     _statusController.close();
     _queueController.close();
-    debugPrint('SyncService: Disposed');
   }
 
   /// Persist the current queue state
@@ -745,10 +679,9 @@ class SyncServiceImpl implements SyncService {
     try {
       final result = await _persistence!.saveQueue(_queue);
       if (!result.success) {
-        debugPrint('SyncService: Failed to persist queue: ${result.error}');
       }
     } catch (e) {
-      debugPrint('SyncService: Error persisting queue: $e');
+    // intentional silent catch
     }
   }
 
@@ -760,44 +693,34 @@ class SyncServiceImpl implements SyncService {
   /// 3. Handle conflicts if detected
   /// 4. Update local storage on success
   Future<bool> _processSingleOperation(SyncOperation operation) async {
-    debugPrint('SyncService: Processing operation ${operation.id} '
-        '(${operation.operationType.name} ${operation.entityType.name})');
 
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 100));
 
     // Mock success (in real implementation, this would make API calls)
-    // Simulate occasional failures for testing
-    final shouldFail =
-        operation.retryCount == 0 && false; // Set to true to test failures
-
-    if (shouldFail) {
-      debugPrint('SyncService: Operation ${operation.id} failed (simulated)');
-      return false;
-    }
-
-    debugPrint('SyncService: Operation ${operation.id} succeeded');
     return true;
   }
 
   /// Update sync status and notify listeners
   void _updateStatus(SyncOperationStatus newStatus) {
+    if (_isDisposed) return;
     if (_status != newStatus) {
       _status = newStatus;
       _statusController.add(_status);
-      debugPrint('SyncService: Status changed to ${_status.name}');
     }
   }
 
   /// Notify listeners that queue has changed
   void _notifyQueueChanged() {
+    if (_isDisposed) return;
     _queueController.add(List.unmodifiable(_queue));
   }
 
   /// Schedule processing with delay
   void _scheduleProcessing() {
+    if (_isDisposed) return;
     Future.delayed(Duration(milliseconds: _config.retryDelayMs), () {
-      if (!_isPaused && !_isProcessing && _queue.isNotEmpty) {
+      if (!_isDisposed && !_isPaused && !_isProcessing && _queue.isNotEmpty) {
         processBatch();
       }
     });
@@ -808,10 +731,8 @@ class SyncServiceImpl implements SyncService {
     if (!_networkMonitoringEnabled) return null;
 
     try {
-      final connection = await _networkConnectivity!.currentConnection;
-      return connection?.type.name;
+      return _networkConnectivity!.connectionType.name;
     } catch (e) {
-      debugPrint('SyncService: Error getting connection type: $e');
       return null;
     }
   }
@@ -851,6 +772,7 @@ class SyncServiceImpl implements SyncService {
                 severity: SyncErrorSeverity.medium,
                 technicalMessage: error,
                 userMessage: error,
+                suggestion: 'Please try again later',
                 occurredAt: DateTime.now(),
               )
             : null;
@@ -869,9 +791,8 @@ class SyncServiceImpl implements SyncService {
       }
 
       await _historyService!.updateEntry(_currentHistoryEntryId!, updatedEntry);
-      debugPrint('SyncService: Updated history entry $_currentHistoryEntryId');
     } catch (e) {
-      debugPrint('SyncService: Error updating history entry: $e');
+      // intentional silent catch - updateEntry failure is non-critical
     } finally {
       _currentHistoryEntryId = null;
     }

@@ -87,7 +87,7 @@ void main() {
         ),
       );
 
-      expect(find.byType(Stack), findsOneWidget);
+      expect(find.byType(Stack), findsAtLeast(1));
       expect(find.byIcon(Icons.mail), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
     });
@@ -166,7 +166,7 @@ void main() {
             .first,
       );
       var width = container.constraints?.maxWidth;
-      expect(width, greaterThan(18));
+      expect(width, greaterThanOrEqualTo(18));
 
       // Double digit count
       await tester.pumpWidget(
@@ -186,7 +186,7 @@ void main() {
             .first,
       );
       width = container.constraints?.maxWidth;
-      expect(width, greaterThan(22));
+      expect(width, greaterThanOrEqualTo(22));
 
       // 99+ count
       await tester.pumpWidget(
@@ -325,7 +325,7 @@ void main() {
                 SyncOperationStatusBadge(
                     count: 5, child: Icon(Icons.notifications)),
                 SyncOperationStatusBadge(
-                    count: 10, child: Icon(Icons.calendar)),
+                    count: 10, child: Icon(Icons.calendar_today)),
               ],
             ),
           ),

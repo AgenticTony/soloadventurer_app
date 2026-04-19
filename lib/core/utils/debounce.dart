@@ -121,8 +121,6 @@ class Debouncer<T> {
     _isPending = true;
 
     if (debug) {
-      debugPrint('[Debouncer] Debouncing with input: "$input" '
-          '(call #$_callCount)');
     }
 
     // Notify debounce started
@@ -137,8 +135,6 @@ class Debouncer<T> {
       final currentInput = _lastInput!;
 
       if (debug) {
-        debugPrint('[Debouncer] Executing action for input: "$currentInput" '
-            '(execution #$_executionCount)');
       }
 
       try {
@@ -153,15 +149,12 @@ class Debouncer<T> {
         );
 
         if (debug) {
-          debugPrint('[Debouncer] Action completed with value: $value');
         }
 
         // Call completion callback
         (onCompleteOverride ?? onComplete)?.call(result);
-      } catch (error, stackTrace) {
+      } catch (error) {
         if (debug) {
-          debugPrint('[Debouncer] Action failed: $error');
-          debugPrint(stackTrace.toString());
         }
 
         // Create error result
@@ -190,7 +183,6 @@ class Debouncer<T> {
       _isPending = false;
 
       if (debug) {
-        debugPrint('[Debouncer] Cancelled pending operation');
       }
 
       return true;
@@ -224,7 +216,6 @@ class Debouncer<T> {
     _executionCount = 0;
 
     if (debug) {
-      debugPrint('[Debouncer] Reset');
     }
   }
 

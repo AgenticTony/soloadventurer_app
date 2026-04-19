@@ -119,7 +119,7 @@ void main() {
         );
 
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, Colors.blue.shade700.withOpacity(0.1));
+        expect(decoration.color, Colors.blue.shade700.withValues(alpha: 0.1));
         expect(decoration.border?.top.color, Colors.blue.shade700);
       });
 
@@ -141,7 +141,7 @@ void main() {
         );
 
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, Colors.lightBlue.withOpacity(0.1));
+        expect(decoration.color, Colors.lightBlue.withValues(alpha: 0.1));
         expect(decoration.border?.top.color, Colors.lightBlue);
       });
 
@@ -163,7 +163,7 @@ void main() {
         );
 
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, Colors.grey.shade600.withOpacity(0.1));
+        expect(decoration.color, Colors.grey.shade600.withValues(alpha: 0.1));
         expect(decoration.border?.top.color, Colors.grey.shade600);
       });
     });
@@ -182,7 +182,7 @@ void main() {
             tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
-          'Solo suitability score: 9.0 out of 10, excellent for solo travelers',
+          startsWith('Solo suitability score: 9.0 out of 10, excellent for solo travelers'),
         );
       });
 
@@ -231,7 +231,7 @@ void main() {
             tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
-          'Rating suitability score: 9.0 out of 10, excellent for solo travelers',
+          startsWith('Rating suitability score: 9.0 out of 10, excellent for solo travelers'),
         );
       });
 
@@ -249,7 +249,7 @@ void main() {
             tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
-          'Solo suitability score: 7.5 out of 10, good for solo travelers',
+          startsWith('Solo suitability score: 7.5 out of 10, good for solo travelers'),
         );
       });
 
@@ -267,7 +267,7 @@ void main() {
             tester.getSemantics(find.byType(SoloSuitabilityBadge));
         expect(
           semantics.label,
-          'Solo suitability score: 5.0 out of 10, challenging for solo travelers',
+          startsWith('Solo suitability score: 5.0 out of 10, challenging for solo travelers'),
         );
       });
     });

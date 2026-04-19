@@ -251,7 +251,6 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -468,8 +467,8 @@ class _LocationPrivacyWidgetState extends ConsumerState<LocationPrivacyWidget> {
         ],
       ),
       subtitle: Text(subtitle),
-      value: timing,
       groupValue: _settings.sharingTiming,
+      value: timing,
       onChanged: widget.enabled
           ? (value) {
               if (value != null) {

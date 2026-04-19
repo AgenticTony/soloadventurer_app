@@ -8,17 +8,26 @@ part of 'test_profile_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Test profile provider that returns mock data
+/// Provider that returns profile data from the current Supabase auth session.
+///
+/// On first build, it reads user metadata from the auth session.
+/// Falls back to placeholder values if no session exists.
 
 @ProviderFor(testProfile)
 const testProfileProvider = TestProfileProvider._();
 
-/// Test profile provider that returns mock data
+/// Provider that returns profile data from the current Supabase auth session.
+///
+/// On first build, it reads user metadata from the auth session.
+/// Falls back to placeholder values if no session exists.
 
 final class TestProfileProvider
     extends $FunctionalProvider<ProfileState, ProfileState, ProfileState>
     with $Provider<ProfileState> {
-  /// Test profile provider that returns mock data
+  /// Provider that returns profile data from the current Supabase auth session.
+  ///
+  /// On first build, it reads user metadata from the auth session.
+  /// Falls back to placeholder values if no session exists.
   const TestProfileProvider._()
       : super(
           from: null,
@@ -52,4 +61,4 @@ final class TestProfileProvider
   }
 }
 
-String _$testProfileHash() => r'ea97928bda15be57c5a699ab472018923fa0b27a';
+String _$testProfileHash() => r'4efc52069b759e1bbbd2da7dce01dd3cdd18fac7';

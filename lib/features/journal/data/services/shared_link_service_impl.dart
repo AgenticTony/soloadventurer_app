@@ -279,7 +279,7 @@ class SharedLinkServiceImpl implements SharedLinkService {
       }
 
       if (existingLink.userId != userId) {
-        throw const SharedLinkException.notAuthorized();
+        throw SharedLinkException.notAuthorized();
       }
 
       final model = await _remoteDataSource.updateSharedLink(
@@ -325,7 +325,7 @@ class SharedLinkServiceImpl implements SharedLinkService {
       }
 
       if (existingLink.userId != userId) {
-        throw const SharedLinkException.notAuthorized();
+        throw SharedLinkException.notAuthorized();
       }
 
       await _remoteDataSource.deactivateSharedLink(linkId);
@@ -364,7 +364,7 @@ class SharedLinkServiceImpl implements SharedLinkService {
       }
 
       if (existingLink.userId != userId) {
-        throw const SharedLinkException.notAuthorized();
+        throw SharedLinkException.notAuthorized();
       }
 
       await _remoteDataSource.deleteSharedLink(linkId);

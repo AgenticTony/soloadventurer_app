@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/sync_providers.dart';
+import '../notifiers/manual_sync_notifier.dart' show manualSyncProvider;
 import '../state/manual_sync_state.dart';
 
 /// Wrapper widget that adds pull-to-refresh sync functionality
@@ -61,32 +62,40 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
 
   @override
   Widget build(BuildContext context) {
-    final isSyncing = ref.watch(isSyncingProvider);
-    final state = ref.watch(manualSyncStateProvider);
-
     // Listen to state changes and show notifications
-    ref.listen<ManualSyncState>(
-      manualSyncStateProvider,
+    ref.listen(
+      manualSyncProvider,
       (previous, next) {
         if (!widget.showNotifications) return;
 
-        // Check if sync just completed
-        if (previous?.isSyncing == true && !next.isSyncing) {
-          _handleSyncCompletion(context, next);
+        // Check if sync just completed (was loading, now has data or error)
+        final wasLoading = previous?.isLoading ?? false;
+        final isNowData = next.hasValue && !next.isLoading;
+        final isNowError = next.hasError;
+
+        if (wasLoading && (isNowData || isNowError)) {
+          if (isNowError) {
+            _handleSyncError(context);
+            widget.onFailure?.call();
+          } else {
+            _handleSyncCompletion(context, next.value!);
+          }
         }
       },
     );
 
     return RefreshIndicator(
       key: widget.refreshIndicatorKey,
-      onRefresh: isSyncing
-          ? null // Disable refresh during sync
-          : () => _handleRefresh(context),
+      onRefresh: () => _handleRefresh(context),
       child: widget.child,
     );
   }
 
   Future<void> _handleRefresh(BuildContext context) async {
+    // Don't trigger if already syncing
+    final syncing = ref.read(isSyncingProvider);
+    if (syncing) return;
+
     // Trigger sync
     await ref.read(manualSyncProvider.notifier).triggerSync();
 
@@ -119,12 +128,18 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
           context,
           scaffoldMessenger,
           theme,
-          state,
         );
       }
 
       widget.onFailure?.call();
     }
+  }
+
+  void _handleSyncError(BuildContext context) {
+    final theme = Theme.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+    _showErrorSnackBar(context, scaffoldMessenger, theme);
   }
 
   void _showSuccessSnackBar(
@@ -149,7 +164,6 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
                 textColor: theme.colorScheme.onPrimary,
                 onPressed: () {
                   // Navigate to sync errors or show details
-                  // This can be customized by the parent widget
                 },
               )
             : null,
@@ -161,13 +175,10 @@ class _SyncPullToRefreshState extends ConsumerState<SyncPullToRefresh> {
     BuildContext context,
     ScaffoldMessengerState scaffoldMessenger,
     ThemeData theme,
-    ManualSyncState state,
   ) {
     scaffoldMessenger.showSnackBar(
       SnackBar(
-        content: Text(
-          state.errorMessage ?? 'Sync failed',
-        ),
+        content: const Text('Sync failed'),
         backgroundColor: theme.colorScheme.error,
         duration: const Duration(seconds: 3),
         action: SnackBarAction(

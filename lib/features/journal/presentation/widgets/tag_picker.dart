@@ -78,7 +78,8 @@ class TagPicker extends ConsumerWidget {
             onTagToggled: (tagId) {
               final notifier = ref.read(entryTagsProvider.notifier);
               notifier.toggleTag(tagId);
-              onTagsChanged(List.from(notifier.state.selectedTagIds));
+              final currentState = ref.read(entryTagsProvider);
+              onTagsChanged(List.from(currentState.selectedTagIds));
             },
             onCreateNewTag: () => _showTagManagementDialog(context, ref),
           ),
@@ -164,9 +165,11 @@ class _TagChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = tag.hasColor
-        ? _tryParseColor(tag.color!)
-        : Theme.of(context).colorScheme.primary;
+    final fallbackColor = Theme.of(context).colorScheme.primary;
+    final parsedColor = _tryParseColor(tag.color!);
+    final color = tag.hasColor && parsedColor != null
+        ? parsedColor
+        : fallbackColor;
 
     return FilterChip(
       label: Row(
@@ -205,7 +208,7 @@ class _TagChip extends StatelessWidget {
 }
 
 class _TagManagementSheet extends ConsumerStatefulWidget {
-  final EntryTagsNotifier entryTagsNotifier;
+  final EntryTags entryTagsNotifier;
   final ValueChanged<List<String>> onTagsChanged;
 
   const _TagManagementSheet({
@@ -293,9 +296,10 @@ class _TagManagementSheetState extends ConsumerState<_TagManagementSheet> {
                                   isSelected: isSelected,
                                   onToggle: () {
                                     widget.entryTagsNotifier.toggleTag(tag.id);
+                                    // Read the updated state via ref instead of accessing .state directly
+                                    final updatedState = ref.read(entryTagsProvider);
                                     widget.onTagsChanged(
-                                      List.from(widget.entryTagsNotifier.state
-                                          .selectedTagIds),
+                                      List.from(updatedState.selectedTagIds),
                                     );
                                   },
                                 );
@@ -353,9 +357,11 @@ class _TagListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = tag.hasColor
-        ? _tryParseColor(tag.color!)
-        : Theme.of(context).colorScheme.primary;
+    final fallbackColor = Theme.of(context).colorScheme.primary;
+    final parsedColor = _tryParseColor(tag.color!);
+    final color = tag.hasColor && parsedColor != null
+        ? parsedColor
+        : fallbackColor;
 
     return ListTile(
       leading: CircleAvatar(
@@ -399,6 +405,17 @@ class _TagListTile extends StatelessWidget {
 class _CreateTagDialog extends ConsumerStatefulWidget {
   final TextEditingController nameController;
   final VoidCallback onTagCreated;
+
+  static const List<String> _colors = [
+    '#FF6B6B',
+    '#FFA06B',
+    '#FFD93D',
+    '#6BCB77',
+    '#4D96FF',
+    '#6BCBFF',
+    '#9B59B6',
+    '#FF69B4',
+  ];
 
   const _CreateTagDialog({
     required this.nameController,
@@ -529,15 +546,4 @@ class _CreateTagDialogState extends ConsumerState<_CreateTagDialog> {
   Color _parseColor(String colorString) {
     return Color(int.parse(colorString.replaceFirst('#', '0xFF')));
   }
-
-  static const List<String> _colors = [
-    '#FF6B6B',
-    '#FFA06B',
-    '#FFD93D',
-    '#6BCB77',
-    '#4D96FF',
-    '#6BCBFF',
-    '#9B59B6',
-    '#FF69B4',
-  ];
 }

@@ -311,20 +311,16 @@ class CacheManager<K, V> {
     }
   }
 
-  /// Get value from disk cache with deserialization
+  /// Get value from disk cache with deserialization.
+  ///
+  /// Note: Generic type deserialization from disk is not supported.
+  /// Only values stored via [put] into memory cache are retrievable.
+  /// Disk cache serves as a write-through backup — reads come from memory.
   Future<V?> _getFromDisk(K key) async {
-    final keyString = key.toString();
-    final jsonString = await _diskCache.get(keyString);
-    if (jsonString == null) return null;
-
-    try {
-      // This is a placeholder - actual deserialization would depend on type
-      // For now, return null as we can't deserialize generic types
-      // In practice, you'd use type converters or JSON serialization
-      return null;
-    } catch (e) {
-      return null;
-    }
+    // Disk cache is write-through only — values are promoted to memory
+    // on the initial put(). Generic type deserialization from JSON strings
+    // is not safely possible without type tokens.
+    return null;
   }
 
   /// Put a value in all cache layers
@@ -364,12 +360,12 @@ class CacheManager<K, V> {
 
     final keyString = key.toString();
 
-    // Store in memory cache (as JSON string for simplicity)
-    await _memoryCache.put(
-      key,
-      jsonValue.toString() as V,
-      ttl: memoryTtl,
-    );
+    // Store in memory cache only if the JSON string is assignable to V.
+    // Skip memory layer for non-String V types to avoid unsafe casts.
+    final asString = jsonValue.toString();
+    if (asString is V) {
+      await _memoryCache.put(key, asString as V, ttl: memoryTtl);
+    }
 
     // Store in disk cache
     await _diskCache.putJson(keyString, jsonValue, ttl: diskTtl);

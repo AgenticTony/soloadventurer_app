@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/memory_timeline_provider.dart';
-import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/timeline_item.dart';
-import 'package:intl/intl.dart';
 
 /// Screen displaying chronological timeline of all travel experiences
 class MemoryTimelineScreen extends ConsumerStatefulWidget {

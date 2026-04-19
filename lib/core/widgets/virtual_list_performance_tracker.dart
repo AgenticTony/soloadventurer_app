@@ -157,9 +157,6 @@ class _VirtualListPerformanceTrackerState
   /// Last frame timestamp
   DateTime? _lastFrameTime;
 
-  /// Whether metrics have been reported
-  final bool _hasReportedMetrics = false;
-
   /// Current performance metrics
   VirtualListPerformanceMetrics? _currentMetrics;
 
@@ -239,7 +236,6 @@ class _VirtualListPerformanceTrackerState
     } catch (e) {
       // Silently fail in production
       if (kDebugMode) {
-        debugPrint('Error capturing memory: $e');
       }
     }
   }

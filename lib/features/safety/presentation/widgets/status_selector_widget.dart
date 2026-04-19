@@ -161,8 +161,6 @@ class StatusSelectorWidget extends StatelessWidget {
     required IconData icon,
     required Color color,
   }) {
-    final theme = Theme.of(context);
-
     return RadioListTile<safety.SafetyStatusType>(
       title: Row(
         children: [
@@ -176,11 +174,11 @@ class StatusSelectorWidget extends StatelessWidget {
         ],
       ),
       subtitle: Text(subtitle),
-      value: status,
       groupValue: selectedStatus,
-      onChanged: enabled
+      value: status,
+      onChanged: enabled && onStatusChanged != null
           ? (value) {
-              if (value != null && onStatusChanged != null) {
+              if (value != null) {
                 onStatusChanged!(value);
               }
             }

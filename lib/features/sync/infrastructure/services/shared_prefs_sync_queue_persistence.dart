@@ -8,7 +8,7 @@ import '../../domain/services/sync_queue_persistence.dart';
 ///
 /// Stores operations as JSON strings with the following keys:
 /// - 'sync_queue_operations': List of operation IDs in order
-/// - 'sync_queue_op_<id>': Individual operation data
+/// - 'sync_queue_op_\<id\>': Individual operation data
 class SharedPrefsSyncQueuePersistence implements SyncQueuePersistence {
   final SharedPreferences _prefs;
 

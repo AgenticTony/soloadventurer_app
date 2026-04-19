@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/safety/presentation/routes/safety_routes.dart';
 import '../providers/safety_providers.dart';
 import '../../domain/entities/safety_status.dart';
+import 'package:soloadventurer/features/safety/domain/entities/meetup_checkin.dart';
+import 'package:soloadventurer/features/safety/presentation/providers/meetup_checkin_providers.dart';
+import 'package:soloadventurer/features/safety/presentation/widgets/create_checkin_sheet.dart';
+import 'package:soloadventurer/features/safety/presentation/widgets/liability_disclaimer_modal.dart';
 
 /// Main safety hub screen serving as the entry point for all safety features
 ///
@@ -35,16 +39,16 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final trustedContactsState = ref.watch(trustedContactsProvider);
-    final checkInState = ref.watch(checkInProvider);
-    final locationSharingState = ref.watch(locationSharingProvider);
-    final safetyState = ref.watch(safetyProvider);
+    final trustedContactsState = ref.watch(trustedContactsProvider).value;
+    final checkInState = ref.watch(checkInProvider).value;
+    final locationSharingState = ref.watch(locationSharingProvider).value;
+    final safetyState = ref.watch(safetyProvider).value;
 
-    final contactsCount = trustedContactsState.contacts.length;
-    final upcomingCheckInsCount = checkInState.upcomingCheckIns.length;
-    final activeLocationSharesCount = locationSharingState.activeShares.length;
-    final currentStatus = safetyState.currentStatus;
-    final hasActiveEmergency = safetyState.hasActiveEmergency;
+    final contactsCount = trustedContactsState?.contacts.length ?? 0;
+    final upcomingCheckInsCount = checkInState?.upcomingCheckIns.length ?? 0;
+    final activeLocationSharesCount = locationSharingState?.activeShares.length ?? 0;
+    final currentStatus = safetyState?.currentStatus;
+    final hasActiveEmergency = safetyState?.hasActiveEmergency ?? false;
 
     return Scaffold(
       body: CustomScrollView(
@@ -119,6 +123,10 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
                     _buildCurrentStatusCard(context, currentStatus),
 
                   if (currentStatus != null) const SizedBox(height: 16),
+
+                  // Meetup Check-ins section
+                  _buildMeetupCheckins(context, hasActiveEmergency),
+                    const SizedBox(height: 24),
 
                   // Quick actions section
                   _buildQuickActions(context),
@@ -267,6 +275,241 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
     );
   }
 
+  // ============================================================
+  // Meetup Check-ins
+  // ============================================================
+
+  Widget _buildMeetupCheckins(BuildContext context, bool hasActiveEmergency) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.event_available,
+              color: Theme.of(context).colorScheme.primary,
+              size: 20,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Meetup Check-ins',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Consumer(
+          builder: (context, ref, child) {
+            final activeCheckins = ref.watch(activeCheckinsProvider);            return activeCheckins.when(
+              data: (checkins) {
+                if (checkins.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Text(
+                      'No active check-ins',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  );
+                }
+                return Column(
+                  children: checkins
+                      .map((c) => _meetupCheckinTile(checkin: c))
+                      .toList(),
+                );
+              },
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              error: (error, _) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Text(
+                  error.toString(),
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: () => _showCreateCheckinSheet(context),
+            icon: const Icon(Icons.add),
+            label: const Text('Create Check-in'),
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _meetupCheckinTile({required MeetupCheckin checkin}) {
+    final statusColor = _checkinStatusColor(checkin.status);
+    final statusIcon = _checkinStatusIcon(checkin.status);
+    final statusLabel = _checkinStatusLabel(checkin.status);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(statusIcon, color: statusColor, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                checkin.locationName ?? 'No location',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              Text(
+                _formatMeetupTime(checkin.meetupTime),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: statusColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            statusLabel,
+            style: TextStyle(
+              fontSize: 11,
+              color: statusColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    ),
+    const SizedBox(height: 8),
+    Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        if (checkin.status == MeetupCheckinStatus.active ||
+            checkin.status == MeetupCheckinStatus.alerted)
+          TextButton(
+            onPressed: () => ref
+                .read(activeCheckinsProvider.notifier)
+                .checkInSafe(checkin.id),
+            child: Text(
+              "I'm Safe",
+              style: TextStyle(color: Colors.green),
+            ),
+          ),
+        TextButton(
+          onPressed: () => ref
+            .read(activeCheckinsProvider.notifier)
+            .triggerSOS(checkin.id),
+          style: TextButton.styleFrom(foregroundColor: Colors.red),
+          child: const Text('SOS'),
+        ),
+        if (checkin.status == MeetupCheckinStatus.scheduled ||
+            checkin.status == MeetupCheckinStatus.active)
+          TextButton(
+            onPressed: () => ref
+              .read(activeCheckinsProvider.notifier)
+              .cancelCheckin(checkin.id),
+            child: const Text('Cancel'),
+          ),
+      ],
+    ),
+  ],
+),
+),
+);
+  }
+
+  void _showCreateCheckinSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return const CreateCheckinSheet();
+      },
+    );
+  }
+
+  String _formatMeetupTime(DateTime time) {
+    final now = DateTime.now();
+    final diff = time.difference(now);
+    if (diff.inMinutes < 60) {
+      return 'in ${diff.inMinutes}m';
+    } else if (diff.inHours < 24) {
+      return 'in ${diff.inHours}h';
+    } else {
+      return '${time.month}/${time.day} ${time.hour}:${time.minute.toString().padLeft(2)}';
+    }
+  }
+
+  Color _checkinStatusColor(MeetupCheckinStatus status) {
+    switch (status) {
+      case MeetupCheckinStatus.scheduled:
+        return Colors.blue;
+      case MeetupCheckinStatus.active:
+        return Colors.orange;
+      case MeetupCheckinStatus.checkedIn:
+        return Colors.green;
+      case MeetupCheckinStatus.alerted:
+        return Colors.amber;
+      case MeetupCheckinStatus.sos:
+        return Colors.red;
+      case MeetupCheckinStatus.cancelled:
+        return Colors.grey;
+    }
+  }
+
+  IconData _checkinStatusIcon(MeetupCheckinStatus status) {
+    switch (status) {
+      case MeetupCheckinStatus.scheduled:
+        return Icons.schedule;
+      case MeetupCheckinStatus.active:
+        return Icons.timer;
+      case MeetupCheckinStatus.checkedIn:
+        return Icons.check_circle;
+      case MeetupCheckinStatus.alerted:
+        return Icons.warning;
+      case MeetupCheckinStatus.sos:
+        return Icons.emergency;
+      case MeetupCheckinStatus.cancelled:
+        return Icons.cancel;
+    }
+  }
+
+  String _checkinStatusLabel(MeetupCheckinStatus status) {
+    switch (status) {
+      case MeetupCheckinStatus.scheduled:
+        return 'Scheduled';
+      case MeetupCheckinStatus.active:
+        return 'Active';
+      case MeetupCheckinStatus.checkedIn:
+        return 'Checked In';
+      case MeetupCheckinStatus.alerted:
+        return 'Alerted';
+      case MeetupCheckinStatus.sos:
+        return 'SOS';
+      case MeetupCheckinStatus.cancelled:
+        return 'Cancelled';
+    }
+  }
+
   Widget _buildQuickActions(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -343,7 +586,23 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
           description: 'Quick emergency alert',
           color: Colors.red,
           isEmergency: true,
-          onTap: () => _navigateToEmergencySOS(context),
+          onTap: () => _navigateToEmergencySOSWithDisclaimer(context),
+        ),
+        const SizedBox(height: 12),
+        _FeatureCard(
+          icon: Icons.share_location,
+          title: 'Share My Meetup',
+          description: 'Share meetup details with contacts',
+          color: Colors.teal,
+          onTap: () => _navigateToShareMeetup(context),
+        ),
+        const SizedBox(height: 12),
+        _FeatureCard(
+          icon: Icons.shield_outlined,
+          title: 'Message Safety',
+          description: 'AI-powered message screening',
+          color: Colors.indigo,
+          onTap: () => _navigateToMessageSafety(context),
         ),
       ],
     );
@@ -373,6 +632,31 @@ class _SafetyHubScreenState extends ConsumerState<SafetyHubScreen> {
 
   void _navigateToManualCheckIn(BuildContext context) {
     context.push(SafetyRoutes.manualCheckIn);
+  }
+
+  void _navigateToEmergencySOSWithDisclaimer(BuildContext context) async {
+    final acknowledged = await LiabilityDisclaimerModal.showIfNeeded(
+      context,
+      feature: LiabilityFeature.sos,
+      onAcknowledged: () {},
+    );
+    if (acknowledged && context.mounted) {
+      context.push(SafetyRoutes.emergencySOS);
+    }
+  }
+
+  void _navigateToShareMeetup(BuildContext context) {
+    context.push('/safety/meetup/share');
+  }
+
+  void _navigateToMessageSafety(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('AI message screening runs automatically in your chats.'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   // Helper methods

@@ -98,10 +98,13 @@ class _CreateJournalEntryScreenState
           await ref.read(journalEntryCreationProvider.notifier).saveEntry();
 
       if (success && mounted) {
+        final creationState = ref.read(journalEntryCreationProvider);
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Journal entry saved!'),
+          SnackBar(
+            content: Text(creationState.isEditing
+                ? 'Journal entry updated!'
+                : 'Journal entry saved!'),
             backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
           ),
@@ -172,7 +175,9 @@ class _CreateJournalEntryScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Journal Entry'),
+        title: Text(creationState.isEditing
+            ? 'Edit Journal Entry'
+            : 'New Journal Entry'),
         actions: [
           // Cancel button
           TextButton(

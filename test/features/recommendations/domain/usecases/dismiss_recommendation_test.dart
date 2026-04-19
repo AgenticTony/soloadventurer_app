@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/recommendations/domain/repositories/recommendation_repository.dart';
 import 'package:soloadventurer/features/recommendations/domain/usecases/dismiss_recommendation.dart';
 
@@ -18,6 +18,7 @@ void main() {
   setUp(() {
     mockRepository = MockRecommendationRepository();
     useCase = DismissRecommendation(mockRepository);
+    provideDummy<Either<Failure, Unit>>(const Right(unit));
   });
 
   group('DismissRecommendation', () {
@@ -129,7 +130,7 @@ void main() {
       when(mockRepository.dismissRecommendation(any, any))
           .thenAnswer((_) async => const Left(ServerFailure(
                 message: 'Server error',
-                code: '500',
+                statusCode: 500,
               )));
 
       // Act
@@ -141,7 +142,7 @@ void main() {
         (failure) {
           expect(failure, isA<ServerFailure>());
           expect(failure.message, 'Server error');
-          expect(failure.code, '500');
+          expect((failure as ServerFailure).statusCode, 500);
         },
         (_) => fail('Should return Left'),
       );

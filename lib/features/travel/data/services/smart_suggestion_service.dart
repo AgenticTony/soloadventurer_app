@@ -1,6 +1,7 @@
 import 'package:soloadventurer/core/services/places_service.dart';
 import 'package:soloadventurer/core/services/weather_service.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/date_range.dart';
+import 'package:soloadventurer/features/travel/domain/models/weather_forecast.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/destination.dart';
 import 'package:soloadventurer/features/travel/domain/models/activity_suggestion.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary_item.dart';

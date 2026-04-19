@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/core/models/paginated_data.dart';
 import 'package:soloadventurer/core/repositories/paginated_repository_mixin.dart';
@@ -79,7 +78,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       final localTrip = await _tripDao.getTripById(id);
       return localTrip != null ? LocalTripModel.fromDatabase(localTrip) : null;
     } catch (e) {
-      debugPrint('❌ trip: Error reading from local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to read trip from local cache');
     }
@@ -97,17 +95,14 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       if (existing != null) {
         // Update existing trip
         await _tripDao.updateTrip(localTrip);
-        debugPrint('📝 trip: Updated in local database: ${model.id}');
       } else {
         // Insert new trip
         final companion = _localTripToCompanion(localTrip);
         await _tripDao.insertTrip(companion);
-        debugPrint('📝 trip: Inserted in local database: ${model.id}');
       }
 
       return model;
     } catch (e) {
-      debugPrint('❌ trip: Error writing to local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to write trip to local cache');
     }
@@ -118,9 +113,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
     try {
       // Soft delete the trip
       await _tripDao.softDeleteTripById(id);
-      debugPrint('📝 trip: Soft deleted in local database: $id');
     } catch (e) {
-      debugPrint('❌ trip: Error deleting from local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to delete trip from local cache');
     }
@@ -137,7 +130,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         return trips.map((t) => LocalTripModel.fromDatabase(t)).toList();
       }
     } catch (e) {
-      debugPrint('❌ trip: Error reading all from local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to read trips from local cache');
     }
@@ -164,7 +156,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       final tripDataResponse = response.data['data']['createTrip'];
       return Trip.fromJson(tripDataResponse);
     } catch (e) {
-      debugPrint('❌ trip: Error in remote create: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -195,7 +186,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       final tripDataResponse = response.data['data']['updateTrip'];
       return Trip.fromJson(tripDataResponse);
     } catch (e) {
-      debugPrint('❌ trip: Error in remote update: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -227,9 +217,7 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         );
       }
 
-      debugPrint('🌐 trip: Deleted on remote API: $id');
     } catch (e) {
-      debugPrint('❌ trip: Error in remote delete: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -257,7 +245,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       final tripData = response.data['data']['getTrip'];
       return Trip.fromJson(tripData);
     } catch (e) {
-      debugPrint('❌ trip: Error in remote fetch: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -291,7 +278,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       final tripsData = response.data['data']['getTrips'] as List;
       return tripsData.map((json) => Trip.fromJson(json)).toList();
     } catch (e) {
-      debugPrint('❌ trip: Error in remote fetch all: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -309,7 +295,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
     return result;
   }
 
-  @override
   Future<List<Trip>> getTrips({String? userId}) {
     return getAll(userId: userId);
   }
@@ -338,7 +323,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
     }
   }
 
-  @override
   Future<List<Trip>> getTripsByStatus(String status, {String? userId}) async {
     try {
       // For now, we only support local queries
@@ -348,12 +332,10 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
           .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
           .toList();
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips by status: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips by status');
     }
   }
 
-  @override
   Future<List<Trip>> getTripsByDateRange(
     DateTime startDate,
     DateTime endDate, {
@@ -371,7 +353,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
           .map((t) => LocalTripModel.fromDatabase(t).toDomainEntity())
           .toList();
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips by date range: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips by date range');
     }
   }
@@ -404,7 +385,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         ),
       );
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips cursor: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips cursor');
     }
   }
@@ -444,7 +424,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         ),
       );
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips offset: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips offset');
     }
   }
@@ -474,7 +453,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         ),
       );
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips metadata: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips metadata');
     }
   }
@@ -492,7 +470,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       }
       return results;
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips by ids: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips by ids');
     }
   }
@@ -523,7 +500,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         ),
       );
     } catch (e) {
-      debugPrint('❌ trip: Error searching trips: ${e.toString()}');
       throw const CacheException(message: 'Failed to search trips');
     }
   }
@@ -537,7 +513,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
       final trips = await _tripDao.getTripsByUserId(userId);
       return trips.length;
     } catch (e) {
-      debugPrint('❌ trip: Error counting trips: ${e.toString()}');
       throw const CacheException(message: 'Failed to count trips');
     }
   }
@@ -572,7 +547,6 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
         ),
       );
     } catch (e) {
-      debugPrint('❌ trip: Error getting trips in date range: ${e.toString()}');
       throw const CacheException(message: 'Failed to get trips in date range');
     }
   }
@@ -669,8 +643,4 @@ class TripRepositoryImpl extends OfflineAwareRepository<Trip, LocalTripModel,
     return data;
   }
 
-  @override
-  Map<String, dynamic> _modelToJson(LocalTripModel model) {
-    return model.toJson();
-  }
 }

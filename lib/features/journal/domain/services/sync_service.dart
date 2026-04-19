@@ -217,7 +217,7 @@ class SyncConfig {
     operationTimeout: Duration(seconds: 30),
     syncMedia: true,
     autoResolveConflicts: false,
-    conflictResolutionStrategy: ConflictResolutionStrategy.mostRecent,
+    conflictStrategy: ConflictResolutionStrategy.mostRecent,
     syncPendingOnly: false,
   );
 
@@ -229,7 +229,7 @@ class SyncConfig {
     operationTimeout: Duration(seconds: 15),
     syncMedia: false,
     autoResolveConflicts: true,
-    conflictResolutionStrategy: ConflictResolutionStrategy.mostRecent,
+    conflictStrategy: ConflictResolutionStrategy.mostRecent,
     syncPendingOnly: true,
   );
 
@@ -241,7 +241,7 @@ class SyncConfig {
     operationTimeout: Duration(minutes: 1),
     syncMedia: true,
     autoResolveConflicts: false,
-    conflictResolutionStrategy: ConflictResolutionStrategy.manual,
+    conflictStrategy: ConflictResolutionStrategy.manual,
     syncPendingOnly: false,
   );
 
@@ -252,7 +252,7 @@ class SyncConfig {
     this.operationTimeout = const Duration(seconds: 30),
     this.syncMedia = true,
     this.autoResolveConflicts = false,
-    this.conflictResolutionStrategy = ConflictResolutionStrategy.mostRecent,
+    this.conflictStrategy = ConflictResolutionStrategy.mostRecent,
     this.syncPendingOnly = false,
   });
 }

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/utils/video_compression.dart';
+import 'package:soloadventurer/features/journal/data/services/video_compression.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'media_test_helpers.dart';
 
@@ -473,8 +473,8 @@ void main() {
         // Act
         final config = VideoCompression.getRecommendedConfig(
           fileSize: 80 * 1024 * 1024, // 80 MB
-          width: 1920,
-          height: 1080, // 1080p (2 MP)
+          width: 1600,
+          height: 900, // 1.44 MP (between 1.0 and 2.0)
           duration: 30.0,
           slowNetwork: false,
         );
@@ -519,16 +519,23 @@ void main() {
         );
       });
 
-      test('should throw InvalidVideoException for unsupported format', () {
-        // Arrange
-        final file = File('/tmp/test.flv'); // FLV not supported
+      test('should throw UnsupportedVideoFormatException for unsupported format',
+          () {
+        // Arrange - create a real file so existence check passes
+        final dir = Directory.systemTemp.createTempSync('video_test_');
+        final file = File('${dir.path}/test.flv');
+        file.writeAsStringSync('fake video content');
 
-        // Act & Assert
-        expect(
-          () => videoCompression.compressVideo(file),
-          throwsA(isA<UnsupportedVideoFormatException>()
-              .having((e) => e.code, 'code', equals('unsupported_format'))),
-        );
+        try {
+          // Act & Assert
+          expect(
+            () => videoCompression.compressVideo(file),
+            throwsA(isA<UnsupportedVideoFormatException>()
+                .having((e) => e.code, 'code', equals('unsupported_format'))),
+          );
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
       });
 
       test('should throw InvalidVideoException when file exceeds max size', () {

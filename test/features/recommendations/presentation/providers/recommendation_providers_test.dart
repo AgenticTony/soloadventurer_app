@@ -1,9 +1,16 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';
+import 'package:soloadventurer/features/recommendations/domain/entities/place_activity.dart';
+import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
 import 'package:soloadventurer/features/recommendations/domain/repositories/recommendation_repository.dart';
+import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart';
+import 'package:soloadventurer/features/recommendations/domain/usecases/save_recommendation.dart';
+import 'package:soloadventurer/features/recommendations/domain/usecases/dismiss_recommendation.dart';
+import 'package:soloadventurer/features/recommendations/data/datasources/recommendation_local_data_source.dart';
+import 'package:soloadventurer/features/recommendations/data/repositories/recommendation_repository_impl.dart';
 import 'package:soloadventurer/features/recommendations/presentation/providers/recommendation_providers.dart';
 
 /// Mock implementation of RecommendationRepository for testing
@@ -286,8 +293,23 @@ void main() {
 }
 
 /// Helper to create a test recommendation
-dynamic _createTestRecommendation(String id) {
-  // Return a simple map-based test object
-  // since we can't use the full freezed classes
-  return {'id': id, 'name': 'Test Place'};
+PersonalizedRecommendation _createTestRecommendation(String id) {
+  return PersonalizedRecommendation(
+    id: id,
+    activity: const PlaceActivity(
+      id: 'place-1',
+      name: 'Test Place',
+      category: RecommendationCategory.food,
+    ),
+    metadata: RecommendationMetadata(
+      matchedInterests: {TravelInterest.food},
+      suggestedDate: DateTime(2026, 6, 1),
+      suggestedTime: const TimeOfDay(hour: 12),
+      distance: DistanceFromHotel.walking,
+      weather: WeatherContext.anyWeather,
+      crowdLevel: CrowdLevel.low,
+    ),
+    reasoning: 'Test',
+    relevanceScore: 90.0,
+  );
 }

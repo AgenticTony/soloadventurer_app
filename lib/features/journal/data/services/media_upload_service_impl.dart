@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -82,7 +81,10 @@ class MediaUploadServiceImpl extends MediaUploadService {
 
   @override
   UploadTask? getTask(String taskId) {
-    return _queue.firstWhere((task) => task.id == taskId);
+    for (final task in _queue) {
+      if (task.id == taskId) return task;
+    }
+    return null;
   }
 
   @override
@@ -225,7 +227,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
   @override
   Future<void> cancelAllUploads() async {
     for (final task in _queue) {
-      if (task.isActive) {
+      if (task.status == UploadStatus.queued || task.status == UploadStatus.pending || task.status == UploadStatus.uploading) {
         final cancelledTask = task.copyWith(
           status: UploadStatus.cancelled,
           completedAt: DateTime.now(),
@@ -241,7 +243,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
   @override
   Future<void> retryUpload(String taskId) async {
     final task = getTask(taskId);
-    if (task == null || !task.canRetry) return;
+    if (task == null || !task.shouldRetry) return;
 
     final retriedTask = task.copyWith(
       status: UploadStatus.queued,
@@ -336,7 +338,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
       _backgroundTaskId,
       'mediaUploadTask',
       frequency: const Duration(minutes: 15),
-      constraints: WorkManagerConstraints(
+      constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: true,
         requiresCharging: false,
@@ -435,7 +437,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
     final storagePath = '$userId/${DateTime.now().toIso8601String()}$_uuid$ext';
 
     // Upload file with progress tracking
-    final response = await _client.storage.from(bucket).upload(
+    await _client.storage.from(bucket).upload(
           storagePath,
           file,
           fileOptions: const FileOptions(
@@ -467,7 +469,6 @@ class MediaUploadServiceImpl extends MediaUploadService {
         );
       } catch (e) {
         // Log error but don't fail the upload
-        debugPrint('Failed to update media item: $e');
       }
     }
   }
@@ -528,7 +529,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
   ) async {
     await _client.from('media_items').insert({
       'journal_entry_id': entryId,
-      'media_type': mediaType.toValue(),
+      'media_type': mediaType.value,
       'storage_path': storagePath,
       'upload_status': 'completed',
       'upload_progress': 100,
@@ -567,7 +568,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
       try {
         callback(task);
       } catch (e) {
-        debugPrint('Error in status callback: $e');
+      // intentional silent catch
       }
     }
   }
@@ -578,7 +579,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
       final jsonList = _queue.map((task) => task.toJson()).toList();
       await _prefs.setString(_queueKey, jsonEncode(jsonList));
     } catch (e) {
-      debugPrint('Failed to persist queue: $e');
+    // intentional silent catch
     }
   }
 
@@ -596,7 +597,7 @@ class MediaUploadServiceImpl extends MediaUploadService {
         _queue.addAll(tasks);
       }
     } catch (e) {
-      debugPrint('Failed to load queue: $e');
+    // intentional silent catch
     }
   }
 }

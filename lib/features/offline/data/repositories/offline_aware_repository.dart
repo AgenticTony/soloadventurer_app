@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 
 /// Result of an offline-aware repository operation
@@ -179,7 +178,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
       final localModel = await readFromLocal(id);
       if (localModel != null) {
         final entity = modelToEntity(localModel);
-        debugPrint('📦 $entityType: Retrieved from local cache: $id');
 
         // If local data is synced, we can trust it
         // If it has pending changes, we still return it (optimistic)
@@ -202,7 +200,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
       }
 
       // Step 3: Fetch from remote API
-      debugPrint('🌐 $entityType: Fetching from remote API: $id');
       final remoteEntity = await executeRemoteFetch(id);
 
       // Step 4: Cache the fetched entity locally
@@ -210,11 +207,9 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
       await writeToLocal(model);
 
       return remoteEntity;
-    } on AppException catch (e) {
-      debugPrint('❌ $entityType: Error in getById: ${e.message}');
+    } on AppException catch (_) {
       rethrow;
     } catch (e) {
-      debugPrint('❌ $entityType: Unexpected error in getById: ${e.toString()}');
       throw UnknownException(message: e.toString());
     }
   }
@@ -233,8 +228,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
 
       if (localModels.isNotEmpty) {
         final entities = localModels.map(modelToEntity).toList();
-        debugPrint(
-            '📦 $entityType: Retrieved ${entities.length} from local cache');
         return entities;
       }
 
@@ -254,7 +247,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
       }
 
       // Step 3: Fetch from remote API
-      debugPrint('🌐 $entityType: Fetching all from remote API');
       final remoteEntities = await executeRemoteFetchAll(userId: userId);
 
       // Step 4: Cache the fetched entities locally
@@ -263,16 +255,14 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         try {
           await writeToLocal(model);
         } catch (e) {
-          debugPrint('⚠️ $entityType: Failed to cache entity: $e');
+        // intentional silent catch
         }
       }
 
       return remoteEntities;
-    } on AppException catch (e) {
-      debugPrint('❌ $entityType: Error in getAll: ${e.message}');
+    } on AppException catch (_) {
       rethrow;
     } catch (e) {
-      debugPrint('❌ $entityType: Unexpected error in getAll: ${e.toString()}');
       throw UnknownException(message: e.toString());
     }
   }
@@ -293,7 +283,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
       final tempId = _generateTemporaryId();
 
       // Step 2: Write to local database immediately
-      debugPrint('📝 $entityType: Writing to local database: $tempId');
       final localModel = await _writeModelWithId(model, tempId);
 
       // Step 3: Check connectivity
@@ -301,7 +290,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
 
       if (isConnected.isConnected) {
         // Online: Execute remote operation immediately
-        debugPrint('🌐 $entityType: Online, creating on remote API');
         try {
           final remoteEntity =
               await executeRemoteCreate(localModel as CreateModel);
@@ -311,9 +299,8 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
           await writeToLocal(updatedModel);
 
           return RepositoryOperationResult.immediate(remoteEntity);
-        } on AppException catch (e) {
+        } on AppException catch (_) {
           // Remote operation failed, but we have local data
-          debugPrint('⚠️ $entityType: Remote create failed: ${e.message}');
           if (config.queueWhenOffline) {
             await queueOperation(
               entityType: entityType,
@@ -328,7 +315,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         }
       } else {
         // Offline: Queue for sync
-        debugPrint('📴 $entityType: Offline, queuing for sync');
         if (config.queueWhenOffline) {
           await queueOperation(
             entityType: entityType,
@@ -342,11 +328,9 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         final entity = modelToEntity(localModel);
         return RepositoryOperationResult.queued(entity);
       }
-    } on AppException catch (e) {
-      debugPrint('❌ $entityType: Error in create: ${e.message}');
+    } on AppException catch (_) {
       rethrow;
     } catch (e) {
-      debugPrint('❌ $entityType: Unexpected error in create: ${e.toString()}');
       throw UnknownException(message: e.toString());
     }
   }
@@ -363,7 +347,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
   ) async {
     try {
       // Step 1: Write to local database immediately
-      debugPrint('📝 $entityType: Writing update to local database: $id');
       final localModel = await _writeModelWithId(model, id);
 
       // Step 2: Check connectivity
@@ -371,7 +354,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
 
       if (isConnected.isConnected) {
         // Online: Execute remote operation immediately
-        debugPrint('🌐 $entityType: Online, updating on remote API: $id');
         try {
           final remoteEntity =
               await executeRemoteUpdate(id, localModel as UpdateModel);
@@ -381,9 +363,8 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
           await writeToLocal(updatedModel);
 
           return RepositoryOperationResult.immediate(remoteEntity);
-        } on AppException catch (e) {
+        } on AppException catch (_) {
           // Remote operation failed, but we have local data
-          debugPrint('⚠️ $entityType: Remote update failed: ${e.message}');
           if (config.queueWhenOffline) {
             await queueOperation(
               entityType: entityType,
@@ -398,7 +379,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         }
       } else {
         // Offline: Queue for sync
-        debugPrint('📴 $entityType: Offline, queuing update for sync: $id');
         if (config.queueWhenOffline) {
           await queueOperation(
             entityType: entityType,
@@ -412,11 +392,9 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         final entity = modelToEntity(localModel);
         return RepositoryOperationResult.queued(entity);
       }
-    } on AppException catch (e) {
-      debugPrint('❌ $entityType: Error in update: ${e.message}');
+    } on AppException catch (_) {
       rethrow;
     } catch (e) {
-      debugPrint('❌ $entityType: Unexpected error in update: ${e.toString()}');
       throw UnknownException(message: e.toString());
     }
   }
@@ -430,7 +408,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
   Future<RepositoryOperationResult<void>> delete(String id) async {
     try {
       // Step 1: Soft delete in local database immediately
-      debugPrint('📝 $entityType: Soft deleting in local database: $id');
       await deleteFromLocal(id);
 
       // Step 2: Check connectivity
@@ -438,13 +415,11 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
 
       if (isConnected.isConnected) {
         // Online: Execute remote operation immediately
-        debugPrint('🌐 $entityType: Online, deleting on remote API: $id');
         try {
           await executeRemoteDelete(id);
           return const RepositoryOperationResult.immediate(null);
-        } on AppException catch (e) {
+        } on AppException catch (_) {
           // Remote operation failed, but we have local deletion
-          debugPrint('⚠️ $entityType: Remote delete failed: ${e.message}');
           if (config.queueWhenOffline) {
             await queueOperation(
               entityType: entityType,
@@ -458,7 +433,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         }
       } else {
         // Offline: Queue for sync
-        debugPrint('📴 $entityType: Offline, queuing deletion for sync: $id');
         if (config.queueWhenOffline) {
           await queueOperation(
             entityType: entityType,
@@ -471,11 +445,9 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
         // Return queued result
         return const RepositoryOperationResult.queued(null);
       }
-    } on AppException catch (e) {
-      debugPrint('❌ $entityType: Error in delete: ${e.message}');
+    } on AppException catch (_) {
       rethrow;
     } catch (e) {
-      debugPrint('❌ $entityType: Unexpected error in delete: ${e.toString()}');
       throw UnknownException(message: e.toString());
     }
   }
@@ -519,7 +491,7 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
     required SyncOperationType operation,
     required Map<String, dynamic> data,
   }) async {
-    final result = await _syncQueueService.enqueueOperation(
+    await _syncQueueService.enqueueOperation(
       entityType: entityType,
       entityId: entityId,
       operation: operation,
@@ -527,8 +499,6 @@ abstract class OfflineAwareRepository<Entity, Model, CreateModel extends Model,
       priority: config.defaultSyncPriority,
       maxRetries: config.maxSyncRetries,
     );
-    debugPrint('📋 $entityType: Queued operation #$result.operationId '
-        'for $operation on $entityId');
   }
 
   /// Check if currently online

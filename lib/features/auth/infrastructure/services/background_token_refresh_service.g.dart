@@ -38,7 +38,7 @@ final class BackgroundTokenRefreshServiceProvider
 }
 
 String _$backgroundTokenRefreshServiceHash() =>
-    r'7c77d7f80b7a51f339ebdb802b6de16d258e5554';
+    r'23b463bb6e5154fce4b108bc2d6913be595194ef';
 
 /// Service responsible for managing background token refresh operations
 

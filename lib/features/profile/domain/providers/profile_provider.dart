@@ -8,7 +8,7 @@ import '../../presentation/providers/profile_providers.dart'
 part 'profile_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
+/// - Converted from `StateNotifier<ProfileDomainState>` to `Notifier<ProfileDomainState>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - build() returns ProfileDomainState not AsyncValue
 /// - Constructor auto-load moved to build() method

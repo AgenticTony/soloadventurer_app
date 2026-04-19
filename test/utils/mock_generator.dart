@@ -1,5 +1,4 @@
 import 'package:mocktail/mocktail.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// A registry for mock objects to ensure consistent usage across tests.
 class MockRegistry {
@@ -38,88 +37,6 @@ class MockRegistry {
   /// Clears all registered mocks.
   static void clear() {
     _mocks.clear();
-  }
-}
-
-/// Creates a provider override for a specific provider using a mock.
-///
-/// [provider] - The provider to override.
-/// [mock] - The mock instance to use for the override.
-///
-/// Returns an [Override] that can be used in a [ProviderContainer].
-Override mockProvider<T>(Provider<T> provider, T mock) {
-  return provider.overrideWithValue(mock);
-}
-
-/// Creates a provider override for a specific future provider using a mock.
-///
-/// [provider] - The future provider to override.
-/// [value] - The value to return from the mock.
-///
-/// Returns an [Override] that can be used in a [ProviderContainer].
-Override mockFutureProvider<T>(FutureProvider<T> provider, T value) {
-  return provider.overrideWith((ref) => Future.value(value));
-}
-
-/// Creates a provider override for a specific future provider to simulate loading.
-///
-/// [provider] - The future provider to override.
-///
-/// Returns an [Override] that can be used in a [ProviderContainer].
-Override mockFutureProviderLoading<T>(FutureProvider<T> provider) {
-  return provider.overrideWith((ref) => Future<T>.delayed(
-        const Duration(
-            days: 365), // Long delay to ensure it stays in loading state
-        () => throw UnimplementedError(),
-      ));
-}
-
-/// Creates a provider override for a specific future provider to simulate an error.
-///
-/// [provider] - The future provider to override.
-/// [error] - The error to simulate.
-/// [stackTrace] - Optional stack trace to include with the error.
-///
-/// Returns an [Override] that can be used in a [ProviderContainer].
-Override mockFutureProviderError<T>(
-  FutureProvider<T> provider,
-  Object error, [
-  StackTrace? stackTrace,
-]) {
-  return provider.overrideWith((ref) => Future<T>.error(
-        error,
-        stackTrace ?? StackTrace.current,
-      ));
-}
-
-/// Creates a provider override for a specific state notifier provider using a mock.
-///
-/// [provider] - The state notifier provider to override.
-/// [mockNotifier] - The mock state notifier to use.
-///
-/// Returns an [Override] that can be used in a [ProviderContainer].
-Override
-    mockStateNotifierProvider<Notifier extends StateNotifier<State>, State>(
-  StateNotifierProvider<Notifier, State> provider,
-  Notifier mockNotifier,
-) {
-  return provider.overrideWith((_) => mockNotifier);
-}
-
-/// A utility class to create mock state notifiers for testing.
-///
-/// [T] - The state type for the notifier.
-class MockStateNotifier<T> extends Mock implements StateNotifier<T> {
-  T _state;
-
-  MockStateNotifier(this._state);
-
-  @override
-  T get state => _state;
-
-  @override
-  set state(T value) {
-    _state = value;
   }
 }
 

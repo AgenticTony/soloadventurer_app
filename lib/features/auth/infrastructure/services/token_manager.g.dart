@@ -44,7 +44,7 @@ final class TokenManagerProvider
   }
 }
 
-String _$tokenManagerHash() => r'e6cf8ad909444a80325358fa9dc0e542b876b907';
+String _$tokenManagerHash() => r'0469cd80ddcb24395b26ebecec3538bcf5cd1712';
 
 /// Manages authentication tokens and their lifecycle according to AWS Cognito specifications
 

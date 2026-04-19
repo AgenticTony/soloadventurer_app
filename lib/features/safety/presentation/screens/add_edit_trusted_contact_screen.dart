@@ -185,9 +185,8 @@ class _AddEditTrustedContactScreenState
 
   @override
   Widget build(BuildContext context) {
-    final contactsState = ref.watch(trustedContactsProvider);
-    final isSaving =
-        _isEditMode ? contactsState.isUpdating : contactsState.isAdding;
+    final contactsAsync = ref.watch(trustedContactsProvider);
+    final isSaving = contactsAsync.isLoading;
 
     return Scaffold(
       appBar: AppBar(

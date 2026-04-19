@@ -23,8 +23,6 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - platform_device_id (0.0.1):
-    - FlutterMacOS
   - printing (1.0.0):
     - FlutterMacOS
   - quill_native_bridge_macos (0.0.1):
@@ -60,7 +58,6 @@ DEPENDENCIES:
   - geolocator_apple (from `Flutter/ephemeral/.symlinks/plugins/geolocator_apple/darwin`)
   - package_info_plus (from `Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos`)
   - path_provider_foundation (from `Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin`)
-  - platform_device_id (from `Flutter/ephemeral/.symlinks/plugins/platform_device_id/macos`)
   - printing (from `Flutter/ephemeral/.symlinks/plugins/printing/macos`)
   - quill_native_bridge_macos (from `Flutter/ephemeral/.symlinks/plugins/quill_native_bridge_macos/macos`)
   - sentry_flutter (from `Flutter/ephemeral/.symlinks/plugins/sentry_flutter/macos`)
@@ -97,8 +94,6 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/package_info_plus/macos
   path_provider_foundation:
     :path: Flutter/ephemeral/.symlinks/plugins/path_provider_foundation/darwin
-  platform_device_id:
-    :path: Flutter/ephemeral/.symlinks/plugins/platform_device_id/macos
   printing:
     :path: Flutter/ephemeral/.symlinks/plugins/printing/macos
   quill_native_bridge_macos:
@@ -128,7 +123,6 @@ SPEC CHECKSUMS:
   geolocator_apple: ab36aa0e8b7d7a2d7639b3b4e48308394e8cef5e
   package_info_plus: f0052d280d17aa382b932f399edf32507174e870
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
-  platform_device_id: 9cf7fdecef26b194408c7bad49b4ba8371d1dd50
   printing: c4cf83c78fd684f9bc318e6aadc18972aa48f617
   quill_native_bridge_macos: 2b005cb56902bb740e0cd9620aa399dfac6b4882
   Sentry: b53951377b78e21a734f5dc8318e333dbfc682d7

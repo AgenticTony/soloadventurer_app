@@ -520,7 +520,7 @@ void main() {
 }
 
 /// Fixed random generator for testing jitter behavior
-class FixedRandom extends Random {
+class FixedRandom implements Random {
   final double _value;
 
   FixedRandom(this._value);
@@ -530,4 +530,7 @@ class FixedRandom extends Random {
 
   @override
   int nextInt(int max) => (_value * max).floor();
+
+  @override
+  bool nextBool() => _value > 0.5;
 }

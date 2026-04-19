@@ -103,7 +103,6 @@ class _SliverGridGridLayoutWithVariableAspectRatio extends SliverGridLayout {
     required this.getAspectRatio,
   });
 
-  @override
   double getMinScrollOffset(int childCount) {
     return 0.0;
   }

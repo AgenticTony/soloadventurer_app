@@ -8,17 +8,16 @@ import 'safety_providers.dart';
 
 part 'location_sharing_provider.g.dart';
 
-/// Notifier for managing location sharing state
-/// Handles starting, stopping, and monitoring location shares
+/// AsyncNotifier for managing location sharing state.
 ///
 /// Riverpod 3.0 Compliant:
 /// - Uses @riverpod annotation with code generation
-/// - Uses Notifier base class instead of StateNotifier
-/// - Dependencies accessed via ref.watch() in methods
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 @riverpod
 class LocationSharing extends _$LocationSharing {
   @override
-  LocationSharingState build() => const LocationSharingState();
+  Future<LocationSharingState> build() async => LocationSharingState.initial();
 
   ShareLocationUseCase get _shareLocation =>
       ref.watch(shareLocationUseCaseProvider);
@@ -29,26 +28,17 @@ class LocationSharing extends _$LocationSharing {
 
   /// Load active location shares
   Future<void> loadActiveShares() async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final activeShares = await _getActiveShares();
       final recentUpdates = await _getActiveShares.getRecentUpdates();
 
-      state = state.copyWith(
-        isLoading: false,
+      return (state.value ?? LocationSharingState.initial()).copyWith(
         activeShares: activeShares,
         locationUpdates: recentUpdates,
         latestLocation: recentUpdates.isNotEmpty ? recentUpdates.first : null,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Share current location with contacts
@@ -67,10 +57,11 @@ class LocationSharing extends _$LocationSharing {
     String? emergencyAlertId,
     String? checkInId,
   }) async {
-    if (state.isStarting) return;
+    final current = state.value;
+    if (current == null || current.isStarting) return;
 
-    state = state.copyWith(isStarting: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isStarting: true));
+    state = await AsyncValue.guard(() async {
       final locationUpdate = await _shareLocation(
         latitude: latitude,
         longitude: longitude,
@@ -87,22 +78,16 @@ class LocationSharing extends _$LocationSharing {
         checkInId: checkInId,
       );
 
-      final updatedShares = [locationUpdate, ...state.activeShares];
-      final updatedUpdates = [locationUpdate, ...state.locationUpdates];
+      final updatedShares = [locationUpdate, ...current.activeShares];
+      final updatedUpdates = [locationUpdate, ...current.locationUpdates];
 
-      state = state.copyWith(
+      return current.copyWith(
         isStarting: false,
         activeShares: updatedShares,
         locationUpdates: updatedUpdates,
         latestLocation: locationUpdate,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isStarting: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Share location with a single contact
@@ -170,29 +155,23 @@ class LocationSharing extends _$LocationSharing {
 
   /// Stop sharing location with specific contacts
   Future<void> stopSharing(List<String> contactIds) async {
-    if (state.isStopping) return;
+    final current = state.value;
+    if (current == null || current.isStopping) return;
 
-    state = state.copyWith(isStopping: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isStopping: true));
+    state = await AsyncValue.guard(() async {
       await _stopLocationSharing(contactIds);
 
-      // Filter out shares with the specified contacts
-      final updatedShares = state.activeShares
+      final updatedShares = current.activeShares
           .where((share) =>
               !share.sharedWithContactIds.any((id) => contactIds.contains(id)))
           .toList();
 
-      state = state.copyWith(
+      return current.copyWith(
         isStopping: false,
         activeShares: updatedShares,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isStopping: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Stop sharing location with a single contact
@@ -202,23 +181,17 @@ class LocationSharing extends _$LocationSharing {
 
   /// Stop all location sharing
   Future<void> stopAllSharing() async {
-    if (state.isStopping) return;
+    final current = state.value;
+    if (current == null || current.isStopping) return;
 
-    state = state.copyWith(isStopping: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isStopping: true));
+    state = await AsyncValue.guard(() async {
       await _stopLocationSharing.stopAll();
-
-      state = state.copyWith(
+      return current.copyWith(
         isStopping: false,
         activeShares: [],
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isStopping: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Get recent location updates
@@ -227,37 +200,27 @@ class LocationSharing extends _$LocationSharing {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final updates = await _getActiveShares.getRecentUpdates(
         limit: limit,
         startDate: startDate,
         endDate: endDate,
       );
 
-      state = state.copyWith(
-        isLoading: false,
+      return (state.value ?? LocationSharingState.initial()).copyWith(
         locationUpdates: updates,
         latestLocation:
-            updates.isNotEmpty ? updates.first : state.latestLocation,
-        error: null,
+            updates.isNotEmpty ? updates.first : (state.value ?? LocationSharingState.initial()).latestLocation,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Get location shares for a specific contact
   Future<List<LocationUpdate>> getSharesForContact(String contactId) async {
     try {
       return await _getActiveShares.getSharesForContact(contactId);
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
+    } catch (_) {
       return [];
     }
   }
@@ -266,8 +229,7 @@ class LocationSharing extends _$LocationSharing {
   Future<List<LocationUpdate>> getEmergencyShares() async {
     try {
       return await _getActiveShares.getEmergencyShares();
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
+    } catch (_) {
       return [];
     }
   }
@@ -276,15 +238,9 @@ class LocationSharing extends _$LocationSharing {
   Future<List<LocationUpdate>> getSharesForCheckIn(String checkInId) async {
     try {
       return await _getActiveShares.getSharesForCheckIn(checkInId);
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
+    } catch (_) {
       return [];
     }
-  }
-
-  /// Clear any error message
-  void clearError() {
-    state = state.copyWith(error: null);
   }
 
   /// Refresh active shares

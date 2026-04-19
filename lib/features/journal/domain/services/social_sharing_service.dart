@@ -377,7 +377,7 @@ abstract class SocialSharingService {
   /// Generate a shareable link for content (future feature)
   /// This would integrate with subtask 8.3 (public trip sharing links)
   Future<String?> generateShareLink({
-    ShareableType type,
+    ShareableType type = ShareableType.journalEntry,
     String? entryId,
     String? tripId,
     String? mediaId,

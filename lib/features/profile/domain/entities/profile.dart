@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:soloadventurer/features/social/domain/enums/verification_tier.dart';
 
 /// Represents a user profile in the application
 class Profile extends Equatable {
@@ -12,6 +13,7 @@ class Profile extends Equatable {
     this.bio,
     this.avatarUrl,
     this.isPublic = false,
+    this.verificationTier = VerificationTier.unverified,
     this.interests = const [],
     this.preferences = const {},
     required this.createdAt,
@@ -42,6 +44,9 @@ class Profile extends Equatable {
   /// Whether the profile is publicly visible
   final bool isPublic;
 
+  /// The user's verification tier
+  final VerificationTier verificationTier;
+
   /// The user's interests
   final List<String> interests;
 
@@ -64,6 +69,7 @@ class Profile extends Equatable {
         bio,
         avatarUrl,
         isPublic,
+        verificationTier,
         interests,
         preferences,
         createdAt,
@@ -80,6 +86,7 @@ class Profile extends Equatable {
     String? bio,
     String? avatarUrl,
     bool? isPublic,
+    VerificationTier? verificationTier,
     List<String>? interests,
     Map<String, dynamic>? preferences,
     DateTime? createdAt,
@@ -94,6 +101,7 @@ class Profile extends Equatable {
       bio: bio ?? this.bio,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isPublic: isPublic ?? this.isPublic,
+      verificationTier: verificationTier ?? this.verificationTier,
       interests: interests ?? this.interests,
       preferences: preferences ?? this.preferences,
       createdAt: createdAt ?? this.createdAt,

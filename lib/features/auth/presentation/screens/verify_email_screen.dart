@@ -23,11 +23,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authAsync = ref.read(authProvider);
       final authState = authAsync.value;
-      debugPrint('VerifyEmailScreen: Auth state on init: $authState');
-      debugPrint(
-          'VerifyEmailScreen: User email from state: ${authState?.user?.email}');
-      debugPrint(
-          'VerifyEmailScreen: Needs verification: ${authState?.requiresEmailVerification}');
 
       // Try to get email from navigation arguments first
       final args =
@@ -43,8 +38,6 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
                   : null);
         });
       }
-
-      debugPrint('VerifyEmailScreen: Final email state: $_email');
 
       // Check if we need to redirect to login
       if (authState?.requiresEmailVerification != true &&
@@ -80,14 +73,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
       // Store the current auth state before verification
       final preservedUser = authAsync.value?.user;
 
-      debugPrint('VerifyEmailScreen: Starting verification');
-      debugPrint('VerifyEmailScreen: Current auth async state: $authAsync');
-      debugPrint('VerifyEmailScreen: Preserved user: $preservedUser');
-      debugPrint('VerifyEmailScreen: Local email state: $_email');
-      debugPrint('VerifyEmailScreen: Verification code: $code');
-
       if (_email == null) {
-        debugPrint('VerifyEmailScreen: No email available in local state');
         // Try to get email from preserved user first
         _email = preservedUser?.email ?? authAsync.value?.user?.email;
         if (_email == null) {
@@ -101,13 +87,9 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
           }
           return;
         }
-        debugPrint('VerifyEmailScreen: Retrieved email: $_email');
       }
 
-      debugPrint(
-          'VerifyEmailScreen: Proceeding with verification - Email: $_email, Code: $code');
       await ref.read(authProvider.notifier).verifyEmail(code, _email!);
-      debugPrint('VerifyEmailScreen: Verification completed successfully');
     }
   }
 

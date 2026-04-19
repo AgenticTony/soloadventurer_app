@@ -38,7 +38,9 @@ mixin _$NotificationPreferences {
   bool get keepNotificationHistory;
   int get historyRetentionDays; // Location-based notifications
   bool get locationBasedNotificationsEnabled;
-  int get proximityNotificationRadiusMeters; // Timestamps
+  int get proximityNotificationRadiusMeters; // Chat notification preferences
+  List<String> get mutedChatIds;
+  bool get chatMessageNotifications; // Timestamps
   DateTime? get lastUpdated;
   String? get userId;
 
@@ -110,8 +112,10 @@ mixin _$NotificationPreferences {
             (identical(other.proximityNotificationRadiusMeters, proximityNotificationRadiusMeters) ||
                 other.proximityNotificationRadiusMeters ==
                     proximityNotificationRadiusMeters) &&
-            (identical(other.lastUpdated, lastUpdated) ||
-                other.lastUpdated == lastUpdated) &&
+            const DeepCollectionEquality()
+                .equals(other.mutedChatIds, mutedChatIds) &&
+            (identical(other.chatMessageNotifications, chatMessageNotifications) || other.chatMessageNotifications == chatMessageNotifications) &&
+            (identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated) &&
             (identical(other.userId, userId) || other.userId == userId));
   }
 
@@ -143,13 +147,15 @@ mixin _$NotificationPreferences {
         historyRetentionDays,
         locationBasedNotificationsEnabled,
         proximityNotificationRadiusMeters,
+        const DeepCollectionEquality().hash(mutedChatIds),
+        chatMessageNotifications,
         lastUpdated,
         userId
       ]);
 
   @override
   String toString() {
-    return 'NotificationPreferences(flightCheckInReminders: $flightCheckInReminders, flightDelaysAndCancellations: $flightDelaysAndCancellations, flightGateChanges: $flightGateChanges, bookingConfirmations: $bookingConfirmations, checkInReminders: $checkInReminders, reservationReminders: $reservationReminders, severeWeatherAlerts: $severeWeatherAlerts, dailyWeatherSummary: $dailyWeatherSummary, rainAlertsForOutdoorActivities: $rainAlertsForOutdoorActivities, safetyAlerts: $safetyAlerts, travelAdvisories: $travelAdvisories, emergencyAlerts: $emergencyAlerts, nearbyDeals: $nearbyDeals, localEventSuggestions: $localEventSuggestions, restaurantRecommendations: $restaurantRecommendations, vibrateEnabled: $vibrateEnabled, soundEnabled: $soundEnabled, bypassDoNotDisturb: $bypassDoNotDisturb, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, keepNotificationHistory: $keepNotificationHistory, historyRetentionDays: $historyRetentionDays, locationBasedNotificationsEnabled: $locationBasedNotificationsEnabled, proximityNotificationRadiusMeters: $proximityNotificationRadiusMeters, lastUpdated: $lastUpdated, userId: $userId)';
+    return 'NotificationPreferences(flightCheckInReminders: $flightCheckInReminders, flightDelaysAndCancellations: $flightDelaysAndCancellations, flightGateChanges: $flightGateChanges, bookingConfirmations: $bookingConfirmations, checkInReminders: $checkInReminders, reservationReminders: $reservationReminders, severeWeatherAlerts: $severeWeatherAlerts, dailyWeatherSummary: $dailyWeatherSummary, rainAlertsForOutdoorActivities: $rainAlertsForOutdoorActivities, safetyAlerts: $safetyAlerts, travelAdvisories: $travelAdvisories, emergencyAlerts: $emergencyAlerts, nearbyDeals: $nearbyDeals, localEventSuggestions: $localEventSuggestions, restaurantRecommendations: $restaurantRecommendations, vibrateEnabled: $vibrateEnabled, soundEnabled: $soundEnabled, bypassDoNotDisturb: $bypassDoNotDisturb, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, keepNotificationHistory: $keepNotificationHistory, historyRetentionDays: $historyRetentionDays, locationBasedNotificationsEnabled: $locationBasedNotificationsEnabled, proximityNotificationRadiusMeters: $proximityNotificationRadiusMeters, mutedChatIds: $mutedChatIds, chatMessageNotifications: $chatMessageNotifications, lastUpdated: $lastUpdated, userId: $userId)';
   }
 }
 
@@ -184,6 +190,8 @@ abstract mixin class $NotificationPreferencesCopyWith<$Res> {
       int historyRetentionDays,
       bool locationBasedNotificationsEnabled,
       int proximityNotificationRadiusMeters,
+      List<String> mutedChatIds,
+      bool chatMessageNotifications,
       DateTime? lastUpdated,
       String? userId});
 }
@@ -225,6 +233,8 @@ class _$NotificationPreferencesCopyWithImpl<$Res>
     Object? historyRetentionDays = null,
     Object? locationBasedNotificationsEnabled = null,
     Object? proximityNotificationRadiusMeters = null,
+    Object? mutedChatIds = null,
+    Object? chatMessageNotifications = null,
     Object? lastUpdated = freezed,
     Object? userId = freezed,
   }) {
@@ -327,6 +337,14 @@ class _$NotificationPreferencesCopyWithImpl<$Res>
           ? _self.proximityNotificationRadiusMeters
           : proximityNotificationRadiusMeters // ignore: cast_nullable_to_non_nullable
               as int,
+      mutedChatIds: null == mutedChatIds
+          ? _self.mutedChatIds
+          : mutedChatIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      chatMessageNotifications: null == chatMessageNotifications
+          ? _self.chatMessageNotifications
+          : chatMessageNotifications // ignore: cast_nullable_to_non_nullable
+              as bool,
       lastUpdated: freezed == lastUpdated
           ? _self.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable
@@ -457,6 +475,8 @@ extension NotificationPreferencesPatterns on NotificationPreferences {
             int historyRetentionDays,
             bool locationBasedNotificationsEnabled,
             int proximityNotificationRadiusMeters,
+            List<String> mutedChatIds,
+            bool chatMessageNotifications,
             DateTime? lastUpdated,
             String? userId)?
         $default, {
@@ -490,6 +510,8 @@ extension NotificationPreferencesPatterns on NotificationPreferences {
             _that.historyRetentionDays,
             _that.locationBasedNotificationsEnabled,
             _that.proximityNotificationRadiusMeters,
+            _that.mutedChatIds,
+            _that.chatMessageNotifications,
             _that.lastUpdated,
             _that.userId);
       case _:
@@ -537,6 +559,8 @@ extension NotificationPreferencesPatterns on NotificationPreferences {
             int historyRetentionDays,
             bool locationBasedNotificationsEnabled,
             int proximityNotificationRadiusMeters,
+            List<String> mutedChatIds,
+            bool chatMessageNotifications,
             DateTime? lastUpdated,
             String? userId)
         $default,
@@ -569,6 +593,8 @@ extension NotificationPreferencesPatterns on NotificationPreferences {
             _that.historyRetentionDays,
             _that.locationBasedNotificationsEnabled,
             _that.proximityNotificationRadiusMeters,
+            _that.mutedChatIds,
+            _that.chatMessageNotifications,
             _that.lastUpdated,
             _that.userId);
       case _:
@@ -615,6 +641,8 @@ extension NotificationPreferencesPatterns on NotificationPreferences {
             int historyRetentionDays,
             bool locationBasedNotificationsEnabled,
             int proximityNotificationRadiusMeters,
+            List<String> mutedChatIds,
+            bool chatMessageNotifications,
             DateTime? lastUpdated,
             String? userId)?
         $default,
@@ -647,6 +675,8 @@ extension NotificationPreferencesPatterns on NotificationPreferences {
             _that.historyRetentionDays,
             _that.locationBasedNotificationsEnabled,
             _that.proximityNotificationRadiusMeters,
+            _that.mutedChatIds,
+            _that.chatMessageNotifications,
             _that.lastUpdated,
             _that.userId);
       case _:
@@ -683,9 +713,12 @@ class _NotificationPreferences extends NotificationPreferences {
       this.historyRetentionDays = 30,
       this.locationBasedNotificationsEnabled = false,
       this.proximityNotificationRadiusMeters = 500,
+      final List<String> mutedChatIds = const [],
+      this.chatMessageNotifications = true,
       this.lastUpdated,
       this.userId})
-      : super._();
+      : _mutedChatIds = mutedChatIds,
+        super._();
   factory _NotificationPreferences.fromJson(Map<String, dynamic> json) =>
       _$NotificationPreferencesFromJson(json);
 
@@ -770,6 +803,20 @@ class _NotificationPreferences extends NotificationPreferences {
   @override
   @JsonKey()
   final int proximityNotificationRadiusMeters;
+// Chat notification preferences
+  final List<String> _mutedChatIds;
+// Chat notification preferences
+  @override
+  @JsonKey()
+  List<String> get mutedChatIds {
+    if (_mutedChatIds is EqualUnmodifiableListView) return _mutedChatIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_mutedChatIds);
+  }
+
+  @override
+  @JsonKey()
+  final bool chatMessageNotifications;
 // Timestamps
   @override
   final DateTime? lastUpdated;
@@ -849,8 +896,10 @@ class _NotificationPreferences extends NotificationPreferences {
             (identical(other.proximityNotificationRadiusMeters, proximityNotificationRadiusMeters) ||
                 other.proximityNotificationRadiusMeters ==
                     proximityNotificationRadiusMeters) &&
-            (identical(other.lastUpdated, lastUpdated) ||
-                other.lastUpdated == lastUpdated) &&
+            const DeepCollectionEquality()
+                .equals(other._mutedChatIds, _mutedChatIds) &&
+            (identical(other.chatMessageNotifications, chatMessageNotifications) || other.chatMessageNotifications == chatMessageNotifications) &&
+            (identical(other.lastUpdated, lastUpdated) || other.lastUpdated == lastUpdated) &&
             (identical(other.userId, userId) || other.userId == userId));
   }
 
@@ -882,13 +931,15 @@ class _NotificationPreferences extends NotificationPreferences {
         historyRetentionDays,
         locationBasedNotificationsEnabled,
         proximityNotificationRadiusMeters,
+        const DeepCollectionEquality().hash(_mutedChatIds),
+        chatMessageNotifications,
         lastUpdated,
         userId
       ]);
 
   @override
   String toString() {
-    return 'NotificationPreferences(flightCheckInReminders: $flightCheckInReminders, flightDelaysAndCancellations: $flightDelaysAndCancellations, flightGateChanges: $flightGateChanges, bookingConfirmations: $bookingConfirmations, checkInReminders: $checkInReminders, reservationReminders: $reservationReminders, severeWeatherAlerts: $severeWeatherAlerts, dailyWeatherSummary: $dailyWeatherSummary, rainAlertsForOutdoorActivities: $rainAlertsForOutdoorActivities, safetyAlerts: $safetyAlerts, travelAdvisories: $travelAdvisories, emergencyAlerts: $emergencyAlerts, nearbyDeals: $nearbyDeals, localEventSuggestions: $localEventSuggestions, restaurantRecommendations: $restaurantRecommendations, vibrateEnabled: $vibrateEnabled, soundEnabled: $soundEnabled, bypassDoNotDisturb: $bypassDoNotDisturb, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, keepNotificationHistory: $keepNotificationHistory, historyRetentionDays: $historyRetentionDays, locationBasedNotificationsEnabled: $locationBasedNotificationsEnabled, proximityNotificationRadiusMeters: $proximityNotificationRadiusMeters, lastUpdated: $lastUpdated, userId: $userId)';
+    return 'NotificationPreferences(flightCheckInReminders: $flightCheckInReminders, flightDelaysAndCancellations: $flightDelaysAndCancellations, flightGateChanges: $flightGateChanges, bookingConfirmations: $bookingConfirmations, checkInReminders: $checkInReminders, reservationReminders: $reservationReminders, severeWeatherAlerts: $severeWeatherAlerts, dailyWeatherSummary: $dailyWeatherSummary, rainAlertsForOutdoorActivities: $rainAlertsForOutdoorActivities, safetyAlerts: $safetyAlerts, travelAdvisories: $travelAdvisories, emergencyAlerts: $emergencyAlerts, nearbyDeals: $nearbyDeals, localEventSuggestions: $localEventSuggestions, restaurantRecommendations: $restaurantRecommendations, vibrateEnabled: $vibrateEnabled, soundEnabled: $soundEnabled, bypassDoNotDisturb: $bypassDoNotDisturb, quietHoursStart: $quietHoursStart, quietHoursEnd: $quietHoursEnd, keepNotificationHistory: $keepNotificationHistory, historyRetentionDays: $historyRetentionDays, locationBasedNotificationsEnabled: $locationBasedNotificationsEnabled, proximityNotificationRadiusMeters: $proximityNotificationRadiusMeters, mutedChatIds: $mutedChatIds, chatMessageNotifications: $chatMessageNotifications, lastUpdated: $lastUpdated, userId: $userId)';
   }
 }
 
@@ -925,6 +976,8 @@ abstract mixin class _$NotificationPreferencesCopyWith<$Res>
       int historyRetentionDays,
       bool locationBasedNotificationsEnabled,
       int proximityNotificationRadiusMeters,
+      List<String> mutedChatIds,
+      bool chatMessageNotifications,
       DateTime? lastUpdated,
       String? userId});
 }
@@ -966,6 +1019,8 @@ class __$NotificationPreferencesCopyWithImpl<$Res>
     Object? historyRetentionDays = null,
     Object? locationBasedNotificationsEnabled = null,
     Object? proximityNotificationRadiusMeters = null,
+    Object? mutedChatIds = null,
+    Object? chatMessageNotifications = null,
     Object? lastUpdated = freezed,
     Object? userId = freezed,
   }) {
@@ -1068,6 +1123,14 @@ class __$NotificationPreferencesCopyWithImpl<$Res>
           ? _self.proximityNotificationRadiusMeters
           : proximityNotificationRadiusMeters // ignore: cast_nullable_to_non_nullable
               as int,
+      mutedChatIds: null == mutedChatIds
+          ? _self._mutedChatIds
+          : mutedChatIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      chatMessageNotifications: null == chatMessageNotifications
+          ? _self.chatMessageNotifications
+          : chatMessageNotifications // ignore: cast_nullable_to_non_nullable
+              as bool,
       lastUpdated: freezed == lastUpdated
           ? _self.lastUpdated
           : lastUpdated // ignore: cast_nullable_to_non_nullable

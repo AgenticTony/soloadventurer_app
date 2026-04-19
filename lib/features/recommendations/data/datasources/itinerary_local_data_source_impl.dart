@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/itinerary_dao.dart';
+import 'package:soloadventurer/features/offline/infrastructure/database/database.dart'
+    show ItineraryItemsCompanion;
 import 'package:soloadventurer/features/travel/data/models/itinerary_local_model.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary_item.dart';

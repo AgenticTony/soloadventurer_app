@@ -29,9 +29,6 @@ class AuthNavigation extends _$AuthNavigation {
       final authState = next.value;
       if (authState == null) return;
 
-      debugPrint('AuthNavigation: Auth state changed');
-      debugPrint('AuthNavigation: Previous state: $previous');
-      debugPrint('AuthNavigation: Next state: $authState');
       // AuthWrapper handles automatic routing based on auth state
       // We don't navigate here to avoid conflicts with AuthWrapper
     });
@@ -48,14 +45,11 @@ class AuthNavigation extends _$AuthNavigation {
 
   /// Handle unauthorized state
   void _handleUnauthorized() {
-    debugPrint('AuthNavigation: Handling unauthorized state');
     navigateToLogin(null);
   }
 
   /// Navigate to confirm password reset screen
   void navigateToConfirmPasswordReset(String email) {
-    debugPrint(
-        'AuthNavigation: Navigating to confirm password reset with email: $email');
     navigateTo(
       AuthRoutes.confirmPasswordReset,
       arguments: {'email': email},
@@ -87,8 +81,6 @@ class AuthNavigation extends _$AuthNavigation {
       case AuthRoutes.forgotPassword:
         // Block navigation to auth screens if user needs verification
         if (authState.requiresEmailVerification) {
-          debugPrint(
-              'AuthNavigation: Blocking navigation to $route - email verification required');
           return false;
         }
         // Allow navigation to auth screens if not logged in
@@ -103,7 +95,6 @@ class AuthNavigation extends _$AuthNavigation {
 
   /// Set navigation error
   void _setNavigationError(String message) {
-    debugPrint('AuthNavigation: Setting error: $message');
     // Only set the error if it's different from the current error
     if (state.error != message) {
       state = state.copyWith(error: message);
@@ -170,18 +161,14 @@ class AuthNavigation extends _$AuthNavigation {
 
   /// Request navigation to a specific route (internal use)
   void navigateTo(String route, {Map<String, dynamic>? arguments}) {
-    debugPrint(
-        'AuthNavigation: Requesting navigation to $route with arguments: $arguments');
 
     // Clear any previous errors
     clearError();
 
     // Special handling for confirm password reset
     if (route == AuthRoutes.confirmPasswordReset) {
-      debugPrint('AuthNavigation: Handling confirm password reset navigation');
       final email = arguments?['email'] as String?;
       if (email == null || email.isEmpty) {
-        debugPrint('AuthNavigation: No email provided for password reset');
         // Instead of setting an error, just return without navigation
         return;
       }
@@ -189,7 +176,6 @@ class AuthNavigation extends _$AuthNavigation {
 
     // Check if navigation is allowed
     if (!_canNavigate(route)) {
-      debugPrint('AuthNavigation: Navigation not allowed to $route');
       return;
     }
 
@@ -202,18 +188,15 @@ class AuthNavigation extends _$AuthNavigation {
         arguments: arguments,
       );
 
-      debugPrint('AuthNavigation: Creating navigation request: $request');
       state = state.copyWith(
         currentRequest: request,
         history: [...state.history, request],
         error: null, // Clear any previous errors
       );
-      debugPrint('AuthNavigation: New state after navigation: $state');
 
       // Run post-navigation middleware
       _afterNavigation(route);
     } catch (e) {
-      debugPrint('AuthNavigation: Navigation failed: $e');
       _setNavigationError('Failed to navigate: ${e.toString()}');
       // Run post-navigation middleware with failure status
       _afterNavigation(route, success: false);

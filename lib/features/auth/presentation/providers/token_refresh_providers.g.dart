@@ -8,18 +8,24 @@ part of 'token_refresh_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provider for the TokenRefreshService from the service locator
+/// Provider for the TokenRefreshService
+///
+/// Delegates to the canonical provider in auth_service_providers.dart.
 
 @ProviderFor(tokenRefreshService)
 const tokenRefreshServiceProvider = TokenRefreshServiceProvider._();
 
-/// Provider for the TokenRefreshService from the service locator
+/// Provider for the TokenRefreshService
+///
+/// Delegates to the canonical provider in auth_service_providers.dart.
 
 final class TokenRefreshServiceProvider extends $FunctionalProvider<
     TokenRefreshService,
     TokenRefreshService,
     TokenRefreshService> with $Provider<TokenRefreshService> {
-  /// Provider for the TokenRefreshService from the service locator
+  /// Provider for the TokenRefreshService
+  ///
+  /// Delegates to the canonical provider in auth_service_providers.dart.
   const TokenRefreshServiceProvider._()
       : super(
           from: null,
@@ -55,4 +61,4 @@ final class TokenRefreshServiceProvider extends $FunctionalProvider<
 }
 
 String _$tokenRefreshServiceHash() =>
-    r'6e5f7037431d85fa4b8d388ad8d7045617a44ef1';
+    r'39b5ecaf6f9d0462bee00e424c475259cf5c24da';

@@ -10,46 +10,37 @@ part of 'sync_state_notifier.dart';
 // ignore_for_file: type=lint, type=warning
 /// Notifier for managing comprehensive sync state
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Uses ref.onDispose() for cleanup instead of dispose() method
-/// - Initialization logic moved from constructor to build() method
-///
-/// Listens to all sync service status changes and queue updates,
-/// providing reactive state for UI components to consume.
-/// Ensures all status indicators update immediately when sync state changes.
-/// Optionally persists state across app restarts.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isProcessing/lastError removed from state (AsyncValue handles them)
+/// - Stream subscriptions update state via AsyncData
+/// - UI reads state via ref.watch(syncStateProvider)
+/// - UI calls methods via ref.read(syncStateProvider.notifier)
 
 @ProviderFor(SyncStateNotifier)
 const syncStateProvider = SyncStateNotifierProvider._();
 
 /// Notifier for managing comprehensive sync state
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Uses ref.onDispose() for cleanup instead of dispose() method
-/// - Initialization logic moved from constructor to build() method
-///
-/// Listens to all sync service status changes and queue updates,
-/// providing reactive state for UI components to consume.
-/// Ensures all status indicators update immediately when sync state changes.
-/// Optionally persists state across app restarts.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isProcessing/lastError removed from state (AsyncValue handles them)
+/// - Stream subscriptions update state via AsyncData
+/// - UI reads state via ref.watch(syncStateProvider)
+/// - UI calls methods via ref.read(syncStateProvider.notifier)
 final class SyncStateNotifierProvider
-    extends $NotifierProvider<SyncStateNotifier, SyncState> {
+    extends $AsyncNotifierProvider<SyncStateNotifier, SyncState> {
   /// Notifier for managing comprehensive sync state
   ///
-  /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier to @riverpod Notifier
-  /// - Dependencies injected via ref.watch() in build() method
-  /// - Uses ref.onDispose() for cleanup instead of dispose() method
-  /// - Initialization logic moved from constructor to build() method
-  ///
-  /// Listens to all sync service status changes and queue updates,
-  /// providing reactive state for UI components to consume.
-  /// Ensures all status indicators update immediately when sync state changes.
-  /// Optionally persists state across app restarts.
+  /// Riverpod 3.0 AsyncNotifier Migration:
+  /// - Uses AsyncNotifier pattern with AsyncValue wrapper
+  /// - Loading/error states handled by AsyncValue, NOT manual state fields
+  /// - isProcessing/lastError removed from state (AsyncValue handles them)
+  /// - Stream subscriptions update state via AsyncData
+  /// - UI reads state via ref.watch(syncStateProvider)
+  /// - UI calls methods via ref.read(syncStateProvider.notifier)
   const SyncStateNotifierProvider._()
       : super(
           from: null,
@@ -67,40 +58,32 @@ final class SyncStateNotifierProvider
   @$internal
   @override
   SyncStateNotifier create() => SyncStateNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SyncState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<SyncState>(value),
-    );
-  }
 }
 
-String _$syncStateNotifierHash() => r'a6f1b0adf17f57ecc444c39f9277805abc0feee8';
+String _$syncStateNotifierHash() => r'9a1a87e501d29b4201c282a605c7f958c40c0d2a';
 
 /// Notifier for managing comprehensive sync state
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Uses ref.onDispose() for cleanup instead of dispose() method
-/// - Initialization logic moved from constructor to build() method
-///
-/// Listens to all sync service status changes and queue updates,
-/// providing reactive state for UI components to consume.
-/// Ensures all status indicators update immediately when sync state changes.
-/// Optionally persists state across app restarts.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isProcessing/lastError removed from state (AsyncValue handles them)
+/// - Stream subscriptions update state via AsyncData
+/// - UI reads state via ref.watch(syncStateProvider)
+/// - UI calls methods via ref.read(syncStateProvider.notifier)
 
-abstract class _$SyncStateNotifier extends $Notifier<SyncState> {
-  SyncState build();
+abstract class _$SyncStateNotifier extends $AsyncNotifier<SyncState> {
+  FutureOr<SyncState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<SyncState, SyncState>;
+    final ref = this.ref as $Ref<AsyncValue<SyncState>, SyncState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<SyncState, SyncState>, SyncState, Object?, Object?>;
+        AnyNotifier<AsyncValue<SyncState>, SyncState>,
+        AsyncValue<SyncState>,
+        Object?,
+        Object?>;
     element.handleValue(ref, created);
   }
 }

@@ -8,11 +8,33 @@ import 'package:soloadventurer/core/widgets/virtual_list_performance_tracker.dar
 /// This provider manages the collection of performance metrics from
 /// multiple virtual lists throughout the app.
 final performanceMetricsProvider =
-    StateProvider<List<VirtualListPerformanceMetrics>>((ref) => []);
+    NotifierProvider<_PerformanceMetricsNotifier, List<VirtualListPerformanceMetrics>>(
+  _PerformanceMetricsNotifier.new,
+);
+
+class _PerformanceMetricsNotifier extends Notifier<List<VirtualListPerformanceMetrics>> {
+  @override
+  List<VirtualListPerformanceMetrics> build() => [];
+
+  void update(List<VirtualListPerformanceMetrics> newMetrics) {
+    state = newMetrics;
+  }
+}
 
 /// Provider for global metrics state
 final globalMetricsProvider =
-    StateProvider<GlobalPerformanceMetrics?>((ref) => null);
+    NotifierProvider<_GlobalMetricsNotifier, GlobalPerformanceMetrics?>(
+  _GlobalMetricsNotifier.new,
+);
+
+class _GlobalMetricsNotifier extends Notifier<GlobalPerformanceMetrics?> {
+  @override
+  GlobalPerformanceMetrics? build() => null;
+
+  void update(GlobalPerformanceMetrics? metrics) {
+    state = metrics;
+  }
+}
 
 /// Global performance metrics aggregated from all tracked lists
 class GlobalPerformanceMetrics {
@@ -85,7 +107,7 @@ Global Performance Metrics:
 - Average FPS: ${averageFPS.toStringAsFixed(1)}
 - Average Janky: ${averageJankyPercentage.toStringAsFixed(1)}%
 - Total Memory: ${(totalMemoryUsage / 1024 / 1024).toStringAsFixed(2)} MB
-- Tracked Lists: $trackededListCount
+- Tracked Lists: $trackedListCount
 - Timestamp: $timestamp
 ''';
   }
@@ -132,14 +154,14 @@ class _PerformanceDashboardScreenState
     final metrics = ref.read(performanceMetricsProvider);
     if (metrics.isNotEmpty) {
       final global = GlobalPerformanceMetrics.fromMetrics(metrics);
-      ref.read(globalMetricsProvider.notifier).state = global;
+      ref.read(globalMetricsProvider.notifier).update(global);
     }
   }
 
   /// Clear all collected metrics
   void _clearMetrics() {
-    ref.read(performanceMetricsProvider.notifier).state = [];
-    ref.read(globalMetricsProvider.notifier).state = null;
+    ref.read(performanceMetricsProvider.notifier).update([]);
+    ref.read(globalMetricsProvider.notifier).update(null);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

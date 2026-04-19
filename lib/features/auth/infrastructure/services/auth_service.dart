@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Service for handling authentication operations
 ///
@@ -25,7 +24,6 @@ class AuthService {
   /// Initialize the auth service
   Future<void> initialize() async {
     // Stub: Check for existing session
-    debugPrint('AuthService initialized (stubbed)');
   }
 
   /// Sign in with username and password
@@ -52,6 +50,5 @@ class AuthService {
     _token = null;
     _username = null;
     _isAuthenticated = false;
-    debugPrint('AuthService: Signed out (stubbed)');
   }
 }

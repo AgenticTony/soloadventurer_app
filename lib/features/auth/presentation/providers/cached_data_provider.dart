@@ -2,22 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/cached_data_provider.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/offline_auth_manager.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/app/providers/auth_service_providers.dart'
+    as auth_providers;
 
 /// Provider for the [OfflineAuthManager]
 ///
-/// This provider provides a singleton instance of the [OfflineAuthManager]
-/// which is registered in the service locator.
+/// Delegates to the canonical provider in auth_service_providers.dart.
 final offlineAuthManagerProvider = Provider<OfflineAuthManager>((ref) {
-  return getIt<OfflineAuthManager>();
+  return ref.watch(auth_providers.offlineAuthManagerProvider);
 });
 
 /// Provider for the [AuthLocalDataSource]
 ///
-/// This provider provides a singleton instance of the [AuthLocalDataSource]
-/// which is registered in the service locator.
+/// Delegates to the canonical provider in auth_service_providers.dart.
 final authLocalDataSourceProvider = Provider<AuthLocalDataSource>((ref) {
-  return getIt<AuthLocalDataSource>();
+  return ref.watch(auth_providers.authLocalDataSourceProvider);
 });
 
 /// Provider for the [CachedDataProvider]

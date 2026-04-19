@@ -14,6 +14,8 @@ void main() {
   final tProfile = ProfileModel(
     id: 'test_id',
     userId: 'test_user_id',
+    username: 'testuser',
+    email: 'test@example.com',
     displayName: 'Test User',
     bio: 'Test bio',
     createdAt: DateTime(2024),
@@ -46,7 +48,7 @@ void main() {
       final result = await dataSource.getProfile(tUserId);
 
       // assert
-      expect(result, equals(tProfile));
+      expect(result.id, equals(tProfile.id));
       verify(mockDio.get(tPath));
     });
 
@@ -60,6 +62,7 @@ void main() {
             requestOptions: RequestOptions(path: tPath),
           ),
           requestOptions: RequestOptions(path: tPath),
+          type: DioExceptionType.badResponse,
         ),
       );
 
@@ -88,7 +91,7 @@ void main() {
       final result = await dataSource.getCurrentProfile();
 
       // assert
-      expect(result, equals(tProfile));
+      expect(result.id, equals(tProfile.id));
       verify(mockDio.get(tPath));
     });
   });
@@ -114,7 +117,7 @@ void main() {
       final result = await dataSource.updateProfile(tProfile);
 
       // assert
-      expect(result, equals(tProfile));
+      expect(result.id, equals(tProfile.id));
       verify(mockDio.put(
         tPath,
         data: tProfile.toJson(),
@@ -133,6 +136,10 @@ void main() {
       when(mockDio.post(
         tPath,
         data: anyNamed('data'),
+        options: anyNamed('options'),
+        cancelToken: anyNamed('cancelToken'),
+        onSendProgress: anyNamed('onSendProgress'),
+        onReceiveProgress: anyNamed('onReceiveProgress'),
       )).thenAnswer(
         (_) async => Response(
           data: {'avatarUrl': tAvatarUrl},
@@ -153,7 +160,7 @@ void main() {
       expect(result, equals(tAvatarUrl));
       verify(mockDio.post(
         tPath,
-        data: any,
+        data: anyNamed('data'),
       ));
 
       // cleanup
@@ -231,6 +238,7 @@ void main() {
             requestOptions: RequestOptions(path: tPath),
           ),
           requestOptions: RequestOptions(path: tPath),
+          type: DioExceptionType.badResponse,
         ),
       );
 

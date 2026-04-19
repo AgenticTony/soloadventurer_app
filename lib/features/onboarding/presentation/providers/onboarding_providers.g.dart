@@ -85,7 +85,7 @@ final class ItineraryGenerationRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$itineraryGenerationRepositoryHash() =>
-    r'7ed1a51ae012b2b139f065daca256244331bbbcb';
+    r'15aa1e3d985d871611c263bf1962d447f0dc0950';
 
 /// Provider for the generate starter itinerary use case
 ///

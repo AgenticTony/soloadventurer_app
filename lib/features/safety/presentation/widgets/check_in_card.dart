@@ -206,7 +206,6 @@ class CheckInCard extends StatelessWidget {
   /// Formats the check-in time for display
   String _formatCheckInTime(CheckIn checkIn) {
     final scheduledTime = checkIn.scheduledTime;
-    final deadline = checkIn.deadline;
 
     if (scheduledTime == null) return 'No time set';
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import './auth_service.dart';
 import '../../../../features/core/infrastructure/storage/secure_storage_service.dart';
 
@@ -59,8 +58,6 @@ class SessionManager {
       (_) => _refreshTokenIfNeeded(),
     );
 
-    debugPrint(
-        'Token refresh scheduled every $_defaultRefreshIntervalMinutes minutes');
   }
 
   /// Cancels the token refresh timer.

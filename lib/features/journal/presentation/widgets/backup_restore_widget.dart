@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../domain/services/backup_service.dart';
@@ -49,8 +50,6 @@ class _BackupRestoreWidgetState extends ConsumerState<BackupRestoreWidget>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       children: [
         if (widget.showBackup && widget.showRestore) ...[
@@ -105,7 +104,7 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
 
   @override
   Widget build(BuildContext context) {
-    final backupState = ref.watch(backupNotifierProvider);
+    final backupState = ref.watch(backupProvider);
     final estimatedSize =
         ref.watch(estimatedBackupSizeProvider(includeMedia: _includeMedia));
 
@@ -264,18 +263,18 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
             _BackupSuccessCard(
               result: backupState.result!,
               onReset: () {
-                ref.read(backupNotifierProvider.notifier).reset();
+                ref.read(backupProvider.notifier).reset();
               },
             )
           else if (backupState.isFailed)
             _BackupErrorCard(
               error: backupState.error ?? 'Unknown error',
               onRetry: () {
-                ref.read(backupNotifierProvider.notifier).reset();
+                ref.read(backupProvider.notifier).reset();
                 _createBackup();
               },
               onReset: () {
-                ref.read(backupNotifierProvider.notifier).reset();
+                ref.read(backupProvider.notifier).reset();
               },
             )
           else
@@ -315,7 +314,7 @@ class _BackupSectionState extends ConsumerState<_BackupSection> {
 
     try {
       await ref
-          .read(backupNotifierProvider.notifier)
+          .read(backupProvider.notifier)
           .createBackup(config: config);
     } catch (e) {
       // Error is handled in state
@@ -360,7 +359,7 @@ class _RestoreSectionState extends ConsumerState<_RestoreSection> {
 
   @override
   Widget build(BuildContext context) {
-    final restoreState = ref.watch(restoreNotifierProvider);
+    final restoreState = ref.watch(restoreProvider);
     final backupsAsync = ref.watch(availableBackupsProvider);
 
     return SingleChildScrollView(
@@ -565,18 +564,18 @@ class _RestoreSectionState extends ConsumerState<_RestoreSection> {
               _RestoreSuccessCard(
                 result: restoreState.result!,
                 onReset: () {
-                  ref.read(restoreNotifierProvider.notifier).reset();
+                  ref.read(restoreProvider.notifier).reset();
                 },
               )
             else if (restoreState.isFailed)
               _RestoreErrorCard(
                 error: restoreState.error ?? 'Unknown error',
                 onRetry: () {
-                  ref.read(restoreNotifierProvider.notifier).reset();
+                  ref.read(restoreProvider.notifier).reset();
                   _restoreBackup();
                 },
                 onReset: () {
-                  ref.read(restoreNotifierProvider.notifier).reset();
+                  ref.read(restoreProvider.notifier).reset();
                 },
               )
             else
@@ -619,7 +618,7 @@ class _RestoreSectionState extends ConsumerState<_RestoreSection> {
     );
 
     try {
-      await ref.read(restoreNotifierProvider.notifier).restoreBackup(
+      await ref.read(restoreProvider.notifier).restoreBackup(
             backupPath: _selectedBackup!.path,
             config: config,
           );
@@ -832,8 +831,7 @@ class _BackupSuccessCard extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
-                      Clipboard.setData(
-                          ClipboardData(text: result.backupPath!));
+                      Clipboard.setData(ClipboardData(text: result.backupPath!));
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                             content: Text('Path copied to clipboard')),

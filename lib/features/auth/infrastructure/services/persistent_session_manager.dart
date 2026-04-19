@@ -193,7 +193,6 @@ class PersistentSessionManager {
   final AuthLocalDataSource _localDataSource;
 
   /// Storage keys for session metadata
-  static const String _sessionVersionKey = 'session_version';
   static const String _currentSessionVersion = '1.0';
 
   /// Cache for loaded session to avoid repeated storage reads
@@ -220,11 +219,6 @@ class PersistentSessionManager {
   Future<void> saveSession(AuthSession session) async {
     try {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Saving session');
-        debugPrint('  - Access token: ${_maskToken(session.accessToken)}');
-        debugPrint('  - ID token: ${_maskToken(session.idToken)}');
-        debugPrint('  - Refresh token: ${_maskToken(session.refreshToken)}');
-        debugPrint('  - Expires at: ${session.expiresAt.toIso8601String()}');
       }
 
       // Save tokens and expiration to secure storage
@@ -246,12 +240,9 @@ class PersistentSessionManager {
       _cacheTimestamp = DateTime.now();
 
       if (kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Session saved successfully (cached)');
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Failed to save session: $e');
       }
       throw AuthException(
         'Failed to save session: ${e.toString()}',
@@ -275,13 +266,11 @@ class PersistentSessionManager {
       // Check if we have a valid cached session
       if (_isCacheValid()) {
         if (kDebugMode) {
-          debugPrint('PersistentSessionManager: Returning cached session');
         }
         return _cachedSession;
       }
 
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Loading session from storage');
       }
 
       // Get all session components
@@ -291,17 +280,11 @@ class PersistentSessionManager {
       final expiresAt = await _localDataSource.getTokenExpiration();
 
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Retrieved data:');
-        debugPrint('  - Has access token: ${accessToken != null}');
-        debugPrint('  - Has ID token: ${idToken != null}');
-        debugPrint('  - Has refresh token: ${refreshToken != null}');
-        debugPrint('  - Expires at: ${expiresAt?.toIso8601String() ?? "null"}');
       }
 
       // Validate we have all required data
       if (accessToken == null || refreshToken == null || expiresAt == null) {
         if (kDebugMode) {
-          debugPrint('PersistentSessionManager: Missing required session data');
         }
         return null;
       }
@@ -319,13 +302,10 @@ class PersistentSessionManager {
       _cacheTimestamp = DateTime.now();
 
       if (kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Session loaded successfully (cached)');
       }
       return session;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Failed to load session: $e');
       }
       throw AuthException(
         'Failed to load session: ${e.toString()}',
@@ -343,13 +323,11 @@ class PersistentSessionManager {
   /// Returns a [SessionOperationResult] with validation status and session data.
   Future<SessionOperationResult> validateSession() async {
     try {
-      debugPrint('PersistentSessionManager: Validating session');
 
       // Load the session
       final session = await loadSession();
 
       if (session == null) {
-        debugPrint('PersistentSessionManager: No session found');
         return SessionOperationResult.validated(isValid: false);
       }
 
@@ -357,10 +335,6 @@ class PersistentSessionManager {
       final isExpired = DateTime.now().isAfter(session.expiresAt);
 
       if (isExpired) {
-        debugPrint(
-            'PersistentSessionManager: Session expired at ${session.expiresAt.toIso8601String()}');
-        debugPrint(
-            'PersistentSessionManager: Current time: ${DateTime.now().toIso8601String()}');
         return SessionOperationResult.validated(
           isValid: false,
           session: session,
@@ -368,16 +342,13 @@ class PersistentSessionManager {
       }
 
       // Calculate time until expiration
-      final timeUntilExpiration = session.expiresAt.difference(DateTime.now());
-      debugPrint('PersistentSessionManager: Session is valid');
-      debugPrint('  - Expires in: ${timeUntilExpiration.inMinutes} minutes');
+      session.expiresAt.difference(DateTime.now());
 
       return SessionOperationResult.validated(
         isValid: true,
         session: session,
       );
     } catch (e) {
-      debugPrint('PersistentSessionManager: Failed to validate session: $e');
       return SessionOperationResult.failure(
         AuthException(
           'Failed to validate session: ${e.toString()}',
@@ -400,16 +371,12 @@ class PersistentSessionManager {
   /// Returns a [SessionValidationResult] with the action and session data.
   Future<SessionValidationResult> validateSessionForRestoration() async {
     try {
-      debugPrint(
-          'PersistentSessionManager: Validating session for restoration');
 
       // Load the session
       final session = await loadSession();
 
       // Handle missing or corrupted session data
       if (session == null) {
-        debugPrint(
-            'PersistentSessionManager: No session found or corrupted data');
         return SessionValidationResult.invalid(
           error: const AuthException(
             'No valid session found in storage',
@@ -424,18 +391,12 @@ class PersistentSessionManager {
 
       if (!isExpired) {
         // Session is valid
-        final timeUntilExpiration = session.expiresAt.difference(now);
-        debugPrint('PersistentSessionManager: Session is valid');
-        debugPrint('  - Expires in: ${timeUntilExpiration.inMinutes} minutes');
+        session.expiresAt.difference(now);
         return SessionValidationResult.valid(session);
       }
 
       // Token is expired, calculate how long ago
       final timeSinceExpiration = now.difference(session.expiresAt);
-      debugPrint('PersistentSessionManager: Session expired');
-      debugPrint('  - Expired at: ${session.expiresAt.toIso8601String()}');
-      debugPrint(
-          '  - Time since expiration: ${timeSinceExpiration.inHours} hours');
 
       // Determine if we can refresh or need re-authentication
       // AWS Cognito refresh tokens are typically valid for 30 days,
@@ -443,24 +404,17 @@ class PersistentSessionManager {
       const refreshThreshold = Duration(hours: 24);
 
       if (timeSinceExpiration <= refreshThreshold) {
-        debugPrint('PersistentSessionManager: Session can be refreshed '
-            '(expired ${timeSinceExpiration.inHours}h ago, threshold is ${refreshThreshold.inHours}h)');
         return SessionValidationResult.canRefresh(
           session: session,
           timeSinceExpiration: timeSinceExpiration,
         );
       } else {
-        debugPrint(
-            'PersistentSessionManager: Session requires re-authentication '
-            '(expired ${timeSinceExpiration.inHours}h ago, threshold is ${refreshThreshold.inHours}h)');
         return SessionValidationResult.reauthenticate(
           session: session,
           timeSinceExpiration: timeSinceExpiration,
         );
       }
     } catch (e) {
-      debugPrint(
-          'PersistentSessionManager: Failed to validate session for restoration: $e');
       return SessionValidationResult.invalid(
         error: AuthException(
           'Failed to validate session: ${e.toString()}',
@@ -479,7 +433,6 @@ class PersistentSessionManager {
   Future<void> clearSession() async {
     try {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Clearing session');
       }
 
       await _localDataSource.clearAuthData();
@@ -489,12 +442,9 @@ class PersistentSessionManager {
       _cacheTimestamp = null;
 
       if (kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Session cleared successfully (cache cleared)');
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Failed to clear session: $e');
       }
       throw AuthException(
         'Failed to clear session: ${e.toString()}',
@@ -510,11 +460,8 @@ class PersistentSessionManager {
   Future<bool> hasValidSession() async {
     try {
       final hasSession = await _localDataSource.hasValidSession();
-      debugPrint('PersistentSessionManager: Has valid session: $hasSession');
       return hasSession;
     } catch (e) {
-      debugPrint(
-          'PersistentSessionManager: Error checking session validity: $e');
       return false;
     }
   }
@@ -525,12 +472,8 @@ class PersistentSessionManager {
   Future<DateTime?> getTokenExpiration() async {
     try {
       final expiration = await _localDataSource.getTokenExpiration();
-      debugPrint(
-          'PersistentSessionManager: Token expiration: ${expiration?.toIso8601String() ?? "null"}');
       return expiration;
     } catch (e) {
-      debugPrint(
-          'PersistentSessionManager: Failed to get token expiration: $e');
       return null;
     }
   }
@@ -541,24 +484,12 @@ class PersistentSessionManager {
   Future<bool> isTokenExpired() async {
     try {
       final isExpired = await _localDataSource.isTokenExpired();
-      debugPrint('PersistentSessionManager: Is token expired: $isExpired');
       return isExpired;
     } catch (e) {
-      debugPrint(
-          'PersistentSessionManager: Error checking token expiration: $e');
       return true; // Assume expired on error
     }
   }
 
-  /// Masks a token for safe logging (shows first 8 and last 4 characters)
-  String _maskToken(String token) {
-    if (token.length <= 12) {
-      return '****';
-    }
-    final start = token.substring(0, 8);
-    final end = token.substring(token.length - 4);
-    return '$start...$end (${token.length} chars)';
-  }
 
   /// Checks if the cached session is still valid
   ///
@@ -575,8 +506,6 @@ class PersistentSessionManager {
     final cacheAge = DateTime.now().difference(_cacheTimestamp!);
     if (cacheAge > _cacheValidDuration) {
       if (kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Cache expired (age: ${cacheAge.inMinutes}m)');
       }
       return false;
     }
@@ -585,7 +514,6 @@ class PersistentSessionManager {
     final isExpired = DateTime.now().isAfter(_cachedSession!.expiresAt);
     if (isExpired) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Cached session is expired');
       }
       return false;
     }
@@ -599,7 +527,6 @@ class PersistentSessionManager {
   /// Use this when you need to force a reload from storage.
   void clearCache() {
     if (kDebugMode) {
-      debugPrint('PersistentSessionManager: Clearing session cache');
     }
     _cachedSession = null;
     _cacheTimestamp = null;
@@ -612,13 +539,10 @@ class PersistentSessionManager {
     try {
       final token = await _localDataSource.getAuthToken();
       if (token != null && kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Retrieved access token: ${_maskToken(token)}');
       }
       return token;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Failed to get access token: $e');
       }
       return null;
     }
@@ -631,13 +555,10 @@ class PersistentSessionManager {
     try {
       final token = await _localDataSource.getIdToken();
       if (token != null && kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Retrieved ID token: ${_maskToken(token)}');
       }
       return token;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Failed to get ID token: $e');
       }
       return null;
     }
@@ -650,13 +571,10 @@ class PersistentSessionManager {
     try {
       final token = await _localDataSource.getRefreshToken();
       if (token != null && kDebugMode) {
-        debugPrint(
-            'PersistentSessionManager: Retrieved refresh token: ${_maskToken(token)}');
       }
       return token;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('PersistentSessionManager: Failed to get refresh token: $e');
       }
       return null;
     }

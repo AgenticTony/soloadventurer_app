@@ -307,7 +307,7 @@ class _DestinationDetailScreenState
           if (destination == null) return const SizedBox.shrink();
 
           // Check if destination is saved
-          final isSaved = savedState?.hasValue ?? false &&
+          final isSaved = (savedState?.hasValue ?? false) &&
               savedState!.value!.isDestinationInWishlist(destination.id);
 
           return _buildFloatingActionButtons(destination, theme, isSaved);

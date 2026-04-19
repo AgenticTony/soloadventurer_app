@@ -367,7 +367,7 @@ void main() {
     });
 
     test('should create failure result', () {
-      final result = BatchResult.failure<int>(
+      final result = BatchResult<int>.failure(
         key: 'test-key',
         error: 'Test error',
       );

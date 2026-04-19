@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart'
-    show getCurrentUserProvider;
-import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/onboarding/domain/entities/date_range.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart';
 import 'package:soloadventurer/features/recommendations/presentation/providers/recommendation_providers.dart';
 import 'package:soloadventurer/features/recommendations/presentation/widgets/recommendation_card.dart';
 import 'package:soloadventurer/features/recommendations/presentation/widgets/recommendation_detail_sheet.dart';
 import 'package:soloadventurer/features/recommendations/presentation/widgets/recommendation_filter_panel.dart';
+import 'package:soloadventurer/features/recommendations/presentation/widgets/schedule_recommendation_sheet.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
-
-part 'recommendations_screen.g.dart';
 
 /// Screen for browsing personalized recommendations
 ///
@@ -245,12 +243,11 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
 
     if (scheduledAt == null) return;
 
-    final result = await ref.read(
-      addRecommendationToItineraryProvider(
-        itineraryId: widget.itineraryId,
-        recommendation: recommendation,
-        scheduledAt: scheduledAt,
-      ).future,
+    final useCase = ref.read(addRecommendationToItineraryProvider);
+    final result = await useCase(
+      itineraryId: widget.itineraryId,
+      recommendation: recommendation,
+      scheduledAt: scheduledAt,
     );
 
     result.fold(
@@ -269,21 +266,17 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
     PersonalizedRecommendation recommendation,
   ) async {
     // Get current user from auth state
-    final userResult = await ref.read(getCurrentUserProvider.future);
+    final authState = ref.read(authProvider).value;
+    final user = authState?.user;
 
-    final userId = userResult.fold(
-      (failure) {
-        _showError(context, 'Please sign in to save recommendations');
-        return null;
-      },
-      (user) => user.id,
-    );
-
-    if (userId == null) return;
+    if (user == null) {
+      _showError(context, 'Please sign in to save recommendations');
+      return;
+    }
 
     // Get the use case and call it with parameters
     final useCase = ref.read(saveRecommendationProvider);
-    final result = await useCase(userId, recommendation);
+    final result = await useCase(user.id, recommendation);
 
     result.fold(
       (failure) => _showError(context, failure.toString()),
@@ -300,21 +293,17 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
     PersonalizedRecommendation recommendation,
   ) async {
     // Get current user from auth state
-    final userResult = await ref.read(getCurrentUserProvider.future);
+    final authState = ref.read(authProvider).value;
+    final user = authState?.user;
 
-    final userId = userResult.fold(
-      (failure) {
-        _showError(context, 'Please sign in to dismiss recommendations');
-        return null;
-      },
-      (user) => user.id,
-    );
-
-    if (userId == null) return;
+    if (user == null) {
+      _showError(context, 'Please sign in to dismiss recommendations');
+      return;
+    }
 
     // Get the use case and call it with parameters
     final useCase = ref.read(dismissRecommendationProvider);
-    final result = await useCase(userId, recommendation.id);
+    final result = await useCase(user.id, recommendation.id);
 
     result.fold(
       (failure) => _showError(context, failure.toString()),
@@ -337,11 +326,9 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
 }
 
 /// Provider for recommendations for a specific itinerary
-@riverpod
-Future<List<PersonalizedRecommendation>> recommendationsForItinerary(
-  RecommendationsForItineraryRef ref,
-  String itineraryId,
-) async {
+final recommendationsForItineraryProvider =
+    FutureProvider.family<List<PersonalizedRecommendation>, String>(
+        (ref, itineraryId) async {
   final itinerary = await ref.watch(itineraryProvider(itineraryId).future);
 
   final request = RecommendationRequest(
@@ -360,11 +347,11 @@ Future<List<PersonalizedRecommendation>> recommendationsForItinerary(
     (failure) => throw Exception(failure.toString()),
     (recommendations) => recommendations,
   );
-}
+});
 
 /// Provider for getting an itinerary
-@riverpod
-Future<Itinerary> itinerary(ItineraryRef ref, String itineraryId) async {
+final itineraryProvider = FutureProvider.family<Itinerary, String>(
+    (ref, itineraryId) async {
   // In production, would fetch from actual repository
   throw UnimplementedError('Implement itinerary provider');
-}
+});

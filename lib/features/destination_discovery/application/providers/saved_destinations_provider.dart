@@ -7,12 +7,12 @@ import 'destination_repository_provider.dart';
 part 'saved_destinations_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for saved destinations state management
@@ -56,7 +56,7 @@ part 'saved_destinations_provider.g.dart';
 class SavedDestinations extends _$SavedDestinations {
   /// Initialize the notifier and auto-load saved destinations
   ///
-  /// Riverpod 3.0: build() returns Future<SavedDestinationsState>
+  /// Riverpod 3.0: build() returns `Future<SavedDestinationsState>`
   /// Family provider parameter (userId) is passed here
   /// AutoDispose behavior: provider will be disposed when no longer watched
   @override

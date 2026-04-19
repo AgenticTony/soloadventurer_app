@@ -25,7 +25,7 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final exportState = ref.watch(pdfExportNotifierProvider);
+    final exportState = ref.watch(pdfExportProvider);
     final exportStats = ref.watch(pdfExportStatsProvider(widget.tripId));
 
     return Scaffold(
@@ -230,7 +230,7 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () =>
-                        ref.read(pdfExportNotifierProvider.notifier).reset(),
+                        ref.read(pdfExportProvider.notifier).reset(),
                     icon: const Icon(Icons.close),
                     label: const Text('Close'),
                   ),
@@ -275,7 +275,7 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(pdfExportNotifierProvider.notifier).clearError();
+                ref.read(pdfExportProvider.notifier).clearError();
               },
               child: const Text('Dismiss'),
             ),
@@ -304,7 +304,7 @@ class _PdfExportWidgetState extends ConsumerState<PdfExportWidget> {
   void _startExport() async {
     final outputPath =
         await ref.read(defaultPdfPathProvider(widget.tripName).future);
-    await ref.read(pdfExportNotifierProvider.notifier).exportTrip(
+    await ref.read(pdfExportProvider.notifier).exportTrip(
           tripId: widget.tripId,
           config: _selectedConfig,
           outputPath: outputPath,
@@ -438,26 +438,28 @@ class _ConfigSection extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-            RadioListTile<PdfExportConfig>(
-              title: const Text('Standard'),
-              subtitle: const Text('Balanced quality and file size'),
-              value: PdfExportConfig.defaultConfig,
+            RadioGroup<PdfExportConfig>(
               groupValue: selectedConfig,
               onChanged: (config) => onConfigChanged(config!),
-            ),
-            RadioListTile<PdfExportConfig>(
-              title: const Text('High Quality'),
-              subtitle: const Text('Best quality, larger file size'),
-              value: PdfExportConfig.highQualityConfig,
-              groupValue: selectedConfig,
-              onChanged: (config) => onConfigChanged(config!),
-            ),
-            RadioListTile<PdfExportConfig>(
-              title: const Text('Compact'),
-              subtitle: const Text('Smaller file size, good for sharing'),
-              value: PdfExportConfig.compactConfig,
-              groupValue: selectedConfig,
-              onChanged: (config) => onConfigChanged(config!),
+              child: Column(
+                children: [
+                  RadioListTile<PdfExportConfig>(
+                    title: const Text('Standard'),
+                    subtitle: const Text('Balanced quality and file size'),
+                    value: PdfExportConfig.defaultConfig,
+                  ),
+                  RadioListTile<PdfExportConfig>(
+                    title: const Text('High Quality'),
+                    subtitle: const Text('Best quality, larger file size'),
+                    value: PdfExportConfig.highQualityConfig,
+                  ),
+                  RadioListTile<PdfExportConfig>(
+                    title: const Text('Compact'),
+                    subtitle: const Text('Smaller file size, good for sharing'),
+                    value: PdfExportConfig.compactConfig,
+                  ),
+                ],
+              ),
             ),
           ],
         ),

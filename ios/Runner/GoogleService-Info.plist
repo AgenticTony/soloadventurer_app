@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDSLmsijwQyxRW8wgY0NmBI-FfeS4R5HuA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>925419186363</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.soloadventurer</string>
+	<key>PROJECT_ID</key>
+	<string>soloadventurer-9780a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>soloadventurer-9780a.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:925419186363:ios:60a37b1132fb6cca05a19e</string>
+</dict>
+</plist>

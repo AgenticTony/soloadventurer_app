@@ -9,6 +9,7 @@ import 'package:soloadventurer/core/services/map_marker_clustering_service.dart'
 import 'package:soloadventurer/core/services/map_viewport_loader.dart';
 import 'package:soloadventurer/core/services/zoom_aware_clustering_manager.dart';
 import 'package:soloadventurer/core/widgets/widgets.dart';
+import 'package:soloadventurer/features/travel/infrastructure/repositories/spatial_activity_repository.dart' show Bounds;
 
 /// Provider for trip map markers
 ///
@@ -122,7 +123,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
       markers: [],
       initialZoom: _currentZoom,
       debounceDelayMs: 300,
-      useBoundsBasedClustering:
+      useLatLngBoundsBasedClustering:
           false, // We handle viewport filtering at loader level
     );
 
@@ -137,7 +138,10 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
 
     // Initialize with initial viewport bounds
     final initialBounds = _calculateInitialBounds();
-    _viewportLoader!.initialize(initialBounds).then((result) {
+    _viewportLoader!.initialize(LatLngBounds(
+      LatLng(initialBounds.south, initialBounds.west),
+      LatLng(initialBounds.north, initialBounds.east),
+    )).then((result) {
       if (mounted) {
         _updateClusteringWithViewportResult(result);
       }
@@ -151,10 +155,10 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     const double lngDelta = 0.3; // ~24km at this latitude
 
     return Bounds(
-      LatLng(_mapCenter.latitude - latDelta / 2,
-          _mapCenter.longitude - lngDelta / 2),
-      LatLng(_mapCenter.latitude + latDelta / 2,
-          _mapCenter.longitude + lngDelta / 2),
+      south: _mapCenter.latitude - latDelta / 2,
+      west: _mapCenter.longitude - lngDelta / 2,
+      north: _mapCenter.latitude + latDelta / 2,
+      east: _mapCenter.longitude + lngDelta / 2,
     );
   }
 
@@ -181,11 +185,11 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
   }
 
   /// Handle map bounds change (for viewport-based loading)
-  void _onMapBoundsChanged(Bounds bounds) {
+  void _onMapBoundsChanged(LatLngBounds latLngBounds) {
     if (_viewportLoader == null) return;
 
     // Update viewport loader to load only visible + buffered markers
-    _viewportLoader!.updateBounds(bounds);
+    _viewportLoader!.updateLatLngBounds(latLngBounds);
   }
 
   /// Handle cluster tap - show expand options
@@ -210,7 +214,10 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     // Zoom map to fit cluster bounds
     _mapController.fitCamera(
       CameraFit.bounds(
-        bounds: bounds,
+        bounds: LatLngBounds(
+          LatLng(bounds.south, bounds.west),
+          LatLng(bounds.north, bounds.east),
+        ),
         padding: const EdgeInsets.all(50),
       ),
     );
@@ -224,7 +231,12 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
         .toList();
 
     if (clusterMarkers.isEmpty) {
-      return Bounds(cluster.position, cluster.position);
+      return Bounds(
+        south: cluster.position.latitude,
+        west: cluster.position.longitude,
+        north: cluster.position.latitude,
+        east: cluster.position.longitude,
+      );
     }
 
     double minLat = cluster.position.latitude;
@@ -240,8 +252,10 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     }
 
     return Bounds(
-      LatLng(minLat, minLng),
-      LatLng(maxLat, maxLng),
+      south: minLat,
+      west: minLng,
+      north: maxLat,
+      east: maxLng,
     );
   }
 
@@ -285,6 +299,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     return Positioned(
       top: 16,
       right: 16,
+      width: 300,
       child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface.withValues(alpha: 0.9),
@@ -298,7 +313,8 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
           ],
         ),
         padding: const EdgeInsets.all(12),
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -341,6 +357,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
             ),
             _buildStatRow('Algorithm', '${clusterStats['algorithm']}'),
           ],
+        ),
         ),
       ),
     );
@@ -443,7 +460,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
           if (event is MapEventMoveEnd) {
             // Update clustering when map movement ends
             _onMapZoomChanged(event.camera.zoom);
-            _onMapBoundsChanged(event.camera.bounds);
+            _onMapBoundsChanged(event.camera.visibleBounds);
           }
         },
       ),
@@ -474,11 +491,12 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
 
     // Add clusters
     for (final cluster in _currentResult!.clusters) {
+      final clusterSize = (30 + (cluster.markerCount * 5)).clamp(40, 120).toDouble();
       markers.add(
         Marker(
-          point: LatLng(cluster.lat, cluster.lng),
-          width: cluster.markerSize.toDouble(),
-          height: cluster.markerSize.toDouble(),
+          point: cluster.position,
+          width: clusterSize,
+          height: clusterSize,
           child: _buildCluster(cluster),
         ),
       );
@@ -488,7 +506,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     for (final marker in _currentResult!.unclusteredMarkers) {
       markers.add(
         Marker(
-          point: LatLng(marker.lat, marker.lng),
+          point: marker.position,
           width: 50.0,
           height: 50.0,
           child: _buildMarker(marker),
@@ -549,7 +567,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
           markers: [],
           initialZoom: _currentZoom,
           debounceDelayMs: 300,
-          useBoundsBasedClustering: false,
+          useLatLngBoundsBasedClustering: false,
         );
         break;
       case ClusteringPreset.lowDensity:
@@ -557,7 +575,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
           markers: [],
           initialZoom: _currentZoom,
           debounceDelayMs: 300,
-          useBoundsBasedClustering: false,
+          useLatLngBoundsBasedClustering: false,
         );
         break;
       case ClusteringPreset.performance:
@@ -565,7 +583,7 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
           markers: [],
           initialZoom: _currentZoom,
           debounceDelayMs: 200,
-          useBoundsBasedClustering: false,
+          useLatLngBoundsBasedClustering: false,
         );
         break;
     }
@@ -580,9 +598,14 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
     });
 
     // Re-initialize with current viewport
-    final currentBounds = _viewportLoader?.currentResult?.viewportBounds ??
-        _calculateInitialBounds();
-    _viewportLoader!.initialize(currentBounds).then((result) {
+    final initialBounds = _calculateInitialBounds();
+    final currentLatLngBounds =
+        _viewportLoader?.currentResult?.viewportLatLngBounds ??
+            LatLngBounds(
+              LatLng(initialBounds.south, initialBounds.west),
+              LatLng(initialBounds.north, initialBounds.east),
+            );
+    _viewportLoader!.initialize(currentLatLngBounds).then((result) {
       if (mounted) {
         _updateClusteringWithViewportResult(result);
       }
@@ -894,6 +917,8 @@ class _MarkerTypeSection extends StatelessWidget {
         return Icons.directions_car;
       case MarkerType.poi:
         return Icons.place;
+      case MarkerType.shopping:
+        return Icons.shopping_bag;
       case MarkerType.defaultType:
         return Icons.location_on;
     }
@@ -915,6 +940,8 @@ class _MarkerTypeSection extends StatelessWidget {
         return Colors.indigo;
       case MarkerType.poi:
         return Colors.amber;
+      case MarkerType.shopping:
+        return Colors.pink;
       case MarkerType.defaultType:
         return Colors.grey;
     }
@@ -936,6 +963,8 @@ class _MarkerTypeSection extends StatelessWidget {
         return 'Transport';
       case MarkerType.poi:
         return 'Places';
+      case MarkerType.shopping:
+        return 'Shopping';
       case MarkerType.defaultType:
         return 'Other';
     }
@@ -1033,6 +1062,8 @@ class _MarkerListItem extends StatelessWidget {
         return Colors.indigo;
       case MarkerType.poi:
         return Colors.amber;
+      case MarkerType.shopping:
+        return Colors.pink;
       case MarkerType.defaultType:
         return Theme.of(context).primaryColor;
     }
@@ -1054,6 +1085,8 @@ class _MarkerListItem extends StatelessWidget {
         return Icons.directions_car;
       case MarkerType.poi:
         return Icons.place;
+      case MarkerType.shopping:
+        return Icons.shopping_bag;
       case MarkerType.defaultType:
         return Icons.location_on;
     }

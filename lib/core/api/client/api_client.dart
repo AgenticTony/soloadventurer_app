@@ -3,6 +3,7 @@ import '../api_service.dart';
 import '../interceptors/auth_interceptor.dart';
 import '../interceptors/error_interceptor.dart';
 import '../../monitoring/performance/network_monitor.dart';
+import '../../errors/exceptions.dart';
 
 /// API client for making HTTP requests
 ///
@@ -54,130 +55,52 @@ class ApiClient implements ApiService {
   }
 
   @override
-  Future<Map<String, dynamic>> get(String endpoint) async {
-    if (_isOffline) {
-      throw Exception('No internet connection');
-    }
-
-    try {
-      final stopwatch = Stopwatch()..start();
-      _networkMonitor.trackRequest(endpoint);
-
-      final response = await _dio.get<Map<String, dynamic>>(endpoint);
-      stopwatch.stop();
-
-      _networkMonitor.trackRequestAndResponse(
-        path: endpoint,
-        duration: stopwatch.elapsed,
-        statusCode: response.statusCode ?? 0,
-        responseSize: _calculateResponseSize(response),
-      );
-
-      return response.data ?? {};
-    } catch (error) {
-      _handleRequestError(endpoint, error);
-      rethrow;
-    }
-  }
+  Future<Map<String, dynamic>> get(String endpoint) =>
+      _request('GET', endpoint);
 
   @override
   Future<Map<String, dynamic>> post(String endpoint,
-      {Map<String, dynamic>? data}) async {
-    if (_isOffline) {
-      throw Exception('No internet connection');
-    }
-
-    try {
-      final stopwatch = Stopwatch()..start();
-      _networkMonitor.trackRequest(endpoint);
-
-      final response =
-          await _dio.post<Map<String, dynamic>>(endpoint, data: data);
-      stopwatch.stop();
-
-      _networkMonitor.trackRequestAndResponse(
-        path: endpoint,
-        duration: stopwatch.elapsed,
-        statusCode: response.statusCode ?? 0,
-        responseSize: _calculateResponseSize(response),
-      );
-
-      return response.data ?? {};
-    } catch (error) {
-      _handleRequestError(endpoint, error);
-      rethrow;
-    }
-  }
+          {Map<String, dynamic>? data}) =>
+      _request('POST', endpoint, data: data);
 
   @override
   Future<Map<String, dynamic>> put(String endpoint,
-      {Map<String, dynamic>? data}) async {
-    if (_isOffline) {
-      throw Exception('No internet connection');
-    }
-
-    try {
-      final stopwatch = Stopwatch()..start();
-      _networkMonitor.trackRequest(endpoint);
-
-      final response =
-          await _dio.put<Map<String, dynamic>>(endpoint, data: data);
-      stopwatch.stop();
-
-      _networkMonitor.trackRequestAndResponse(
-        path: endpoint,
-        duration: stopwatch.elapsed,
-        statusCode: response.statusCode ?? 0,
-        responseSize: _calculateResponseSize(response),
-      );
-
-      return response.data ?? {};
-    } catch (error) {
-      _handleRequestError(endpoint, error);
-      rethrow;
-    }
-  }
+          {Map<String, dynamic>? data}) =>
+      _request('PUT', endpoint, data: data);
 
   @override
-  Future<Map<String, dynamic>> delete(String endpoint) async {
-    if (_isOffline) {
-      throw Exception('No internet connection');
-    }
+  Future<Map<String, dynamic>> delete(String endpoint) =>
+      _request('DELETE', endpoint);
 
-    try {
-      final stopwatch = Stopwatch()..start();
-      _networkMonitor.trackRequest(endpoint);
-
-      final response = await _dio.delete<Map<String, dynamic>>(endpoint);
-      stopwatch.stop();
-
-      _networkMonitor.trackRequestAndResponse(
-        path: endpoint,
-        duration: stopwatch.elapsed,
-        statusCode: response.statusCode ?? 0,
-        responseSize: _calculateResponseSize(response),
-      );
-
-      return response.data ?? {};
-    } catch (error) {
-      _handleRequestError(endpoint, error);
-      rethrow;
-    }
-  }
-
-  /// Make a PATCH request to the specified [path]
+  /// Make a PATCH request to the specified endpoint
   Future<Map<String, dynamic>> patch(String endpoint,
-      {Map<String, dynamic>? data}) async {
+          {Map<String, dynamic>? data}) =>
+      _request('PATCH', endpoint, data: data);
+
+  /// Template method for all HTTP requests.
+  ///
+  /// Eliminates the 5 duplicate method bodies by centralizing
+  /// offline checks, performance tracking, and error handling.
+  Future<Map<String, dynamic>> _request(
+    String method,
+    String endpoint, {
+    Map<String, dynamic>? data,
+  }) async {
     if (_isOffline) {
-      throw Exception('No internet connection');
+      throw const NetworkConnectivityException(
+        message: 'No internet connection',
+      );
     }
 
     try {
       final stopwatch = Stopwatch()..start();
       _networkMonitor.trackRequest(endpoint);
 
-      final response =
-          await _dio.patch<Map<String, dynamic>>(endpoint, data: data);
+      final response = await _dio.request<Map<String, dynamic>>(
+        endpoint,
+        data: data,
+        options: Options(method: method),
+      );
       stopwatch.stop();
 
       _networkMonitor.trackRequestAndResponse(

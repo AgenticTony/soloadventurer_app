@@ -50,7 +50,7 @@ final class SyncSettingsProvider
   }
 }
 
-String _$syncSettingsHash() => r'7001baf0ca766b2e8a747b5d6593317e8dfbade3';
+String _$syncSettingsHash() => r'917e2bc7a8d7e88dcaef5c27e075c57aa7a8e9b1';
 
 /// Notifier for sync settings
 ///

@@ -127,9 +127,6 @@ class DiskCache {
   /// Cache directory
   Directory? _cacheDir;
 
-  /// Metadata file
-  File get _metadataFile => File('${_cacheDir?.path}/.cache_metadata.json');
-
   /// Index file for fast lookups
   File get _indexFile => File('${_cacheDir?.path}/.cache_index.json');
 

@@ -5,8 +5,7 @@ import 'package:geolocator/geolocator.dart' as geo
         LocationAccuracy,
         LocationPermission,
         LocationSettings,
-        Position,
-        ServiceStatus;
+        Position;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'location_service.dart'
     show

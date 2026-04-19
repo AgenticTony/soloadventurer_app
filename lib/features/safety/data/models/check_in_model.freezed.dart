@@ -481,7 +481,7 @@ extension CheckInModelPatterns on CheckInModel {
 
 /// @nodoc
 @JsonSerializable()
-class _CheckInModel implements CheckInModel {
+class _CheckInModel extends CheckInModel {
   const _CheckInModel(
       {required this.id,
       required this.userId,
@@ -498,7 +498,8 @@ class _CheckInModel implements CheckInModel {
       this.alertSentAt,
       required this.createdAt,
       this.updatedAt})
-      : _notifyContactIds = notifyContactIds;
+      : _notifyContactIds = notifyContactIds,
+        super._();
   factory _CheckInModel.fromJson(Map<String, dynamic> json) =>
       _$CheckInModelFromJson(json);
 

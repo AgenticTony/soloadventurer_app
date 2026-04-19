@@ -4,7 +4,7 @@ import 'package:soloadventurer/core/utils/json_helpers.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
-import 'package:soloadventurer/utils/performance/query_optimizer.dart';
+import 'package:soloadventurer/features/journal/data/services/query_optimizer.dart';
 
 /// Optimized implementation of [JournalRemoteDataSource] with field selection and caching
 class JournalRemoteDataSourceOptimized implements JournalRemoteDataSource {

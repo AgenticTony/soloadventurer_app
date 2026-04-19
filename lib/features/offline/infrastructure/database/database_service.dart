@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -58,19 +57,16 @@ class DatabaseService {
   Future<bool> initialize() async {
     // Prevent concurrent initialization
     if (_isInitializing) {
-      debugPrint('Database initialization already in progress');
       return false;
     }
 
     if (_isInitialized && _database != null) {
-      debugPrint('Database already initialized');
       return true;
     }
 
     _isInitializing = true;
 
     try {
-      debugPrint('Initializing database...');
 
       // Try to create/open the database
       _database = await _tryCreateDatabase();
@@ -78,33 +74,25 @@ class DatabaseService {
       // Verify database integrity
       final isValid = await _validateDatabase();
       if (!isValid) {
-        debugPrint('Database validation failed, attempting recovery...');
         await _recoverFromCorruption();
         _database = await _tryCreateDatabase();
       }
 
       _isInitialized = true;
       _isInitializing = false;
-      debugPrint('Database initialized successfully');
       return true;
-    } catch (e, stackTrace) {
+    } catch (e) {
       _isInitializing = false;
       _isInitialized = false;
       _database = null;
 
-      debugPrint('Database initialization failed: $e');
-      debugPrint('Stack trace: $stackTrace');
-
       // Try to recover from corruption
       try {
-        debugPrint('Attempting database recovery...');
         await _recoverFromCorruption();
         _database = await _tryCreateDatabase();
         _isInitialized = true;
-        debugPrint('Database recovery successful');
         return true;
       } catch (recoveryError) {
-        debugPrint('Database recovery failed: $recoveryError');
         rethrow;
       }
     }
@@ -116,11 +104,9 @@ class DatabaseService {
   /// the database needs to be closed for migration purposes.
   Future<void> close() async {
     if (_database != null) {
-      debugPrint('Closing database...');
       await _database!.close();
       _database = null;
       _isInitialized = false;
-      debugPrint('Database closed');
     }
   }
 
@@ -132,17 +118,14 @@ class DatabaseService {
   /// Returns [true] if the reset was successful, [false] otherwise.
   Future<bool> reset() async {
     try {
-      debugPrint('Resetting database...');
 
       if (_database != null) {
         await _database!.clearAllTables();
-        debugPrint('Database reset complete');
         return true;
       }
 
       return false;
     } catch (e) {
-      debugPrint('Database reset failed: $e');
       return false;
     }
   }
@@ -155,7 +138,6 @@ class DatabaseService {
   /// Returns [true] if the deletion was successful, [false] otherwise.
   Future<bool> delete() async {
     try {
-      debugPrint('Deleting database file...');
 
       // Close the database first
       await close();
@@ -163,10 +145,8 @@ class DatabaseService {
       // Delete the database file
       await AppDatabaseExtension.deleteDatabaseFile();
 
-      debugPrint('Database file deleted');
       return true;
     } catch (e) {
-      debugPrint('Database deletion failed: $e');
       return false;
     }
   }
@@ -198,7 +178,6 @@ class DatabaseService {
       await _database!.customSelect('SELECT COUNT(*) FROM sqlite_master').get();
       return true;
     } catch (e) {
-      debugPrint('Database validation failed: $e');
       return false;
     }
   }
@@ -211,7 +190,6 @@ class DatabaseService {
     try {
       return AppDatabase();
     } catch (e) {
-      debugPrint('Failed to create database: $e');
       rethrow;
     }
   }
@@ -226,7 +204,6 @@ class DatabaseService {
   /// Throws [Exception] if recovery fails.
   Future<void> _recoverFromCorruption() async {
     try {
-      debugPrint('Starting database recovery...');
 
       // Try to backup the corrupted database
       await _backupCorruptedDatabase();
@@ -234,9 +211,7 @@ class DatabaseService {
       // Delete the corrupted database
       await delete();
 
-      debugPrint('Database recovery complete');
     } catch (e) {
-      debugPrint('Database recovery error: $e');
       rethrow;
     }
   }
@@ -252,7 +227,6 @@ class DatabaseService {
       final dbFile = File(dbPath);
 
       if (!await dbFile.exists()) {
-        debugPrint('No database file to backup');
         return;
       }
 
@@ -263,9 +237,7 @@ class DatabaseService {
 
       // Copy the database file
       await dbFile.copy(backupPath);
-      debugPrint('Corrupted database backed up to: $backupPath');
     } catch (e) {
-      debugPrint('Failed to backup corrupted database: $e');
       // Don't throw - backup failure shouldn't prevent recovery
     }
   }
@@ -298,7 +270,6 @@ class DatabaseService {
 
       return true;
     } catch (e) {
-      debugPrint('Database health check failed: $e');
       return false;
     }
   }
@@ -312,7 +283,6 @@ class DatabaseService {
       final info = await getDatabaseInfo();
       return info['size'] as int? ?? 0;
     } catch (e) {
-      debugPrint('Failed to get database size: $e');
       return 0;
     }
   }

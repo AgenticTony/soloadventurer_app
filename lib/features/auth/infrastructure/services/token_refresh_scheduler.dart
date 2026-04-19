@@ -53,7 +53,6 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// This will schedule a refresh at 75% of the token lifetime and
   /// register the app lifecycle observer to pause/resume monitoring.
   void start(AuthSession session) {
-    debugPrint('TokenRefreshScheduler: Starting scheduler');
 
     _currentSession = session;
 
@@ -61,14 +60,12 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
     if (!_isObserverRegistered) {
       WidgetsBinding.instance.addObserver(this);
       _isObserverRegistered = true;
-      debugPrint('TokenRefreshScheduler: Registered as WidgetsBindingObserver');
     }
 
     // Start tracking with the expiration tracker
     _expirationTracker.startTracking(session);
     _status = TokenRefreshSchedulerStatus.running;
 
-    debugPrint('TokenRefreshScheduler: Scheduler is now running');
   }
 
   /// Stops monitoring token expiration
@@ -76,7 +73,6 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// This will cancel any pending refresh operations and unregister
   /// the app lifecycle observer.
   void stop() {
-    debugPrint('TokenRefreshScheduler: Stopping scheduler');
 
     _status = TokenRefreshSchedulerStatus.stopped;
     _currentSession = null;
@@ -88,10 +84,8 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
     if (_isObserverRegistered) {
       WidgetsBinding.instance.removeObserver(this);
       _isObserverRegistered = false;
-      debugPrint('TokenRefreshScheduler: Unregistered WidgetsBindingObserver');
     }
 
-    debugPrint('TokenRefreshScheduler: Scheduler stopped');
   }
 
   /// Pauses the scheduler (e.g., when app goes to background)
@@ -99,20 +93,14 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// This keeps the session but stops the refresh timer.
   void pause() {
     if (_status != TokenRefreshSchedulerStatus.running) {
-      debugPrint(
-          'TokenRefreshScheduler: Cannot pause - scheduler is not running');
       return;
     }
-
-    debugPrint('TokenRefreshScheduler: Pausing scheduler');
 
     _status = TokenRefreshSchedulerStatus.paused;
 
     // Stop the tracking timer but keep the session
     _expirationTracker.stopTracking();
 
-    debugPrint(
-        'TokenRefreshScheduler: Scheduler paused (timer stopped, session retained)');
   }
 
   /// Resumes the scheduler (e.g., when app returns to foreground)
@@ -120,59 +108,46 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// This restarts the refresh timer with the retained session.
   void resume() {
     if (_status != TokenRefreshSchedulerStatus.paused) {
-      debugPrint(
-          'TokenRefreshScheduler: Cannot resume - scheduler is not paused');
       return;
     }
 
     if (_currentSession == null) {
-      debugPrint('TokenRefreshScheduler: Cannot resume - no session to track');
       return;
     }
-
-    debugPrint('TokenRefreshScheduler: Resuming scheduler');
 
     // Restart tracking with the retained session
     _expirationTracker.startTracking(_currentSession!);
     _status = TokenRefreshSchedulerStatus.running;
 
-    debugPrint('TokenRefreshScheduler: Scheduler resumed and running');
   }
 
   /// Handles app lifecycle state changes
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    debugPrint('TokenRefreshScheduler: App lifecycle state changed to $state');
 
     switch (state) {
       case AppLifecycleState.resumed:
         // App returned to foreground
-        debugPrint(
-            'TokenRefreshScheduler: App resumed - checking if refresh needed');
         _handleAppResumed();
         break;
 
       case AppLifecycleState.inactive:
         // App is inactive (e.g., during a phone call)
-        debugPrint('TokenRefreshScheduler: App inactive - pausing scheduler');
         pause();
         break;
 
       case AppLifecycleState.paused:
         // App went to background
-        debugPrint('TokenRefreshScheduler: App paused - pausing scheduler');
         pause();
         break;
 
       case AppLifecycleState.detached:
         // App is being destroyed
-        debugPrint('TokenRefreshScheduler: App detached - stopping scheduler');
         stop();
         break;
 
       case AppLifecycleState.hidden:
         // App is hidden (same as background on most platforms)
-        debugPrint('TokenRefreshScheduler: App hidden - pausing scheduler');
         pause();
         break;
     }
@@ -181,7 +156,6 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// Handles app resume event
   void _handleAppResumed() {
     if (_currentSession == null) {
-      debugPrint('TokenRefreshScheduler: No session to monitor on resume');
       return;
     }
 
@@ -190,17 +164,11 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
         _expirationTracker.checkExpiration(_currentSession!);
 
     if (expirationResult.isExpired) {
-      debugPrint(
-          'TokenRefreshScheduler: Token is expired, immediate refresh needed');
       // Resume will trigger immediate refresh if needed
     } else if (expirationResult.shouldRefresh) {
-      debugPrint('TokenRefreshScheduler: Token should be refreshed soon');
       // Resume will schedule refresh appropriately
     } else {
-      final minutesUntilRefresh =
-          expirationResult.timeUntilRefresh?.inMinutes ?? 0;
-      debugPrint(
-          'TokenRefreshScheduler: Token is valid, refresh in $minutesUntilRefresh minutes');
+      expirationResult.timeUntilRefresh?.inMinutes ?? 0;
     }
 
     // Resume the scheduler
@@ -212,7 +180,6 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// Use this when the session is updated externally (e.g., after a manual refresh).
   /// This will reschedule the refresh timer based on the new expiration time.
   void updateSession(AuthSession session) {
-    debugPrint('TokenRefreshScheduler: Updating monitored session');
 
     _currentSession = session;
 
@@ -221,7 +188,6 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
       _expirationTracker.updateSession(session);
     } else if (_status == TokenRefreshSchedulerStatus.paused) {
       // Just update the session, don't start tracking while paused
-      debugPrint('TokenRefreshScheduler: Session updated while paused');
     }
   }
 
@@ -230,7 +196,6 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
   /// Returns null if no session is being monitored.
   TokenExpirationResult? checkExpiration() {
     if (_currentSession == null) {
-      debugPrint('TokenRefreshScheduler: No session to check');
       return null;
     }
 
@@ -239,13 +204,11 @@ class TokenRefreshScheduler extends WidgetsBindingObserver {
 
   /// Disposes of the scheduler and cleans up resources
   void dispose() {
-    debugPrint('TokenRefreshScheduler: Disposing scheduler');
     stop();
   }
 
   /// Resets the scheduler state (useful for testing)
   void reset() {
-    debugPrint('TokenRefreshScheduler: Resetting scheduler state');
     stop();
   }
 }

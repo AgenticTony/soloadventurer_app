@@ -54,7 +54,7 @@ final class JournalEntryCreationProvider
 }
 
 String _$journalEntryCreationHash() =>
-    r'bb0b0783e848bf67f4ac84511cf320875d68067a';
+    r'5dc171c2224693f69cd5ca28239d62bb87a7b5ad';
 
 /// Notifier for managing journal entry creation state
 ///

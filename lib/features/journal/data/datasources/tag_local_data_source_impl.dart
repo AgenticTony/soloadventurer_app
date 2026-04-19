@@ -4,7 +4,6 @@ import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 import 'package:soloadventurer/features/journal/data/datasources/database_helper.dart';
 import 'package:soloadventurer/features/journal/data/datasources/tag_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';
-import 'package:soloadventurer/features/journal/domain/entities/tag.dart';
 
 /// SQLite implementation of [TagLocalDataSource]
 class TagLocalDataSourceImpl implements TagLocalDataSource {
@@ -46,7 +45,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
       );
 
       if (count == 0) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Tag not found',
         );
       }
@@ -125,14 +124,13 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
     try {
       final tag = await getTag(tagId);
       if (tag == null) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Tag not found',
         );
       }
 
       final updatedTag = tag.copyWith(
         syncStatus: SyncStatusExtension.fromString(syncStatus),
-        lastSyncedAt: DateTime.now(),
       );
 
       return await updateTag(updatedTag);
@@ -167,7 +165,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
     try {
       final tag = await getTag(tagId);
       if (tag == null) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Tag not found',
         );
       }
@@ -191,7 +189,7 @@ class TagLocalDataSourceImpl implements TagLocalDataSource {
     try {
       final tag = await getTag(tagId);
       if (tag == null) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Tag not found',
         );
       }

@@ -107,7 +107,6 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
             .where((list) => list.type == CuratedListType.wellness)
             .toList();
       case CuratedListFilter.all:
-      default:
         return allLists;
     }
   }
@@ -475,7 +474,6 @@ class _CuratedListsScreenState extends ConsumerState<CuratedListsScreen> {
         return 'No wellness collections found. '
             'Browse other categories for retreat destinations!';
       case CuratedListFilter.all:
-      default:
         return 'No curated collections available at the moment. '
             'Our travel experts are curating new collections for you!';
     }

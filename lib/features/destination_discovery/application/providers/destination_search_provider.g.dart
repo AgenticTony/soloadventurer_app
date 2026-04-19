@@ -9,10 +9,10 @@ part of 'destination_search_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
-/// - build() returns Future<T> not AsyncValue<T> (Riverpod 3.0 handles wrapping)
-/// - State is automatically AsyncValue<DestinationSearchState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>` (Riverpod 3.0 handles wrapping)
+/// - State is automatically `AsyncValue<DestinationSearchState>` when consumed
 /// - Initialization logic moved from constructor to build() method
 /// Provider for destination search state management
 ///
@@ -44,10 +44,10 @@ part of 'destination_search_provider.dart';
 const destinationSearchProvider = DestinationSearchProvider._();
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
-/// - build() returns Future<T> not AsyncValue<T> (Riverpod 3.0 handles wrapping)
-/// - State is automatically AsyncValue<DestinationSearchState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>` (Riverpod 3.0 handles wrapping)
+/// - State is automatically `AsyncValue<DestinationSearchState>` when consumed
 /// - Initialization logic moved from constructor to build() method
 /// Provider for destination search state management
 ///
@@ -77,10 +77,10 @@ const destinationSearchProvider = DestinationSearchProvider._();
 final class DestinationSearchProvider
     extends $AsyncNotifierProvider<DestinationSearch, DestinationSearchState> {
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
   /// - Dependencies injected via ref.watch() in build() method
-  /// - build() returns Future<T> not AsyncValue<T> (Riverpod 3.0 handles wrapping)
-  /// - State is automatically AsyncValue<DestinationSearchState> when consumed
+  /// - build() returns `Future<T>` not `AsyncValue<T>` (Riverpod 3.0 handles wrapping)
+  /// - State is automatically `AsyncValue<DestinationSearchState>` when consumed
   /// - Initialization logic moved from constructor to build() method
   /// Provider for destination search state management
   ///
@@ -129,10 +129,10 @@ final class DestinationSearchProvider
 String _$destinationSearchHash() => r'52ac8964e026d4e41172a0ee533ba12654e8f7d8';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
-/// - build() returns Future<T> not AsyncValue<T> (Riverpod 3.0 handles wrapping)
-/// - State is automatically AsyncValue<DestinationSearchState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>` (Riverpod 3.0 handles wrapping)
+/// - State is automatically `AsyncValue<DestinationSearchState>` when consumed
 /// - Initialization logic moved from constructor to build() method
 /// Provider for destination search state management
 ///

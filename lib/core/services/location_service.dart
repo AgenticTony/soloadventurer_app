@@ -1,75 +1,92 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-// Import for the implementation provider
-import 'location_service_impl.dart' show locationServiceOverrideProvider;
-
-part 'location_service.g.dart';
-
-/// Accuracy level for location tracking
+/// Location accuracy levels for location requests
 enum LocationAccuracy {
-  /// Lowest accuracy, lowest battery usage (~3km)
+  /// Low accuracy (~3000m) - uses cell towers
   low,
 
-  /// Balanced accuracy and battery usage (~100m)
+  /// Balanced accuracy (~100m) - uses cell towers + WiFi
   balanced,
 
-  /// High accuracy, moderate battery usage (~10m)
+  /// High accuracy (~10m) - uses GPS
   high,
 
-  /// Best possible accuracy, high battery usage (~0m)
+  /// Best accuracy available (~0m) - uses GPS + other sensors
   best,
 }
 
-/// Result of a location request
+/// Location permission status
+enum LocationPermissionStatus {
+  /// Permission has been granted
+  granted,
+
+  /// Permission has been denied
+  denied,
+
+  /// Permission has been permanently denied (user selected "Don't ask again")
+  permanentlyDenied,
+}
+
+/// Result of a location capture operation
 class LocationData {
-  /// Latitude in degrees
+  /// Latitude coordinate
   final double latitude;
 
-  /// Longitude in degrees
+  /// Longitude coordinate
   final double longitude;
 
-  /// Accuracy of the location in meters
-  final double? accuracy;
+  /// Accuracy of the location fix in meters
+  final double accuracy;
 
-  /// Altitude in meters above sea level
+  /// Altitude in meters (null if not available)
   final double? altitude;
 
-  /// Speed in meters per second
+  /// Speed in meters per second (null if not available)
   final double? speed;
 
-  /// Heading in degrees (0-360)
+  /// Heading in degrees (null if not available)
   final double? heading;
 
-  /// Timestamp when location was recorded
+  /// Timestamp when location was captured
   final DateTime timestamp;
+
+  /// Human-readable location name (optional, requires geocoding)
+  final String? locationName;
 
   const LocationData({
     required this.latitude,
     required this.longitude,
-    this.accuracy,
+    required this.accuracy,
     this.altitude,
     this.speed,
     this.heading,
     required this.timestamp,
+    this.locationName,
   });
 
-  /// Creates LocationData from a map
-  factory LocationData.fromMap(Map<String, dynamic> map) {
+  /// Creates a copy with updated fields
+  LocationData copyWith({
+    double? latitude,
+    double? longitude,
+    double? accuracy,
+    double? altitude,
+    double? speed,
+    double? heading,
+    DateTime? timestamp,
+    String? locationName,
+  }) {
     return LocationData(
-      latitude: map['latitude'] as double,
-      longitude: map['longitude'] as double,
-      accuracy: map['accuracy'] as double?,
-      altitude: map['altitude'] as double?,
-      speed: map['speed'] as double?,
-      heading: map['heading'] as double?,
-      timestamp: DateTime.fromMillisecondsSinceEpoch(
-        map['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch,
-      ),
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      accuracy: accuracy ?? this.accuracy,
+      altitude: altitude ?? this.altitude,
+      speed: speed ?? this.speed,
+      heading: heading ?? this.heading,
+      timestamp: timestamp ?? this.timestamp,
+      locationName: locationName ?? this.locationName,
     );
   }
 
-  /// Converts LocationData to a map
-  Map<String, dynamic> toMap() {
+  /// Convert to JSON
+  Map<String, dynamic> toJson() {
     return {
       'latitude': latitude,
       'longitude': longitude,
@@ -77,77 +94,75 @@ class LocationData {
       'altitude': altitude,
       'speed': speed,
       'heading': heading,
-      'timestamp': timestamp.millisecondsSinceEpoch,
+      'timestamp': timestamp.toIso8601String(),
+      'locationName': locationName,
     };
+  }
+
+  /// Create from JSON
+  factory LocationData.fromJson(Map<String, dynamic> json) {
+    return LocationData(
+      latitude: json['latitude'] as double,
+      longitude: json['longitude'] as double,
+      accuracy: json['accuracy'] as double,
+      altitude: json['altitude'] as double?,
+      speed: json['speed'] as double?,
+      heading: json['heading'] as double?,
+      timestamp: DateTime.parse(json['timestamp'] as String),
+      locationName: json['locationName'] as String?,
+    );
   }
 
   @override
   String toString() {
-    return 'LocationData(lat: $latitude, lng: $longitude, accuracy: $accuracy)';
+    return 'LocationData(lat: $latitude, lng: $longitude, accuracy: ${accuracy}m'
+        '${locationName != null ? ', name: $locationName' : ''})';
   }
 }
 
-/// Permission status for location services
-enum LocationPermissionStatus {
-  /// Permission is granted
-  granted,
-
-  /// Permission is denied
-  denied,
-
-  /// Permission is denied permanently (user selected "Don't ask again")
-  permanentlyDenied,
-
-  /// Permission is restricted (e.g., parental controls)
-  restricted,
-}
-
-/// Abstract interface for location operations
+/// Abstract interface for location services
+///
+/// Defines the contract for location-related operations including
+/// getting current location, tracking, and permission management.
 abstract class LocationService {
   /// Stream of location updates
   Stream<LocationData> get onLocationChanged;
 
-  /// Gets the current location once
+  /// Whether location tracking is currently active
+  bool get isTrackingLocation;
+
+  /// Get the current device location
   ///
-  /// [accuracy] - The desired accuracy level (default: balanced)
-  /// Returns the current location or throws an exception if unable to get location
+  /// [accuracy] - Desired accuracy level (defaults to balanced)
   Future<LocationData> getCurrentLocation({
     LocationAccuracy accuracy = LocationAccuracy.balanced,
   });
 
-  /// Gets the last known cached location (faster, may be outdated)
-  ///
-  /// Returns the last known location or null if no location is cached
+  /// Get the last known location (cached, may be outdated)
   Future<LocationData?> getLastKnownLocation();
 
-  /// Starts continuous location updates with specified accuracy
+  /// Start continuous location updates
   ///
-  /// [accuracy] - The desired accuracy level (default: balanced for battery efficiency)
-  /// [distanceFilter] - Minimum distance between updates in meters (default: 10)
-  /// Throws an exception if location updates are already active
+  /// [accuracy] - Desired accuracy level
+  /// [distanceFilter] - Minimum distance between updates in meters
   Future<void> startLocationUpdates({
     LocationAccuracy accuracy = LocationAccuracy.balanced,
     int distanceFilter = 10,
   });
 
-  /// Stops continuous location updates
+  /// Stop continuous location updates
   Future<void> stopLocationUpdates();
 
-  /// Checks if location updates are currently active
-  bool get isTrackingLocation;
-
-  /// Checks if location services are enabled on the device
+  /// Check if location services are enabled on the device
   Future<bool> isLocationServiceEnabled();
 
-  /// Checks the current location permission status
+  /// Check the current location permission status
   Future<LocationPermissionStatus> checkPermission();
 
-  /// Requests location permission
-  ///
-  /// Returns the permission status after requesting
+  /// Request location permission from the user
   Future<LocationPermissionStatus> requestPermission();
 
-  /// Calculates distance between two coordinates in meters
+  /// Calculate distance between two coordinates in meters
   double distanceBetween(
     double startLatitude,
     double startLongitude,
@@ -155,15 +170,6 @@ abstract class LocationService {
     double endLongitude,
   );
 
-  /// Disposes any resources (closes streams, etc.)
+  /// Dispose of resources
   void dispose();
-}
-
-/// Provider for the location service implementation
-///
-/// This provider returns the actual implementation from location_service_impl.dart.
-/// The locationServiceOverrideProvider handles the proper instantiation and disposal.
-@riverpod
-LocationService locationService(Ref ref) {
-  return ref.watch(locationServiceOverrideProvider);
 }

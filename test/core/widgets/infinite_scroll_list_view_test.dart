@@ -563,7 +563,7 @@ void main() {
 
   group('InfiniteScrollState', () {
     test('creates initial state correctly', () {
-      const state = InfiniteScrollState<String>();
+      final state = InfiniteScrollState<String>();
 
       expect(state.items, isEmpty);
       expect(state.status, InfiniteScrollStatus.initialLoading);
@@ -573,7 +573,7 @@ void main() {
     });
 
     test('copyWith updates fields correctly', () {
-      const state = InfiniteScrollState<String>(
+      final state = InfiniteScrollState<String>(
         items: ['Item 1'],
         status: InfiniteScrollStatus.loaded,
       );
@@ -602,17 +602,17 @@ void main() {
     });
 
     test('calculates isLoading correctly', () {
-      const initialLoading = InfiniteScrollState<String>(
+      final initialLoading = InfiniteScrollState<String>(
         status: InfiniteScrollStatus.initialLoading,
       );
       expect(initialLoading.isLoading, true);
 
-      const loadingMore = InfiniteScrollState<String>(
+      final loadingMore = InfiniteScrollState<String>(
         status: InfiniteScrollStatus.loadingMore,
       );
       expect(loadingMore.isLoading, true);
 
-      const loaded = InfiniteScrollState<String>(
+      final loaded = InfiniteScrollState<String>(
         status: InfiniteScrollStatus.loaded,
       );
       expect(loaded.isLoading, false);
@@ -655,7 +655,6 @@ class MockPaginatedDataFetcher {
     }
 
     if (_data != null) {
-      await Future.delayed(const Duration(milliseconds: 100));
       return _data!;
     }
 

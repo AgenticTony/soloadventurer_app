@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
 import 'package:soloadventurer/features/sync/domain/models/entity_version.dart';
 import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart'
     show ConflictType, ConflictSeverity;
+import 'package:soloadventurer/features/sync/domain/models/conflict_resolution.dart';
 import 'package:soloadventurer/features/sync/presentation/widgets/conflict_resolution_dialog.dart';
 
 void main() {

@@ -6,11 +6,11 @@ import 'destination_repository_provider.dart';
 part 'curated_lists_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - Dependencies injected via ref.watch() in build() method
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<CuratedListsState> when consumed
-/// - Constructor auto-load logic moved to build() method
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+/// - Dependencies injected via `ref.watch()` in `build()` method
+/// - `build()` returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<CuratedListsState>` when consumed
+/// - Constructor auto-load logic moved to `build()` method
 ///
 /// Provider for curated destination lists state management
 ///
@@ -45,8 +45,8 @@ part 'curated_lists_provider.g.dart';
 class CuratedLists extends _$CuratedLists {
   /// Initialize the notifier and auto-load curated lists
   ///
-  /// Riverpod 3.0: build() returns Future<CuratedListsState>
-  /// AsyncValue wrapping is handled automatically by the framework
+  /// Riverpod 3.0: `build()` returns `Future<CuratedListsState>`
+  /// `AsyncValue` wrapping is handled automatically by the framework
   @override
   Future<CuratedListsState> build() async {
     // Get dependencies via ref.watch()

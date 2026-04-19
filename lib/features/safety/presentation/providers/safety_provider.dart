@@ -11,17 +11,16 @@ import '../../data/repositories/safety_providers.dart' as data;
 
 part 'safety_provider.g.dart';
 
-/// Notifier for managing overall safety state
-/// Handles safety status, emergency SOS, and safety alerts
+/// AsyncNotifier for managing overall safety state.
 ///
 /// Riverpod 3.0 Compliant:
 /// - Uses @riverpod annotation with code generation
-/// - Uses Notifier base class instead of StateNotifier
-/// - Dependencies accessed via ref.watch() in methods
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 @riverpod
 class Safety extends _$Safety {
   @override
-  SafetyState build() => const SafetyState();
+  Future<SafetyState> build() async => SafetyState.initial();
 
   TriggerEmergencySOSUseCase get _triggerSOS =>
       ref.watch(triggerEmergencySOSUseCaseProvider);
@@ -34,10 +33,8 @@ class Safety extends _$Safety {
 
   /// Initialize safety state by loading current status and alerts
   Future<void> initialize() async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final currentStatus = await _getStatus();
       final recentAlerts = await _repository.getRecentSafetyAlerts(limit: 10);
       final activeAlerts = recentAlerts
@@ -47,41 +44,28 @@ class Safety extends _$Safety {
           .toList();
       final contacts = await _repository.getTrustedContacts();
 
-      state = state.copyWith(
-        isLoading: false,
+      return (state.value ?? SafetyState.initial()).copyWith(
         currentStatus: currentStatus,
         recentAlerts: recentAlerts,
         activeAlerts: activeAlerts,
         trustedContactsCount: contacts.length,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Load current safety status
   Future<void> loadSafetyStatus() async {
-    if (state.isProcessing) return;
+    final current = state.value;
+    if (current == null || current.isProcessing) return;
 
-    state = state.copyWith(isProcessing: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final status = await _getStatus();
-
-      state = state.copyWith(
+      return (state.value ?? current).copyWith(
         isProcessing: false,
         currentStatus: status,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Trigger emergency SOS
@@ -93,11 +77,11 @@ class Safety extends _$Safety {
     int? batteryLevel,
     String? tripId,
   }) async {
-    if (state.isProcessing) return;
+    final current = state.value;
+    if (current == null || current.isProcessing) return;
 
-    state = state.copyWith(isProcessing: true, error: null);
-    try {
-      // Get all trusted contacts if none specified
+    state = AsyncData(current.copyWith(isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final contacts = notifyContactIds ??
           (await _repository.getTrustedContacts())
               .where((c) => c.receivesEmergencyAlerts)
@@ -113,21 +97,15 @@ class Safety extends _$Safety {
         tripId: tripId,
       );
 
-      final updatedAlerts = [alert, ...state.recentAlerts];
-      final updatedActiveAlerts = [alert, ...state.activeAlerts];
+      final updatedAlerts = [alert, ...current.recentAlerts];
+      final updatedActiveAlerts = [alert, ...current.activeAlerts];
 
-      state = state.copyWith(
+      return current.copyWith(
         isProcessing: false,
         recentAlerts: updatedAlerts,
         activeAlerts: updatedActiveAlerts,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Update safety status
@@ -139,10 +117,11 @@ class Safety extends _$Safety {
     String? safetyAlertId,
     String? checkInId,
   }) async {
-    if (state.isProcessing) return;
+    final current = state.value;
+    if (current == null || current.isProcessing) return;
 
-    state = state.copyWith(isProcessing: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final updatedStatus = await _updateStatus(
         status: status,
         message: message,
@@ -152,17 +131,11 @@ class Safety extends _$Safety {
         checkInId: checkInId,
       );
 
-      state = state.copyWith(
+      return current.copyWith(
         isProcessing: false,
         currentStatus: updatedStatus,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Mark user as safe
@@ -211,10 +184,8 @@ class Safety extends _$Safety {
 
   /// Load recent safety alerts
   Future<void> loadRecentAlerts({int limit = 20}) async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final recentAlerts =
           await _repository.getRecentSafetyAlerts(limit: limit);
       final activeAlerts = recentAlerts
@@ -223,29 +194,23 @@ class Safety extends _$Safety {
               alert.status == SafetyAlertStatus.acknowledged)
           .toList();
 
-      state = state.copyWith(
-        isLoading: false,
+      return (state.value ?? SafetyState.initial()).copyWith(
         recentAlerts: recentAlerts,
         activeAlerts: activeAlerts,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Acknowledge a safety alert (as a trusted contact)
   Future<void> acknowledgeAlert(String alertId, String contactId) async {
-    if (state.isProcessing) return;
+    final current = state.value;
+    if (current == null || current.isProcessing) return;
 
-    state = state.copyWith(isProcessing: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isProcessing: true));
+    state = await AsyncValue.guard(() async {
       await _repository.acknowledgeSafetyAlert(alertId, contactId);
 
-      final updatedAlerts = state.recentAlerts.map((alert) {
+      final updatedAlerts = current.recentAlerts.map((alert) {
         if (alert.id == alertId) {
           final acknowledgedByContactIds = [
             ...alert.acknowledgedByContactIds,
@@ -257,7 +222,7 @@ class Safety extends _$Safety {
         return alert;
       }).toList();
 
-      final updatedActiveAlerts = state.activeAlerts.map((alert) {
+      final updatedActiveAlerts = current.activeAlerts.map((alert) {
         if (alert.id == alertId) {
           final acknowledgedByContactIds = [
             ...alert.acknowledgedByContactIds,
@@ -269,109 +234,83 @@ class Safety extends _$Safety {
         return alert;
       }).toList();
 
-      state = state.copyWith(
+      return current.copyWith(
         isProcessing: false,
         recentAlerts: updatedAlerts,
         activeAlerts: updatedActiveAlerts,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Resolve a safety alert (user is safe)
   Future<void> resolveAlert(String alertId) async {
-    if (state.isProcessing) return;
+    final current = state.value;
+    if (current == null || current.isProcessing) return;
 
-    state = state.copyWith(isProcessing: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isProcessing: true));
+    state = await AsyncValue.guard(() async {
       await _repository.resolveSafetyAlert(alertId);
 
-      final updatedAlerts = state.recentAlerts.map((alert) {
+      final updatedAlerts = current.recentAlerts.map((alert) {
         return alert.id == alertId
             ? alert.copyWith(status: SafetyAlertStatus.resolved)
             : alert;
       }).toList();
 
       final updatedActiveAlerts =
-          state.activeAlerts.where((alert) => alert.id != alertId).toList();
+          current.activeAlerts.where((alert) => alert.id != alertId).toList();
 
-      state = state.copyWith(
+      return current.copyWith(
         isProcessing: false,
         recentAlerts: updatedAlerts,
         activeAlerts: updatedActiveAlerts,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Cancel a safety alert (false alarm)
   Future<void> cancelAlert(String alertId) async {
-    if (state.isProcessing) return;
+    final current = state.value;
+    if (current == null || current.isProcessing) return;
 
-    state = state.copyWith(isProcessing: true, error: null);
-    try {
+    state = AsyncData(current.copyWith(isProcessing: true));
+    state = await AsyncValue.guard(() async {
       await _repository.cancelSafetyAlert(alertId);
 
-      final updatedAlerts = state.recentAlerts.map((alert) {
+      final updatedAlerts = current.recentAlerts.map((alert) {
         return alert.id == alertId
             ? alert.copyWith(status: SafetyAlertStatus.cancelled)
             : alert;
       }).toList();
 
       final updatedActiveAlerts =
-          state.activeAlerts.where((alert) => alert.id != alertId).toList();
+          current.activeAlerts.where((alert) => alert.id != alertId).toList();
 
-      state = state.copyWith(
+      return current.copyWith(
         isProcessing: false,
         recentAlerts: updatedAlerts,
         activeAlerts: updatedActiveAlerts,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Get missed check-in alerts
   Future<void> loadMissedCheckInAlerts() async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final missedAlerts = await _repository.getMissedCheckInAlerts();
-
-      state = state.copyWith(
-        isLoading: false,
+      return (state.value ?? SafetyState.initial()).copyWith(
         recentAlerts: missedAlerts,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Update battery level
   Future<void> updateBatteryLevel(int level) async {
     try {
       await _repository.updateBatteryLevel(level);
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
+    } catch (_) {
+      // Silent fail for background battery updates
     }
   }
 
@@ -379,25 +318,22 @@ class Safety extends _$Safety {
   Future<int?> getBatteryLevel() async {
     try {
       return await _repository.getBatteryLevel();
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
+    } catch (_) {
       return null;
     }
   }
 
   /// Update trusted contacts count
   Future<void> updateContactsCount() async {
+    final current = state.value;
+    if (current == null) return;
+
     try {
       final contacts = await _repository.getTrustedContacts();
-      state = state.copyWith(trustedContactsCount: contacts.length);
-    } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = AsyncData(current.copyWith(trustedContactsCount: contacts.length));
+    } catch (_) {
+      // Silent fail for background count updates
     }
-  }
-
-  /// Clear any error message
-  void clearError() {
-    state = state.copyWith(error: null);
   }
 
   /// Refresh all safety data

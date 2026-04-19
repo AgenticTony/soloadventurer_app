@@ -118,7 +118,7 @@ class MockPlacesRemoteDataSource implements PlacesRemoteDataSource {
       if (place != null) return place;
     }
 
-    throw const ServerException(
+    throw ServerException(
       message: 'Place not found: $placeId',
       statusCode: 404,
     );
@@ -137,8 +137,12 @@ class MockPlacesRemoteDataSource implements PlacesRemoteDataSource {
     // For mock, just return generic places
     // In production, would use actual location-based search
     final results = _generateGenericPlaces(
-      const Destination(
-          name: 'Unknown', country: 'Unknown', latitude: 0, longitude: 0),
+      Destination(
+          placeId: 'unknown',
+          name: 'Unknown',
+          country: 'Unknown',
+          latitude: 0,
+          longitude: 0),
     );
 
     return results.take(limit).toList();

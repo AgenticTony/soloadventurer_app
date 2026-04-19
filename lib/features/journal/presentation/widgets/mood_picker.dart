@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/core/utils/string_extensions.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 
 /// Predefined mood options with emoji and label

@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 import 'package:soloadventurer/features/sync/infrastructure/services/shared_prefs_sync_state_persistence.dart';
-import 'package:soloadventurer/features/sync/presentation/state/sync_state.dart';
+import 'package:soloadventurer/features/sync/domain/state/sync_state.dart';
 
 @GenerateMocks([SharedPreferences])
 import 'shared_prefs_sync_state_persistence_test.mocks.dart';
@@ -23,17 +24,10 @@ void main() {
 
     group('saveState', () {
       test('saves valid state to SharedPreferences', () async {
-        final now = DateTime.now();
-        final state = SyncState(
+        const state = SyncState(
           status: SyncOperationStatus.syncing,
-          queueSize: 5,
-          isProcessing: true,
-          lastStatusChangeAt: now,
-          lastSuccessfulSyncAt: now,
-          lastSuccessCount: 10,
-          lastFailureCount: 2,
-          lastError: 'Test error',
-          hasPendingOperations: true,
+          pendingCount: 5,
+          failedCount: 2,
         );
 
         when(mockPrefs.setString(stateKey, any)).thenAnswer((_) async => true);
@@ -62,14 +56,10 @@ void main() {
         final now = DateTime.now();
         final state = SyncState(
           status: SyncOperationStatus.failed,
-          queueSize: 3,
-          isProcessing: false,
-          lastStatusChangeAt: now,
-          lastSuccessfulSyncAt: now.subtract(const Duration(days: 1)),
-          lastSuccessCount: 7,
-          lastFailureCount: 3,
-          lastError: 'Network timeout',
-          hasPendingOperations: true,
+          pendingCount: 3,
+          failedCount: 3,
+          lastSyncTime: now.subtract(const Duration(days: 1)),
+          error: 'Network timeout',
         );
 
         String? capturedJson;
@@ -82,38 +72,31 @@ void main() {
 
         expect(capturedJson, isNotNull);
         expect(capturedJson, contains('"status":"failed"'));
-        expect(capturedJson, contains('"queueSize":3'));
-        expect(capturedJson, contains('"hasPendingOperations":true'));
+        expect(capturedJson, contains('"pendingCount":3'));
+        expect(capturedJson, contains('"error":"Network timeout"'));
       });
     });
 
     group('loadState', () {
       test('loads valid state from SharedPreferences', () async {
         final now = DateTime.now();
-        final originalState = SyncState(
-          status: SyncOperationStatus.failed,
-          queueSize: 3,
-          isProcessing: false,
-          lastStatusChangeAt: now,
-          lastSuccessfulSyncAt: now.subtract(const Duration(days: 1)),
-          lastSuccessCount: 7,
-          lastFailureCount: 3,
-          lastError: 'Network timeout',
-          hasPendingOperations: true,
-        );
+        final json = jsonEncode({
+          'status': 'failed',
+          'pendingCount': 3,
+          'failedCount': 3,
+          'lastSyncTime': now.toIso8601String(),
+          'error': 'Network timeout',
+        });
 
-        when(mockPrefs.getString(stateKey))
-            .thenReturn(originalState.toJsonString());
+        when(mockPrefs.getString(stateKey)).thenReturn(json);
 
         final loadedState = await persistence.loadState();
 
         expect(loadedState, isNotNull);
         expect(loadedState!.status, SyncOperationStatus.failed);
-        expect(loadedState.queueSize, 3);
-        expect(loadedState.hasPendingOperations, true);
-        expect(loadedState.lastError, 'Network timeout');
-        expect(loadedState.lastSuccessCount, 7);
-        expect(loadedState.lastFailureCount, 3);
+        expect(loadedState.pendingCount, 3);
+        expect(loadedState.failedCount, 3);
+        expect(loadedState.error, 'Network timeout');
       });
 
       test('returns null when no persisted state exists', () async {
@@ -177,7 +160,7 @@ void main() {
     group('hasPersistedState', () {
       test('returns true when state exists', () async {
         when(mockPrefs.getString(stateKey))
-            .thenReturn('{"status":"idle","queueSize":0}');
+            .thenReturn('{"status":"idle","pendingCount":0}');
 
         final hasState = await persistence.hasPersistedState();
 
@@ -215,23 +198,19 @@ void main() {
         final now = DateTime.now();
         final original = SyncState(
           status: SyncOperationStatus.syncing,
-          queueSize: 10,
-          isProcessing: true,
-          lastStatusChangeAt: now,
-          lastSuccessfulSyncAt: now.subtract(const Duration(hours: 1)),
-          lastSuccessCount: 15,
-          lastFailureCount: 5,
-          lastError: null,
-          hasPendingOperations: true,
+          pendingCount: 10,
+          failedCount: 5,
+          lastSyncTime: now.subtract(const Duration(hours: 1)),
+          error: null,
         );
 
-        // Setup save
-        when(mockPrefs.setString(stateKey, any)).thenAnswer((_) async => true);
-
-        // Setup load
-        when(mockPrefs.getString(stateKey)).thenAnswer((_) {
-          return original.toJsonString();
+        // Capture the JSON saved
+        String? savedJson;
+        when(mockPrefs.setString(stateKey, any)).thenAnswer((inv) {
+          savedJson = inv.positionalArguments[1] as String;
+          return Future.value(true);
         });
+        when(mockPrefs.getString(stateKey)).thenAnswer((_) => savedJson);
 
         // Save
         final saveResult = await persistence.saveState(original);
@@ -242,11 +221,8 @@ void main() {
 
         expect(restored, isNotNull);
         expect(restored!.status, original.status);
-        expect(restored.queueSize, original.queueSize);
-        expect(restored.isProcessing, original.isProcessing);
-        expect(restored.lastSuccessCount, original.lastSuccessCount);
-        expect(restored.lastFailureCount, original.lastFailureCount);
-        expect(restored.hasPendingOperations, original.hasPendingOperations);
+        expect(restored.pendingCount, original.pendingCount);
+        expect(restored.failedCount, original.failedCount);
       });
 
       test('all status values persist correctly', () async {
@@ -261,10 +237,12 @@ void main() {
         for (final status in statuses) {
           final state = SyncState(status: status);
 
-          when(mockPrefs.setString(stateKey, any))
-              .thenAnswer((_) async => true);
-          when(mockPrefs.getString(stateKey))
-              .thenAnswer((_) => state.toJsonString());
+          String? savedJson;
+          when(mockPrefs.setString(stateKey, any)).thenAnswer((inv) {
+            savedJson = inv.positionalArguments[1] as String;
+            return Future.value(true);
+          });
+          when(mockPrefs.getString(stateKey)).thenAnswer((_) => savedJson);
 
           await persistence.saveState(state);
           final loaded = await persistence.loadState();

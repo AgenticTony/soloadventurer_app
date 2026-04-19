@@ -1,7 +1,7 @@
 library;
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 
 void main() {
   group('Failure factory constructors', () {

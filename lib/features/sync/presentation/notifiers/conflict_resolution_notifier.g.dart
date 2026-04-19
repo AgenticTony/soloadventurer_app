@@ -10,58 +10,37 @@ part of 'conflict_resolution_notifier.dart';
 // ignore_for_file: type=lint, type=warning
 /// Notifier for managing conflict resolution state and user interactions
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - build() method returns ConflictResolutionState directly (not wrapped in AsyncValue)
-/// - AsyncValue wrapping is handled automatically by the framework
-/// - mounted checks removed (handled automatically by Riverpod 3.0)
-/// - Dependencies injected via ref.watch() in build() method
-///
-/// Handles the complete flow of conflict resolution:
-/// 1. Receives conflict detection events
-/// 2. Shows resolution UI to user
-/// 3. Processes user's resolution choice
-/// 4. Applies resolution to local data store
-/// 5. Queues sync operations for remote update
-/// 6. Updates UI state
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isResolving/errorMessage removed from state (AsyncValue handles them)
+/// - Async methods use AsyncValue.guard() for loading/error handling
+/// - UI reads state via ref.watch(conflictResolutionProvider)
+/// - UI calls methods via ref.read(conflictResolutionProvider.notifier)
 
 @ProviderFor(ConflictResolutionNotifier)
 const conflictResolutionProvider = ConflictResolutionNotifierProvider._();
 
 /// Notifier for managing conflict resolution state and user interactions
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - build() method returns ConflictResolutionState directly (not wrapped in AsyncValue)
-/// - AsyncValue wrapping is handled automatically by the framework
-/// - mounted checks removed (handled automatically by Riverpod 3.0)
-/// - Dependencies injected via ref.watch() in build() method
-///
-/// Handles the complete flow of conflict resolution:
-/// 1. Receives conflict detection events
-/// 2. Shows resolution UI to user
-/// 3. Processes user's resolution choice
-/// 4. Applies resolution to local data store
-/// 5. Queues sync operations for remote update
-/// 6. Updates UI state
-final class ConflictResolutionNotifierProvider extends $NotifierProvider<
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isResolving/errorMessage removed from state (AsyncValue handles them)
+/// - Async methods use AsyncValue.guard() for loading/error handling
+/// - UI reads state via ref.watch(conflictResolutionProvider)
+/// - UI calls methods via ref.read(conflictResolutionProvider.notifier)
+final class ConflictResolutionNotifierProvider extends $AsyncNotifierProvider<
     ConflictResolutionNotifier, ConflictResolutionState> {
   /// Notifier for managing conflict resolution state and user interactions
   ///
-  /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-  /// - build() method returns ConflictResolutionState directly (not wrapped in AsyncValue)
-  /// - AsyncValue wrapping is handled automatically by the framework
-  /// - mounted checks removed (handled automatically by Riverpod 3.0)
-  /// - Dependencies injected via ref.watch() in build() method
-  ///
-  /// Handles the complete flow of conflict resolution:
-  /// 1. Receives conflict detection events
-  /// 2. Shows resolution UI to user
-  /// 3. Processes user's resolution choice
-  /// 4. Applies resolution to local data store
-  /// 5. Queues sync operations for remote update
-  /// 6. Updates UI state
+  /// Riverpod 3.0 AsyncNotifier Migration:
+  /// - Uses AsyncNotifier pattern with AsyncValue wrapper
+  /// - Loading/error states handled by AsyncValue, NOT manual state fields
+  /// - isResolving/errorMessage removed from state (AsyncValue handles them)
+  /// - Async methods use AsyncValue.guard() for loading/error handling
+  /// - UI reads state via ref.watch(conflictResolutionProvider)
+  /// - UI calls methods via ref.read(conflictResolutionProvider.notifier)
   const ConflictResolutionNotifierProvider._()
       : super(
           from: null,
@@ -79,48 +58,34 @@ final class ConflictResolutionNotifierProvider extends $NotifierProvider<
   @$internal
   @override
   ConflictResolutionNotifier create() => ConflictResolutionNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ConflictResolutionState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<ConflictResolutionState>(value),
-    );
-  }
 }
 
 String _$conflictResolutionNotifierHash() =>
-    r'863e9736c7a038e1abda487c2c32b44ab2805848';
+    r'104b314bf695ed4a2b404fffb58b627c99e3ba82';
 
 /// Notifier for managing conflict resolution state and user interactions
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - build() method returns ConflictResolutionState directly (not wrapped in AsyncValue)
-/// - AsyncValue wrapping is handled automatically by the framework
-/// - mounted checks removed (handled automatically by Riverpod 3.0)
-/// - Dependencies injected via ref.watch() in build() method
-///
-/// Handles the complete flow of conflict resolution:
-/// 1. Receives conflict detection events
-/// 2. Shows resolution UI to user
-/// 3. Processes user's resolution choice
-/// 4. Applies resolution to local data store
-/// 5. Queues sync operations for remote update
-/// 6. Updates UI state
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isResolving/errorMessage removed from state (AsyncValue handles them)
+/// - Async methods use AsyncValue.guard() for loading/error handling
+/// - UI reads state via ref.watch(conflictResolutionProvider)
+/// - UI calls methods via ref.read(conflictResolutionProvider.notifier)
 
 abstract class _$ConflictResolutionNotifier
-    extends $Notifier<ConflictResolutionState> {
-  ConflictResolutionState build();
+    extends $AsyncNotifier<ConflictResolutionState> {
+  FutureOr<ConflictResolutionState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref =
-        this.ref as $Ref<ConflictResolutionState, ConflictResolutionState>;
+    final ref = this.ref
+        as $Ref<AsyncValue<ConflictResolutionState>, ConflictResolutionState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<ConflictResolutionState, ConflictResolutionState>,
-        ConflictResolutionState,
+        AnyNotifier<AsyncValue<ConflictResolutionState>,
+            ConflictResolutionState>,
+        AsyncValue<ConflictResolutionState>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

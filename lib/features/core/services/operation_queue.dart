@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../providers/connectivity_provider.dart';
 import '../../auth/domain/services/token_manager.dart';
@@ -414,8 +413,6 @@ class OperationQueue extends _$OperationQueue {
     // Check for duplicate operations if this operation has a deduplication key
     final duplicate = _findDuplicate(operation);
     if (duplicate != null) {
-      debugPrint(
-          'OperationQueue: Found duplicate operation ${duplicate.id}, replacing with ${operation.id}');
       _replaceOperation(duplicate, operation);
     } else {
       _pendingOperations.add(operation);
@@ -460,9 +457,6 @@ class OperationQueue extends _$OperationQueue {
     _isProcessing = true;
 
     try {
-      final tokenManager = ref.read(tokenManagerProvider);
-      final isOnline = ref.read(connectivityProvider);
-
       // Process operations in effective priority order (with aging boost)
       final operations = _pendingOperations.toList()
         ..sort((a, b) {
@@ -484,8 +478,6 @@ class OperationQueue extends _$OperationQueue {
 
         // Check if operation has exceeded max retries
         if (!_shouldRetry(operation)) {
-          debugPrint(
-              'Operation ${operation.id} exceeded max retries (${operation.maxRetries}), moving to failed queue');
           operationsToFail.add(operation);
           operationsToRemove.add(operation);
           continue;
@@ -499,9 +491,7 @@ class OperationQueue extends _$OperationQueue {
           final effectivePriority = _getEffectivePriority(operation);
           _consecutiveProcessedByPriority[effectivePriority] =
               (_consecutiveProcessedByPriority[effectivePriority] ?? 0) + 1;
-        } catch (e, stackTrace) {
-          debugPrint('Failed to execute operation ${operation.id}: $e');
-          debugPrint('Stack trace: $stackTrace');
+        } catch (e) {
 
           // Update operation with error information and increment attempt count
           final failedOperation =
@@ -509,8 +499,6 @@ class OperationQueue extends _$OperationQueue {
 
           // Check if this was the last retry attempt
           if (failedOperation.attemptCount >= failedOperation.maxRetries) {
-            debugPrint(
-                'Operation ${operation.id} reached max retries, moving to failed queue');
             operationsToFail.add(failedOperation);
             operationsToRemove.add(operation);
           } else {
@@ -604,9 +592,7 @@ class OperationQueue extends _$OperationQueue {
     final inBackoff = now.isBefore(retryTime);
 
     if (inBackoff) {
-      final timeUntilRetry = retryTime.difference(now);
-      debugPrint('Operation ${operation.id} is in backoff period. '
-          'Can retry in ${timeUntilRetry.inSeconds}s');
+      retryTime.difference(now);
     }
 
     return inBackoff;
@@ -638,10 +624,7 @@ class OperationQueue extends _$OperationQueue {
 
       // Log the priority boost for debugging
       if (boostedPriority > basePriority) {
-        final ageMinutes = age.inMinutes;
-        debugPrint(
-            'Operation ${operation.id} has been waiting ${ageMinutes}min, '
-            'boosting priority from $basePriority to $boostedPriority');
+        age.inMinutes;
       }
 
       return boostedPriority;
@@ -669,9 +652,6 @@ class OperationQueue extends _$OperationQueue {
 
     // Skip if we've already processed too many operations of this priority level
     if (consecutiveCount >= _maxConsecutivePerPriority) {
-      debugPrint(
-          'Skipping operation ${operation.id} (priority $effectivePriority) - '
-          'already processed $consecutiveCount consecutive operations of this priority');
       return true;
     }
 
@@ -704,7 +684,6 @@ class OperationQueue extends _$OperationQueue {
           );
     } catch (e) {
       // If there's any error searching, just return null (no duplicate found)
-      debugPrint('OperationQueue: Error searching for duplicate: $e');
       return null;
     }
   }
@@ -720,9 +699,6 @@ class OperationQueue extends _$OperationQueue {
     _pendingOperations.remove(oldOperation);
     _pendingOperations.add(newOperation);
 
-    debugPrint(
-        'OperationQueue: Replaced operation ${oldOperation.id} with ${newOperation.id} '
-        '(deduplication key: ${newOperation.deduplicationKey})');
   }
 
   /// Load saved queue from storage on initialization
@@ -738,9 +714,8 @@ class OperationQueue extends _$OperationQueue {
           if (operation != null) {
             _pendingOperations.add(operation);
           }
-        } catch (e, stackTrace) {
-          debugPrint('Failed to deserialize pending operation: $e');
-          debugPrint('Stack trace: $stackTrace');
+        } catch (e) {
+        // intentional silent catch
         }
       }
 
@@ -751,22 +726,15 @@ class OperationQueue extends _$OperationQueue {
           if (operation != null) {
             _failedOperations.add(operation);
           }
-        } catch (e, stackTrace) {
-          debugPrint('Failed to deserialize failed operation: $e');
-          debugPrint('Stack trace: $stackTrace');
+        } catch (e) {
+        // intentional silent catch
         }
       }
 
       if (result.hadCorruptedData) {
-        debugPrint(
-            'OperationQueue: Warning - some operations were corrupted and skipped');
       }
 
-      debugPrint(
-          'OperationQueue: Loaded ${_pendingOperations.length} pending and ${_failedOperations.length} failed operations');
-    } catch (e, stackTrace) {
-      debugPrint('OperationQueue: Error loading queue from storage: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
       // Continue with empty queue if loading fails
     }
   }
@@ -777,7 +745,6 @@ class OperationQueue extends _$OperationQueue {
       final type = data['type'] as String?;
 
       if (type == null) {
-        debugPrint('OperationQueue: Missing type in operation data');
         return null;
       }
 
@@ -790,12 +757,9 @@ class OperationQueue extends _$OperationQueue {
         case 'location_update':
           return LocationUpdateOperation.fromJson(data);
         default:
-          debugPrint('OperationQueue: Unknown operation type: $type');
           return null;
       }
-    } catch (e, stackTrace) {
-      debugPrint('OperationQueue: Error deserializing operation: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
       return null;
     }
   }
@@ -816,12 +780,8 @@ class OperationQueue extends _$OperationQueue {
       );
 
       if (!pendingSuccess || !failedSuccess) {
-        debugPrint(
-            'OperationQueue: Warning - some operations failed to persist');
       }
-    } catch (e, stackTrace) {
-      debugPrint('OperationQueue: Error persisting queue: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
       // Continue even if persistence fails - operations are still in memory
     }
   }
@@ -908,11 +868,8 @@ class OperationQueue extends _$OperationQueue {
         );
 
     if (operation == null) {
-      debugPrint('OperationQueue: Failed operation with id $id not found');
       return;
     }
-
-    debugPrint('OperationQueue: Retrying failed operation ${operation.id}');
 
     // Remove from failed queue
     _failedOperations.remove(operation);
@@ -923,8 +880,6 @@ class OperationQueue extends _$OperationQueue {
     // Add back to pending queue
     await addOperation(resetOperation);
 
-    debugPrint(
-        'OperationQueue: Operation ${operation.id} moved back to pending queue');
   }
 
   /// Retries all failed operations by moving them back to the pending queue.
@@ -951,8 +906,6 @@ class OperationQueue extends _$OperationQueue {
   /// - User wants to retry all failed operations after connectivity is restored
   /// - User believes the issue causing failures has been resolved
   Future<void> retryAllFailed() async {
-    debugPrint(
-        'OperationQueue: Retrying all ${_failedOperations.length} failed operations');
 
     final operationsToRetry = List<QueueableOperation>.from(_failedOperations);
 
@@ -965,8 +918,6 @@ class OperationQueue extends _$OperationQueue {
       await addOperation(resetOperation);
     }
 
-    debugPrint(
-        'OperationQueue: Moved ${operationsToRetry.length} operations back to pending queue');
   }
 
   /// Clears all failed operations from the queue.
@@ -989,15 +940,12 @@ class OperationQueue extends _$OperationQueue {
   /// - Operations are no longer relevant
   /// - User has manually handled the operations elsewhere
   Future<void> clearFailedOperations() async {
-    debugPrint(
-        'OperationQueue: Clearing all ${_failedOperations.length} failed operations');
 
-    final count = _failedOperations.length;
+    _failedOperations.length;
     _failedOperations.clear();
 
     await _persistQueue();
 
-    debugPrint('OperationQueue: Cleared $count failed operations');
   }
 
   /// Removes a specific failed operation from the queue by ID.
@@ -1027,17 +975,13 @@ class OperationQueue extends _$OperationQueue {
         );
 
     if (operation == null) {
-      debugPrint('OperationQueue: Failed operation with id $id not found');
       return;
     }
-
-    debugPrint('OperationQueue: Removing failed operation ${operation.id}');
 
     _failedOperations.remove(operation);
 
     await _persistQueue();
 
-    debugPrint('OperationQueue: Removed failed operation ${operation.id}');
   }
 
   /// Reset attempt metadata for retrying a failed operation

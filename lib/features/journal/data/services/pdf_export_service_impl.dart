@@ -14,11 +14,6 @@ class PdfExportServiceImpl implements PdfExportService {
   final JournalRepository _journalRepository;
   final TripRepository _tripRepository;
 
-  // Font instances (will be initialized in generatePdf)
-  pw.Font? _baseFont;
-  pw.Font? _boldFont;
-  pw.Font? _italicFont;
-
   PdfExportServiceImpl({
     required JournalRepository journalRepository,
     required TripRepository tripRepository,
@@ -87,7 +82,7 @@ class PdfExportServiceImpl implements PdfExportService {
       // Calculate stats
       final mediaCount = entriesToExport.fold<int>(
         0,
-        (sum, entry) => sum + (entry.hasMedia ? 1 : 0),
+        (sum, entry) => sum + 0, // Media count not available from JournalEntry directly
       );
 
       onProgress?.call(const PdfExportProgress(
@@ -125,7 +120,7 @@ class PdfExportServiceImpl implements PdfExportService {
       ));
 
       final trip = entry.tripId != null
-          ? await _tripRepository.getTripById(entry.tripId!)
+          ? await _tripRepository.getTrip(entry.tripId!)
           : null;
 
       onProgress?.call(const PdfExportProgress(
@@ -307,7 +302,7 @@ class PdfExportServiceImpl implements PdfExportService {
 
     for (final entry in entriesToExport) {
       wordCount += entry.content.split(RegExp(r'\s+')).length;
-      totalMediaCount += entry.hasMedia ? 1 : 0; // Approximate
+      totalMediaCount += 0; // Media count not available from JournalEntry directly
     }
 
     return {
@@ -409,7 +404,7 @@ class PdfExportServiceImpl implements PdfExportService {
             style: pw.TextStyle(
               fontSize: config.titleFontSize,
               fontWeight: pw.FontWeight.bold,
-              color: theme.defaultTextStyle.color,
+              color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
             ),
           ),
           pw.SizedBox(height: 16),
@@ -418,7 +413,7 @@ class PdfExportServiceImpl implements PdfExportService {
               trip.description!,
               style: pw.TextStyle(
                 fontSize: config.bodyFontSize,
-                color: theme.defaultTextStyle.color,
+                color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
               ),
             ),
             pw.SizedBox(height: 24),
@@ -428,7 +423,7 @@ class PdfExportServiceImpl implements PdfExportService {
             '${trip.endDate != null ? dateFormat.format(trip.endDate!) : 'Present'}',
             style: pw.TextStyle(
               fontSize: config.bodyFontSize,
-              color: theme.defaultTextStyle.color,
+              color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
             ),
           ),
           pw.SizedBox(height: 8),
@@ -436,7 +431,7 @@ class PdfExportServiceImpl implements PdfExportService {
             'Duration: $durationFormat',
             style: pw.TextStyle(
               fontSize: config.bodyFontSize,
-              color: theme.defaultTextStyle.color,
+              color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
             ),
           ),
           if (trip.destination != null) ...[
@@ -445,7 +440,7 @@ class PdfExportServiceImpl implements PdfExportService {
               'Destination: ${trip.destination}',
               style: pw.TextStyle(
                 fontSize: config.bodyFontSize,
-                color: theme.defaultTextStyle.color,
+                color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
               ),
             ),
           ],
@@ -454,7 +449,7 @@ class PdfExportServiceImpl implements PdfExportService {
             'Generated on ${DateFormat.yMMMMd('en_US').add_jm().format(DateTime.now())}',
             style: pw.TextStyle(
               fontSize: config.captionFontSize,
-              color: theme.defaultTextStyle.color?.withValues(alpha: 0.6),
+              color: PdfColors.grey600,
             ),
           ),
         ],
@@ -477,7 +472,7 @@ class PdfExportServiceImpl implements PdfExportService {
             style: pw.TextStyle(
               fontSize: config.headingFontSize,
               fontWeight: pw.FontWeight.bold,
-              color: theme.defaultTextStyle.color,
+              color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
             ),
           ),
           pw.SizedBox(height: 16),
@@ -488,7 +483,7 @@ class PdfExportServiceImpl implements PdfExportService {
               dateFormat.format(entry.entryDate),
               style: pw.TextStyle(
                 fontSize: config.captionFontSize,
-                color: theme.defaultTextStyle.color?.withValues(alpha: 0.7),
+                color: PdfColors.grey700,
               ),
             ),
           pw.SizedBox(height: 8),
@@ -499,7 +494,7 @@ class PdfExportServiceImpl implements PdfExportService {
               '📍 ${entry.locationName}',
               style: pw.TextStyle(
                 fontSize: config.captionFontSize,
-                color: theme.defaultTextStyle.color?.withValues(alpha: 0.7),
+                color: PdfColors.grey700,
               ),
             ),
           pw.SizedBox(height: 8),
@@ -510,7 +505,7 @@ class PdfExportServiceImpl implements PdfExportService {
               'Mood: ${entry.mood}',
               style: pw.TextStyle(
                 fontSize: config.captionFontSize,
-                color: theme.defaultTextStyle.color?.withValues(alpha: 0.7),
+                color: PdfColors.grey700,
               ),
             ),
           pw.SizedBox(height: 24),
@@ -520,12 +515,12 @@ class PdfExportServiceImpl implements PdfExportService {
             entry.content,
             style: pw.TextStyle(
               fontSize: config.bodyFontSize,
-              color: theme.defaultTextStyle.color,
+              color: theme.theme?.defaultTextStyle.color ?? PdfColors.black,
             ),
           ),
 
           // Media placeholder (actual images would be loaded and embedded)
-          if (config.includeMedia && entry.hasMedia) ...[
+          if (config.includeMedia) ...[
             pw.SizedBox(height: 24),
             pw.Container(
               height: 100,
@@ -535,7 +530,7 @@ class PdfExportServiceImpl implements PdfExportService {
               ),
               child: pw.Center(
                 child: pw.Text(
-                  'Media attachments (${entry.hasMedia ? "included" : "none"})',
+                  'Media attachments placeholder',
                   style: pw.TextStyle(
                     fontSize: config.captionFontSize,
                     color: PdfColors.grey700,
@@ -550,8 +545,6 @@ class PdfExportServiceImpl implements PdfExportService {
   }
 
   pw.PageTheme _getTheme(PdfColorScheme scheme) {
-    const baseColor = PdfColor.fromInt(0xFF000000);
-
     switch (scheme) {
       case PdfColorScheme.light:
         return pw.PageTheme(
@@ -568,7 +561,7 @@ class PdfExportServiceImpl implements PdfExportService {
                 child: pw.Container(color: PdfColors.white),
               );
             }
-            return null;
+            return pw.SizedBox.shrink();
           },
         );
       case PdfColorScheme.dark:
@@ -613,8 +606,10 @@ class PdfExportServiceImpl implements PdfExportService {
   Future<int> _getPageCount(Uint8List pdfData) async {
     // Parse PDF to count pages
     try {
-      final document = await PdfDocument.openData(pdfData);
-      return document.pagesCount;
+      // Simple page count estimation based on PDF structure
+      final pdfString = String.fromCharCodes(pdfData);
+      final pageMatches = '/Type /Page'.allMatches(pdfString);
+      return pageMatches.isNotEmpty ? pageMatches.length : 1;
     } catch (e) {
       return 1; // Default to 1 if parsing fails
     }

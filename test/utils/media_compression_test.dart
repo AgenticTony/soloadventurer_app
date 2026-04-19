@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:soloadventurer/utils/media_compression.dart';
+import 'package:soloadventurer/features/journal/data/services/media_compression.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'media_test_helpers.dart';
 
@@ -87,7 +87,7 @@ void main() {
 
         final ineffectiveResult = createTestCompressedImageResult(
           originalSize: 10 * 1024 * 1024, // 10 MB
-          compressedSize: 9.5 * 1024 * 1024, // 9.5 MB (5% reduction)
+          compressedSize: (9.5 * 1024 * 1024).toInt(), // 9.5 MB (5% reduction)
         );
         expect(ineffectiveResult.isEffective, isFalse);
       });
@@ -425,15 +425,21 @@ void main() {
       test(
           'should throw UnsupportedImageFormatException for unsupported format',
           () {
-        // Arrange
-        final file = File('/tmp/test.bmp'); // BMP not supported
+        // Arrange - create a real file so existence check passes
+        final dir = Directory.systemTemp.createTempSync('image_test_');
+        final file = File('${dir.path}/test.bmp');
+        file.writeAsBytesSync([0x42, 0x4D]); // BMP header bytes
 
-        // Act & Assert
-        expect(
-          () => mediaCompression.compressImage(file),
-          throwsA(isA<UnsupportedImageFormatException>()
-              .having((e) => e.code, 'code', equals('unsupported_format'))),
-        );
+        try {
+          // Act & Assert
+          expect(
+            () => mediaCompression.compressImage(file),
+            throwsA(isA<UnsupportedImageFormatException>()
+                .having((e) => e.code, 'code', equals('unsupported_format'))),
+          );
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
       });
 
       test('should compress JPEG image with default config', () async {

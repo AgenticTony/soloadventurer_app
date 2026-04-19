@@ -1,39 +1,28 @@
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
+import 'package:soloadventurer/features/social/domain/enums/verification_tier.dart';
 
 /// Model class for Profile that handles JSON serialization/deserialization and validation
-class ProfileModel {
+class ProfileModel extends Profile {
   static const int maxDisplayNameLength = 50;
   static const int maxBioLength = 500;
   static const int maxInterestsCount = 20;
   static const int maxPreferencesCount = 50;
 
-  final String id;
-  final String userId;
-  final String username;
-  final String email;
-  final String displayName;
-  final String? bio;
-  final String? avatarUrl;
-  final bool isPublic;
-  final List<String> interests;
-  final Map<String, dynamic> preferences;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
   const ProfileModel({
-    required this.id,
-    required this.userId,
-    required this.username,
-    required this.email,
-    required this.displayName,
-    this.bio,
-    this.avatarUrl,
-    this.isPublic = false,
-    this.interests = const [],
-    this.preferences = const {},
-    required this.createdAt,
-    required this.updatedAt,
+    required super.id,
+    required super.userId,
+    required super.username,
+    required super.email,
+    required super.displayName,
+    super.bio,
+    super.avatarUrl,
+    super.isPublic = false,
+    super.verificationTier = VerificationTier.unverified,
+    super.interests = const [],
+    super.preferences = const {},
+    required super.createdAt,
+    required super.updatedAt,
   });
 
   /// Creates a [ProfileModel] from a domain [Profile] entity
@@ -47,6 +36,7 @@ class ProfileModel {
       bio: profile.bio,
       avatarUrl: profile.avatarUrl,
       isPublic: profile.isPublic,
+      verificationTier: profile.verificationTier,
       interests: profile.interests,
       preferences: profile.preferences,
       createdAt: profile.createdAt,
@@ -65,6 +55,7 @@ class ProfileModel {
       bio: bio,
       avatarUrl: avatarUrl,
       isPublic: isPublic,
+      verificationTier: verificationTier,
       interests: interests,
       preferences: preferences,
       createdAt: createdAt,
@@ -85,6 +76,16 @@ class ProfileModel {
     _validateInterests(interests);
     _validatePreferences(preferences);
 
+    // Parse verification tier
+    VerificationTier tier = VerificationTier.unverified;
+    if (json['verificationTier'] != null) {
+      try {
+        tier = VerificationTier.fromString(json['verificationTier'] as String);
+      } catch (_) {
+        tier = VerificationTier.unverified;
+      }
+    }
+
     return ProfileModel(
       id: json['id'] as String,
       userId: json['userId'] as String,
@@ -94,6 +95,7 @@ class ProfileModel {
       bio: bio,
       avatarUrl: json['avatarUrl'] as String?,
       isPublic: json['isPublic'] as bool? ?? false,
+      verificationTier: tier,
       interests: interests,
       preferences: preferences,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -111,6 +113,7 @@ class ProfileModel {
       'bio': bio,
       'avatarUrl': avatarUrl,
       'isPublic': isPublic,
+      'verificationTier': verificationTier.value,
       'interests': interests,
       'preferences': preferences,
       'createdAt': createdAt.toIso8601String(),
@@ -119,6 +122,7 @@ class ProfileModel {
   }
 
   /// Creates a copy of this ProfileModel with the given fields replaced with the new values
+  @override
   ProfileModel copyWith({
     String? id,
     String? userId,
@@ -128,6 +132,7 @@ class ProfileModel {
     String? bio,
     String? avatarUrl,
     bool? isPublic,
+    VerificationTier? verificationTier,
     List<String>? interests,
     Map<String, dynamic>? preferences,
     DateTime? createdAt,
@@ -142,6 +147,7 @@ class ProfileModel {
       bio: bio ?? this.bio,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isPublic: isPublic ?? this.isPublic,
+      verificationTier: verificationTier ?? this.verificationTier,
       interests: interests ?? this.interests,
       preferences: preferences ?? this.preferences,
       createdAt: createdAt ?? this.createdAt,

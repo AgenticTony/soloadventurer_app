@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'package:clock/clock.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter/foundation.dart';
 import '../models/auth_session.dart';
 
 part 'token_blacklist_manager.g.dart';
@@ -22,8 +22,7 @@ class TokenBlacklistManager extends _$TokenBlacklistManager {
 
   /// Add a token to the blacklist
   void blacklistToken(String token) {
-    debugPrint('TokenBlacklistManager: Blacklisting token');
-    _blacklistedTokens[token] = DateTime.now().add(_blacklistDuration);
+    _blacklistedTokens[token] = clock.now().add(_blacklistDuration);
   }
 
   /// Check if a token is blacklisted
@@ -31,7 +30,7 @@ class TokenBlacklistManager extends _$TokenBlacklistManager {
     final expiryTime = _blacklistedTokens[token];
     if (expiryTime == null) return false;
 
-    if (DateTime.now().isAfter(expiryTime)) {
+    if (clock.now().isAfter(expiryTime)) {
       _blacklistedTokens.remove(token);
       return false;
     }
@@ -40,8 +39,7 @@ class TokenBlacklistManager extends _$TokenBlacklistManager {
 
   /// Clean up expired blacklisted tokens
   void _cleanupBlacklist() {
-    debugPrint('TokenBlacklistManager: Running blacklist cleanup');
-    final now = DateTime.now();
+    final now = clock.now();
     _blacklistedTokens.removeWhere((_, expiry) => now.isAfter(expiry));
   }
 

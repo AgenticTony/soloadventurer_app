@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/network/api_client.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/destination.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/places_remote_data_source.dart';
@@ -12,9 +10,7 @@ import 'package:soloadventurer/features/recommendations/domain/entities/place_ac
 /// Currently returns mock data for graceful degradation.
 /// TODO: Integrate real Google Places API with proper API keys.
 class PlacesRemoteDataSourceImpl implements PlacesRemoteDataSource {
-  final ApiClient _apiClient;
-
-  PlacesRemoteDataSourceImpl(this._apiClient);
+  PlacesRemoteDataSourceImpl();
 
   @override
   Future<List<PlaceActivity>> findPlacesByInterest({
@@ -26,10 +22,6 @@ class PlacesRemoteDataSourceImpl implements PlacesRemoteDataSource {
     try {
       // PRODUCTION TODO: Replace with real Google Places API call
       // For now, return mock data to allow app to function
-      debugPrint(
-        '⚠️ PLACES API: Using mock data for findPlacesByInterest. '
-        'Real Google Places API integration pending.',
-      );
 
       // Simulate API delay
       await Future.delayed(const Duration(milliseconds: 300));
@@ -55,10 +47,6 @@ class PlacesRemoteDataSourceImpl implements PlacesRemoteDataSource {
   }) async {
     try {
       // PRODUCTION TODO: Replace with Google Places Text Search API
-      debugPrint(
-        '⚠️ PLACES API: Using mock data for searchPlaces. '
-        'Real Google Places API integration pending.',
-      );
 
       await Future.delayed(const Duration(milliseconds: 300));
 
@@ -85,10 +73,6 @@ class PlacesRemoteDataSourceImpl implements PlacesRemoteDataSource {
   Future<PlaceActivity> getPlaceDetails(String placeId) async {
     try {
       // PRODUCTION TODO: Replace with Google Places Details API
-      debugPrint(
-        '⚠️ PLACES API: Using mock data for getPlaceDetails. '
-        'Real Google Places API integration pending.',
-      );
 
       await Future.delayed(const Duration(milliseconds: 200));
 
@@ -132,10 +116,6 @@ class PlacesRemoteDataSourceImpl implements PlacesRemoteDataSource {
   }) async {
     try {
       // PRODUCTION TODO: Replace with Google Places Nearby Search API
-      debugPrint(
-        '⚠️ PLACES API: Using mock data for getNearbyPlaces. '
-        'Real Google Places API integration pending.',
-      );
 
       await Future.delayed(const Duration(milliseconds: 300));
 
@@ -166,10 +146,6 @@ class PlacesRemoteDataSourceImpl implements PlacesRemoteDataSource {
   }) async {
     try {
       // PRODUCTION TODO: Replace with popular places API
-      debugPrint(
-        '⚠️ PLACES API: Using mock data for getPopularPlaces. '
-        'Real Google Places API integration pending.',
-      );
 
       await Future.delayed(const Duration(milliseconds: 300));
 

@@ -55,7 +55,7 @@ final class TravelOperationRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$travelOperationRepositoryHash() =>
-    r'dfca59a02c9c282e20a251781dfcb3ed65ca1294';
+    r'd1294b5e7f4704d40fe142c6943551af28ca735c';
 
 /// Provider for managing add to trip operations
 ///
@@ -234,7 +234,7 @@ final class AddToTripNotifierProvider
   }
 }
 
-String _$addToTripNotifierHash() => r'967153d1eac717efbf123c3ac2b652d455285117';
+String _$addToTripNotifierHash() => r'c5e3b501d97ef0ef8bba99d765c96a35392ee16a';
 
 /// Provider for managing add to trip operations
 ///

@@ -7,6 +7,8 @@ part 'check_in_model.g.dart';
 /// Model for [CheckIn] with JSON serialization
 @freezed
 sealed class CheckInModel with _$CheckInModel {
+  const CheckInModel._(); // Private constructor for custom methods
+
   const factory CheckInModel({
     required String id,
     required String userId,

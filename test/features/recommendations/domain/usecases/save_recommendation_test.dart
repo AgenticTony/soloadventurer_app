@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/place_activity.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';
@@ -21,6 +21,9 @@ void main() {
   setUp(() {
     mockRepository = MockRecommendationRepository();
     useCase = SaveRecommendation(mockRepository);
+    provideDummy<Either<Failure, PersonalizedRecommendation>>(
+      Left(CacheFailure(message: 'dummy')),
+    );
   });
 
   group('SaveRecommendation', () {
@@ -33,7 +36,7 @@ void main() {
         rating: 4.5,
       ),
       metadata: RecommendationMetadata(
-        matchedInterests: {TravelInterest.foodTours},
+        matchedInterests: {TravelInterest.food},
         suggestedDate: DateTime(2026, 6, 15),
         suggestedTime: const TimeOfDay(hour: 12),
         distance: DistanceFromHotel.walking,

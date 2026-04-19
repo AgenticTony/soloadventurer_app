@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Interface for local data storage operations related to authentication
 abstract class AuthLocalDataSource {
@@ -60,7 +59,6 @@ abstract class AuthLocalDataSource {
 /// Implementation of [AuthLocalDataSource] using [SecureStorage] and SharedPreferences
 class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   final SecureStorage _secureStorage;
-  final SharedPreferences _sharedPreferences;
   static const _userKey = 'user_data';
   static const _authTokenKey = 'auth_token';
   static const _idTokenKey = 'id_token';
@@ -68,7 +66,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   static const _tokenExpirationKey = 'token_expiration';
 
   /// Creates a new [AuthLocalDataSourceImpl] with the given secure storage and shared preferences
-  AuthLocalDataSourceImpl(this._secureStorage, this._sharedPreferences);
+  AuthLocalDataSourceImpl(this._secureStorage);
 
   @override
   Future<void> cacheUser(User user) async {
@@ -190,34 +188,32 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> setAuthToken(String token) async {
-    await _sharedPreferences.setString(_authTokenKey, token);
+    await _secureStorage.write(_authTokenKey, token);
   }
 
   @override
   Future<void> setIdToken(String idToken) async {
-    await _sharedPreferences.setString(_idTokenKey, idToken);
+    await _secureStorage.write(_idTokenKey, idToken);
   }
 
   @override
   Future<void> setRefreshToken(String refreshToken) async {
-    await _sharedPreferences.setString(_refreshTokenKey, refreshToken);
+    await _secureStorage.write(_refreshTokenKey, refreshToken);
   }
 
   @override
   Future<void> setTokenExpiration(DateTime expiration) async {
-    await _sharedPreferences.setInt(
-      _tokenExpirationKey,
-      expiration.millisecondsSinceEpoch,
-    );
+    await _secureStorage.write(
+        _tokenExpirationKey, expiration.millisecondsSinceEpoch.toString());
   }
 
   @override
   Future<void> clearSession() async {
     await Future.wait([
-      _sharedPreferences.remove(_authTokenKey),
-      _sharedPreferences.remove(_idTokenKey),
-      _sharedPreferences.remove(_refreshTokenKey),
-      _sharedPreferences.remove(_tokenExpirationKey),
+      _secureStorage.delete(_authTokenKey),
+      _secureStorage.delete(_idTokenKey),
+      _secureStorage.delete(_refreshTokenKey),
+      _secureStorage.delete(_tokenExpirationKey),
     ]);
   }
 }

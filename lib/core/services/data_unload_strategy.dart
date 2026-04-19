@@ -388,11 +388,6 @@ class DataUnloadStrategy {
     }
 
     if (kDebugMode && effectiveConfig.enableDebugLogging) {
-      debugPrint('DataUnloadStrategy initialized');
-      debugPrint(
-          '  Auto-unload on warning: ${effectiveConfig.autoUnloadOnWarning}');
-      debugPrint(
-          '  Auto-unload on critical: ${effectiveConfig.autoUnloadOnCritical}');
     }
   }
 
@@ -424,11 +419,6 @@ class DataUnloadStrategy {
     final targetFreeBytes = (currentUsage * targetPercentage).round();
 
     if (kDebugMode && _config.enableDebugLogging) {
-      debugPrint('🔄 Auto-unload triggered ($alertLevel)');
-      debugPrint(
-          '  Current usage: ${(currentUsage / (1024 * 1024)).toStringAsFixed(2)} MB');
-      debugPrint(
-          '  Target free: ${(targetPercentage * 100).toStringAsFixed(0)}% = ${(targetFreeBytes / (1024 * 1024)).toStringAsFixed(2)} MB');
     }
 
     await unloadOffScreenData(
@@ -449,7 +439,6 @@ class DataUnloadStrategy {
     _instance!._entries[entry.id] = entry;
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
-      debugPrint('📦 Registered data entry: $entry');
     }
   }
 
@@ -464,7 +453,6 @@ class DataUnloadStrategy {
     _instance!._entries.remove(entryId);
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
-      debugPrint('📦 Unregistered data entry: $entryId');
     }
   }
 
@@ -539,12 +527,6 @@ class DataUnloadStrategy {
     final errors = <String>[];
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
-      debugPrint('🧹 Starting data unload...');
-      debugPrint(
-          '  Target free: ${(targetFreeBytes / (1024 * 1024)).toStringAsFixed(2)} MB');
-      debugPrint('  Max duration: ${effectiveMaxDuration.inMilliseconds}ms');
-      debugPrint('  Only off-screen: $onlyOffScreen');
-      debugPrint('  Max priority: ${maxPriority.name}');
     }
 
     // Build candidate list and sort by priority/visibility/access time
@@ -579,7 +561,6 @@ class DataUnloadStrategy {
     });
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
-      debugPrint('  Found ${candidates.length} candidates for unloading');
     }
 
     // Unload candidates until target is reached or duration exceeded
@@ -588,7 +569,6 @@ class DataUnloadStrategy {
       final elapsed = DateTime.now().difference(startTime);
       if (elapsed >= effectiveMaxDuration) {
         if (kDebugMode && _instance!._config.enableDebugLogging) {
-          debugPrint('⏱️ Max duration reached, stopping unload');
         }
         break;
       }
@@ -596,7 +576,6 @@ class DataUnloadStrategy {
       // Check if target reached
       if (memoryFreed >= targetFreeBytes) {
         if (kDebugMode && _instance!._config.enableDebugLogging) {
-          debugPrint('✅ Target memory freed, stopping unload');
         }
         break;
       }
@@ -604,7 +583,6 @@ class DataUnloadStrategy {
       // Unload the entry
       try {
         if (kDebugMode && _instance!._config.enableDebugLogging) {
-          debugPrint('  Unloading: ${candidate.dataType}:${candidate.id}');
         }
 
         await candidate.unloadCallback!();
@@ -617,7 +595,6 @@ class DataUnloadStrategy {
         _instance!._entries.remove(candidate.id);
 
         if (kDebugMode && _instance!._config.enableDebugLogging) {
-          debugPrint('    ✓ Unloaded ${candidate.dataType}:${candidate.id}');
         }
       } catch (e) {
         failedUnloads++;
@@ -625,7 +602,6 @@ class DataUnloadStrategy {
             .add('Failed to unload ${candidate.dataType}:${candidate.id}: $e');
 
         if (kDebugMode && _instance!._config.enableDebugLogging) {
-          debugPrint('    ✗ Failed: $e');
         }
       }
     }
@@ -653,12 +629,6 @@ class DataUnloadStrategy {
     }
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
-      debugPrint('🧹 Unload complete');
-      debugPrint('  Entries unloaded: $entriesUnloaded');
-      debugPrint(
-          '  Memory freed: ${result.memoryFreedMB.toStringAsFixed(2)} MB');
-      debugPrint('  Failed: $failedUnloads');
-      debugPrint('  Duration: ${duration.inMilliseconds}ms');
     }
 
     return result;
@@ -706,7 +676,6 @@ class DataUnloadStrategy {
     _instance!._entries.clear();
 
     if (kDebugMode && _instance!._config.enableDebugLogging) {
-      debugPrint('📦 Cleared all tracked entries');
     }
   }
 
@@ -718,7 +687,6 @@ class DataUnloadStrategy {
     _instance!._config = config;
 
     if (kDebugMode && config.enableDebugLogging) {
-      debugPrint('⚙️ DataUnloadStrategy config updated');
     }
   }
 
@@ -767,7 +735,6 @@ class DataUnloadStrategy {
     _instance = null;
 
     if (kDebugMode) {
-      debugPrint('DataUnloadStrategy disposed');
     }
   }
 }

@@ -27,11 +27,7 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final contactsState = ref.watch(trustedContactsProvider);
-    final contacts = contactsState.contacts;
-    final isLoading = contactsState.isLoading;
-    final isRemoving = contactsState.isRemoving;
-    final error = contactsState.error;
+    final contactsAsync = ref.watch(trustedContactsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +40,11 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
           ),
         ],
       ),
-      body: _buildBody(context, contacts, isLoading, isRemoving, error),
+      body: contactsAsync.when(
+        data: (contactsState) => _buildBody(context, contactsState),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _buildErrorWidget(context, error.toString()),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _navigateToAddContact(context),
         icon: const Icon(Icons.add),
@@ -53,22 +53,9 @@ class _TrustedContactsScreenState extends ConsumerState<TrustedContactsScreen> {
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    List<TrustedContact> contacts,
-    bool isLoading,
-    bool isRemoving,
-    String? error,
-  ) {
-    if (isLoading && contacts.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (error != null) {
-      return _buildErrorWidget(context, error);
-    }
+  Widget _buildBody(BuildContext context, dynamic contactsState) {
+    final contacts = contactsState.contacts;
+    final isRemoving = contactsState.isRemoving;
 
     if (contacts.isEmpty) {
       return _buildEmptyState(context);

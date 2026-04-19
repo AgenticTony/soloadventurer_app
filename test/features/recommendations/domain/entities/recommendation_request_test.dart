@@ -3,6 +3,7 @@ import 'package:soloadventurer/features/onboarding/domain/entities/date_range.da
 import 'package:soloadventurer/features/onboarding/domain/entities/destination.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/place_activity.dart';
+import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart';
 
 void main() {
@@ -20,9 +21,9 @@ void main() {
     );
 
     final interests = {
-      TravelInterest.foodTours,
-      TravelInterest.museums,
-      TravelInterest.hiking,
+      TravelInterest.food,
+      TravelInterest.art,
+      TravelInterest.adventure,
     };
 
     group('Factory Constructor', () {
@@ -66,12 +67,12 @@ void main() {
 
         const budget = BudgetRange(min: 50, max: 200);
 
-        final categories = {
+        final categories = <RecommendationCategory>{
           RecommendationCategory.food,
           RecommendationCategory.attraction,
         };
 
-        final weatherPreferences = {
+        final weatherPreferences = <WeatherContext>{
           WeatherContext.anyWeather,
           WeatherContext.indoor,
         };
@@ -121,7 +122,7 @@ void main() {
           'itineraryId': 'itinerary-1',
           'destination': destination.toJson(),
           'tripDates': dateRange.toJson(),
-          'interests': interests.map((i) => i.index).toList(),
+          'interests': interests.map((i) => i.name).toList(),
           'limit': 20,
           'excludeItineraryItems': true,
         };
@@ -177,8 +178,8 @@ void main() {
 
       test('isValid returns false when tripDates is invalid', () {
         final invalidDateRange = DateRange(
-          start: DateTime(2026, 6, 7),
-          end: DateTime(2026, 6, 1), // End before start
+          start: DateTime(2020, 6, 7),
+          end: DateTime(2020, 6, 1), // End before start
         );
 
         final request = RecommendationRequest(
@@ -220,10 +221,10 @@ void main() {
           itineraryId: 'itinerary-1',
           destination: destination,
           tripDates: dateRange,
-          interests: {TravelInterest.foodTours},
+          interests: <TravelInterest>{TravelInterest.food},
         );
 
-        expect(request.interestsDisplay, 'Food Tours');
+        expect(request.interestsDisplay, 'Food & Cuisine');
       });
 
       test('interestsDisplay joins two interests with &', () {
@@ -231,10 +232,10 @@ void main() {
           itineraryId: 'itinerary-1',
           destination: destination,
           tripDates: dateRange,
-          interests: {TravelInterest.foodTours, TravelInterest.museums},
+          interests: <TravelInterest>{TravelInterest.food, TravelInterest.art},
         );
 
-        expect(request.interestsDisplay, 'Food Tours & Museums');
+        expect(request.interestsDisplay, 'Food & Cuisine & Art & Museums');
       });
 
       test('interestsDisplay shows count for more than 2 interests', () {
@@ -245,7 +246,7 @@ void main() {
           interests: interests,
         );
 
-        expect(request.interestsDisplay, 'Food Tours +2 more');
+        expect(request.interestsDisplay, 'Food & Cuisine +2 more');
       });
     });
   });
@@ -490,7 +491,7 @@ void main() {
       });
 
       test('display formats to zero decimal places', () {
-        const budget = BudgetRange(min: 50.99, max: 200.89, currency: 'USD');
+        const budget = BudgetRange(min: 50, max: 200, currency: 'USD');
 
         expect(budget.display, '\$50 - \$200');
       });

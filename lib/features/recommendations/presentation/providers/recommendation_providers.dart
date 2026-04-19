@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/app/providers/offline_service_providers.dart'
     show itineraryDaoProvider;
-import 'package:soloadventurer/core/providers/core_providers.dart'
-    show apiClientProvider;
 import 'package:soloadventurer/core/services/location_service.dart';
 import 'package:soloadventurer/core/services/location_service_impl.dart';
 import 'package:soloadventurer/core/services/weather_service.dart';
@@ -38,8 +36,7 @@ part 'recommendation_providers.g.dart';
 /// In production, Google Places API integration should be completed.
 @riverpod
 PlacesRemoteDataSource placesRemoteDataSource(Ref ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return PlacesRemoteDataSourceImpl(apiClient);
+  return PlacesRemoteDataSourceImpl();
 }
 
 /// Provider for places repository

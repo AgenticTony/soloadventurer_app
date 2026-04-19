@@ -1,8 +1,6 @@
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthException;
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
 import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 

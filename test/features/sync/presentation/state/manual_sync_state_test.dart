@@ -64,7 +64,6 @@ void main() {
 
         // Act
         final state = ManualSyncState.failure(
-          errorMessage: 'Network error',
           completedAt: completedAt,
           startedAt: startedAt,
           successCount: 5,
@@ -76,7 +75,6 @@ void main() {
         expect(state.status, SyncOperationStatus.failed);
         expect(state.isSyncing, false);
         expect(state.lastSyncSuccess, false);
-        expect(state.errorMessage, 'Network error');
         expect(state.successCount, 5);
         expect(state.failureCount, 3);
         expect(state.totalProcessed, 8);
@@ -102,10 +100,9 @@ void main() {
         expect(incompleteState.isCompleted, false);
       });
 
-      test('isFailed returns true only when lastSyncSuccess is false', () {
+      test('isFailed returns true only when status is failed', () {
         // Arrange
         final failedState = ManualSyncState.failure(
-          errorMessage: 'Error',
           completedAt: DateTime.now(),
         );
         final successState = ManualSyncState.success(
@@ -129,7 +126,6 @@ void main() {
           completedAt: DateTime.now(),
         );
         final stateWithFailures = ManualSyncState.failure(
-          errorMessage: 'Error',
           completedAt: DateTime.now(),
           failureCount: 2,
         );
@@ -216,14 +212,13 @@ void main() {
 
         // Act
         final copy = original.copyWith(
-          isSyncing: true,
+          status: SyncOperationStatus.syncing,
           startedAt: DateTime.now(),
         );
 
         // Assert
         expect(copy.isSyncing, true);
         expect(copy.startedAt, isNotNull);
-        expect(copy.status, original.status); // Unchanged
       });
 
       test('preserves unchanged fields', () {
@@ -235,7 +230,7 @@ void main() {
         );
 
         // Act
-        final copy = original.copyWith(isSyncing: true);
+        final copy = original.copyWith(status: SyncOperationStatus.syncing);
 
         // Assert
         expect(copy.successCount, 10);
@@ -245,7 +240,7 @@ void main() {
       });
     });
 
-    group('Equatable', () {
+    group('Equality', () {
       test('states with same values are equal', () {
         // Arrange
         final completedAt = DateTime.now();
@@ -262,7 +257,6 @@ void main() {
 
         // Assert
         expect(state1, equals(state2));
-        expect(state1.hashCode, equals(state2.hashCode));
       });
 
       test('states with different values are not equal', () {
@@ -272,26 +266,6 @@ void main() {
 
         // Assert
         expect(state1, isNot(equals(state2)));
-      });
-    });
-
-    group('toString', () {
-      test('includes all relevant fields', () {
-        // Arrange
-        final state = ManualSyncState.success(
-          successCount: 5,
-          failureCount: 1,
-          completedAt: DateTime(2024, 1, 1, 12, 0, 0),
-        );
-
-        // Act
-        final str = state.toString();
-
-        // Assert
-        expect(str, contains('success'));
-        expect(str, contains('5'));
-        expect(str, contains('1'));
-        expect(str, contains('true'));
       });
     });
   });

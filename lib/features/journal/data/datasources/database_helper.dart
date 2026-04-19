@@ -98,7 +98,7 @@ class DatabaseHelper {
         onUpgrade: _onUpgrade,
       );
     } catch (e) {
-      throw const DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to initialize database',
       );
     }

@@ -301,7 +301,7 @@ class PerformanceProfiler {
         'tokenManagerProvider',
       ];
 
-      final providerResults = <Map<String, dynamic>>{};
+      final providerResults = <String, Map<String, dynamic>>{};
 
       for (final provider in providers) {
         final stopwatch = Stopwatch()..start();
@@ -363,6 +363,7 @@ class PerformanceProfiler {
         metric: 'Provider Initialization',
         value: -1,
         unit: 'ms',
+        threshold: PerformanceThresholds.maxProviderInitTime.inMilliseconds.toDouble(),
         status: Status.error,
         details: ['Error: $e'],
       ));
@@ -441,6 +442,7 @@ class PerformanceProfiler {
         metric: 'Memory Growth',
         value: -1,
         unit: 'MB',
+        threshold: PerformanceThresholds.memoryLeakThresholdMB.toDouble(),
         status: Status.error,
         details: ['Error: $e'],
       ));

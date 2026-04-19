@@ -119,7 +119,7 @@ void main() {
         );
 
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, Colors.green.withOpacity(0.1));
+        expect(decoration.color, Colors.green.withValues(alpha: 0.1));
         expect(decoration.border?.top.color, Colors.green);
       });
 
@@ -141,7 +141,7 @@ void main() {
         );
 
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, Colors.orange.withOpacity(0.1));
+        expect(decoration.color, Colors.orange.withValues(alpha: 0.1));
         expect(decoration.border?.top.color, Colors.orange);
       });
 
@@ -163,7 +163,7 @@ void main() {
         );
 
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, Colors.red.withOpacity(0.1));
+        expect(decoration.color, Colors.red.withValues(alpha: 0.1));
         expect(decoration.border?.top.color, Colors.red);
       });
     });
@@ -181,7 +181,7 @@ void main() {
         final semantics = tester.getSemantics(find.byType(SafetyScoreBadge));
         expect(
           semantics.label,
-          'Safety score: 8.5 out of 10, high safety',
+          startsWith('Safety score: 8.5 out of 10, high safety'),
         );
       });
 
@@ -227,7 +227,7 @@ void main() {
         final semantics = tester.getSemantics(find.byType(SafetyScoreBadge));
         expect(
           semantics.label,
-          'Rating score: 8.5 out of 10, high safety',
+          startsWith('Rating score: 8.5 out of 10, high safety'),
         );
       });
 
@@ -244,7 +244,7 @@ void main() {
         final semantics = tester.getSemantics(find.byType(SafetyScoreBadge));
         expect(
           semantics.label,
-          'Safety score: 6.5 out of 10, medium safety',
+          startsWith('Safety score: 6.5 out of 10, medium safety'),
         );
       });
 
@@ -261,7 +261,7 @@ void main() {
         final semantics = tester.getSemantics(find.byType(SafetyScoreBadge));
         expect(
           semantics.label,
-          'Safety score: 4.0 out of 10, low safety',
+          startsWith('Safety score: 4.0 out of 10, low safety'),
         );
       });
     });

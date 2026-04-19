@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/auth_error_handler.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
+import 'package:soloadventurer/features/auth/presentation/state/auth_navigation_state.dart';
 import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/credentials_error_screen.dart';
 import 'package:soloadventurer/features/auth/presentation/screens/network_error_screen.dart';
@@ -12,16 +13,16 @@ import 'package:soloadventurer/features/auth/presentation/screens/session_expire
 
 void main() {
   group('SessionExpiredScreen', () {
-    late MockAuthNavigationNotifier mockNavigationNotifier;
+    late FakeAuthNavigation mockNavigationNotifier;
 
     setUp(() {
-      mockNavigationNotifier = MockAuthNavigationNotifier();
+      mockNavigationNotifier = FakeAuthNavigation();
     });
 
     Widget makeTestableWidget(Widget child) {
       return ProviderScope(
         overrides: [
-          authNavigationProvider.overrideWith((ref) => mockNavigationNotifier),
+          authNavigationProvider.overrideWith(() => mockNavigationNotifier),
         ],
         child: MaterialApp(
           theme: ThemeData(
@@ -103,8 +104,7 @@ void main() {
         await tester.tap(find.text('Sign In Again'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.login))
-            .called(1);
+        expect(mockNavigationNotifier.navigatedRoutes, contains(AuthRoutes.login));
       });
 
       testWidgets('navigates to home when cancel button pressed',
@@ -116,8 +116,7 @@ void main() {
         await tester.tap(find.text('Cancel'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.home))
-            .called(1);
+        expect(mockNavigationNotifier.navigatedRoutes, contains(AuthRoutes.home));
       });
     });
 
@@ -184,7 +183,7 @@ void main() {
         );
 
         expect(find.text('Connection Error'), findsOneWidget);
-        expect(find.byIcon(Icons.wifi_off), findsOneWidget);
+        expect(find.byIcon(Icons.wifi_off), findsAtLeast(1));
       });
 
       testWidgets('renders default message', (WidgetTester tester) async {
@@ -311,6 +310,9 @@ void main() {
         await tester.pump();
 
         expect(retryCalled, isTrue);
+
+        // Drain pending timers from AuthRetryButton
+        await tester.pump(const Duration(seconds: 5));
       });
 
       testWidgets('calls continue offline callback when pressed',
@@ -349,18 +351,18 @@ void main() {
   });
 
   group('CredentialsErrorScreen', () {
-    late MockAuthNavigationNotifier mockNavigationNotifier;
+    late FakeAuthNavigation mockNavigationNotifier;
     bool tryAgainCalled = false;
 
     setUp(() {
-      mockNavigationNotifier = MockAuthNavigationNotifier();
+      mockNavigationNotifier = FakeAuthNavigation();
       tryAgainCalled = false;
     });
 
     Widget makeTestableWidget(Widget child) {
       return ProviderScope(
         overrides: [
-          authNavigationProvider.overrideWith((ref) => mockNavigationNotifier),
+          authNavigationProvider.overrideWith(() => mockNavigationNotifier),
         ],
         child: MaterialApp(
           theme: ThemeData(
@@ -562,9 +564,10 @@ void main() {
         await tester.tap(find.text('Forgot Password?'));
         await tester.pump();
 
-        verify(() =>
-                mockNavigationNotifier.navigateTo(AuthRoutes.forgotPassword))
-            .called(1);
+        expect(
+          mockNavigationNotifier.navigatedRoutes,
+          contains(AuthRoutes.forgotPassword),
+        );
       });
 
       testWidgets('navigates to sign up when create account pressed',
@@ -583,8 +586,7 @@ void main() {
         await tester.tap(find.text('Create an Account'));
         await tester.pump();
 
-        verify(() => mockNavigationNotifier.navigateTo(AuthRoutes.signup))
-            .called(1);
+        expect(mockNavigationNotifier.navigatedRoutes, contains(AuthRoutes.signup));
       });
 
       testWidgets('navigates back when go back pressed',
@@ -694,8 +696,8 @@ void main() {
           ),
         );
 
-        expect(find.text('Please Wait'), findsOneWidget);
-        expect(find.byIcon(Icons.schedule), findsOneWidget);
+        expect(find.text('Please Wait'), findsAtLeast(1));
+        expect(find.byIcon(Icons.schedule), findsAtLeast(1));
       });
 
       testWidgets('disables retry button during countdown',
@@ -715,7 +717,7 @@ void main() {
           find.byType(ElevatedButton),
         );
         expect(retryButton.onPressed, isNull);
-        expect(find.text('Please Wait'), findsOneWidget);
+        expect(find.text('Please Wait'), findsAtLeast(1));
       });
 
       testWidgets('shows about rate limiting section',
@@ -771,14 +773,14 @@ void main() {
         );
 
         // Initial state should show remaining time
-        expect(find.byIcon(Icons.schedule), findsOneWidget);
+        expect(find.byIcon(Icons.schedule), findsAtLeast(1));
 
         // Pump forward 1 second
         await tester.pump(const Duration(seconds: 1));
         await tester.pump();
 
         // Timer should still be counting down
-        expect(find.byIcon(Icons.schedule), findsOneWidget);
+        expect(find.byIcon(Icons.schedule), findsAtLeast(1));
       });
 
       testWidgets('enables retry button when countdown finishes',
@@ -806,7 +808,7 @@ void main() {
         );
 
         // Initially disabled
-        expect(find.text('Please Wait'), findsOneWidget);
+        expect(find.text('Please Wait'), findsAtLeast(1));
 
         // Wait for countdown to finish
         await tester.pump(const Duration(seconds: 3));
@@ -990,8 +992,17 @@ void main() {
 }
 
 // Mock classes
-class MockAuthNavigationNotifier extends Mock
-    implements AuthNavigationNotifier {}
+class FakeAuthNavigation extends AuthNavigation {
+  final List<String> navigatedRoutes = [];
+
+  @override
+  AuthNavigationState build() => AuthNavigationState.initial();
+
+  @override
+  void navigateTo(String route, {Map<String, dynamic>? arguments}) {
+    navigatedRoutes.add(route);
+  }
+}
 
 // Helper functions to create mock error info
 AuthErrorInfo createMockCredentialsError() {

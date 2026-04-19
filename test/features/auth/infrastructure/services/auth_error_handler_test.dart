@@ -246,7 +246,7 @@ void main() {
         );
         expect(
           errorInfo.recovery.primaryAction,
-          contains('request a new code'),
+          contains('Request a new verification code'),
         );
       });
 

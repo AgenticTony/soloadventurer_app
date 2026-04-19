@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 
 /// Result of an intercepted operation
@@ -203,7 +202,6 @@ class OfflineInterceptor {
   }) async {
     // Check if interception is enabled
     if (!_config.enabled) {
-      debugPrint('🔄 Offline interception disabled, executing immediately');
       return await _executeOperation(executor, localUpdate);
     }
 
@@ -211,17 +209,12 @@ class OfflineInterceptor {
     final connectivityStatus = await _connectivityService.checkConnectivity();
     final isConnected = connectivityStatus.isConnected;
 
-    debugPrint('🔄 Intercepting $operation operation for $entityType:$entityId '
-        '(connected: $isConnected)');
-
     if (isConnected) {
       // Online - execute immediately
-      debugPrint('✅ Online - executing operation immediately');
       return await _executeOperation(executor, localUpdate);
     } else {
       // Offline - queue for later
       if (_config.queueWhenOffline) {
-        debugPrint('📴 Offline - queueing operation for later sync');
         return await _queueOperation(
           entityType: entityType,
           entityId: entityId,
@@ -235,7 +228,6 @@ class OfflineInterceptor {
       } else {
         // Queueing disabled - fail the operation
         const error = 'Offline and queueing disabled';
-        debugPrint('❌ $error');
         return const InterceptorResult.failure(error);
       }
     }
@@ -259,8 +251,6 @@ class OfflineInterceptor {
     required LocalUpdateCallback Function(Map<String, dynamic> op) localUpdate,
   }) async {
     if (!_config.enabled) {
-      debugPrint(
-          '🔄 Offline interception disabled, executing batch immediately');
       final results = <InterceptorResult>[];
       for (final op in operations) {
         final result = await _executeOperation(
@@ -276,14 +266,10 @@ class OfflineInterceptor {
     final connectivityStatus = await _connectivityService.checkConnectivity();
     final isConnected = connectivityStatus.isConnected;
 
-    debugPrint('🔄 Intercepting batch of ${operations.length} operations '
-        '(connected: $isConnected)');
-
     final results = <InterceptorResult>[];
 
     if (isConnected) {
       // Online - execute all operations immediately
-      debugPrint('✅ Online - executing batch immediately');
       for (final op in operations) {
         final result = await _executeOperation(
           executor(op),
@@ -294,7 +280,6 @@ class OfflineInterceptor {
     } else {
       // Offline - queue all operations
       if (_config.queueWhenOffline) {
-        debugPrint('📴 Offline - queueing batch for later sync');
         for (final op in operations) {
           final result = await _queueOperation(
             entityType: op['entityType'] as String,
@@ -312,7 +297,6 @@ class OfflineInterceptor {
       } else {
         // Queueing disabled - fail all operations
         const error = 'Offline and queueing disabled';
-        debugPrint('❌ $error');
         for (int i = 0; i < operations.length; i++) {
           results.add(const InterceptorResult.failure(error));
         }
@@ -328,7 +312,6 @@ class OfflineInterceptor {
   void updateConfig(InterceptorConfig config) {
     // In a real implementation, we might want to make _config mutable
     // or use a different approach. For now, this is a placeholder.
-    debugPrint('⚙️ Updating interceptor config (not yet implemented)');
   }
 
   // ==============================================================================
@@ -350,15 +333,12 @@ class OfflineInterceptor {
       // Update local database to keep in sync
       try {
         await localUpdate();
-        debugPrint('✅ Local database updated');
       } catch (e) {
-        debugPrint('⚠️ Failed to update local database: $e');
         // Don't fail the operation if local update fails
       }
 
       return const InterceptorResult.executed();
     } catch (e) {
-      debugPrint('❌ Operation execution failed: $e');
       return InterceptorResult.failure('Operation failed: $e');
     }
   }
@@ -380,7 +360,6 @@ class OfflineInterceptor {
     try {
       // Update local database immediately (optimistic)
       await localUpdate();
-      debugPrint('✅ Local database updated (optimistic)');
 
       // Queue the operation for sync
       final result = await _syncQueueService.enqueueOperation(
@@ -394,11 +373,8 @@ class OfflineInterceptor {
       );
 
       if (result.success) {
-        debugPrint(
-            '✅ Operation queued successfully (id: ${result.operationId})');
         return InterceptorResult.queued(result.operationId);
       } else {
-        debugPrint('❌ Failed to queue operation: ${result.errorMessage}');
         // Local database was updated, but queuing failed
         // This is a problematic state - the user sees the change but it won't sync
         return InterceptorResult.failure(
@@ -406,7 +382,6 @@ class OfflineInterceptor {
         );
       }
     } catch (e) {
-      debugPrint('❌ Error queuing operation: $e');
       return InterceptorResult.failure('Failed to queue operation: $e');
     }
   }

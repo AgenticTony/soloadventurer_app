@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/offline_interceptor.dart';
 
@@ -189,17 +188,12 @@ class MutationInterceptor extends Interceptor {
 
     if (metadata == null) {
       // Not a mutation or couldn't parse - proceed normally
-      debugPrint('🔄 Not a mutation request, proceeding normally');
       handler.next(options);
       return;
     }
 
-    debugPrint('🔄 Intercepting mutation: ${metadata.operation.value} '
-        '${metadata.entityType}:${metadata.entityId}');
-
     // Check if interception is enabled
     if (!_config.enabled) {
-      debugPrint('🔄 Mutation interception disabled, executing immediately');
       handler.next(options);
       return;
     }
@@ -209,16 +203,12 @@ class MutationInterceptor extends Interceptor {
       final connectivityStatus = await _connectivityService.checkConnectivity();
       final isConnected = connectivityStatus.isConnected;
 
-      debugPrint('🔄 Mutation connectivity check: $isConnected');
-
       if (isConnected) {
         // Online - proceed with the request
-        debugPrint('✅ Online - executing mutation immediately');
         handler.next(options);
       } else {
         // Offline - queue the mutation and return optimistic response
         if (_config.queueWhenOffline) {
-          debugPrint('📴 Offline - queuing mutation for later sync');
           await _handleOfflineMutation(metadata, options, handler);
         } else {
           // Queueing disabled - fail the request
@@ -227,13 +217,11 @@ class MutationInterceptor extends Interceptor {
             type: DioExceptionType.connectionError,
             error: 'Offline and mutation queueing disabled',
           );
-          debugPrint('❌ Offline and queueing disabled');
           handler.reject(error);
         }
       }
     } catch (e) {
       // Error checking connectivity - proceed with request
-      debugPrint('⚠️ Error checking connectivity: $e, proceeding with request');
       handler.next(options);
     }
   }
@@ -259,7 +247,6 @@ class MutationInterceptor extends Interceptor {
         err.type == DioExceptionType.sendTimeout;
 
     if (isNetworkError && _config.queueWhenOffline) {
-      debugPrint('📴 Mutation failed due to network error, queuing for retry');
       // Cannot call async method in sync onError handler
       // Just proceed with the error for now
       handler.next(err);
@@ -282,7 +269,6 @@ class MutationInterceptor extends Interceptor {
     try {
       // Update local database immediately (optimistic)
       await _localUpdate(metadata);
-      debugPrint('✅ Local database updated (optimistic)');
 
       // Generate a temporary ID if needed
       final tempId =
@@ -299,8 +285,6 @@ class MutationInterceptor extends Interceptor {
       );
 
       if (result.success) {
-        debugPrint(
-            '✅ Mutation queued successfully (id: ${result.operationId})');
 
         if (_config.optimisticResponses) {
           // Return optimistic response to caller
@@ -330,7 +314,6 @@ class MutationInterceptor extends Interceptor {
           type: DioExceptionType.unknown,
           error: 'Failed to queue mutation: ${result.errorMessage}',
         );
-        debugPrint('❌ Failed to queue mutation: ${result.errorMessage}');
         handler.reject(error);
       }
     } catch (e) {
@@ -340,7 +323,6 @@ class MutationInterceptor extends Interceptor {
         type: DioExceptionType.unknown,
         error: 'Failed to handle offline mutation: $e',
       );
-      debugPrint('❌ Error handling offline mutation: $e');
       handler.reject(error);
     }
   }

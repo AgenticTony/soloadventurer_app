@@ -106,7 +106,6 @@ class ImageCacheConfig {
   }) async {
     if (_initialized) {
       if (kDebugMode) {
-        debugPrint('ImageCacheConfig: Already initialized, skipping');
       }
       return;
     }
@@ -121,10 +120,6 @@ class ImageCacheConfig {
     _initialized = true;
 
     if (kDebugMode) {
-      debugPrint('ImageCacheConfig: Initialized with settings:');
-      debugPrint('  - Max Memory Cache: ${_formatBytes(maxMemoryCacheBytes)}');
-      debugPrint('  - Max Disk Cache: ${_formatBytes(maxDiskCacheBytes)}');
-      debugPrint('  - Max Memory Images: $maxMemoryCacheImages');
     }
   }
 
@@ -150,11 +145,6 @@ class ImageCacheConfig {
     // Logging can be controlled through the package's configuration if needed
 
     if (kDebugMode) {
-      debugPrint('ImageCacheConfig: Cache settings configured');
-      debugPrint('  - Maximum images: $maxMemoryCacheImages');
-      debugPrint('  - Maximum memory: ${_formatBytes(maxMemoryCacheBytes)}');
-      debugPrint('  - Disk cache: ${_formatBytes(maxDiskCacheBytes)}');
-      debugPrint('  - LRU eviction: enabled (automatic)');
     }
 
     // Note: Disk cache size is configured through DefaultCacheManager
@@ -192,7 +182,6 @@ class ImageCacheConfig {
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ImageCacheConfig: Error calculating disk cache size: $e');
       }
     }
 
@@ -220,7 +209,6 @@ class ImageCacheConfig {
     imageCache.clearLiveImages();
 
     if (kDebugMode) {
-      debugPrint('ImageCacheConfig: Memory cache cleared');
     }
   }
 
@@ -245,11 +233,9 @@ class ImageCacheConfig {
       // await DefaultCacheManager().emptyCache();
 
       if (kDebugMode) {
-        debugPrint('ImageCacheConfig: Disk cache clear requested (not implemented in this version)');
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ImageCacheConfig: Error clearing disk cache: $e');
       }
       rethrow;
     }
@@ -288,16 +274,6 @@ class ImageCacheConfig {
     }
 
     return size;
-  }
-
-  /// Format bytes to human-readable string.
-  static String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   /// Get the current maximum cache size (number of images).

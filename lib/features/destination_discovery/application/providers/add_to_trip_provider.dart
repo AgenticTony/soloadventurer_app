@@ -9,7 +9,7 @@ part 'add_to_trip_provider.g.dart';
 
 /// Provider for the travel operation repository from the travel feature
 @riverpod
-TravelOperationRepository travelOperationRepository(ref) {
+TravelOperationRepository travelOperationRepository(Ref ref) {
   throw UnimplementedError(
       'travelOperationRepositoryProvider must be overridden in main app');
 }
@@ -138,7 +138,7 @@ class AddToTripNotifier extends _$AddToTripNotifier {
         error.toString().replaceAll('Exception: ', ''),
       );
       // Re-throw for caller to handle if needed
-      Error.throwWithStackTrace(error.toString(), stackTrace);
+      Error.throwWithStackTrace(error, stackTrace);
     }
   }
 
@@ -216,9 +216,7 @@ class AddToTripNotifier extends _$AddToTripNotifier {
         error.toString().replaceAll('Exception: ', ''),
       );
       // Re-throw for caller to handle if needed
-      Error.throwWithStackTrace(error.toString(), stackTrace);
-      // Return empty string to satisfy return type (will never reach here)
-      return '';
+      Error.throwWithStackTrace(error, stackTrace);
     }
   }
 

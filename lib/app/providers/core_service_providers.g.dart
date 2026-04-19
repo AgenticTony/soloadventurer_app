@@ -61,7 +61,7 @@ final class FlutterSecureStorageProvider extends $FunctionalProvider<
 }
 
 String _$flutterSecureStorageHash() =>
-    r'74fc6ea2bb3b1f668a5f3e4f549614146c526484';
+    r'688f2766cfc676c0b8b358c61764208a06448c1e';
 
 /// Provider for SecureStorage wrapper
 ///

@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/onboarding/data/repositories/itinerary_generation_repository_impl.dart';
 import 'package:soloadventurer/features/onboarding/data/services/itinerary_generation_service.dart';
@@ -28,9 +27,7 @@ ItineraryGenerationRepository itineraryGenerationRepository(
   // Mock implementation for development/testing
   // The repository already contains mock behavior that returns
   // sample itinerary structures
-  return ItineraryGenerationRepositoryImpl(
-    MockItineraryGenerationService(),
-  );
+  return ItineraryGenerationRepositoryImpl();
 }
 
 /// Mock service for development

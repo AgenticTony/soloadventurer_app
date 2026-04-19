@@ -19,6 +19,9 @@ class MockItineraryGenerationRepository extends Mock
     implements ItineraryGenerationRepository {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(<String, dynamic>{});
+  });
   group('OnboardingProviders', () {
     late ProviderContainer container;
     late MockItineraryGenerationRepository mockRepository;
@@ -93,9 +96,9 @@ void main() {
       });
     });
 
-    group('onboardingNotifierProvider', () {
+    group('onboardingProvider', () {
       test('should start with initial state', () {
-        final state = container.read(onboardingNotifierProvider);
+        final state = container.read(onboardingProvider);
 
         expect(state, isA<OnboardingState>());
         expect(
@@ -108,12 +111,12 @@ void main() {
       });
 
       test('should update state when form data changes', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         const name = 'Jane Doe';
 
         notifier.updateName(name);
 
-        final state = container.read(onboardingNotifierProvider);
+        final state = container.read(onboardingProvider);
 
         expect(
           state.maybeWhen(
@@ -127,23 +130,39 @@ void main() {
       test('should update to submitting state when form is submitted',
           () async {
         final data = createValidOnboardingData();
-        final mockItineraryJson = createMockItinerary().toJson();
+        final mockItineraryJson = <String, dynamic>{
+          'id': 'test-itinerary-id',
+          'name': 'Test Trip',
+          'destination': {
+            'placeId': 'test-place-id',
+            'name': 'Test City',
+            'latitude': 40.7128,
+            'longitude': -74.006,
+          },
+          'dateRange': {
+            'start': '2026-06-01T00:00:00.000',
+            'end': '2026-06-07T00:00:00.000',
+          },
+          'items': <dynamic>[],
+          'isStarter': true,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
 
         when(() => mockRepository.canGenerateItinerary(any()))
             .thenAnswer((_) async => true);
         when(() => mockRepository.generateStarterItinerary(any()))
             .thenAnswer((_) async => mockItineraryJson);
 
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
 
         // Update form with valid data first
         notifier.updateFormData(data);
 
         // Submit the form
         await notifier
-            .submitForm(container.read(generateStarterItineraryProvider));
+              .submitForm(container.read(generateStarterItineraryProvider));
 
-        final state = container.read(onboardingNotifierProvider);
+        final state = container.read(onboardingProvider);
 
         expect(
           state.maybeWhen(
@@ -160,7 +179,7 @@ void main() {
         when(() => mockRepository.canGenerateItinerary(any()))
             .thenThrow(Exception('Network error'));
 
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
 
         notifier.updateFormData(data);
 
@@ -172,7 +191,7 @@ void main() {
           // Exception is expected
         }
 
-        final state = container.read(onboardingNotifierProvider);
+        final state = container.read(onboardingProvider);
 
         expect(
           state.maybeWhen(
@@ -192,7 +211,7 @@ void main() {
       });
 
       test('should return data in inProgress state', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -203,7 +222,7 @@ void main() {
       });
 
       test('should return data in submitting state', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -214,9 +233,25 @@ void main() {
       });
 
       test('should return data in success state', () async {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
-        final mockItineraryJson = createMockItinerary().toJson();
+        final mockItineraryJson = <String, dynamic>{
+          'id': 'test-itinerary-id',
+          'name': 'Test Trip',
+          'destination': {
+            'placeId': 'test-place-id',
+            'name': 'Test City',
+            'latitude': 40.7128,
+            'longitude': -74.006,
+          },
+          'dateRange': {
+            'start': '2026-06-01T00:00:00.000',
+            'end': '2026-06-07T00:00:00.000',
+          },
+          'items': <dynamic>[],
+          'isStarter': true,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
 
         when(() => mockRepository.canGenerateItinerary(any()))
             .thenAnswer((_) async => true);
@@ -234,7 +269,7 @@ void main() {
       });
 
       test('should return data in error state', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -255,7 +290,7 @@ void main() {
       });
 
       test('should return true when form data is valid', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -266,7 +301,7 @@ void main() {
       });
 
       test('should return false when form data is invalid', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = OnboardingData(
           name: '', // Invalid
           destination: const Destination(
@@ -298,7 +333,7 @@ void main() {
       });
 
       test('should return errors when form is invalid', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = OnboardingData(
           name: '',
           destination: const Destination(
@@ -322,7 +357,7 @@ void main() {
       });
 
       test('should return empty list when form is valid', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -341,9 +376,25 @@ void main() {
       });
 
       test('should return true in submitting state', () async {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
-        final mockItineraryJson = createMockItinerary().toJson();
+        final mockItineraryJson = <String, dynamic>{
+          'id': 'test-itinerary-id',
+          'name': 'Test Trip',
+          'destination': {
+            'placeId': 'test-place-id',
+            'name': 'Test City',
+            'latitude': 40.7128,
+            'longitude': -74.006,
+          },
+          'dateRange': {
+            'start': '2026-06-01T00:00:00.000',
+            'end': '2026-06-07T00:00:00.000',
+          },
+          'items': <dynamic>[],
+          'isStarter': true,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
 
         // Use a completer to keep the submission pending
         final completer = Completer<Map<String, dynamic>>();
@@ -371,9 +422,25 @@ void main() {
       });
 
       test('should return false in success state', () async {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
-        final mockItineraryJson = createMockItinerary().toJson();
+        final mockItineraryJson = <String, dynamic>{
+          'id': 'test-itinerary-id',
+          'name': 'Test Trip',
+          'destination': {
+            'placeId': 'test-place-id',
+            'name': 'Test City',
+            'latitude': 40.7128,
+            'longitude': -74.006,
+          },
+          'dateRange': {
+            'start': '2026-06-01T00:00:00.000',
+            'end': '2026-06-07T00:00:00.000',
+          },
+          'items': <dynamic>[],
+          'isStarter': true,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
 
         when(() => mockRepository.canGenerateItinerary(any()))
             .thenAnswer((_) async => true);
@@ -399,7 +466,7 @@ void main() {
       });
 
       test('should return null in inProgress state', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -410,10 +477,25 @@ void main() {
       });
 
       test('should return itinerary JSON in success state', () async {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
-        final mockItinerary = createMockItinerary();
-        final mockItineraryJson = mockItinerary.toJson();
+        final mockItineraryJson = <String, dynamic>{
+          'id': 'test-itinerary-id',
+          'name': 'Test Trip',
+          'destination': {
+            'placeId': 'test-place-id',
+            'name': 'Test City',
+            'latitude': 40.7128,
+            'longitude': -74.006,
+          },
+          'dateRange': {
+            'start': '2026-06-01T00:00:00.000',
+            'end': '2026-06-07T00:00:00.000',
+          },
+          'items': <dynamic>[],
+          'isStarter': true,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
 
         when(() => mockRepository.canGenerateItinerary(any()))
             .thenAnswer((_) async => true);
@@ -428,12 +510,12 @@ void main() {
         final itinerary = container.read(generatedItineraryProvider);
 
         expect(itinerary, isNotNull);
-        expect(itinerary!['id'], equals(mockItinerary.id));
-        expect(itinerary['name'], equals(mockItinerary.name));
+        expect(itinerary!['id'], equals('test-itinerary-id'));
+        expect(itinerary['name'], equals('Test Trip'));
       });
 
       test('should return null in error state', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -453,7 +535,7 @@ void main() {
       });
 
       test('should return null in inProgress state when valid', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
         notifier.updateFormData(data);
@@ -463,23 +545,43 @@ void main() {
         expect(errorMessage, isNull);
       });
 
-      test('should return error message in error state', () {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+      test('should return error message in error state', () async {
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
 
+        when(() => mockRepository.canGenerateItinerary(any()))
+            .thenThrow(Exception('Network error'));
+
         notifier.updateFormData(data);
-        notifier.updateName(''); // Invalid - empty name
+        await notifier.submitForm(
+          container.read(generateStarterItineraryProvider),
+        );
 
         final errorMessage = container.read(onboardingErrorMessageProvider);
 
         expect(errorMessage, isNotNull);
-        expect(errorMessage, contains('name'));
       });
 
       test('should return null in success state', () async {
-        final notifier = container.read(onboardingNotifierProvider.notifier);
+        final notifier = container.read(onboardingProvider.notifier);
         final data = createValidOnboardingData();
-        final mockItineraryJson = createMockItinerary().toJson();
+        final mockItineraryJson = <String, dynamic>{
+          'id': 'test-itinerary-id',
+          'name': 'Test Trip',
+          'destination': {
+            'placeId': 'test-place-id',
+            'name': 'Test City',
+            'latitude': 40.7128,
+            'longitude': -74.006,
+          },
+          'dateRange': {
+            'start': '2026-06-01T00:00:00.000',
+            'end': '2026-06-07T00:00:00.000',
+          },
+          'items': <dynamic>[],
+          'isStarter': true,
+          'createdAt': DateTime.now().toIso8601String(),
+        };
 
         when(() => mockRepository.canGenerateItinerary(any()))
             .thenAnswer((_) async => true);

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../domain/models/sync_history_entry.dart';
 import '../../domain/models/sync_status.dart';
@@ -209,8 +210,6 @@ class _SyncActivityTile extends StatelessWidget {
   }
 
   Widget _buildLeadingIcon(BuildContext context) {
-    final theme = Theme.of(context);
-
     IconData icon;
     Color color;
 

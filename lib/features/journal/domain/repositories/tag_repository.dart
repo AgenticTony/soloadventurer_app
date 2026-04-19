@@ -1,4 +1,4 @@
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/journal/domain/entities/tag.dart';
 import 'package:fpdart/fpdart.dart';
 

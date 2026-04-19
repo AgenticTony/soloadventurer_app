@@ -6,10 +6,10 @@ import 'destination_repository_provider.dart';
 part 'destination_search_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
-/// - build() returns Future<T> not AsyncValue<T> (Riverpod 3.0 handles wrapping)
-/// - State is automatically AsyncValue<DestinationSearchState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>` (Riverpod 3.0 handles wrapping)
+/// - State is automatically `AsyncValue<DestinationSearchState>` when consumed
 /// - Initialization logic moved from constructor to build() method
 
 /// Provider for destination search state management
@@ -44,7 +44,7 @@ class DestinationSearch extends _$DestinationSearch {
 
   /// Initialize the notifier and perform initial search
   ///
-  /// Riverpod 3.0: build() returns Future<DestinationSearchState>
+  /// Riverpod 3.0: build() returns `Future<DestinationSearchState>`
   /// AsyncValue wrapping is handled automatically by the framework
   @override
   Future<DestinationSearchState> build() async {

@@ -62,7 +62,7 @@ final class TokenRefreshNotificationHandlerProvider extends $NotifierProvider<
 }
 
 String _$tokenRefreshNotificationHandlerHash() =>
-    r'f5801e298857a861547c6556fb7d9e9169f5d72e';
+    r'3a2fdbf3e260c874989aaad6fcb984697e0abab1';
 
 /// Notifier for handling token refresh notifications
 ///

@@ -26,6 +26,7 @@ void main() {
     OnboardingData createValidOnboardingData({
       String name = 'John Doe',
       Set<TravelInterest>? interests,
+      BudgetRange? budget,
     }) {
       return OnboardingData(
         name: name,
@@ -40,7 +41,7 @@ void main() {
           end: DateTime(2026, 5, 18),
         ),
         interests: interests ?? {TravelInterest.food, TravelInterest.culture},
-        budget: BudgetRange.moderate,
+        budget: budget ?? BudgetRange.moderate,
       );
     }
 
@@ -157,7 +158,7 @@ void main() {
               (ValidationException e) =>
                   e.message.contains('name') &&
                   e.message.contains('destination') &&
-                  e.message.contains('interests'),
+                  e.message.contains('interest'),
             ),
           ),
         );

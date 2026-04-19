@@ -217,7 +217,6 @@ class _LazyLoadImageState extends State<LazyLoadImage> {
     } catch (e) {
       // Ignore connectivity check errors
       if (kDebugMode) {
-        debugPrint('Connectivity check failed: $e');
       }
     }
   }

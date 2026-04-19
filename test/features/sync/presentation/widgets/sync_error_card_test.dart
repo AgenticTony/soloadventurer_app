@@ -26,7 +26,7 @@ void main() {
 
       expect(find.text('User-friendly message'), findsOneWidget);
       expect(find.text('MEDIUM'), findsOneWidget);
-      expect(find.text('NETWORK ERROR'), findsOneWidget);
+      expect(find.text('Network Error'), findsOneWidget);
     });
 
     testWidgets('is not expanded by default', (tester) async {
@@ -72,7 +72,7 @@ void main() {
       );
 
       // Tap to expand
-      await tester.tap(find.byType(SyncErrorCard));
+      await tester.tap(find.byType(InkWell));
       await tester.pumpAndSettle();
 
       // Technical details should now be visible

@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:soloadventurer/core/monitoring/performance/performance_metrics.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 
 /// Simplified performance metrics for benchmarking

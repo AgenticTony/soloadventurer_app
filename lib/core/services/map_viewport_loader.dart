@@ -105,9 +105,6 @@ class MapViewportLoader {
   /// Current viewport bounds
   LatLngBounds? _currentLatLngBounds;
 
-  /// Extended bounds including buffer zone
-  LatLngBounds? _extendedLatLngBounds;
-
   /// Current load result
   ViewportLoadResult? _currentResult;
 
@@ -276,7 +273,6 @@ class MapViewportLoader {
 
     // Calculate extended bounds with buffer zone
     final extendedLatLngBounds = _calculateExtendedLatLngBounds(bounds);
-    _extendedLatLngBounds = extendedLatLngBounds;
 
     // Check cache first
     final cached = _cache.get(extendedLatLngBounds);

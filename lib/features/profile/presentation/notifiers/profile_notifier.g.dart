@@ -8,38 +8,36 @@ part of 'profile_notifier.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Notifier for managing profile state and user interactions
+/// Notifier for managing profile state and user interactions.
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Removed _ref field (use ref directly in methods)
-/// - Initialization logic moved from constructor to build() method
-///
-/// Maps domain state to presentation state and handles user profile operations.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Converted from synchronous Notifier to AsyncNotifier
+/// - build() is async and loads initial profile data
+/// - Loading/error state handled by AsyncValue wrapper
+/// - AsyncValue.guard() replaces manual try/catch + isLoading/error
+/// - Methods set state = AsyncLoading() then AsyncValue.guard()
 
 @ProviderFor(Profile)
 const profileProvider = ProfileProvider._();
 
-/// Notifier for managing profile state and user interactions
+/// Notifier for managing profile state and user interactions.
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Removed _ref field (use ref directly in methods)
-/// - Initialization logic moved from constructor to build() method
-///
-/// Maps domain state to presentation state and handles user profile operations.
-final class ProfileProvider extends $NotifierProvider<Profile, ProfileState> {
-  /// Notifier for managing profile state and user interactions
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Converted from synchronous Notifier to AsyncNotifier
+/// - build() is async and loads initial profile data
+/// - Loading/error state handled by AsyncValue wrapper
+/// - AsyncValue.guard() replaces manual try/catch + isLoading/error
+/// - Methods set state = AsyncLoading() then AsyncValue.guard()
+final class ProfileProvider
+    extends $AsyncNotifierProvider<Profile, ProfileState> {
+  /// Notifier for managing profile state and user interactions.
   ///
-  /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier to @riverpod Notifier
-  /// - Dependencies injected via ref.watch() in build() method
-  /// - Removed _ref field (use ref directly in methods)
-  /// - Initialization logic moved from constructor to build() method
-  ///
-  /// Maps domain state to presentation state and handles user profile operations.
+  /// Riverpod 3.0 AsyncNotifier Migration:
+  /// - Converted from synchronous Notifier to AsyncNotifier
+  /// - build() is async and loads initial profile data
+  /// - Loading/error state handled by AsyncValue wrapper
+  /// - AsyncValue.guard() replaces manual try/catch + isLoading/error
+  /// - Methods set state = AsyncLoading() then AsyncValue.guard()
   const ProfileProvider._()
       : super(
           from: null,
@@ -57,38 +55,29 @@ final class ProfileProvider extends $NotifierProvider<Profile, ProfileState> {
   @$internal
   @override
   Profile create() => Profile();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ProfileState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<ProfileState>(value),
-    );
-  }
 }
 
-String _$profileHash() => r'0a4b24d32b89b963688b8ef30138efc2f8fea2f5';
+String _$profileHash() => r'96136e7da90ba84564316c12b9ecaa6b70602653';
 
-/// Notifier for managing profile state and user interactions
+/// Notifier for managing profile state and user interactions.
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Removed _ref field (use ref directly in methods)
-/// - Initialization logic moved from constructor to build() method
-///
-/// Maps domain state to presentation state and handles user profile operations.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Converted from synchronous Notifier to AsyncNotifier
+/// - build() is async and loads initial profile data
+/// - Loading/error state handled by AsyncValue wrapper
+/// - AsyncValue.guard() replaces manual try/catch + isLoading/error
+/// - Methods set state = AsyncLoading() then AsyncValue.guard()
 
-abstract class _$Profile extends $Notifier<ProfileState> {
-  ProfileState build();
+abstract class _$Profile extends $AsyncNotifier<ProfileState> {
+  FutureOr<ProfileState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ProfileState, ProfileState>;
+    final ref = this.ref as $Ref<AsyncValue<ProfileState>, ProfileState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<ProfileState, ProfileState>,
-        ProfileState,
+        AnyNotifier<AsyncValue<ProfileState>, ProfileState>,
+        AsyncValue<ProfileState>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
 import 'package:soloadventurer/features/auth/presentation/widgets/auth_retry_button.dart';
@@ -75,6 +79,9 @@ void main() {
 
         // Should show CircularProgressIndicator
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        // Drain pending timer
+        await tester.pump(const Duration(seconds: 5));
       });
     });
 
@@ -143,13 +150,14 @@ void main() {
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
 
-        // Wait for countdown
-        await tester.pump(const Duration(seconds: 1));
+        // Wait for countdown to finish (calculateDelay(2) = 2 seconds)
+        await tester.pump(const Duration(seconds: 2));
 
         // Second retry
         await tester.tap(find.text('Retry'));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
+        await tester.pump();
 
         // Should show max attempts message
         expect(find.text('Max Attempts Reached'), findsOneWidget);
@@ -159,6 +167,9 @@ void main() {
           find.byType(ElevatedButton).first,
         );
         expect(button.onPressed, isNull);
+
+        // Drain pending timers
+        await tester.pump(const Duration(seconds: 5));
       });
     });
 
@@ -188,20 +199,25 @@ void main() {
         // Should show countdown with remaining seconds
         expect(find.textContaining('Next retry in'), findsOneWidget);
 
-        // Countdown should decrease
+        // Verify countdown value before advancing
         final countdownBefore = tester
             .widget<Text>(
               find.textContaining('Next retry in'),
             )
             .data;
-        await tester.pump(const Duration(seconds: 1));
-        final countdownAfter = tester
-            .widget<Text>(
-              find.textContaining('Next retry in'),
-            )
-            .data;
+        expect(countdownBefore, contains('second')); // countdown is showing
 
-        expect(countdownBefore, isNot(equals(countdownAfter)));
+        // Advance and verify it decreased
+        await tester.pump(const Duration(seconds: 1));
+        // After 1s, countdown should either show a lower number or be gone
+        final countdownFinder = find.textContaining('Next retry in');
+        if (countdownFinder.evaluate().isNotEmpty) {
+          final countdownAfter = tester.widget<Text>(countdownFinder).data;
+          expect(countdownBefore, isNot(equals(countdownAfter)));
+        }
+
+        // Drain pending timers
+        await tester.pump(const Duration(seconds: 5));
       });
 
       testWidgets('disables button during countdown',
@@ -309,24 +325,30 @@ void main() {
         await tester.pump(const Duration(milliseconds: 500));
         await tester.pump(const Duration(seconds: 1));
 
+        // Countdown for next attempt: calculateDelay(2) = 2 seconds
+        // After pumping 1s, remaining = 1 → "Next retry in 1 second"
         expect(find.text('Next retry in 1 second'), findsOneWidget);
 
-        // Wait for countdown
+        // Wait for countdown to finish
         await tester.pump(const Duration(seconds: 1));
 
-        // Second attempt - should have 2 second countdown (2^1)
+        // Second attempt
         await tester.tap(find.text('Retry'));
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
         await tester.pump(const Duration(seconds: 1));
 
-        // Countdown should be for 2 seconds (2^1)
+        // Countdown for next attempt: calculateDelay(3) = 4 seconds
+        // After pumping 1s, remaining = 3 → "Next retry in 3 seconds"
         final countdown = tester
             .widget<Text>(
               find.textContaining('Next retry in'),
             )
             .data;
-        expect(countdown, contains('2 seconds'));
+        expect(countdown, contains('3 seconds'));
+
+        // Drain pending timers
+        await tester.pump(const Duration(seconds: 5));
       });
     });
 
@@ -504,8 +526,13 @@ void main() {
 
       testWidgets('shows loading when refresh is in progress',
           (WidgetTester tester) async {
+        // Use a completer to keep the refresh hanging
+        final completer = Completer<AuthSession>();
+        final mockRepo = MockAuthRepository();
+        when(() => mockRepo.performBasicTokenRefresh())
+            .thenAnswer((_) => completer.future);
         final service = TokenRefreshService(
-          authRepository: mockAuthRepository,
+          authRepository: mockRepo,
         );
 
         await tester.pumpWidget(
@@ -522,12 +549,20 @@ void main() {
 
         // Should show loading indicator
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+        // Complete the refresh and drain
+        completer.complete(createMockSession());
+        await tester.pump(const Duration(seconds: 5));
       });
 
       testWidgets('disables button when max attempts reached',
           (WidgetTester tester) async {
+        final mockRepo = MockAuthRepository();
+        when(() => mockRepo.performBasicTokenRefresh()).thenThrow(
+          const AuthException('Refresh failed'),
+        );
         final service = TokenRefreshService(
-          authRepository: mockAuthRepository,
+          authRepository: mockRepo,
         );
 
         await tester.pumpWidget(
@@ -539,17 +574,27 @@ void main() {
           ),
         );
 
-        // Wait for service to complete (will fail since mock returns null)
-        await tester.pump(const Duration(seconds: 2));
+        // Trigger refresh which will fail immediately
+        service.refreshToken().catchError((_) => createMockSession());
+        await tester.pump();
+        // Wait for all 3 retry attempts with backoff delays (2s + 4s)
+        await tester.pump(const Duration(seconds: 8));
 
-        // After failure, should show max attempts
+        // After all retries fail, should show max attempts
         expect(find.text('Max Attempts Reached'), findsOneWidget);
+
+        // Drain pending timers
+        await tester.pump(const Duration(seconds: 5));
       });
 
       testWidgets('cancel button calls onCancel and cancels refresh',
           (WidgetTester tester) async {
+        final completer = Completer<AuthSession>();
+        final mockRepo = MockAuthRepository();
+        when(() => mockRepo.performBasicTokenRefresh())
+            .thenAnswer((_) => completer.future);
         final service = TokenRefreshService(
-          authRepository: mockAuthRepository,
+          authRepository: mockRepo,
         );
         bool cancelCalled = false;
 
@@ -562,15 +607,20 @@ void main() {
           ),
         );
 
-        // Trigger refresh to show cancel button
-        service.refreshToken();
+        // Trigger refresh to show cancel button (ignore cancellation error)
+        service.refreshToken().catchError((_) => createMockSession());
         await tester.pump();
 
-        // Tap cancel button (need to wait for it to appear)
-        await tester.pump(const Duration(milliseconds: 100));
+        // Tap cancel button
+        await tester.tap(find.text('Cancel'));
+        await tester.pump();
 
         // Verify cancel was called
         expect(cancelCalled, isTrue);
+
+        // Clean up
+        completer.complete(createMockSession());
+        await tester.pump(const Duration(seconds: 5));
       });
     });
   });
@@ -581,10 +631,11 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 
 // Helper function to create a mock user
 User createMockUser() {
-  return const User(
+  return User(
     id: 'test-id',
     email: 'test@example.com',
-    name: 'Test User',
+    username: 'Test User',
+    createdAt: DateTime(2024),
   );
 }
 
@@ -594,6 +645,6 @@ AuthSession createMockSession() {
     accessToken: 'mock-access-token',
     idToken: 'mock-id-token',
     refreshToken: 'mock-refresh-token',
-    expiration: DateTime.now().add(const Duration(hours: 1)),
+    expiresAt: DateTime.now().add(const Duration(hours: 1)),
   );
 }

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/recommendation_local_data_source.dart';
 import 'package:soloadventurer/features/recommendations/data/repositories/recommendation_repository_impl.dart';
@@ -23,6 +23,26 @@ void main() {
   setUp(() {
     mockDataSource = MockRecommendationLocalDataSource();
     repository = RecommendationRepositoryImpl(mockDataSource);
+    provideDummy<PersonalizedRecommendation>(
+      PersonalizedRecommendation(
+        id: 'dummy',
+        activity: const PlaceActivity(
+          id: 'dummy',
+          name: 'dummy',
+          category: RecommendationCategory.food,
+        ),
+        metadata: RecommendationMetadata(
+          matchedInterests: {},
+          suggestedDate: DateTime(2026),
+          suggestedTime: const TimeOfDay(hour: 0),
+          distance: DistanceFromHotel.walking,
+          weather: WeatherContext.anyWeather,
+          crowdLevel: CrowdLevel.low,
+        ),
+        reasoning: 'dummy',
+        relevanceScore: 0.0,
+      ),
+    );
   });
 
   group('RecommendationRepositoryImpl', () {
@@ -74,7 +94,7 @@ void main() {
         // Arrange
         const userId = 'user-123';
         when(mockDataSource.saveRecommendation(any, any))
-            .thenThrow(RepositoryException('Save failed'));
+            .thenThrow(RepositoryException(message: 'Save failed'));
 
         // Act
         final result =
@@ -159,7 +179,7 @@ void main() {
         // Arrange
         const userId = 'user-123';
         when(mockDataSource.getSavedRecommendations(any))
-            .thenThrow(RepositoryException('Fetch failed'));
+            .thenThrow(RepositoryException(message: 'Fetch failed'));
 
         // Act
         final result = await repository.getSavedRecommendations(userId);
@@ -207,7 +227,7 @@ void main() {
         const userId = 'user-123';
         const recommendationId = 'rec-456';
         when(mockDataSource.dismissRecommendation(any, any))
-            .thenThrow(RepositoryException('Dismiss failed'));
+            .thenThrow(RepositoryException(message: 'Dismiss failed'));
 
         // Act
         final result =
@@ -249,7 +269,7 @@ void main() {
         const recommendationId = 'rec-123';
         const feedback = RecommendationFeedback.notHelpful;
         when(mockDataSource.recordFeedback(any, any))
-            .thenThrow(RepositoryException('Feedback failed'));
+            .thenThrow(RepositoryException(message: 'Feedback failed'));
 
         // Act
         final result =
@@ -376,7 +396,7 @@ void main() {
         when(mockDataSource.clearOldDismissals(
           userId: anyNamed('userId'),
           olderThan: anyNamed('olderThan'),
-        )).thenThrow(RepositoryException('Clear failed'));
+        )).thenThrow(RepositoryException(message: 'Clear failed'));
 
         // Act
         final result = await repository.clearOldDismissals(

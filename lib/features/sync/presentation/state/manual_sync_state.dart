@@ -1,69 +1,57 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/models/sync_status.dart';
+
+part 'manual_sync_state.freezed.dart';
 
 /// State for manual sync operations
 ///
 /// Tracks the status of manually triggered sync operations,
-/// including progress, results, and error information.
-class ManualSyncState with EquatableMixin {
-  /// Current sync status
-  final SyncOperationStatus status;
+/// including progress and results.
+///
+/// Riverpod 3.0 Migration:
+/// - Removed isSyncing (handled by AsyncValue loading state)
+/// - Removed errorMessage (handled by AsyncValue error state)
+/// - Removed lastSyncSuccess (derived from status)
+/// - Uses @freezed for immutability and copyWith
+@freezed
+sealed class ManualSyncState with _$ManualSyncState {
+  const ManualSyncState._();
 
-  /// Whether a manual sync is currently in progress
-  final bool isSyncing;
+  /// Default constructor
+  const factory ManualSyncState({
+    /// Current sync status
+    required SyncOperationStatus status,
 
-  /// Whether the last manual sync was successful
-  final bool? lastSyncSuccess;
+    /// Number of operations successfully synced in last manual sync
+    @Default(0) int successCount,
 
-  /// Number of operations successfully synced in last manual sync
-  final int successCount;
+    /// Number of operations that failed in last manual sync
+    @Default(0) int failureCount,
 
-  /// Number of operations that failed in last manual sync
-  final int failureCount;
+    /// Timestamp when the last manual sync completed
+    DateTime? completedAt,
 
-  /// Error message if the last manual sync failed
-  final String? errorMessage;
+    /// Timestamp when the current manual sync started
+    DateTime? startedAt,
 
-  /// Timestamp when the last manual sync completed
-  final DateTime? completedAt;
-
-  /// Timestamp when the current manual sync started
-  final DateTime? startedAt;
-
-  /// Total number of operations processed
-  final int totalProcessed;
-
-  const ManualSyncState({
-    required this.status,
-    this.isSyncing = false,
-    this.lastSyncSuccess,
-    this.successCount = 0,
-    this.failureCount = 0,
-    this.errorMessage,
-    this.completedAt,
-    this.startedAt,
-    this.totalProcessed = 0,
-  });
+    /// Total number of operations processed
+    @Default(0) int totalProcessed,
+  }) = _ManualSyncState;
 
   /// Factory constructor for initial state
-  factory ManualSyncState.initial() {
-    return const ManualSyncState(
-      status: SyncOperationStatus.idle,
-      isSyncing: false,
-    );
-  }
+  factory ManualSyncState.initial() => const ManualSyncState(
+        status: SyncOperationStatus.idle,
+      );
 
   /// Factory constructor for syncing state
   factory ManualSyncState.syncing({
     required DateTime startedAt,
     SyncOperationStatus status = SyncOperationStatus.syncing,
-  }) {
-    return ManualSyncState(
-      status: status,
-      isSyncing: true,
-      startedAt: startedAt,
-    );
-  }
+  }) =>
+      ManualSyncState(
+        status: status,
+        startedAt: startedAt,
+      );
 
   /// Factory constructor for success state
   factory ManualSyncState.success({
@@ -73,47 +61,48 @@ class ManualSyncState with EquatableMixin {
     DateTime? startedAt,
     int totalProcessed = 0,
     SyncOperationStatus status = SyncOperationStatus.success,
-  }) {
-    return ManualSyncState(
-      status: status,
-      isSyncing: false,
-      lastSyncSuccess: true,
-      successCount: successCount,
-      failureCount: failureCount,
-      completedAt: completedAt,
-      startedAt: startedAt,
-      totalProcessed: totalProcessed,
-    );
-  }
+  }) =>
+      ManualSyncState(
+        status: status,
+        successCount: successCount,
+        failureCount: failureCount,
+        completedAt: completedAt,
+        startedAt: startedAt,
+        totalProcessed: totalProcessed,
+      );
 
   /// Factory constructor for failure state
   factory ManualSyncState.failure({
-    required String errorMessage,
     required DateTime completedAt,
     DateTime? startedAt,
     int successCount = 0,
     int failureCount = 0,
     int totalProcessed = 0,
     SyncOperationStatus status = SyncOperationStatus.failed,
-  }) {
-    return ManualSyncState(
-      status: status,
-      isSyncing: false,
-      lastSyncSuccess: false,
-      successCount: successCount,
-      failureCount: failureCount,
-      errorMessage: errorMessage,
-      completedAt: completedAt,
-      startedAt: startedAt,
-      totalProcessed: totalProcessed,
-    );
+  }) =>
+      ManualSyncState(
+        status: status,
+        successCount: successCount,
+        failureCount: failureCount,
+        completedAt: completedAt,
+        startedAt: startedAt,
+        totalProcessed: totalProcessed,
+      );
+
+  /// Whether the current state represents an active sync
+  bool get isSyncing => status == SyncOperationStatus.syncing;
+
+  /// Whether the last manual sync was successful
+  bool? get lastSyncSuccess {
+    if (completedAt == null) return null;
+    return status == SyncOperationStatus.success;
   }
 
   /// Whether the state represents a completed sync
   bool get isCompleted => completedAt != null;
 
   /// Whether the state represents a failed sync
-  bool get isFailed => lastSyncSuccess == false;
+  bool get isFailed => status == SyncOperationStatus.failed;
 
   /// Whether there are any results from a sync
   bool get hasResults => successCount > 0 || failureCount > 0;
@@ -141,55 +130,13 @@ class ManualSyncState with EquatableMixin {
     return successCount / totalOperations;
   }
 
-  /// Create a copy with updated fields
-  ManualSyncState copyWith({
-    SyncOperationStatus? status,
-    bool? isSyncing,
-    bool? lastSyncSuccess,
-    int? successCount,
-    int? failureCount,
-    String? errorMessage,
-    DateTime? completedAt,
-    DateTime? startedAt,
-    int? totalProcessed,
-  }) {
-    return ManualSyncState(
-      status: status ?? this.status,
-      isSyncing: isSyncing ?? this.isSyncing,
-      lastSyncSuccess: lastSyncSuccess ?? this.lastSyncSuccess,
-      successCount: successCount ?? this.successCount,
-      failureCount: failureCount ?? this.failureCount,
-      errorMessage: errorMessage ?? this.errorMessage,
-      completedAt: completedAt ?? this.completedAt,
-      startedAt: startedAt ?? this.startedAt,
-      totalProcessed: totalProcessed ?? this.totalProcessed,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        status,
-        isSyncing,
-        lastSyncSuccess,
-        successCount,
-        failureCount,
-        errorMessage,
-        completedAt,
-        startedAt,
-        totalProcessed,
-      ];
-
-  @override
-  String toString() {
-    return 'ManualSyncState('
-        'status: $status, '
-        'isSyncing: $isSyncing, '
-        'lastSyncSuccess: $lastSyncSuccess, '
-        'successCount: $successCount, '
-        'failureCount: $failureCount, '
-        'errorMessage: $errorMessage, '
-        'completedAt: $completedAt, '
-        'startedAt: $startedAt, '
-        'totalProcessed: $totalProcessed)';
-  }
+  /// Convert to JSON for serialization
+  Map<String, dynamic> toJson() => {
+        'status': status.name,
+        'successCount': successCount,
+        'failureCount': failureCount,
+        'completedAt': completedAt?.toIso8601String(),
+        'startedAt': startedAt?.toIso8601String(),
+        'totalProcessed': totalProcessed,
+      };
 }

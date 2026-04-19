@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_error.dart';
 
@@ -387,7 +388,7 @@ class SyncErrorDialog extends StatelessWidget {
   }
 
   /// Copies error details to clipboard
-  void _copyErrorDetails(BuildContext context) {
+  Future<void> _copyErrorDetails(BuildContext context) async {
     final details = '''
 Sync Error Details
 ==================
@@ -401,8 +402,8 @@ Suggestion: ${error.suggestion}
 Technical Details
 -----------------
 Message: ${error.technicalMessage}
-Code: ${error.error.code ?? 'N/A'}
-Status Code: ${error.error.statusCode ?? 'N/A'}
+Code: ${error.code ?? 'N/A'}
+Status Code: ${error.statusCode ?? 'N/A'}
 
 Context
 -------
@@ -421,8 +422,8 @@ Additional Details
 ${error.details?.toString() ?? 'N/A'}
 ''';
 
-    // In a real implementation, you would use flutter/services to copy to clipboard
-    // Clipboard.setData(ClipboardData(text: details));
+    // Copy to clipboard
+    await Clipboard.setData(ClipboardData(text: details));
 
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

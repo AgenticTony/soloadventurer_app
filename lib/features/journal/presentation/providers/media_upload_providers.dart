@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart' show sharedPreferencesProvider;
 import '../../data/models/upload_task.dart';
 import '../../data/services/media_upload_service_impl.dart';
 import '../../domain/entities/media_item.dart';
@@ -10,29 +10,14 @@ import '../../domain/services/media_upload_service.dart';
 part 'media_upload_providers.g.dart';
 part 'media_upload_state.dart';
 
-/// Provider for SharedPreferences
-@riverpod
-Future<SharedPreferences> sharedPreferences(Ref ref) async {
-  return await SharedPreferences.getInstance();
-}
-
 /// Provider for MediaUploadService
 @riverpod
 MediaUploadService mediaUploadService(Ref ref) {
-  final prefsAsync = ref.watch(sharedPreferencesProvider);
-
-  // We need to handle the async nature of SharedPreferences
-  // In production, you'd want to handle this more gracefully
-  return prefsAsync.when(
-    data: (prefs) {
-      final client = Supabase.instance.client;
-      return MediaUploadServiceImpl(
-        client: client,
-        prefs: prefs,
-      );
-    },
-    loading: () => throw Exception('SharedPreferences not initialized'),
-    error: (_, __) => throw Exception('Failed to initialize SharedPreferences'),
+  final prefs = ref.watch(sharedPreferencesProvider);
+  final client = Supabase.instance.client;
+  return MediaUploadServiceImpl(
+    client: client,
+    prefs: prefs,
   );
 }
 
@@ -93,6 +78,7 @@ class MediaUploadNotifier extends _$MediaUploadNotifier {
   FutureOr<void> build() async {
     _service = ref.watch(mediaUploadServiceProvider);
     await _service!.initialize();
+    return null;
   }
 
   /// Enqueue a single upload

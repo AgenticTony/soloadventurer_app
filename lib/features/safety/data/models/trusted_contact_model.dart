@@ -7,6 +7,8 @@ part 'trusted_contact_model.g.dart';
 /// Model for [TrustedContact] with JSON serialization
 @freezed
 sealed class TrustedContactModel with _$TrustedContactModel {
+  const TrustedContactModel._(); // Private constructor for custom methods
+
   const factory TrustedContactModel({
     required String id,
     required String userId,

@@ -50,12 +50,15 @@ TrustedContact createTestTrustedContact({
   String phoneNumber = testContactPhone,
   String? email = testContactEmail,
   ContactSource source = ContactSource.phone,
+  String? communityUserId,
   ContactPermission permission = ContactPermission.fullAccess,
   bool locationSharingEnabled = false,
   bool receivesCheckIns = true,
   bool receivesEmergencyAlerts = true,
   DateTime? addedAt,
   DateTime? updatedAt,
+  DateTime? revokedAt,
+  String? notes,
 }) {
   return TrustedContact(
     id: id,
@@ -64,12 +67,15 @@ TrustedContact createTestTrustedContact({
     phoneNumber: phoneNumber,
     email: email,
     source: source,
+    communityUserId: communityUserId,
     permission: permission,
     locationSharingEnabled: locationSharingEnabled,
     receivesCheckIns: receivesCheckIns,
     receivesEmergencyAlerts: receivesEmergencyAlerts,
     addedAt: addedAt ?? testDateTime,
     updatedAt: updatedAt,
+    revokedAt: revokedAt,
+    notes: notes,
   );
 }
 
@@ -277,7 +283,7 @@ LocationUpdate createTestLocationUpdate({
   int? batteryLevel,
   LocationSharingStatus sharingStatus = LocationSharingStatus.active,
   List<String>? sharedWithContactIds,
-  @Default(false) bool isEmergency,
+  bool isEmergency = false,
   String? checkInId,
   String? emergencyAlertId,
   Map<String, dynamic>? metadata,
@@ -309,7 +315,7 @@ List<SafetyStatus> createTestSafetyStatusesList({int count = 3}) {
     count,
     (index) => createTestSafetyStatus(
       id: 'status-$index',
-      createdAt: testDateTime.add(Duration(hours: index)),
+      timestamp: testDateTime.add(Duration(hours: index)),
     ),
   );
 }

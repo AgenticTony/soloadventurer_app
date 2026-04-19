@@ -464,7 +464,7 @@ extension TrustedContactModelPatterns on TrustedContactModel {
 
 /// @nodoc
 @JsonSerializable()
-class _TrustedContactModel implements TrustedContactModel {
+class _TrustedContactModel extends TrustedContactModel {
   const _TrustedContactModel(
       {required this.id,
       required this.userId,
@@ -480,7 +480,8 @@ class _TrustedContactModel implements TrustedContactModel {
       required this.addedAt,
       this.updatedAt,
       this.revokedAt,
-      this.notes});
+      this.notes})
+      : super._();
   factory _TrustedContactModel.fromJson(Map<String, dynamic> json) =>
       _$TrustedContactModelFromJson(json);
 

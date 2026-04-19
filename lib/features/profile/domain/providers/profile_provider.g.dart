@@ -9,7 +9,7 @@ part of 'profile_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
+/// - Converted from `StateNotifier<ProfileDomainState>` to `Notifier<ProfileDomainState>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - build() returns ProfileDomainState not AsyncValue
 /// - Constructor auto-load moved to build() method
@@ -18,14 +18,14 @@ part of 'profile_provider.dart';
 const profileDomainProvider = ProfileDomainProvider._();
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
+/// - Converted from `StateNotifier<ProfileDomainState>` to `Notifier<ProfileDomainState>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - build() returns ProfileDomainState not AsyncValue
 /// - Constructor auto-load moved to build() method
 final class ProfileDomainProvider
     extends $NotifierProvider<ProfileDomain, ProfileDomainState> {
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
+  /// - Converted from `StateNotifier<ProfileDomainState>` to `Notifier<ProfileDomainState>`
   /// - Dependencies injected via ref.watch() in build() method
   /// - build() returns ProfileDomainState not AsyncValue
   /// - Constructor auto-load moved to build() method
@@ -59,7 +59,7 @@ final class ProfileDomainProvider
 String _$profileDomainHash() => r'8dc024b2992ec425dc1b5a266522512f06f515f4';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<ProfileDomainState> to Notifier<ProfileDomainState>
+/// - Converted from `StateNotifier<ProfileDomainState>` to `Notifier<ProfileDomainState>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - build() returns ProfileDomainState not AsyncValue
 /// - Constructor auto-load moved to build() method

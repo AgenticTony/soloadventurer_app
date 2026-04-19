@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,15 +27,20 @@ class UserIdProvider {
   /// - User is not available (returns empty string)
   String getCurrentUserId() {
     try {
-      final authState = _container.read(authProvider);
+      final authStateAsync = _container.read(authProvider);
 
-      // With new AuthState pattern, we directly access fields
-      if (authState.isAuthenticated && authState.user != null) {
-        return authState.user!.id;
-      }
-      return '';
+      // With new AuthState pattern, we need to unwrap the AsyncValue
+      return authStateAsync.when(
+        data: (authState) {
+          if (authState.isAuthenticated && authState.user != null) {
+            return authState.user!.id;
+          }
+          return '';
+        },
+        loading: () => '',
+        error: (_, __) => '',
+      );
     } catch (e) {
-      debugPrint('⚠️ Error getting current user ID: $e');
       return '';
     }
   }

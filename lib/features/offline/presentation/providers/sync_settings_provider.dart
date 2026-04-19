@@ -1,11 +1,10 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 
 part 'sync_settings_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<SyncSettings> to Notifier<SyncSettingsData>
+/// - Converted from `StateNotifier<SyncSettings>` to `Notifier<SyncSettingsData>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - build() returns SyncSettingsData not AsyncValue
 /// - Constructor auto-load moved to build() method
@@ -68,10 +67,8 @@ class SyncSettings extends _$SyncSettings {
         syncOnlyOnWifi: syncOnlyOnWifi,
       );
 
-      debugPrint(
-          'SyncSettings loaded: enabled=$syncEnabled, wifiOnly=$syncOnlyOnWifi');
     } catch (e) {
-      debugPrint('Error loading sync settings: $e');
+    // intentional silent catch
     }
   }
 
@@ -80,9 +77,7 @@ class SyncSettings extends _$SyncSettings {
     try {
       await prefs.setBool(_syncEnabledKey, value);
       state = state.copyWith(syncEnabled: value);
-      debugPrint('Sync enabled updated: $value');
     } catch (e) {
-      debugPrint('Error updating sync enabled: $e');
       rethrow;
     }
   }
@@ -92,9 +87,7 @@ class SyncSettings extends _$SyncSettings {
     try {
       await prefs.setBool(_syncOnlyOnWifiKey, value);
       state = state.copyWith(syncOnlyOnWifi: value);
-      debugPrint('Sync WiFi-only updated: $value');
     } catch (e) {
-      debugPrint('Error updating sync WiFi-only: $e');
       rethrow;
     }
   }
@@ -105,9 +98,7 @@ class SyncSettings extends _$SyncSettings {
       await prefs.remove(_syncEnabledKey);
       await prefs.remove(_syncOnlyOnWifiKey);
       state = const SyncSettingsData();
-      debugPrint('Sync settings reset to defaults');
     } catch (e) {
-      debugPrint('Error resetting sync settings: $e');
       rethrow;
     }
   }

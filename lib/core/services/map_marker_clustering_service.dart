@@ -197,7 +197,6 @@ class MapMarkerClusteringService {
       case ClusteringAlgorithm.kmeans:
         return _kmeansClustering(markers);
       case ClusteringAlgorithm.distance:
-      default:
         return _distanceBasedClustering(markers);
     }
   }
@@ -275,7 +274,6 @@ class MapMarkerClusteringService {
     final List<MapCluster> clusters = [];
     final List<MapMarker> unclustered = [];
     final Map<String, List<MapMarker>> gridCells = {};
-    const Distance distance = Distance();
 
     // Calculate grid boundaries
     double minLat = double.infinity;

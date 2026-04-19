@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
@@ -104,7 +103,6 @@ class UploadSync {
     final Map<int, String> failedOperations = {};
 
     try {
-      debugPrint('📤 UploadSync: Starting to process pending operations...');
 
       // Get pending operations prioritized by priority and age
       final operations = await _syncQueueRepository.getPendingOperations(
@@ -112,7 +110,6 @@ class UploadSync {
       );
 
       if (operations.isEmpty) {
-        debugPrint('📭 UploadSync: No pending operations to process');
         return const UploadSyncResult(
           successCount: 0,
           failureCount: 0,
@@ -120,9 +117,6 @@ class UploadSync {
           duration: Duration.zero,
         );
       }
-
-      debugPrint(
-          '🔄 UploadSync: Processing ${operations.length} operations...');
 
       // Process each operation
       for (int i = 0; i < operations.length; i++) {
@@ -132,8 +126,6 @@ class UploadSync {
           // Mark as processing
           await _syncQueueRepository.markAsProcessing(operation.id);
 
-          debugPrint('🔄 Uploading: ${operation.description}');
-
           // Execute the operation based on entity type and operation type
           final success = await _executeOperation(operation);
 
@@ -141,7 +133,6 @@ class UploadSync {
             // Mark as completed
             await _syncQueueRepository.markAsCompleted(operation.id);
             successCount++;
-            debugPrint('✅ Upload success: ${operation.description}');
           } else {
             // Mark as failed
             await _syncQueueRepository.markAsFailed(
@@ -150,7 +141,6 @@ class UploadSync {
             );
             failureCount++;
             failedOperations[operation.id] = 'Execution returned false';
-            debugPrint('❌ Upload failed: ${operation.description}');
           }
 
           // Notify progress
@@ -164,7 +154,6 @@ class UploadSync {
           );
           failureCount++;
           failedOperations[operation.id] = errorMessage;
-          debugPrint('❌ Upload error: ${operation.description} - $e');
 
           // Notify progress
           onProgress?.call(i + 1, operations.length);
@@ -173,9 +162,6 @@ class UploadSync {
 
       final duration = DateTime.now().difference(startTime);
 
-      debugPrint('✅ UploadSync complete: $successCount succeeded, '
-          '$failureCount failed in ${duration.inSeconds}s');
-
       return UploadSyncResult(
         successCount: successCount,
         failureCount: failureCount,
@@ -183,7 +169,6 @@ class UploadSync {
         duration: duration,
       );
     } catch (e) {
-      debugPrint('❌ UploadSync error: $e');
       rethrow;
     }
   }
@@ -196,8 +181,6 @@ class UploadSync {
   /// Returns [true] if the operation was successful, [false] otherwise.
   Future<bool> processOperation(SyncOperationEntity operation) async {
     try {
-      debugPrint(
-          '🔄 Processing operation immediately: ${operation.description}');
 
       // Mark as processing
       await _syncQueueRepository.markAsProcessing(operation.id);
@@ -207,19 +190,16 @@ class UploadSync {
 
       if (success) {
         await _syncQueueRepository.markAsCompleted(operation.id);
-        debugPrint('✅ Operation processed successfully');
         return true;
       } else {
         await _syncQueueRepository.markAsFailed(
           operation.id,
           'Operation execution returned false',
         );
-        debugPrint('❌ Operation execution failed');
         return false;
       }
     } catch (e) {
       await _syncQueueRepository.markAsFailed(operation.id, e.toString());
-      debugPrint('❌ Operation processing error: $e');
       return false;
     }
   }
@@ -249,11 +229,9 @@ class UploadSync {
         case 'travelpreference':
           return await _executeTravelPreferenceOperation(operation);
         default:
-          debugPrint('⚠️ Unknown entity type: ${operation.entityType}');
           return false;
       }
     } catch (e) {
-      debugPrint('❌ Error executing operation: $e');
       return false;
     }
   }
@@ -269,11 +247,9 @@ class UploadSync {
         case SyncOperationType.delete:
           return await _deleteTrip(operation);
       }
-    } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException executing trip operation: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     } catch (e) {
-      debugPrint('❌ Error executing trip operation: $e');
       return false;
     }
   }
@@ -289,11 +265,9 @@ class UploadSync {
         case SyncOperationType.delete:
           return await _deleteJournal(operation);
       }
-    } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException executing journal operation: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     } catch (e) {
-      debugPrint('❌ Error executing journal operation: $e');
       return false;
     }
   }
@@ -304,20 +278,16 @@ class UploadSync {
       switch (operation.operation) {
         case SyncOperationType.create:
           // User creation typically handled through auth flow
-          debugPrint('⚠️ User creation through sync not supported');
           return false;
         case SyncOperationType.update:
           return await _updateUserProfile(operation);
         case SyncOperationType.delete:
           // User deletion typically handled through auth flow
-          debugPrint('⚠️ User deletion through sync not supported');
           return false;
       }
-    } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException executing user operation: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     } catch (e) {
-      debugPrint('❌ Error executing user operation: $e');
       return false;
     }
   }
@@ -333,14 +303,11 @@ class UploadSync {
           return await _updateTravelPreference(operation);
         case SyncOperationType.delete:
           // Travel preference deletion not typically supported
-          debugPrint('⚠️ Travel preference deletion not supported');
           return false;
       }
-    } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException executing travel preference operation: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     } catch (e) {
-      debugPrint('❌ Error executing travel preference operation: $e');
       return false;
     }
   }
@@ -352,16 +319,14 @@ class UploadSync {
   /// Creates a trip on the server
   Future<bool> _createTrip(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('trips')
           .insert(operation.data)
           .select()
           .single();
 
-      debugPrint('✅ Trip created on server: ${response['id']}');
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException creating trip: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -369,17 +334,15 @@ class UploadSync {
   /// Updates a trip on the server
   Future<bool> _updateTrip(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('trips')
           .update(operation.data)
           .eq('id', operation.entityId)
           .select()
           .single();
 
-      debugPrint('✅ Trip updated on server: ${response['id']}');
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException updating trip: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -392,10 +355,8 @@ class UploadSync {
           .delete()
           .eq('id', operation.entityId);
 
-      debugPrint('✅ Trip deleted on server: ${operation.entityId}');
       return true;
-    } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException deleting trip: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -403,16 +364,14 @@ class UploadSync {
   /// Creates a journal on the server
   Future<bool> _createJournal(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('journal_entries')
           .insert(operation.data)
           .select()
           .single();
 
-      debugPrint('✅ Journal created on server: ${response['id']}');
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException creating journal: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -420,17 +379,15 @@ class UploadSync {
   /// Updates a journal on the server
   Future<bool> _updateJournal(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('journal_entries')
           .update(operation.data)
           .eq('id', operation.entityId)
           .select()
           .single();
 
-      debugPrint('✅ Journal updated on server: ${response['id']}');
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException updating journal: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -443,10 +400,8 @@ class UploadSync {
           .delete()
           .eq('id', operation.entityId);
 
-      debugPrint('✅ Journal deleted on server: ${operation.entityId}');
       return true;
-    } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException deleting journal: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -454,17 +409,25 @@ class UploadSync {
   /// Updates user profile on the server
   Future<bool> _updateUserProfile(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('profiles')
           .update(operation.data)
           .eq('id', operation.entityId)
           .select()
           .single();
 
-      debugPrint('✅ User profile updated on server: ${response['id']}');
+      // Fire-and-forget: trigger embedding regeneration after profile update
+      try {
+        _client.functions.invoke(
+          'generate-profile-embedding',
+          body: {'user_id': operation.entityId},
+        );
+      } catch (_) {
+        // Non-critical — embedding will be regenerated on next profile save
+      }
+
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException updating user profile: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -472,17 +435,14 @@ class UploadSync {
   /// Creates travel preference on the server
   Future<bool> _createTravelPreference(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('travel_preferences')
           .insert(operation.data)
           .select()
           .single();
 
-      debugPrint(
-          '✅ Travel preference created on server: ${response['id']}');
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException creating travel preference: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }
@@ -490,18 +450,15 @@ class UploadSync {
   /// Updates travel preference on the server
   Future<bool> _updateTravelPreference(SyncOperationEntity operation) async {
     try {
-      final response = await _client
+      await _client
           .from('travel_preferences')
           .update(operation.data)
           .eq('id', operation.entityId)
           .select()
           .single();
 
-      debugPrint(
-          '✅ Travel preference updated on server: ${response['id']}');
       return true;
-        } on PostgrestException catch (e) {
-      debugPrint('❌ PostgrestException updating travel preference: ${e.message}');
+    } on PostgrestException catch (_) {
       return false;
     }
   }

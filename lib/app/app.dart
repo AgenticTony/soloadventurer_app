@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:soloadventurer/l10n/app_localizations.dart';
 import 'package:soloadventurer/app/router/go_router_config.dart';
 import 'package:soloadventurer/app/theme/app_theme.dart';
 import 'package:soloadventurer/app/app_lifecycle_sync_manager.dart';
@@ -25,7 +26,6 @@ class NavigationHandler extends ConsumerWidget {
       (previous, current) {
         final request = current.currentRequest;
         if (request == null || request.handled) {
-          debugPrint('[Navigation] No pending navigation request');
           return;
         }
 
@@ -34,15 +34,12 @@ class NavigationHandler extends ConsumerWidget {
 
         try {
           if (request.isBack) {
-            debugPrint('[Navigation] Handling back navigation');
             if (router.canPop()) {
               router.pop();
             } else {
-              debugPrint('[Navigation] Cannot pop - no routes to pop');
               return;
             }
           } else {
-            debugPrint('[Navigation] Handling navigation to ${request.route}');
             // Use go_router's go() method for navigation
             router.go(request.route, extra: request.arguments);
           }
@@ -50,7 +47,6 @@ class NavigationHandler extends ConsumerWidget {
           // Mark the request as handled only if navigation was successful
           ref.read(authNavigationProvider.notifier).markCurrentRequestHandled();
         } catch (e) {
-          debugPrint('[Navigation] Error during navigation: $e');
           // Don't mark as handled if navigation failed
         }
       },
@@ -80,6 +76,8 @@ class App extends ConsumerWidget {
               themeMode: ThemeMode.system,
               debugShowCheckedModeBanner: false,
               routerConfig: router,
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
             ),
           ),
         ),

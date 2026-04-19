@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/core/error/safety_exceptions.dart';
+import 'package:soloadventurer/features/safety/domain/exceptions/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';

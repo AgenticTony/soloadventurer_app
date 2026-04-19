@@ -5,17 +5,14 @@ part 'check_in_state.freezed.dart';
 
 /// Immutable state for Check-In functionality.
 ///
-/// Riverpod 2 Compliant:
+/// Riverpod 3.0 Compliant:
 /// - All fields must be final (enforced by freezed)
-/// - NO getters - all derived values are fields
-/// - isLoading and error are ALWAYS fields on state
-/// - State is NEVER nullable
+/// - Uses sealed class as required by Freezed 3.2.x with Dart 3.10
+/// - Loading/error handled by AsyncNotifier/AsyncValue, NOT state fields
 @freezed
 sealed class CheckInState with _$CheckInState {
+  const CheckInState._();
   const factory CheckInState({
-    /// Loading indicator - always a field on State
-    @Default(false) bool isLoading,
-
     /// Whether a check-in creation is in progress
     @Default(false) bool isCreating,
 
@@ -34,22 +31,19 @@ sealed class CheckInState with _$CheckInState {
     /// Currently selected check-in (for viewing/editing)
     CheckIn? selectedCheckIn,
 
-    /// Error message - always a field on State
-    String? error,
-
-    /// Whether there are any upcoming check-ins (was a getter, now a field)
+    /// Whether there are any upcoming check-ins
     @Default(false) bool hasUpcomingCheckIns,
 
-    /// Whether operations are in progress (was a getter, now a field)
+    /// Whether operations are in progress
     @Default(false) bool isProcessing,
 
-    /// Count of check-ins due within the next hour (was a getter, now a field)
+    /// Count of check-ins due within the next hour
     @Default(0) int dueSoonCount,
 
-    /// Count of missed check-ins (was a getter, now a field)
+    /// Count of missed check-ins
     @Default(0) int missedCount,
 
-    /// Next check-in (if any) - was a getter, now a field
+    /// Next check-in (if any)
     CheckIn? nextCheckIn,
   }) = _CheckInState;
 

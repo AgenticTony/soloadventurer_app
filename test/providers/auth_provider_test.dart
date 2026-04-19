@@ -15,6 +15,9 @@ import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_re
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
+import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
+import 'package:soloadventurer/app/providers/auth_service_providers.dart';
+import 'package:soloadventurer/features/core/infrastructure/providers/core_providers.dart';
 
 // Mocks
 class MockGetCurrentUser extends Mock implements GetCurrentUser {}
@@ -39,6 +42,8 @@ class MockConfirmPasswordReset extends Mock implements ConfirmPasswordReset {}
 class MockLoggingService extends Mock implements LoggingService {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   // Register fallback values for mocktail
   setUpAll(() {
     registerFallbackValue(
@@ -46,8 +51,8 @@ void main() {
     );
   });
 
-  group('AuthNotifier - Riverpod StateNotifier Pattern', () {
-    late AuthNotifier authNotifier;
+  group('AuthNotifier - Riverpod AsyncNotifier Pattern', () {
+    late ProviderContainer container;
     late MockGetCurrentUser mockGetCurrentUser;
     late MockIsSignedIn mockIsSignedIn;
     late MockLoginUseCase mockLoginUseCase;
@@ -71,28 +76,48 @@ void main() {
       mockConfirmPasswordReset = MockConfirmPasswordReset();
       mockLoggingService = MockLoggingService();
 
-      authNotifier = AuthNotifier(
-        getCurrentUser: mockGetCurrentUser,
-        isSignedIn: mockIsSignedIn,
-        login: mockLoginUseCase,
-        signUp: mockSignUp,
-        signOut: mockSignOut,
-        verifyEmail: mockVerifyEmail,
-        resendVerificationEmail: mockResendVerificationEmail,
-        forgotPassword: mockForgotPassword,
-        confirmPasswordReset: mockConfirmPasswordReset,
-        logger: mockLoggingService,
-      );
+      // Default: not signed in
+      when(() => mockIsSignedIn()).thenAnswer((_) async => false);
+      when(() => mockLoggingService.logAuthEvent(
+            event: any(named: 'event'),
+            status: any(named: 'status'),
+            metadata: any(named: 'metadata'),
+          )).thenReturn(null);
+      when(() => mockLoggingService.logError(
+            feature: any(named: 'feature'),
+            error: any(named: 'error'),
+            code: any(named: 'code'),
+            metadata: any(named: 'metadata'),
+            stackTrace: any(named: 'stackTrace'),
+          )).thenReturn(null);
+
+      container = ProviderContainer(overrides: [
+        getCurrentUserUseCaseProvider.overrideWithValue(mockGetCurrentUser),
+        isSignedInUseCaseProvider.overrideWithValue(mockIsSignedIn),
+        loginUseCaseProvider.overrideWithValue(mockLoginUseCase),
+        signUpUseCaseProvider.overrideWithValue(mockSignUp),
+        signOutUseCaseProvider.overrideWithValue(mockSignOut),
+        verifyEmailUseCaseProvider.overrideWithValue(mockVerifyEmail),
+        resendVerificationEmailUseCaseProvider
+            .overrideWithValue(mockResendVerificationEmail),
+        forgotPasswordUseCaseProvider.overrideWithValue(mockForgotPassword),
+        confirmPasswordResetUseCaseProvider
+            .overrideWithValue(mockConfirmPasswordReset),
+        loggingServiceProvider.overrideWithValue(mockLoggingService),
+        tokenManagerProvider.overrideWith(() => _FakeTokenManager()),
+      ]);
     });
 
-    test('initial state is AsyncValue.data with initial AuthState', () {
-      expect(
-        authNotifier.state,
-        isA<AsyncValue<AuthState>>()
-            .having((state) => state.value?.isAuthenticated, 'isAuthenticated',
-                false)
-            .having((state) => state.value?.user, 'user', null),
-      );
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('initial state is AsyncValue.data with unauthenticated AuthState',
+        () async {
+      // Wait for the async build to complete
+      final state = await container.read(authProvider.future);
+      expect(state.isAuthenticated, false);
+      expect(state.user, isNull);
     });
 
     test('signIn updates state to authenticated on success', () async {
@@ -105,15 +130,11 @@ void main() {
 
       when(() => mockLoginUseCase(any())).thenAnswer((_) async => user);
 
-      await authNotifier.signIn('test@example.com', 'password');
+      await container.read(authProvider.notifier).signIn('test@example.com', 'password');
 
-      expect(
-        authNotifier.state,
-        isA<AsyncValue<AuthState>>()
-            .having((state) => state.value?.isAuthenticated, 'isAuthenticated',
-                true)
-            .having((state) => state.value?.user, 'user', user),
-      );
+      final state = await container.read(authProvider.future);
+      expect(state.isAuthenticated, true);
+      expect(state.user, user);
     });
 
     test('signOut returns to initial state', () async {
@@ -126,46 +147,33 @@ void main() {
       );
 
       when(() => mockLoginUseCase(any())).thenAnswer((_) async => user);
-
-      await authNotifier.signIn('test@example.com', 'pass');
-
       when(() => mockSignOut()).thenAnswer((_) async => Future.value());
 
-      await authNotifier.signOut();
+      await container.read(authProvider.notifier).signIn('test@example.com', 'pass');
+      await container.read(authProvider.notifier).signOut();
 
-      expect(
-        authNotifier.state,
-        isA<AsyncValue<AuthState>>()
-            .having((state) => state.value?.isAuthenticated, 'isAuthenticated',
-                false)
-            .having((state) => state.value?.user, 'user', null),
-      );
+      final state = await container.read(authProvider.future);
+      expect(state.isAuthenticated, false);
+      expect(state.user, isNull);
     });
 
     test('error state is set on signIn failure', () async {
       when(() => mockLoginUseCase(any()))
           .thenThrow(Exception('Invalid credentials'));
 
-      await authNotifier.signIn('test@example.com', 'wrong');
+      await container.read(authProvider.notifier).signIn('test@example.com', 'wrong');
 
-      expect(
-        authNotifier.state,
-        isA<AsyncValue<AuthState>>()
-            .having((state) => state.hasError, 'hasError', true)
-            .having((state) => state.error.toString(), 'error',
-                contains('Invalid credentials')),
-      );
+      final asyncState = container.read(authProvider);
+      expect(asyncState.hasError, true);
+      expect(asyncState.error.toString(), contains('Invalid credentials'));
     });
 
-    test('state uses AsyncValue wrapper - NOT direct state access', () {
+    test('state uses AsyncValue wrapper - NOT direct state access', () async {
       // This test validates that we're using AsyncValue, not direct state access
-      // If someone changes to StateNotifier<AuthState>, this would fail
-      expect(authNotifier.state, isA<AsyncValue<AuthState>>());
-
-      // AsyncValue has these methods, raw state doesn't
-      expect(authNotifier.state.hasValue, isA<bool>());
-      expect(authNotifier.state.isLoading, isA<bool>());
-      expect(authNotifier.state.hasError, isA<bool>());
+      final asyncState = container.read(authProvider);
+      expect(asyncState, isA<AsyncValue<AuthState>>());
+      expect(asyncState.hasValue, isA<bool>());
+      expect(asyncState.hasError, isA<bool>());
     });
 
     test('AuthState is immutable - copyWith creates new instance', () {
@@ -197,17 +205,34 @@ void main() {
       });
 
       // Start the operation
-      final future = authNotifier.signIn('test@example.com', 'password');
+      final future = container.read(authProvider.notifier).signIn('test@example.com', 'password');
 
       // Check that we're in loading state
-      expect(authNotifier.state.isLoading, true);
+      expect(container.read(authProvider).isLoading, true);
 
       // Wait for completion
       await future;
 
       // Check that we're done loading
-      expect(authNotifier.state.isLoading, false);
-      expect(authNotifier.state.value?.isAuthenticated, true);
+      final finalState = container.read(authProvider);
+      expect(finalState.isLoading, false);
+      expect(finalState.hasValue, true);
+      expect(finalState.value?.isAuthenticated, true);
     });
   });
+}
+
+// Fake TokenManager for testing purposes
+class _FakeTokenManager extends TokenManager {
+  @override
+  FeatureAvailability build() => FeatureAvailability.fullyAvailable;
+
+  @override
+  Future<void> refreshState() async {}
+
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<void> refreshToken() async {}
 }

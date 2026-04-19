@@ -1,4 +1,3 @@
-import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/notifications/data/datasources/notification_local_data_source.dart';
 import 'package:soloadventurer/features/notifications/data/models/notification_model.dart';
 import 'package:soloadventurer/features/notifications/data/models/notification_preferences_model.dart';
@@ -10,12 +9,10 @@ import 'package:uuid/uuid.dart';
 /// Implementation of [NotificationRepository]
 class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationLocalDataSource _localDataSource;
-  final ConnectivityService _connectivityService;
   final Uuid _uuid = const Uuid();
 
   NotificationRepositoryImpl(
     this._localDataSource,
-    this._connectivityService,
   );
 
   @override

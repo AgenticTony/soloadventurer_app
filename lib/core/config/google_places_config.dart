@@ -1,31 +1,17 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'secure_keys.dart';
 
 /// Configuration class for Google Places API settings
 ///
 /// This class provides access to Google Places API configuration
-/// values loaded from environment variables via flutter_dotenv.
-///
-/// Required environment variable:
-/// - GOOGLE_PLACES_API_KEY: Your Google Places API key from Google Cloud Console
-///
-/// To get an API key:
-/// 1. Go to https://console.cloud.google.com/
-/// 2. Create a new project or select existing one
-/// 3. Enable "Places API" from the API library
-/// 4. Create credentials (API Key) with appropriate restrictions
-/// 5. Add the key to your .env file
+/// values loaded via [SecureKeys] (--dart-define or .env fallback).
 class GooglePlacesConfig {
-  /// Google Places API key for accessing the Places API
+  /// Google Places API key for accessing the Places API.
   ///
-  /// This key is required for the google_places_flutter package
-  /// to provide location autocomplete and place details.
-  static String get apiKey => dotenv.env['GOOGLE_PLACES_API_KEY'] ?? '';
+  /// Priority: --dart-define > .env > empty string.
+  static String get apiKey => SecureKeys.googlePlacesApiKey;
 
-  /// Base URL for Google Places API (for reference, not used directly)
-  ///
-  /// The google_places_flutter package handles API calls internally.
-  /// This is provided for reference or custom implementations.
-  static const String baseUrl = 'https://maps.googleapis.com/maps/api/place';
+  /// Base URL for Google Places API (New)
+  static const String baseUrl = 'https://places.googleapis.com/v1';
 
   /// Validates that the Google Places API key is present and non-empty
   ///

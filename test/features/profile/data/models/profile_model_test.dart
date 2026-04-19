@@ -7,6 +7,8 @@ void main() {
   final tProfileModel = ProfileModel(
     id: 'test_id',
     userId: 'test_user_id',
+    username: 'testuser',
+    email: 'test@example.com',
     displayName: 'Test User',
     bio: 'Test bio',
     createdAt: DateTime(2024),
@@ -19,8 +21,11 @@ void main() {
   final tProfileJson = {
     'id': 'test_id',
     'userId': 'test_user_id',
+    'username': 'testuser',
+    'email': 'test@example.com',
     'displayName': 'Test User',
     'bio': 'Test bio',
+    'avatarUrl': null,
     'createdAt': '2024-01-01T00:00:00.000',
     'updatedAt': '2024-01-01T00:00:00.000',
     'preferences': {'theme': 'dark'},

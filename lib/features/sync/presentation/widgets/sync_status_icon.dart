@@ -102,9 +102,10 @@ class SyncOperationStatusIcon extends StatelessWidget {
           },
           onEnd: () {
             // Animation loops infinitely by rebuilding
-            if (status == SyncOperationStatus.syncing) {
-              (context as Element).markNeedsBuild();
-            }
+            // Note: onEnd cannot access builder's context, so this
+            // approach does not work for StatelessWidget. The animation
+            // will play once per widget build. For continuous animation,
+            // convert to a StatefulWidget or use an AnimationController.
           },
         ),
       );
@@ -213,9 +214,10 @@ class SyncOperationStatusIndicator extends StatelessWidget {
       },
       onEnd: () {
         // Animation loops
-        if (status == SyncOperationStatus.syncing) {
-          (context as Element).markNeedsBuild();
-        }
+        // Note: onEnd cannot access builder's context, so this
+        // approach does not work for StatelessWidget. The animation
+        // will play once per widget build. For continuous animation,
+        // convert to a StatefulWidget or use an AnimationController.
       },
     );
   }

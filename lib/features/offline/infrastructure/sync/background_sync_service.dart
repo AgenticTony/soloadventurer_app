@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:workmanager/workmanager.dart';
-import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
 
 /// Background sync service using Workmanager
 ///
@@ -36,12 +34,6 @@ class BackgroundSyncService {
   /// Workmanager task name for immediate sync
   static const String immediateSyncTaskName = 'immediateSyncTask';
 
-  /// Sync manager for triggering sync operations
-  final SyncManager _syncManager;
-
-  /// Connectivity service for checking network availability
-  final ConnectivityService _connectivityService;
-
   /// Whether the service is initialized
   bool _isInitialized = false;
 
@@ -64,15 +56,12 @@ class BackgroundSyncService {
   /// [periodicSyncInterval] - Interval for periodic sync (default: 15 min, min: 15 min)
   /// [initialDelay] - Initial delay before first sync (default: 5 min)
   BackgroundSyncService({
-    required SyncManager syncManager,
-    required ConnectivityService connectivityService,
     this.periodicSyncInterval = const Duration(minutes: 15),
     this.initialDelay = const Duration(minutes: 5),
-  })  : _syncManager = syncManager,
-        _connectivityService = connectivityService {
+  }) {
     // Workmanager requires minimum 15 minute interval
     if (periodicSyncInterval.inMinutes < 15) {
-      debug.warn(
+      Debug.warn(
         '$_tag: Periodic sync interval must be at least 15 minutes. '
         'Using 15 minutes instead of ${periodicSyncInterval.inMinutes} minutes.',
       );
@@ -95,30 +84,29 @@ class BackgroundSyncService {
   /// Returns [true] if initialization was successful.
   Future<bool> initialize() async {
     if (_isInitialized) {
-      debug.info('$_tag: Already initialized, skipping...');
+      Debug.info('$_tag: Already initialized, skipping...');
       return true;
     }
 
     try {
-      debug.info('$_tag: Initializing background sync service...');
+      Debug.info('$_tag: Initializing background sync service...');
 
       // Initialize workmanager
       await Workmanager().initialize(
         _callbackDispatcher,
-        isInDebugMode: kDebugMode,
       );
 
       // Schedule periodic sync task
       await schedulePeriodicSync();
 
       _isInitialized = true;
-      debug.info('$_tag: ✅ Initialized successfully');
-      debug.info('$_tag: Periodic sync scheduled every $periodicSyncInterval');
+      Debug.info('$_tag: ✅ Initialized successfully');
+      Debug.info('$_tag: Periodic sync scheduled every $periodicSyncInterval');
 
       return true;
     } catch (e, stack) {
-      debug.error('$_tag: ❌ Failed to initialize: $e');
-      debug.error('$_tag: Stack: $stack');
+      Debug.error('$_tag: ❌ Failed to initialize: $e');
+      Debug.error('$_tag: Stack: $stack');
       return false;
     }
   }
@@ -132,7 +120,7 @@ class BackgroundSyncService {
   /// - Reschedule itself for the next interval
   Future<void> schedulePeriodicSync() async {
     if (!_isEnabled) {
-      debug.info('$_tag: Background sync is disabled, not scheduling tasks');
+      Debug.info('$_tag: Background sync is disabled, not scheduling tasks');
       return;
     }
 
@@ -163,11 +151,11 @@ class BackgroundSyncService {
             BackoffPolicy.exponential, // Retry with exponential backoff
       );
 
-      debug.info('$_tag: ✅ Periodic sync task scheduled every $interval');
-      debug.info(
+      Debug.info('$_tag: ✅ Periodic sync task scheduled every $interval');
+      Debug.info(
           '$_tag: Constraints: Connected, Battery Not Low, Storage Not Low');
     } catch (e) {
-      debug.error('$_tag: ❌ Failed to schedule periodic sync: $e');
+      Debug.error('$_tag: ❌ Failed to schedule periodic sync: $e');
       rethrow;
     }
   }
@@ -178,7 +166,7 @@ class BackgroundSyncService {
   /// constraints are met (e.g., when network becomes available).
   Future<void> scheduleImmediateSync() async {
     if (!_isEnabled) {
-      debug.info(
+      Debug.info(
           '$_tag: Background sync is disabled, not scheduling immediate task');
       return;
     }
@@ -198,9 +186,9 @@ class BackgroundSyncService {
         existingWorkPolicy: ExistingWorkPolicy.keep, // Don't replace existing
       );
 
-      debug.info('$_tag: ✅ Immediate sync task scheduled');
+      Debug.info('$_tag: ✅ Immediate sync task scheduled');
     } catch (e) {
-      debug.error('$_tag: ❌ Failed to schedule immediate sync: $e');
+      Debug.error('$_tag: ❌ Failed to schedule immediate sync: $e');
       rethrow;
     }
   }
@@ -212,9 +200,9 @@ class BackgroundSyncService {
   Future<void> cancelAllTasks() async {
     try {
       await Workmanager().cancelAll();
-      debug.info('$_tag: ✅ All background tasks cancelled');
+      Debug.info('$_tag: ✅ All background tasks cancelled');
     } catch (e) {
-      debug.error('$_tag: ❌ Failed to cancel tasks: $e');
+      Debug.error('$_tag: ❌ Failed to cancel tasks: $e');
       rethrow;
     }
   }
@@ -227,9 +215,9 @@ class BackgroundSyncService {
     try {
       // Use cancelByTag with the task name
       await Workmanager().cancelByTag(periodicSyncTaskName);
-      debug.info('$_tag: ✅ Periodic sync task cancelled');
+      Debug.info('$_tag: ✅ Periodic sync task cancelled');
     } catch (e) {
-      debug.error('$_tag: ❌ Failed to cancel periodic sync: $e');
+      Debug.error('$_tag: ❌ Failed to cancel periodic sync: $e');
       rethrow;
     }
   }
@@ -240,13 +228,13 @@ class BackgroundSyncService {
   /// if the service was previously disabled.
   Future<void> enable() async {
     if (_isEnabled) {
-      debug.info('$_tag: Background sync already enabled');
+      Debug.info('$_tag: Background sync already enabled');
       return;
     }
 
     _isEnabled = true;
     await schedulePeriodicSync();
-    debug.info('$_tag: ✅ Background sync enabled');
+    Debug.info('$_tag: ✅ Background sync enabled');
   }
 
   /// Disables background sync
@@ -255,13 +243,13 @@ class BackgroundSyncService {
   /// all tasks. The service can be re-enabled later.
   Future<void> disable() async {
     if (!_isEnabled) {
-      debug.info('$_tag: Background sync already disabled');
+      Debug.info('$_tag: Background sync already disabled');
       return;
     }
 
     _isEnabled = false;
     await cancelAllTasks();
-    debug.info('$_tag: ⏸️ Background sync disabled');
+    Debug.info('$_tag: ⏸️ Background sync disabled');
   }
 
   /// Callback dispatcher for background tasks
@@ -273,7 +261,7 @@ class BackgroundSyncService {
   @pragma('vm:entry-point')
   static void _callbackDispatcher() {
     Workmanager().executeTask((task, inputData) async {
-      debug.info('$_tag: 📱 Background task triggered: $task');
+      Debug.info('$_tag: 📱 Background task triggered: $task');
 
       try {
         switch (task) {
@@ -283,12 +271,12 @@ class BackgroundSyncService {
             return await _executeBackgroundSync(task);
 
           default:
-            debug.warn('$_tag: ⚠️ Unknown task: $task');
+            Debug.warn('$_tag: ⚠️ Unknown task: $task');
             return false;
         }
       } catch (e, stack) {
-        debug.error('$_tag: ❌ Background task failed: $e');
-        debug.error('$_tag: Stack: $stack');
+        Debug.error('$_tag: ❌ Background task failed: $e');
+        Debug.error('$_tag: Stack: $stack');
         return false;
       }
     });
@@ -307,7 +295,7 @@ class BackgroundSyncService {
       // So we need to reinitialize services or use a different approach
       // For now, this is a placeholder that shows the structure
 
-      debug.info('$_tag: Checking connectivity...');
+      Debug.info('$_tag: Checking connectivity...');
 
       // TODO: Initialize services in background isolate
       // This requires either:
@@ -316,8 +304,8 @@ class BackgroundSyncService {
       // 3. Using platform channel to trigger sync in main isolate (limited)
 
       // For now, log the intent and return true to mark task as successful
-      debug.info('$_tag: 📊 Background sync would run here');
-      debug.info(
+      Debug.info('$_tag: 📊 Background sync would run here');
+      Debug.info(
           '$_tag: ℹ️ Full implementation requires cross-isolate communication');
 
       // Placeholder: Simulate successful sync
@@ -329,11 +317,11 @@ class BackgroundSyncService {
 
       await Future.delayed(const Duration(seconds: 2)); // Simulate work
 
-      debug.info('$_tag: ✅ Background task completed: $taskName');
+      Debug.info('$_tag: ✅ Background task completed: $taskName');
       return true;
     } catch (e, stack) {
-      debug.error('$_tag: ❌ Background sync execution failed: $e');
-      debug.error('$_tag: Stack: $stack');
+      Debug.error('$_tag: ❌ Background sync execution failed: $e');
+      Debug.error('$_tag: Stack: $stack');
       return false;
     }
   }
@@ -342,13 +330,13 @@ class BackgroundSyncService {
   ///
   /// Call this when the service is no longer needed.
   void dispose() {
-    debug.info('$_tag: Disposing background sync service');
+    Debug.info('$_tag: Disposing background sync service');
     _isInitialized = false;
   }
 }
 
 /// Debug logging utilities
-class debug {
+class Debug {
   static void info(String message) {
     if (kDebugMode) {
       print('[INFO] $message');

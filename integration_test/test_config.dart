@@ -1,12 +1,52 @@
+import 'package:flutter/foundation.dart';
+
 /// Configuration for integration tests
+///
+/// **WARNING:** This file contains test credentials and should NEVER
+/// be used in production builds. All constants are guarded by [kDebugMode].
 class TestConfig {
+  TestConfig._();
+
+  static bool get _debugGuard {
+    if (kReleaseMode) {
+      throw StateError(
+        'TestConfig must not be used in release builds. '
+        'This indicates a misconfigured build.',
+      );
+    }
+    return true;
+  }
+
   /// The base URL for the API in test mode
-  static const String apiBaseUrl = 'https://api-test.soloadventurer.com';
+  static String get apiBaseUrl {
+    assert(_debugGuard);
+    return 'https://api-test.soloadventurer.com';
+  }
 
   /// Test user credentials
-  static const String testEmail = 'test@example.com';
-  static const String testPassword = 'password123';
-  static const String testName = 'Test User';
+  static String get testEmail {
+    assert(_debugGuard);
+    return 'test@example.com';
+  }
+
+  static String get testPassword {
+    assert(_debugGuard);
+    return 'password123';
+  }
+
+  static String get testName => 'Test User';
+
+  /// Simulated network delay for mock repositories
+  static Duration get stepDelay {
+    assert(_debugGuard);
+    return const Duration(milliseconds: 10);
+  }
+
+  /// Generate a unique test email address
+  static String generateTestEmail() {
+    assert(_debugGuard);
+    return 'test_${DateTime.now().millisecondsSinceEpoch}@example.com';
+  }
 
   /// API endpoints
   static const String loginEndpoint = '/auth/login';
@@ -19,30 +59,4 @@ class TestConfig {
   static const String authTokenKey = 'auth_token';
   static const String refreshTokenKey = 'refresh_token';
   static const String userDataKey = 'user_data';
-
-  /// Timing configurations for tests
-  static const Duration stepDelay = Duration(milliseconds: 100);
-  static const Duration defaultUiDelay = Duration(milliseconds: 300);
-  static const Duration maxWaitTime = Duration(seconds: 30);
-  static const bool verboseLogging = false;
-
-  /// Valid test passwords
-  static const List<String> validPasswords = [
-    'password123',
-    'Test@1234',
-    'SecurePass!2024',
-    'TravelSafe2024',
-  ];
-
-  /// Generates a random test email address
-  static String generateTestEmail() {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    return 'test$timestamp@example.com';
-  }
-
-  /// Generates a random test user ID
-  static String generateTestUserId() {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    return 'user_$timestamp';
-  }
 }

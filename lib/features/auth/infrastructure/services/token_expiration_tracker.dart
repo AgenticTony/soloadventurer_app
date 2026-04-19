@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
+import 'package:clock/clock.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
@@ -33,7 +33,7 @@ class TokenExpirationResult {
   factory TokenExpirationResult.expired({
     required DateTime expirationTime,
   }) {
-    final now = DateTime.now();
+    final now = clock.now();
     return TokenExpirationResult(
       isExpired: true,
       shouldRefresh: true,
@@ -133,7 +133,6 @@ class TokenExpirationTracker {
   /// This will schedule a refresh at 75% of the token lifetime.
   /// If a refresh is already scheduled, it will be cancelled and rescheduled.
   void startTracking(AuthSession session) {
-    debugPrint('TokenExpirationTracker: Starting to track token expiration');
 
     _currentSession = session;
     _isMonitoring = true;
@@ -146,15 +145,11 @@ class TokenExpirationTracker {
 
     if (result.shouldRefresh) {
       // Token is already expired or should be refreshed now
-      debugPrint(
-          'TokenExpirationTracker: Token should be refreshed immediately');
       _scheduleRefresh(Duration.zero);
     } else if (result.timeUntilRefresh != null) {
       // Schedule refresh for the future
       _scheduleRefresh(result.timeUntilRefresh!);
     } else {
-      debugPrint(
-          'TokenExpirationTracker: No expiration information, cannot schedule refresh');
     }
   }
 
@@ -162,7 +157,6 @@ class TokenExpirationTracker {
   ///
   /// This will cancel any pending refresh operations.
   void stopTracking() {
-    debugPrint('TokenExpirationTracker: Stopping token expiration tracking');
 
     _isMonitoring = false;
     _currentSession = null;
@@ -176,11 +170,10 @@ class TokenExpirationTracker {
   /// expiration status and whether it should be refreshed.
   TokenExpirationResult checkExpiration(AuthSession session) {
     final expirationTime = session.expiresAt;
-    final now = DateTime.now();
+    final now = clock.now();
 
     // Edge case: missing expiration time
     if (expirationTime == DateTime(0)) {
-      debugPrint('TokenExpirationTracker: No expiration time available');
       return TokenExpirationResult.noExpiration();
     }
 
@@ -189,8 +182,6 @@ class TokenExpirationTracker {
 
     // Check if token is already expired
     if (timeUntilExpiration.isNegative) {
-      debugPrint(
-          'TokenExpirationTracker: Token is expired (expired at $expirationTime)');
       return TokenExpirationResult.expired(expirationTime: expirationTime);
     }
 
@@ -209,8 +200,6 @@ class TokenExpirationTracker {
 
     // Check if we should refresh now
     if (timeUntilRefresh.isNegative) {
-      debugPrint('TokenExpirationTracker: Token should be refreshed now '
-          '(expires in ${timeUntilExpiration.inMinutes} minutes)');
 
       return TokenExpirationResult.shouldRefreshNow(
         expirationTime: expirationTime,
@@ -220,9 +209,6 @@ class TokenExpirationTracker {
     }
 
     // Token is still valid
-    debugPrint(
-        'TokenExpirationTracker: Token is valid, refresh in ${timeUntilRefresh.inMinutes} minutes '
-        '(expires in ${timeUntilExpiration.inMinutes} minutes)');
 
     return TokenExpirationResult.valid(
       expirationTime: expirationTime,
@@ -242,7 +228,7 @@ class TokenExpirationTracker {
       return null;
     }
 
-    return expirationTime.difference(DateTime.now());
+    return expirationTime.difference(clock.now());
   }
 
   /// Checks if a token is expired
@@ -270,12 +256,9 @@ class TokenExpirationTracker {
 
     if (delay == Duration.zero) {
       // Refresh immediately
-      debugPrint('TokenExpirationTracker: Triggering immediate refresh');
       _performRefresh();
     } else {
       // Schedule refresh for the future
-      debugPrint(
-          'TokenExpirationTracker: Scheduling refresh in ${delay.inMinutes} minutes');
       _refreshTimer = Timer(delay, _performRefresh);
     }
   }
@@ -283,15 +266,12 @@ class TokenExpirationTracker {
   /// Performs the token refresh operation
   Future<void> _performRefresh() async {
     if (!_isMonitoring || _currentSession == null) {
-      debugPrint('TokenExpirationTracker: Not monitoring, skipping refresh');
       return;
     }
 
     // Check if we're still within the refresh window
     final result = checkExpiration(_currentSession!);
     if (!result.shouldRefresh) {
-      debugPrint(
-          'TokenExpirationTracker: Token was refreshed by another operation, rescheduling');
       // Reschedule based on new timing
       if (result.timeUntilRefresh != null) {
         _scheduleRefresh(result.timeUntilRefresh!);
@@ -299,32 +279,22 @@ class TokenExpirationTracker {
       return;
     }
 
-    debugPrint('TokenExpirationTracker: Performing token refresh');
-
     try {
       // Use the TokenRefreshService to perform the refresh
       final newSession = await _refreshService.refreshToken();
 
-      debugPrint('TokenExpirationTracker: Token refresh successful');
-
       // Update the current session and reschedule
       _currentSession = newSession;
       startTracking(newSession);
-    } on AuthException catch (e) {
-      debugPrint('TokenExpirationTracker: Token refresh failed: ${e.message}');
+    } on AuthException catch (_) {
 
       // Retry with exponential backoff
       final retryDelay = _calculateRetryDelay();
-      debugPrint(
-          'TokenExpirationTracker: Scheduling retry in ${retryDelay.inSeconds} seconds');
       _scheduleRefresh(retryDelay);
     } catch (e) {
-      debugPrint('TokenExpirationTracker: Unexpected error during refresh: $e');
 
       // Retry with exponential backoff
       final retryDelay = _calculateRetryDelay();
-      debugPrint(
-          'TokenExpirationTracker: Scheduling retry in ${retryDelay.inSeconds} seconds');
       _scheduleRefresh(retryDelay);
     }
   }
@@ -333,7 +303,6 @@ class TokenExpirationTracker {
   Duration _calculateRetryDelay() {
     // Simple exponential backoff: 30s, 60s, 120s, 300s (5 min max)
     const baseDelay = Duration(seconds: 30);
-    const maxDelay = Duration(minutes: 5);
 
     // For now, use a fixed delay. In a more sophisticated implementation,
     // we could track the number of consecutive failures and increase delay.
@@ -346,20 +315,17 @@ class TokenExpirationTracker {
   /// This will reschedule the refresh timer based on the new expiration time.
   void updateSession(AuthSession session) {
     if (_isMonitoring) {
-      debugPrint('TokenExpirationTracker: Updating tracked session');
       startTracking(session);
     }
   }
 
   /// Disposes of the tracker and cancels any pending operations
   void dispose() {
-    debugPrint('TokenExpirationTracker: Disposing tracker');
     stopTracking();
   }
 
   /// Resets the tracker state (useful for testing)
   void reset() {
-    debugPrint('TokenExpirationTracker: Resetting tracker state');
     stopTracking();
   }
 }

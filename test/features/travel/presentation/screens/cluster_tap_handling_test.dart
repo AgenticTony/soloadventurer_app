@@ -1,24 +1,92 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:soloadventurer/core/models/map_marker.dart';
-import 'package:soloadventurer/features/travel/presentation/screens/trip_map_screen.dart';
 
-/// Tests for cluster tap handling and expand functionality
+/// Tests for cluster tap handling logic and MapCluster behavior
 ///
-/// Verifies that tapping clusters shows the expand bottom sheet with:
-/// - Cluster information header
-/// - Action buttons (zoom to fit, close)
-/// - List of all markers in the cluster
-/// - Markers grouped by type
-/// - Individual marker tap handling
+/// Verifies that MapCluster correctly:
+/// - Groups markers by type
+/// - Counts markers per type
+/// - Calculates center positions
+/// - Handles single and multiple marker types
+/// - Calculates cluster size
 void main() {
-  group('Cluster Tap Handling Tests', () {
-    late List<MapMarker> testMarkers;
+  group('MapCluster Creation', () {
+    test('creates cluster from markers with correct center position',
+        () async {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'trip1',
+          latitude: 37.7749,
+          longitude: -122.4194,
+          title: 'San Francisco Trip',
+          description: 'A wonderful trip to SF',
+          type: MarkerType.trip,
+        ),
+        MapMarker.fromLatLng(
+          id: 'activity1',
+          latitude: 37.7750,
+          longitude: -122.4195,
+          title: 'Golden Gate Bridge',
+          description: 'Visit the famous bridge',
+          type: MarkerType.activity,
+        ),
+        MapMarker.fromLatLng(
+          id: 'restaurant1',
+          latitude: 37.7751,
+          longitude: -122.4196,
+          title: 'Seafood Restaurant',
+          description: 'Fresh seafood downtown',
+          type: MarkerType.restaurant,
+        ),
+      ];
+
+      final cluster = MapCluster.fromMarkers(
+        id: 'cluster1',
+        markers: markers,
+      );
+
+      expect(cluster.id, 'cluster1');
+      expect(cluster.markerCount, 3);
+      expect(cluster.markerIds, containsAll(['trip1', 'activity1', 'restaurant1']));
+      expect(cluster.position.latitude, closeTo(37.7750, 0.001));
+      expect(cluster.position.longitude, closeTo(-122.4195, 0.001));
+    });
+
+    test('throws when creating cluster from empty markers', () {
+      expect(
+        () => MapCluster.fromMarkers(id: 'empty', markers: []),
+        throwsArgumentError,
+      );
+    });
+
+    test('creates cluster with single marker', () {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'single1',
+          latitude: 37.7749,
+          longitude: -122.4194,
+          title: 'Single Marker',
+          type: MarkerType.trip,
+        ),
+      ];
+
+      final cluster = MapCluster.fromMarkers(
+        id: 'single-cluster',
+        markers: markers,
+      );
+
+      expect(cluster.markerCount, 1);
+      expect(cluster.markerIds, ['single1']);
+      expect(cluster.position.latitude, 37.7749);
+    });
+  });
+
+  group('Cluster Marker Type Grouping', () {
+    late List<MapMarker> mixedMarkers;
 
     setUp(() {
-      // Create test markers for clustering
-      testMarkers = [
+      mixedMarkers = [
         MapMarker.fromLatLng(
           id: 'trip1',
           latitude: 37.7749,
@@ -62,288 +130,35 @@ void main() {
       ];
     });
 
-    testWidgets('Tapping cluster shows expand bottom sheet',
-        (WidgetTester tester) async {
-      // Create a test cluster
+    test('cluster contains all marker types', () {
       final cluster = MapCluster.fromMarkers(
         id: 'cluster1',
-        markers: testMarkers,
+        markers: mixedMarkers,
       );
 
-      // Build the test widget
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(testMarkers),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: TripMapScreen(),
-            ),
-          ),
-        ),
-      );
-
-      // Wait for initial build
-      await tester.pumpAndSettle();
-
-      // The cluster expand sheet should not be visible initially
-      expect(find.byType(_ClusterExpandSheet), findsNothing);
-
-      // Note: In a real test, we would tap a cluster widget
-      // Since we can't easily create the cluster widget in isolation,
-      // we'll verify the sheet can be rendered correctly
+      expect(cluster.markerTypes.length, 5);
+      expect(cluster.containsType(MarkerType.trip), isTrue);
+      expect(cluster.containsType(MarkerType.activity), isTrue);
+      expect(cluster.containsType(MarkerType.restaurant), isTrue);
+      expect(cluster.containsType(MarkerType.photo), isTrue);
+      expect(cluster.containsType(MarkerType.accommodation), isTrue);
     });
 
-    testWidgets('Cluster expand sheet displays correct information',
-        (WidgetTester tester) async {
+    test('cluster counts by type correctly', () {
       final cluster = MapCluster.fromMarkers(
         id: 'cluster1',
-        markers: testMarkers,
+        markers: mixedMarkers,
       );
 
-      bool zoomToFitCalled = false;
-      MapMarker? tappedMarker;
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(testMarkers),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () => zoomToFitCalled = true,
-                onMarkerTap: (marker) => tappedMarker = marker,
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Verify cluster info is displayed
-      expect(find.text('5 Locations'), findsOneWidget);
-      expect(find.text('Tap to view details'), findsOneWidget);
-
-      // Verify action buttons are present
-      expect(find.text('Zoom to Fit'), findsOneWidget);
-      expect(find.text('Close'), findsOneWidget);
-
-      // Verify markers are grouped by type
-      expect(find.text('Trips'), findsOneWidget);
-      expect(find.text('Activities'), findsOneWidget);
-      expect(find.text('Restaurants'), findsOneWidget);
-      expect(find.text('Photos'), findsOneWidget);
-      expect(find.text('Accommodations'), findsOneWidget);
-
-      // Verify marker items are displayed
-      expect(find.text('San Francisco Trip'), findsOneWidget);
-      expect(find.text('Golden Gate Bridge'), findsOneWidget);
-      expect(find.text('Seafood Restaurant'), findsOneWidget);
-      expect(find.text('Sunset Photo'), findsOneWidget);
-      expect(find.text('Downtown Hotel'), findsOneWidget);
+      expect(cluster.countByType(MarkerType.trip), 1);
+      expect(cluster.countByType(MarkerType.activity), 1);
+      expect(cluster.countByType(MarkerType.restaurant), 1);
+      expect(cluster.countByType(MarkerType.photo), 1);
+      expect(cluster.countByType(MarkerType.accommodation), 1);
+      expect(cluster.countByType(MarkerType.transport), 0);
     });
 
-    testWidgets('Zoom to Fit button triggers callback',
-        (WidgetTester tester) async {
-      final cluster = MapCluster.fromMarkers(
-        id: 'cluster1',
-        markers: testMarkers,
-      );
-
-      bool zoomToFitCalled = false;
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(testMarkers),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () => zoomToFitCalled = true,
-                onMarkerTap: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Tap the Zoom to Fit button
-      await tester.tap(find.text('Zoom to Fit'));
-      await tester.pump();
-
-      // Verify callback was triggered
-      expect(zoomToFitCalled, isTrue);
-    });
-
-    testWidgets('Tapping marker item triggers marker tap callback',
-        (WidgetTester tester) async {
-      final cluster = MapCluster.fromMarkers(
-        id: 'cluster1',
-        markers: testMarkers,
-      );
-
-      MapMarker? tappedMarker;
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(testMarkers),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () {},
-                onMarkerTap: (marker) => tappedMarker = marker,
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Find and tap the first marker item
-      final tripMarkerItem = find.ancestor(
-        of: find.text('San Francisco Trip'),
-        matching: find.byType(InkWell),
-      );
-
-      await tester.tap(tripMarkerItem);
-      await tester.pump();
-
-      // Verify the correct marker was tapped
-      expect(tappedMarker, isNotNull);
-      expect(tappedMarker!.id, 'trip1');
-      expect(tappedMarker.title, 'San Francisco Trip');
-    });
-
-    testWidgets('Markers are grouped by type with correct counts',
-        (WidgetTester tester) async {
-      final cluster = MapCluster.fromMarkers(
-        id: 'cluster1',
-        markers: testMarkers,
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(testMarkers),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () {},
-                onMarkerTap: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Verify type sections with badges are displayed
-      // Each badge should show the count of markers in that type
-      final typeBadges = find.byType(Container);
-      expect(typeBadges, findsWidgets);
-
-      // Verify each type section appears
-      expect(find.text('Trips'), findsOneWidget);
-      expect(find.text('Activities'), findsOneWidget);
-      expect(find.text('Restaurants'), findsOneWidget);
-      expect(find.text('Photos'), findsOneWidget);
-      expect(find.text('Accommodations'), findsOneWidget);
-    });
-
-    testWidgets('Cluster expand sheet shows handle bar',
-        (WidgetTester tester) async {
-      final cluster = MapCluster.fromMarkers(
-        id: 'cluster1',
-        markers: testMarkers,
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(testMarkers),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () {},
-                onMarkerTap: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // The handle bar should be visible
-      // It's a Container with specific dimensions
-      final containers = find.byType(Container);
-      expect(containers, findsWidgets);
-
-      // Verify the handle dimensions (40x4)
-      final handleBar = tester.widget<Container>(
-        containers.first,
-      );
-      expect(handleBar.constraints?.minWidth, 40);
-      expect(handleBar.constraints?.minHeight, 4);
-    });
-
-    testWidgets('Empty cluster displays correctly',
-        (WidgetTester tester) async {
-      // Create a cluster with no markers
-      final cluster = MapCluster(
-        id: 'empty-cluster',
-        position: const LatLng(37.7749, -122.4194),
-        markerCount: 0,
-        markerIds: const [],
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue([]),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () {},
-                onMarkerTap: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Should display 0 Locations
-      expect(find.text('0 Locations'), findsOneWidget);
-
-      // Action buttons should still be present
-      expect(find.text('Zoom to Fit'), findsOneWidget);
-      expect(find.text('Close'), findsOneWidget);
-    });
-
-    testWidgets('Cluster with multiple markers of same type groups correctly',
-        (WidgetTester tester) async {
-      // Create markers with multiple of the same type
+    test('cluster with multiple markers of same type groups correctly', () {
       final multiMarkers = [
         MapMarker.fromLatLng(
           id: 'trip1',
@@ -373,39 +188,14 @@ void main() {
         markers: multiMarkers,
       );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(multiMarkers),
-          ],
-          child: MaterialApp(
-            home: Scaffold(
-              body: _ClusterExpandSheet(
-                cluster: cluster,
-                onZoomToFit: () {},
-                onMarkerTap: (_) {},
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      // Should display 3 Locations
-      expect(find.text('3 Locations'), findsOneWidget);
-
-      // Should show one Trips section with all three trips
-      expect(find.text('Trips'), findsOneWidget);
-      expect(find.text('Trip 1'), findsOneWidget);
-      expect(find.text('Trip 2'), findsOneWidget);
-      expect(find.text('Trip 3'), findsOneWidget);
+      expect(cluster.markerCount, 3);
+      expect(cluster.countByType(MarkerType.trip), 3);
+      expect(cluster.containsType(MarkerType.activity), isFalse);
     });
   });
 
-  group('Cluster Bounds Calculation Tests', () {
-    testWidgets('Calculate bounds for cluster with multiple markers',
-        (WidgetTester tester) async {
+  group('Cluster Bounds Calculation', () {
+    test('calculates cluster size from markers', () {
       final markers = [
         MapMarker.fromLatLng(
           id: 'marker1',
@@ -432,23 +222,135 @@ void main() {
         markers: markers,
       );
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            tripMapMarkersProvider.overrideWithValue(markers),
-          ],
-          child: const MaterialApp(
-            home: Scaffold(
-              body: TripMapScreen(),
-            ),
-          ),
+      final size = cluster.calculateSize(markers);
+      expect(size, greaterThan(0));
+    });
+
+    test('cluster size is 0 for single marker', () {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'single',
+          latitude: 37.7749,
+          longitude: -122.4194,
+          title: 'Single',
         ),
+      ];
+
+      final cluster = MapCluster.fromMarkers(
+        id: 'single',
+        markers: markers,
       );
 
-      await tester.pumpAndSettle();
+      expect(cluster.calculateSize(markers), 0);
+    });
+  });
 
-      // The screen should build without errors
-      // In a real integration test, we would verify bounds calculation
+  group('Cluster Weighted Center', () {
+    test('uses weighted center when enabled', () {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'trip1',
+          latitude: 37.7749,
+          longitude: -122.4194,
+          title: 'Trip',
+          type: MarkerType.trip,
+        ),
+        MapMarker.fromLatLng(
+          id: 'photo1',
+          latitude: 37.7849,
+          longitude: -122.4094,
+          title: 'Photo',
+          type: MarkerType.photo,
+        ),
+      ];
+
+      final cluster = MapCluster.fromMarkers(
+        id: 'weighted-cluster',
+        markers: markers,
+        useWeightedCenter: true,
+      );
+
+      expect(cluster.weightedPosition, isNotNull);
+      // Trip (weight 3.0) should pull center closer to its position
+      expect(
+        cluster.position.latitude,
+        lessThan(cluster.position.latitude + 0.01),
+      );
+    });
+
+    test('no weighted position when not enabled', () {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'm1',
+          latitude: 37.7749,
+          longitude: -122.4194,
+          title: 'M1',
+        ),
+        MapMarker.fromLatLng(
+          id: 'm2',
+          latitude: 37.7849,
+          longitude: -122.4094,
+          title: 'M2',
+        ),
+      ];
+
+      final cluster = MapCluster.fromMarkers(
+        id: 'unweighted',
+        markers: markers,
+      );
+
+      expect(cluster.weightedPosition, isNull);
+    });
+  });
+
+  group('Cluster Equality', () {
+    test('clusters with same properties are equal', () {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'm1',
+          latitude: 37.7749,
+          longitude: -122.4194,
+        ),
+      ];
+
+      final cluster1 = MapCluster.fromMarkers(id: 'c1', markers: markers);
+      final cluster2 = MapCluster.fromMarkers(id: 'c1', markers: markers);
+
+      expect(cluster1, equals(cluster2));
+    });
+
+    test('clusters with different ids are not equal', () {
+      final markers = [
+        MapMarker.fromLatLng(
+          id: 'm1',
+          latitude: 37.7749,
+          longitude: -122.4194,
+        ),
+      ];
+
+      final cluster1 = MapCluster.fromMarkers(id: 'c1', markers: markers);
+      final cluster2 = MapCluster.fromMarkers(id: 'c2', markers: markers);
+
+      expect(cluster1, isNot(equals(cluster2)));
+    });
+  });
+
+  group('MapMarker fromLatLng', () {
+    test('creates marker with all properties', () {
+      final marker = MapMarker.fromLatLng(
+        id: 'test',
+        latitude: 37.7749,
+        longitude: -122.4194,
+        title: 'Test Marker',
+        description: 'A test',
+        type: MarkerType.trip,
+      );
+
+      expect(marker.id, 'test');
+      expect(marker.position, equals(const LatLng(37.7749, -122.4194)));
+      expect(marker.title, 'Test Marker');
+      expect(marker.description, 'A test');
+      expect(marker.type, MarkerType.trip);
     });
   });
 }

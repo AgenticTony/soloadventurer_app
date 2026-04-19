@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/services/sync_state_persistence.dart';
-import '../../presentation/state/sync_state.dart';
+import '../../domain/state/sync_state.dart';
+import '../../domain/models/sync_status.dart';
 
 /// Implementation of [SyncStatePersistence] using SharedPreferences
 ///
@@ -19,13 +21,19 @@ class SharedPrefsSyncStatePersistence implements SyncStatePersistence {
   @override
   Future<SyncStatePersistenceResult> saveState(SyncState state) async {
     try {
-      final jsonString = state.toJsonString();
+      final jsonString = jsonEncode({
+        'status': state.status.name,
+        'pendingCount': state.pendingCount,
+        'failedCount': state.failedCount,
+        'lastSyncTime': state.lastSyncTime?.toIso8601String(),
+        'error': state.error,
+      });
 
       await _prefs.setString(_stateKey, jsonString);
 
       developer.log(
         'SyncStatePersistence: Saved state (status: ${state.status}, '
-        'queueSize: ${state.queueSize}, hasPending: ${state.hasPendingOperations})',
+        'pendingCount: ${state.pendingCount}, hasPending: ${state.pendingCount > 0})',
         name: 'sync.state_persistence',
       );
 
@@ -56,22 +64,26 @@ class SharedPrefsSyncStatePersistence implements SyncStatePersistence {
         return null;
       }
 
-      final state = SyncState.fromJsonString(jsonString);
+      final decoded = jsonDecode(jsonString) as Map<String, dynamic>;
 
-      if (state == null) {
-        developer.log(
-          'SyncStatePersistence: Persisted state is corrupted, clearing',
-          name: 'sync.state_persistence',
-          level: 900, // WARNING level
-        );
-        // Clear corrupted data
-        await clearState();
-        return null;
-      }
+      final statusName = decoded['status'] as String? ?? 'idle';
+      final lastSyncTimeStr = decoded['lastSyncTime'] as String?;
+      final state = SyncState(
+        status: SyncOperationStatus.values.firstWhere(
+          (s) => s.name == statusName,
+          orElse: () => SyncOperationStatus.idle,
+        ),
+        pendingCount: decoded['pendingCount'] as int? ?? 0,
+        failedCount: decoded['failedCount'] as int? ?? 0,
+        lastSyncTime: lastSyncTimeStr != null
+            ? DateTime.tryParse(lastSyncTimeStr)
+            : null,
+        error: decoded['error'] as String?,
+      );
 
       developer.log(
         'SyncStatePersistence: Loaded state (status: ${state.status}, '
-        'queueSize: ${state.queueSize}, hasPending: ${state.hasPendingOperations})',
+        'pendingCount: ${state.pendingCount})',
         name: 'sync.state_persistence',
       );
 

@@ -4,7 +4,6 @@ import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_so
 import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/refresh_queue_manager.dart';
 
@@ -42,12 +41,17 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Save complete session data including expiresAt
-      await localDataSource.saveAuthData(
-        session.accessToken,
-        session.refreshToken,
-        expiresAt: session.expiresAt,
-        idToken: session.idToken,
-      );
+      try {
+        await localDataSource.saveAuthData(
+          session.accessToken,
+          session.refreshToken,
+          expiresAt: session.expiresAt,
+          idToken: session.idToken,
+        );
+      } catch (storageError) {
+        // Re-throw to fail the whole sign-in
+        rethrow;
+      }
       await localDataSource.cacheUser(user);
       await securityManager.resetLoginAttempts();
       return user;
@@ -67,8 +71,6 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String name,
   }) async {
-    debugPrint('AuthRepositoryImpl: Starting registration');
-    debugPrint('AuthRepositoryImpl: Registering with email: $email');
 
     final (user, needsVerification) = await remoteDataSource.register(
       email: email,
@@ -76,13 +78,9 @@ class AuthRepositoryImpl implements AuthRepository {
       name: name,
     );
 
-    debugPrint(
-        'AuthRepositoryImpl: Registration successful, caching user data');
     // Cache the user data even though they're not fully verified yet
     await localDataSource.cacheUser(user);
 
-    debugPrint(
-        'AuthRepositoryImpl: User cached, needs verification: $needsVerification');
     return (user, needsVerification);
   }
 
@@ -189,43 +187,31 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> verifyEmail(String code, String email) async {
-    debugPrint('AuthRepositoryImpl: Starting email verification');
-    debugPrint('AuthRepositoryImpl: Verifying email: $email');
 
     // Get cached user to ensure we have the right context
     final cachedUser = await localDataSource.getCachedUser();
-    debugPrint('AuthRepositoryImpl: Cached user: $cachedUser');
 
     if (cachedUser?.email != email) {
-      debugPrint(
-          'AuthRepositoryImpl: Warning - Verification email does not match cached user');
     }
 
     try {
       await remoteDataSource.verifyEmail(code, email);
-      debugPrint('AuthRepositoryImpl: Email verification successful');
 
       // After successful verification, try to get fresh user data
       try {
         final verifiedUser = await remoteDataSource.getCurrentUser();
         if (verifiedUser != null) {
           await localDataSource.cacheUser(verifiedUser);
-          debugPrint(
-              'AuthRepositoryImpl: Updated cached user after verification');
         } else if (cachedUser != null) {
           // If we can't get fresh data, use cached user but mark as verified
-          debugPrint(
-              'AuthRepositoryImpl: Using cached user data after verification');
           await localDataSource.cacheUser(cachedUser);
         } else {
           throw const AuthException(
               'No user data available after verification');
         }
       } catch (e) {
-        debugPrint('AuthRepositoryImpl: Failed to get fresh user data: $e');
         if (cachedUser != null) {
           // If getting fresh data fails, use cached user
-          debugPrint('AuthRepositoryImpl: Falling back to cached user data');
           await localDataSource.cacheUser(cachedUser);
         } else {
           throw const AuthException(
@@ -233,7 +219,6 @@ class AuthRepositoryImpl implements AuthRepository {
         }
       }
     } catch (e) {
-      debugPrint('AuthRepositoryImpl: Email verification failed: $e');
       throw AuthException('Failed to verify email: ${e.toString()}');
     }
   }
@@ -246,18 +231,14 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<String> enableTwoFactor() async {
     try {
-      debugPrint('AuthRepositoryImpl: Enabling MFA');
 
       // Setup MFA - returns (factorId, qrCode, secret)
       final (factorId, qrCode, secret) = await remoteDataSource.setupMFA();
-
-      debugPrint('AuthRepositoryImpl: MFA enabled, factorId: $factorId');
 
       // Return the factorId for reference
       // The QR code and secret can be obtained from the data source if needed for UI
       return factorId;
     } catch (e) {
-      debugPrint('AuthRepositoryImpl: Error enabling MFA: $e');
       throw AuthException('Failed to enable two-factor authentication: ${e.toString()}');
     }
   }
@@ -265,15 +246,12 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> disableTwoFactor(String code) async {
     try {
-      debugPrint('AuthRepositoryImpl: Disabling MFA for factor: $code');
 
       // Note: The interface parameter is named "code" but it's actually the factorId
       // This is a naming inconsistency in the original interface
       await remoteDataSource.disableMFA(code);
 
-      debugPrint('AuthRepositoryImpl: MFA disabled successfully');
     } catch (e) {
-      debugPrint('AuthRepositoryImpl: Error disabling MFA: $e');
       throw AuthException('Failed to disable two-factor authentication: ${e.toString()}');
     }
   }
@@ -281,7 +259,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> verifyTwoFactor(String code) async {
     try {
-      debugPrint('AuthRepositoryImpl: Verifying MFA code');
 
       // Verify the MFA code
       final success = await remoteDataSource.verifyMFA(code);
@@ -290,9 +267,7 @@ class AuthRepositoryImpl implements AuthRepository {
         throw AuthException('Invalid verification code');
       }
 
-      debugPrint('AuthRepositoryImpl: MFA verification successful');
     } catch (e) {
-      debugPrint('AuthRepositoryImpl: Error verifying MFA: $e');
       throw AuthException('Failed to verify two-factor authentication: ${e.toString()}');
     }
   }
@@ -301,8 +276,6 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AuthSession> refreshToken() async {
     // Use RefreshQueueManager if available for robust refresh with retry logic
     if (refreshQueueManager != null) {
-      debugPrint(
-          'AuthRepositoryImpl: Using RefreshQueueManager for token refresh');
       try {
         final queuedResult = await refreshQueueManager!.enqueueRefresh();
         if (queuedResult.success && queuedResult.session != null) {
@@ -324,8 +297,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     // Fallback to simple refresh without retry logic
-    debugPrint(
-        'AuthRepositoryImpl: Using basic token refresh (no queue manager)');
     return performBasicTokenRefresh();
   }
 
@@ -363,17 +334,6 @@ class AuthRepositoryImpl implements AuthRepository {
   /// Get security event history
   Future<List<Map<String, dynamic>>> getSecurityEvents() {
     return securityManager.getSecurityEvents();
-  }
-
-  /// Handle authentication exceptions
-  AppException _handleAuthException(dynamic error) {
-    if (error is AppException) {
-      return error;
-    }
-
-    return UnknownException(
-      message: error.toString(),
-    );
   }
 
   @override
@@ -436,7 +396,6 @@ class AuthRepositoryImpl implements AuthRepository {
         expiresAt: expiresAt,
       );
     } catch (e) {
-      debugPrint('AuthRepositoryImpl: Error getting session: $e');
       return null;
     }
   }
@@ -444,7 +403,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> deleteAccount() async {
     try {
-      debugPrint('AuthRepositoryImpl: Starting account deletion');
 
       // Call remote data source to delete account
       // This will invoke an Edge Function for Supabase implementation
@@ -454,9 +412,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await localDataSource.clearCache();
       await securityManager.resetLoginAttempts();
 
-      debugPrint('AuthRepositoryImpl: Account deleted successfully');
     } catch (e) {
-      debugPrint('AuthRepositoryImpl: Error deleting account: $e');
       throw AuthException('Failed to delete account: ${e.toString()}');
     }
   }

@@ -5,7 +5,6 @@ import 'package:soloadventurer/features/notifications/data/datasources/notificat
 import 'package:soloadventurer/features/notifications/data/datasources/notification_local_data_source_impl.dart';
 import 'package:soloadventurer/features/notifications/data/repositories/notification_repository_impl.dart';
 import 'package:soloadventurer/features/notifications/domain/repositories/notification_repository.dart';
-import 'package:soloadventurer/app/providers/offline_service_providers.dart';
 
 // ============================================================================
 // DATA SOURCE PROVIDERS
@@ -28,11 +27,9 @@ final notificationLocalDataSourceProvider =
 /// Provider for NotificationRepository implementation
 final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
   final localDataSource = ref.watch(notificationLocalDataSourceProvider);
-  final connectivityService = ref.watch(connectivityServiceProvider);
 
   return NotificationRepositoryImpl(
     localDataSource,
-    connectivityService,
   );
 });
 

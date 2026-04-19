@@ -24,6 +24,7 @@ class TokenStorage {
       // accountName is supported in 9.2.4
       accountName: 'SoloAdventurer',
     ),
+    mOptions: MacOsOptions(usesDataProtectionKeychain: false),
   );
 
   // Storage Keys

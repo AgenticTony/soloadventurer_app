@@ -14,9 +14,6 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$CheckInState {
-  /// Loading indicator - always a field on State
-  bool get isLoading;
-
   /// Whether a check-in creation is in progress
   bool get isCreating;
 
@@ -35,22 +32,19 @@ mixin _$CheckInState {
   /// Currently selected check-in (for viewing/editing)
   CheckIn? get selectedCheckIn;
 
-  /// Error message - always a field on State
-  String? get error;
-
-  /// Whether there are any upcoming check-ins (was a getter, now a field)
+  /// Whether there are any upcoming check-ins
   bool get hasUpcomingCheckIns;
 
-  /// Whether operations are in progress (was a getter, now a field)
+  /// Whether operations are in progress
   bool get isProcessing;
 
-  /// Count of check-ins due within the next hour (was a getter, now a field)
+  /// Count of check-ins due within the next hour
   int get dueSoonCount;
 
-  /// Count of missed check-ins (was a getter, now a field)
+  /// Count of missed check-ins
   int get missedCount;
 
-  /// Next check-in (if any) - was a getter, now a field
+  /// Next check-in (if any)
   CheckIn? get nextCheckIn;
 
   /// Create a copy of CheckInState
@@ -66,8 +60,6 @@ mixin _$CheckInState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is CheckInState &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
             (identical(other.isCreating, isCreating) ||
                 other.isCreating == isCreating) &&
             (identical(other.isCompleting, isCompleting) ||
@@ -79,7 +71,6 @@ mixin _$CheckInState {
                 .equals(other.upcomingCheckIns, upcomingCheckIns) &&
             (identical(other.selectedCheckIn, selectedCheckIn) ||
                 other.selectedCheckIn == selectedCheckIn) &&
-            (identical(other.error, error) || other.error == error) &&
             (identical(other.hasUpcomingCheckIns, hasUpcomingCheckIns) ||
                 other.hasUpcomingCheckIns == hasUpcomingCheckIns) &&
             (identical(other.isProcessing, isProcessing) ||
@@ -95,14 +86,12 @@ mixin _$CheckInState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      isLoading,
       isCreating,
       isCompleting,
       isCancelling,
       const DeepCollectionEquality().hash(checkIns),
       const DeepCollectionEquality().hash(upcomingCheckIns),
       selectedCheckIn,
-      error,
       hasUpcomingCheckIns,
       isProcessing,
       dueSoonCount,
@@ -111,7 +100,7 @@ mixin _$CheckInState {
 
   @override
   String toString() {
-    return 'CheckInState(isLoading: $isLoading, isCreating: $isCreating, isCompleting: $isCompleting, isCancelling: $isCancelling, checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn, error: $error, hasUpcomingCheckIns: $hasUpcomingCheckIns, isProcessing: $isProcessing, dueSoonCount: $dueSoonCount, missedCount: $missedCount, nextCheckIn: $nextCheckIn)';
+    return 'CheckInState(isCreating: $isCreating, isCompleting: $isCompleting, isCancelling: $isCancelling, checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn, hasUpcomingCheckIns: $hasUpcomingCheckIns, isProcessing: $isProcessing, dueSoonCount: $dueSoonCount, missedCount: $missedCount, nextCheckIn: $nextCheckIn)';
   }
 }
 
@@ -122,14 +111,12 @@ abstract mixin class $CheckInStateCopyWith<$Res> {
       _$CheckInStateCopyWithImpl;
   @useResult
   $Res call(
-      {bool isLoading,
-      bool isCreating,
+      {bool isCreating,
       bool isCompleting,
       bool isCancelling,
       List<CheckIn> checkIns,
       List<CheckIn> upcomingCheckIns,
       CheckIn? selectedCheckIn,
-      String? error,
       bool hasUpcomingCheckIns,
       bool isProcessing,
       int dueSoonCount,
@@ -152,14 +139,12 @@ class _$CheckInStateCopyWithImpl<$Res> implements $CheckInStateCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isLoading = null,
     Object? isCreating = null,
     Object? isCompleting = null,
     Object? isCancelling = null,
     Object? checkIns = null,
     Object? upcomingCheckIns = null,
     Object? selectedCheckIn = freezed,
-    Object? error = freezed,
     Object? hasUpcomingCheckIns = null,
     Object? isProcessing = null,
     Object? dueSoonCount = null,
@@ -167,10 +152,6 @@ class _$CheckInStateCopyWithImpl<$Res> implements $CheckInStateCopyWith<$Res> {
     Object? nextCheckIn = freezed,
   }) {
     return _then(_self.copyWith(
-      isLoading: null == isLoading
-          ? _self.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
       isCreating: null == isCreating
           ? _self.isCreating
           : isCreating // ignore: cast_nullable_to_non_nullable
@@ -195,10 +176,6 @@ class _$CheckInStateCopyWithImpl<$Res> implements $CheckInStateCopyWith<$Res> {
           ? _self.selectedCheckIn
           : selectedCheckIn // ignore: cast_nullable_to_non_nullable
               as CheckIn?,
-      error: freezed == error
-          ? _self.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as String?,
       hasUpcomingCheckIns: null == hasUpcomingCheckIns
           ? _self.hasUpcomingCheckIns
           : hasUpcomingCheckIns // ignore: cast_nullable_to_non_nullable
@@ -343,14 +320,12 @@ extension CheckInStatePatterns on CheckInState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            bool isLoading,
             bool isCreating,
             bool isCompleting,
             bool isCancelling,
             List<CheckIn> checkIns,
             List<CheckIn> upcomingCheckIns,
             CheckIn? selectedCheckIn,
-            String? error,
             bool hasUpcomingCheckIns,
             bool isProcessing,
             int dueSoonCount,
@@ -363,14 +338,12 @@ extension CheckInStatePatterns on CheckInState {
     switch (_that) {
       case _CheckInState() when $default != null:
         return $default(
-            _that.isLoading,
             _that.isCreating,
             _that.isCompleting,
             _that.isCancelling,
             _that.checkIns,
             _that.upcomingCheckIns,
             _that.selectedCheckIn,
-            _that.error,
             _that.hasUpcomingCheckIns,
             _that.isProcessing,
             _that.dueSoonCount,
@@ -397,14 +370,12 @@ extension CheckInStatePatterns on CheckInState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            bool isLoading,
             bool isCreating,
             bool isCompleting,
             bool isCancelling,
             List<CheckIn> checkIns,
             List<CheckIn> upcomingCheckIns,
             CheckIn? selectedCheckIn,
-            String? error,
             bool hasUpcomingCheckIns,
             bool isProcessing,
             int dueSoonCount,
@@ -416,14 +387,12 @@ extension CheckInStatePatterns on CheckInState {
     switch (_that) {
       case _CheckInState():
         return $default(
-            _that.isLoading,
             _that.isCreating,
             _that.isCompleting,
             _that.isCancelling,
             _that.checkIns,
             _that.upcomingCheckIns,
             _that.selectedCheckIn,
-            _that.error,
             _that.hasUpcomingCheckIns,
             _that.isProcessing,
             _that.dueSoonCount,
@@ -447,14 +416,12 @@ extension CheckInStatePatterns on CheckInState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            bool isLoading,
             bool isCreating,
             bool isCompleting,
             bool isCancelling,
             List<CheckIn> checkIns,
             List<CheckIn> upcomingCheckIns,
             CheckIn? selectedCheckIn,
-            String? error,
             bool hasUpcomingCheckIns,
             bool isProcessing,
             int dueSoonCount,
@@ -466,14 +433,12 @@ extension CheckInStatePatterns on CheckInState {
     switch (_that) {
       case _CheckInState() when $default != null:
         return $default(
-            _that.isLoading,
             _that.isCreating,
             _that.isCompleting,
             _that.isCancelling,
             _that.checkIns,
             _that.upcomingCheckIns,
             _that.selectedCheckIn,
-            _that.error,
             _that.hasUpcomingCheckIns,
             _that.isProcessing,
             _that.dueSoonCount,
@@ -487,28 +452,22 @@ extension CheckInStatePatterns on CheckInState {
 
 /// @nodoc
 
-class _CheckInState implements CheckInState {
+class _CheckInState extends CheckInState {
   const _CheckInState(
-      {this.isLoading = false,
-      this.isCreating = false,
+      {this.isCreating = false,
       this.isCompleting = false,
       this.isCancelling = false,
       final List<CheckIn> checkIns = const [],
       final List<CheckIn> upcomingCheckIns = const [],
       this.selectedCheckIn,
-      this.error,
       this.hasUpcomingCheckIns = false,
       this.isProcessing = false,
       this.dueSoonCount = 0,
       this.missedCount = 0,
       this.nextCheckIn})
       : _checkIns = checkIns,
-        _upcomingCheckIns = upcomingCheckIns;
-
-  /// Loading indicator - always a field on State
-  @override
-  @JsonKey()
-  final bool isLoading;
+        _upcomingCheckIns = upcomingCheckIns,
+        super._();
 
   /// Whether a check-in creation is in progress
   @override
@@ -554,31 +513,27 @@ class _CheckInState implements CheckInState {
   @override
   final CheckIn? selectedCheckIn;
 
-  /// Error message - always a field on State
-  @override
-  final String? error;
-
-  /// Whether there are any upcoming check-ins (was a getter, now a field)
+  /// Whether there are any upcoming check-ins
   @override
   @JsonKey()
   final bool hasUpcomingCheckIns;
 
-  /// Whether operations are in progress (was a getter, now a field)
+  /// Whether operations are in progress
   @override
   @JsonKey()
   final bool isProcessing;
 
-  /// Count of check-ins due within the next hour (was a getter, now a field)
+  /// Count of check-ins due within the next hour
   @override
   @JsonKey()
   final int dueSoonCount;
 
-  /// Count of missed check-ins (was a getter, now a field)
+  /// Count of missed check-ins
   @override
   @JsonKey()
   final int missedCount;
 
-  /// Next check-in (if any) - was a getter, now a field
+  /// Next check-in (if any)
   @override
   final CheckIn? nextCheckIn;
 
@@ -595,8 +550,6 @@ class _CheckInState implements CheckInState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _CheckInState &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
             (identical(other.isCreating, isCreating) ||
                 other.isCreating == isCreating) &&
             (identical(other.isCompleting, isCompleting) ||
@@ -608,7 +561,6 @@ class _CheckInState implements CheckInState {
                 .equals(other._upcomingCheckIns, _upcomingCheckIns) &&
             (identical(other.selectedCheckIn, selectedCheckIn) ||
                 other.selectedCheckIn == selectedCheckIn) &&
-            (identical(other.error, error) || other.error == error) &&
             (identical(other.hasUpcomingCheckIns, hasUpcomingCheckIns) ||
                 other.hasUpcomingCheckIns == hasUpcomingCheckIns) &&
             (identical(other.isProcessing, isProcessing) ||
@@ -624,14 +576,12 @@ class _CheckInState implements CheckInState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      isLoading,
       isCreating,
       isCompleting,
       isCancelling,
       const DeepCollectionEquality().hash(_checkIns),
       const DeepCollectionEquality().hash(_upcomingCheckIns),
       selectedCheckIn,
-      error,
       hasUpcomingCheckIns,
       isProcessing,
       dueSoonCount,
@@ -640,7 +590,7 @@ class _CheckInState implements CheckInState {
 
   @override
   String toString() {
-    return 'CheckInState(isLoading: $isLoading, isCreating: $isCreating, isCompleting: $isCompleting, isCancelling: $isCancelling, checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn, error: $error, hasUpcomingCheckIns: $hasUpcomingCheckIns, isProcessing: $isProcessing, dueSoonCount: $dueSoonCount, missedCount: $missedCount, nextCheckIn: $nextCheckIn)';
+    return 'CheckInState(isCreating: $isCreating, isCompleting: $isCompleting, isCancelling: $isCancelling, checkIns: $checkIns, upcomingCheckIns: $upcomingCheckIns, selectedCheckIn: $selectedCheckIn, hasUpcomingCheckIns: $hasUpcomingCheckIns, isProcessing: $isProcessing, dueSoonCount: $dueSoonCount, missedCount: $missedCount, nextCheckIn: $nextCheckIn)';
   }
 }
 
@@ -653,14 +603,12 @@ abstract mixin class _$CheckInStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool isLoading,
-      bool isCreating,
+      {bool isCreating,
       bool isCompleting,
       bool isCancelling,
       List<CheckIn> checkIns,
       List<CheckIn> upcomingCheckIns,
       CheckIn? selectedCheckIn,
-      String? error,
       bool hasUpcomingCheckIns,
       bool isProcessing,
       int dueSoonCount,
@@ -686,14 +634,12 @@ class __$CheckInStateCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? isLoading = null,
     Object? isCreating = null,
     Object? isCompleting = null,
     Object? isCancelling = null,
     Object? checkIns = null,
     Object? upcomingCheckIns = null,
     Object? selectedCheckIn = freezed,
-    Object? error = freezed,
     Object? hasUpcomingCheckIns = null,
     Object? isProcessing = null,
     Object? dueSoonCount = null,
@@ -701,10 +647,6 @@ class __$CheckInStateCopyWithImpl<$Res>
     Object? nextCheckIn = freezed,
   }) {
     return _then(_CheckInState(
-      isLoading: null == isLoading
-          ? _self.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
       isCreating: null == isCreating
           ? _self.isCreating
           : isCreating // ignore: cast_nullable_to_non_nullable
@@ -729,10 +671,6 @@ class __$CheckInStateCopyWithImpl<$Res>
           ? _self.selectedCheckIn
           : selectedCheckIn // ignore: cast_nullable_to_non_nullable
               as CheckIn?,
-      error: freezed == error
-          ? _self.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as String?,
       hasUpcomingCheckIns: null == hasUpcomingCheckIns
           ? _self.hasUpcomingCheckIns
           : hasUpcomingCheckIns // ignore: cast_nullable_to_non_nullable

@@ -9,12 +9,12 @@ part of 'destination_detail_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - Dependencies injected via ref.watch() in build() method
-/// - Family provider with destinationId parameter in build()
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+/// - Dependencies injected via `ref.watch()` in `build()` method
+/// - Family provider with destinationId parameter in `build()`
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<DestinationDetailState> when consumed
+/// - `build()` returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
 ///
 /// Provider for destination detail state management
 ///
@@ -47,12 +47,12 @@ part of 'destination_detail_provider.dart';
 const destinationDetailProvider = DestinationDetailFamily._();
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - Dependencies injected via ref.watch() in build() method
-/// - Family provider with destinationId parameter in build()
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+/// - Dependencies injected via `ref.watch()` in `build()` method
+/// - Family provider with destinationId parameter in `build()`
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<DestinationDetailState> when consumed
+/// - `build()` returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
 ///
 /// Provider for destination detail state management
 ///
@@ -83,12 +83,12 @@ const destinationDetailProvider = DestinationDetailFamily._();
 final class DestinationDetailProvider
     extends $AsyncNotifierProvider<DestinationDetail, DestinationDetailState> {
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-  /// - Dependencies injected via ref.watch() in build() method
-  /// - Family provider with destinationId parameter in build()
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+  /// - Dependencies injected via `ref.watch()` in `build()` method
+  /// - Family provider with destinationId parameter in `build()`
   /// - AutoDispose enabled via @Riverpod annotation
-  /// - build() returns Future<T> not AsyncValue<T>
-  /// - State is automatically AsyncValue<DestinationDetailState> when consumed
+  /// - `build()` returns `Future<T>` not `AsyncValue<T>`
+  /// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
   ///
   /// Provider for destination detail state management
   ///
@@ -152,15 +152,15 @@ final class DestinationDetailProvider
   }
 }
 
-String _$destinationDetailHash() => r'd6dbff7fc3b2ffa79e4897564edf4f4d37ad2cdb';
+String _$destinationDetailHash() => r'6acafbc34879833f6be848f75e6d1cad53c69fe6';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - Dependencies injected via ref.watch() in build() method
-/// - Family provider with destinationId parameter in build()
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+/// - Dependencies injected via `ref.watch()` in `build()` method
+/// - Family provider with destinationId parameter in `build()`
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<DestinationDetailState> when consumed
+/// - `build()` returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
 ///
 /// Provider for destination detail state management
 ///
@@ -207,12 +207,12 @@ final class DestinationDetailFamily extends $Family
         );
 
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-  /// - Dependencies injected via ref.watch() in build() method
-  /// - Family provider with destinationId parameter in build()
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+  /// - Dependencies injected via `ref.watch()` in `build()` method
+  /// - Family provider with destinationId parameter in `build()`
   /// - AutoDispose enabled via @Riverpod annotation
-  /// - build() returns Future<T> not AsyncValue<T>
-  /// - State is automatically AsyncValue<DestinationDetailState> when consumed
+  /// - `build()` returns `Future<T>` not `AsyncValue<T>`
+  /// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
   ///
   /// Provider for destination detail state management
   ///
@@ -251,12 +251,12 @@ final class DestinationDetailFamily extends $Family
 }
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - Dependencies injected via ref.watch() in build() method
-/// - Family provider with destinationId parameter in build()
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+/// - Dependencies injected via `ref.watch()` in `build()` method
+/// - Family provider with destinationId parameter in `build()`
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<DestinationDetailState> when consumed
+/// - `build()` returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
 ///
 /// Provider for destination detail state management
 ///

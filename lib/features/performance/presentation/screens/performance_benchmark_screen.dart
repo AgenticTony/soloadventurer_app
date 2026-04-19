@@ -274,13 +274,17 @@ class _PerformanceBenchmarkScreenState
 
     // Measure 1: Memory with trips
     final memoryBeforeTrips = await PerformanceReporter.captureMemoryUsage();
-    final loadedTrips = <Trip>[...trips];
+    // Load trips into memory
+    final _ = <Trip>[...trips];
     final memoryAfterTrips = await PerformanceReporter.captureMemoryUsage();
     final tripMemory = memoryAfterTrips - memoryBeforeTrips;
 
     // Measure 2: Memory with photos
     final memoryBeforePhotos = await PerformanceReporter.captureMemoryUsage();
-    final loadedPhotos = <Map<String, dynamic>>[...photos];
+    // Load photos into memory
+    // Load photos into memory (kept for memory measurement)
+    <Map<String, dynamic>>[...photos];
+    // Prevent unused variable warning
     final memoryAfterPhotos = await PerformanceReporter.captureMemoryUsage();
     final photoMemory = memoryAfterPhotos - memoryBeforePhotos;
 

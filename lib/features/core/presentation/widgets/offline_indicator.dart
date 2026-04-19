@@ -182,62 +182,52 @@ class OfflineIndicator extends ConsumerStatefulWidget {
   });
 
   /// Convenience constructor for banner mode
-  const OfflineIndicator.banner({
+  OfflineIndicator.banner({
     super.key,
     String message = 'You\'re offline',
-    VoidCallback? onShow,
-    VoidCallback? onHide,
+    this.onShow,
+    this.onHide,
   })  : config = OfflineIndicatorConfig(
           message: message,
           mode: OfflineIndicatorMode.banner,
         ),
         position = OfflineIndicatorPosition.topLeft,
-        offset = Offset.zero,
-        onShow = onShow,
-        onHide = onHide;
+        offset = Offset.zero;
 
   /// Convenience constructor for badge mode
   const OfflineIndicator.badge({
     super.key,
-    OfflineIndicatorPosition position = OfflineIndicatorPosition.topRight,
-    Offset offset = const Offset(16, 16),
-    VoidCallback? onShow,
-    VoidCallback? onHide,
-  })  : config = const OfflineIndicatorConfig.badge(),
-        position = position,
-        offset = offset,
-        onShow = onShow,
-        onHide = onHide;
+    this.position = OfflineIndicatorPosition.topRight,
+    this.offset = const Offset(16, 16),
+    this.onShow,
+    this.onHide,
+  })  : config = const OfflineIndicatorConfig.badge();
 
   /// Convenience constructor for status bar mode
-  const OfflineIndicator.statusBar({
+  OfflineIndicator.statusBar({
     super.key,
     String message = 'No connection',
-    VoidCallback? onShow,
-    VoidCallback? onHide,
+    this.onShow,
+    this.onHide,
   })  : config = OfflineIndicatorConfig.statusBar(
           message: message,
         ),
         position = OfflineIndicatorPosition.topLeft,
-        offset = Offset.zero,
-        onShow = onShow,
-        onHide = onHide;
+        offset = Offset.zero;
 
   /// Convenience constructor for snackbar mode
-  const OfflineIndicator.snackbar({
+  OfflineIndicator.snackbar({
     super.key,
     String message = 'You\'re offline. Some features may be limited.',
     Duration? autoDismissDuration,
-    VoidCallback? onShow,
-    VoidCallback? onHide,
+    this.onShow,
+    this.onHide,
   })  : config = OfflineIndicatorConfig.snackbar(
           message: message,
           autoDismissDuration: autoDismissDuration,
         ),
         position = OfflineIndicatorPosition.topLeft,
-        offset = Offset.zero,
-        onShow = onShow,
-        onHide = onHide;
+        offset = Offset.zero;
 
   @override
   ConsumerState<OfflineIndicator> createState() => _OfflineIndicatorState();
@@ -321,7 +311,7 @@ class _OfflineIndicatorState extends ConsumerState<OfflineIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final isConnected = ref.watch(connectivityNotifierProvider);
+    final isConnected = ref.watch(connectivityProvider);
     final theme = Theme.of(context);
 
     // Reset dismissed state when coming back online

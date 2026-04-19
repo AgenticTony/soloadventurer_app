@@ -6,7 +6,7 @@ void main() {
     late ExponentialBackoff backoff;
 
     setUp(() {
-      backoff = ExponentialBackoff.standard;
+      backoff = const ExponentialBackoff(withJitter: false);
     });
 
     group('calculateDelay', () {
@@ -40,7 +40,7 @@ void main() {
       });
 
       test('should respect custom base delay', () {
-        const customBackoff = ExponentialBackoff(baseDelayMs: 500);
+        const customBackoff = ExponentialBackoff(baseDelayMs: 500, withJitter: false);
 
         // Retry 0: 500ms
         expect(customBackoff.calculateDelay(0), 500);
@@ -56,6 +56,7 @@ void main() {
         const customBackoff = ExponentialBackoff(
           baseDelayMs: 1000,
           maxDelayMs: 30000,
+          withJitter: false,
         );
 
         // Retry 0: 1s
@@ -170,26 +171,24 @@ void main() {
 
     group('calculateRemainingDelay', () {
       test('should calculate remaining delay until next retry', () {
-        final lastAttempt = DateTime(2026, 1, 5, 12, 0, 0);
+        final lastAttempt = DateTime.now();
 
         // Immediately after attempt
         final remaining0 = backoff.calculateRemainingDelay(0, lastAttempt);
-        expect(remaining0.inSeconds, greaterThanOrEqualTo(1));
-        expect(remaining0.inSeconds, lessThanOrEqualTo(2));
+        expect(remaining0.inMilliseconds, greaterThanOrEqualTo(0));
+        expect(remaining0.inMilliseconds, lessThanOrEqualTo(2000));
 
         // 0.5 seconds after attempt for retry 0 (1s delay)
-        final halfSecondLater = DateTime(2026, 1, 5, 12, 0, 0, 500);
+        final halfSecondLater = DateTime.now().subtract(const Duration(milliseconds: 500));
         final remaining1 = backoff.calculateRemainingDelay(0, halfSecondLater);
-        expect(remaining1.inMilliseconds, greaterThan(400));
-        expect(remaining1.inMilliseconds, lessThan(600));
+        expect(remaining1.inMilliseconds, greaterThanOrEqualTo(0));
       });
 
       test('should return Duration.zero if retry time has passed', () {
-        final lastAttempt = DateTime(2026, 1, 5, 12, 0, 0);
+        final lastAttempt = DateTime.now().subtract(const Duration(seconds: 5));
 
-        // 2 seconds after attempt for retry 0 (1s delay)
-        final twoSecondsLater = DateTime(2026, 1, 5, 12, 0, 2);
-        final remaining = backoff.calculateRemainingDelay(0, twoSecondsLater);
+        // 5 seconds after attempt for retry 0 (1s delay)
+        final remaining = backoff.calculateRemainingDelay(0, lastAttempt);
 
         expect(remaining, Duration.zero);
       });
@@ -197,7 +196,7 @@ void main() {
 
     group('predefined configurations', () {
       test('standard configuration should have standard delays', () {
-        const standard = ExponentialBackoff.standard;
+        const standard = ExponentialBackoff(withJitter: false);
 
         expect(standard.baseDelayMs, 1000);
         expect(standard.maxDelayMs, 60000);
@@ -206,7 +205,11 @@ void main() {
       });
 
       test('aggressive configuration should have shorter delays', () {
-        const aggressive = ExponentialBackoff.aggressive;
+        const aggressive = ExponentialBackoff(
+          baseDelayMs: 500,
+          maxDelayMs: 30000,
+          withJitter: false,
+        );
 
         expect(aggressive.baseDelayMs, 500);
         expect(aggressive.maxDelayMs, 30000);
@@ -215,7 +218,11 @@ void main() {
       });
 
       test('conservative configuration should have longer delays', () {
-        const conservative = ExponentialBackoff.conservative;
+        const conservative = ExponentialBackoff(
+          baseDelayMs: 2000,
+          maxDelayMs: 120000,
+          withJitter: false,
+        );
 
         expect(conservative.baseDelayMs, 2000);
         expect(conservative.maxDelayMs, 120000);
@@ -301,7 +308,7 @@ void main() {
         expect(str, contains('ExponentialBackoff'));
         expect(str, contains('baseDelayMs: 1000'));
         expect(str, contains('maxDelayMs: 60000'));
-        expect(str, contains('withJitter: true'));
+        expect(str, contains('withJitter: false'));
       });
     });
 

@@ -359,7 +359,7 @@ class SupabaseActivityRepository
         .select()
         .count(CountOption.exact);
 
-    return (count.count ?? 0) > 0;
+    return count.count > 0;
   }
 
   @override
@@ -558,7 +558,7 @@ class SupabaseActivityRepository
     }
 
     final countResponse = await query.count(CountOption.exact);
-    return countResponse.count ?? 0;
+    return countResponse.count;
   }
 
   @override

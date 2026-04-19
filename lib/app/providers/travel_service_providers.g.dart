@@ -330,7 +330,7 @@ final class NotificationRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$notificationRepositoryHash() =>
-    r'37927ae97e08e227217c7c3e0f53d0a8d3348a60';
+    r'c2db6fcd62b4be4e6fded14d5254d75d70276958';
 
 /// Provider for NotificationSchedulerService
 ///

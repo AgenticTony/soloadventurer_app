@@ -12,14 +12,12 @@ import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 
 part 'check_in_provider.g.dart';
 
-/// Notifier for managing check-in state
-/// Handles check-in creation, completion, scheduling, and cancellation
+/// AsyncNotifier for managing check-in state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 @riverpod
 class CheckInNotifier extends _$CheckInNotifier {
   CreateCheckInUseCase get _createCheckIn =>
@@ -34,7 +32,7 @@ class CheckInNotifier extends _$CheckInNotifier {
       ref.watch(getUpcomingCheckInsUseCaseProvider);
 
   @override
-  CheckInState build() => CheckInState.initial();
+  Future<CheckInState> build() async => CheckInState.initial();
 
   /// Helper to compute all derived values
   ({
@@ -43,24 +41,24 @@ class CheckInNotifier extends _$CheckInNotifier {
     int dueSoon,
     int missed,
     CheckIn? next
-  }) _computeDerivedValues() {
-    final hasUpcoming = state.upcomingCheckIns.isNotEmpty;
+  }) _computeDerivedValues(CheckInState current) {
+    final hasUpcoming = current.upcomingCheckIns.isNotEmpty;
     final isProcessing =
-        state.isCreating || state.isCompleting || state.isCancelling;
+        current.isCreating || current.isCompleting || current.isCancelling;
 
-    final dueSoon = state.upcomingCheckIns.where((checkIn) {
+    final dueSoon = current.upcomingCheckIns.where((checkIn) {
       final deadline = checkIn.deadline;
       if (deadline == null) return false;
       return deadline.isBefore(DateTime.now().add(const Duration(hours: 1)));
     }).length;
 
-    final missed = state.checkIns
+    final missed = current.checkIns
         .where((checkIn) => checkIn.status == CheckInStatus.missed)
         .length;
 
     CheckIn? next;
-    if (state.upcomingCheckIns.isNotEmpty) {
-      final sorted = List<CheckIn>.from(state.upcomingCheckIns)
+    if (current.upcomingCheckIns.isNotEmpty) {
+      final sorted = List<CheckIn>.from(current.upcomingCheckIns)
         ..sort((a, b) {
           final aTime = a.scheduledTime ?? a.deadline ?? DateTime.now();
           final bTime = b.scheduledTime ?? b.deadline ?? DateTime.now();
@@ -80,53 +78,37 @@ class CheckInNotifier extends _$CheckInNotifier {
 
   /// Load all check-ins
   Future<void> loadCheckIns() async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final checkIns = await _getUpcomingCheckIns();
-      final derived = _computeDerivedValues();
-      state = state.copyWith(
-        isLoading: false,
+      final derived = _computeDerivedValues(state.value ?? CheckInState.initial());
+      return (state.value ?? CheckInState.initial()).copyWith(
         checkIns: checkIns,
         upcomingCheckIns: checkIns,
-        error: null,
         hasUpcomingCheckIns: derived.hasUpcoming,
         isProcessing: derived.isProcessing,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Load upcoming check-ins
   Future<void> loadUpcomingCheckIns() async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final upcoming = await _getUpcomingCheckIns();
-      final derived = _computeDerivedValues();
-      state = state.copyWith(
-        isLoading: false,
+      final derived = _computeDerivedValues(state.value ?? CheckInState.initial());
+      return (state.value ?? CheckInState.initial()).copyWith(
         upcomingCheckIns: upcoming,
-        error: null,
         hasUpcomingCheckIns: derived.hasUpcoming,
         isProcessing: derived.isProcessing,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Create a manual check-in
@@ -136,11 +118,11 @@ class CheckInNotifier extends _$CheckInNotifier {
     required double longitude,
     String? tripId,
   }) async {
-    if (state.isCreating) return;
+    final current = state.value!;
+    if (current.isCreating) return;
 
-    state = state.copyWith(isCreating: true, error: null, isProcessing: true);
-    try {
-      // Get current user ID from auth state
+    state = AsyncData(current.copyWith(isCreating: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final authAsync = ref.read(authProvider);
       final userId = authAsync.value?.user?.id ?? '';
 
@@ -148,7 +130,6 @@ class CheckInNotifier extends _$CheckInNotifier {
         throw Exception('User not authenticated');
       }
 
-      // Construct CheckIn entity as required by domain
       final now = DateTime.now();
       final location = CheckInLocation(
         latitude: latitude,
@@ -160,8 +141,7 @@ class CheckInNotifier extends _$CheckInNotifier {
         id: const Uuid().v4(),
         userId: userId,
         triggerType: CheckInTriggerType.manual,
-        status: CheckInStatus
-            .completed, // Manual check-ins are completed immediately
+        status: CheckInStatus.completed,
         notifyContactIds: const [],
         createdAt: now,
         completedAt: now,
@@ -172,29 +152,27 @@ class CheckInNotifier extends _$CheckInNotifier {
 
       final createdCheckIn = await _createCheckIn(checkIn);
 
-      final updatedCheckIns = [...state.checkIns, createdCheckIn];
-      final updatedUpcoming = [...state.upcomingCheckIns, createdCheckIn];
-      final derived = _computeDerivedValues();
+      final updatedCheckIns = [...current.checkIns, createdCheckIn];
+      final updatedUpcoming = [...current.upcomingCheckIns, createdCheckIn];
+      final derived = _computeDerivedValues(
+        current.copyWith(
+          checkIns: updatedCheckIns,
+          upcomingCheckIns: updatedUpcoming,
+        ),
+      );
 
-      state = state.copyWith(
+      return current.copyWith(
         isCreating: false,
         checkIns: updatedCheckIns,
         upcomingCheckIns: updatedUpcoming,
         selectedCheckIn: createdCheckIn,
-        error: null,
         isProcessing: false,
         hasUpcomingCheckIns: derived.hasUpcoming,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Schedule a check-in
@@ -206,11 +184,11 @@ class CheckInNotifier extends _$CheckInNotifier {
     String? tripId,
     DateTime? deadline,
   }) async {
-    if (state.isCreating) return;
+    final current = state.value!;
+    if (current.isCreating) return;
 
-    state = state.copyWith(isCreating: true, error: null, isProcessing: true);
-    try {
-      // Get current user ID from auth state
+    state = AsyncData(current.copyWith(isCreating: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final authAsync = ref.read(authProvider);
       final userId = authAsync.value?.user?.id ?? '';
 
@@ -218,7 +196,6 @@ class CheckInNotifier extends _$CheckInNotifier {
         throw Exception('User not authenticated');
       }
 
-      // Call ScheduleCheckInUseCase with named parameters as per domain contract
       final checkIn = await _scheduleCheckIn(
         userId: userId,
         scheduledTime: scheduledTime,
@@ -227,173 +204,158 @@ class CheckInNotifier extends _$CheckInNotifier {
         statusMessage: statusMessage,
         notifyContactIds: notifyContactIds,
         tripId: tripId,
-        triggerType: CheckInTriggerType.scheduledTime, // Correct enum value
+        triggerType: CheckInTriggerType.scheduledTime,
       );
 
-      final updatedCheckIns = [...state.checkIns, checkIn];
-      final updatedUpcoming = [...state.upcomingCheckIns, checkIn];
-      final derived = _computeDerivedValues();
+      final updatedCheckIns = [...current.checkIns, checkIn];
+      final updatedUpcoming = [...current.upcomingCheckIns, checkIn];
+      final derived = _computeDerivedValues(
+        current.copyWith(
+          checkIns: updatedCheckIns,
+          upcomingCheckIns: updatedUpcoming,
+        ),
+      );
 
-      state = state.copyWith(
+      return current.copyWith(
         isCreating: false,
         checkIns: updatedCheckIns,
         upcomingCheckIns: updatedUpcoming,
         selectedCheckIn: checkIn,
-        error: null,
         isProcessing: false,
         hasUpcomingCheckIns: derived.hasUpcoming,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isCreating: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Complete a check-in
-  /// Location is REQUIRED for safety verification as per domain contract
   Future<void> completeCheckIn({
     required String checkInId,
     required double latitude,
     required double longitude,
     String? statusMessage,
   }) async {
-    if (state.isCompleting) return;
+    final current = state.value!;
+    if (current.isCompleting) return;
 
-    state = state.copyWith(isCompleting: true, error: null, isProcessing: true);
-    try {
-      // Construct CheckInLocation as required by domain
+    state = AsyncData(current.copyWith(isCompleting: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final location = CheckInLocation(
         latitude: latitude,
         longitude: longitude,
         timestamp: DateTime.now(),
       );
 
-      // Call CompleteCheckInUseCase with required parameters as per domain contract
       final completedCheckIn = await _completeCheckIn(
         checkInId: checkInId,
         location: location,
         statusMessage: statusMessage,
       );
 
-      final updatedCheckIns = state.checkIns.map((checkIn) {
+      final updatedCheckIns = current.checkIns.map((checkIn) {
         return checkIn.id == checkInId ? completedCheckIn : checkIn;
       }).toList();
 
-      final updatedUpcoming = state.upcomingCheckIns
+      final updatedUpcoming = current.upcomingCheckIns
           .where((checkIn) => checkIn.id != checkInId)
           .toList();
-      final derived = _computeDerivedValues();
+      final derived = _computeDerivedValues(
+        current.copyWith(
+          checkIns: updatedCheckIns,
+          upcomingCheckIns: updatedUpcoming,
+        ),
+      );
 
-      state = state.copyWith(
+      return current.copyWith(
         isCompleting: false,
         checkIns: updatedCheckIns,
         upcomingCheckIns: updatedUpcoming,
         selectedCheckIn: completedCheckIn,
-        error: null,
         isProcessing: false,
         hasUpcomingCheckIns: derived.hasUpcoming,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isCompleting: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Cancel a check-in
   Future<void> cancelCheckIn(String checkInId) async {
-    if (state.isCancelling) return;
+    final current = state.value!;
+    if (current.isCancelling) return;
 
-    state = state.copyWith(isCancelling: true, error: null, isProcessing: true);
-    try {
+    state = AsyncData(current.copyWith(isCancelling: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       await _cancelCheckIn(checkInId);
 
-      final updatedCheckIns = state.checkIns.map((checkIn) {
+      final updatedCheckIns = current.checkIns.map((checkIn) {
         return checkIn.id == checkInId
             ? checkIn.copyWith(status: CheckInStatus.cancelled)
             : checkIn;
       }).toList();
 
-      final updatedUpcoming = state.upcomingCheckIns
+      final updatedUpcoming = current.upcomingCheckIns
           .where((checkIn) => checkIn.id != checkInId)
           .toList();
-      final derived = _computeDerivedValues();
+      final derived = _computeDerivedValues(
+        current.copyWith(
+          checkIns: updatedCheckIns,
+          upcomingCheckIns: updatedUpcoming,
+        ),
+      );
 
-      state = state.copyWith(
+      return current.copyWith(
         isCancelling: false,
         checkIns: updatedCheckIns,
         upcomingCheckIns: updatedUpcoming,
-        selectedCheckIn: state.selectedCheckIn?.id == checkInId
-            ? null
-            : state.selectedCheckIn,
-        error: null,
+        selectedCheckIn:
+            current.selectedCheckIn?.id == checkInId ? null : current.selectedCheckIn,
         isProcessing: false,
         hasUpcomingCheckIns: derived.hasUpcoming,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isCancelling: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Load check-ins for a specific trip
   Future<void> loadCheckInsByTrip(String tripId) async {
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final checkIns = await _getUpcomingCheckIns();
       final tripCheckIns =
           checkIns.where((checkIn) => checkIn.tripId == tripId).toList();
-      final derived = _computeDerivedValues();
-
-      state = state.copyWith(
-        isLoading: false,
+      final derived = _computeDerivedValues(state.value ?? CheckInState.initial());
+      return (state.value ?? CheckInState.initial()).copyWith(
         checkIns: tripCheckIns,
         upcomingCheckIns: tripCheckIns,
-        error: null,
         hasUpcomingCheckIns: derived.hasUpcoming,
         isProcessing: derived.isProcessing,
         dueSoonCount: derived.dueSoon,
         missedCount: derived.missed,
         nextCheckIn: derived.next,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Select a check-in for viewing/editing
   void selectCheckIn(CheckIn? checkIn) {
-    state = state.copyWith(selectedCheckIn: checkIn);
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(current.copyWith(selectedCheckIn: checkIn));
+    }
   }
 
   /// Clear the selected check-in
   void clearSelection() {
-    state = state.copyWith(selectedCheckIn: null);
-  }
-
-  /// Clear any error message
-  void clearError() {
-    state = state.copyWith(error: null);
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(current.copyWith(selectedCheckIn: null));
+    }
   }
 
   /// Refresh upcoming check-ins

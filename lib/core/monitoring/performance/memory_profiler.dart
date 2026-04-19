@@ -240,7 +240,6 @@ class MemoryProfiler {
           }
         } catch (e) {
           if (kDebugMode) {
-            debugPrint('Error connecting to VM service: $e');
           }
         }
       }
@@ -259,7 +258,6 @@ class MemoryProfiler {
       return snapshot;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Error capturing memory snapshot: $e');
       }
       // Return estimated values on error
       return MemorySnapshot(
@@ -292,7 +290,6 @@ class MemoryProfiler {
   static Future<void> startProfiling() async {
     if (_isProfiling) {
       if (kDebugMode) {
-        debugPrint('MemoryProfiler: Profiling already active');
       }
       return;
     }
@@ -305,7 +302,6 @@ class MemoryProfiler {
     await captureSnapshot();
 
     if (kDebugMode) {
-      debugPrint('MemoryProfiler: Profiling started');
     }
   }
 
@@ -316,7 +312,6 @@ class MemoryProfiler {
   static Future<MemoryStatistics?> stopProfiling() async {
     if (!_isProfiling) {
       if (kDebugMode) {
-        debugPrint('MemoryProfiler: No active profiling session');
       }
       return null;
     }
@@ -328,7 +323,6 @@ class MemoryProfiler {
 
     if (_snapshots.isEmpty) {
       if (kDebugMode) {
-        debugPrint('MemoryProfiler: No snapshots collected');
       }
       return null;
     }
@@ -401,8 +395,6 @@ class MemoryProfiler {
     _profilingStartTime = null;
 
     if (kDebugMode) {
-      debugPrint('MemoryProfiler: Profiling stopped');
-      debugPrint(stats.toString());
     }
 
     return stats;
@@ -417,7 +409,6 @@ class MemoryProfiler {
   static void clearSnapshots() {
     _snapshots.clear();
     if (kDebugMode) {
-      debugPrint('MemoryProfiler: Snapshots cleared');
     }
   }
 
@@ -433,15 +424,13 @@ class MemoryProfiler {
     _profilingStartTime = null;
 
     if (kDebugMode) {
-      debugPrint('MemoryProfiler: Disposed');
     }
   }
 
   /// Log a memory snapshot with a custom message
   static Future<void> logSnapshot(String message) async {
-    final snapshot = await captureSnapshot();
+    await captureSnapshot();
     if (kDebugMode) {
-      debugPrint('$message\n$snapshot');
     }
   }
 
@@ -465,7 +454,6 @@ class MemoryProfiler {
         '(${rssDiff >= 0 ? '+' : ''}${(rssDiff / (1024 * 1024)).toStringAsFixed(2)})');
 
     if (kDebugMode) {
-      debugPrint(buffer.toString());
     }
   }
 }

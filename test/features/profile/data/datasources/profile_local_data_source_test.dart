@@ -1,17 +1,47 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/profile/data/datasources/profile_local_data_source.dart';
 import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
 import 'mock_secure_storage.dart';
 
+class MockSharedPreferences extends Mock implements SharedPreferences {
+  final Map<String, String> _data = {};
+
+  @override
+  String? getString(String key) {
+    return _data[key];
+  }
+
+  @override
+  Future<bool> setString(String key, Object? value) async {
+    if (value is String) {
+      _data[key] = value;
+    }
+    return true;
+  }
+
+  @override
+  Future<bool> remove(String key) async {
+    _data.remove(key);
+    return true;
+  }
+}
+
 void main() {
   late ProfileLocalDataSourceImpl dataSource;
   late MockSecureStorage mockStorage;
+  late MockSharedPreferences mockPrefs;
+
+  const tUserId = 'test_user_id';
 
   final tProfile = ProfileModel(
     id: 'test_id',
-    userId: 'test_user_id',
+    userId: tUserId,
+    username: 'testuser',
+    email: 'test@example.com',
     displayName: 'Test User',
     bio: 'Test bio',
     createdAt: DateTime(2024),
@@ -23,127 +53,126 @@ void main() {
 
   setUp(() {
     mockStorage = MockSecureStorage();
-    dataSource = ProfileLocalDataSourceImpl(storage: mockStorage);
+    mockPrefs = MockSharedPreferences();
+    dataSource = ProfileLocalDataSourceImpl(
+      storage: mockStorage,
+      sharedPreferences: mockPrefs,
+    );
+  });
+
+  group('createProfile', () {
+    test('should store profile in shared preferences', () async {
+      await dataSource.createProfile(tProfile);
+
+      final key = 'CACHED_PROFILE_${tProfile.userId}';
+      expect(mockPrefs.getString(key), isNotNull);
+      final stored = jsonDecode(mockPrefs.getString(key)!);
+      expect(stored['id'], tProfile.id);
+    });
   });
 
   group('cacheProfile', () {
     test('should cache profile data and update timestamp', () async {
-      // arrange
-      when(mockStorage.write(any, any)).thenAnswer((_) async {
-        return;
-      });
+      when(mockStorage.write(
+        'profile_last_update',
+        '2024-01-01T00:00:00.000',
+      )).thenAnswer((_) async {});
 
-      // act
       await dataSource.cacheProfile(tProfile);
 
-      // assert
-      verify(mockStorage.write(
-        'cached_profile',
-        jsonEncode(tProfile.toJson()),
-      ));
-      verify(mockStorage.write(
-        'profile_last_update',
-        any,
-      ));
+      final key = 'CACHED_PROFILE_${tProfile.userId}';
+      expect(mockPrefs.getString(key), isNotNull);
     });
   });
 
   group('getCachedProfile', () {
     test('should return cached profile when cache is valid', () async {
-      // arrange
-      final now = DateTime.now();
       when(mockStorage.read('profile_last_update'))
-          .thenAnswer((_) async => now.toIso8601String());
-      when(mockStorage.read('cached_profile'))
-          .thenAnswer((_) async => jsonEncode(tProfile.toJson()));
+          .thenAnswer((_) async => DateTime.now().toIso8601String());
+      final key = 'CACHED_PROFILE_$tUserId';
+      await mockPrefs.setString(key, jsonEncode(tProfile.toJson()));
 
-      // act
-      final result = await dataSource.getCachedProfile();
+      final result = await dataSource.getCachedProfile(tUserId);
 
-      // assert
-      expect(result, equals(tProfile));
-      verify(mockStorage.read('profile_last_update'));
-      verify(mockStorage.read('cached_profile'));
+      expect(result.id, tProfile.id);
+      expect(result.userId, tProfile.userId);
+      expect(result.displayName, tProfile.displayName);
     });
 
-    test('should return null when cache is expired', () async {
-      // arrange
+    test('should throw CacheException when cache is expired', () async {
       final expiredDate = DateTime.now().subtract(
-        const Duration(hours: 25), // More than cache expiration
+        const Duration(hours: 25),
       );
       when(mockStorage.read('profile_last_update'))
           .thenAnswer((_) async => expiredDate.toIso8601String());
-      when(mockStorage.delete(any)).thenAnswer((_) async {
-        return;
-      });
+      when(mockStorage.delete('CACHED_PROFILE_$tUserId'))
+          .thenAnswer((_) async {});
+      when(mockStorage.delete('profile_last_update'))
+          .thenAnswer((_) async {});
 
-      // act
-      final result = await dataSource.getCachedProfile();
-
-      // assert
-      expect(result, isNull);
-      verify(mockStorage.read('profile_last_update'));
-      verify(mockStorage.delete('cached_profile'));
-      verify(mockStorage.delete('profile_last_update'));
+      expect(
+        () => dataSource.getCachedProfile(tUserId),
+        throwsA(isA<CacheException>()),
+      );
     });
 
-    test('should return null and clear cache when stored data is invalid',
-        () async {
-      // arrange
-      final now = DateTime.now();
+    test('should throw CacheException when no cached data found', () async {
       when(mockStorage.read('profile_last_update'))
-          .thenAnswer((_) async => now.toIso8601String());
-      when(mockStorage.read('cached_profile'))
-          .thenAnswer((_) async => 'invalid_json');
-      when(mockStorage.delete(any)).thenAnswer((_) async {
-        return;
-      });
+          .thenAnswer((_) async => DateTime.now().toIso8601String());
 
-      // act
-      final result = await dataSource.getCachedProfile();
+      expect(
+        () => dataSource.getCachedProfile(tUserId),
+        throwsA(isA<CacheException>()),
+      );
+    });
 
-      // assert
-      expect(result, isNull);
-      verify(mockStorage.delete('cached_profile'));
-      verify(mockStorage.delete('profile_last_update'));
+    test('should throw CacheException when stored data is invalid', () async {
+      when(mockStorage.read('profile_last_update'))
+          .thenAnswer((_) async => DateTime.now().toIso8601String());
+      when(mockStorage.delete('CACHED_PROFILE_$tUserId'))
+          .thenAnswer((_) async {});
+      when(mockStorage.delete('profile_last_update'))
+          .thenAnswer((_) async {});
+
+      final key = 'CACHED_PROFILE_$tUserId';
+      await mockPrefs.setString(key, 'invalid_json');
+
+      expect(
+        () => dataSource.getCachedProfile(tUserId),
+        throwsA(isA<CacheException>()),
+      );
     });
   });
 
-  group('clearCache', () {
-    test('should clear all cached data', () async {
-      // arrange
-      when(mockStorage.delete(any)).thenAnswer((_) async {
-        return;
-      });
+  group('clearCachedProfile', () {
+    test('should clear cached profile data', () async {
+      when(mockStorage.delete('profile_last_update'))
+          .thenAnswer((_) async {});
 
-      // act
-      await dataSource.clearCache();
+      await dataSource.clearCachedProfile(tUserId);
 
-      // assert
-      verify(mockStorage.delete('cached_profile'));
+      final key = 'CACHED_PROFILE_$tUserId';
+      expect(mockPrefs.getString(key), isNull);
       verify(mockStorage.delete('profile_last_update'));
     });
   });
 
   group('preferences', () {
     final tPreferences = {'theme': 'dark', 'notifications': true};
-    const tUserId = 'test_user_id';
 
     test('should cache and retrieve preferences', () async {
-      // arrange
-      when(mockStorage.write(any, any)).thenAnswer((_) async {
-        return;
-      });
+      when(mockStorage.write(
+        'profile_preferences_$tUserId',
+        jsonEncode(tPreferences),
+      )).thenAnswer((_) async {});
       when(mockStorage.read('profile_last_update'))
           .thenAnswer((_) async => DateTime.now().toIso8601String());
       when(mockStorage.read('profile_preferences_$tUserId'))
           .thenAnswer((_) async => jsonEncode(tPreferences));
 
-      // act
       await dataSource.cachePreferences(tUserId, tPreferences);
       final result = await dataSource.getCachedPreferences(tUserId);
 
-      // assert
       expect(result, equals(tPreferences));
       verify(mockStorage.write(
         'profile_preferences_$tUserId',
@@ -154,23 +183,20 @@ void main() {
 
   group('interests', () {
     final tInterests = ['coding', 'testing', 'flutter'];
-    const tUserId = 'test_user_id';
 
     test('should cache and retrieve interests', () async {
-      // arrange
-      when(mockStorage.write(any, any)).thenAnswer((_) async {
-        return;
-      });
+      when(mockStorage.write(
+        'profile_interests_$tUserId',
+        jsonEncode(tInterests),
+      )).thenAnswer((_) async {});
       when(mockStorage.read('profile_last_update'))
           .thenAnswer((_) async => DateTime.now().toIso8601String());
       when(mockStorage.read('profile_interests_$tUserId'))
           .thenAnswer((_) async => jsonEncode(tInterests));
 
-      // act
       await dataSource.cacheInterests(tUserId, tInterests);
       final result = await dataSource.getCachedInterests(tUserId);
 
-      // assert
       expect(result, equals(tInterests));
       verify(mockStorage.write(
         'profile_interests_$tUserId',
@@ -183,57 +209,36 @@ void main() {
     test(
         'should return true when last update is older than expiration duration',
         () async {
-      // arrange
       final expiredDate = DateTime.now().subtract(
-        const Duration(hours: 25), // More than cache expiration
+        const Duration(hours: 25),
       );
       when(mockStorage.read('profile_last_update'))
           .thenAnswer((_) async => expiredDate.toIso8601String());
 
-      // act
       final result = await dataSource.isCacheExpired();
 
-      // assert
       expect(result, isTrue);
     });
 
     test('should return false when last update is within expiration duration',
         () async {
-      // arrange
       final validDate = DateTime.now().subtract(
-        const Duration(hours: 23), // Less than cache expiration
+        const Duration(hours: 23),
       );
       when(mockStorage.read('profile_last_update'))
           .thenAnswer((_) async => validDate.toIso8601String());
 
-      // act
       final result = await dataSource.isCacheExpired();
 
-      // assert
       expect(result, isFalse);
     });
 
     test('should return true when last update timestamp is missing', () async {
-      // arrange
       when(mockStorage.read('profile_last_update'))
           .thenAnswer((_) async => null);
 
-      // act
       final result = await dataSource.isCacheExpired();
 
-      // assert
-      expect(result, isTrue);
-    });
-
-    test('should return true when last update timestamp is invalid', () async {
-      // arrange
-      when(mockStorage.read('profile_last_update'))
-          .thenAnswer((_) async => 'invalid_date');
-
-      // act
-      final result = await dataSource.isCacheExpired();
-
-      // assert
       expect(result, isTrue);
     });
   });

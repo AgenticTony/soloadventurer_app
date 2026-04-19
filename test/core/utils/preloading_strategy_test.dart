@@ -74,7 +74,7 @@ void main() {
 
     test('should create metrics with values', () {
       final now = DateTime.now();
-      const metrics = PreloadMetrics(
+      final metrics = PreloadMetrics(
         successfulPreloads: 10,
         failedPreloads: 2,
         averageLoadTime: 500.0,

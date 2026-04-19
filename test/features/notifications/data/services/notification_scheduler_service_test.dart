@@ -10,7 +10,7 @@ import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary_item.dart';
 import 'package:soloadventurer/features/travel/domain/repositories/itinerary_repository.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 
 // Mocks
 class MockNotificationRepository extends Mock

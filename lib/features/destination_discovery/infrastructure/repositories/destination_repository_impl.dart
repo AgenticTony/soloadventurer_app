@@ -1,8 +1,7 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
-import '../../domain/models/destination.dart';
-import '../../domain/models/destination_filter.dart'
-    hide BudgetLevel, ActivityLevel;
+import '../../domain/models/destination.dart' hide BudgetLevel, ActivityLevel;
+import '../../domain/models/destination_filter.dart';
 import '../../domain/models/curated_list.dart';
 import '../../domain/models/personalized_recommendation.dart';
 import '../../domain/models/saved_destination.dart';
@@ -50,7 +49,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
           .toList();
 
       return destinations;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -75,13 +74,13 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['getDestinationById'];
       if (data == null) {
-        throw NotFoundException(
+        throw app_exceptions.NotFoundException(
           message: 'Destination not found with ID: $id',
         );
       }
 
       return Destination.fromJson(data as Map<String, dynamic>);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -108,13 +107,13 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['getPersonalizedRecommendations'];
       if (data == null) {
-        throw NotFoundException(
+        throw app_exceptions.NotFoundException(
           message: 'No recommendations found for user: $userId',
         );
       }
 
       return PersonalizedRecommendation.fromJson(data as Map<String, dynamic>);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -149,7 +148,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
           .toList();
 
       return curatedLists;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -175,13 +174,13 @@ class DestinationRepositoryImpl implements DestinationRepository {
 
       final data = result.data?['getCuratedListById'];
       if (data == null) {
-        throw NotFoundException(
+        throw app_exceptions.NotFoundException(
           message: 'Curated list not found with ID: $id',
         );
       }
 
       return CuratedList.fromJson(data as Map<String, dynamic>);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -219,7 +218,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
       }
 
       return SavedDestination.fromJson(data as Map<String, dynamic>);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -257,7 +256,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
           message: 'Failed to unsave destination',
         );
       }
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -300,7 +299,7 @@ class DestinationRepositoryImpl implements DestinationRepository {
           .toList();
 
       return savedDestinations;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
       throw app_exceptions.ServerException(
@@ -369,10 +368,16 @@ class DestinationRepositoryImpl implements DestinationRepository {
     switch (level) {
       case BudgetLevel.budget:
         return 'BUDGET';
-      case BudgetLevel.moderate:
-        return 'MODERATE';
-      case BudgetLevel.expensive:
-        return 'EXPENSIVE';
+      case BudgetLevel.economy:
+        return 'ECONOMY';
+      case BudgetLevel.midRange:
+        return 'MID_RANGE';
+      case BudgetLevel.premium:
+        return 'PREMIUM';
+      case BudgetLevel.luxury:
+        return 'LUXURY';
+      case BudgetLevel.ultraLuxury:
+        return 'ULTRA_LUXURY';
     }
   }
 
@@ -381,10 +386,16 @@ class DestinationRepositoryImpl implements DestinationRepository {
     switch (level) {
       case ActivityLevel.relaxed:
         return 'RELAXED';
+      case ActivityLevel.light:
+        return 'LIGHT';
       case ActivityLevel.moderate:
         return 'MODERATE';
-      case ActivityLevel.adventurous:
-        return 'ADVENTUROUS';
+      case ActivityLevel.active:
+        return 'ACTIVE';
+      case ActivityLevel.intense:
+        return 'INTENSE';
+      case ActivityLevel.extreme:
+        return 'EXTREME';
     }
   }
 
@@ -454,9 +465,9 @@ class DestinationRepositoryImpl implements DestinationRepository {
   /// ```
   ///
   /// Returns an [AppException] subclass appropriate for the error type.
-  AppException _handleGraphQLException(OperationException? exception) {
+  app_exceptions.AppException _handleGraphQLException(OperationException? exception) {
     if (exception == null) {
-      return const UnknownException(
+      return const app_exceptions.UnknownException(
         message: 'Unknown GraphQL error occurred',
       );
     }
@@ -466,19 +477,19 @@ class DestinationRepositoryImpl implements DestinationRepository {
       // Network-related errors
       if (linkException.toString().contains('timeout') ||
           linkException.toString().contains('SocketException')) {
-        return const NetworkTimeoutException(
+        return const app_exceptions.NetworkTimeoutException(
           message: 'Request timeout. Please check your connection.',
         );
       }
 
       if (linkException.toString().contains('NetworkException') ||
           linkException.toString().contains('no internet')) {
-        return const NetworkConnectivityException(
+        return const app_exceptions.NetworkConnectivityException(
           message: 'No internet connection. Please check your network.',
         );
       }
 
-      return ServerException(
+      return app_exceptions.ServerException(
         message: 'Network error: ${linkException.toString()}',
       );
     }
@@ -495,15 +506,15 @@ class DestinationRepositoryImpl implements DestinationRepository {
       // Map common GraphQL error codes to AppException types
       switch (code) {
         case 'BAD_REQUEST':
-          return BadRequestException(message: message);
+          return app_exceptions.BadRequestException(message: message);
         case 'UNAUTHORIZED':
-          return UnauthorizedException(message: message);
+          return app_exceptions.UnauthorizedException(message: message);
         case 'FORBIDDEN':
-          return ForbiddenException(message: message);
+          return app_exceptions.ForbiddenException(message: message);
         case 'NOT_FOUND':
-          return NotFoundException(message: message);
+          return app_exceptions.NotFoundException(message: message);
         case 'VALIDATION_ERROR':
-          return ValidationException(
+          return app_exceptions.ValidationException(
             message: message,
             errors: (firstError.extensions?['errors'] as Map<String, dynamic>?)
                     ?.map(
@@ -515,11 +526,11 @@ class DestinationRepositoryImpl implements DestinationRepository {
                 {},
           );
         default:
-          return ServerException(message: message, code: code);
+          return app_exceptions.ServerException(message: message, code: code);
       }
     }
 
-    return ServerException(
+    return app_exceptions.ServerException(
       message: exception.toString(),
     );
   }

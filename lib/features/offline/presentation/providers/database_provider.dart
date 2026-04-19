@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
-import 'package:get_it/get_it.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart'
+    as core_providers;
 
 part 'database_provider.g.dart';
 
@@ -13,8 +14,7 @@ part 'database_provider.g.dart';
 class DatabaseNotifier extends _$DatabaseNotifier {
   @override
   Future<DatabaseService> build() async {
-    final getIt = GetIt.instance;
-    final dbService = getIt<DatabaseService>();
+    final dbService = ref.watch(core_providers.databaseServiceProvider);
 
     // Initialize the database if not already initialized
     if (!dbService.isInitialized && !dbService.isInitializing) {
@@ -60,9 +60,9 @@ class DatabaseNotifier extends _$DatabaseNotifier {
 /// Note: This provider requires databaseNotifierProvider to be
 /// initialized first. Use databaseNotifierProvider for most cases.
 @Riverpod(keepAlive: true)
-DatabaseService databaseService(DatabaseServiceRef ref) {
+DatabaseService databaseService(Ref ref) {
   // Watch the async provider to ensure initialization
-  final asyncValue = ref.watch(databaseNotifierProvider);
+  final asyncValue = ref.watch(databaseProvider);
 
   // Return the database service when ready
   return asyncValue.when(

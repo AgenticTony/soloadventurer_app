@@ -1,29 +1,34 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/location_update.dart';
 
-/// State for location sharing functionality
-/// Manages active location shares and location updates
-class LocationSharingState extends Equatable {
-  /// Whether location data is currently loading
-  final bool isLoading;
+part 'location_sharing_state.freezed.dart';
 
-  /// Whether location sharing is being started
-  final bool isStarting;
+/// State for location sharing functionality.
+///
+/// Riverpod 3.0 Compliant:
+/// - Uses @freezed with sealed class as required by Freezed 3.2.x with Dart 3.10
+/// - Loading/error handled by AsyncNotifier/AsyncValue, NOT state fields
+@freezed
+sealed class LocationSharingState with _$LocationSharingState {
+  const LocationSharingState._();
+  const factory LocationSharingState({
+    /// Whether location sharing is being started
+    @Default(false) bool isStarting,
 
-  /// Whether location sharing is being stopped
-  final bool isStopping;
+    /// Whether location sharing is being stopped
+    @Default(false) bool isStopping,
 
-  /// List of all location updates
-  final List<LocationUpdate> locationUpdates;
+    /// List of all location updates
+    @Default([]) List<LocationUpdate> locationUpdates,
 
-  /// List of currently active location shares
-  final List<LocationUpdate> activeShares;
+    /// List of currently active location shares
+    @Default([]) List<LocationUpdate> activeShares,
 
-  /// Most recent location update
-  final LocationUpdate? latestLocation;
+    /// Most recent location update
+    LocationUpdate? latestLocation,
+  }) = _LocationSharingState;
 
-  /// Error message if any operation failed
-  final String? error;
+  factory LocationSharingState.initial() => const LocationSharingState();
 
   /// Whether any location sharing is currently active
   bool get hasActiveShares => activeShares.isNotEmpty;
@@ -47,46 +52,4 @@ class LocationSharingState extends Equatable {
     }
     return ids.toList();
   }
-
-  const LocationSharingState({
-    this.isLoading = false,
-    this.isStarting = false,
-    this.isStopping = false,
-    this.locationUpdates = const [],
-    this.activeShares = const [],
-    this.latestLocation,
-    this.error,
-  });
-
-  /// Creates a copy of this state with the given fields replaced
-  LocationSharingState copyWith({
-    bool? isLoading,
-    bool? isStarting,
-    bool? isStopping,
-    List<LocationUpdate>? locationUpdates,
-    List<LocationUpdate>? activeShares,
-    LocationUpdate? latestLocation,
-    String? error,
-  }) {
-    return LocationSharingState(
-      isLoading: isLoading ?? this.isLoading,
-      isStarting: isStarting ?? this.isStarting,
-      isStopping: isStopping ?? this.isStopping,
-      locationUpdates: locationUpdates ?? this.locationUpdates,
-      activeShares: activeShares ?? this.activeShares,
-      latestLocation: latestLocation ?? this.latestLocation,
-      error: error ?? this.error,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        isLoading,
-        isStarting,
-        isStopping,
-        locationUpdates,
-        activeShares,
-        latestLocation,
-        error,
-      ];
 }

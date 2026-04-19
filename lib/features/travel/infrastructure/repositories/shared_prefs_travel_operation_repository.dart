@@ -44,7 +44,6 @@ class SharedPrefsTravelOperationRepository
           }
         } catch (e) {
           // Log error and continue
-          print('Error deserializing operation $opId: $e');
         }
       }
     }
@@ -103,7 +102,6 @@ class SharedPrefsTravelOperationRepository
           return BaseTravelOperation.fromJson(json);
       }
     } catch (e) {
-      print('Error deserializing operation of type $type: $e');
       return null;
     }
   }

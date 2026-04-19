@@ -36,7 +36,6 @@ class AppStartTracker {
   static void trackAppStart() {
     if (_startTime != null) {
       if (kDebugMode) {
-        debugPrint('AppStartTracker: Startup already tracked');
       }
       return;
     }
@@ -53,8 +52,6 @@ class AppStartTracker {
     }
 
     if (kDebugMode) {
-      debugPrint(
-          'AppStartTracker: Started tracking at ${_startTime!.toIso8601String()}');
     }
   }
 
@@ -66,15 +63,12 @@ class AppStartTracker {
   static void completeStartup() {
     if (_startTime == null) {
       if (kDebugMode) {
-        debugPrint(
-            'AppStartTracker: Startup not started, call trackAppStart() first');
       }
       return;
     }
 
     if (_isCompleted) {
       if (kDebugMode) {
-        debugPrint('AppStartTracker: Startup already completed');
       }
       return;
     }
@@ -118,27 +112,18 @@ class AppStartTracker {
     final duration = getStartupDuration();
     if (duration == null) {
       if (kDebugMode) {
-        debugPrint('AppStartTracker: No startup duration available');
       }
       return;
     }
 
     if (kDebugMode) {
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('App Startup Performance');
-      debugPrint('═══════════════════════════════════════');
-      debugPrint('Startup Duration: ${duration.inMilliseconds}ms');
 
       // Add breakdown
       if (duration.inSeconds >= 1) {
-        debugPrint(
-            '  (${duration.inSeconds}s ${duration.inMilliseconds % 1000}ms)');
       }
 
       // Log memory usage after startup if available
       MemoryProfiler.getCurrentUsageMB().then((memoryMB) {
-        debugPrint('Memory After Startup: ${memoryMB.toStringAsFixed(2)} MB');
-        debugPrint('═══════════════════════════════════════');
       });
     }
   }

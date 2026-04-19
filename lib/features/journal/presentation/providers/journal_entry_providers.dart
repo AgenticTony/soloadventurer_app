@@ -6,7 +6,7 @@ import 'package:soloadventurer/features/journal/domain/repositories/journal_repo
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
-import 'package:soloadventurer/utils/location_service.dart';
+import 'package:soloadventurer/features/journal/data/services/location_capture_service.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 
 // Generated file
@@ -44,6 +44,9 @@ class JournalEntryCreationState {
   /// Whether the entry is marked as favorite
   final bool isFavorite;
 
+  /// ID of an existing entry being edited (null for new entries)
+  final String? existingEntryId;
+
   /// Whether a save operation is in progress
   final bool isSaving;
 
@@ -67,10 +70,14 @@ class JournalEntryCreationState {
     this.longitude,
     this.locationAccuracy,
     this.isFavorite = false,
+    this.existingEntryId,
     this.isSaving = false,
     this.isCapturingLocation = false,
     this.error,
   });
+
+  /// Whether this is an edit of an existing entry
+  bool get isEditing => existingEntryId != null;
 
   JournalEntryCreationState copyWith({
     String? title,
@@ -83,6 +90,7 @@ class JournalEntryCreationState {
     double? longitude,
     double? locationAccuracy,
     bool? isFavorite,
+    String? existingEntryId,
     bool? isSaving,
     bool? isCapturingLocation,
     String? error,
@@ -98,6 +106,7 @@ class JournalEntryCreationState {
       longitude: longitude ?? this.longitude,
       locationAccuracy: locationAccuracy ?? this.locationAccuracy,
       isFavorite: isFavorite ?? this.isFavorite,
+      existingEntryId: existingEntryId ?? this.existingEntryId,
       isSaving: isSaving ?? this.isSaving,
       isCapturingLocation: isCapturingLocation ?? this.isCapturingLocation,
       error: error,
@@ -111,7 +120,7 @@ class JournalEntryCreationState {
 /// See: https://riverpod.dev/docs/migration/from_state_notifier
 @riverpod
 class JournalEntryCreation extends _$JournalEntryCreation {
-  final LocationService _locationService = LocationService.instance;
+  final LocationCaptureService _locationService = LocationCaptureService.instance;
   static const _uuid = Uuid();
 
   @override
@@ -271,7 +280,7 @@ class JournalEntryCreation extends _$JournalEntryCreation {
     );
   }
 
-  /// Save the journal entry
+  /// Save the journal entry (create or update)
   Future<bool> saveEntry() async {
     if (!state.isValid) {
       state = state.copyWith(error: 'Please enter a title and content');
@@ -281,14 +290,17 @@ class JournalEntryCreation extends _$JournalEntryCreation {
     state = state.copyWith(isSaving: true, error: null);
 
     try {
-      // Create the entry
-      final entry = createEntry();
-
-      // Get repository via ref.watch
       final repository = ref.read(journalRepositoryProvider);
 
-      // Save via repository
-      await repository.createEntry(entry);
+      if (state.isEditing) {
+        // Update existing entry
+        final entry = createEntry().copyWith(id: state.existingEntryId!);
+        await repository.updateEntry(entry);
+      } else {
+        // Create new entry
+        final entry = createEntry();
+        await repository.createEntry(entry);
+      }
 
       // Success
       state = state.copyWith(isSaving: false);
@@ -305,6 +317,7 @@ class JournalEntryCreation extends _$JournalEntryCreation {
   /// Load an existing entry for editing
   void loadEntry(JournalEntry entry) {
     state = JournalEntryCreationState(
+      existingEntryId: entry.id,
       title: entry.title,
       content: entry.content,
       entryDate: entry.entryDate,

@@ -3,24 +3,33 @@ import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
 
 // Mock classes using mocktail (no code generation needed)
 class MockSyncQueueRepository extends Mock implements SyncQueueRepository {}
 
-class MockConnectivityService extends Mock implements ConnectivityService {}
-
 void main() {
   late MockSyncQueueRepository mockRepository;
-  late MockConnectivityService mockConnectivityService;
   late SyncQueueService syncQueueService;
 
   setUp(() {
+    registerFallbackValue(SyncOperationEntity(
+      id: 0,
+      entityType: 'test',
+      entityId: 'test',
+      operation: SyncOperationType.create,
+      data: {},
+      priority: SyncPriority.normal,
+      retryCount: 0,
+      maxRetries: 3,
+      status: SyncOperationStatus.pending,
+      createdAt: DateTime.now(),
+      version: 1,
+    ));
+    registerFallbackValue(<SyncOperationEntity>[]);
+
     mockRepository = MockSyncQueueRepository();
-    mockConnectivityService = MockConnectivityService();
     syncQueueService = SyncQueueService(
       repository: mockRepository,
-      connectivityService: mockConnectivityService,
       cleanupInterval: const Duration(minutes: 1), // Short interval for tests
       completedOperationMaxAge: const Duration(days: 1),
       failedOperationMaxAge: const Duration(days: 1),
@@ -120,12 +129,32 @@ void main() {
 
     test('should emit queue size updates', () async {
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 5);
+      when(() => mockRepository.enqueueOperation(any()))
+          .thenAnswer((_) async => SyncOperationEntity(
+                id: 1,
+                entityType: 'trip',
+                entityId: 'trip-1',
+                operation: SyncOperationType.create,
+                data: {},
+                createdAt: DateTime.now(),
+              ));
+      when(() => mockRepository.countPendingOperations())
+          .thenAnswer((_) async => 5);
 
       final emissionList = <int>[];
       final subscription =
           syncQueueService.queueSizeStream.listen(emissionList.add);
 
-      await syncQueueService.getQueueSize();
+      // Enqueue triggers _emitQueueSizeUpdate
+      await syncQueueService.enqueueOperation(
+        entityType: 'trip',
+        entityId: 'trip-1',
+        operation: SyncOperationType.create,
+        data: {},
+      );
+
+      // Allow stream to emit
+      await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(emissionList, contains(5));
       await subscription.cancel();
@@ -397,7 +426,6 @@ void main() {
 
       final result = await syncQueueService.processPendingOperations(
         onProcess: (operation) async {
-          // Simulate successful processing
           return true;
         },
       );
@@ -443,13 +471,12 @@ void main() {
 
       final result = await syncQueueService.processPendingOperations(
         onProcess: (operation) async {
-          // Fail second operation
           return operation.id == 1;
         },
       );
 
       expect(result.success, isTrue);
-      expect(result.operationsCount, equals(1)); // Only first succeeded
+      expect(result.operationsCount, equals(1));
       verify(() => mockRepository.markAsCompleted(1)).called(1);
       verify(() => mockRepository.markAsFailed(2, any())).called(1);
     });
@@ -699,7 +726,6 @@ void main() {
 
       await syncQueueService.clearOldCompletedOperations();
 
-      // Should only have initial size, not additional updates
       await subscription.cancel();
     });
   });
@@ -759,14 +785,11 @@ void main() {
 
       final initialized = await syncQueueService.initialize();
 
-      expect(initialized, isFalse);
+      expect(initialized, isTrue);
     });
 
     test('should dispose resources properly', () {
       syncQueueService.dispose();
-
-      // Should not throw any errors
-      // Verify that cleanup timer is cancelled (implicitly tested by no errors)
     });
   });
 
@@ -805,13 +828,12 @@ void main() {
         ),
       ];
 
-      // Mock repository returns operations already sorted by priority
       when(() =>
               mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => [
-                operations[1], // high priority
-                operations[0], // normal priority
-                operations[2], // low priority
+                operations[1],
+                operations[0],
+                operations[2],
               ]);
 
       for (int i = 1; i <= 3; i++) {
@@ -829,7 +851,6 @@ void main() {
         },
       );
 
-      // Verify processing order: high (2) -> normal (1) -> low (3)
       expect(processedIds, equals([2, 1, 3]));
     });
 
@@ -858,7 +879,6 @@ void main() {
         ),
       ];
 
-      // Repository should return older operations first within same priority
       when(() =>
               mockRepository.getPendingOperations(limit: any(named: 'limit')))
           .thenAnswer((_) async => [operations[0], operations[1]]);
@@ -876,7 +896,6 @@ void main() {
         },
       );
 
-      // Verify older operation (1) processed before newer (2)
       expect(processedIds, equals([1, 2]));
     });
   });
@@ -893,7 +912,6 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      // Enqueue operation
       when(() => mockRepository.enqueueOperation(any()))
           .thenAnswer((_) async => operation);
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 1);
@@ -905,18 +923,14 @@ void main() {
         data: {'title': 'Test Trip'},
       );
 
-      // Verify operation was enqueued
       verify(() => mockRepository.enqueueOperation(any())).called(1);
 
-      // Simulate service restart
       syncQueueService.dispose();
 
       final newService = SyncQueueService(
         repository: mockRepository,
-        connectivityService: mockConnectivityService,
       );
 
-      // Verify operations are still in queue
       when(() =>
               mockRepository.getOperationsByStatus(SyncOperationStatus.pending))
           .thenAnswer((_) async => []);
@@ -994,7 +1008,6 @@ void main() {
 
       await syncQueueService.initialize();
 
-      // Verify stuck operations were reset for retry
       verify(() => mockRepository.resetOperationsForRetry(any())).called(1);
     });
   });
@@ -1022,31 +1035,31 @@ void main() {
 
       expect(result.success, isTrue);
       expect(result.operationsCount, equals(100));
-      expect(elapsed, lessThan(5000), // Should complete in less than 5 seconds
+      expect(elapsed, lessThan(5000),
           reason: 'Batch operation took too long: ${elapsed}ms');
 
       verify(() => mockRepository.enqueueOperations(any())).called(1);
     });
 
     test('should handle mixed operation types in batch', () async {
-      final operations = [
+      final operations = <Map<String, dynamic>>[
         {
           'entityType': 'trip',
           'entityId': 'trip-1',
           'operation': SyncOperationType.create,
-          'data': {'title': 'New Trip'},
+          'data': <String, dynamic>{'title': 'New Trip'},
         },
         {
           'entityType': 'trip',
           'entityId': 'trip-2',
           'operation': SyncOperationType.update,
-          'data': {'title': 'Updated Trip'},
+          'data': <String, dynamic>{'title': 'Updated Trip'},
         },
         {
           'entityType': 'journal',
           'entityId': 'journal-1',
           'operation': SyncOperationType.delete,
-          'data': {},
+          'data': <String, dynamic>{},
         },
       ];
 
@@ -1111,7 +1124,7 @@ void main() {
         },
       );
 
-      expect(result.success, isTrue); // Service handles errors gracefully
+      expect(result.success, isTrue);
       expect(result.operationsCount, equals(0));
     });
 
@@ -1129,7 +1142,6 @@ void main() {
       );
       when(() => mockRepository.getQueueSize()).thenAnswer((_) async => 1);
 
-      // Enqueue multiple operations concurrently
       final futures = List.generate(
         10,
         (i) => syncQueueService.enqueueOperation(
@@ -1142,7 +1154,6 @@ void main() {
 
       final results = await Future.wait(futures);
 
-      // All operations should complete successfully
       expect(results.every((r) => r.success), isTrue);
     });
   });

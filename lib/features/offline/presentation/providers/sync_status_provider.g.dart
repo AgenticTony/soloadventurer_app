@@ -9,75 +9,37 @@ part of 'sync_status_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<SyncStatus> to Notifier<SyncStatus>
+/// - Converted from `StateNotifier<SyncStatus>` to `Notifier<SyncStatus>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - AutoDispose enabled via @Riverpod annotation
 /// - build() returns SyncStatus not AsyncValue
 /// - StreamSubscription management via ref.onDispose()
 /// - Constructor auto-load and stream subscription moved to build() method
+// syncManager is provided by sync_manager_provider.dart
 
-@ProviderFor(syncManager)
-const syncManagerProvider = SyncManagerProvider._();
+@ProviderFor(syncStatusStream)
+const syncStatusStreamProvider = SyncStatusStreamProvider._();
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<SyncStatus> to Notifier<SyncStatus>
+/// - Converted from `StateNotifier<SyncStatus>` to `Notifier<SyncStatus>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - AutoDispose enabled via @Riverpod annotation
 /// - build() returns SyncStatus not AsyncValue
 /// - StreamSubscription management via ref.onDispose()
 /// - Constructor auto-load and stream subscription moved to build() method
+// syncManager is provided by sync_manager_provider.dart
 
-final class SyncManagerProvider
-    extends $FunctionalProvider<SyncManager, SyncManager, SyncManager>
-    with $Provider<SyncManager> {
+final class SyncStatusStreamProvider extends $FunctionalProvider<
+        AsyncValue<SyncStatus>, SyncStatus, Stream<SyncStatus>>
+    with $FutureModifier<SyncStatus>, $StreamProvider<SyncStatus> {
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<SyncStatus> to Notifier<SyncStatus>
+  /// - Converted from `StateNotifier<SyncStatus>` to `Notifier<SyncStatus>`
   /// - Dependencies injected via ref.watch() in build() method
   /// - AutoDispose enabled via @Riverpod annotation
   /// - build() returns SyncStatus not AsyncValue
   /// - StreamSubscription management via ref.onDispose()
   /// - Constructor auto-load and stream subscription moved to build() method
-  const SyncManagerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'syncManagerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$syncManagerHash();
-
-  @$internal
-  @override
-  $ProviderElement<SyncManager> $createElement($ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  SyncManager create(Ref ref) {
-    return syncManager(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SyncManager value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<SyncManager>(value),
-    );
-  }
-}
-
-String _$syncManagerHash() => r'fff15752fb7ceb1729469931f3523982a6fe0ced';
-
-@ProviderFor(syncStatusStream)
-const syncStatusStreamProvider = SyncStatusStreamProvider._();
-
-final class SyncStatusStreamProvider extends $FunctionalProvider<
-        AsyncValue<SyncStatus>, SyncStatus, Stream<SyncStatus>>
-    with $FutureModifier<SyncStatus>, $StreamProvider<SyncStatus> {
+// syncManager is provided by sync_manager_provider.dart
   const SyncStatusStreamProvider._()
       : super(
           from: null,

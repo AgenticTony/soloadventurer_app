@@ -674,7 +674,7 @@ void main() {
         30,
         (i) => MapCluster(
           id: 'cluster-$i',
-          position: const LatLng(37.7749 + i * 0.1, -122.4194 + i * 0.1),
+          position: LatLng(37.7749 + i * 0.1, -122.4194 + i * 0.1),
           markerCount: (i + 1) * 10,
           markerIds: List.generate((i + 1) * 10, (j) => 'marker-$j'),
         ),

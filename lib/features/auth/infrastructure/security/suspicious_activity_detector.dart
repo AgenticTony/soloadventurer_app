@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../features/core/domain/services/logging_service.dart';
 import '../../../../core/security/security_manager.dart';
@@ -185,8 +184,6 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       );
 
       // Instead of immediate token revocation, flag for review
-      debugPrint('Rapid location changes detected for user $userId: '
-          '${uniqueLocationsInWindow.length} locations in ${_locationTimeWindow.inHours} hours');
     }
   }
 
@@ -243,8 +240,6 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
       );
 
       // Monitor instead of immediate revocation
-      debugPrint('Concurrent token usage detected for user $userId: '
-          '$currentUsage concurrent uses for token $tokenId');
     }
   }
 
@@ -313,8 +308,6 @@ class SuspiciousActivityDetector extends _$SuspiciousActivityDetector {
         );
 
         // Log for review instead of immediate token revocation
-        debugPrint('High sensitive endpoint access detected for user $userId: '
-            '$sensitiveAccessesInWindow accesses to $endpoint in ${_sensitiveEndpointWindow.inHours} hours');
       }
     }
   }

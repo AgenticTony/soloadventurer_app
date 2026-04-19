@@ -13,7 +13,9 @@ part 'core_service_providers.g.dart';
 /// Keeps a single instance alive for the app lifetime.
 @Riverpod(keepAlive: true)
 FlutterSecureStorage flutterSecureStorage(Ref ref) {
-  return const FlutterSecureStorage();
+  return const FlutterSecureStorage(
+    mOptions: MacOsOptions(usesDataProtectionKeychain: false),
+  );
 }
 
 /// Provider for SecureStorage wrapper

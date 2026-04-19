@@ -28,8 +28,7 @@ class PerformanceMetrics {
   }
 
   /// Stop measuring a performance metric and record the result.
-  static Duration stopMeasurement(String metricName,
-      {MetricCategory? category}) {
+  static Duration stopMeasurement(String metricName) {
     final stopwatch = _activeTimers[metricName];
     if (stopwatch == null) {
       developer.log('Error: No timer found for $metricName');
@@ -49,8 +48,7 @@ class PerformanceMetrics {
         .log('Finished measuring: $metricName - ${duration.inMilliseconds}ms');
 
     // Report to monitoring service if available
-    _monitoringService?.trackOperation(metricName, duration,
-        category: category);
+    _monitoringService?.recordMetric(metricName, duration.inMilliseconds.toDouble());
 
     _activeTimers.remove(metricName);
 
@@ -106,41 +104,35 @@ class PerformanceMetrics {
 
   /// Measure the execution time of a function and report to monitoring service.
   static Future<T> measureFunction<T>(
-      String metricName, Future<T> Function() function,
-      {MetricCategory? category}) async {
+      String metricName, Future<T> Function() function) async {
     startMeasurement(metricName);
     try {
       final result = await function();
-      stopMeasurement(metricName, category: category);
+      stopMeasurement(metricName);
       return result;
     } catch (e, stackTrace) {
-      stopMeasurement(metricName, category: category);
+      stopMeasurement(metricName);
       // Report error to monitoring service if available
-      _monitoringService?.reportError('PerformanceError', e, stackTrace,
-          context: {
-            'metricName': metricName,
-            'category': category?.toString()
-          });
+      _monitoringService?.logError(e, stackTrace: stackTrace, context: {
+        'metricName': metricName,
+      });
       rethrow;
     }
   }
 
   /// Measure the execution time of a synchronous function and report to monitoring service.
-  static T measureSyncFunction<T>(String metricName, T Function() function,
-      {MetricCategory? category}) {
+  static T measureSyncFunction<T>(String metricName, T Function() function) {
     startMeasurement(metricName);
     try {
       final result = function();
-      stopMeasurement(metricName, category: category);
+      stopMeasurement(metricName);
       return result;
     } catch (e, stackTrace) {
-      stopMeasurement(metricName, category: category);
+      stopMeasurement(metricName);
       // Report error to monitoring service if available
-      _monitoringService?.reportError('PerformanceError', e, stackTrace,
-          context: {
-            'metricName': metricName,
-            'category': category?.toString()
-          });
+      _monitoringService?.logError(e, stackTrace: stackTrace, context: {
+        'metricName': metricName,
+      });
       rethrow;
     }
   }
@@ -155,7 +147,7 @@ class PerformanceMetrics {
     developer.log(message, level: 900); // Using a high level for visibility
 
     // Report to monitoring service if available
-    _monitoringService?.trackEvent('performance_threshold_breach', parameters: {
+    _monitoringService?.recordEvent('performance_threshold_breach', attributes: {
       'metricName': metricName,
       'thresholdMs': threshold.inMilliseconds,
       'actualMs': actual.inMilliseconds,
@@ -174,7 +166,7 @@ class PerformanceMetrics {
 /// // Measure authentication time
 /// PerformanceMetrics.startMeasurement('authentication');
 /// await authService.signIn(email, password);
-/// final duration = PerformanceMetrics.stopMeasurement('authentication', category: MetricCategory.authentication);
+/// final duration = PerformanceMetrics.stopMeasurement('authentication');
 ///
 /// // Check if duration exceeds threshold
 /// if (duration > Duration(milliseconds: 1000)) {
@@ -185,7 +177,6 @@ class PerformanceMetrics {
 /// final result = await PerformanceMetrics.measureFunction(
 ///   'api_call',
 ///   () => apiService.fetchData(),
-///   category: MetricCategory.network
 /// );
 ///
 /// // At the end of a testing session, print the summary

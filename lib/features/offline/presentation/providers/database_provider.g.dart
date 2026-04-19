@@ -48,7 +48,7 @@ final class DatabaseNotifierProvider
   DatabaseNotifier create() => DatabaseNotifier();
 }
 
-String _$databaseNotifierHash() => r'0ab6a1aa33a246948c69634a76a5e40b5b5cf806';
+String _$databaseNotifierHash() => r'3a26c02af2b43296cf1364058a216786773cf192';
 
 /// Provider for DatabaseService initialization and management
 ///
@@ -124,4 +124,4 @@ final class DatabaseServiceProvider extends $FunctionalProvider<DatabaseService,
   }
 }
 
-String _$databaseServiceHash() => r'58b23d0d84e17d09b2ae7c9558f08ba42f224d4e';
+String _$databaseServiceHash() => r'85f3ec2d553fd4e12247ada5779873445695f013';

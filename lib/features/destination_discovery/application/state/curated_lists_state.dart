@@ -1,5 +1,7 @@
 import '../../domain/models/curated_list.dart';
 
+const _absent = Object();
+
 /// State class for curated destination lists
 class CuratedListsState {
   /// List of all curated lists
@@ -27,12 +29,12 @@ class CuratedListsState {
   /// Creates a copy of this state with the given fields replaced
   CuratedListsState copyWith({
     List<CuratedList>? curatedLists,
-    CuratedList? selectedList,
+    Object? selectedList = _absent,
     bool? isInitial,
   }) {
     return CuratedListsState(
       curatedLists: curatedLists ?? this.curatedLists,
-      selectedList: selectedList ?? this.selectedList,
+      selectedList: identical(selectedList, _absent) ? this.selectedList : selectedList as CuratedList?,
       isInitial: isInitial ?? this.isInitial,
     );
   }

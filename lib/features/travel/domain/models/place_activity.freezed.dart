@@ -948,12 +948,13 @@ extension PeakHoursPatterns on PeakHours {
 
 /// @nodoc
 
-class _PeakHours implements PeakHours {
+class _PeakHours extends PeakHours {
   const _PeakHours(
       {required final List<int> hours,
       required this.dayOfWeek,
       this.currentHour})
-      : _hours = hours;
+      : _hours = hours,
+        super._();
 
   final List<int> _hours;
   @override

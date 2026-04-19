@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/recommendations/domain/repositories/recommendation_repository.dart';
 
 /// Use case for dismissing a recommendation

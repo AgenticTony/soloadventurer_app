@@ -13,7 +13,10 @@ import 'package:soloadventurer/features/auth/domain/usecases/resend_verification
 import 'package:soloadventurer/features/auth/domain/usecases/forgot_password.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/confirm_password_reset.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
+import 'package:soloadventurer/app/providers/auth_service_providers.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
+import 'package:soloadventurer/features/core/infrastructure/providers/core_providers.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 
@@ -39,6 +42,7 @@ class MockConfirmPasswordReset extends Mock implements ConfirmPasswordReset {}
 class MockLoggingService extends Mock implements LoggingService {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   // Register fallback values for mocktail
   setUpAll(() {
     registerFallbackValue(
@@ -112,18 +116,20 @@ void main() {
       // Current project uses Riverpod 2.6.1, so we use manual disposal
       return ProviderContainer(
         overrides: [
-          getCurrentUserProvider.overrideWithValue(mockGetCurrentUser),
-          isSignedInProvider.overrideWithValue(mockIsSignedIn),
+          getCurrentUserUseCaseProvider.overrideWithValue(mockGetCurrentUser),
+          isSignedInUseCaseProvider.overrideWithValue(mockIsSignedIn),
           loginUseCaseProvider.overrideWithValue(mockLoginUseCase),
-          signOutProvider.overrideWithValue(mockSignOut),
-          signUpProvider.overrideWithValue(mockSignUp),
-          verifyEmailProvider.overrideWithValue(mockVerifyEmail),
-          resendVerificationEmailProvider
+          signOutUseCaseProvider.overrideWithValue(mockSignOut),
+          signUpUseCaseProvider.overrideWithValue(mockSignUp),
+          verifyEmailUseCaseProvider.overrideWithValue(mockVerifyEmail),
+          resendVerificationEmailUseCaseProvider
               .overrideWithValue(mockResendVerificationEmail),
-          forgotPasswordProvider.overrideWithValue(mockForgotPassword),
-          confirmPasswordResetProvider
+          forgotPasswordUseCaseProvider.overrideWithValue(mockForgotPassword),
+          confirmPasswordResetUseCaseProvider
               .overrideWithValue(mockConfirmPasswordReset),
           loggingServiceProvider.overrideWithValue(mockLoggingService),
+          // Override tokenManagerProvider to avoid initialization errors
+          tokenManagerProvider.overrideWith(() => _FakeTokenManager()),
         ],
       );
     }
@@ -579,3 +585,19 @@ void main() {
     });
   });
 }
+
+// Fake TokenManager for testing purposes
+class _FakeTokenManager extends TokenManager {
+  @override
+  FeatureAvailability build() => FeatureAvailability.fullyAvailable;
+
+  @override
+  Future<void> refreshState() async {}
+
+  @override
+  Future<void> initialize() async {}
+
+  @override
+  Future<void> refreshToken() async {}
+}
+

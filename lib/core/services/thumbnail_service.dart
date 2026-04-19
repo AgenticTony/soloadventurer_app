@@ -62,7 +62,6 @@ class ThumbnailService {
   static Future<void> initialize() async {
     if (_initialized) {
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Already initialized');
       }
       return;
     }
@@ -83,14 +82,10 @@ class ThumbnailService {
       _initialized = true;
 
       if (kDebugMode) {
-        final cacheSize = await _getCacheSize();
-        debugPrint('ThumbnailService: Initialized');
-        debugPrint('  - Cache directory: ${_cacheDir!.path}');
-        debugPrint('  - Cache size: ${_formatBytes(cacheSize)}');
+        await _getCacheSize();
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Initialization failed: $e');
       }
       rethrow;
     }
@@ -140,14 +135,12 @@ class ThumbnailService {
       final thumbnailFile = File(thumbnailPath);
       if (await thumbnailFile.exists()) {
         if (kDebugMode) {
-          debugPrint('ThumbnailService: Using cached thumbnail: $cacheKey');
         }
         return thumbnailPath;
       }
 
       // Download the original image
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Downloading image: $imageUrl');
       }
 
       final response = await http.get(Uri.parse(imageUrl));
@@ -186,7 +179,6 @@ class ThumbnailService {
       resizedImage.dispose();
 
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Generated thumbnail: $cacheKey');
       }
 
       // Clean up cache if needed
@@ -195,7 +187,6 @@ class ThumbnailService {
       return thumbnailPath;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Error generating thumbnail: $e');
       }
       rethrow;
     }
@@ -244,8 +235,6 @@ class ThumbnailService {
             results[url] = thumbnailPath;
           } catch (e) {
             if (kDebugMode) {
-              debugPrint(
-                  'ThumbnailService: Failed to generate thumbnail for $url: $e');
             }
             results[url] = url; // Fallback to original URL
           }
@@ -322,11 +311,9 @@ class ThumbnailService {
       await _cacheDir!.create(recursive: true);
 
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Cache cleared');
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Error clearing cache: $e');
       }
       rethrow;
     }
@@ -422,7 +409,6 @@ class ThumbnailService {
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Error calculating cache size: $e');
       }
     }
 
@@ -438,8 +424,6 @@ class ThumbnailService {
     }
 
     if (kDebugMode) {
-      debugPrint(
-          'ThumbnailService: Cache size exceeds limit (${_formatBytes(cacheSize)}), cleaning up');
     }
 
     try {
@@ -473,30 +457,16 @@ class ThumbnailService {
         currentSize -= fileSize;
 
         if (kDebugMode) {
-          debugPrint('ThumbnailService: Deleted ${file.path}');
         }
       }
 
       if (kDebugMode) {
-        final newSize = await _getCacheSize();
-        debugPrint(
-            'ThumbnailService: Cache cleanup complete. New size: ${_formatBytes(newSize)}');
+        await _getCacheSize();
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ThumbnailService: Error during cache cleanup: $e');
       }
     }
-  }
-
-  /// Format bytes to human-readable string.
-  static String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   /// Dispose of resources (for testing).

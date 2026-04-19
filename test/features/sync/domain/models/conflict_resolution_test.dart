@@ -16,18 +16,16 @@ void main() {
         entityType: 'trip',
         version: 2,
         deviceId: 'device-local',
-        updatedAt: now,
-        createdAt: now.subtract(const Duration(minutes: 5)),
-        contentHash: 'hash-local',
+        lastModified: now,
+        dataHash: 'hash-local',
       );
       remoteVersion = EntityVersion(
         entityId: 'entity-1',
         entityType: 'trip',
         version: 2,
         deviceId: 'device-remote',
-        updatedAt: now.add(const Duration(seconds: 30)),
-        createdAt: now.subtract(const Duration(minutes: 5)),
-        contentHash: 'hash-remote',
+        lastModified: now.add(const Duration(seconds: 30)),
+        dataHash: 'hash-remote',
       );
 
       baseConflict = ConflictInfo(
@@ -51,8 +49,7 @@ void main() {
         entityType: 'trip',
         version: 3,
         deviceId: 'device-resolver',
-        updatedAt: DateTime.utc(2024, 1, 1, 12, 0, 30),
-        createdAt: localVersion.createdAt,
+        lastModified: DateTime.utc(2024, 1, 1, 12, 0, 30),
       );
 
       final resolution = ConflictResolution(

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
-import 'package:soloadventurer/utils/geocoding_service.dart';
-import 'package:soloadventurer/utils/location_service.dart';
+import 'package:soloadventurer/features/journal/data/services/geocoding_service.dart';
+import 'package:soloadventurer/features/journal/data/services/location_capture_service.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// Widget for manually selecting or editing location for journal entries
@@ -43,7 +43,7 @@ class LocationPickerWidget extends ConsumerStatefulWidget {
 class _LocationPickerWidgetState extends ConsumerState<LocationPickerWidget> {
   final TextEditingController _searchController = TextEditingController();
   final GeocodingService _geocodingService = GeocodingService.instance;
-  final LocationService _locationService = LocationService.instance;
+  final LocationCaptureService _locationService = LocationCaptureService.instance;
 
   List<GeocodingResult> _searchResults = [];
   bool _isSearching = false;

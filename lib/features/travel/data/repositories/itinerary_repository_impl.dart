@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/itinerary_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/travel/data/models/itinerary_local_model.dart';

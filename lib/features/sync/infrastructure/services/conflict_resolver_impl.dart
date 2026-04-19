@@ -74,7 +74,7 @@ class ConflictResolverImpl extends ConflictResolver {
     required List<ConflictInfo> conflicts,
     List<ConflictResolutionStrategy>? strategies,
     List<ManualResolutionChoice>? userChoices,
-    List<Map<String, dynamic>?> userDataList,
+    List<Map<String, dynamic>?> userDataList = const [],
   }) async {
     final resolutions = <ConflictResolution>[];
     final failedConflicts = <ConflictInfo>[];
@@ -82,9 +82,9 @@ class ConflictResolverImpl extends ConflictResolver {
 
     for (int i = 0; i < conflicts.length; i++) {
       final conflict = conflicts[i];
-      final strategy = strategies?.elementAt(i);
-      final userChoice = userChoices?.elementAt(i);
-      final userData = userDataList.elementAt(i);
+      final strategy = strategies != null && i < strategies.length ? strategies.elementAt(i) : null;
+      final userChoice = userChoices != null && i < userChoices.length ? userChoices.elementAt(i) : null;
+      final userData = i < userDataList.length ? userDataList.elementAt(i) : null;
 
       try {
         final resolution = await resolveConflict(
@@ -123,8 +123,8 @@ class ConflictResolverImpl extends ConflictResolver {
     }
 
     // Compare timestamps
-    final localTimestamp = conflict.localVersion.updatedAt;
-    final remoteTimestamp = conflict.remoteVersion.updatedAt;
+    final localTimestamp = conflict.localVersion.lastModified;
+    final remoteTimestamp = conflict.remoteVersion.lastModified;
 
     Map<String, dynamic> resolvedData;
     bool choseLocal = false;
@@ -182,8 +182,8 @@ class ConflictResolverImpl extends ConflictResolver {
     Map<String, dynamic> resolvedData;
     bool choseLocal = false;
     bool choseRemote = false;
-    List<String> localFieldsUsed = const [];
-    List<String> remoteFieldsUsed = const [];
+    List<String> localFieldsUsed = [];
+    List<String> remoteFieldsUsed = [];
 
     switch (userChoice) {
       case ManualResolutionChoice.keepLocal:
@@ -443,8 +443,8 @@ class ConflictResolverImpl extends ConflictResolver {
 
     // Use most recent timestamp
     final latestTimestamp = [
-      conflict.localVersion.updatedAt,
-      conflict.remoteVersion.updatedAt,
+      conflict.localVersion.lastModified,
+      conflict.remoteVersion.lastModified,
     ].reduce((a, b) => a.isAfter(b) ? a : b);
 
     return EntityVersion(
@@ -452,9 +452,8 @@ class ConflictResolverImpl extends ConflictResolver {
       entityType: conflict.entityType,
       version: maxVersion + 1,
       deviceId: config.deviceId,
-      updatedAt: DateTime.now().toUtc(),
-      createdAt: baseVersion?.createdAt ?? latestTimestamp,
-      contentHash: null, // Will be computed when data is saved
+      lastModified: latestTimestamp,
+      dataHash: null, // Will be computed when data is saved
     );
   }
 

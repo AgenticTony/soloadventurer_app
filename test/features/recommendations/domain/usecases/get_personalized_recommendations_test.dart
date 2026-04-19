@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/date_range.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/destination.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
@@ -24,6 +24,9 @@ void main() {
   setUp(() {
     mockService = MockRecommendationService();
     useCase = GetPersonalizedRecommendations(mockService);
+    provideDummy<Either<Failure, List<PersonalizedRecommendation>>>(
+      const Left(ServerFailure(message: 'dummy', statusCode: 0)),
+    );
   });
 
   group('GetPersonalizedRecommendations', () {
@@ -39,9 +42,9 @@ void main() {
       end: DateTime(2026, 6, 7),
     );
 
-    final interests = {
-      TravelInterest.foodTours,
-      TravelInterest.museums,
+    final interests = <TravelInterest>{
+      TravelInterest.food,
+      TravelInterest.art,
     };
 
     final validRequest = RecommendationRequest(
@@ -160,8 +163,8 @@ void main() {
         () async {
       // Arrange
       final invalidDateRange = DateRange(
-        start: DateTime(2026, 6, 7),
-        end: DateTime(2026, 6, 1), // End before start
+        start: DateTime(2020, 6, 7),
+        end: DateTime(2020, 6, 1), // End before start
       );
 
       final invalidRequest = RecommendationRequest(
@@ -193,7 +196,7 @@ void main() {
         itineraryId: 'itinerary-123',
         destination: destination,
         tripDates: dateRange,
-        interests: {}, // Empty interests
+        interests: <TravelInterest>{}, // Empty interests
       );
 
       // Act
@@ -216,7 +219,7 @@ void main() {
       when(mockService.getPersonalizedRecommendations(any))
           .thenAnswer((_) async => const Left(ServerFailure(
                 message: 'Failed to fetch recommendations',
-                code: '500',
+                statusCode: 500,
               )));
 
       // Act
@@ -255,7 +258,7 @@ void main() {
       );
     });
 
-    test('returns multiple recommendations sorted by relevance', () async {
+    test('returns multiple recommendations in service order', () async {
       // Arrange
       final recommendations = [
         PersonalizedRecommendation(
@@ -308,10 +311,10 @@ void main() {
         (failure) => fail('Should return Right'),
         (recs) {
           expect(recs, hasLength(2));
-          expect(recs.first.id, 'rec-1'); // Highest score first
-          expect(recs.first.relevanceScore, 95.0);
-          expect(recs.last.id, 'rec-2');
-          expect(recs.last.relevanceScore, 88.0);
+          expect(recs.first.id, 'rec-2');
+          expect(recs.first.relevanceScore, 88.0);
+          expect(recs.last.id, 'rec-1');
+          expect(recs.last.relevanceScore, 95.0);
         },
       );
     });

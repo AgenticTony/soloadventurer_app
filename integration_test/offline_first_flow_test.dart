@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
@@ -45,7 +45,7 @@ void main() {
     test('Test creating trip while offline', () async {
       // Setup: Device is offline
       when(() => mockConnectivityService.checkConnectivity())
-          .thenAnswer((_) async => NetworkStatus.disconnected);
+          .thenAnswer((_) async => ConnectivityStatus.disconnected());
       when(() => mockConnectivityService.onConnectivityChanged)
           .thenAnswer((_) => Stream.value(NetworkStatus.disconnected));
 
@@ -101,7 +101,11 @@ void main() {
       when(() => mockConnectivityService.onConnectivityChanged)
           .thenAnswer((_) => connectivityStatusStream);
       when(() => mockConnectivityService.checkConnectivity())
-          .thenAnswer((_) async => NetworkStatus.connected);
+          .thenAnswer((_) async => ConnectivityStatus(
+                connectionType: ConnectionType.wifi,
+                isConnected: true,
+                timestamp: DateTime.now(),
+              ));
 
       // Mock pending count
       when(() => mockSyncQueueService.getPendingCount())
@@ -132,7 +136,7 @@ void main() {
 
       // Phase 1: Offline - Create trip
       when(() => mockConnectivityService.checkConnectivity())
-          .thenAnswer((_) async => NetworkStatus.disconnected);
+          .thenAnswer((_) async => ConnectivityStatus.disconnected());
 
       when(() => mockTripDao.insertTrip(any())).thenAnswer((_) async => 1);
       when(() => mockSyncQueueService.enqueueOperation(
@@ -168,7 +172,11 @@ void main() {
 
       // Phase 2: Connection restored
       when(() => mockConnectivityService.checkConnectivity())
-          .thenAnswer((_) async => NetworkStatus.connected);
+          .thenAnswer((_) async => ConnectivityStatus(
+                connectionType: ConnectionType.wifi,
+                isConnected: true,
+                timestamp: DateTime.now(),
+              ));
 
       when(() => mockSyncQueueService.getPendingCount())
           .thenAnswer((_) async => 1);
@@ -195,7 +203,11 @@ void main() {
     test('Test error handling during sync', () async {
       // Setup: Connection is online but sync fails
       when(() => mockConnectivityService.checkConnectivity())
-          .thenAnswer((_) async => NetworkStatus.connected);
+          .thenAnswer((_) async => ConnectivityStatus(
+                connectionType: ConnectionType.wifi,
+                isConnected: true,
+                timestamp: DateTime.now(),
+              ));
 
       when(() => mockSyncQueueService.getPendingCount())
           .thenAnswer((_) async => 1);

@@ -6,12 +6,12 @@ import '../../../../features/core/infrastructure/api/dio_api_service.dart';
 part 'user_profile_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<User?>> to AsyncNotifier<User?>
+/// - Converted from `StateNotifier<AsyncValue<User?>>` to `AsyncNotifier<User?>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<User?> not AsyncValue
-/// - State is automatically AsyncValue<User?> when consumed
+/// - build() returns `Future<User?>` not AsyncValue
+/// - State is automatically `AsyncValue<User?>` when consumed
 
 /// Provider for the API service
 @riverpod

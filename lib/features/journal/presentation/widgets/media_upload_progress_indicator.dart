@@ -133,13 +133,12 @@ class MediaUploadProgressIndicator extends ConsumerStatefulWidget {
   /// Create a progress indicator for all tasks in a journal entry
   const MediaUploadProgressIndicator.queue({
     super.key,
-    required String entryId,
-    UploadProgressConfig config = const UploadProgressConfig(),
+    required this.taskId,
+    this.config = const UploadProgressConfig(),
     this.onUploadComplete,
     this.onUploadFailed,
     this.onUploadCancelled,
-  })  : taskId = entryId,
-        config = config;
+  });
 
   @override
   ConsumerState<MediaUploadProgressIndicator> createState() =>
@@ -271,7 +270,7 @@ class _MediaUploadProgressIndicatorState
               children: [
                 _buildStatusText(task, theme, colorScheme),
                 if (widget.config.showActions && _canShowActions(task.status))
-                  _buildActionButton(task, colorScheme),
+                  _buildActionButton(task, colorScheme)!,
               ],
             ),
 
@@ -348,7 +347,7 @@ class _MediaUploadProgressIndicatorState
           ],
           const SizedBox(width: 12),
           if (widget.config.showActions && _canShowActions(task.status))
-            _buildActionButton(task, colorScheme),
+            _buildActionButton(task, colorScheme)!,
         ],
       ),
     );
@@ -441,6 +440,7 @@ class _MediaUploadProgressIndicatorState
         color = colorScheme.outline;
         break;
       case UploadStatus.queued:
+      case UploadStatus.pending:
         icon = Icons.schedule;
         color = colorScheme.outline;
         break;
@@ -463,6 +463,7 @@ class _MediaUploadProgressIndicatorState
 
     switch (task.status) {
       case UploadStatus.queued:
+      case UploadStatus.pending:
         text = 'Queued';
         color = colorScheme.outline;
         break;
@@ -505,7 +506,7 @@ class _MediaUploadProgressIndicatorState
         icon: const Icon(Icons.close),
         color: colorScheme.error,
         onPressed: () {
-          ref.read(mediaUploadNotifierProvider.notifier).cancelUpload(task.id);
+          ref.read(mediaUploadProvider.notifier).cancelUpload(task.id);
         },
         tooltip: 'Cancel upload',
       );
@@ -517,7 +518,7 @@ class _MediaUploadProgressIndicatorState
         icon: const Icon(Icons.refresh),
         color: colorScheme.primary,
         onPressed: () {
-          ref.read(mediaUploadNotifierProvider.notifier).retryUpload(task.id);
+          ref.read(mediaUploadProvider.notifier).retryUpload(task.id);
         },
         tooltip: 'Retry upload',
       );
@@ -528,7 +529,7 @@ class _MediaUploadProgressIndicatorState
         icon: const Icon(Icons.play_arrow),
         color: colorScheme.primary,
         onPressed: () {
-          ref.read(mediaUploadNotifierProvider.notifier).resumeUploads();
+          ref.read(mediaUploadProvider.notifier).resumeUploads();
         },
         tooltip: 'Resume upload',
       );
@@ -705,6 +706,7 @@ class UploadTaskTile extends ConsumerWidget {
         color = colorScheme.outline;
         break;
       case UploadStatus.queued:
+      case UploadStatus.pending:
         icon = Icons.schedule;
         color = colorScheme.outline;
         break;
@@ -727,6 +729,7 @@ class UploadTaskTile extends ConsumerWidget {
 
     switch (task.status) {
       case UploadStatus.queued:
+      case UploadStatus.pending:
         text = 'Queued';
         color = colorScheme.outline;
         break;

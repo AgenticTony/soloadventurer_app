@@ -243,10 +243,10 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
     final theme = Theme.of(context);
     final safetyState = ref.watch(safetyProvider);
     final contactsState = ref.watch(trustedContactsProvider);
-    final isProcessing = safetyState.isProcessing;
+    final isProcessing = safetyState.isLoading;
 
     // Get contacts who will be notified (all contacts for status updates)
-    final contactsToNotify = contactsState.contacts;
+    final contactsToNotify = contactsState.value?.contacts ?? [];
 
     return Scaffold(
       appBar: AppBar(
@@ -280,8 +280,8 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Current status display
-            if (safetyState.currentStatus != null) ...[
-              _buildCurrentStatusCard(theme, safetyState.currentStatus!),
+            if (safetyState.value?.currentStatus != null) ...[
+              _buildCurrentStatusCard(theme, safetyState.value!.currentStatus!),
               const SizedBox(height: 24),
             ],
 
@@ -541,8 +541,8 @@ class _StatusUpdateScreenState extends ConsumerState<StatusUpdateScreen> {
         ],
       ),
       subtitle: Text(subtitle),
-      value: status,
       groupValue: _selectedStatus,
+      value: status,
       onChanged: isProcessing
           ? null
           : (value) {

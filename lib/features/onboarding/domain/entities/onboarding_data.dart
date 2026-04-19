@@ -44,7 +44,8 @@ sealed class OnboardingData with _$OnboardingData {
     return name.trim().isNotEmpty &&
         destination.isValid &&
         dateRange.isValid &&
-        interests.isNotEmpty;
+        interests.isNotEmpty &&
+        interests.length <= 5;
   }
 
   /// Returns a list of validation errors if any

@@ -1,21 +1,31 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:soloadventurer/app/app.dart';
 import 'package:soloadventurer/core/config/app_config.dart';
 import 'package:soloadventurer/core/config/image_cache_config.dart';
+import 'package:soloadventurer/core/monitoring/app_logger.dart';
 import 'package:soloadventurer/core/monitoring/performance/app_start_tracker.dart';
 import 'package:soloadventurer/core/errors/error_handler.dart';
-import 'package:soloadventurer/core/security/security_manager.dart';
-import 'package:soloadventurer/core/storage/secure_storage_adapter.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
 import 'package:soloadventurer/app/providers/core_service_providers.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
+import 'package:soloadventurer/features/matching/presentation/providers/matching_provider.dart';
+import 'package:soloadventurer/features/matching/data/datasources/matching_remote_data_source_impl.dart';
+import 'package:soloadventurer/features/matching/data/datasources/matching_local_data_source_impl.dart';
+import 'package:soloadventurer/features/matching/data/repositories/matching_repository_impl.dart';
+import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
+import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source_impl.dart';
+import 'package:soloadventurer/features/journal/data/repositories/journal_repository_impl.dart';
+import 'package:soloadventurer/core/services/push_notification_service.dart';
+import 'package:soloadventurer/app/router/go_router_config.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
 /// before the app is run.
@@ -24,6 +34,11 @@ Future<void> bootstrap() async {
   runZonedGuarded(() async {
     // Initialize Flutter bindings first
     WidgetsFlutterBinding.ensureInitialized();
+
+    // Silence all debugPrint in release builds globally.
+    // Individual debugPrint calls don't need kDebugMode guards
+    // when this is installed — the guard is centralized here.
+    AppLogger.installGlobalGuard();
 
     // Track app start time
     AppStartTracker.trackAppStart();
@@ -35,13 +50,17 @@ Future<void> bootstrap() async {
     try {
       await dotenv.load(fileName: '.env');
     } catch (e) {
-      debugPrint('Warning: Failed to load .env file. Using default values.');
+      if (kDebugMode) {
+        debugPrint('Warning: Failed to load .env file. Using default values.');
+      }
       // Load example environment file as fallback
       try {
         await dotenv.load(fileName: '.env.example');
       } catch (e) {
-        debugPrint(
-            'Warning: Failed to load .env.example file. Using hardcoded defaults.');
+        if (kDebugMode) {
+          debugPrint(
+              'Warning: Failed to load .env.example file. Using hardcoded defaults.');
+        }
       }
     }
 
@@ -62,64 +81,81 @@ Future<void> bootstrap() async {
 
     AppStartTracker.endPhase('error_handling_init');
 
-    // Start dependency injection initialization phase
-    AppStartTracker.startPhase('di_init');
+    // Parallelize independent initialization tasks for faster startup.
+    // Database, SharedPreferences, Supabase, and Firebase are all independent.
+    AppStartTracker.startPhase('parallel_init');
 
-    // Initialize GetIt service locator with all dependencies
-    await setupServiceLocator();
+    final results = await Future.wait([
+      // Database initialization
+      (() async {
+        try {
+          final service = DatabaseService();
+          final initialized = await service.initialize();
+          if (initialized) {
+            if (kDebugMode) {
+              debugPrint('✅ Database initialized successfully');
+            }
+            return service;
+          }
+          if (kDebugMode) {
+            debugPrint('⚠️ Database initialization returned false');
+          }
+          return null;
+        } catch (e, stackTrace) {
+          if (kDebugMode) {
+            debugPrint('❌ Database initialization failed: $e');
+            debugPrint('Stack trace: $stackTrace');
+          }
+          return null;
+        }
+      })(),
 
-    AppStartTracker.endPhase('di_init');
+      // SharedPreferences initialization
+      (() async => SharedPreferences.getInstance())(),
 
-    // Start database initialization phase
-    AppStartTracker.startPhase('database_init');
+      // Image cache configuration
+      (() async => ImageCacheConfig.initialize())(),
 
-    // Initialize the local database for offline support
-    // This must happen after DI setup and before provider initialization
-    try {
-      final databaseService = getIt<DatabaseService>();
-      final initialized = await databaseService.initialize();
-      if (initialized) {
-        debugPrint('✅ Database initialized successfully');
-      } else {
-        debugPrint('⚠️ Database initialization returned false');
-      }
-    } catch (e, stackTrace) {
-      debugPrint('❌ Database initialization failed: $e');
-      debugPrint('Stack trace: $stackTrace');
-      // Don't fail the app startup - offline features will be disabled
-    }
+      // Supabase initialization
+      (() async {
+        final supabaseUrl = AppConfig.supabaseUrl;
+        final supabaseAnonKey = AppConfig.supabaseAnonKey;
+        if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
+          await Supabase.initialize(
+            url: supabaseUrl,
+            anonKey: supabaseAnonKey,
+            debug: kDebugMode,
+          );
+          if (kDebugMode) {
+            debugPrint('✅ Supabase initialized successfully');
+          }
+        } else {
+          if (kDebugMode) {
+            debugPrint('⚠️ Supabase credentials missing');
+            debugPrint('  Set SUPABASE_URL and SUPABASE_ANON_KEY in .env');
+          }
+        }
+      })(),
 
-    AppStartTracker.endPhase('database_init');
+      // Firebase initialization
+      (() async {
+        try {
+          await Firebase.initializeApp();
+          if (kDebugMode) {
+            debugPrint('✅ Firebase initialized successfully');
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint('⚠️ Firebase initialization failed: $e');
+          }
+        }
+      })(),
+    ]);
 
-    // Start storage initialization phase
-    AppStartTracker.startPhase('storage_init');
+    final databaseService = results[0] as DatabaseService?;
+    final sharedPreferences = results[1] as SharedPreferences;
 
-    // Initialize SharedPreferences
-    final sharedPreferences = await SharedPreferences.getInstance();
-
-    // Initialize image cache configuration for memory efficiency
-    // This configures cached_network_image to handle 500+ photos efficiently
-    await ImageCacheConfig.initialize();
-
-    // Start auth initialization phase
-    AppStartTracker.startPhase('auth_init');
-
-    // Initialize Supabase auth
-    final supabaseUrl = AppConfig.supabaseUrl;
-    final supabaseAnonKey = AppConfig.supabaseAnonKey;
-    if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty) {
-      await Supabase.initialize(
-        url: supabaseUrl,
-        anonKey: supabaseAnonKey,
-        debug: true,
-      );
-      debugPrint('✅ Supabase initialized successfully');
-    } else {
-      debugPrint('⚠️ Supabase credentials missing');
-      debugPrint('  Set SUPABASE_URL and SUPABASE_ANON_KEY in .env');
-    }
-
-    AppStartTracker.endPhase('auth_init');
+    AppStartTracker.endPhase('parallel_init');
 
     // Start provider initialization phase
     AppStartTracker.startPhase('provider_init');
@@ -128,17 +164,84 @@ Future<void> bootstrap() async {
     final container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        if (databaseService != null)
+          databaseServiceProvider.overrideWithValue(databaseService),
+        // Wire MatchingRepository with real Supabase implementation
+        matchingRepositoryProvider.overrideWithValue(
+          MatchingRepositoryImpl(
+            remoteDataSource: MatchingRemoteDataSourceImpl(
+              client: Supabase.instance.client,
+            ),
+            localDataSource: MatchingLocalDataSourceImpl(),
+            isOnline: true, // Default to online; connectivity updates handled by repository
+          ),
+        ),
+        // Wire JournalRepository with real Supabase implementation
+        journalRepositoryProvider.overrideWithValue(
+          JournalRepositoryImpl(
+            remoteDataSource: JournalRemoteDataSourceImpl(
+              client: Supabase.instance.client,
+            ),
+          ),
+        ),
       ],
     );
 
-    // Initialize SecurityManagerAdapter with the SecurityManager from Riverpod
-    // This bridges the GetIt and Riverpod DI systems for auth-related services
-    final securityManager = container.read(securityManagerProvider);
-    SecurityManagerAdapter.setSecurityManager(securityManager);
-    debugPrint('✅ SecurityManagerAdapter initialized with SecurityManager');
-
     // Initialize TokenManager (domain service with FeatureAvailability state)
     await container.read(tokenManagerProvider.notifier).initialize();
+
+    // Initialize push notifications
+    try {
+      final pushService = container.read(pushNotificationServiceProvider);
+      await pushService.initialize();
+      if (kDebugMode) {
+        debugPrint('✅ Push notification service initialized');
+      }
+
+      // On token refresh, re-register with Supabase if user is authenticated
+      pushService.onTokenRefresh = (token) {
+        try {
+          final client = Supabase.instance.client;
+          final userId = client.auth.currentUser?.id;
+          if (userId == null) return;
+
+          final remoteDataSource = MatchingRemoteDataSourceImpl(client: client);
+          remoteDataSource.registerNotificationToken(
+            token: token,
+            platform: Platform.operatingSystem,
+          );
+          if (kDebugMode) {
+            debugPrint('✅ Refreshed push token registered');
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint('⚠️ Failed to register refreshed push token: $e');
+          }
+        }
+      };
+
+      // Handle notification tap → navigate to chat screen
+      pushService.onNotificationTap = (data) {
+        final type = data['type'];
+        if (type == 'new_message') {
+          final chatId = data['chatId'] ?? '';
+          final connectionId = data['connectionId'] ?? '';
+          if (connectionId.isNotEmpty) {
+            final context = goRouterNavigatorKey.currentContext;
+            if (context != null) {
+              goRouterNavigatorKey.currentState?.context;
+              // Use the router directly to navigate
+              final router = container.read(goRouterProvider);
+              router.go('/chat/$connectionId', extra: {'chatId': chatId});
+            }
+          }
+        }
+      };
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ Push notification init failed: $e');
+      }
+    }
 
     AppStartTracker.endPhase('provider_init');
 
@@ -175,12 +278,14 @@ final class ProviderLogger extends ProviderObserver {
     ProviderObserverContext context,
     Object? value,
   ) {
-    debugPrint('''
+    if (kDebugMode) {
+      debugPrint('''
 {
   "event": "didAddProvider",
   "provider": "${context.provider}",
   "value": "$value"
 }''');
+    }
   }
 
   @override
@@ -189,24 +294,28 @@ final class ProviderLogger extends ProviderObserver {
     Object? previousValue,
     Object? newValue,
   ) {
-    debugPrint('''
+    if (kDebugMode) {
+      debugPrint('''
 {
   "event": "didUpdateProvider",
   "provider": "${context.provider}",
   "previousValue": "$previousValue",
   "newValue": "$newValue"
 }''');
+    }
   }
 
   @override
   void didDisposeProvider(
     ProviderObserverContext context,
   ) {
-    debugPrint('''
+    if (kDebugMode) {
+      debugPrint('''
 {
   "event": "didDisposeProvider",
   "provider": "${context.provider}"
 }''');
+    }
   }
 
   @override
@@ -215,13 +324,15 @@ final class ProviderLogger extends ProviderObserver {
     Object error,
     StackTrace stackTrace,
   ) {
-    debugPrint('''
+    if (kDebugMode) {
+      debugPrint('''
 {
   "event": "providerDidFail",
   "provider": "${context.provider}",
   "error": "$error",
   "stackTrace": "$stackTrace"
 }''');
+    }
   }
 }
 

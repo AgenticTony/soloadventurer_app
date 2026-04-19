@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
-import 'package:soloadventurer/utils/media_compression.dart';
-import 'package:soloadventurer/utils/video_compression.dart';
+import 'package:soloadventurer/features/journal/data/services/media_compression.dart';
+import 'package:soloadventurer/features/journal/data/services/video_compression.dart';
 
 /// Result of picking media from the device
 class PickedMediaFile {
@@ -189,7 +189,7 @@ class MediaPicker extends ConsumerStatefulWidget {
   const MediaPicker({
     super.key,
     this.onMediaPicked,
-    this.config = const MediaPickerConfig.forTravelJournal(),
+    this.config = const MediaPickerConfig(),
     this.showAsButton = true,
     this.buttonText = 'Add Media',
     this.buttonIcon,
@@ -399,7 +399,7 @@ class _MediaPickerState extends ConsumerState<MediaPicker> {
             mimeType: file.mimeType,
             width: result.width,
             height: result.height,
-            duration: result.duration,
+            duration: result.duration.toInt(),
           ));
         } catch (e) {
           // Keep original on compression error

@@ -259,7 +259,7 @@ class MapCluster extends Equatable {
       position: center,
       markerCount: markers.length,
       markerIds: markers.map((m) => m.id).toList(),
-      markerTypes: markers.map((m) => m.type).toSet().toList(),
+      markerTypes: markers.map((m) => m.type).toList(),
       weightedPosition: useWeightedCenter ? center : null,
     );
   }

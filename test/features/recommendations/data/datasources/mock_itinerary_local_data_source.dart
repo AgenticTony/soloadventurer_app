@@ -27,7 +27,9 @@ class MockItineraryLocalDataSource implements ItineraryLocalDataSource {
   @override
   Future<Itinerary> getItinerary(String itineraryId) async {
     if (!_itineraries.containsKey(itineraryId)) {
-      throw RepositoryException('Itinerary not found: $itineraryId');
+      throw RepositoryException(
+        message: 'Itinerary not found: $itineraryId',
+      );
     }
     return _itineraries[itineraryId]!;
   }

@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'package:flutter/foundation.dart';
 
 /// Class to store information about a network request
 class NetworkRequestInfo {
@@ -56,17 +55,14 @@ class NetworkMonitor {
 
   /// Track a network request
   void trackRequest(String endpoint) {
-    debugPrint('🌐 Network request to: $endpoint');
   }
 
   /// Track a network response
   void trackResponse(String path, int statusCode) {
-    debugPrint('✅ Network response from: $path (Status: $statusCode)');
   }
 
   /// Track a network error
   void trackError(String path, String errorMessage) {
-    debugPrint('❌ Network error for: $path\nError: $errorMessage');
   }
 
   /// Track a network request and its response
@@ -97,16 +93,11 @@ class NetworkMonitor {
 
     // Log slow requests
     if (duration.inMilliseconds > _slowRequestThresholdMs) {
-      debugPrint(
-          '⚠️ Slow network request: ${request.path} took ${duration.inMilliseconds}ms');
     }
 
     // Log errors
     if (isError) {
-      debugPrint('❌ Network request error: ${request.path} - $errorMessage');
     } else {
-      debugPrint(
-          '✅ Network request: ${request.path} - ${duration.inMilliseconds}ms');
     }
   }
 

@@ -26,14 +26,7 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final checkInState = ref.watch(checkInProvider);
-    final upcomingCheckIns = checkInState.upcomingCheckIns;
-    final nextCheckIn = checkInState.nextCheckIn;
-    final isLoading = checkInState.isLoading;
-    final isProcessing = checkInState.isProcessing;
-    final error = checkInState.error;
-    final dueSoonCount = checkInState.dueSoonCount;
-    final missedCount = checkInState.missedCount;
+    final checkInAsync = ref.watch(checkInProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,43 +46,26 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
           ),
         ],
       ),
-      body: _buildBody(
-        context,
-        upcomingCheckIns,
-        nextCheckIn,
-        isLoading,
-        isProcessing,
-        error,
-        dueSoonCount,
-        missedCount,
+      body: checkInAsync.when(
+        data: (checkInState) => _buildBody(context, checkInState),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _buildErrorWidget(context, error.toString()),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: isProcessing ? null : () => _showCheckInOptions(context),
+        onPressed: checkInAsync.value?.isProcessing ?? false
+            ? null
+            : () => _showCheckInOptions(context),
         icon: const Icon(Icons.add),
         label: const Text('New Check-in'),
       ),
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    List<CheckIn> upcomingCheckIns,
-    CheckIn? nextCheckIn,
-    bool isLoading,
-    bool isProcessing,
-    String? error,
-    int dueSoonCount,
-    int missedCount,
-  ) {
-    if (isLoading && upcomingCheckIns.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (error != null) {
-      return _buildErrorWidget(context, error);
-    }
+  Widget _buildBody(BuildContext context, dynamic checkInState) {
+    final upcomingCheckIns = checkInState.upcomingCheckIns;
+    final nextCheckIn = checkInState.nextCheckIn;
+    final dueSoonCount = checkInState.dueSoonCount;
+    final missedCount = checkInState.missedCount;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -447,11 +423,8 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () {
-                ref
-                    .read(checkInProvider.notifier)
-                    .loadUpcomingCheckIns();
-              },
+              onPressed: () =>
+                  ref.read(checkInProvider.notifier).loadUpcomingCheckIns(),
               icon: const Icon(Icons.refresh),
               label: const Text('Try Again'),
             ),
@@ -579,7 +552,6 @@ class _CheckInHomeScreenState extends ConsumerState<CheckInHomeScreen> {
 
   String _formatCheckInTime(CheckIn checkIn) {
     final scheduledTime = checkIn.scheduledTime;
-    final deadline = checkIn.deadline;
 
     if (scheduledTime == null) return 'No time set';
 

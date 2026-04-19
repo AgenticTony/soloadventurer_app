@@ -67,7 +67,7 @@ class ConflictComparisonView extends StatelessWidget {
                   );
                 } else {
                   // Side-by-side layout for larger screens
-                  Row(
+                  return Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
@@ -197,8 +197,6 @@ class ConflictComparisonView extends StatelessWidget {
     dynamic version,
     Color color,
   ) {
-    final theme = Theme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

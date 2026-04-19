@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/repositories/travel_operation_repository.dart';
 import '../../domain/models/base_travel_operation.dart';
 
@@ -8,13 +7,12 @@ part 'travel_operation_provider.g.dart';
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier to @riverpod Notifier
 /// - Dependencies injected via ref.watch() in build() method
-/// - Keeps AsyncValue<void> state pattern (synchronous Notifier with AsyncValue state)
+/// - Keeps `AsyncValue<void>` state pattern (synchronous Notifier with AsyncValue state)
 /// - Initialization logic moved from constructor to build() method
 ///
 /// Provider for the travel operation repository
 @riverpod
-TravelOperationRepository travelOperationRepository(
-    TravelOperationRepositoryRef ref) {
+TravelOperationRepository travelOperationRepository(Ref ref) {
   throw UnimplementedError(
       'Repository must be initialized with SharedPreferences');
 }
@@ -23,8 +21,7 @@ TravelOperationRepository travelOperationRepository(
 ///
 /// Riverpod 3.0: Uses @riverpod annotation for FutureProvider
 @riverpod
-Future<List<BaseTravelOperation>> pendingOperations(
-    PendingOperationsRef ref) async {
+Future<List<BaseTravelOperation>> pendingOperations(Ref ref) async {
   final repository = ref.watch(travelOperationRepositoryProvider);
   return repository.getPendingOperations();
 }
@@ -32,7 +29,7 @@ Future<List<BaseTravelOperation>> pendingOperations(
 /// Provider for managing travel operation state
 ///
 /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
-/// Keeps AsyncValue<void> state for tracking operation status.
+/// Keeps `AsyncValue<void>` state for tracking operation status.
 ///
 /// Usage:
 /// ```dart
@@ -52,9 +49,6 @@ class TravelOperation extends _$TravelOperation {
   /// Riverpod 3.0: build() replaces constructor for initialization
   @override
   AsyncValue<void> build() {
-    // Get dependencies via ref.watch()
-    final repository = ref.watch(travelOperationRepositoryProvider);
-
     // Return initial state
     return const AsyncValue.data(null);
   }

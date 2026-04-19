@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workmanager/workmanager.dart';
 import '../../../../core/services/notification_service.dart';
@@ -56,7 +54,6 @@ class BackgroundTokenRefreshService extends _$BackgroundTokenRefreshService {
       // Initialize Workmanager with custom configuration
       await Workmanager().initialize(
         callbackDispatcher,
-        isInDebugMode: kDebugMode,
       );
 
       // Register periodic task with constraints
@@ -141,8 +138,6 @@ void callbackDispatcher() {
         // Perform token refresh
         await container.read(tokenManagerProvider.notifier).refreshToken();
 
-        debugPrint('Background token refresh completed successfully');
-
         // Log successful refresh
         container.read(tokenAuditLoggerProvider).logTokenEvent(
               event: 'background_refresh_success',
@@ -169,8 +164,6 @@ void callbackDispatcher() {
             code: 'refresh_failed',
             stackTrace: stack,
           );
-
-      debugPrint('Background token refresh failed: $e');
 
       return false;
     }

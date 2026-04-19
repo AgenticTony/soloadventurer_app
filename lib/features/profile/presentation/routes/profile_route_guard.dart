@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/profile_providers.dart';
 import '../../domain/entities/profile_state.dart';
-import '../state/profile_state.dart' as presentation;
 import '../widgets/error_view.dart';
-import 'package:soloadventurer/features/profile/presentation/state/profile_navigation_state.dart';
 
 enum GuardAction { proceed, redirect, block }
 
@@ -146,11 +144,8 @@ class ProfileRouteObserver extends NavigatorObserver {
       scheduleMicrotask(() {
         // Since we can't directly remove a specific route from the middle of the history,
         // we'll need to rebuild the history without the removed route
-        final currentState = _navigationNotifier.state;
-        final newHistory = currentState.history
-            .where((r) => r != route.settings.name)
-            .toList();
-        _navigationNotifier.state = ProfileNavigationState(history: newHistory);
+        // Use the notifier's public API instead of accessing .state directly
+        _navigationNotifier.removeRoute(route.settings.name!);
       });
     }
   }

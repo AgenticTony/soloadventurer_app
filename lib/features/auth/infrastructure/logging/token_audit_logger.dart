@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../../features/core/domain/services/logging_service.dart';
 import '../../domain/models/auth_session.dart';
@@ -15,8 +14,6 @@ LoggingService tokenAuditLogger(Ref ref) {
 }
 
 class _TokenAuditLoggerImpl implements LoggingService {
-  static const String _logPrefix = '[TokenAudit]';
-
   _TokenAuditLoggerImpl();
 
   /// Log token lifecycle events with detailed metadata
@@ -27,18 +24,8 @@ class _TokenAuditLoggerImpl implements LoggingService {
     Map<String, dynamic>? metadata,
     StackTrace? stackTrace,
   }) {
-    final timestamp = DateTime.now().toIso8601String();
-    final logData = {
-      'timestamp': timestamp,
-      'type': 'TokenEvent',
-      'event': event,
-      'status': status,
-      if (metadata != null) ...metadata,
-      if (stackTrace != null) 'stack_trace': stackTrace.toString(),
-    };
-
-    // Debug logging only (CloudWatch removed)
-    debugPrint('$_logPrefix Token Event: $logData');
+    // Logging disabled (CloudWatch removed)
+    // Event: $event, Status: $status
   }
 
   /// Log token rotation events

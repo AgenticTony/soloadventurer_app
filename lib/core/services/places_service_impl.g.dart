@@ -8,17 +8,17 @@ part of 'places_service_impl.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provider for PlacesServiceImpl
+/// Provider for PlacesServiceImpl.
 
 @ProviderFor(placesServiceImpl)
 const placesServiceImplProvider = PlacesServiceImplProvider._();
 
-/// Provider for PlacesServiceImpl
+/// Provider for PlacesServiceImpl.
 
 final class PlacesServiceImplProvider
     extends $FunctionalProvider<PlacesService, PlacesService, PlacesService>
     with $Provider<PlacesService> {
-  /// Provider for PlacesServiceImpl
+  /// Provider for PlacesServiceImpl.
   const PlacesServiceImplProvider._()
       : super(
           from: null,
@@ -54,17 +54,17 @@ final class PlacesServiceImplProvider
 
 String _$placesServiceImplHash() => r'6fcb043dee53e5a18d8a34e79016ef2d09f4f074';
 
-/// Provider override for PlacesService interface
+/// Provider override for PlacesService interface.
 
 @ProviderFor(placesServiceOverride)
 const placesServiceOverrideProvider = PlacesServiceOverrideProvider._();
 
-/// Provider override for PlacesService interface
+/// Provider override for PlacesService interface.
 
 final class PlacesServiceOverrideProvider
     extends $FunctionalProvider<PlacesService, PlacesService, PlacesService>
     with $Provider<PlacesService> {
-  /// Provider override for PlacesService interface
+  /// Provider override for PlacesService interface.
   const PlacesServiceOverrideProvider._()
       : super(
           from: null,

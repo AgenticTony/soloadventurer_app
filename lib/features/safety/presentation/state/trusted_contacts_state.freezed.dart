@@ -14,9 +14,6 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$TrustedContactsState {
-  /// Loading indicator - always a field on State
-  bool get isLoading;
-
   /// Whether an add operation is in progress
   bool get isAdding;
 
@@ -32,19 +29,16 @@ mixin _$TrustedContactsState {
   /// Currently selected contact (for editing/viewing)
   TrustedContact? get selectedContact;
 
-  /// Error message - always a field on State
-  String? get error;
-
-  /// Whether there are any trusted contacts (was a getter, now a field)
+  /// Whether there are any trusted contacts
   bool get hasContacts;
 
-  /// Whether operations are in progress (was a getter, now a field)
+  /// Whether operations are in progress
   bool get isProcessing;
 
-  /// Count of contacts receiving emergency alerts (was a getter, now a field)
+  /// Count of contacts receiving emergency alerts
   int get emergencyContactsCount;
 
-  /// Count of contacts with location sharing enabled (was a getter, now a field)
+  /// Count of contacts with location sharing enabled
   int get locationSharingCount;
 
   /// Create a copy of TrustedContactsState
@@ -60,8 +54,6 @@ mixin _$TrustedContactsState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is TrustedContactsState &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
             (identical(other.isAdding, isAdding) ||
                 other.isAdding == isAdding) &&
             (identical(other.isUpdating, isUpdating) ||
@@ -71,7 +63,6 @@ mixin _$TrustedContactsState {
             const DeepCollectionEquality().equals(other.contacts, contacts) &&
             (identical(other.selectedContact, selectedContact) ||
                 other.selectedContact == selectedContact) &&
-            (identical(other.error, error) || other.error == error) &&
             (identical(other.hasContacts, hasContacts) ||
                 other.hasContacts == hasContacts) &&
             (identical(other.isProcessing, isProcessing) ||
@@ -85,13 +76,11 @@ mixin _$TrustedContactsState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      isLoading,
       isAdding,
       isUpdating,
       isRemoving,
       const DeepCollectionEquality().hash(contacts),
       selectedContact,
-      error,
       hasContacts,
       isProcessing,
       emergencyContactsCount,
@@ -99,7 +88,7 @@ mixin _$TrustedContactsState {
 
   @override
   String toString() {
-    return 'TrustedContactsState(isLoading: $isLoading, isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, error: $error, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
+    return 'TrustedContactsState(isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
   }
 }
 
@@ -110,13 +99,11 @@ abstract mixin class $TrustedContactsStateCopyWith<$Res> {
       _$TrustedContactsStateCopyWithImpl;
   @useResult
   $Res call(
-      {bool isLoading,
-      bool isAdding,
+      {bool isAdding,
       bool isUpdating,
       bool isRemoving,
       List<TrustedContact> contacts,
       TrustedContact? selectedContact,
-      String? error,
       bool hasContacts,
       bool isProcessing,
       int emergencyContactsCount,
@@ -138,23 +125,17 @@ class _$TrustedContactsStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isLoading = null,
     Object? isAdding = null,
     Object? isUpdating = null,
     Object? isRemoving = null,
     Object? contacts = null,
     Object? selectedContact = freezed,
-    Object? error = freezed,
     Object? hasContacts = null,
     Object? isProcessing = null,
     Object? emergencyContactsCount = null,
     Object? locationSharingCount = null,
   }) {
     return _then(_self.copyWith(
-      isLoading: null == isLoading
-          ? _self.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
       isAdding: null == isAdding
           ? _self.isAdding
           : isAdding // ignore: cast_nullable_to_non_nullable
@@ -175,10 +156,6 @@ class _$TrustedContactsStateCopyWithImpl<$Res>
           ? _self.selectedContact
           : selectedContact // ignore: cast_nullable_to_non_nullable
               as TrustedContact?,
-      error: freezed == error
-          ? _self.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as String?,
       hasContacts: null == hasContacts
           ? _self.hasContacts
           : hasContacts // ignore: cast_nullable_to_non_nullable
@@ -305,13 +282,11 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            bool isLoading,
             bool isAdding,
             bool isUpdating,
             bool isRemoving,
             List<TrustedContact> contacts,
             TrustedContact? selectedContact,
-            String? error,
             bool hasContacts,
             bool isProcessing,
             int emergencyContactsCount,
@@ -323,13 +298,11 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
     switch (_that) {
       case _TrustedContactsState() when $default != null:
         return $default(
-            _that.isLoading,
             _that.isAdding,
             _that.isUpdating,
             _that.isRemoving,
             _that.contacts,
             _that.selectedContact,
-            _that.error,
             _that.hasContacts,
             _that.isProcessing,
             _that.emergencyContactsCount,
@@ -355,13 +328,11 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            bool isLoading,
             bool isAdding,
             bool isUpdating,
             bool isRemoving,
             List<TrustedContact> contacts,
             TrustedContact? selectedContact,
-            String? error,
             bool hasContacts,
             bool isProcessing,
             int emergencyContactsCount,
@@ -372,13 +343,11 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
     switch (_that) {
       case _TrustedContactsState():
         return $default(
-            _that.isLoading,
             _that.isAdding,
             _that.isUpdating,
             _that.isRemoving,
             _that.contacts,
             _that.selectedContact,
-            _that.error,
             _that.hasContacts,
             _that.isProcessing,
             _that.emergencyContactsCount,
@@ -401,13 +370,11 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            bool isLoading,
             bool isAdding,
             bool isUpdating,
             bool isRemoving,
             List<TrustedContact> contacts,
             TrustedContact? selectedContact,
-            String? error,
             bool hasContacts,
             bool isProcessing,
             int emergencyContactsCount,
@@ -418,13 +385,11 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
     switch (_that) {
       case _TrustedContactsState() when $default != null:
         return $default(
-            _that.isLoading,
             _that.isAdding,
             _that.isUpdating,
             _that.isRemoving,
             _that.contacts,
             _that.selectedContact,
-            _that.error,
             _that.hasContacts,
             _that.isProcessing,
             _that.emergencyContactsCount,
@@ -437,25 +402,19 @@ extension TrustedContactsStatePatterns on TrustedContactsState {
 
 /// @nodoc
 
-class _TrustedContactsState implements TrustedContactsState {
+class _TrustedContactsState extends TrustedContactsState {
   const _TrustedContactsState(
-      {this.isLoading = false,
-      this.isAdding = false,
+      {this.isAdding = false,
       this.isUpdating = false,
       this.isRemoving = false,
       final List<TrustedContact> contacts = const [],
       this.selectedContact,
-      this.error,
       this.hasContacts = false,
       this.isProcessing = false,
       this.emergencyContactsCount = 0,
       this.locationSharingCount = 0})
-      : _contacts = contacts;
-
-  /// Loading indicator - always a field on State
-  @override
-  @JsonKey()
-  final bool isLoading;
+      : _contacts = contacts,
+        super._();
 
   /// Whether an add operation is in progress
   @override
@@ -488,26 +447,22 @@ class _TrustedContactsState implements TrustedContactsState {
   @override
   final TrustedContact? selectedContact;
 
-  /// Error message - always a field on State
-  @override
-  final String? error;
-
-  /// Whether there are any trusted contacts (was a getter, now a field)
+  /// Whether there are any trusted contacts
   @override
   @JsonKey()
   final bool hasContacts;
 
-  /// Whether operations are in progress (was a getter, now a field)
+  /// Whether operations are in progress
   @override
   @JsonKey()
   final bool isProcessing;
 
-  /// Count of contacts receiving emergency alerts (was a getter, now a field)
+  /// Count of contacts receiving emergency alerts
   @override
   @JsonKey()
   final int emergencyContactsCount;
 
-  /// Count of contacts with location sharing enabled (was a getter, now a field)
+  /// Count of contacts with location sharing enabled
   @override
   @JsonKey()
   final int locationSharingCount;
@@ -526,8 +481,6 @@ class _TrustedContactsState implements TrustedContactsState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _TrustedContactsState &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
             (identical(other.isAdding, isAdding) ||
                 other.isAdding == isAdding) &&
             (identical(other.isUpdating, isUpdating) ||
@@ -537,7 +490,6 @@ class _TrustedContactsState implements TrustedContactsState {
             const DeepCollectionEquality().equals(other._contacts, _contacts) &&
             (identical(other.selectedContact, selectedContact) ||
                 other.selectedContact == selectedContact) &&
-            (identical(other.error, error) || other.error == error) &&
             (identical(other.hasContacts, hasContacts) ||
                 other.hasContacts == hasContacts) &&
             (identical(other.isProcessing, isProcessing) ||
@@ -551,13 +503,11 @@ class _TrustedContactsState implements TrustedContactsState {
   @override
   int get hashCode => Object.hash(
       runtimeType,
-      isLoading,
       isAdding,
       isUpdating,
       isRemoving,
       const DeepCollectionEquality().hash(_contacts),
       selectedContact,
-      error,
       hasContacts,
       isProcessing,
       emergencyContactsCount,
@@ -565,7 +515,7 @@ class _TrustedContactsState implements TrustedContactsState {
 
   @override
   String toString() {
-    return 'TrustedContactsState(isLoading: $isLoading, isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, error: $error, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
+    return 'TrustedContactsState(isAdding: $isAdding, isUpdating: $isUpdating, isRemoving: $isRemoving, contacts: $contacts, selectedContact: $selectedContact, hasContacts: $hasContacts, isProcessing: $isProcessing, emergencyContactsCount: $emergencyContactsCount, locationSharingCount: $locationSharingCount)';
   }
 }
 
@@ -578,13 +528,11 @@ abstract mixin class _$TrustedContactsStateCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {bool isLoading,
-      bool isAdding,
+      {bool isAdding,
       bool isUpdating,
       bool isRemoving,
       List<TrustedContact> contacts,
       TrustedContact? selectedContact,
-      String? error,
       bool hasContacts,
       bool isProcessing,
       int emergencyContactsCount,
@@ -607,23 +555,17 @@ class __$TrustedContactsStateCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? isLoading = null,
     Object? isAdding = null,
     Object? isUpdating = null,
     Object? isRemoving = null,
     Object? contacts = null,
     Object? selectedContact = freezed,
-    Object? error = freezed,
     Object? hasContacts = null,
     Object? isProcessing = null,
     Object? emergencyContactsCount = null,
     Object? locationSharingCount = null,
   }) {
     return _then(_TrustedContactsState(
-      isLoading: null == isLoading
-          ? _self.isLoading
-          : isLoading // ignore: cast_nullable_to_non_nullable
-              as bool,
       isAdding: null == isAdding
           ? _self.isAdding
           : isAdding // ignore: cast_nullable_to_non_nullable
@@ -644,10 +586,6 @@ class __$TrustedContactsStateCopyWithImpl<$Res>
           ? _self.selectedContact
           : selectedContact // ignore: cast_nullable_to_non_nullable
               as TrustedContact?,
-      error: freezed == error
-          ? _self.error
-          : error // ignore: cast_nullable_to_non_nullable
-              as String?,
       hasContacts: null == hasContacts
           ? _self.hasContacts
           : hasContacts // ignore: cast_nullable_to_non_nullable

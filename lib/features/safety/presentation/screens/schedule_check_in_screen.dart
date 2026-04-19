@@ -250,7 +250,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
     final theme = Theme.of(context);
     final contactsState = ref.watch(trustedContactsProvider);
     final checkInState = ref.watch(checkInProvider);
-    final isScheduling = checkInState.isCreating;
+    final isScheduling = checkInState.isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -343,7 +343,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildContactsSelector(theme, contactsState.contacts),
+              _buildContactsSelector(theme, contactsState.value?.contacts ?? []),
               const SizedBox(height: 32),
 
               // Schedule button
@@ -406,8 +406,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
               ],
             ),
             subtitle: const Text('Check in at a specific date and time'),
-            value: CheckInTriggerType.scheduledTime,
             groupValue: _selectedTriggerType,
+            value: CheckInTriggerType.scheduledTime,
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -428,8 +428,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
               ],
             ),
             subtitle: const Text('Check in when you arrive at a location'),
-            value: CheckInTriggerType.locationArrival,
             groupValue: _selectedTriggerType,
+            value: CheckInTriggerType.locationArrival,
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -450,8 +450,8 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
               ],
             ),
             subtitle: const Text('Check in when you leave a location'),
-            value: CheckInTriggerType.locationDeparture,
             groupValue: _selectedTriggerType,
+            value: CheckInTriggerType.locationDeparture,
             onChanged: (value) {
               if (value != null) {
                 setState(() {
@@ -663,7 +663,7 @@ class _ScheduleCheckInScreenState extends ConsumerState<ScheduleCheckInScreen> {
           final isSelected = _selectedContactIds.contains(contact.id);
           return CheckboxListTile(
             title: Text(contact.name),
-            subtitle: Text(contact.phoneNumber ?? ''),
+            subtitle: Text(contact.phoneNumber),
             secondary: CircleAvatar(
               child: Text(
                 contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
@@ -169,14 +168,12 @@ class CachedDataProvider {
   /// }
   /// ```
   Future<CachedDataResult<User>> getCachedUserProfile() async {
-    debugPrint('CachedDataProvider: Getting cached user profile');
 
     try {
       // Get cached user data
       final userData = await _localDataSource.getUserData();
 
       if (userData == null) {
-        debugPrint('CachedDataProvider: No cached user profile found');
         return CachedDataResult<User>.noData();
       }
 
@@ -184,7 +181,6 @@ class CachedDataProvider {
       final user = _parseUserData(userData);
 
       if (user == null) {
-        debugPrint('CachedDataProvider: Failed to parse cached user data');
         return CachedDataResult<User>.failure(
           errorMessage: 'Failed to parse cached user data',
         );
@@ -197,8 +193,7 @@ class CachedDataProvider {
         try {
           cachedAt = DateTime.parse(cachedAtStr);
         } catch (e) {
-          debugPrint(
-              'CachedDataProvider: Failed to parse cached_at timestamp: $e');
+        // intentional silent catch
         }
       }
 
@@ -206,18 +201,12 @@ class CachedDataProvider {
       final isFresh = cachedAt != null &&
           DateTime.now().difference(cachedAt) < _maxCacheAge;
 
-      debugPrint(
-          'CachedDataProvider: Retrieved cached user profile: ${user.username}, '
-          'isFresh: $isFresh, cachedAt: $cachedAt');
-
       return CachedDataResult<User>.cached(
         data: user,
         cachedAt: cachedAt,
         isFresh: isFresh,
       );
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error getting cached user profile: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       return CachedDataResult<User>.failure(
         errorMessage: 'Failed to get cached user profile: ${e.toString()}',
@@ -246,25 +235,20 @@ class CachedDataProvider {
   /// }
   /// ```
   Future<CachedDataResult<List<Map<String, dynamic>>>> getCachedTrips() async {
-    debugPrint('CachedDataProvider: Getting cached trips');
 
     try {
       // Check if we're offline
       final isOffline = await _offlineAuthManager.isCurrentlyOffline();
 
       if (!isOffline) {
-        debugPrint('CachedDataProvider: Online, no cached trips needed');
         return CachedDataResult<List<Map<String, dynamic>>>.noData();
       }
 
       // TODO: Implement trip caching
       // For now, return no data since trip caching is not yet implemented
-      debugPrint('CachedDataProvider: Trip caching not yet implemented');
 
       return CachedDataResult<List<Map<String, dynamic>>>.noData();
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error getting cached trips: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       return CachedDataResult<List<Map<String, dynamic>>>.failure(
         errorMessage: 'Failed to get cached trips: ${e.toString()}',
@@ -292,25 +276,20 @@ class CachedDataProvider {
   /// }
   /// ```
   Future<void> updateUserProfile(User user) async {
-    debugPrint('CachedDataProvider: Attempting to update user profile');
 
     // Check if offline
     final isOffline = await _offlineAuthManager.isCurrentlyOffline();
 
     if (isOffline) {
-      debugPrint(
-          'CachedDataProvider: Cannot update user profile while offline');
 
-      throw OfflineException(
+      throw const NetworkConnectivityException(
         message: 'Cannot update user profile while offline',
-        recoveryAction: 'Please connect to the internet and try again',
       );
     }
 
     try {
       // TODO: Implement server update
       // For now, just cache the updated user data locally
-      debugPrint('CachedDataProvider: Caching updated user profile locally');
 
       final userData = {
         'id': user.id,
@@ -323,10 +302,7 @@ class CachedDataProvider {
 
       await _localDataSource.cacheUserData(userData);
 
-      debugPrint('CachedDataProvider: User profile cached successfully');
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error updating user profile: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       throw AuthException(
         'Failed to update user profile: ${e.toString()}',
@@ -350,28 +326,22 @@ class CachedDataProvider {
   /// }
   /// ```
   Future<void> createTrip(Map<String, dynamic> tripData) async {
-    debugPrint('CachedDataProvider: Attempting to create trip');
 
     // Check if offline
     final isOffline = await _offlineAuthManager.isCurrentlyOffline();
 
     if (isOffline) {
-      debugPrint('CachedDataProvider: Cannot create trip while offline');
 
-      throw OfflineException(
+      throw const NetworkConnectivityException(
         message: 'Cannot create trip while offline',
-        recoveryAction: 'Please connect to the internet and try again',
       );
     }
 
     try {
       // TODO: Implement trip creation
-      debugPrint('CachedDataProvider: Trip creation not yet implemented');
 
       throw UnimplementedError('Trip creation not yet implemented');
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error creating trip: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       rethrow;
     }
@@ -392,28 +362,22 @@ class CachedDataProvider {
   /// }
   /// ```
   Future<void> updateTrip(String tripId, Map<String, dynamic> tripData) async {
-    debugPrint('CachedDataProvider: Attempting to update trip: $tripId');
 
     // Check if offline
     final isOffline = await _offlineAuthManager.isCurrentlyOffline();
 
     if (isOffline) {
-      debugPrint('CachedDataProvider: Cannot update trip while offline');
 
-      throw OfflineException(
+      throw const NetworkConnectivityException(
         message: 'Cannot update trip while offline',
-        recoveryAction: 'Please connect to the internet and try again',
       );
     }
 
     try {
       // TODO: Implement trip update
-      debugPrint('CachedDataProvider: Trip update not yet implemented');
 
       throw UnimplementedError('Trip update not yet implemented');
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error updating trip: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       rethrow;
     }
@@ -434,28 +398,22 @@ class CachedDataProvider {
   /// }
   /// ```
   Future<void> deleteTrip(String tripId) async {
-    debugPrint('CachedDataProvider: Attempting to delete trip: $tripId');
 
     // Check if offline
     final isOffline = await _offlineAuthManager.isCurrentlyOffline();
 
     if (isOffline) {
-      debugPrint('CachedDataProvider: Cannot delete trip while offline');
 
-      throw OfflineException(
+      throw const NetworkConnectivityException(
         message: 'Cannot delete trip while offline',
-        recoveryAction: 'Please connect to the internet and try again',
       );
     }
 
     try {
       // TODO: Implement trip deletion
-      debugPrint('CachedDataProvider: Trip deletion not yet implemented');
 
       throw UnimplementedError('Trip deletion not yet implemented');
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error deleting trip: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       rethrow;
     }
@@ -495,7 +453,6 @@ class CachedDataProvider {
   /// print('User cache fresh: ${info['isUserCacheFresh']}');
   /// ```
   Future<Map<String, dynamic>> getCachedDataInfo() async {
-    debugPrint('CachedDataProvider: Getting cached data info');
 
     try {
       final cachedDataInfo = await _offlineAuthManager.getCachedDataInfo();
@@ -509,7 +466,7 @@ class CachedDataProvider {
           try {
             cachedAt = DateTime.parse(cachedAtStr);
           } catch (e) {
-            debugPrint('CachedDataProvider: Failed to parse cached_at: $e');
+          // intentional silent catch
           }
         }
       }
@@ -525,9 +482,7 @@ class CachedDataProvider {
         'isUserCacheFresh': cachedDataInfo.isFresh,
         'userCachedAt': cachedAt?.toIso8601String(),
       };
-    } catch (e, stackTrace) {
-      debugPrint('CachedDataProvider: Error getting cached data info: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       return {
         'hasUserData': false,
@@ -557,7 +512,6 @@ class CachedDataProvider {
             : null,
       );
     } catch (e) {
-      debugPrint('CachedDataProvider: Failed to parse user data: $e');
       return null;
     }
   }

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import '../../features/core/config/app_config.dart';
 
 /// Result of a network reachability test
@@ -124,9 +123,6 @@ class NetworkReachabilityService {
   /// Test endpoint path (relative to base URL)
   final String _testEndpointPath;
 
-  /// Request timeout in milliseconds
-  final int _timeoutMs;
-
   /// Cache time-to-live in milliseconds
   final int _cacheTtlMs;
 
@@ -154,11 +150,7 @@ class NetworkReachabilityService {
               sendTimeout: Duration(milliseconds: timeoutMs),
             )),
         _testEndpointPath = testEndpointPath,
-        _timeoutMs = timeoutMs,
         _cacheTtlMs = cacheTtlMs {
-    debugPrint(
-        '🔍 NetworkReachabilityService initialized (timeout: ${timeoutMs}ms, '
-        'cache TTL: ${cacheTtlMs}ms)');
   }
 
   /// Check if the API server is reachable
@@ -172,17 +164,13 @@ class NetworkReachabilityService {
     if (_cachedResult != null) {
       final age = DateTime.now().difference(_cachedResult!.timestamp);
       if (age.inMilliseconds < _cacheTtlMs) {
-        debugPrint('🔍 Using cached reachability result '
-            '(age: ${age.inSeconds}s, valid for: ${(_cacheTtlMs - age.inMilliseconds) / 1000}s)');
         return NetworkReachabilityResult.cached(_cachedResult!);
       } else {
-        debugPrint('🔍 Cached result expired (age: ${age.inSeconds}s)');
         _cachedResult = null;
       }
     }
 
     // Perform actual reachability test
-    debugPrint('🔍 Testing network reachability to $_testEndpointPath...');
     final stopwatch = Stopwatch()..start();
 
     try {
@@ -202,7 +190,6 @@ class NetworkReachabilityService {
       } on DioException catch (e) {
         // If HEAD is not allowed, try GET
         if (e.response?.statusCode == 405) {
-          debugPrint('🔍 HEAD not allowed, trying GET...');
           response = await _dio.get(
             fullUrl,
             options: Options(
@@ -235,10 +222,6 @@ class NetworkReachabilityService {
 
       _updateCache(result);
 
-      debugPrint(
-          '🔍 Reachability test result: ${result.isReachable ? "REACHABLE" : "UNREACHABLE"} '
-          '(${stopwatch.elapsedMilliseconds}ms, status: ${result.statusCode})');
-
       return result;
     } on DioException catch (e) {
       stopwatch.stop();
@@ -268,8 +251,6 @@ class NetworkReachabilityService {
 
       _updateCache(result);
 
-      debugPrint('🔍 Reachability test failed: $errorMessage');
-
       return result;
     } catch (e) {
       stopwatch.stop();
@@ -280,8 +261,6 @@ class NetworkReachabilityService {
       );
 
       _updateCache(result);
-
-      debugPrint('🔍 Reachability test failed with unexpected error: $e');
 
       return result;
     }
@@ -296,7 +275,6 @@ class NetworkReachabilityService {
 
     // Set new timer to clear cache
     _cacheTimer = Timer(Duration(milliseconds: _cacheTtlMs), () {
-      debugPrint('🔍 Clearing expired reachability cache');
       _cachedResult = null;
       _cacheTimer = null;
     });
@@ -309,7 +287,6 @@ class NetworkReachabilityService {
     _cachedResult = null;
     _cacheTimer?.cancel();
     _cacheTimer = null;
-    debugPrint('🔍 Reachability cache cleared manually');
   }
 
   /// Get the cached result (if any) without performing a new test
@@ -338,6 +315,5 @@ class NetworkReachabilityService {
     _cacheTimer = null;
     _cachedResult = null;
     _dio.close();
-    debugPrint('🔍 NetworkReachabilityService disposed');
   }
 }

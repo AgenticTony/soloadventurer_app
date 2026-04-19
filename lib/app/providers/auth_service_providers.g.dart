@@ -61,7 +61,7 @@ final class AuthLocalDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$authLocalDataSourceHash() =>
-    r'48ed8dbbd7d27c5e663d0ebaa93fe078a56a56ce';
+    r'7da4ac3986894050cc5b2af8588d0f2873cf347e';
 
 /// Provider for AuthRemoteDataSource
 ///
@@ -119,7 +119,7 @@ final class AuthRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$authRemoteDataSourceHash() =>
-    r'0b79e7c0116c98f41dec60ea530fe433479f5547';
+    r'cbef684f447339bf791f140006a997bc2266abb9';
 
 /// Mock provider for AuthRemoteDataSource
 ///
@@ -653,3 +653,297 @@ final class ConfirmPasswordResetUseCaseProvider extends $FunctionalProvider<
 
 String _$confirmPasswordResetUseCaseHash() =>
     r'ffeb7b08a28d59c5e16ea07728a967a8e75b9f10';
+
+/// Provider for TokenRefreshService
+
+@ProviderFor(tokenRefreshService)
+const tokenRefreshServiceProvider = TokenRefreshServiceProvider._();
+
+/// Provider for TokenRefreshService
+
+final class TokenRefreshServiceProvider extends $FunctionalProvider<
+    TokenRefreshService,
+    TokenRefreshService,
+    TokenRefreshService> with $Provider<TokenRefreshService> {
+  /// Provider for TokenRefreshService
+  const TokenRefreshServiceProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tokenRefreshServiceProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tokenRefreshServiceHash();
+
+  @$internal
+  @override
+  $ProviderElement<TokenRefreshService> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  TokenRefreshService create(Ref ref) {
+    return tokenRefreshService(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TokenRefreshService value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TokenRefreshService>(value),
+    );
+  }
+}
+
+String _$tokenRefreshServiceHash() =>
+    r'6e6a94d459788cb56ba0b582692a08dfe795bdb4';
+
+/// Provider for RefreshQueueManager
+
+@ProviderFor(refreshQueueManager)
+const refreshQueueManagerProvider = RefreshQueueManagerProvider._();
+
+/// Provider for RefreshQueueManager
+
+final class RefreshQueueManagerProvider extends $FunctionalProvider<
+    RefreshQueueManager,
+    RefreshQueueManager,
+    RefreshQueueManager> with $Provider<RefreshQueueManager> {
+  /// Provider for RefreshQueueManager
+  const RefreshQueueManagerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'refreshQueueManagerProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$refreshQueueManagerHash();
+
+  @$internal
+  @override
+  $ProviderElement<RefreshQueueManager> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  RefreshQueueManager create(Ref ref) {
+    return refreshQueueManager(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(RefreshQueueManager value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<RefreshQueueManager>(value),
+    );
+  }
+}
+
+String _$refreshQueueManagerHash() =>
+    r'75f8c38d0106d30c7622142f216bbbb20584c888';
+
+/// Provider for TokenExpirationTracker
+
+@ProviderFor(tokenExpirationTracker)
+const tokenExpirationTrackerProvider = TokenExpirationTrackerProvider._();
+
+/// Provider for TokenExpirationTracker
+
+final class TokenExpirationTrackerProvider extends $FunctionalProvider<
+    TokenExpirationTracker,
+    TokenExpirationTracker,
+    TokenExpirationTracker> with $Provider<TokenExpirationTracker> {
+  /// Provider for TokenExpirationTracker
+  const TokenExpirationTrackerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tokenExpirationTrackerProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tokenExpirationTrackerHash();
+
+  @$internal
+  @override
+  $ProviderElement<TokenExpirationTracker> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  TokenExpirationTracker create(Ref ref) {
+    return tokenExpirationTracker(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TokenExpirationTracker value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TokenExpirationTracker>(value),
+    );
+  }
+}
+
+String _$tokenExpirationTrackerHash() =>
+    r'1ca969eadc572a9065b43232d4edbe284a9439ca';
+
+/// Provider for TokenRefreshScheduler
+
+@ProviderFor(tokenRefreshScheduler)
+const tokenRefreshSchedulerProvider = TokenRefreshSchedulerProvider._();
+
+/// Provider for TokenRefreshScheduler
+
+final class TokenRefreshSchedulerProvider extends $FunctionalProvider<
+    TokenRefreshScheduler,
+    TokenRefreshScheduler,
+    TokenRefreshScheduler> with $Provider<TokenRefreshScheduler> {
+  /// Provider for TokenRefreshScheduler
+  const TokenRefreshSchedulerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tokenRefreshSchedulerProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tokenRefreshSchedulerHash();
+
+  @$internal
+  @override
+  $ProviderElement<TokenRefreshScheduler> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  TokenRefreshScheduler create(Ref ref) {
+    return tokenRefreshScheduler(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TokenRefreshScheduler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TokenRefreshScheduler>(value),
+    );
+  }
+}
+
+String _$tokenRefreshSchedulerHash() =>
+    r'0d6ba3d1d60f664dd995912d56ffae9a95621880';
+
+/// Provider for PersistentSessionManager
+
+@ProviderFor(persistentSessionManager)
+const persistentSessionManagerProvider = PersistentSessionManagerProvider._();
+
+/// Provider for PersistentSessionManager
+
+final class PersistentSessionManagerProvider extends $FunctionalProvider<
+    PersistentSessionManager,
+    PersistentSessionManager,
+    PersistentSessionManager> with $Provider<PersistentSessionManager> {
+  /// Provider for PersistentSessionManager
+  const PersistentSessionManagerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'persistentSessionManagerProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$persistentSessionManagerHash();
+
+  @$internal
+  @override
+  $ProviderElement<PersistentSessionManager> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PersistentSessionManager create(Ref ref) {
+    return persistentSessionManager(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PersistentSessionManager value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PersistentSessionManager>(value),
+    );
+  }
+}
+
+String _$persistentSessionManagerHash() =>
+    r'3c7ff31d6535d396f2d20082b6f1fc448a5ff795';
+
+/// Provider for OfflineAuthManager
+
+@ProviderFor(offlineAuthManager)
+const offlineAuthManagerProvider = OfflineAuthManagerProvider._();
+
+/// Provider for OfflineAuthManager
+
+final class OfflineAuthManagerProvider extends $FunctionalProvider<
+    OfflineAuthManager,
+    OfflineAuthManager,
+    OfflineAuthManager> with $Provider<OfflineAuthManager> {
+  /// Provider for OfflineAuthManager
+  const OfflineAuthManagerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'offlineAuthManagerProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$offlineAuthManagerHash();
+
+  @$internal
+  @override
+  $ProviderElement<OfflineAuthManager> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  OfflineAuthManager create(Ref ref) {
+    return offlineAuthManager(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(OfflineAuthManager value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<OfflineAuthManager>(value),
+    );
+  }
+}
+
+String _$offlineAuthManagerHash() =>
+    r'efccc431f66d7111dce3468213262a4abdd0ea73';

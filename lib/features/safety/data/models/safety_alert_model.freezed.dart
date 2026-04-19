@@ -527,7 +527,7 @@ extension SafetyAlertModelPatterns on SafetyAlertModel {
 
 /// @nodoc
 @JsonSerializable()
-class _SafetyAlertModel implements SafetyAlertModel {
+class _SafetyAlertModel extends SafetyAlertModel {
   const _SafetyAlertModel(
       {required this.id,
       required this.userId,
@@ -549,7 +549,8 @@ class _SafetyAlertModel implements SafetyAlertModel {
       this.updatedAt})
       : _notifiedContactIds = notifiedContactIds,
         _acknowledgedByContactIds = acknowledgedByContactIds,
-        _metadata = metadata;
+        _metadata = metadata,
+        super._();
   factory _SafetyAlertModel.fromJson(Map<String, dynamic> json) =>
       _$SafetyAlertModelFromJson(json);
 

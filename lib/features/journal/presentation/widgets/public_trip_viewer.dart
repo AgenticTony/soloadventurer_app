@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/shared_link_providers.dart';
+import 'package:soloadventurer/features/journal/presentation/providers/trip_providers.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 
 /// Screen for viewing a publicly shared trip
@@ -36,7 +37,7 @@ class _PublicTripViewerState extends ConsumerState<PublicTripViewer> {
   }
 
   Future<void> _validateAccess([String? password]) async {
-    final notifier = ref.read(validateLinkNotifierProvider.notifier);
+    final notifier = ref.read(validateLinkProvider.notifier);
     await notifier.validateAccess(
       slug: widget.slug,
       password: password,
@@ -52,20 +53,28 @@ class _PublicTripViewerState extends ConsumerState<PublicTripViewer> {
 
   @override
   Widget build(BuildContext context) {
-    final validateState = ref.watch(validateLinkNotifierProvider);
+    final validateState = ref.watch(validateLinkProvider);
 
     return Scaffold(
-      body: validateState.when(
-        data: (state) {
+      body: Builder(
+        builder: (context) {
           // Validation in progress
-          if (state.isValidating) {
+          if (validateState.isValidating) {
             return _LoadingView();
           }
 
+          // Error
+          if (validateState.errorMessage != null) {
+            return _ErrorView(
+              result: SharedLinkAccessResult.notFound(),
+              customError: validateState.errorMessage,
+            );
+          }
+
           // Requires password
-          if (state.result != null &&
-              state.result!.requiresPassword &&
-              !state.result!.isAccessible) {
+          if (validateState.result != null &&
+              validateState.result!.requiresPassword &&
+              !validateState.result!.isAccessible) {
             return _PasswordView(
               onSubmit: _submitPassword,
               controller: _passwordController,
@@ -73,23 +82,18 @@ class _PublicTripViewerState extends ConsumerState<PublicTripViewer> {
           }
 
           // Error
-          if (state.result != null && !state.result!.isAccessible) {
-            return _ErrorView(result: state.result!);
+          if (validateState.result != null && !validateState.result!.isAccessible) {
+            return _ErrorView(result: validateState.result!);
           }
 
           // Success - load trip
-          if (state.result != null && state.result!.isAccessible) {
-            return _TripContentView(tripId: state.result!.tripId);
+          if (validateState.result != null && validateState.result!.isAccessible) {
+            return _TripContentView(tripId: validateState.result!.tripId);
           }
 
           // Initial state
           return _LoadingView();
         },
-        loading: () => _LoadingView(),
-        error: (error, stack) => _ErrorView(
-          result: SharedLinkAccessResult.notFound(),
-          customError: error.toString(),
-        ),
       ),
     );
   }
@@ -247,7 +251,7 @@ class _TripContentView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tripAsync = ref.watch(tripDetailProvider(tripId));
+    final tripState = ref.watch(tripDetailProvider(tripId));
 
     return Scaffold(
       appBar: AppBar(
@@ -264,123 +268,131 @@ class _TripContentView extends ConsumerWidget {
           ),
         ],
       ),
-      body: tripAsync.when(
-        data: (trip) {
-          return CustomScrollView(
-            slivers: [
-              // Cover image
-              if (trip.coverImageUrl != null)
-                SliverToBoxAdapter(
-                  child: SizedBox(
+      body: Builder(builder: (context) {
+        if (tripState.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (tripState.error != null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, size: 48),
+                const SizedBox(height: 16),
+                Text('Error loading trip: ${tripState.error}'),
+              ],
+            ),
+          );
+        }
+        final trip = tripState.trip;
+        if (trip == null) {
+          return const Center(child: Text('Trip not found'));
+        }
+        return _buildTripContent(context, trip);
+      }),
+    );
+  }
+
+  Widget _buildTripContent(BuildContext context, Trip trip) {
+    return CustomScrollView(
+      slivers: [
+        // Cover image
+        if (trip.coverImageUrl != null)
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 250,
+              child: Image.network(
+                trip.coverImageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
                     height: 250,
-                    child: Image.network(
-                      trip.coverImageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          height: 250,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          child: const Icon(Icons.travel_explore, size: 64),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-
-              // Trip details
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trip.name,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                      ),
-                      if (trip.description != null) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          trip.description!,
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ),
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 16,
-                        children: [
-                          if (trip.destination != null)
-                            _InfoChip(
-                              icon: Icons.location_on,
-                              label: trip.destination!,
-                            ),
-                          _InfoChip(
-                            icon: Icons.calendar_today,
-                            label:
-                                _formatDateRange(trip.startDate, trip.endDate),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      const Divider(),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Journal Entries',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ],
-                  ),
-                ),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest,
+                    child: const Icon(Icons.travel_explore, size: 64),
+                  );
+                },
               ),
+            ),
+          ),
 
-              // Journal entries
-              // In a real implementation, this would load and display journal entries
-              // For now, show a placeholder
-              SliverFillRemaining(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.book,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Journal entries will be displayed here',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+        // Trip details
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  trip.name,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                if (trip.description != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    trip.description!,
+                    style:
+                        Theme.of(context).textTheme.bodyLarge?.copyWith(
                               color: Theme.of(context)
                                   .colorScheme
                                   .onSurfaceVariant,
                             ),
-                      ),
-                    ],
                   ),
+                ],
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 16,
+                  children: [
+                    if (trip.destination != null)
+                      _InfoChip(
+                        icon: Icons.location_on,
+                        label: trip.destination!,
+                      ),
+                    _InfoChip(
+                      icon: Icons.calendar_today,
+                      label:
+                          _formatDateRange(trip.startDate, trip.endDate),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.error_outline, size: 48),
-              const SizedBox(height: 16),
-              Text('Error loading trip: $error'),
-            ],
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                Text(
+                  'Journal Entries',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+
+        // Journal entries placeholder
+        SliverFillRemaining(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.book,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Journal entries will be displayed here',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -434,25 +446,5 @@ class _InfoChip extends StatelessWidget {
       label: Text(label),
       visualDensity: VisualDensity.compact,
     );
-  }
-}
-
-/// Provider for trip details
-final tripDetailProvider =
-    Provider.family<Future<Trip>, String>((ref, tripId) async {
-  final repository = ref.watch(tripRepositoryProvider);
-  return repository.getTrip(tripId);
-});
-
-/// Provider for trip repository (placeholder - should be in trip_providers.dart)
-final tripRepositoryProvider = Provider<TripRepository>((ref) {
-  throw UnimplementedError(
-      'tripRepositoryProvider should be in trip_providers.dart');
-});
-
-/// TripRepository placeholder
-class TripRepository {
-  Future<Trip> getTrip(String tripId) {
-    throw UnimplementedError();
   }
 }

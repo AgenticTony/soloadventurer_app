@@ -14,7 +14,6 @@ class AuthWrapper extends ConsumerWidget {
 
     return authAsync.when(
       loading: () {
-        debugPrint('AuthWrapper: Loading state detected');
         return const Scaffold(
           body: Center(
             child: CircularProgressIndicator(),
@@ -22,7 +21,6 @@ class AuthWrapper extends ConsumerWidget {
         );
       },
       error: (error, stack) {
-        debugPrint('AuthWrapper: Error state - $error');
         return Scaffold(
           body: Center(
             child: Column(
@@ -46,29 +44,18 @@ class AuthWrapper extends ConsumerWidget {
         );
       },
       data: (authState) {
-        debugPrint('AuthWrapper build - Full authState: $authState');
-        debugPrint('AuthWrapper - isLoggedIn: ${authState.isLoggedIn}');
-        debugPrint(
-            'AuthWrapper - requiresEmailVerification: ${authState.requiresEmailVerification}');
-        debugPrint('AuthWrapper - user: ${authState.user}');
 
         // Email verification takes precedence over other states
         if (authState.requiresEmailVerification) {
-          debugPrint(
-              'AuthWrapper: Email verification required, showing verification screen');
           return const VerifyEmailScreen();
         }
 
         // Only show home screen if user is logged in and verified
         if (authState.isLoggedIn && !authState.requiresEmailVerification) {
-          debugPrint(
-              'AuthWrapper: User authenticated and verified, showing HomeScreen');
           return const HomeScreen();
         }
 
         // Show login screen if not in verification state and not logged in
-        debugPrint(
-            'AuthWrapper: No special conditions met, showing login screen');
         return const LoginScreen();
       },
     );

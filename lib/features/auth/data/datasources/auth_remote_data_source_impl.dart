@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthException;
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
@@ -55,7 +54,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String name,
   }) async {
     try {
-      debugPrint('SupabaseAuth: Starting sign up for $email');
 
       final response = await client.auth.signUp(
         email: email,
@@ -76,11 +74,8 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // The user won't be fully signed in until verified
       final needsVerification = response.session == null;
 
-      debugPrint('SupabaseAuth: Sign up successful, needs verification: $needsVerification');
-
       return (user, needsVerification);
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during sign up: $e');
       throw AuthException(
         'Registration failed: ${e.toString()}',
         type: AuthErrorType.unknown,
@@ -91,7 +86,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<(UserModel, AuthSession)> signIn(String email, String password) async {
     try {
-      debugPrint('SupabaseAuth: Starting sign in for $email');
 
       final response = await client.auth.signInWithPassword(
         email: email,
@@ -108,12 +102,8 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final user = _userModelFromUser(response.user!);
       final session = _authSessionFromSession(response.session!);
 
-      debugPrint('SupabaseAuth: Sign in successful for user ${user.id}');
-      debugPrint('SupabaseAuth: Session expires at ${session.expiresAt}');
-
       return (user, session);
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during sign in: $e');
 
       // Map Supabase auth errors to app-specific error types
       final errorStr = e.toString().toLowerCase();
@@ -141,11 +131,8 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> signOut() async {
     try {
-      debugPrint('SupabaseAuth: Signing out');
       await client.auth.signOut();
-      debugPrint('SupabaseAuth: Sign out successful');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during sign out: $e');
       // Don't throw - sign out should always clear local state
     }
   }
@@ -155,13 +142,11 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       final session = client.auth.currentSession;
       if (session == null) {
-        debugPrint('SupabaseAuth: No current user session');
         return null;
       }
 
       return _userModelFromUser(session.user);
     } catch (e) {
-      debugPrint('SupabaseAuth: Error getting current user: $e');
       return null;
     }
   }
@@ -171,7 +156,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     try {
       return client.auth.currentSession != null;
     } catch (e) {
-      debugPrint('SupabaseAuth: Error checking signed in status: $e');
       return false;
     }
   }
@@ -200,7 +184,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return _authSessionFromSession(newSession);
     } catch (e) {
-      debugPrint('SupabaseAuth: Error refreshing token: $e');
       throw AuthException(
         'Failed to refresh token: ${e.toString()}',
         type: AuthErrorType.tokenExpired,
@@ -211,7 +194,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> verifyEmail(String code, String email) async {
     try {
-      debugPrint('SupabaseAuth: Verifying email with OTP: $code');
 
       // Supabase uses OTP (one-time password) for email verification
       final response = await client.auth.verifyOTP(
@@ -227,9 +209,7 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
-      debugPrint('SupabaseAuth: Email verification successful');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during verify: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('expired')) {
@@ -266,9 +246,7 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         email: currentUser.email!,
       );
 
-      debugPrint('SupabaseAuth: Verification email resent');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error resending verification: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('limit')) {
@@ -287,13 +265,10 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> forgotPassword(String email) async {
     try {
-      debugPrint('SupabaseAuth: Requesting password reset for $email');
 
       await client.auth.resetPasswordForEmail(email);
 
-      debugPrint('SupabaseAuth: Password reset email sent');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during forgot password: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('limit') || errorStr.contains('too many')) {
@@ -321,7 +296,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String newPassword,
   ) async {
     try {
-      debugPrint('SupabaseAuth: Confirming password reset');
 
       // Supabase uses OTP for password reset confirmation
       await client.auth.verifyOTP(
@@ -342,9 +316,7 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
-      debugPrint('SupabaseAuth: Password reset successful');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during confirm reset: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('invalid') && errorStr.contains('code')) {
@@ -469,7 +441,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<(String factorId, String qrCode, String secret)> setupMFA() async {
     try {
-      debugPrint('SupabaseAuth: Starting MFA enrollment');
 
       // Step 1: Enroll a TOTP factor
       final response = await client.auth.mfa.enroll();
@@ -482,14 +453,11 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
 
       final factorId = response.id;
-      final qrCode = response.totp!.qrCode ?? '';
-      final secret = response.totp!.secret ?? '';
-
-      debugPrint('SupabaseAuth: MFA enrollment successful, factorId: $factorId');
+      final qrCode = response.totp!.qrCode;
+      final secret = response.totp!.secret;
 
       return (factorId, qrCode, secret);
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during MFA enrollment: $e');
       throw AuthException(
         'Failed to setup MFA: ${e.toString()}',
         type: AuthErrorType.unknown,
@@ -500,7 +468,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<bool> verifyMFA(String code, {String? factorId}) async {
     try {
-      debugPrint('SupabaseAuth: Verifying MFA code');
 
       // If no factorId provided, get the first available TOTP factor
       final targetFactorId = factorId ?? await _getFirstTOTPFactorId();
@@ -520,23 +487,14 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final challengeId = challengeResponse.id;
 
       // Step 2: Verify the code with the challenge
-      final verifyResponse = await client.auth.mfa.verify(
+      await client.auth.mfa.verify(
         factorId: targetFactorId,
         challengeId: challengeId,
         code: code,
       );
 
-      final success = verifyResponse != null;
-
-      if (success) {
-        debugPrint('SupabaseAuth: MFA verification successful');
-      } else {
-        debugPrint('SupabaseAuth: MFA verification failed');
-      }
-
-      return success;
+      return true;
     } catch (e) {
-      debugPrint('SupabaseAuth: Error during MFA verification: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('invalid') && errorStr.contains('code')) {
@@ -561,7 +519,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<List<String>> listMFAFactors() async {
     try {
-      debugPrint('SupabaseAuth: Listing MFA factors');
 
       final response = await client.auth.mfa.listFactors();
 
@@ -571,11 +528,8 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       final allFactors = [...totpFactors, ...phoneFactors];
 
-      debugPrint('SupabaseAuth: Found ${allFactors.length} MFA factors');
-
       return allFactors;
     } catch (e) {
-      debugPrint('SupabaseAuth: Error listing MFA factors: $e');
       throw AuthException(
         'Failed to list MFA factors: ${e.toString()}',
         type: AuthErrorType.unknown,
@@ -586,14 +540,11 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> disableMFA(String factorId) async {
     try {
-      debugPrint('SupabaseAuth: Disabling MFA factor: $factorId');
 
       // unenroll takes a single positional parameter (factorId as string)
       await client.auth.mfa.unenroll(factorId);
 
-      debugPrint('SupabaseAuth: MFA factor disabled successfully');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error disabling MFA: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('not found')) {
@@ -622,7 +573,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
       return response.totp.first.id;
     } catch (e) {
-      debugPrint('SupabaseAuth: Error getting TOTP factor: $e');
       return null;
     }
   }
@@ -634,7 +584,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> deleteAccount() async {
     try {
-      debugPrint('SupabaseAuth: Deleting user account');
 
       // Get current user ID before deleting
       final user = client.auth.currentUser;
@@ -645,7 +594,7 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
-      final userId = user.id;
+      user.id;
 
       // ============================================================
       // IMPORTANT: Account deletion requires admin privileges
@@ -661,9 +610,6 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       // Edge Function: 'delete-user-account'
       // - Expected to return: { success: true } or { error: string }
       // ============================================================
-
-      debugPrint(
-          'SupabaseAuth: Calling Edge Function to delete account: $userId');
 
       final response = await client.functions.invoke(
         'delete-user-account',
@@ -694,9 +640,7 @@ class SupabaseAuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         );
       }
 
-      debugPrint('SupabaseAuth: Account deleted successfully');
     } catch (e) {
-      debugPrint('SupabaseAuth: Error deleting account: $e');
 
       final errorStr = e.toString().toLowerCase();
       if (errorStr.contains('not authenticated') ||

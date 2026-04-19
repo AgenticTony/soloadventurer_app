@@ -8,14 +8,18 @@ part of 'connectivity_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// Provider for the offline ConnectivityService
 
 @ProviderFor(connectivityService)
 const connectivityServiceProvider = ConnectivityServiceProvider._();
+
+/// Provider for the offline ConnectivityService
 
 final class ConnectivityServiceProvider extends $FunctionalProvider<
     ConnectivityService,
     ConnectivityService,
     ConnectivityService> with $Provider<ConnectivityService> {
+  /// Provider for the offline ConnectivityService
   const ConnectivityServiceProvider._()
       : super(
           from: null,
@@ -51,7 +55,7 @@ final class ConnectivityServiceProvider extends $FunctionalProvider<
 }
 
 String _$connectivityServiceHash() =>
-    r'6176a137dc83b81479363eb81f447438e9e20df4';
+    r'2e6fff597753f3daa65c40c6e41ee91902db6e73';
 
 @ProviderFor(ConnectivityNotifier)
 const connectivityProvider = ConnectivityNotifierProvider._();

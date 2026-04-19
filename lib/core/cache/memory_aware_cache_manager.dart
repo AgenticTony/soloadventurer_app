@@ -329,8 +329,6 @@ class MemoryAwareCacheManager<K, V> {
     await checkMemoryPressure();
 
     if (kDebugMode) {
-      debugPrint('MemoryAwareCacheManager: Initialized with baseline '
-          '${(config.baselineMemoryBytes / (1024 * 1024)).toStringAsFixed(0)} MB');
     }
   }
 
@@ -514,10 +512,7 @@ class MemoryAwareCacheManager<K, V> {
         }
 
         if (kDebugMode) {
-          final usageMB = currentUsage / (1024 * 1024);
-          debugPrint('MemoryAwareCacheManager: Pressure changed '
-              '${_currentPressure.name} -> ${newPressure.name} '
-              '(${usageMB.toStringAsFixed(2)} MB)');
+          currentUsage / (1024 * 1024);
         }
 
         _currentPressure = newPressure;
@@ -536,8 +531,6 @@ class MemoryAwareCacheManager<K, V> {
       return _currentPressure;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint(
-            'MemoryAwareCacheManager: Error checking memory pressure: $e');
       }
       return _currentPressure;
     }
@@ -565,10 +558,7 @@ class MemoryAwareCacheManager<K, V> {
 
     if (itemsToEvict > 0) {
       // Get memory cache keys (LRU order - oldest first)
-      final memoryStats = _cacheManager.getMemoryStats();
-      final allKeys = <K>[];
-
-      // This is a simplified eviction - in practice, we'd need access
+      // Note: This is a simplified eviction - in practice, we'd need access
       // to the underlying cache's LRU list. For now, we rely on the
       // cache's natural behavior when we reduce maxSize.
       // The cache will automatically evict LRU items on next put().
@@ -581,8 +571,6 @@ class MemoryAwareCacheManager<K, V> {
       _stats.totalItemsEvicted += itemsToEvict;
 
       if (kDebugMode) {
-        debugPrint('MemoryAwareCacheManager: Evicted $itemsToEvict items '
-            'due to ${_currentPressure.name} memory pressure');
       }
     }
   }
@@ -596,8 +584,6 @@ class MemoryAwareCacheManager<K, V> {
     );
 
     if (kDebugMode) {
-      debugPrint('MemoryAwareCacheManager: Started monitoring every '
-          '${config.monitoringInterval.inSeconds}s');
     }
   }
 
@@ -678,7 +664,6 @@ class MemoryAwareCacheManager<K, V> {
     _isInitialized = false;
 
     if (kDebugMode) {
-      debugPrint('MemoryAwareCacheManager: Disposed');
     }
   }
 

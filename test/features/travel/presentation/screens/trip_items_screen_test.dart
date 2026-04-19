@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/core/widgets/widgets.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip.dart';
 import 'package:soloadventurer/features/travel/presentation/screens/trip_items_screen.dart';
-import 'package:soloadventurer/test/utils/performance/performance_test_utils.dart';
 
 /// Tests for [TripItemsScreen] virtual scrolling performance
 ///
@@ -16,8 +15,7 @@ void main() {
 
     setUp(() {
       // Generate test data for performance testing
-      final generator = PerformanceTestDataGenerator();
-      testTrips = generator.generateTriips(500);
+      testTrips = _generateTrips(500);
     });
 
     testWidgets('should render 500 trip items efficiently', (tester) async {
@@ -171,5 +169,35 @@ void main() {
       // Verify the list is still scrollable and hasn't crashed
       expect(find.byType(VirtualListView<Trip>), findsOneWidget);
     });
+  });
+}
+
+/// Generate test trips for performance testing
+List<Trip> _generateTrips(int count) {
+  final destinations = [
+    'Tokyo, Japan',
+    'Paris, France',
+    'New York, USA',
+    'London, UK',
+    'Sydney, Australia',
+    'Bangkok, Thailand',
+    'Rome, Italy',
+    'Barcelona, Spain',
+  ];
+
+  return List.generate(count, (i) {
+    final destination = destinations[i % destinations.length];
+    return Trip(
+      id: 'trip_$i',
+      userId: 'test-user',
+      title: 'Trip to $destination',
+      destination: destination,
+      startDate: DateTime.now().add(Duration(days: i * 7)),
+      endDate: DateTime.now().add(Duration(days: i * 7 + 7)),
+      budget: 1000 + (i % 10) * 500,
+      status: i % 3 == 0 ? 'completed' : 'planned',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
   });
 }

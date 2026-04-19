@@ -1,10 +1,17 @@
 import 'package:drift/drift.dart';
 
+// Index definitions for frequently queried columns across all tables.
+// Each table uses @TableIndex annotations that Drift processes
+// during schema generation.
+
 /// Trips table
 ///
 /// Stores trip data locally with sync tracking.
 /// Supports offline access and automatic synchronization with the server.
 @DataClassName('LocalTrip')
+@TableIndex(name: 'idx_trips_userId', columns: {#userId})
+@TableIndex(name: 'idx_trips_status', columns: {#status})
+@TableIndex(name: 'idx_trips_isSynced', columns: {#isSynced})
 class Trips extends Table {
   /// Primary key - matches server-generated trip ID
   TextColumn get id => text()();
@@ -77,10 +84,6 @@ class Trips extends Table {
   /// Set id as primary key
   @override
   Set<Column> get primaryKey => {id};
-
-  /// Create indexes for common queries
-  @override
-  List<Index> get indexes => [];
 }
 
 /// Journals table
@@ -88,6 +91,9 @@ class Trips extends Table {
 /// Stores journal entries linked to trips with sync tracking.
 /// Supports offline access and automatic synchronization with the server.
 @DataClassName('LocalJournal')
+@TableIndex(name: 'idx_journals_tripId', columns: {#tripId})
+@TableIndex(name: 'idx_journals_userId', columns: {#userId})
+@TableIndex(name: 'idx_journals_isSynced', columns: {#isSynced})
 class Journals extends Table {
   /// Primary key - matches server-generated journal ID
   TextColumn get id => text()();
@@ -148,10 +154,6 @@ class Journals extends Table {
   /// Set id as primary key
   @override
   Set<Column> get primaryKey => {id};
-
-  /// Create indexes for common queries
-  @override
-  List<Index> get indexes => [];
 }
 
 /// Users table
@@ -159,6 +161,7 @@ class Journals extends Table {
 /// Caches user profile data locally for offline access.
 /// Primary source is AWS Cognito + user profile service.
 @DataClassName('LocalUser')
+@TableIndex(name: 'idx_users_id', columns: {#id})
 class Users extends Table {
   /// Primary key - matches user ID from Cognito
   TextColumn get id => text()();
@@ -216,10 +219,6 @@ class Users extends Table {
   /// Set id as primary key
   @override
   Set<Column> get primaryKey => {id};
-
-  /// Create indexes for common queries
-  @override
-  List<Index> get indexes => [];
 }
 
 /// SyncQueue table
@@ -227,6 +226,10 @@ class Users extends Table {
 /// Tracks operations that need to be synchronized with the server.
 /// Operations are queued when offline and processed when connectivity is restored.
 @DataClassName('SyncQueueItem')
+@TableIndex(name: 'idx_syncqueue_status', columns: {#status})
+@TableIndex(name: 'idx_syncqueue_priority', columns: {#priority})
+@TableIndex(name: 'idx_syncqueue_entityType', columns: {#entityType})
+@TableIndex(name: 'idx_syncqueue_status_priority', columns: {#status, #priority})
 class SyncQueue extends Table {
   /// Primary key - local unique identifier
   IntColumn get id => integer().autoIncrement()();
@@ -273,10 +276,6 @@ class SyncQueue extends Table {
 
   /// Optional version for conflict resolution
   IntColumn get version => integer().nullable()();
-
-  /// Create indexes for common queries
-  @override
-  List<Index> get indexes => [];
 }
 
 /// SyncMetadata table
@@ -284,6 +283,7 @@ class SyncQueue extends Table {
 /// Tracks synchronization state and metadata for the offline-first system.
 /// Maintains one row per entity type with the last sync timestamp and state.
 @DataClassName('SyncMetadata')
+@TableIndex(name: 'idx_syncmetadata_entityType', columns: {#entityType})
 class SyncMetadataTable extends Table {
   /// Primary key - entity type name (e.g., 'trips', 'journals', 'users')
   TextColumn get entityType => text()();
@@ -321,10 +321,6 @@ class SyncMetadataTable extends Table {
   /// Set entityType as primary key
   @override
   Set<Column> get primaryKey => {entityType};
-
-  /// Create index for finding stale entity types needing sync
-  @override
-  List<Index> get indexes => [];
 }
 
 /// Itineraries table
@@ -332,6 +328,8 @@ class SyncMetadataTable extends Table {
 /// Stores trip itineraries with day-by-day planning.
 /// Supports offline access and automatic synchronization with the server.
 @DataClassName('LocalItinerary')
+@TableIndex(name: 'idx_itineraries_userId', columns: {#userId})
+@TableIndex(name: 'idx_itineraries_isSynced', columns: {#isSynced})
 class Itineraries extends Table {
   /// Primary key - matches server-generated itinerary ID
   TextColumn get id => text()();
@@ -412,10 +410,6 @@ class Itineraries extends Table {
   /// Set id as primary key
   @override
   Set<Column> get primaryKey => {id};
-
-  /// Create indexes for common queries
-  @override
-  List<Index> get indexes => [];
 }
 
 /// ItineraryItems table
@@ -423,6 +417,8 @@ class Itineraries extends Table {
 /// Stores individual items within an itinerary (activities, meals, flights, etc.).
 /// Supports offline access and automatic synchronization with the server.
 @DataClassName('LocalItineraryItem')
+@TableIndex(name: 'idx_itineraryitems_itineraryId', columns: {#itineraryId})
+@TableIndex(name: 'idx_itineraryitems_id', columns: {#id})
 class ItineraryItems extends Table {
   /// Primary key - matches server-generated item ID
   TextColumn get id => text()();
@@ -490,8 +486,4 @@ class ItineraryItems extends Table {
   /// Set id as primary key
   @override
   Set<Column> get primaryKey => {id};
-
-  /// Create indexes for common queries
-  @override
-  List<Index> get indexes => [];
 }

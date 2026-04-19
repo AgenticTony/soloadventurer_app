@@ -12,23 +12,23 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/app/app.dart';
+import 'package:dio/dio.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/core/api/interceptors/auth_interceptor.dart';
+import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
+import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/core/api/interceptors/error_interceptor.dart';
 import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
-import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/profile/data/datasources/profile_local_data_source.dart';
 import 'package:soloadventurer/features/profile/data/datasources/profile_remote_data_source.dart';
 import 'package:soloadventurer/features/profile/data/models/profile_model.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart';
 import 'package:soloadventurer/core/monitoring/performance/network_monitor.dart';
-import 'package:soloadventurer/core/security/security_manager.dart';
 import 'test_config.dart';
 import 'package:soloadventurer/app/providers/auth_service_providers.dart'
     as auth_providers;
@@ -368,6 +368,34 @@ class MockAuthLocalDataSource implements AuthLocalDataSource {
   }
 }
 
+/// Simple mock AuthRepository for auth flow tests
+class _SimpleMockAuthRepository implements AuthRepository {
+  @override
+  Future<(User, bool)> register({required String email, required String password, required String name}) async {
+    return (User(id: 'test', email: email, username: name, createdAt: DateTime.now()), true);
+  }
+  @override Future<User> signInWithEmailAndPassword(String email, String password) async => User(id: 'test', email: email, username: 'test', createdAt: DateTime.now());
+  @override Future<void> signOut() async {}
+  @override Future<User?> getCurrentUser() async => null;
+  @override Future<bool> isAuthenticated() async => false;
+  @override Future<void> sendPasswordResetEmail(String email) async {}
+  @override Future<void> confirmPasswordReset({required String email, required String code, required String newPassword}) async {}
+  @override Future<User> updateUserProfile({String? name, String? email, String? photoUrl}) async => User(id: 'test', email: email ?? 'test@test.com', username: name ?? 'test', createdAt: DateTime.now());
+  @override Future<void> changePassword({required String currentPassword, required String newPassword}) async {}
+  @override Future<void> verifyEmail(String code, String email) async {}
+  @override Future<void> resendVerificationEmail() async {}
+  @override Future<String> enableTwoFactor() async => '';
+  @override Future<void> disableTwoFactor(String code) async {}
+  @override Future<void> verifyTwoFactor(String code) async {}
+  @override Future<bool> isSignedIn() async => false;
+  @override Future<String?> getAccessToken() async => null;
+  @override Future<AuthSession> refreshToken() async => AuthSession(accessToken: '', idToken: '', refreshToken: '', expiresAt: DateTime.now());
+  @override Future<AuthSession> performBasicTokenRefresh() async => AuthSession(accessToken: '', idToken: '', refreshToken: '', expiresAt: DateTime.now());
+  @override Future<AuthSession?> getSession() async => null;
+  @override Future<User> registerWithEmailAndPassword(String email, String password, String username) async => User(id: 'test', email: email, username: username, createdAt: DateTime.now());
+  @override Future<void> deleteAccount() async {}
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -382,37 +410,28 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
-    // Initialize service locator in test mode
-    await setupServiceLocator(isTest: true);
+    // Clear any existing auth data using a local SecureStorage instance
+    final secureStorage = SecureStorage();
+    await secureStorage.delete(TestConfig.authTokenKey);
+    await secureStorage.delete(TestConfig.refreshTokenKey);
+    await secureStorage.delete(TestConfig.userDataKey);
 
-    // Clear any existing auth data
-    await getIt<SecureStorage>().delete(TestConfig.authTokenKey);
-    await getIt<SecureStorage>().delete(TestConfig.refreshTokenKey);
-    await getIt<SecureStorage>().delete(TestConfig.userDataKey);
+    // Initialize mock data sources
+    mockProfileRemoteDataSource = MockProfileRemoteDataSource();
+
+    // Create a simple mock auth repository for the interceptor
+    authRepository = _SimpleMockAuthRepository();
 
     // Create ApiClient instance for testing
+    final testDio = Dio(BaseOptions(baseUrl: TestConfig.apiBaseUrl));
     apiClient = ApiClient(
       baseUrl: TestConfig.apiBaseUrl,
-      authInterceptor: AuthInterceptor(),
+      authInterceptor: AuthInterceptor(authRepository: authRepository, dio: testDio),
       errorInterceptor: ErrorInterceptor(),
       networkMonitor: NetworkMonitor(),
     );
 
-    // Initialize mock data sources
-    mockProfileRemoteDataSource = MockProfileRemoteDataSource();
     mockAuthRemoteDataSource = MockAuthRemoteDataSource(apiClient);
-
-    // Create AuthLocalDataSource and SecurityManager for testing
-    final authLocalDataSource = MockAuthLocalDataSource(getIt<SecureStorage>());
-
-    // Get SecurityManager from service locator (it's registered in core_module)
-    final securityManager = getIt<SecurityManager>();
-
-    authRepository = AuthRepositoryImpl(
-      remoteDataSource: mockAuthRemoteDataSource,
-      localDataSource: authLocalDataSource,
-      securityManager: securityManager,
-    );
 
     // Override providers with mock implementations
     container = ProviderContainer(
@@ -424,8 +443,6 @@ void main() {
   });
 
   tearDown(() async {
-    // Reset service locator after each test
-    await resetServiceLocator();
     container.dispose();
   });
 

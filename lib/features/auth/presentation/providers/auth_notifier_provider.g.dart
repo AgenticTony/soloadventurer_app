@@ -11,7 +11,7 @@ part of 'auth_notifier_provider.dart';
 /// AuthNotifier - manages authentication state using AsyncNotifier pattern
 ///
 /// Riverpod 3.0 AsyncNotifier Compliant:
-/// - Uses AsyncNotifier<AuthState> with AsyncValue wrapper
+/// - Uses `AsyncNotifier<AuthState>` with AsyncValue wrapper
 /// - Loading/error states handled by AsyncValue, NOT manual state fields
 /// - UI reads STATE via ref.watch(authProvider)
 /// - UI calls methods via ref.read(authProvider.notifier)
@@ -22,7 +22,7 @@ const authProvider = AuthNotifierProvider._();
 /// AuthNotifier - manages authentication state using AsyncNotifier pattern
 ///
 /// Riverpod 3.0 AsyncNotifier Compliant:
-/// - Uses AsyncNotifier<AuthState> with AsyncValue wrapper
+/// - Uses `AsyncNotifier<AuthState>` with AsyncValue wrapper
 /// - Loading/error states handled by AsyncValue, NOT manual state fields
 /// - UI reads STATE via ref.watch(authProvider)
 /// - UI calls methods via ref.read(authProvider.notifier)
@@ -31,7 +31,7 @@ final class AuthNotifierProvider
   /// AuthNotifier - manages authentication state using AsyncNotifier pattern
   ///
   /// Riverpod 3.0 AsyncNotifier Compliant:
-  /// - Uses AsyncNotifier<AuthState> with AsyncValue wrapper
+  /// - Uses `AsyncNotifier<AuthState>` with AsyncValue wrapper
   /// - Loading/error states handled by AsyncValue, NOT manual state fields
   /// - UI reads STATE via ref.watch(authProvider)
   /// - UI calls methods via ref.read(authProvider.notifier)
@@ -54,12 +54,12 @@ final class AuthNotifierProvider
   AuthNotifier create() => AuthNotifier();
 }
 
-String _$authNotifierHash() => r'd77d5c09a66f585440761928057a5cbb537b70f5';
+String _$authNotifierHash() => r'dce78c661227b80a383eefc621389189399b0af5';
 
 /// AuthNotifier - manages authentication state using AsyncNotifier pattern
 ///
 /// Riverpod 3.0 AsyncNotifier Compliant:
-/// - Uses AsyncNotifier<AuthState> with AsyncValue wrapper
+/// - Uses `AsyncNotifier<AuthState>` with AsyncValue wrapper
 /// - Loading/error states handled by AsyncValue, NOT manual state fields
 /// - UI reads STATE via ref.watch(authProvider)
 /// - UI calls methods via ref.read(authProvider.notifier)

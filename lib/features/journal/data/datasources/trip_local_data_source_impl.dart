@@ -1,9 +1,9 @@
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
-import 'package:soloadventurer/core/errors/exceptions.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:soloadventurer/core/errors/exceptions.dart' as app_exceptions;
 import 'package:soloadventurer/features/journal/data/datasources/database_helper.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
-import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 
 /// SQLite implementation of [TripLocalDataSource]
 class TripLocalDataSourceImpl implements TripLocalDataSource {
@@ -26,7 +26,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
 
       return trip;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to create trip: $e',
       );
     }
@@ -45,16 +45,16 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
       );
 
       if (count == 0) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Trip not found',
         );
       }
 
       return trip;
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update trip: $e',
       );
     }
@@ -75,7 +75,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
 
       return _mapToTrip(maps.first);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get trip: $e',
       );
     }
@@ -93,7 +93,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
 
       return maps.map(_mapToTrip).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get trips: $e',
       );
     }
@@ -113,7 +113,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
 
       return maps.map(_mapToTrip).toList();
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to get trips by sync status: $e',
       );
     }
@@ -124,7 +124,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
     try {
       final trip = await getTrip(tripId);
       if (trip == null) {
-        throw const NotFoundException(
+        throw const app_exceptions.NotFoundException(
           message: 'Trip not found',
         );
       }
@@ -135,10 +135,10 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
       );
 
       return await updateTrip(updatedTrip);
-    } on AppException {
+    } on app_exceptions.AppException {
       rethrow;
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to update sync status: $e',
       );
     }
@@ -155,7 +155,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
         whereArgs: [tripId],
       );
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to delete trip: $e',
       );
     }
@@ -167,7 +167,7 @@ class TripLocalDataSourceImpl implements TripLocalDataSource {
       final db = await _databaseHelper.database;
       await db.delete(DatabaseHelper.tableTrips);
     } catch (e) {
-      throw DatabaseException(
+      throw app_exceptions.DatabaseException(
         message: 'Failed to clear all trips: $e',
       );
     }

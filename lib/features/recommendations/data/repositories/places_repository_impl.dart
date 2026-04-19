@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/destination.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/travel_interest.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/places_remote_data_source.dart';

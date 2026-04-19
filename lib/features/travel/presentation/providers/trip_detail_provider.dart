@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models/trip.dart';
 import '../../../destination_discovery/domain/models/destination.dart';
 import '../../../destination_discovery/domain/repositories/destination_repository.dart';
@@ -14,8 +13,7 @@ part 'trip_detail_provider.g.dart';
 ///
 /// Provider for the destination repository from the destination discovery feature
 @riverpod
-DestinationRepository tripDestinationRepository(
-    TripDestinationRepositoryRef ref) {
+DestinationRepository tripDestinationRepository(Ref ref) {
   throw UnimplementedError(
       'tripDestinationRepositoryProvider must be overridden in main app');
 }
@@ -47,9 +45,6 @@ class TripDetail extends _$TripDetail {
   /// Family provider parameter (tripId) is passed here
   @override
   TripDetailState build(String tripId) {
-    // Get dependencies via ref.watch()
-    final destinationRepository = ref.watch(tripDestinationRepositoryProvider);
-
     // Return initial state
     return const TripDetailState.initial();
   }

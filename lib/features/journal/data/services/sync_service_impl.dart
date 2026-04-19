@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_local_data_source.dart';
@@ -281,8 +281,12 @@ class SyncServiceImpl implements SyncService {
             final localEntry =
                 await _journalLocalDataSource.getEntry(remoteEntry.id);
 
-            // Check if remote is newer
-            if (remoteEntry.updatedAt.isAfter(localEntry!.updatedAt)) {
+            if (localEntry == null) {
+              // Entry doesn't exist locally, create it
+              await _journalLocalDataSource.createEntry(remoteEntry);
+              downloadedCount++;
+            } else if (remoteEntry.updatedAt.isAfter(localEntry.updatedAt)) {
+              // Check if remote is newer
               await _journalLocalDataSource.updateEntry(remoteEntry);
               downloadedCount++;
             }
@@ -327,7 +331,6 @@ class SyncServiceImpl implements SyncService {
     SyncDirection direction = SyncDirection.bidirectional,
     SyncConfig? config,
   ]) async {
-    final effectiveConfig = config ?? SyncConfig.defaultConfig;
     final startedAt = DateTime.now();
 
     try {
@@ -493,7 +496,10 @@ class SyncServiceImpl implements SyncService {
             final localTrip = await _tripLocalDataSource.getTrip(remoteTrip.id);
 
             // Check if remote is newer
-            if (remoteTrip.updatedAt.isAfter(localTrip!.updatedAt)) {
+            if (localTrip == null) {
+              await _tripLocalDataSource.createTrip(remoteTrip);
+              downloadedCount++;
+            } else if (remoteTrip.updatedAt.isAfter(localTrip.updatedAt)) {
               await _tripLocalDataSource.updateTrip(remoteTrip);
               downloadedCount++;
             }
@@ -602,7 +608,10 @@ class SyncServiceImpl implements SyncService {
             final localTag = await _tagLocalDataSource.getTag(remoteTag.id);
 
             // Check if remote is newer
-            if (remoteTag.createdAt.isAfter(localTag!.createdAt)) {
+            if (localTag == null) {
+              await _tagLocalDataSource.createTag(remoteTag);
+              downloadedCount++;
+            } else if (remoteTag.createdAt.isAfter(localTag.createdAt)) {
               await _tagLocalDataSource.updateTag(remoteTag);
               downloadedCount++;
             }

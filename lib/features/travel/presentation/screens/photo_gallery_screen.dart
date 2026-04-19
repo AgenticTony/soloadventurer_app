@@ -265,7 +265,7 @@ class _PhotoImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Use LazyLoadImage for visibility-based lazy loading
-    return LazyLoadImage.photo(
+    return LazyLoadImage(
       imageUrl: photo.displayUrl,
       thumbnailUrl: photo.thumbnailUrl,
       fit: BoxFit.cover,

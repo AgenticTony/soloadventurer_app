@@ -1,6 +1,5 @@
 import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/onboarding/data/services/itinerary_generation_service.dart';
 import 'package:soloadventurer/features/onboarding/domain/repositories/itinerary_generation_repository.dart';
 
 /// Implementation of the itinerary generation repository
@@ -11,13 +10,8 @@ import 'package:soloadventurer/features/onboarding/domain/repositories/itinerary
 /// generation.
 class ItineraryGenerationRepositoryImpl
     implements ItineraryGenerationRepository {
-  /// The itinerary generation service
-  final ItineraryGenerationService _service;
-
   /// Creates a new repository implementation
-  ///
-  /// [_service] The itinerary generation service to use
-  const ItineraryGenerationRepositoryImpl(this._service);
+  const ItineraryGenerationRepositoryImpl();
 
   @override
   Future<Map<String, dynamic>> generateStarterItinerary(

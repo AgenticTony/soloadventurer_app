@@ -10,17 +10,18 @@ import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
 import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
-import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
+import 'package:soloadventurer/core/storage/secure_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:soloadventurer/features/core/data/services/connectivity_service_impl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/app/providers/auth_service_providers.dart';
+import 'package:soloadventurer/app/providers/offline_service_providers.dart';
 
 class MockConnectivityService implements ConnectivityService {
   final _statusController = StreamController<NetworkStatus>.broadcast();
+  final _connectivityStatusController = StreamController<ConnectivityStatus>.broadcast();
   NetworkStatus _currentStatus = NetworkStatus.connected;
   bool _isDisposed = false;
 
@@ -28,9 +29,23 @@ class MockConnectivityService implements ConnectivityService {
   Stream<NetworkStatus> get onConnectivityChanged => _statusController.stream;
 
   @override
-  Future<NetworkStatus> checkConnectivity() async {
+  Stream<ConnectivityStatus> get connectivityStream => _connectivityStatusController.stream;
+
+  @override
+  Future<ConnectivityStatus> checkConnectivity() async {
     debugPrint(
         'MockConnectivityService: Checking connectivity: $_currentStatus');
+    return ConnectivityStatus(
+      connectionType: _currentStatus == NetworkStatus.connected ? ConnectionType.wifi : ConnectionType.none,
+      isConnected: _currentStatus == NetworkStatus.connected,
+      timestamp: DateTime.now(),
+    );
+  }
+
+  @override
+  Future<NetworkStatus> checkNetworkStatus() async {
+    debugPrint(
+        'MockConnectivityService: Checking network status: $_currentStatus');
     return _currentStatus;
   }
 
@@ -64,6 +79,14 @@ class MockConnectivityService implements ConnectivityService {
             'MockConnectivityService: Broadcasting new status: $_currentStatus');
         _statusController.add(_currentStatus);
       }
+      final connectivityStatus = ConnectivityStatus(
+        connectionType: connected ? ConnectionType.wifi : ConnectionType.none,
+        isConnected: connected,
+        timestamp: DateTime.now(),
+      );
+      if (!_connectivityStatusController.isClosed) {
+        _connectivityStatusController.add(connectivityStatus);
+      }
     } else {
       debugPrint(
           'MockConnectivityService: Status unchanged, skipping broadcast');
@@ -76,6 +99,9 @@ class MockConnectivityService implements ConnectivityService {
     _isDisposed = true;
     if (!_statusController.isClosed) {
       _statusController.close();
+    }
+    if (!_connectivityStatusController.isClosed) {
+      _connectivityStatusController.close();
     }
   }
 }
@@ -176,7 +202,7 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<(UserModel, String)> signIn(String email, String password) async {
+  Future<(UserModel, AuthSession)> signIn(String email, String password) async {
     throw UnimplementedError();
   }
 
@@ -241,37 +267,32 @@ void main() {
   late MockConnectivityService mockConnectivityService;
   late AuthLocalDataSource authLocalDataSource;
   late MockAuthRemoteDataSource mockAuthRemoteDataSource;
-  late SecurityManager securityManager;
+  late SecureStorage secureStorage;
 
   setUp(() async {
     // Set up test environment
-    await resetServiceLocator();
     SharedPreferences.setMockInitialValues({});
 
     // Create and configure mock services
     mockConnectivityService = MockConnectivityService();
     mockAuthRemoteDataSource = MockAuthRemoteDataSource();
 
-    // Set up service locator in test mode
-    await setupServiceLocator(isTest: true);
-
     // Create ProviderContainer with mock service overrides
     container = ProviderContainer(
       overrides: [
-        connectivityServiceImplProvider
+        connectivityServiceProvider
             .overrideWithValue(mockConnectivityService),
         authRemoteDataSourceProvider
             .overrideWithValue(mockAuthRemoteDataSource),
       ],
     );
 
-    // Initialize security manager and local data source
-    securityManager = getIt<SecurityManager>();
-    final sharedPrefs = await SharedPreferences.getInstance();
-    authLocalDataSource = AuthLocalDataSourceImpl(securityManager, sharedPrefs);
+    // Initialize secure storage and local data source
+    secureStorage = SecureStorage();
+    authLocalDataSource = AuthLocalDataSourceImpl(secureStorage);
 
     // Clear existing storage and auth data
-    await getIt<FlutterSecureStorage>().deleteAll();
+    await secureStorage.deleteAll();
     await authLocalDataSource.clearAuthData();
 
     // Set up initial authentication state
@@ -298,11 +319,9 @@ void main() {
     await tokenManager.initialize();
 
     addTearDown(() async {
-      // Clean up resources
       await tokenManager.clearSession();
       container.dispose();
-      await getIt<FlutterSecureStorage>().deleteAll();
-      await resetServiceLocator();
+      await secureStorage.deleteAll();
     });
   });
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/sync/domain/models/sync_error.dart';
 
@@ -468,7 +469,7 @@ class _SyncErrorCardState extends State<SyncErrorCard> {
   }
 
   /// Copies error details to clipboard
-  void _copyErrorDetails(BuildContext context) {
+  Future<void> _copyErrorDetails(BuildContext context) async {
     final details = '''
 Error: ${widget.error.userMessage}
 Type: ${widget.error.type.name}
@@ -484,8 +485,8 @@ Occurred: ${widget.error.occurredAt.toIso8601String()}
 Details: ${widget.error.details?.toString() ?? 'N/A'}
 ''';
 
-    // In a real implementation, you would use flutter/services to copy to clipboard
-    // Clipboard.setData(ClipboardData(text: details));
+    // Copy to clipboard
+    await Clipboard.setData(ClipboardData(text: details));
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

@@ -141,7 +141,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Widget _buildSignUpForm(BuildContext context, authState) {
     // Note: With AsyncValue pattern, loading state is handled by .when() in build()
     // When _buildSignUpForm is called, we're already in data state
-    const isLoading = false;
+    const isLoading = false; // TODO: Wire up to actual loading state
 
     return Scaffold(
       appBar: AppBar(
@@ -269,13 +269,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
                       // Sign up button
                       ElevatedButton(
-                        onPressed: isLoading ? null : _signUp,
+                        onPressed: _signUp,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: isLoading
-                            ? const CircularProgressIndicator()
-                            : const Text(
+                        child: const Text(
                                 'Sign Up',
                                 style: TextStyle(fontSize: 16),
                               ),
@@ -289,7 +287,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         children: [
                           const Text('Already have an account?'),
                           TextButton(
-                            onPressed: isLoading ? null : _navigateToLogin,
+                            onPressed: _navigateToLogin,
                             child: const Text('Login'),
                           ),
                         ],

@@ -21,7 +21,7 @@ void main() {
         const placeActivity = PlaceActivity(
           id: 'test-id',
           name: 'Test Place',
-          category: RecommendationCategory.restaurant,
+          category: RecommendationCategory.food,
           description: 'A great restaurant',
           location: '123 Main St',
           latitude: 40.7128,
@@ -41,7 +41,7 @@ void main() {
 
         expect(placeActivity.id, 'test-id');
         expect(placeActivity.name, 'Test Place');
-        expect(placeActivity.category, RecommendationCategory.restaurant);
+        expect(placeActivity.category, RecommendationCategory.food);
         expect(placeActivity.description, 'A great restaurant');
         expect(placeActivity.location, '123 Main St');
         expect(placeActivity.latitude, 40.7128);
@@ -106,7 +106,7 @@ void main() {
 
         expect(json['id'], 'test-id');
         expect(json['name'], 'Test Place');
-        expect(json['category'], RecommendationCategory.attraction.index);
+        expect(json['category'], 'attraction');
         expect(json['rating'], 4.5);
       });
 
@@ -114,7 +114,7 @@ void main() {
         final json = {
           'id': 'test-id',
           'name': 'Test Place',
-          'category': RecommendationCategory.attraction.index,
+          'category': 'attraction',
           'rating': 4.5,
         };
 

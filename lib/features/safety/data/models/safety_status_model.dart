@@ -7,6 +7,8 @@ part 'safety_status_model.g.dart';
 /// Model for [SafetyStatus] with JSON serialization
 @freezed
 sealed class SafetyStatusModel with _$SafetyStatusModel {
+  const SafetyStatusModel._(); // Private constructor for custom methods
+
   const factory SafetyStatusModel({
     required String id,
     required String userId,

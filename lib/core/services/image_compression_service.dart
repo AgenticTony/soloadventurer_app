@@ -114,9 +114,6 @@ class ImageCompressionService {
 
     final originalSize = await file.length();
     if (kDebugMode) {
-      debugPrint('ImageCompressionService: Compressing ${file.path}');
-      debugPrint('  - Original size: ${_formatBytes(originalSize)}');
-      debugPrint('  - Quality: $quality%');
     }
 
     try {
@@ -155,16 +152,11 @@ class ImageCompressionService {
       );
 
       if (kDebugMode) {
-        debugPrint('  - Compressed size: ${result.formattedCompressedSize}');
-        debugPrint('  - Savings: ${result.savingsPercentage}%');
-        debugPrint(
-            '  - Dimensions: ${result.originalWidth}x${result.originalHeight} → ${result.compressedWidth}x${result.compressedHeight}');
       }
 
       return result;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ImageCompressionService: Compression failed: $e');
       }
       rethrow;
     }
@@ -207,7 +199,6 @@ class ImageCompressionService {
     final maxH = maxHeight ?? defaultMaxHeight;
 
     if (kDebugMode) {
-      debugPrint('ImageCompressionService: Compressing ${bytes.length} bytes');
     }
 
     try {
@@ -261,13 +252,7 @@ class ImageCompressionService {
       }
 
       if (kDebugMode) {
-        final savings =
-            ((1 - compressedBytes.length / bytes.length) * 100).toInt();
-        debugPrint(
-            '  - Original: ${_formatBytes(bytes.length)} ($originalWidth x $originalHeight)');
-        debugPrint(
-            '  - Compressed: ${_formatBytes(compressedBytes.length)} ($compressedWidth x $compressedHeight)');
-        debugPrint('  - Savings: $savings%');
+        ((1 - compressedBytes.length / bytes.length) * 100).toInt();
       }
 
       return ImageCompressionData(
@@ -279,7 +264,6 @@ class ImageCompressionService {
       );
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('ImageCompressionService: Compression failed: $e');
       }
       rethrow;
     }
@@ -317,8 +301,6 @@ class ImageCompressionService {
     int? maxHeight,
   }) async {
     if (kDebugMode) {
-      debugPrint(
-          'ImageCompressionService: Compressing batch of ${files.length} images');
     }
 
     // Process in batches to avoid overwhelming memory
@@ -340,24 +322,6 @@ class ImageCompressionService {
       );
 
       results.addAll(batchResults);
-    }
-
-    if (kDebugMode) {
-      final totalOriginal = results.fold<int>(
-        0,
-        (sum, r) => sum + r.originalSize,
-      );
-      final totalCompressed = results.fold<int>(
-        0,
-        (sum, r) => sum + r.compressedSize,
-      );
-      final totalSavings = totalOriginal - totalCompressed;
-
-      debugPrint('Batch compression complete:');
-      debugPrint('  - Total original: ${_formatBytes(totalOriginal)}');
-      debugPrint('  - Total compressed: ${_formatBytes(totalCompressed)}');
-      debugPrint(
-          '  - Total savings: ${_formatBytes(totalSavings)} (${((1 - totalCompressed / totalOriginal) * 100).toStringAsFixed(1)}%)');
     }
 
     return results;
@@ -448,17 +412,6 @@ class ImageCompressionService {
     }
   }
 
-  /// Format bytes to human-readable string.
-  static String _formatBytes(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    }
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
 }
 
 /// Result of image compression operation.

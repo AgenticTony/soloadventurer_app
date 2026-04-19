@@ -29,8 +29,6 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
   String? _locationError;
   late AnimationController _pulseController;
   late AnimationController _countdownController;
-  int _countdown = 3;
-  bool _isCountingDown = false;
 
   @override
   void initState() {
@@ -145,18 +143,9 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
   }
 
   Future<bool> _showCountdownDialog() async {
-    setState(() {
-      _isCountingDown = true;
-      _countdown = 3;
-    });
-
     _countdownController.reset();
     await _countdownController.forward();
     _countdownController.reset();
-
-    setState(() {
-      _isCountingDown = false;
-    });
 
     // Show confirmation dialog
     return await showDialog<bool>(
@@ -262,14 +251,17 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final safetyState = ref.watch(safetyProvider);
-    final contactsState = ref.watch(trustedContactsProvider);
-    final isProcessing = ref.watch(safetyProvider.select((state) => state.isProcessing));
-    final hasActiveEmergency = ref.watch(safetyProvider.select((state) => state.activeAlerts.isNotEmpty));
+    final safetyAsync = ref.watch(safetyProvider);
+    final contactsAsync = ref.watch(trustedContactsProvider);
+    final safetyState = safetyAsync.value;
+    final isProcessing = safetyState?.isProcessing ?? false;
+    final hasActiveEmergency = safetyState?.activeAlerts.isNotEmpty ?? false;
 
     // Get contacts who will be notified
-    final emergencyContacts =
-        contactsState.contacts.where((c) => c.receivesEmergencyAlerts).toList();
+    final emergencyContacts = contactsAsync.value?.contacts
+            .where((c) => c.receivesEmergencyAlerts)
+            .toList() ??
+        [];
 
     return Scaffold(
       appBar: AppBar(
@@ -277,7 +269,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
         backgroundColor: hasActiveEmergency ? Colors.red.shade700 : null,
         foregroundColor: hasActiveEmergency ? Colors.white : null,
         actions: [
-          if (hasActiveEmergency)
+          if (hasActiveEmergency && safetyState != null)
             IconButton(
               icon: const Icon(Icons.info_outline),
               onPressed: () =>
@@ -291,7 +283,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Active emergency banner
-            if (hasActiveEmergency) ...[
+            if (hasActiveEmergency && safetyState != null) ...[
               _buildActiveEmergencyBanner(
                   theme, safetyState.activeAlerts.first),
               const SizedBox(height: 24),
@@ -324,7 +316,7 @@ class _EmergencySOSScreenState extends ConsumerState<EmergencySOSScreen>
             if (!hasActiveEmergency) _buildMessageSection(theme),
 
             // Active alerts section
-            if (hasActiveEmergency) ...[
+            if (hasActiveEmergency && safetyState != null) ...[
               const SizedBox(height: 24),
               _buildActiveAlertActions(theme, safetyState.activeAlerts.first),
             ],

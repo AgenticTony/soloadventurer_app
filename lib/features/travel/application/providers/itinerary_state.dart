@@ -50,9 +50,8 @@ class ItineraryState {
       : itinerary = value,
         error = null;
 
-  const ItineraryState.withError(Object error)
-      : itinerary = null,
-        error = error;
+  const ItineraryState.withError(Object this.error)
+      : itinerary = null;
 
   bool get isLoading => itinerary == null && error == null;
   bool get hasError => error != null;

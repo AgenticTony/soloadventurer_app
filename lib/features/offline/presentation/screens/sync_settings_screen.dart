@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/app/providers/offline_service_providers.dart'
+    as offline_providers;
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
-import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
-import 'package:soloadventurer/features/offline/infrastructure/database/database_service.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_settings_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/connectivity_provider.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart';
 
 /// Sync settings screen for managing sync preferences and viewing sync status
 ///
@@ -54,7 +54,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
     });
 
     try {
-      final repository = getIt<SyncQueueRepository>();
+      final repository = ref.read(offline_providers.syncQueueRepositoryProvider);
       final operations = await repository.getPendingOperations(limit: 10);
 
       if (mounted) {
@@ -150,7 +150,7 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
     if (confirmed != true) return;
 
     try {
-      final dbService = getIt<DatabaseService>();
+      final dbService = ref.read(databaseServiceProvider);
       await dbService.reset();
 
       if (!mounted) return;
@@ -460,8 +460,6 @@ class _SyncSettingsScreenState extends ConsumerState<SyncSettingsScreen> {
     BuildContext context,
     SyncOperationEntity operation,
   ) {
-    final theme = Theme.of(context);
-
     IconData icon;
     String operationText;
 

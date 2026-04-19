@@ -125,7 +125,7 @@ class ItineraryNotifier extends _$ItineraryNotifier {
 ///
 @riverpod
 Future<List<ItineraryListState>> itineraries(
-  ref,
+  Ref ref,
   String? userId,
 ) async {
   final getItinerariesUseCase = ref.read(getItinerariesProvider);

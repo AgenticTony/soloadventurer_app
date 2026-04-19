@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_settings_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/connectivity_provider.dart';
@@ -38,9 +38,6 @@ class _AppLifecycleSyncManagerState
   /// Timestamp of last foreground sync trigger
   DateTime? _lastForegroundSyncTime;
 
-  /// Current app lifecycle state
-  AppLifecycleState? _lifecycleState;
-
   @override
   void initState() {
     super.initState();
@@ -59,8 +56,6 @@ class _AppLifecycleSyncManagerState
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
 
-    _lifecycleState = state;
-
     // Trigger sync when app returns to foreground
     if (state == AppLifecycleState.resumed) {
       _onAppResumed();
@@ -69,18 +64,13 @@ class _AppLifecycleSyncManagerState
 
   /// Called when the app is resumed/returns to foreground
   void _onAppResumed() {
-    debugPrint('🔄 App returned to foreground - checking if sync should run');
 
     // Check if enough time has passed since last sync
     if (_lastForegroundSyncTime != null) {
       final timeSinceLastSync =
           DateTime.now().difference(_lastForegroundSyncTime!);
       if (timeSinceLastSync < widget.minSyncInterval) {
-        final remainingTime = widget.minSyncInterval - timeSinceLastSync;
-        debugPrint(
-          '⏱️ Skipping foreground sync - not enough time elapsed. '
-          'Remaining: ${remainingTime.inSeconds}s',
-        );
+        widget.minSyncInterval - timeSinceLastSync;
         return;
       }
     }
@@ -92,29 +82,23 @@ class _AppLifecycleSyncManagerState
 
     // Check if sync is enabled
     if (!syncSettings.syncEnabled) {
-      debugPrint('🔄 Sync is disabled in user preferences - skipping');
       return;
     }
 
     // Check if device is connected to network
     if (!connectivityState.isConnected) {
-      debugPrint('🔄 No network connectivity - skipping foreground sync');
       return;
     }
 
     // Check WiFi-only preference
     if (syncSettings.syncOnlyOnWifi) {
       if (connectivityState.connectionType != ConnectionType.wifi) {
-        debugPrint(
-          '🔄 WiFi-only mode enabled but not on WiFi - skipping sync',
-        );
         return;
       }
     }
 
     // Check if sync is already running
     if (syncStatus.isSyncing) {
-      debugPrint('🔄 Sync already in progress - skipping foreground sync');
       return;
     }
 
@@ -124,7 +108,6 @@ class _AppLifecycleSyncManagerState
 
   /// Triggers a foreground sync
   Future<void> _triggerForegroundSync() async {
-    debugPrint('🔄 Triggering foreground sync...');
 
     // Update last sync time
     _lastForegroundSyncTime = DateTime.now();
@@ -137,17 +120,10 @@ class _AppLifecycleSyncManagerState
       final result = await syncNotifier.triggerSync();
 
       if (result.success) {
-        debugPrint(
-          '✅ Foreground sync completed successfully '
-          '(uploaded: ${result.uploadedCount}, downloaded: ${result.downloadedCount})',
-        );
       } else {
-        debugPrint(
-          '⚠️ Foreground sync failed: ${result.errorMessage}',
-        );
       }
     } catch (e) {
-      debugPrint('❌ Error triggering foreground sync: $e');
+    // intentional silent catch
     }
   }
 

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/core/widgets/spacing.dart';
 
 /// A rich text editor widget for journal entries
 ///
@@ -135,7 +134,7 @@ class _RichTextEditorState extends ConsumerState<RichTextEditor> {
     try {
       final decoded = jsonDecode(jsonString);
       if (decoded is List) {
-        return decoded as List<dynamic>;
+        return decoded;
       }
       if (decoded is Map) {
         return [decoded];

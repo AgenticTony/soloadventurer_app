@@ -52,6 +52,10 @@ abstract class NotificationPreferences with _$NotificationPreferences {
     @Default(false) bool locationBasedNotificationsEnabled,
     @Default(500) int proximityNotificationRadiusMeters,
 
+    // Chat notification preferences
+    @Default([]) List<String> mutedChatIds,
+    @Default(true) bool chatMessageNotifications,
+
     // Timestamps
     DateTime? lastUpdated,
     String? userId,
@@ -102,6 +106,24 @@ abstract class NotificationPreferences with _$NotificationPreferences {
   /// Returns true if recommendation notifications are enabled
   bool get recommendationNotificationsEnabled =>
       nearbyDeals || localEventSuggestions || restaurantRecommendations;
+
+  /// Returns true if a specific chat is muted
+  bool isChatMuted(String chatId) => mutedChatIds.contains(chatId);
+
+  /// Returns a copy with the chat muted
+  NotificationPreferences muteChat(String chatId) {
+    if (mutedChatIds.contains(chatId)) return this;
+    return copyWith(
+      mutedChatIds: [...mutedChatIds, chatId],
+    ).withTimestamp();
+  }
+
+  /// Returns a copy with the chat unmuted
+  NotificationPreferences unmuteChat(String chatId) {
+    return copyWith(
+      mutedChatIds: mutedChatIds.where((id) => id != chatId).toList(),
+    ).withTimestamp();
+  }
 
   /// Returns the count of enabled notification categories
   int get enabledCategoriesCount {

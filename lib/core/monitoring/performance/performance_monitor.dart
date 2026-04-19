@@ -197,10 +197,6 @@ class PerformanceMonitor {
     await _instance!._startMonitoring();
 
     if (kDebugMode) {
-      debugPrint('PerformanceMonitor initialized');
-      debugPrint(
-          '  Monitoring interval: ${effectiveConfig.monitoringInterval.inSeconds}s');
-      debugPrint('  Target FPS: ${effectiveConfig.targetFPS}');
     }
   }
 
@@ -220,7 +216,6 @@ class PerformanceMonitor {
     );
 
     if (kDebugMode) {
-      debugPrint('PerformanceMonitor started tracking');
     }
   }
 
@@ -231,7 +226,6 @@ class PerformanceMonitor {
     if (_instance != null && _instance!._appStartTime == null) {
       _instance!._appStartTime = DateTime.now();
       if (kDebugMode) {
-        debugPrint('PerformanceMonitor: Tracking app start time');
       }
     }
   }
@@ -246,8 +240,6 @@ class PerformanceMonitor {
       _instance!._startupTimeMs =
           DateTime.now().difference(_instance!._appStartTime!).inMilliseconds;
       if (kDebugMode) {
-        debugPrint(
-            'PerformanceMonitor: App startup completed in ${_instance!._startupTimeMs}ms');
       }
       // Trigger immediate metrics update
       _instance!._updateMetrics();
@@ -396,7 +388,6 @@ class PerformanceMonitor {
       }
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Error updating performance metrics: $e');
       }
     }
   }
@@ -465,7 +456,6 @@ class PerformanceMonitor {
       _onAlert(alert);
 
       if (kDebugMode) {
-        debugPrint('⚠️ Performance Alert: $alert');
       }
     }
   }
@@ -525,7 +515,6 @@ class PerformanceMonitor {
     _instance = null;
 
     if (kDebugMode) {
-      debugPrint('PerformanceMonitor disposed');
     }
   }
 }

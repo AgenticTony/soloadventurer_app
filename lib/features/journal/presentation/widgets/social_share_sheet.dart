@@ -71,7 +71,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final sharingState = ref.watch(socialSharingNotifierProvider);
+    final sharingState = ref.watch(socialSharingProvider);
     final theme = Theme.of(context);
 
     return Container(
@@ -236,7 +236,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                ref.read(socialSharingNotifierProvider.notifier).reset();
+                ref.read(socialSharingProvider.notifier).reset();
               },
             ),
           ],
@@ -246,7 +246,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
   }
 
   Widget _buildErrorCard(BuildContext context, ThemeData theme) {
-    final sharingState = ref.watch(socialSharingNotifierProvider);
+    final sharingState = ref.watch(socialSharingProvider);
     return Card(
       color: theme.colorScheme.errorContainer,
       child: Padding(
@@ -269,7 +269,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () {
-                ref.read(socialSharingNotifierProvider.notifier).clearError();
+                ref.read(socialSharingProvider.notifier).clearError();
               },
             ),
           ],
@@ -281,7 +281,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
   Future<void> _handleShare() async {
     if (_selectedPlatform == null) return;
 
-    final notifier = ref.read(socialSharingNotifierProvider.notifier);
+    final notifier = ref.read(socialSharingProvider.notifier);
 
     switch (widget.contentType) {
       case ShareableType.journalEntry:
@@ -322,7 +322,7 @@ class _SocialShareSheetState extends ConsumerState<SocialShareSheet> {
 
     // Close after successful share
     if (mounted) {
-      final state = ref.read(socialSharingNotifierProvider);
+      final state = ref.read(socialSharingProvider);
       if (state.isSuccess) {
         Navigator.of(context).pop();
         widget.onShareComplete?.call();

@@ -378,13 +378,13 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
               const SizedBox(height: 8),
 
               // Location
-              if (destination.location != null)
+              if (destination.countryCode.isNotEmpty || destination.region != null)
                 Row(
                   children: [
                     const Icon(Icons.location_on, size: 16),
                     const SizedBox(width: 4),
                     Text(
-                      '${destination.location!.countryCode} • ${destination.location!.region}',
+                      '${destination.countryCode}${destination.region != null && destination.countryCode.isNotEmpty ? ' • ' : ''}${destination.region ?? ''}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],

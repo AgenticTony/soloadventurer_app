@@ -64,7 +64,7 @@ final class PlacesRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$placesRemoteDataSourceHash() =>
-    r'c522f18fdd15de93f1535fa2d544488dea8fa5fb';
+    r'f5f53eca9660a02d400a4b23aba56066078f479f';
 
 /// Provider for places repository
 

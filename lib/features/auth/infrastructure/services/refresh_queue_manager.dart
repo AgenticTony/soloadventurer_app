@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
@@ -97,19 +96,23 @@ class RefreshQueueManager {
   /// Service for performing token refresh operations
   final TokenRefreshService _refreshService;
 
-  /// Maximum time to wait in queue before timing out (30 seconds)
-  static const Duration queueTimeout = Duration(seconds: 30);
+  /// Maximum time to wait in queue before timing out (default 30 seconds)
+  final Duration queueTimeout;
+
+  /// Default timeout duration
+  static const Duration defaultTimeout = Duration(seconds: 30);
+
+  /// Creates a new [RefreshQueueManager]
+  RefreshQueueManager({
+    required TokenRefreshService refreshService,
+    this.queueTimeout = defaultTimeout,
+  }) : _refreshService = refreshService;
 
   /// Completers for queued refresh requests
   final List<_QueuedRequest> _queue = [];
 
   /// Whether a refresh operation is currently in progress
   bool _isRefreshing = false;
-
-  /// Creates a new [RefreshQueueManager]
-  RefreshQueueManager({
-    required TokenRefreshService refreshService,
-  }) : _refreshService = refreshService;
 
   /// Whether a refresh operation is currently in progress
   bool get isRefreshing => _isRefreshing;
@@ -128,8 +131,6 @@ class RefreshQueueManager {
   /// an error. Throws if the request times out after 30 seconds.
   Future<QueuedRefreshResult> enqueueRefresh() async {
     final startTime = DateTime.now();
-    debugPrint(
-        'RefreshQueueManager: Enqueueing refresh request (queue length: ${_queue.length})');
 
     // Create a completer for this request
     final completer = Completer<QueuedRefreshResult>();
@@ -144,11 +145,8 @@ class RefreshQueueManager {
     // If no refresh is in progress, start one
     if (!_isRefreshing) {
       _isRefreshing = true;
-      debugPrint('RefreshQueueManager: Starting refresh operation');
       _performRefresh();
     } else {
-      debugPrint(
-          'RefreshQueueManager: Refresh already in progress, request queued');
     }
 
     // Set up timeout for this request
@@ -156,8 +154,6 @@ class RefreshQueueManager {
     timeoutTimer = Timer(queueTimeout, () {
       if (!completer.isCompleted) {
         final queueTime = DateTime.now().difference(startTime).inMilliseconds;
-        debugPrint(
-            'RefreshQueueManager: Request timed out after ${queueTime}ms');
         completer.complete(QueuedRefreshResult.timeout(queueTimeMs: queueTime));
       }
     });
@@ -174,14 +170,10 @@ class RefreshQueueManager {
 
   /// Performs the refresh operation and resolves all queued requests
   Future<void> _performRefresh() async {
-    debugPrint('RefreshQueueManager: Performing refresh operation');
 
     try {
       // Perform the actual refresh
       final session = await _refreshService.refreshToken();
-
-      debugPrint(
-          'RefreshQueueManager: Refresh successful, resolving ${_queue.length} queued requests');
 
       // Resolve all queued requests with the same result
       final now = DateTime.now();
@@ -200,7 +192,6 @@ class RefreshQueueManager {
       // Clear the queue
       _queue.clear();
     } on AuthException catch (e) {
-      debugPrint('RefreshQueueManager: Refresh failed: ${e.message}');
 
       // Resolve all queued requests with the error
       final now = DateTime.now();
@@ -219,7 +210,6 @@ class RefreshQueueManager {
       // Clear the queue
       _queue.clear();
     } catch (e) {
-      debugPrint('RefreshQueueManager: Unexpected error during refresh: $e');
 
       // Wrap unexpected errors in AuthException
       final authException = AuthException(
@@ -252,8 +242,6 @@ class RefreshQueueManager {
   ///
   /// This will resolve all pending requests with a timeout error.
   void clearQueue() {
-    debugPrint(
-        'RefreshQueueManager: Clearing queue (${_queue.length} requests)');
 
     final now = DateTime.now();
     for (final request in _queue) {
@@ -271,13 +259,11 @@ class RefreshQueueManager {
 
   /// Disposes of the manager and clears all queued requests
   void dispose() {
-    debugPrint('RefreshQueueManager: Disposing manager');
     clearQueue();
   }
 
   /// Resets the manager state (useful for testing)
   void reset() {
-    debugPrint('RefreshQueueManager: Resetting manager state');
     clearQueue();
   }
 }

@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:uuid/uuid.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/core/services/location_service.dart';
 import 'package:soloadventurer/core/services/weather_service.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/date_range.dart';
@@ -71,14 +71,17 @@ class PersonalizedRecommendationService implements RecommendationService {
     final weatherByDate = <DateTime, List<WeatherForecast>>{};
     for (int i = 0; i < request.tripDates.duration.inDays; i++) {
       final date = request.tripDates.start.add(Duration(days: i));
-      final weatherResult = await _weatherService.getForecast(
-        request.destination,
-        DateRange(start: date, end: date.add(const Duration(days: 1))),
-      );
-      weatherResult.fold(
-        (failure) => null,
-        (forecasts) => weatherByDate[date] = forecasts,
-      );
+      try {
+        final forecasts = await _weatherService.getForecast(
+          request.destination,
+          DateRange(start: date, end: date.add(const Duration(days: 1))),
+        );
+        if (forecasts.isNotEmpty) {
+          weatherByDate[date] = forecasts;
+        }
+      } catch (_) {
+        // Continue without weather data for this date
+      }
     }
 
     // 3. Get places matching interests

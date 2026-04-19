@@ -539,19 +539,12 @@ class AuthErrorHandler {
     }
 
     if (exception is AuthException) {
-      debugPrint('AuthErrorHandler: AuthException - '
-          'Code: ${exception.code}, Message: ${exception.message}');
     } else if (exception is AppException) {
-      debugPrint('AuthErrorHandler: AppException - '
-          'Code: ${exception.code}, Message: ${exception.message}');
     } else {
-      debugPrint('AuthErrorHandler: Unexpected exception - '
-          'Type: ${exception.runtimeType}, Message: ${exception.toString()}');
     }
 
     // Log stack trace for non-AuthException errors
     if (exception is! AuthException && exception is! AppException) {
-      debugPrint('Stack trace: ${StackTrace.current}');
     }
   }
 

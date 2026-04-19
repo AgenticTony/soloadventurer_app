@@ -3,7 +3,6 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:soloadventurer/app/app.dart';
-import 'package:soloadventurer/core/providers/core_providers.dart' show sharedPreferencesProvider;
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source_impl.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
@@ -15,7 +14,7 @@ import 'package:soloadventurer/features/safety/domain/entities/safety_alert.dart
 import 'package:soloadventurer/features/safety/domain/entities/safety_status.dart';
 import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.dart';
 import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart';
 import '../../../test/helpers/safety_test_helpers.dart';
 
 void main() {
@@ -32,9 +31,6 @@ void main() {
     // Initialize SharedPreferences for testing
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-
-    // Initialize service locator in test mode
-    await setupServiceLocator(isTest: true);
 
     // Initialize local data source
     localDataSource = SafetyLocalDataSourceImpl(prefs);
@@ -59,7 +55,6 @@ void main() {
   });
 
   tearDown(() async {
-    await resetServiceLocator();
     container.dispose();
   });
 
@@ -92,10 +87,10 @@ void main() {
       // Verify contact was added - access state directly
       final state = container.read(trustedContactsProvider);
       expect(
-          state.contacts,
+          state.value?.contacts,
           contains(predicate((TrustedContact c) => c.name == 'Jane Doe')));
       expect(
-          state.contacts.length,
+          state.value?.contacts.length,
           greaterThanOrEqualTo(1));
     });
 
@@ -121,9 +116,9 @@ void main() {
 
       // Verify check-in was created
       final checkInState = container.read(checkInProvider);
-      expect(checkInState.checkIns, isNotEmpty);
+      expect(checkInState.value?.checkIns, isNotEmpty);
       expect(
-          checkInState.checkIns.any((c) => c.statusMessage == 'I arrived safely!'), true);
+          checkInState.value?.checkIns.any((c) => c.statusMessage == 'I arrived safely!'), true);
     });
 
     testWidgets('Complete scheduled check-in flow', (tester) async {
@@ -152,9 +147,9 @@ void main() {
 
       // Verify check-in was scheduled
       final checkInState = container.read(checkInProvider);
-      expect(checkInState.upcomingCheckIns, isNotEmpty);
+      expect(checkInState.value?.upcomingCheckIns, isNotEmpty);
       expect(
-          checkInState.upcomingCheckIns.any((c) => c.status == CheckInStatus.scheduled),
+          checkInState.value?.upcomingCheckIns.any((c) => c.status == CheckInStatus.scheduled),
           true);
     });
 
@@ -191,12 +186,12 @@ void main() {
 
       // Verify emergency was triggered
       final safetyState = container.read(safetyProvider);
-      expect(safetyState.activeAlerts, isNotEmpty);
+      expect(safetyState.value?.activeAlerts, isNotEmpty);
       expect(
-          safetyState.activeAlerts.any((a) => a.type == SafetyAlertType.emergencySOS),
+          safetyState.value?.activeAlerts.any((a) => a.type == SafetyAlertType.emergencySOS),
           true);
       expect(
-          safetyState.activeAlerts.any((a) => a.message == 'Need help immediately!'),
+          safetyState.value?.activeAlerts.any((a) => a.message == 'Need help immediately!'),
           true);
     });
 
@@ -230,7 +225,7 @@ void main() {
 
       // Verify safety status was updated
       final safetyState = container.read(safetyProvider);
-      final currentStatus = safetyState.currentStatus;
+      final currentStatus = safetyState.value?.currentStatus;
       expect(currentStatus, isNotNull);
       expect(currentStatus!.status, SafetyStatusType.needHelp);
       expect(currentStatus.message, 'I need some assistance');
@@ -262,7 +257,7 @@ void main() {
 
       // Verify location sharing started
       final locationSharingState = container.read(locationSharingProvider);
-      expect(locationSharingState.activeShares, isNotEmpty);
+      expect(locationSharingState.value?.activeShares, isNotEmpty);
 
       // Test: Stop location sharing
       await locationSharingNotifier.stopSharing(
@@ -273,7 +268,7 @@ void main() {
 
       // Verify location sharing stopped
       expect(
-          container.read(locationSharingProvider).activeShares,
+          container.read(locationSharingProvider).value?.activeShares,
           isEmpty);
     });
 
@@ -320,8 +315,8 @@ void main() {
 
       // Step 4: Complete the check-in
       final checkInState = container.read(checkInProvider);
-      final upcomingCheckIns = checkInState.upcomingCheckIns;
-      if (upcomingCheckIns.isNotEmpty) {
+      final upcomingCheckIns = checkInState.value?.upcomingCheckIns;
+      if (upcomingCheckIns != null && upcomingCheckIns.isNotEmpty) {
         await checkInNotifier.completeCheckIn(
           checkInId: upcomingCheckIns.first.id,
           latitude: 40.7128,
@@ -333,10 +328,10 @@ void main() {
 
       // Verify workflow
       final contactsState = container.read(trustedContactsProvider);
-      expect(contactsState.contacts.length, greaterThanOrEqualTo(1));
+      expect(contactsState.value?.contacts.length, greaterThanOrEqualTo(1));
 
       final locationSharingState = container.read(locationSharingProvider);
-      expect(locationSharingState.activeShares.isNotEmpty, true);
+      expect(locationSharingState.value?.activeShares.isNotEmpty, true);
 
       // Step 5: Stop location sharing
       await locationSharingNotifier.stopSharing(
@@ -345,7 +340,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-          container.read(locationSharingProvider).activeShares,
+          container.read(locationSharingProvider).value?.activeShares,
           isEmpty);
     });
   });

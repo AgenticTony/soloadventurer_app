@@ -12,7 +12,7 @@ class AuthTestScreen extends ConsumerWidget {
             'Test123!', // Replace with your test password
           );
     } catch (e) {
-      debugPrint('Sign in failed: ${e.toString()}');
+    // intentional silent catch
     }
   }
 
@@ -20,7 +20,7 @@ class AuthTestScreen extends ConsumerWidget {
     try {
       await ref.read(authProvider.notifier).signOut();
     } catch (e) {
-      debugPrint('Sign out failed: ${e.toString()}');
+    // intentional silent catch
     }
   }
 
@@ -32,7 +32,7 @@ class AuthTestScreen extends ConsumerWidget {
             name: 'Test User', // Replace with your test name
           );
     } catch (e) {
-      debugPrint('Registration failed: ${e.toString()}');
+    // intentional silent catch
     }
   }
 

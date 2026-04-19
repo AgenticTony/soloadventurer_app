@@ -44,8 +44,8 @@ abstract class DateRange with _$DateRange {
     final today = DateTime(now.year, now.month, now.day);
     final startDate = DateTime(start.year, start.month, start.day);
 
-    return start.isBefore(end) && startDate.isAtSameMomentAs(today) ||
-        startDate.isAfter(today);
+    return start.isBefore(end) &&
+        (startDate.isAtSameMomentAs(today) || startDate.isAfter(today));
   }
 
   /// Returns a formatted string representation

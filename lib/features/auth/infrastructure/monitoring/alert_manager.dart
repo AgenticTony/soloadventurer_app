@@ -54,6 +54,7 @@ class AlertManager extends _$AlertManager implements AlertRepository {
       await _initialize();
       _isInitialized = true;
     }
+    return null;
   }
 
   /// Initialize alert infrastructure
@@ -84,13 +85,6 @@ class AlertManager extends _$AlertManager implements AlertRepository {
   @override
   Future<void> sendAlert(SecurityAlert alert) async {
     try {
-      final logMessage = {
-        'type': alert.type.toString(),
-        'severity': alert.severity.toString(),
-        'timestamp': DateTime.now().toIso8601String(),
-        'details': alert.toJson(),
-      };
-
       // CloudWatch temporarily disabled - just log locally
       // await _cloudWatch.log(logMessage.toString());
 
@@ -116,13 +110,6 @@ class AlertManager extends _$AlertManager implements AlertRepository {
   /// Test CloudWatch logging
   Future<void> testCloudWatchLogging() async {
     try {
-      final testMessage = {
-        'type': 'TEST_ALERT',
-        'severity': 'INFO',
-        'timestamp': DateTime.now().toIso8601String(),
-        'message': 'This is a test alert from the Flutter app',
-      };
-
       // CloudWatch temporarily disabled - just log locally
       // await _cloudWatch.log(testMessage.toString());
 

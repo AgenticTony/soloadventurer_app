@@ -5,6 +5,7 @@ import 'package:soloadventurer/features/sync/domain/models/sync_status.dart';
 import 'package:soloadventurer/features/sync/domain/entities/sync_entity_type.dart';
 import 'package:soloadventurer/features/sync/infrastructure/services/sync_service_impl.dart';
 import 'package:soloadventurer/features/sync/domain/services/exponential_backoff.dart';
+import 'package:soloadventurer/features/sync/domain/services/sync_service.dart';
 
 /// Manual mock implementation of ExponentialBackoff for testing
 class MockExponentialBackoff implements ExponentialBackoff {
@@ -105,6 +106,7 @@ void main() {
 
       // Enqueue operation should trigger status change
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -122,6 +124,7 @@ void main() {
       final subscription = syncService.queueStream.listen(queues.add);
 
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -165,7 +168,7 @@ void main() {
         ),
         SyncOperation.create(
           id: 'op3',
-          entityType: SyncEntityType.activity,
+          entityType: SyncEntityType.travelNote,
           data: const {'title': 'Activity 1'},
         ),
       ];
@@ -262,6 +265,7 @@ void main() {
 
     test('should update status to pending when operation enqueued', () async {
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -276,6 +280,7 @@ void main() {
       final subscription = syncService.statusStream.listen(statuses.add);
 
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -292,6 +297,7 @@ void main() {
       final subscription = syncService.queueStream.listen(queues.add);
 
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -372,6 +378,7 @@ void main() {
 
     test('should update status to idle after clearing queue', () async {
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -409,7 +416,6 @@ void main() {
         SyncOperation.create(
           id: 'op1',
           entityType: SyncEntityType.trip,
-          entityId: 'trip-1',
           data: const {'title': 'Trip 1'},
         ),
         SyncOperation.update(
@@ -420,15 +426,13 @@ void main() {
         ),
         SyncOperation.create(
           id: 'op3',
-          entityType: SyncEntityType.activity,
-          entityId: 'activity-1',
+          entityType: SyncEntityType.travelNote,
           data: const {'title': 'Activity 1'},
         ),
         SyncOperation.delete(
           id: 'op4',
           entityType: SyncEntityType.trip,
           entityId: 'trip-1',
-          data: const {},
         ),
       ];
 
@@ -456,29 +460,29 @@ void main() {
     test('should get operations for specific entity', () {
       final trip1Ops = syncService.getOperationsForEntity('trip-1');
 
-      expect(trip1Ops.length, 2);
+      expect(trip1Ops.length, 1);
       expect(trip1Ops.every((op) => op.entityId == 'trip-1'), true);
     });
 
     test('should return empty list for non-matching queries', () {
-      final noteOps =
-          syncService.getOperationsByType(SyncEntityType.travelNote);
+      final nonExistent = syncService.getOperationsForEntity('non-existent');
 
-      expect(noteOps, isEmpty);
+      expect(nonExistent, isEmpty);
     });
   });
 
   group('SyncServiceImpl - Processing Control', () {
-    test('should pause processing', () {
+    test('should pause processing', () async {
       syncService.pauseProcessing();
 
       // Processing should be paused (no auto-processing when ops enqueued)
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
 
-      syncService.enqueueOperation(operation);
+      await syncService.enqueueOperation(operation);
 
       // Status should be pending but not processing
       expect(syncService.status, SyncOperationStatus.pending);
@@ -489,6 +493,7 @@ void main() {
       syncService.pauseProcessing();
 
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -523,6 +528,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -534,6 +540,7 @@ void main() {
     test('should transition to idle when queue cleared', () async {
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -550,6 +557,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -616,11 +624,13 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
       );
 
+      syncService.resumeProcessing();
       final processingFuture = syncService.processBatch();
       expect(syncService.isProcessing, true);
 
@@ -633,6 +643,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -721,11 +732,13 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
       );
 
+      syncService.resumeProcessing();
       final processingFuture = syncService.processQueue();
       expect(syncService.isProcessing, true);
 
@@ -749,7 +762,8 @@ void main() {
 
       final retried = await syncService.retryFailedOperations();
 
-      expect(retried, 0); // No failed ops to retry in queue
+      expect(retried, 1); // 1 failed op with retryCount > 0
+      expect(syncService.queueSize, 1);
     });
 
     test('should not retry operations exceeding max attempts', () async {
@@ -814,6 +828,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -835,6 +850,7 @@ void main() {
       expect(syncService.isProcessing, false);
 
       final operation = SyncOperation.create(
+        id: "op-1",
         entityType: SyncEntityType.trip,
         data: const {'title': 'Test'},
       );
@@ -856,6 +872,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -880,6 +897,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -900,6 +918,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -1086,6 +1105,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),
@@ -1101,6 +1121,7 @@ void main() {
 
       await syncService.enqueueOperation(
         SyncOperation.create(
+          id: "op-1",
           entityType: SyncEntityType.trip,
           data: const {'title': 'Test'},
         ),

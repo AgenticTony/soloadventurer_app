@@ -293,7 +293,6 @@ class _SafetyInsightCardState extends State<_SafetyInsightCard> {
             ),
             const SizedBox(height: 8),
             ...widget.insight.tips.asMap().entries.map((entry) {
-              final index = entry.key;
               final tip = entry.value;
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),

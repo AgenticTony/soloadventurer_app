@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
@@ -9,11 +8,29 @@ class AuthInterceptor extends Interceptor {
   /// Threshold for proactive token refresh (5 minutes)
   static const _refreshThreshold = Duration(minutes: 5);
 
-  /// Cached repository reference to avoid repeated service locator lookups
+  /// Cached repository reference
   final AuthRepository _authRepository;
 
+  /// The Dio instance to use for retry requests.
+  /// Injected via constructor to ensure correct base URL and interceptors.
+  final Dio _dio;
+
+  /// Tracks retry count per request to prevent infinite refresh loops.
+  /// Keyed by request hashCode to uniquely identify each request.
+  final Map<int, int> _retryCount = {};
+
+  /// Maximum number of retries after token refresh.
+  static const _maxRetries = 1;
+
   /// Creates a new [AuthInterceptor]
-  AuthInterceptor() : _authRepository = getIt<AuthRepository>();
+  ///
+  /// [authRepository] is injected via constructor rather than service locator.
+  /// [dio] is the handler-provided Dio instance for retry requests.
+  AuthInterceptor({
+    required AuthRepository authRepository,
+    required Dio dio,
+  })  : _authRepository = authRepository,
+        _dio = dio;
 
   /// Add authentication token to requests
   @override
@@ -34,8 +51,6 @@ class AuthInterceptor extends Interceptor {
         // Check if token is expiring soon and needs proactive refresh
         if (_shouldRefreshToken(session)) {
           if (kDebugMode) {
-            debugPrint(
-                'AuthInterceptor: Token expiring soon, triggering proactive refresh');
           }
 
           // Wait for in-progress refresh or start a new one
@@ -58,7 +73,6 @@ class AuthInterceptor extends Interceptor {
       return handler.next(options);
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Error in AuthInterceptor: $e');
       }
       return handler.next(options);
     }
@@ -72,6 +86,15 @@ class AuthInterceptor extends Interceptor {
   ) async {
     // Check if error is due to authentication
     if (err.response?.statusCode == 401) {
+      // Guard against infinite retry loops — max 1 retry after refresh.
+      final requestId = err.requestOptions.hashCode;
+      final retries = _retryCount[requestId] ?? 0;
+      if (retries >= _maxRetries) {
+        _retryCount.remove(requestId);
+        return handler.next(err);
+      }
+      _retryCount[requestId] = retries + 1;
+
       try {
         // Try to refresh token
         final session = await _authRepository.refreshToken();
@@ -84,16 +107,17 @@ class AuthInterceptor extends Interceptor {
           final options = err.requestOptions;
           options.headers['Authorization'] = 'Bearer $newToken';
 
-          // Retry request with new token
-          final response = await Dio().fetch(options);
+          // Retry using injected Dio instance (correct base URL + interceptors)
+          final response = await _dio.fetch(options);
+          _retryCount.remove(requestId);
           return handler.resolve(response);
         }
 
         // If token refresh failed, proceed with error
+        _retryCount.remove(requestId);
         return handler.next(err);
       } catch (e) {
         if (kDebugMode) {
-          debugPrint('Error refreshing token: $e');
         }
         return handler.next(err);
       }
@@ -136,16 +160,13 @@ class AuthInterceptor extends Interceptor {
   Future<AuthSession?> _performProactiveRefresh() async {
     try {
       if (kDebugMode) {
-        debugPrint('AuthInterceptor: Starting proactive token refresh');
       }
       final newSession = await _authRepository.refreshToken();
       if (kDebugMode) {
-        debugPrint('AuthInterceptor: Proactive token refresh successful');
       }
       return newSession;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('AuthInterceptor: Proactive token refresh failed: $e');
       }
       // Return null to indicate refresh failure
       // The request will proceed with the old token and 401 will be handled if needed

@@ -214,7 +214,6 @@ class ScrollPerformanceTracker {
       }
 
       if (kDebugMode) {
-        debugPrint('Scroll Performance: ${details.format()}');
       }
     }
 

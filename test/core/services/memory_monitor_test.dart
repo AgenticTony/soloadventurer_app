@@ -271,6 +271,7 @@ void main() {
     });
 
     test('should initialize and track state', () async {
+// ignore: unused_local_variable
       MemoryAlert? capturedAlert;
 
       await MemoryMonitor.initialize(
@@ -319,7 +320,7 @@ void main() {
       );
 
       final snapshots = <MemorySnapshot>[];
-      final subscription = MemoryMonitor.memoryStream.listen((snapshot) {
+      final subscription = MemoryMonitor.instance.memoryStream.listen((snapshot) {
         snapshots.add(snapshot);
       });
 
@@ -542,7 +543,8 @@ void main() {
     });
 
     test('should handle disabled monitoring', () async {
-      int alertCallCount = 0;
+  // ignore: unused_local_variable
+    int alertCallCount = 0;
 
       await MemoryMonitor.initialize(
         config: const MemoryMonitorConfig(

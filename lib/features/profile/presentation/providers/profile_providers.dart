@@ -1,13 +1,14 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soloadventurer/features/core/infrastructure/api/dio_api_service.dart';
+import 'package:soloadventurer/app/providers/offline_service_providers.dart'
+    as offline_providers;
+import 'package:soloadventurer/app/providers/travel_service_providers.dart'
+    as travel_providers;
+import 'package:soloadventurer/features/offline/presentation/providers/connectivity_provider.dart'
+    show connectivityServiceProvider;
 import '../../domain/entities/profile_state.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../data/repositories/profile_repository_impl.dart';
-import '../../../offline/domain/services/connectivity_service.dart';
-import '../../../offline/domain/services/sync_queue_service.dart';
-import '../../../offline/infrastructure/database/dao/user_dao.dart';
 import '../../domain/usecases/get_current_profile_use_case.dart';
 import '../../domain/usecases/update_profile_use_case.dart';
 import '../../domain/usecases/manage_avatar_use_case.dart';
@@ -25,14 +26,12 @@ part 'profile_providers.g.dart';
 
 @riverpod
 ProfileRepository profileRepository(Ref ref) {
-  final getIt = GetIt.instance;
-
   return ProfileRepositoryImpl(
-    userDao: getIt<UserDao>(),
-    apiService: getIt<DioApiService>(),
+    userDao: ref.read(offline_providers.userDaoProvider),
+    apiService: ref.read(travel_providers.dioApiServiceProvider),
     supabaseClient: Supabase.instance.client,
-    connectivityService: getIt<ConnectivityService>(),
-    syncQueueService: getIt<SyncQueueService>(),
+    connectivityService: ref.read(connectivityServiceProvider),
+    syncQueueService: ref.read(offline_providers.syncQueueServiceProvider),
   );
 }
 
@@ -142,5 +141,14 @@ class ProfileNavigationHistory extends _$ProfileNavigationHistory {
 
   void clearHistory() {
     state = const ProfileNavigationState();
+  }
+
+  void updateHistory(List<String> newHistory) {
+    state = ProfileNavigationState(history: newHistory);
+  }
+
+  void removeRoute(String route) {
+    final newHistory = state.history.where((r) => r != route).toList();
+    state = ProfileNavigationState(history: newHistory);
   }
 }

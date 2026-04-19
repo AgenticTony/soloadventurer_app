@@ -59,58 +59,55 @@ class LocationBasedNotificationService {
     }
 
     // Get current location
-    final positionResult = await _locationService.getCurrentPosition();
+    try {
+      final position = await _locationService.getCurrentLocation();
 
-    await positionResult.fold(
-      (failure) async {
-        // Cannot get location, skip
-        return;
-      },
-      (position) async {
-        // Calculate distance
-        final distance = _calculateDistance(
-          position.latitude,
-          position.longitude,
-          destination.location?.latitude ?? 0,
-          destination.location?.longitude ?? 0,
-        );
+      // Calculate distance
+      final distance = _calculateDistance(
+        position.latitude,
+        position.longitude,
+        destination.location?.latitude ?? 0,
+        destination.location?.longitude ?? 0,
+      );
 
-        final radiusMeters =
-            preferences.proximityNotificationRadiusMeters.toDouble();
+      final radiusMeters =
+          preferences.proximityNotificationRadiusMeters.toDouble();
 
-        // Check if within radius
-        if (distance <= radiusMeters) {
-          // Check rate limiting
-          if (_lastNotificationTime != null &&
-              DateTime.now().difference(_lastNotificationTime!) <
-                  _minNotificationInterval) {
-            return;
-          }
-
-          // Check preference for this type
-          bool shouldNotify = false;
-          TravelNotification? notification;
-
-          if (destination.type == 'restaurant' &&
-              preferences.restaurantRecommendations) {
-            shouldNotify = true;
-            notification = _createRestaurantNotification(destination, distance);
-          } else if (destination.type == 'deal' && preferences.nearbyDeals) {
-            shouldNotify = true;
-            notification = _createDealNotification(destination, distance);
-          } else if (destination.type == 'event' &&
-              preferences.localEventSuggestions) {
-            shouldNotify = true;
-            notification = _createEventNotification(destination, distance);
-          }
-
-          if (shouldNotify && notification != null) {
-            _lastNotificationTime = DateTime.now();
-            yield notification;
-          }
+      // Check if within radius
+      if (distance <= radiusMeters) {
+        // Check rate limiting
+        if (_lastNotificationTime != null &&
+            DateTime.now().difference(_lastNotificationTime!) <
+                _minNotificationInterval) {
+          return;
         }
-      },
-    );
+
+        // Check preference for this type
+        bool shouldNotify = false;
+        TravelNotification? notification;
+
+        if (destination.type == 'restaurant' &&
+            preferences.restaurantRecommendations) {
+          shouldNotify = true;
+          notification = _createRestaurantNotification(destination, distance);
+        } else if (destination.type == 'deal' && preferences.nearbyDeals) {
+          shouldNotify = true;
+          notification = _createDealNotification(destination, distance);
+        } else if (destination.type == 'event' &&
+            preferences.localEventSuggestions) {
+          shouldNotify = true;
+          notification = _createEventNotification(destination, distance);
+        }
+
+        if (shouldNotify && notification != null) {
+          _lastNotificationTime = DateTime.now();
+          yield notification;
+        }
+      }
+    } catch (e) {
+      // Cannot get location, skip
+      return;
+    }
   }
 
   /// Send a nearby restaurant notification

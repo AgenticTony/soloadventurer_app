@@ -60,6 +60,7 @@ void main() {
           technicalMessage: 'Connection timeout',
           userMessage: 'Network error occurred',
           occurredAt: DateTime.now(),
+          suggestion: 'Check connection',
         );
 
         final entry = SyncHistoryEntry.failure(
@@ -198,6 +199,7 @@ void main() {
           technicalMessage: 'Error',
           userMessage: 'Error',
           occurredAt: DateTime.now(),
+          suggestion: 'Check connection',
         );
 
         final original = SyncHistoryEntry(
@@ -224,6 +226,7 @@ void main() {
           technicalMessage: 'Connection timeout',
           userMessage: 'Network error',
           occurredAt: DateTime.now(),
+          suggestion: 'Check connection',
         );
 
         final original = SyncHistoryEntry(
@@ -284,6 +287,7 @@ void main() {
               technicalMessage: 'Error',
               userMessage: 'Error',
               occurredAt: DateTime.now(),
+              suggestion: 'Check connection',
             ),
           ),
         ];

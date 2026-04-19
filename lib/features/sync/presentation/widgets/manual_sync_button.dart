@@ -38,21 +38,22 @@ class ManualSyncButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(manualSyncStateProvider);
+    final asyncState = ref.watch(manualSyncProvider);
     final isSyncing = ref.watch(isSyncingProvider);
     final pendingCount = ref.watch(pendingOperationsCountProvider);
 
-    return _buildButton(context, ref, state, isSyncing, pendingCount);
+    return _buildButton(context, ref, asyncState, isSyncing, pendingCount);
   }
 
   Widget _buildButton(
     BuildContext context,
     WidgetRef ref,
-    dynamic state,
+    dynamic asyncState,
     bool isSyncing,
     int pendingCount,
   ) {
     final theme = Theme.of(context);
+    final state = asyncState.value;
 
     // Determine label and icon
     final label = customLabel ?? _getLabel(state, pendingCount);
@@ -62,7 +63,7 @@ class ManualSyncButton extends ConsumerWidget {
     switch (style) {
       case ManualSyncButtonStyle.elevated:
         return ElevatedButton.icon(
-          onPressed: isSyncing ? null : () => _handleSyncPress(ref, state),
+          onPressed: isSyncing ? null : () => _handleSyncPress(ref),
           icon: icon,
           label: Text(label),
           style: ElevatedButton.styleFrom(
@@ -75,14 +76,14 @@ class ManualSyncButton extends ConsumerWidget {
 
       case ManualSyncButtonStyle.text:
         return TextButton.icon(
-          onPressed: isSyncing ? null : () => _handleSyncPress(ref, state),
+          onPressed: isSyncing ? null : () => _handleSyncPress(ref),
           icon: icon,
           label: Text(label),
         );
 
       case ManualSyncButtonStyle.outlined:
         return OutlinedButton.icon(
-          onPressed: isSyncing ? null : () => _handleSyncPress(ref, state),
+          onPressed: isSyncing ? null : () => _handleSyncPress(ref),
           icon: icon,
           label: Text(label),
           style: OutlinedButton.styleFrom(
@@ -95,17 +96,16 @@ class ManualSyncButton extends ConsumerWidget {
     }
   }
 
-  void _handleSyncPress(WidgetRef ref, dynamic state) {
-    // Clear previous error if any
-    if (state?.errorMessage != null) {
-      ref.read(manualSyncProvider.notifier).clearError();
-    }
-
+  void _handleSyncPress(WidgetRef ref) {
     // Trigger sync
     ref.read(manualSyncProvider.notifier).triggerSync();
   }
 
   String _getLabel(dynamic state, int pendingCount) {
+    if (state == null) {
+      return 'Loading...';
+    }
+
     if (state.isSyncing) {
       return 'Syncing...';
     }
@@ -134,7 +134,7 @@ class ManualSyncButton extends ConsumerWidget {
       );
     }
 
-    if (!state.hasResults) {
+    if (state == null || !state.hasResults) {
       return const Icon(Icons.sync);
     }
 
@@ -150,7 +150,7 @@ class ManualSyncButton extends ConsumerWidget {
   }
 
   Color _getBackgroundColor(ThemeData theme, dynamic state) {
-    if (!state.hasResults) {
+    if (state == null || !state.hasResults) {
       return theme.colorScheme.primary;
     }
 
@@ -166,7 +166,7 @@ class ManualSyncButton extends ConsumerWidget {
   }
 
   Color _getForegroundColor(ThemeData theme, dynamic state) {
-    if (!state.hasResults) {
+    if (state == null || !state.hasResults) {
       return theme.colorScheme.onPrimary;
     }
 
@@ -182,7 +182,7 @@ class ManualSyncButton extends ConsumerWidget {
   }
 
   Color _getBorderColor(ThemeData theme, dynamic state) {
-    if (!state.hasResults) {
+    if (state == null || !state.hasResults) {
       return theme.colorScheme.outline;
     }
 

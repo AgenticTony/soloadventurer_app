@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/destination_discovery/presentation/screens/screens.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart' hide BudgetLevel, ActivityLevel;
 
 /// Destination discovery route names
 class DestinationDiscoveryRoutes {

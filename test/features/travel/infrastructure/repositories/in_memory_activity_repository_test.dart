@@ -145,7 +145,7 @@ void main() {
 
       test('toggleActivityCompletion updates status', () async {
         final updated = await repository.toggleActivityCompletion(
-          activityId: 'activity-0',
+          activityId: 'activity_1',
           isCompleted: true,
         );
 
@@ -154,12 +154,12 @@ void main() {
 
       test('deleteActivity removes activity', () async {
         final result =
-            await repository.deleteActivity(activityId: 'activity-0');
+            await repository.deleteActivity(activityId: 'activity_1');
 
         expect(result, isTrue);
 
         final activity =
-            await repository.getActivityById(activityId: 'activity-0');
+            await repository.getActivityById(activityId: 'activity_1');
         expect(activity, isNull);
       });
     });
@@ -271,14 +271,14 @@ void main() {
     group('Bulk operations', () {
       test('bulkUpdateActivities updates multiple activities', () async {
         final updatedCount = await repository.bulkUpdateActivities(
-          activityIds: ['activity-0', 'activity-1', 'activity-2'],
+          activityIds: ['activity_1', 'activity_2', 'activity_3'],
           updates: {'isCompleted': true},
         );
 
         expect(updatedCount, equals(3));
 
         final activity0 =
-            await repository.getActivityById(activityId: 'activity-0');
+            await repository.getActivityById(activityId: 'activity_1');
         expect(activity0!.isCompleted, isTrue);
       });
     });

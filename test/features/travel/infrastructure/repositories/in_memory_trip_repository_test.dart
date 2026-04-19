@@ -239,10 +239,10 @@ void main() {
       });
 
       test('getTripById returns correct trip', () async {
-        final trip = await repository.getTripById(tripId: 'trip-5');
+        final trip = await repository.getTripById(tripId: 'trip_6');
 
         expect(trip, isNotNull);
-        expect(trip!.id, equals('trip-5'));
+        expect(trip!.id, equals('trip_6'));
         expect(trip.title, equals('Trip 5'));
       });
 
@@ -254,13 +254,13 @@ void main() {
 
       test('getTripsByIds returns trips in order', () async {
         final trips = await repository.getTripsByIds(
-          tripIds: ['trip-5', 'trip-2', 'trip-8'],
+          tripIds: ['trip_6', 'trip_3', 'trip_9'],
         );
 
         expect(trips.length, equals(3));
-        expect(trips[0].id, equals('trip-5'));
-        expect(trips[1].id, equals('trip-2'));
-        expect(trips[2].id, equals('trip-8'));
+        expect(trips[0].id, equals('trip_6'));
+        expect(trips[1].id, equals('trip_3'));
+        expect(trips[2].id, equals('trip_9'));
       });
 
       test('updateTrip updates trip correctly', () async {
@@ -270,7 +270,7 @@ void main() {
         );
 
         final updated = await repository.updateTrip(
-          tripId: 'trip-0',
+          tripId: 'trip_1',
           updates: updates,
         );
 
@@ -280,11 +280,11 @@ void main() {
       });
 
       test('deleteTrip removes trip', () async {
-        final result = await repository.deleteTrip(tripId: 'trip-0');
+        final result = await repository.deleteTrip(tripId: 'trip_1');
 
         expect(result, isTrue);
 
-        final trip = await repository.getTripById(tripId: 'trip-0');
+        final trip = await repository.getTripById(tripId: 'trip_1');
         expect(trip, isNull);
       });
 

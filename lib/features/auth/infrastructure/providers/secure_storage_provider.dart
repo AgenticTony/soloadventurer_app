@@ -12,18 +12,17 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
 
   return const FlutterSecureStorage(
     aOptions: secureStorageOptions,
+    mOptions: MacOsOptions(usesDataProtectionKeychain: false),
   );
 });
 
 /// Provider for SecureTokenStorage
 final secureTokenStorageProvider = Provider<SecureTokenStorage>((ref) {
   final secureStorage = ref.watch(secureStorageProvider);
-  final deviceInfoService = ref.watch(deviceInfoServiceProvider);
   final loggingService = ref.watch(loggingServiceProvider);
 
   return SecureTokenStorage(
     secureStorage: secureStorage,
-    deviceInfoService: deviceInfoService,
     logger: loggingService,
   );
 });

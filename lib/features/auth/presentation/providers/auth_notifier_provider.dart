@@ -1,6 +1,6 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/get_current_user.dart';
@@ -29,6 +29,11 @@ import 'package:soloadventurer/app/providers/auth_service_providers.dart'
 import 'package:soloadventurer/features/core/infrastructure/providers/core_providers.dart'
     show loggingServiceProvider;
 import 'package:soloadventurer/features/auth/domain/services/token_manager.dart';
+import 'package:soloadventurer/core/services/push_notification_service.dart';
+import 'package:soloadventurer/features/matching/data/datasources/matching_remote_data_source_impl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthException, AuthState, User;
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 part 'auth_notifier_provider.g.dart';
 
@@ -38,7 +43,7 @@ part 'auth_notifier_provider.g.dart';
 /// AuthNotifier - manages authentication state using AsyncNotifier pattern
 ///
 /// Riverpod 3.0 AsyncNotifier Compliant:
-/// - Uses AsyncNotifier<AuthState> with AsyncValue wrapper
+/// - Uses `AsyncNotifier<AuthState>` with AsyncValue wrapper
 /// - Loading/error states handled by AsyncValue, NOT manual state fields
 /// - UI reads STATE via ref.watch(authProvider)
 /// - UI calls methods via ref.read(authProvider.notifier)
@@ -60,6 +65,10 @@ class AuthNotifier extends _$AuthNotifier {
 
   /// TokenManager for updating token state after authentication
   TokenManager get _tokenManager => ref.watch(tokenManagerProvider.notifier);
+
+  /// Push notification service for FCM token registration
+  PushNotificationService get _pushService =>
+      ref.watch(pushNotificationServiceProvider);
 
   @override
   FutureOr<AuthState> build() async {
@@ -129,6 +138,9 @@ class AuthNotifier extends _$AuthNotifier {
 
         // Update TokenManager state with newly stored tokens
         unawaited(_tokenManager.refreshState());
+
+        // Register push notification token with Supabase
+        unawaited(_registerPushToken());
 
         return AuthState.authenticated(user: user);
       } on ValidationException catch (e, stack) {
@@ -215,10 +227,8 @@ class AuthNotifier extends _$AuthNotifier {
         ));
 
         if (needsVerification) {
-          debugPrint('AuthNotifier: User requires email verification');
           return AuthState.unverified(user: user);
         } else {
-          debugPrint('AuthNotifier: User signed up and verified');
           _logger.logAuthEvent(
             event: 'SignUp',
             status: 'Success',
@@ -226,10 +236,11 @@ class AuthNotifier extends _$AuthNotifier {
           );
           // Update TokenManager state with newly stored tokens
           unawaited(_tokenManager.refreshState());
+          // Register push notification token with Supabase
+          unawaited(_registerPushToken());
           return AuthState.authenticated(user: user);
         }
       } on ValidationException catch (e) {
-        debugPrint('AuthNotifier: Validation error during sign up: $e');
 
         final firstError = e.errors.values
             .firstWhere(
@@ -239,7 +250,6 @@ class AuthNotifier extends _$AuthNotifier {
             .first;
         throw AuthException(firstError);
       } on AuthException catch (e) {
-        debugPrint('AuthNotifier: Auth error during sign up: $e');
 
         final errorStr = e.message.toLowerCase();
         String userMessage;
@@ -255,7 +265,6 @@ class AuthNotifier extends _$AuthNotifier {
 
         throw AuthException(userMessage);
       } catch (e, stack) {
-        debugPrint('AuthNotifier: Unexpected error during sign up: $e');
         _logger.logError(
           feature: 'Authentication',
           error: 'SignUp Failed',
@@ -269,12 +278,75 @@ class AuthNotifier extends _$AuthNotifier {
     });
   }
 
+  /// Register FCM push token with Supabase after successful auth
+  Future<void> _registerPushToken() async {
+    try {
+      final token = _pushService.currentToken;
+      if (token == null) return;
+
+      final packageInfo = await PackageInfo.fromPlatform();
+      final deviceInfo = DeviceInfoPlugin();
+      String? deviceId;
+      String? deviceName;
+      String? osVersion;
+
+      if (Platform.isAndroid) {
+        final android = await deviceInfo.androidInfo;
+        deviceId = android.id;
+        deviceName = android.model;
+        osVersion = 'Android ${android.version.release}';
+      } else if (Platform.isIOS) {
+        final ios = await deviceInfo.iosInfo;
+        deviceId = ios.identifierForVendor;
+        deviceName = ios.utsname.machine;
+        osVersion = ios.systemVersion;
+      }
+
+      final remoteDataSource = MatchingRemoteDataSourceImpl(
+        client: Supabase.instance.client,
+      );
+
+      await remoteDataSource.registerNotificationToken(
+        token: token,
+        platform: Platform.operatingSystem,
+        deviceId: deviceId,
+        deviceName: deviceName,
+        appVersion: packageInfo.version,
+        osVersion: osVersion,
+      );
+
+    } catch (e) {
+      // Non-fatal — push won't work but auth succeeds
+    }
+  }
+
+  /// Deactivate FCM push token on sign-out
+  Future<void> _unregisterPushToken() async {
+    try {
+      final token = _pushService.currentToken;
+      if (token == null) return;
+
+      final remoteDataSource = MatchingRemoteDataSourceImpl(
+        client: Supabase.instance.client,
+      );
+
+      await remoteDataSource.unregisterNotificationToken(token);
+      await _pushService.deleteToken();
+
+    } catch (e) {
+    // intentional silent catch
+    }
+  }
+
   /// Sign out the current user
   Future<void> signOut() async {
     state = const AsyncValue.loading();
 
     state = await AsyncValue.guard(() async {
       try {
+        // Deactivate push token before signing out
+        unawaited(_unregisterPushToken());
+
         await _signOut();
         _logger.logAuthEvent(
           event: 'SignOut',

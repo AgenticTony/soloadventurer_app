@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
@@ -479,7 +480,8 @@ class _AuthRetryButtonAutomaticState
                   : () {
                       if (hasFailed) {
                         // Trigger retry via refresh service
-                        widget.refreshService.refreshToken().catchError((_) {});
+                        // ignore: unawaited_futures
+                        widget.refreshService.refreshToken();
                       } else {
                         widget.onManualRetry?.call();
                       }

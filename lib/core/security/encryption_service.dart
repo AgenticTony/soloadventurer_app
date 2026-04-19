@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:async';
 import 'package:encrypt/encrypt.dart';
@@ -44,7 +45,10 @@ class EncryptionServiceImpl implements EncryptionService {
 
   /// Creates a new [EncryptionService]
   EncryptionServiceImpl({FlutterSecureStorage? secureStorage})
-      : _secureStorage = secureStorage ?? const FlutterSecureStorage() {
+      : _secureStorage = secureStorage ??
+            const FlutterSecureStorage(
+              mOptions: MacOsOptions(usesDataProtectionKeychain: false),
+            ) {
     // Start memory protection timer
     _startMemoryLockTimer();
   }
@@ -358,10 +362,6 @@ class EncryptionServiceImpl implements EncryptionService {
 
   /// Rotate encryption keys with data migration
   Future<void> rotateKeys() async {
-    // Store old key material
-    final oldKey = _encrypter;
-    final oldIV = _iv;
-
     // Generate new key material
     await _generateNewKeyMaterial();
 
@@ -390,7 +390,11 @@ class EncryptionServiceImpl implements EncryptionService {
   /// Generate cryptographically secure random bytes
   Uint8List _generateRandomBytes(int length) {
     final secureRandom = FortunaRandom();
-    final seed = Uint8List.fromList(List.generate(32, (i) => i));
+    // Seed with cryptographically secure random bytes from Random.secure()
+    final random = Random.secure();
+    final seed = Uint8List.fromList(
+      List.generate(32, (_) => random.nextInt(256)),
+    );
     secureRandom.seed(KeyParameter(seed));
     return secureRandom.nextBytes(length);
   }

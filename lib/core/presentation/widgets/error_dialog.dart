@@ -70,7 +70,6 @@ class ErrorDialog extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     final icon = _getSeverityIcon(error.severity);
     final iconColor = _getSeverityColor(error.severity);

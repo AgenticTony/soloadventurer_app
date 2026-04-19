@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
-import 'package:soloadventurer/utils/performance/image_cache_manager.dart';
+import 'package:soloadventurer/core/config/image_cache_manager.dart';
 
 /// Configuration for media gallery display and behavior
 class MediaGalleryConfig {
@@ -177,13 +177,6 @@ class _MediaGalleryState extends State<MediaGallery> {
     });
   }
 
-  void _clearSelection() {
-    setState(() {
-      _selectedIds.clear();
-      widget.onSelectionChanged?.call(_selectedIds);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -321,6 +314,8 @@ class _MediaGridItem extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     required this.onLongPress,
+    // ignore: unused_element_parameter
+    this.imageConfig,
   });
 
   @override
@@ -462,6 +457,7 @@ class _MediaGridItem extends StatelessWidget {
 
   Widget _buildUploadStatusIcon(UploadStatus status) {
     switch (status) {
+      case UploadStatus.queued:
       case UploadStatus.pending:
       case UploadStatus.uploading:
         return const CircularProgressIndicator(
@@ -469,8 +465,13 @@ class _MediaGridItem extends StatelessWidget {
           strokeWidth: 2,
         );
       case UploadStatus.failed:
+      case UploadStatus.permanentFailure:
         return const Icon(Icons.error, color: Colors.red, size: 32);
+      case UploadStatus.cancelled:
+        return const SizedBox.shrink();
       case UploadStatus.completed:
+        return const SizedBox.shrink();
+      case UploadStatus.paused:
         return const SizedBox.shrink();
     }
   }
@@ -547,8 +548,6 @@ class _MediaGalleryWithSelectionState extends State<MediaGalleryWithSelection> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),

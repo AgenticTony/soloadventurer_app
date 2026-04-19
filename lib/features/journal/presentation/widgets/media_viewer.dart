@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:video_player/video_player.dart';
 
@@ -165,10 +164,8 @@ class _MediaViewerState extends State<MediaViewer> {
     // Initialize video if current item is a video
     final currentItem = widget.mediaItems[index];
     if (currentItem.isVideo) {
-      final signedUrl = Supabase.instance.client.storage
-          .from('journal-videos')
-          .createSignedUrl(currentItem.storagePath, expiryMinutes: 60);
-      _initializeVideo(signedUrl);
+      final videoUrl = currentItem.storagePath;
+      _initializeVideo(videoUrl);
     } else {
       _videoController?.dispose();
       _videoController = null;
@@ -183,10 +180,8 @@ class _MediaViewerState extends State<MediaViewer> {
     if (_currentIndex < widget.mediaItems.length) {
       final currentItem = widget.mediaItems[_currentIndex];
       if (currentItem.isVideo && _videoController == null) {
-        final signedUrl = Supabase.instance.client.storage
-            .from('journal-videos')
-            .createSignedUrl(currentItem.storagePath, expiryMinutes: 60);
-        _initializeVideo(signedUrl);
+        final videoUrl = currentItem.storagePath;
+        _initializeVideo(videoUrl);
       }
     }
 
@@ -242,18 +237,16 @@ class _MediaViewerState extends State<MediaViewer> {
   }
 
   Widget _buildImageViewer(MediaItem media) {
-    final signedUrl = Supabase.instance.client.storage
-        .from('journal-photos')
-        .createSignedUrl(media.storagePath, expiryMinutes: 60);
+    final imageUrl = media.storagePath;
 
     if (widget.config.allowZoom) {
       return BuildPhotoView(
-        imageUrl: signedUrl,
+        imageUrl: imageUrl,
         backgroundColor: widget.config.backgroundColor,
       );
     } else {
       return Image.network(
-        signedUrl,
+        imageUrl,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
           return Center(
@@ -604,7 +597,7 @@ class _BuildPhotoViewState extends State<BuildPhotoView> {
           child: Transform(
             transform: Matrix4.identity()
               ..translate(_offset.dx, _offset.dy)
-              ..scale(_scale),
+              ..scale(_scale, _scale, 1.0),
             alignment: Alignment.center,
             child: Image.network(
               widget.imageUrl,

@@ -463,8 +463,6 @@ class _TripOverviewScreenState extends ConsumerState<TripOverviewScreen> {
   }
 
   Widget _buildMediaThumbnail(BuildContext context, MediaItem media) {
-    final theme = Theme.of(context);
-
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Stack(

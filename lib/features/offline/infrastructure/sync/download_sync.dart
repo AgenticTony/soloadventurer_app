@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
@@ -150,7 +149,6 @@ class DownloadSync {
     int conflictCount = 0;
 
     try {
-      debugPrint('📥 DownloadSync: Starting to sync server changes...');
 
       // ========================================================================
       // STEP 1: Sync Trips
@@ -164,8 +162,6 @@ class DownloadSync {
       skipCount += tripResult['skipped'] as int;
       conflictCount += tripResult['conflicts'] as int;
 
-      debugPrint('✅ Trips synced: ${tripResult['total']} total');
-
       // ========================================================================
       // STEP 2: Sync Journals
       // ========================================================================
@@ -177,8 +173,6 @@ class DownloadSync {
       deleteCount += journalResult['deleted'] as int;
       skipCount += journalResult['skipped'] as int;
       conflictCount += journalResult['conflicts'] as int;
-
-      debugPrint('✅ Journals synced: ${journalResult['total']} total');
 
       // ========================================================================
       // STEP 3: Sync User Profile
@@ -192,25 +186,13 @@ class DownloadSync {
       skipCount += userResult['skipped'] as int;
       conflictCount += userResult['conflicts'] as int;
 
-      debugPrint('✅ User profile synced: ${userResult['total']} total');
-
       // ========================================================================
       // STEP 4: Update Sync Metadata
       // ========================================================================
       onProgress?.call(4, 4);
       await _updateSyncMetadata(userId);
 
-      debugPrint('✅ Sync metadata updated');
-
       final duration = DateTime.now().difference(startTime);
-
-      debugPrint('✅ DownloadSync complete: '
-          '$downloadCount downloaded, '
-          '$insertCount inserted, '
-          '$updateCount updated, '
-          '$deleteCount deleted, '
-          '$skipCount skipped, '
-          '$conflictCount conflicts in ${duration.inSeconds}s');
 
       return DownloadSyncResult(
         downloadCount: downloadCount,
@@ -222,7 +204,6 @@ class DownloadSync {
         duration: duration,
       );
     } catch (e) {
-      debugPrint('❌ DownloadSync error: $e');
       rethrow;
     }
   }
@@ -238,7 +219,6 @@ class DownloadSync {
   /// Returns a map with sync statistics.
   Future<Map<String, int>> syncTrips(String userId) async {
     try {
-      debugPrint('📥 Syncing trips...');
 
       // Query server for all trips
       final response = await _dio.post(
@@ -250,13 +230,11 @@ class DownloadSync {
       );
 
       if (response.statusCode != 200 || response.data['data'] == null) {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to fetch trips: $errors');
+        response.data['errors'];
         return _emptyResult();
       }
 
       final serverTrips = response.data['data']['getTrips'] as List;
-      debugPrint('📊 Received ${serverTrips.length} trips from server');
 
       // Get all local trips
       final localTrips = await _tripDao.getTripsByUserId(userId);
@@ -277,7 +255,6 @@ class DownloadSync {
           // Insert new trip
           await _tripDao.insertTrip(_serverTripToCompanion(serverTrip));
           inserted++;
-          debugPrint('➕ Inserted trip: $tripId');
         } else {
           // Check if update is needed
           final serverUpdatedAt = DateTime.parse(serverTrip['updatedAt']);
@@ -288,7 +265,6 @@ class DownloadSync {
             if (localTrip.hasPendingChanges) {
               // Conflict detected - record it
               conflicts++;
-              debugPrint('⚠️ Conflict detected for trip: $tripId');
 
               // Record the conflict if resolver is available
               if (_conflictResolver != null) {
@@ -318,7 +294,6 @@ class DownloadSync {
                 );
 
                 await _conflictResolver.recordConflict(conflict);
-                debugPrint('📝 Conflict recorded for trip: $tripId');
               }
 
               // Skip updating to avoid losing local changes
@@ -332,7 +307,6 @@ class DownloadSync {
                     ..where((t) => t.id.equals(tripId)))
                   .write(companion);
               updated++;
-              debugPrint('🔄 Updated trip: $tripId');
             }
           } else {
             skipped++;
@@ -351,7 +325,6 @@ class DownloadSync {
           // Trip was deleted on server, delete locally
           await _tripDao.deleteTripById(localTrip.id);
           deleted++;
-          debugPrint('🗑️ Deleted trip: ${localTrip.id}');
         }
       }
 
@@ -364,7 +337,6 @@ class DownloadSync {
         'conflicts': conflicts,
       };
     } catch (e) {
-      debugPrint('❌ Error syncing trips: $e');
       return _emptyResult();
     }
   }
@@ -376,13 +348,11 @@ class DownloadSync {
   /// Returns a map with sync statistics.
   Future<Map<String, int>> syncJournals(String userId) async {
     try {
-      debugPrint('📥 Syncing journals...');
 
       // Get all trips to fetch journals for
       final trips = await _tripDao.getTripsByUserId(userId);
 
       if (trips.isEmpty) {
-        debugPrint('📭 No trips to fetch journals for');
         return _emptyResult();
       }
 
@@ -426,14 +396,11 @@ class DownloadSync {
           );
 
           if (response.statusCode != 200 || response.data['data'] == null) {
-            debugPrint('⚠️ Failed to fetch journals for trip ${trip.id}');
             continue;
           }
 
           final serverJournals = response.data['data']['getJournals'] as List;
           totalJournals += serverJournals.length;
-          debugPrint(
-              '📊 Received ${serverJournals.length} journals for trip ${trip.id}');
 
           // Get all local journals for this trip
           final localJournals = await _journalDao.getJournalsByTripId(trip.id);
@@ -449,7 +416,6 @@ class DownloadSync {
               await _journalDao
                   .insertJournal(_serverJournalToCompanion(serverJournal));
               totalInserted++;
-              debugPrint('➕ Inserted journal: $journalId');
             } else {
               // Check if update is needed
               final serverUpdatedAt =
@@ -462,7 +428,6 @@ class DownloadSync {
                 if (localJournal.hasPendingChanges) {
                   // Conflict detected - record it
                   totalConflicts++;
-                  debugPrint('⚠️ Conflict detected for journal: $journalId');
 
                   // Record the conflict if resolver is available
                   if (_conflictResolver != null) {
@@ -494,7 +459,6 @@ class DownloadSync {
                     );
 
                     await _conflictResolver.recordConflict(conflict);
-                    debugPrint('📝 Conflict recorded for journal: $journalId');
                   }
 
                   // Skip updating to avoid losing local changes
@@ -507,7 +471,6 @@ class DownloadSync {
                         ..where((j) => j.id.equals(journalId)))
                       .write(companion);
                   totalUpdated++;
-                  debugPrint('🔄 Updated journal: $journalId');
                 }
               } else {
                 totalSkipped++;
@@ -525,11 +488,9 @@ class DownloadSync {
               // Journal was deleted on server, delete locally
               await _journalDao.deleteJournalById(localJournal.id);
               totalDeleted++;
-              debugPrint('🗑️ Deleted journal: ${localJournal.id}');
             }
           }
         } catch (e) {
-          debugPrint('❌ Error fetching journals for trip ${trip.id}: $e');
           // Continue with next trip
         }
       }
@@ -543,7 +504,6 @@ class DownloadSync {
         'conflicts': totalConflicts,
       };
     } catch (e) {
-      debugPrint('❌ Error syncing journals: $e');
       return _emptyResult();
     }
   }
@@ -555,7 +515,6 @@ class DownloadSync {
   /// Returns a map with sync statistics.
   Future<Map<String, int>> syncUserProfile(String userId) async {
     try {
-      debugPrint('📥 Syncing user profile...');
 
       final response = await _dio.post(
         _graphqlEndpoint,
@@ -566,13 +525,11 @@ class DownloadSync {
       );
 
       if (response.statusCode != 200 || response.data['data'] == null) {
-        final errors = response.data['errors'];
-        debugPrint('❌ Failed to fetch user profile: $errors');
+        response.data['errors'];
         return _emptyResult();
       }
 
       final serverUser = response.data['data']['getUserProfile'];
-      debugPrint('📊 Received user profile from server');
 
       // Get local user
       final localUser = await _userDao.getUserById(userId);
@@ -586,7 +543,6 @@ class DownloadSync {
         // Insert new user
         await _userDao.insertUser(_serverUserToCompanion(serverUser));
         inserted = 1;
-        debugPrint('➕ Inserted user: $userId');
       } else {
         // Check if update is needed
         final serverUpdatedAt = DateTime.parse(serverUser['updatedAt']);
@@ -597,7 +553,6 @@ class DownloadSync {
           if (localUser.hasPendingChanges) {
             // Conflict detected - record it
             conflicts++;
-            debugPrint('⚠️ Conflict detected for user: $userId');
 
             // Record the conflict if resolver is available
             if (_conflictResolver != null) {
@@ -625,7 +580,6 @@ class DownloadSync {
               );
 
               await _conflictResolver.recordConflict(conflict);
-              debugPrint('📝 Conflict recorded for user: $userId');
             }
 
             // Skip updating to avoid losing local changes
@@ -638,7 +592,6 @@ class DownloadSync {
                   ..where((u) => u.id.equals(userId)))
                 .write(companion);
             updated = 1;
-            debugPrint('🔄 Updated user: $userId');
           }
         }
       }
@@ -653,7 +606,6 @@ class DownloadSync {
         'conflicts': conflicts,
       };
     } catch (e) {
-      debugPrint('❌ Error syncing user profile: $e');
       return _emptyResult();
     }
   }
@@ -665,7 +617,6 @@ class DownloadSync {
   /// Updates sync metadata after successful download
   Future<void> _updateSyncMetadata(String userId) async {
     try {
-      debugPrint('📊 Updating sync metadata...');
 
       final now = DateTime.now();
 
@@ -696,7 +647,6 @@ class DownloadSync {
               ));
         } else {
           // Update existing metadata
-          final metadata = metadataList.first;
           await (_database.update(_database.syncMetadataTable)
                 ..where((tbl) => tbl.entityType.equals(entityType)))
               .write(SyncMetadataTableCompanion(
@@ -707,9 +657,7 @@ class DownloadSync {
         }
       }
 
-      debugPrint('✅ Sync metadata updated');
     } catch (e) {
-      debugPrint('❌ Error updating sync metadata: $e');
       // Don't throw - metadata update failure shouldn't fail the sync
     }
   }

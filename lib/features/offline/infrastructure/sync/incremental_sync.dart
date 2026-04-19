@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'package:dio/dio.dart';
-import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
@@ -101,9 +99,6 @@ class IncrementalSync {
   /// Conflict resolver for recording detected conflicts
   final ConflictResolver? _conflictResolver;
 
-  /// Uuid generator for conflict IDs
-  final Uuid _uuid = const Uuid();
-
   /// Whether to force full sync instead of incremental
   bool _forceFullSync = false;
 
@@ -164,7 +159,6 @@ class IncrementalSync {
     bool usedIncrementalSync = false;
 
     try {
-      debugPrint('🔄 IncrementalSync: Starting sync...');
 
       // ========================================================================
       // STEP 1: Determine if incremental sync is possible
@@ -173,12 +167,9 @@ class IncrementalSync {
         final canDoIncremental = await _canPerformIncrementalSync(userId);
         if (canDoIncremental) {
           usedIncrementalSync = true;
-          debugPrint('✅ Incremental sync available, attempting...');
         } else {
-          debugPrint('ℹ️ First-time sync or no metadata, performing full sync');
         }
       } else {
-        debugPrint('⚠️ Forced full sync requested');
       }
 
       // ========================================================================
@@ -196,8 +187,6 @@ class IncrementalSync {
       skipCount += tripResult['skipped'] as int;
       conflictCount += tripResult['conflicts'] as int;
 
-      debugPrint('✅ Trips synced: ${tripResult['total']} total');
-
       // ========================================================================
       // STEP 3: Sync Journals
       // ========================================================================
@@ -212,8 +201,6 @@ class IncrementalSync {
       deleteCount += journalResult['deleted'] as int;
       skipCount += journalResult['skipped'] as int;
       conflictCount += journalResult['conflicts'] as int;
-
-      debugPrint('✅ Journals synced: ${journalResult['total']} total');
 
       // ========================================================================
       // STEP 4: Sync User Profile
@@ -230,26 +217,13 @@ class IncrementalSync {
       skipCount += userResult['skipped'] as int;
       conflictCount += userResult['conflicts'] as int;
 
-      debugPrint('✅ User profile synced: ${userResult['total']} total');
-
       // ========================================================================
       // STEP 5: Update Sync Metadata
       // ========================================================================
       onProgress?.call(4, 4);
       await _updateSyncMetadata(userId, usedIncrementalSync);
 
-      debugPrint('✅ Sync metadata updated');
-
       final duration = DateTime.now().difference(startTime);
-
-      debugPrint('✅ IncrementalSync complete: '
-          '${usedIncrementalSync ? "Incremental" : "Full"} sync, '
-          '$downloadCount downloaded, '
-          '$insertCount inserted, '
-          '$updateCount updated, '
-          '$deleteCount deleted, '
-          '$skipCount skipped, '
-          '$conflictCount conflicts in ${duration.inSeconds}s');
 
       return IncrementalSyncResult(
         downloadCount: downloadCount,
@@ -262,11 +236,9 @@ class IncrementalSync {
         duration: duration,
       );
     } catch (e) {
-      debugPrint('❌ IncrementalSync error: $e');
 
       // If incremental sync failed, fall back to full sync
       if (usedIncrementalSync && !_forceFullSync) {
-        debugPrint('🔄 Incremental sync failed, falling back to full sync...');
         // Don't recursively call to avoid infinite loop
         // Just return the error for now
       }
@@ -292,14 +264,12 @@ class IncrementalSync {
                 .get();
 
         if (metadataList.isEmpty || metadataList.first.lastSyncedAt == null) {
-          debugPrint('📭 No previous sync for $entityType');
           return false;
         }
       }
 
       return true;
     } catch (e) {
-      debugPrint('❌ Error checking incremental sync capability: $e');
       return false;
     }
   }
@@ -318,7 +288,6 @@ class IncrementalSync {
 
       return metadataList.first.lastSyncedAt;
     } catch (e) {
-      debugPrint('❌ Error getting last incremental sync time: $e');
       return null;
     }
   }
@@ -330,7 +299,6 @@ class IncrementalSync {
   /// Syncs trips incrementally from server to local database
   Future<Map<String, int>> _syncTripsIncremental(String userId) async {
     try {
-      debugPrint('🔄 Syncing trips incrementally...');
 
       final lastSyncTime = await _getLastIncrementalSyncTime('trips', userId);
       if (lastSyncTime == null) {
@@ -362,17 +330,14 @@ class IncrementalSync {
             false);
 
         if (isUnsupported) {
-          debugPrint('⚠️ Incremental query not supported, will fall back');
           throw Exception('Incremental query not supported');
         }
 
-        debugPrint('❌ Failed to fetch trips incrementally: $errors');
         return _emptyResult();
       }
 
       return _emptyResult();
     } catch (e) {
-      debugPrint('❌ Error in incremental trips sync: $e');
       rethrow;
     }
   }
@@ -380,7 +345,6 @@ class IncrementalSync {
   /// Syncs journals incrementally from server to local database
   Future<Map<String, int>> _syncJournalsIncremental(String userId) async {
     try {
-      debugPrint('🔄 Syncing journals incrementally...');
 
       final lastSyncTime =
           await _getLastIncrementalSyncTime('journals', userId);
@@ -392,7 +356,6 @@ class IncrementalSync {
       final trips = await _tripDao.getTripsByUserId(userId);
 
       if (trips.isEmpty) {
-        debugPrint('📭 No trips to fetch journals for');
         return _emptyResult();
       }
 
@@ -435,12 +398,10 @@ class IncrementalSync {
                 false);
 
             if (isUnsupported) {
-              debugPrint('⚠️ Incremental journal query not supported');
               throw Exception('Incremental query not supported');
             }
           }
         } catch (e) {
-          debugPrint('❌ Error fetching journals for trip ${trip.id}: $e');
           // Continue with next trip
         }
       }
@@ -454,7 +415,6 @@ class IncrementalSync {
         'conflicts': totalConflicts,
       };
     } catch (e) {
-      debugPrint('❌ Error in incremental journals sync: $e');
       rethrow;
     }
   }
@@ -462,7 +422,6 @@ class IncrementalSync {
   /// Syncs user profile incrementally from server to local database
   Future<Map<String, int>> _syncUserProfileIncremental(String userId) async {
     try {
-      debugPrint('🔄 Syncing user profile incrementally...');
 
       final lastSyncTime = await _getLastIncrementalSyncTime('users', userId);
       if (lastSyncTime == null) {
@@ -490,17 +449,14 @@ class IncrementalSync {
             false);
 
         if (isUnsupported) {
-          debugPrint('⚠️ Incremental user query not supported');
           throw Exception('Incremental query not supported');
         }
 
-        debugPrint('❌ Failed to fetch user incrementally: $errors');
         return _emptyResult();
       }
 
       return _emptyResult();
     } catch (e) {
-      debugPrint('❌ Error in incremental user sync: $e');
       rethrow;
     }
   }
@@ -511,7 +467,6 @@ class IncrementalSync {
 
   /// Syncs trips using full sync (fallback)
   Future<Map<String, int>> _syncTripsFull(String userId) async {
-    debugPrint('🔄 Performing full trip sync...');
     final downloadSync = DownloadSync(
       dio: _dio,
       database: _database,
@@ -523,7 +478,6 @@ class IncrementalSync {
 
   /// Syncs journals using full sync (fallback)
   Future<Map<String, int>> _syncJournalsFull(String userId) async {
-    debugPrint('🔄 Performing full journal sync...');
     final downloadSync = DownloadSync(
       dio: _dio,
       database: _database,
@@ -535,7 +489,6 @@ class IncrementalSync {
 
   /// Syncs user profile using full sync (fallback)
   Future<Map<String, int>> _syncUserProfileFull(String userId) async {
-    debugPrint('🔄 Performing full user profile sync...');
     final downloadSync = DownloadSync(
       dio: _dio,
       database: _database,
@@ -568,7 +521,6 @@ class IncrementalSync {
       if (localTrip == null) {
         await _tripDao.insertTrip(_serverTripToCompanion(serverTrip));
         inserted++;
-        debugPrint('➕ Inserted trip: $tripId');
       } else {
         final serverUpdatedAt = DateTime.parse(serverTrip['updatedAt']);
         final needsUpdate = serverUpdatedAt.isAfter(localTrip.updatedAt);
@@ -584,7 +536,6 @@ class IncrementalSync {
                 _serverTripToCompanion(serverTrip, existing: localTrip);
             await _database.update(_database.trips).write(companion);
             updated++;
-            debugPrint('🔄 Updated trip: $tripId');
           }
         } else {
           skipped++;
@@ -622,7 +573,6 @@ class IncrementalSync {
         await _journalDao
             .insertJournal(_serverJournalToCompanion(serverJournal));
         inserted++;
-        debugPrint('➕ Inserted journal: $journalId');
       } else {
         final serverUpdatedAt = DateTime.parse(serverJournal['updatedAt']);
         final needsUpdate = serverUpdatedAt.isAfter(localJournal.updatedAt);
@@ -639,7 +589,6 @@ class IncrementalSync {
                 existing: localJournal);
             await _database.update(_database.journals).write(companion);
             updated++;
-            debugPrint('🔄 Updated journal: $journalId');
           }
         } else {
           skipped++;
@@ -670,7 +619,6 @@ class IncrementalSync {
     if (localUser == null) {
       await _userDao.insertUser(_serverUserToCompanion(serverUser));
       inserted = 1;
-      debugPrint('➕ Inserted user: $userId');
     } else {
       final serverUpdatedAt = DateTime.parse(serverUser['updatedAt']);
       final needsUpdate = serverUpdatedAt.isAfter(localUser.updatedAt);
@@ -689,7 +637,6 @@ class IncrementalSync {
                 ..where((u) => u.id.equals(userId)))
               .write(companion);
           updated = 1;
-          debugPrint('🔄 Updated user: $userId');
         }
       }
     }
@@ -712,7 +659,6 @@ class IncrementalSync {
   /// Updates sync metadata after successful sync
   Future<void> _updateSyncMetadata(String userId, bool usedIncremental) async {
     try {
-      debugPrint('📊 Updating sync metadata...');
 
       final now = DateTime.now();
       final entityTypes = ['trips', 'journals', 'users'];
@@ -755,9 +701,8 @@ class IncrementalSync {
         }
       }
 
-      debugPrint('✅ Sync metadata updated');
     } catch (e) {
-      debugPrint('❌ Error updating sync metadata: $e');
+    // intentional silent catch
     }
   }
 
@@ -793,9 +738,8 @@ class IncrementalSync {
       );
 
       _conflictResolver.recordConflict(conflict);
-      debugPrint('📝 Conflict recorded for $entityType: $entityId');
     } catch (e) {
-      debugPrint('❌ Error recording conflict: $e');
+    // intentional silent catch
     }
   }
 

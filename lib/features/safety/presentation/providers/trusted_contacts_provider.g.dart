@@ -8,36 +8,30 @@ part of 'trusted_contacts_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Notifier for managing trusted contacts state
-/// Handles CRUD operations for trusted contacts
+/// AsyncNotifier for managing trusted contacts state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 
 @ProviderFor(TrustedContacts)
 const trustedContactsProvider = TrustedContactsProvider._();
 
-/// Notifier for managing trusted contacts state
-/// Handles CRUD operations for trusted contacts
+/// AsyncNotifier for managing trusted contacts state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 final class TrustedContactsProvider
-    extends $NotifierProvider<TrustedContacts, TrustedContactsState> {
-  /// Notifier for managing trusted contacts state
-  /// Handles CRUD operations for trusted contacts
+    extends $AsyncNotifierProvider<TrustedContacts, TrustedContactsState> {
+  /// AsyncNotifier for managing trusted contacts state.
   ///
   /// Riverpod 3.0 Compliant:
-  /// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-  /// - NO getters in state - all derived values are fields
-  /// - UI reads STATE only via ref.watch()
-  /// - UI calls methods via ref.read(provider.notifier)
+  /// - Uses @riverpod annotation with code generation
+  /// - AsyncNotifier with AsyncValue handles loading/error
+  /// - State no longer has isLoading/error fields
   const TrustedContactsProvider._()
       : super(
           from: null,
@@ -55,37 +49,28 @@ final class TrustedContactsProvider
   @$internal
   @override
   TrustedContacts create() => TrustedContacts();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(TrustedContactsState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<TrustedContactsState>(value),
-    );
-  }
 }
 
-String _$trustedContactsHash() => r'1e279e949c721c57383773d4adb6bcad3accde4a';
+String _$trustedContactsHash() => r'5bc6320062f6c1352c21e1ecfe31dfdf3f5379be';
 
-/// Notifier for managing trusted contacts state
-/// Handles CRUD operations for trusted contacts
+/// AsyncNotifier for managing trusted contacts state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 
-abstract class _$TrustedContacts extends $Notifier<TrustedContactsState> {
-  TrustedContactsState build();
+abstract class _$TrustedContacts extends $AsyncNotifier<TrustedContactsState> {
+  FutureOr<TrustedContactsState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<TrustedContactsState, TrustedContactsState>;
+    final ref = this.ref
+        as $Ref<AsyncValue<TrustedContactsState>, TrustedContactsState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<TrustedContactsState, TrustedContactsState>,
-        TrustedContactsState,
+        AnyNotifier<AsyncValue<TrustedContactsState>, TrustedContactsState>,
+        AsyncValue<TrustedContactsState>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

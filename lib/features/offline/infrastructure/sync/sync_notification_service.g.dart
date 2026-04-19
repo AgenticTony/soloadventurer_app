@@ -64,4 +64,4 @@ final class SyncNotificationServiceProvider extends $FunctionalProvider<
 }
 
 String _$syncNotificationServiceHash() =>
-    r'912ed8dced3e14ace56090c29410604101b6b944';
+    r'087f6ab0d47b036e311b30387a311a0a78ed3863';

@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_queue_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
 import 'package:soloadventurer/features/offline/infrastructure/sync/upload_sync.dart';
@@ -112,7 +111,6 @@ class SyncManagerImpl implements SyncManager {
   @override
   Future<bool> initialize() async {
     try {
-      debugPrint('🔄 Initializing SyncManager...');
 
       // Get initial queue size
       final pendingCount = await _syncQueueService.getPendingCount();
@@ -127,7 +125,6 @@ class SyncManagerImpl implements SyncManager {
           _handleConnectivityChange(status);
         },
         onError: (error) {
-          debugPrint('❌ Connectivity stream error: $error');
           _updateStatus(SyncStatus.error(
             'Connectivity monitoring error',
             pendingOperations: _currentStatus.pendingOperations,
@@ -147,22 +144,17 @@ class SyncManagerImpl implements SyncManager {
           }
         },
         onError: (error) {
-          debugPrint('❌ Queue size stream error: $error');
         },
       );
 
-      debugPrint('✅ SyncManager initialized successfully');
-
       return true;
     } catch (e) {
-      debugPrint('❌ Error initializing SyncManager: $e');
       return false;
     }
   }
 
   @override
   void dispose() {
-    debugPrint('🔄 Disposing SyncManager...');
 
     _connectivitySubscription?.cancel();
     _connectivitySubscription = null;
@@ -181,7 +173,6 @@ class SyncManagerImpl implements SyncManager {
   Future<SyncResult> startSync({bool force = false}) async {
     // Prevent concurrent sync cycles
     if (_isSyncing) {
-      debugPrint('⚠️ Sync already in progress, ignoring request');
       return const SyncResult.failure(
         'Sync already in progress',
         duration: Duration.zero,
@@ -192,7 +183,6 @@ class SyncManagerImpl implements SyncManager {
     if (!force) {
       final pendingCount = await _syncQueueService.getPendingCount();
       if (pendingCount == 0) {
-        debugPrint('📭 No pending operations, skipping sync');
         return const SyncResult.success(duration: Duration.zero);
       }
 
@@ -200,9 +190,6 @@ class SyncManagerImpl implements SyncManager {
       if (_lastSyncTime != null) {
         final timeSinceLastSync = DateTime.now().difference(_lastSyncTime!);
         if (timeSinceLastSync < autoSyncMinInterval) {
-          final remainingTime = autoSyncMinInterval - timeSinceLastSync;
-          debugPrint('⏱️ Auto-sync too soon, waiting '
-              '${remainingTime.inSeconds}s');
           return const SyncResult.failure(
             'Sync cooldown active',
             duration: Duration.zero,
@@ -215,12 +202,10 @@ class SyncManagerImpl implements SyncManager {
     _isSyncing = true;
 
     try {
-      debugPrint('🚀 Starting sync cycle...');
 
       // Get current user ID for sync operations
       final userId = _getCurrentUserId();
       if (userId.isEmpty) {
-        debugPrint('⚠️ No user authenticated, skipping sync');
         _isSyncing = false;
         return const SyncResult.failure(
           'No authenticated user',
@@ -239,7 +224,6 @@ class SyncManagerImpl implements SyncManager {
       // ========================================================================
       // PHASE 1: UPLOAD - Sync local changes to server
       // ========================================================================
-      debugPrint('📤 Phase 1: Upload - Syncing local changes to server...');
 
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.upload,
@@ -260,8 +244,6 @@ class SyncManagerImpl implements SyncManager {
         throw Exception('Upload phase failed');
       }
 
-      debugPrint('✅ Upload phase complete: $uploadedCount operations');
-
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.upload,
         progress: 0.5,
@@ -272,7 +254,6 @@ class SyncManagerImpl implements SyncManager {
       // ========================================================================
       // PHASE 2: DOWNLOAD - Pull server changes to local
       // ========================================================================
-      debugPrint('📥 Phase 2: Download - Pulling server changes...');
 
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.download,
@@ -282,8 +263,6 @@ class SyncManagerImpl implements SyncManager {
       ));
 
       int downloadedCount = 0;
-      int insertedCount = 0;
-      int updatedCount = 0;
 
       // Download server changes using DownloadSync service
       final downloadResult = await _downloadSync.syncServerChanges(
@@ -301,12 +280,6 @@ class SyncManagerImpl implements SyncManager {
       );
 
       downloadedCount = downloadResult.downloadCount;
-      insertedCount = downloadResult.insertCount;
-      updatedCount = downloadResult.updateCount;
-
-      debugPrint('✅ Download phase complete: '
-          '$downloadedCount changes '
-          '($insertedCount inserted, $updatedCount updated)');
 
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.download,
@@ -318,7 +291,6 @@ class SyncManagerImpl implements SyncManager {
       // ========================================================================
       // PHASE 3: CONFLICT RESOLUTION - Resolve conflicts
       // ========================================================================
-      debugPrint('⚔️ Phase 3: Conflict Resolution...');
 
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.conflictResolution,
@@ -331,20 +303,13 @@ class SyncManagerImpl implements SyncManager {
       final resolutionResult = await _conflictResolver.resolveAllConflicts();
       conflictsResolved = resolutionResult.resolvedCount;
 
-      debugPrint('✅ Conflict resolution complete: '
-          '$conflictsResolved resolved, '
-          '${resolutionResult.manualResolutionRequired} require manual action');
-
       // Emit a warning if manual resolution is required
       if (resolutionResult.manualResolutionRequired > 0) {
-        debugPrint('⚠️ Warning: ${resolutionResult.manualResolutionRequired} '
-            'conflicts require manual resolution');
       }
 
       // ========================================================================
       // PHASE 4: FINALIZATION - Complete sync
       // ========================================================================
-      debugPrint('🏁 Phase 4: Finalization...');
 
       _updateStatus(SyncStatus.syncing(
         phase: SyncPhase.finalization,
@@ -361,13 +326,6 @@ class SyncManagerImpl implements SyncManager {
 
       final duration = DateTime.now().difference(startTime);
 
-      debugPrint('✅ Sync cycle complete in ${duration.inSeconds}s');
-      debugPrint('📊 Summary: '
-          'uploaded: $uploadedCount, '
-          'downloaded: $downloadedCount '
-          '($insertedCount inserted, $updatedCount updated), '
-          'conflicts: $conflictsResolved');
-
       // Update status to idle
       _updateStatus(SyncStatus.idle(
         pendingOperations: pendingCount,
@@ -379,9 +337,7 @@ class SyncManagerImpl implements SyncManager {
         conflictsResolved: conflictsResolved,
         duration: duration,
       );
-    } catch (e, stackTrace) {
-      debugPrint('❌ Sync failed: $e');
-      debugPrint('Stack trace: $stackTrace');
+    } catch (e) {
 
       final duration = DateTime.now().difference(startTime);
 
@@ -404,11 +360,8 @@ class SyncManagerImpl implements SyncManager {
   @override
   Future<bool> stopSync() async {
     if (!_isSyncing) {
-      debugPrint('⚠️ No sync in progress to stop');
       return false;
     }
-
-    debugPrint('🛑 Stopping sync cycle...');
 
     // Note: We can't immediately stop in-progress operations
     // but we can set a flag to prevent new operations from starting
@@ -421,20 +374,16 @@ class SyncManagerImpl implements SyncManager {
       pendingOperations: _currentStatus.pendingOperations,
     ));
 
-    debugPrint('✅ Sync stopped');
-
     return true;
   }
 
   @override
   void pauseAutoSync() {
-    debugPrint('⏸️ Pausing auto-sync');
     _autoSyncPaused = true;
   }
 
   @override
   void resumeAutoSync() {
-    debugPrint('▶️ Resuming auto-sync');
     _autoSyncPaused = false;
 
     // Trigger sync if we have pending operations
@@ -442,7 +391,6 @@ class SyncManagerImpl implements SyncManager {
       if (count > 0) {
         _connectivityService.checkConnectivity().then((status) {
           if (status.isConnected) {
-            debugPrint('🔄 Triggering sync after resume');
             startSync();
           }
         });
@@ -456,14 +404,11 @@ class SyncManagerImpl implements SyncManager {
 
   /// Handles connectivity changes
   void _handleConnectivityChange(ConnectivityStatus status) {
-    debugPrint('🌐 Connectivity changed: ${status.connectionType} '
-        '(connected: ${status.isConnected})');
 
     // Trigger sync when connection is restored
     if (status.isConnected && !_autoSyncPaused && !_isSyncing) {
       // Check WiFi-only preference
       if (syncOnlyOnWifi && status.connectionType != ConnectionType.wifi) {
-        debugPrint('⚠️ WiFi-only mode, skipping sync on cellular');
         _updateStatus(SyncStatus.paused(
           pendingOperations: _currentStatus.pendingOperations,
         ));
@@ -477,20 +422,16 @@ class SyncManagerImpl implements SyncManager {
           if (_lastSyncTime != null) {
             final timeSinceLastSync = DateTime.now().difference(_lastSyncTime!);
             if (timeSinceLastSync < autoSyncMinInterval) {
-              debugPrint('⏱️ Auto-sync cooldown active');
               return;
             }
           }
 
-          debugPrint('🔄 Connection restored, triggering auto-sync...');
           startSync();
         } else {
-          debugPrint('📭 No pending operations to sync');
         }
       });
     } else if (!status.isConnected && _isSyncing) {
       // Handle connection loss during sync
-      debugPrint('⚠️ Connection lost during sync');
       _updateStatus(SyncStatus.paused(
         pendingOperations: _currentStatus.pendingOperations,
       ));
@@ -509,7 +450,6 @@ class SyncManagerImpl implements SyncManager {
   /// or -1 if an error occurred.
   Future<int> _processPendingOperations() async {
     try {
-      debugPrint('📤 Processing pending operations with UploadSync...');
 
       final result = await _uploadSync.processPendingOperations(
         limit: 10,
@@ -526,17 +466,13 @@ class SyncManagerImpl implements SyncManager {
       );
 
       if (result.isSuccessful) {
-        debugPrint('✅ Upload complete: ${result.successCount} operations');
         return result.successCount;
       } else {
-        debugPrint('⚠️ Upload partial: ${result.successCount} succeeded, '
-            '${result.failureCount} failed');
         // Return success count even if some failed
         // Failed operations will be retried later
         return result.successCount;
       }
     } catch (e) {
-      debugPrint('❌ Error processing operations: $e');
       return -1;
     }
   }
@@ -553,6 +489,5 @@ class SyncManagerImpl implements SyncManager {
       _statusController.add(newStatus);
     }
 
-    debugPrint('📊 Sync status: $newStatus');
   }
 }

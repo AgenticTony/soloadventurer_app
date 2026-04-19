@@ -404,7 +404,7 @@ class _ScrollVelocityTrackerState extends State<ScrollVelocityTracker> {
             final timeDiff =
                 now.difference(_lastTimestamp!).inMicroseconds / 1000000;
             if (timeDiff > 0) {
-              final velocity = (position - _lastPosition) / timeDiff;
+              (position - _lastPosition) / timeDiff;
               widget.onVelocityChanged?.call();
             }
           }

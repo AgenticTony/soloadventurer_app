@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
-import 'package:soloadventurer/core/error/safety_exceptions.dart';
+import 'package:soloadventurer/features/safety/domain/exceptions/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
@@ -53,12 +52,7 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     await _simulateDelay();
     _checkOffline();
 
-    // Validate contact
-    if (contact.email == null && contact.phoneNumber == null) {
-      throw const InvalidContactInformationException(
-        'Contact must have either email or phone number',
-      );
-    }
+    // phoneNumber is required in TrustedContact, so no validation needed
 
     // Check if contact already exists
     final existingContact = _trustedContacts.values.any(
@@ -82,7 +76,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _trustedContacts[newContact.id] = newContact;
-    debugPrint('Mock: Added trusted contact ${newContact.id}');
     return newContact;
   }
 
@@ -96,7 +89,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     _trustedContacts.remove(contactId);
-    debugPrint('Mock: Removed trusted contact $contactId');
   }
 
   @override
@@ -110,7 +102,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
 
     final updatedContact = contact.copyWith(updatedAt: DateTime.now());
     _trustedContacts[contact.id] = updatedContact;
-    debugPrint('Mock: Updated trusted contact ${contact.id}');
     return updatedContact;
   }
 
@@ -150,7 +141,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _checkIns[newCheckIn.id] = newCheckIn;
-    debugPrint('Mock: Created check-in ${newCheckIn.id}');
     return newCheckIn;
   }
 
@@ -181,7 +171,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _checkIns[checkInId] = completedCheckIn;
-    debugPrint('Mock: Completed check-in $checkInId');
     return completedCheckIn;
   }
 
@@ -222,7 +211,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _checkIns[checkIn.id] = checkIn;
-    debugPrint('Mock: Scheduled check-in ${checkIn.id}');
     return checkIn;
   }
 
@@ -241,7 +229,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     _checkIns.remove(checkInId);
-    debugPrint('Mock: Canceled check-in $checkInId');
   }
 
   @override
@@ -310,8 +297,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _checkIns[checkInId] = updatedCheckIn;
-    debugPrint(
-        'Mock: Updated check-in status for $checkInId to ${status.name}');
     return updatedCheckIn;
   }
 
@@ -363,7 +348,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _locationUpdates[locationUpdate.id] = locationUpdate;
-    debugPrint('Mock: Shared location ${locationUpdate.id}');
     return locationUpdate;
   }
 
@@ -383,7 +367,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       }
     });
 
-    debugPrint('Mock: Stopped location sharing for contacts: $contactIds');
   }
 
   @override
@@ -400,7 +383,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       }
     });
 
-    debugPrint('Mock: Stopped all location sharing');
   }
 
   @override
@@ -455,7 +437,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       updatedAt: DateTime.now(),
     );
 
-    debugPrint('Mock: Updated location sharing permission for $contactId');
   }
 
   // ==================== Emergency SOS Operations ====================
@@ -508,7 +489,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _safetyAlerts[alert.id] = alert;
-    debugPrint('Mock: Triggered emergency SOS ${alert.id}');
     return alert;
   }
 
@@ -538,7 +518,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     );
 
     _currentSafetyStatus = safetyStatus;
-    debugPrint('Mock: Updated safety status to ${status.name}');
     return safetyStatus;
   }
 
@@ -636,8 +615,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       updatedAt: DateTime.now(),
     );
 
-    debugPrint(
-        'Mock: Acknowledged safety alert $alertId by contact $contactId');
   }
 
   @override
@@ -660,7 +637,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       updatedAt: DateTime.now(),
     );
 
-    debugPrint('Mock: Resolved safety alert $alertId');
   }
 
   @override
@@ -684,7 +660,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       updatedAt: DateTime.now(),
     );
 
-    debugPrint('Mock: Canceled safety alert $alertId');
   }
 
   @override
@@ -712,7 +687,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
     }
 
     _batteryLevel = level;
-    debugPrint('Mock: Updated battery level to $level%');
   }
 
   @override
@@ -745,7 +719,6 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       updatedAt: DateTime.now(),
     );
 
-    debugPrint('Mock: Updated notification preferences for $contactId');
   }
 
   @override
@@ -780,6 +753,5 @@ class MockSafetyRemoteDataSource implements SafetyRemoteDataSource {
       }
     }
 
-    debugPrint('Mock: Updated safety settings: $settings');
   }
 }

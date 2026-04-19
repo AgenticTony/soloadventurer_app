@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../domain/models/destination.dart' as dest;
 import '../../domain/models/destination_filter.dart';
 import '../state/destination_detail_state.dart';
 import 'destination_repository_provider.dart';
@@ -6,12 +7,12 @@ import 'destination_repository_provider.dart';
 part 'destination_detail_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
-/// - Dependencies injected via ref.watch() in build() method
-/// - Family provider with destinationId parameter in build()
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
+/// - Dependencies injected via `ref.watch()` in `build()` method
+/// - Family provider with destinationId parameter in `build()`
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<DestinationDetailState> when consumed
+/// - `build()` returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<DestinationDetailState>` when consumed
 ///
 /// Provider for destination detail state management
 ///
@@ -46,7 +47,7 @@ class DestinationDetail extends _$DestinationDetail {
 
   /// Initialize the notifier with dependencies
   ///
-  /// Riverpod 3.0: build() returns Future<DestinationDetailState>
+  /// Riverpod 3.0: `build()` returns `Future<DestinationDetailState>`
   /// Family provider parameter (destinationId) is passed here
   /// AutoDispose behavior: provider will be disposed when no longer watched
   @override
@@ -119,7 +120,7 @@ class DestinationDetail extends _$DestinationDetail {
       countryCode: currentDestination.countryCode,
       region: currentDestination.region,
       tags: currentDestination.tags,
-      budgetLevel: currentDestination.budgetLevel as BudgetLevel?,
+      budgetLevel: _mapBudgetLevel(currentDestination.budgetLevel),
     );
 
     // Set loading state
@@ -191,5 +192,18 @@ class DestinationDetail extends _$DestinationDetail {
   /// This is useful for cleanup or when navigating away from the detail view.
   void clear() {
     state = const AsyncValue.data(DestinationDetailState.initial());
+  }
+}
+
+/// Map destination BudgetLevel to filter FilterBudgetLevel
+FilterBudgetLevel? _mapBudgetLevel(dest.BudgetLevel? level) {
+  if (level == null) return null;
+  switch (level) {
+    case dest.BudgetLevel.budget:
+      return FilterBudgetLevel.budget;
+    case dest.BudgetLevel.moderate:
+      return FilterBudgetLevel.midRange;
+    case dest.BudgetLevel.expensive:
+      return FilterBudgetLevel.premium;
   }
 }

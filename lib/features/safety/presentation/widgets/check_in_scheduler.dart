@@ -121,7 +121,6 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final trustedContactsState = ref.watch(trustedContactsProvider);
 
     return Form(
@@ -163,7 +162,7 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
 
           // Contact selector
           if (widget.showContactSelector) ...[
-            _buildContactSelector(context, trustedContactsState),
+            _buildContactSelector(context, trustedContactsState.value),
             const SizedBox(height: 16),
           ],
 
@@ -521,8 +520,6 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
 
   /// Builds the message input field
   Widget _buildMessageInput(BuildContext context) {
-    final theme = Theme.of(context);
-
     return TextFormField(
       controller: _messageController,
       maxLines: 3,
@@ -536,9 +533,9 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
 
   /// Builds the contact selector
   Widget _buildContactSelector(
-      BuildContext context, TrustedContactsState state) {
+      BuildContext context, TrustedContactsState? state) {
     final theme = Theme.of(context);
-    final contacts = state.contacts;
+    final contacts = state?.contacts ?? [];
 
     if (contacts.isEmpty) {
       return Container(
@@ -608,8 +605,6 @@ class _CheckInSchedulerState extends ConsumerState<CheckInScheduler> {
 
   /// Builds the trip ID input field
   Widget _buildTripIdInput(BuildContext context) {
-    final theme = Theme.of(context);
-
     return TextFormField(
       controller: _tripIdController,
       decoration: const InputDecoration(

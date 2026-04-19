@@ -617,7 +617,7 @@ void main() {
 
         // Trigger multiple updates
         for (var i = 0; i < 10; i++) {
-          manager.updateMapBounds(
+          manager.updateMapLatLngBounds(
             LatLngBounds(
               LatLng(37.7 + (i * 0.01), -122.4 + (i * 0.01)),
               LatLng(37.8 + (i * 0.01), -122.5 + (i * 0.01)),

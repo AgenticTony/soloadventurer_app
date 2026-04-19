@@ -254,7 +254,7 @@ final class ItinerariesProvider extends $FunctionalProvider<
   }
 }
 
-String _$itinerariesHash() => r'42f718cf502d290192c096df1c99cbcf8f9206ba';
+String _$itinerariesHash() => r'ca11f7fa30474f827dcf716367223d6d40fca2ac';
 
 /// Provider for watching all itineraries
 ///

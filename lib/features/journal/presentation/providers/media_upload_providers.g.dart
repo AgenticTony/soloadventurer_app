@@ -8,49 +8,6 @@ part of 'media_upload_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Provider for SharedPreferences
-
-@ProviderFor(sharedPreferences)
-const sharedPreferencesProvider = SharedPreferencesProvider._();
-
-/// Provider for SharedPreferences
-
-final class SharedPreferencesProvider extends $FunctionalProvider<
-        AsyncValue<SharedPreferences>,
-        SharedPreferences,
-        FutureOr<SharedPreferences>>
-    with
-        $FutureModifier<SharedPreferences>,
-        $FutureProvider<SharedPreferences> {
-  /// Provider for SharedPreferences
-  const SharedPreferencesProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'sharedPreferencesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$sharedPreferencesHash();
-
-  @$internal
-  @override
-  $FutureProviderElement<SharedPreferences> $createElement(
-          $ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
-
-  @override
-  FutureOr<SharedPreferences> create(Ref ref) {
-    return sharedPreferences(ref);
-  }
-}
-
-String _$sharedPreferencesHash() => r'dc403fbb1d968c7d5ab4ae1721a29ffe173701c7';
-
 /// Provider for MediaUploadService
 
 @ProviderFor(mediaUploadService)
@@ -98,7 +55,7 @@ final class MediaUploadServiceProvider extends $FunctionalProvider<
 }
 
 String _$mediaUploadServiceHash() =>
-    r'a0ff3d1acde00d9b228e43254c61922b27d226ac';
+    r'cd6f202ba99ae72a75409133b4c155a3e2796dc6';
 
 /// Provider for upload statistics
 
@@ -506,7 +463,7 @@ final class MediaUploadNotifierProvider
 }
 
 String _$mediaUploadNotifierHash() =>
-    r'60ab1125fbfdf1b3aa4100e90da7d160acca9c30';
+    r'd98684770ba756477bf8631dcde62b82c3d92145';
 
 /// Notifier for managing media uploads
 

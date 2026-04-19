@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/app/providers/offline_service_providers.dart'
+    as offline_providers;
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
-import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';
 
@@ -78,7 +78,7 @@ class _SyncProgressDialogState extends ConsumerState<SyncProgressDialog>
     });
 
     try {
-      final repository = getIt<SyncQueueRepository>();
+      final repository = ref.read(offline_providers.syncQueueRepositoryProvider);
 
       // Load pending and failed operations in parallel
       final results = await Future.wait([

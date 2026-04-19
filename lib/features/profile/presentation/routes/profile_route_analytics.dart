@@ -19,7 +19,6 @@ class ProfileRouteAnalytics {
 
   static void _logEvent(RouteEvent event) {
     // For now, just log the event using debugPrint
-    debugPrint('ROUTE EVENT: ${event.toString()}');
   }
 }
 

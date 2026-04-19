@@ -137,9 +137,6 @@ class _MultiStageImageLoaderState extends State<MultiStageImageLoader>
   /// Current loading stage
   ImageLoadStage _currentStage = ImageLoadStage.thumbnail;
 
-  /// Whether the current stage has finished loading
-  bool _isLoading = false;
-
   /// Error from the most recent load attempt
   dynamic _loadError;
 
@@ -184,7 +181,6 @@ class _MultiStageImageLoaderState extends State<MultiStageImageLoader>
 
     setState(() {
       _currentStage = stage;
-      _isLoading = true;
       _loadError = null;
     });
 
@@ -269,7 +265,7 @@ class _MultiStageImageLoaderState extends State<MultiStageImageLoader>
                 setState(() {
                   _currentStage = previousStage;
                   _loadError = error;
-                  _isLoading = false;
+                  
                 });
               }
             });
@@ -278,7 +274,7 @@ class _MultiStageImageLoaderState extends State<MultiStageImageLoader>
           // All stages failed, show error widget
           setState(() {
             _loadError = error;
-            _isLoading = false;
+            
           });
         }
 
@@ -287,7 +283,7 @@ class _MultiStageImageLoaderState extends State<MultiStageImageLoader>
       },
       imageBuilder: (context, imageProvider) {
         setState(() {
-          _isLoading = false;
+          
           _loadError = null;
         });
 

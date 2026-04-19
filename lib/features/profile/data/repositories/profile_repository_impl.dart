@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
@@ -16,7 +15,6 @@ import 'package:soloadventurer/features/offline/infrastructure/database/database
 import 'package:soloadventurer/features/profile/data/models/local_user_profile_model.dart';
 import 'package:soloadventurer/features/profile/domain/entities/profile.dart';
 import 'package:soloadventurer/features/profile/domain/repositories/profile_repository.dart';
-import 'package:uuid/uuid.dart';
 
 /// Offline-aware implementation of [ProfileRepository]
 ///
@@ -30,10 +28,10 @@ import 'package:uuid/uuid.dart';
 /// Type parameters:
 /// - Entity: Profile (domain entity)
 /// - Model: LocalUserProfileModel (local data model)
-/// - CreateModel: Map<String, dynamic> (for GraphQL create operations)
-/// - UpdateModel: Map<String, dynamic> (for GraphQL update operations)
+/// - CreateModel: `Map<String, dynamic>` (for GraphQL create operations)
+/// - UpdateModel: `Map<String, dynamic>` (for GraphQL update operations)
 ///
-/// Note: We use Map<String, dynamic> for CreateModel and UpdateModel since
+/// Note: We use `Map<String, dynamic>` for CreateModel and UpdateModel since
 /// GraphQL mutations receive JSON-like maps, not model instances.
 class ProfileRepositoryImpl extends OfflineAwareRepository<
     Profile,
@@ -51,9 +49,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
 
   /// Supabase client for Storage operations (avatar upload)
   final SupabaseClient _supabaseClient;
-
-  /// UUID generator for temporary IDs
-  final Uuid _uuid = const Uuid();
 
   /// Creates a new [ProfileRepositoryImpl]
   ///
@@ -105,7 +100,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
           ? LocalUserProfileModel.fromDatabase(localUser)
           : null;
     } catch (e) {
-      debugPrint('❌ userProfile: Error reading from local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to read user profile from local cache');
     }
@@ -124,17 +118,14 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       if (existing != null) {
         // Update existing user
         await _userDao.updateUser(localUser);
-        debugPrint('📝 userProfile: Updated in local database: ${model.id}');
       } else {
         // Insert new user
         final companion = _localUserToCompanion(localUser);
         await _userDao.insertUser(companion);
-        debugPrint('📝 userProfile: Inserted in local database: ${model.id}');
       }
 
       return model;
     } catch (e) {
-      debugPrint('❌ userProfile: Error writing to local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to write user profile to local cache');
     }
@@ -145,9 +136,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
     try {
       // For users, we do a hard delete (not soft delete)
       await _userDao.deleteUserById(id);
-      debugPrint('📝 userProfile: Deleted in local database: $id');
     } catch (e) {
-      debugPrint('❌ userProfile: Error deleting from local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to delete user profile from local cache');
     }
@@ -166,8 +155,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         return users.map((u) => LocalUserProfileModel.fromDatabase(u)).toList();
       }
     } catch (e) {
-      debugPrint(
-          '❌ userProfile: Error reading all from local: ${e.toString()}');
       throw const CacheException(
           message: 'Failed to read user profiles from local cache');
     }
@@ -193,7 +180,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       final profileData = response.data['data']['createUserProfile'];
       return _profileDataToEntity(profileData);
     } catch (e) {
-      debugPrint('❌ userProfile: Error in remote create: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -225,7 +211,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       final profileData = response.data['data']['updateUserProfile'];
       return _profileDataToEntity(profileData);
     } catch (e) {
-      debugPrint('❌ userProfile: Error in remote update: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -258,9 +243,7 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         );
       }
 
-      debugPrint('🌐 userProfile: Deleted on remote API: $id');
     } catch (e) {
-      debugPrint('❌ userProfile: Error in remote delete: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -289,7 +272,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       final profileData = response.data['data']['getUserProfile'];
       return _profileDataToEntity(profileData);
     } catch (e) {
-      debugPrint('❌ userProfile: Error in remote fetch: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -312,7 +294,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       final profile = await executeRemoteFetch(userId);
       return [profile];
     } catch (e) {
-      debugPrint('❌ userProfile: Error in remote fetch all: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -357,13 +338,11 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       try {
         await writeToLocal(model);
       } catch (e) {
-        debugPrint('⚠️ userProfile: Failed to cache current profile: $e');
+      // intentional silent catch
       }
 
       return profile;
     } catch (e) {
-      debugPrint(
-          '❌ userProfile: Error fetching current profile: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -453,7 +432,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       final storagePath = '$userId/$fileName';
 
       // Upload to Supabase Storage 'avatars' bucket
-      debugPrint('📤 userProfile: Uploading avatar to: avatars/$storagePath');
 
       await _supabaseClient.storage.from('avatars').upload(
             storagePath,
@@ -468,8 +446,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       final avatarUrl = _supabaseClient.storage
           .from('avatars')
           .getPublicUrl(storagePath);
-
-      debugPrint('✅ userProfile: Avatar uploaded successfully: $avatarUrl');
 
       // Update profile with new avatar URL
       final fields = {'avatarUrl': avatarUrl};
@@ -496,7 +472,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
 
       return RepositoryOperationResult.immediate(avatarUrl);
     } catch (e) {
-      debugPrint('❌ userProfile: Error uploading avatar: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -556,7 +531,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
-      debugPrint('❌ userProfile: Error removing avatar: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -616,7 +590,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
-      debugPrint('❌ userProfile: Error updating preferences: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -676,7 +649,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
-      debugPrint('❌ userProfile: Error updating interests: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -735,7 +707,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         return const RepositoryOperationResult.queued(null);
       }
     } catch (e) {
-      debugPrint('❌ userProfile: Error toggling visibility: ${e.toString()}');
       if (e is AppException) {
         rethrow;
       }
@@ -770,8 +741,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
         rethrow;
       }
     } catch (e) {
-      debugPrint(
-          '❌ userProfile: Error checking profile existence: ${e.toString()}');
       return false;
     }
   }
@@ -779,11 +748,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
   // ==============================================================================
   // HELPER METHODS - Local database conversion
   // ==============================================================================
-
-  /// Convert [LocalUserProfileModel] to [LocalUser] database entity
-  LocalUser _modelToLocalUser(LocalUserProfileModel model) {
-    return model.toDatabaseEntity();
-  }
 
   /// Convert [LocalUser] to [UsersCompanion] for database operations
   UsersCompanion _localUserToCompanion(LocalUser user) {
@@ -805,21 +769,6 @@ class ProfileRepositoryImpl extends OfflineAwareRepository<
       version: Value(user.version),
       lastSyncedAt: Value(user.lastSyncedAt),
     );
-  }
-
-  /// Convert [Profile] domain entity to JSON for GraphQL mutations
-  Map<String, dynamic> _profileToJson(Profile profile) {
-    return {
-      'userId': profile.userId,
-      'username': profile.username,
-      'email': profile.email,
-      'displayName': profile.displayName,
-      'bio': profile.bio,
-      'avatarUrl': profile.avatarUrl,
-      'isPublic': profile.isPublic,
-      'interests': profile.interests,
-      'preferences': profile.preferences,
-    };
   }
 
   /// Convert profile data from GraphQL response to domain entity

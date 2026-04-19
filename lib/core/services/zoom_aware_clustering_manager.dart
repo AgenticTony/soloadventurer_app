@@ -167,9 +167,9 @@ class ZoomAwareClusteringManager {
   ///
   /// Useful for awaiting clustering completion after calling [updateZoomLevel].
   Future<ClusteringResult> waitForClusterUpdate() async {
-    // If there's a pending debounce, wait for it
-    if (_debounceTimer != null && _debounceTimer!.isActive) {
-      _debounceTimer!;
+    // If there's a pending debounce, wait for it to complete
+    while (_debounceTimer != null && _debounceTimer!.isActive) {
+      await Future.delayed(const Duration(milliseconds: 50));
     }
 
     // Return current result

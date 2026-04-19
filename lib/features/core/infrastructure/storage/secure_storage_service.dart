@@ -11,7 +11,10 @@ class SecureStorageService {
   static const String _idTokenKey = 'idToken';
 
   SecureStorageService({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+      : _storage = storage ??
+            const FlutterSecureStorage(
+              mOptions: MacOsOptions(usesDataProtectionKeychain: false),
+            );
 
   /// Store the username
   Future<void> storeUsername(String username) async {

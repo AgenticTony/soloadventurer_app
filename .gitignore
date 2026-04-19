@@ -4,6 +4,8 @@
 *.pyc
 *.swp
 .DS_Store
+._*
+~$*
 .atom/
 .build/
 .buildlog/
@@ -17,11 +19,6 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -44,10 +41,59 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# amplify
+# Amplify
 node_modules
 .amplify
 amplify_outputs*
 amplifyconfiguration*
-._*
+
+# Environment
 .env
+
+# Unrelated projects
+Ai-VoiceHive/
+
+# Migration backups
+.migration_backup*/
+
+# Agent working directories
+.auto-claude/
+.claude/
+
+# Python (not part of Flutter project)
+*.py
+
+# Build/test artifacts
+build_output.log
+test_failures.txt
+test_output.txt
+test_results.json
+files.zip
+existing_schema.sql
+cloudwatch-policy.json
+aws-kb-mcp.sh
+
+# OpenClaw agent files (workspace-specific, not project code)
+AGENTS.md
+SOUL.md
+USER.md
+IDENTITY.md
+TOOLS.md
+HEARTBEAT.md
+MEMORY.md
+memory/
+.agents/
+.mcp.json
+skills-lock.json
+
+# Coverage
+coverage/
+
+# Other AI tool dirs
+.openclaw/
+.windsurf/
+.kiro/
+.templates/
+
+# Archive (reference only, not active code)
+docs/archive/

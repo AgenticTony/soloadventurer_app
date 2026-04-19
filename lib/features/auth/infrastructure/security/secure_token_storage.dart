@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'dart:math';
+import 'dart:typed_data';
 import 'package:encrypt/encrypt.dart' as enc;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
-import 'package:soloadventurer/features/core/infrastructure/device/device_info_service.dart';
 
 /// A secure storage implementation for authentication tokens
 /// with additional encryption layer for defense in depth
@@ -16,7 +17,6 @@ class SecureTokenStorage {
   static const String _encryptionKeyKey = 'auth_encryption_key';
 
   final FlutterSecureStorage _secureStorage;
-  final DeviceInfoService _deviceInfoService;
   final LoggingService _logger;
 
   // Encryption components
@@ -26,27 +26,28 @@ class SecureTokenStorage {
   /// Creates a new [SecureTokenStorage]
   SecureTokenStorage({
     required FlutterSecureStorage secureStorage,
-    required DeviceInfoService deviceInfoService,
     required LoggingService logger,
   })  : _secureStorage = secureStorage,
-        _deviceInfoService = deviceInfoService,
         _logger = logger;
 
   /// Initialize the encryption components
   /// This should be called before any other methods
   Future<void> initialize() async {
     try {
-      // Generate a device-specific IV
-      final deviceId = await _deviceInfoService.getDeviceId();
-      final deviceBytes = utf8.encode(deviceId);
-      final ivBytes = List<int>.filled(16, 0);
-
-      // Use device ID bytes for IV, padded or truncated to 16 bytes
-      for (var i = 0; i < deviceBytes.length && i < 16; i++) {
-        ivBytes[i] = deviceBytes[i];
+      // Generate or load a random IV — stored in SecureStorage so it persists
+      // across app restarts. A new IV is generated on first run.
+      String? storedIv = await _secureStorage.read(key: '_iv_key');
+      if (storedIv != null) {
+        _iv = enc.IV.fromBase64(storedIv);
+      } else {
+        // Generate a cryptographically random IV
+        final random = Random.secure();
+        final ivBytes = Uint8List.fromList(
+          List.generate(16, (_) => random.nextInt(256)),
+        );
+        _iv = enc.IV(ivBytes);
+        await _secureStorage.write(key: '_iv_key', value: _iv!.base64);
       }
-
-      _iv = enc.IV(Uint8List.fromList(ivBytes));
 
       // Check if we have an existing encryption key
       String? storedKey = await _secureStorage.read(key: _encryptionKeyKey);

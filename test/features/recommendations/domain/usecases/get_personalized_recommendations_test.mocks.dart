@@ -8,7 +8,7 @@ import 'dart:async' as _i3;
 import 'package:fpdart/fpdart.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i8;
-import 'package:soloadventurer/core/error/failures.dart' as _i5;
+import 'package:soloadventurer/core/failures/failures.dart' as _i5;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart'
     as _i6;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation_request.dart'

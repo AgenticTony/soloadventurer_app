@@ -10,14 +10,14 @@ void main() {
       expect(SaveType.trip, isA<SaveType>());
     });
 
-    test('should serialize correctly', () {
-      expect(SaveType.wishlist.toJson(), 'wishlist');
-      expect(SaveType.trip.toJson(), 'trip');
+    test('should have correct names', () {
+      expect(SaveType.wishlist.name, 'wishlist');
+      expect(SaveType.trip.name, 'trip');
     });
 
-    test('should deserialize correctly', () {
-      expect(SaveType.fromJson('wishlist'), SaveType.wishlist);
-      expect(SaveType.fromJson('trip'), SaveType.trip);
+    test('should look up by name', () {
+      expect(SaveType.values.byName('wishlist'), SaveType.wishlist);
+      expect(SaveType.values.byName('trip'), SaveType.trip);
     });
   });
 
@@ -50,6 +50,8 @@ void main() {
         budgetLevel: BudgetLevel.expensive,
         activityLevels: [ActivityLevel.moderate],
         tags: ['urban'],
+        images: [],
+        popularActivities: [],
         createdAt: now,
         updatedAt: now,
       );
@@ -260,7 +262,7 @@ void main() {
 
     test('withUpdatedTimestamp should update updatedAt timestamp', () {
       final originalTime = now;
-      final newTime = now.add(const Duration(hours: 1));
+      // final newTime = now.add(const Duration(hours: 1));
 
       final savedDest = SavedDestination(
         id: 'saved_1',

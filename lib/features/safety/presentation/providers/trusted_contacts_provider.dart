@@ -9,14 +9,12 @@ import 'safety_providers.dart';
 
 part 'trusted_contacts_provider.g.dart';
 
-/// Notifier for managing trusted contacts state
-/// Handles CRUD operations for trusted contacts
+/// AsyncNotifier for managing trusted contacts state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 @riverpod
 class TrustedContacts extends _$TrustedContacts {
   AddTrustedContactUseCase get _addContact =>
@@ -29,147 +27,121 @@ class TrustedContacts extends _$TrustedContacts {
       ref.watch(getTrustedContactsUseCaseProvider);
 
   @override
-  TrustedContactsState build() => TrustedContactsState.initial();
+  Future<TrustedContactsState> build() async => TrustedContactsState.initial();
+
+  /// Helper to compute derived fields from a contact list
+  TrustedContactsState _withDerivedFields(
+    TrustedContactsState base,
+    List<TrustedContact> contacts,
+  ) {
+    return base.copyWith(
+      contacts: contacts,
+      hasContacts: contacts.isNotEmpty,
+      emergencyContactsCount:
+          contacts.where((c) => c.receivesEmergencyAlerts).length,
+      locationSharingCount:
+          contacts.where((c) => c.locationSharingEnabled).length,
+    );
+  }
 
   /// Load all trusted contacts
   Future<void> loadContacts() async {
-    if (state.isLoading) return;
-
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final contacts = await _getContacts();
-      state = state.copyWith(
-        isLoading: false,
-        contacts: contacts,
-        error: null,
-        // Update all derived fields
-        hasContacts: contacts.isNotEmpty,
-        isProcessing: false,
-        emergencyContactsCount:
-            contacts.where((c) => c.receivesEmergencyAlerts).length,
-        locationSharingCount:
-            contacts.where((c) => c.locationSharingEnabled).length,
+      return _withDerivedFields(
+        state.value ?? TrustedContactsState.initial(),
+        contacts,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Add a new trusted contact
   Future<void> addContact(TrustedContact contact) async {
-    if (state.isAdding) return;
+    final current = state.value!;
+    if (current.isAdding) return;
 
-    state = state.copyWith(isAdding: true, error: null, isProcessing: true);
-    try {
+    state = AsyncData(current.copyWith(isAdding: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final newContact = await _addContact(contact);
-      final updatedContacts = [...state.contacts, newContact];
-      state = state.copyWith(
-        isAdding: false,
-        contacts: updatedContacts,
-        selectedContact: newContact,
-        error: null,
-        // Update all derived fields
-        hasContacts: true,
-        isProcessing: false,
-        emergencyContactsCount:
-            updatedContacts.where((c) => c.receivesEmergencyAlerts).length,
-        locationSharingCount:
-            updatedContacts.where((c) => c.locationSharingEnabled).length,
+      final updatedContacts = [...current.contacts, newContact];
+      return _withDerivedFields(
+        current.copyWith(
+          isAdding: false,
+          isProcessing: false,
+          selectedContact: newContact,
+        ),
+        updatedContacts,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isAdding: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Update an existing trusted contact
   Future<void> updateContact(TrustedContact contact) async {
-    if (state.isUpdating) return;
+    final current = state.value!;
+    if (current.isUpdating) return;
 
-    state = state.copyWith(isUpdating: true, error: null, isProcessing: true);
-    try {
+    state = AsyncData(current.copyWith(isUpdating: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       final updatedContact = await _updateContact(contact);
-      final updatedContacts = state.contacts.map((c) {
+      final updatedContacts = current.contacts.map((c) {
         return c.id == contact.id ? updatedContact : c;
       }).toList();
-      state = state.copyWith(
-        isUpdating: false,
-        contacts: updatedContacts,
-        selectedContact: updatedContact,
-        error: null,
-        // Update all derived fields
-        isProcessing: false,
-        emergencyContactsCount:
-            updatedContacts.where((c) => c.receivesEmergencyAlerts).length,
-        locationSharingCount:
-            updatedContacts.where((c) => c.locationSharingEnabled).length,
+      return _withDerivedFields(
+        current.copyWith(
+          isUpdating: false,
+          isProcessing: false,
+          selectedContact: updatedContact,
+        ),
+        updatedContacts,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Remove a trusted contact
   Future<void> removeContact(String contactId) async {
-    if (state.isRemoving) return;
+    final current = state.value!;
+    if (current.isRemoving) return;
 
-    state = state.copyWith(isRemoving: true, error: null, isProcessing: true);
-    try {
+    state = AsyncData(current.copyWith(isRemoving: true, isProcessing: true));
+    state = await AsyncValue.guard(() async {
       await _removeContact(contactId);
       final updatedContacts =
-          state.contacts.where((contact) => contact.id != contactId).toList();
-      state = state.copyWith(
-        isRemoving: false,
-        contacts: updatedContacts,
-        selectedContact: state.selectedContact?.id == contactId
-            ? null
-            : state.selectedContact,
-        error: null,
-        // Update all derived fields
-        hasContacts: updatedContacts.isNotEmpty,
-        isProcessing: false,
-        emergencyContactsCount:
-            updatedContacts.where((c) => c.receivesEmergencyAlerts).length,
-        locationSharingCount:
-            updatedContacts.where((c) => c.locationSharingEnabled).length,
+          current.contacts.where((contact) => contact.id != contactId).toList();
+      return _withDerivedFields(
+        current.copyWith(
+          isRemoving: false,
+          isProcessing: false,
+          selectedContact:
+              current.selectedContact?.id == contactId ? null : current.selectedContact,
+        ),
+        updatedContacts,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isRemoving: false,
-        isProcessing: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   /// Select a contact for viewing/editing
   void selectContact(TrustedContact? contact) {
-    state = state.copyWith(selectedContact: contact);
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(current.copyWith(selectedContact: contact));
+    }
   }
 
   /// Clear the selected contact
   void clearSelection() {
-    state = state.copyWith(selectedContact: null);
-  }
-
-  /// Clear any error message
-  void clearError() {
-    state = state.copyWith(error: null);
+    final current = state.value;
+    if (current != null) {
+      state = AsyncData(current.copyWith(selectedContact: null));
+    }
   }
 
   /// Update location sharing for a contact
   Future<void> updateLocationSharing(String contactId, bool enabled) async {
-    final contact = state.contacts.firstWhere(
+    final current = state.value;
+    if (current == null) return;
+
+    final contact = current.contacts.firstWhere(
       (c) => c.id == contactId,
       orElse: () => throw Exception('Contact not found'),
     );
@@ -180,7 +152,10 @@ class TrustedContacts extends _$TrustedContacts {
 
   /// Update emergency alerts for a contact
   Future<void> updateEmergencyAlerts(String contactId, bool enabled) async {
-    final contact = state.contacts.firstWhere(
+    final current = state.value;
+    if (current == null) return;
+
+    final contact = current.contacts.firstWhere(
       (c) => c.id == contactId,
       orElse: () => throw Exception('Contact not found'),
     );
@@ -192,7 +167,10 @@ class TrustedContacts extends _$TrustedContacts {
   /// Update check-in notifications for a contact
   Future<void> updateCheckInNotifications(
       String contactId, bool enabled) async {
-    final contact = state.contacts.firstWhere(
+    final current = state.value;
+    if (current == null) return;
+
+    final contact = current.contacts.firstWhere(
       (c) => c.id == contactId,
       orElse: () => throw Exception('Contact not found'),
     );

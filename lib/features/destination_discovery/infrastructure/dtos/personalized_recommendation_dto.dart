@@ -85,7 +85,9 @@ class PersonalizedRecommendationDto {
       totalCount: totalCount ?? recommendations?.length ?? 0,
       generatedAt:
           generatedAt != null ? DateTime.parse(generatedAt!) : DateTime.now(),
-      expiresAt: expiresAt != null ? DateTime.parse(expiresAt!) : null,
+      expiresAt: expiresAt != null
+          ? DateTime.parse(expiresAt!)
+          : DateTime.now().add(const Duration(days: 7)),
       preferenceSnapshot: preferenceSnapshot,
       relatedRecommendationIds: relatedRecommendationIds ?? [],
     );

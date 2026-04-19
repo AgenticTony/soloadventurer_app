@@ -1,16 +1,14 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../models/auth_session.dart';
 import '../../../../app/providers/auth_service_providers.dart';
-import '../../../core/domain/services/connectivity_service.dart';
+import '../../../../core/services/connectivity_service.dart';
 import '../../../core/domain/services/logging_service.dart';
-import '../../../core/data/services/connectivity_service_impl.dart';
+import '../../../../app/providers/offline_service_providers.dart';
 import '../../data/models/credentials.dart';
 import '../services/token_blacklist_manager.dart' as blacklist;
 import '../../infrastructure/logging/token_audit_logger.dart';
-import '../../infrastructure/security/secure_token_storage.dart';
 
 part 'token_manager.g.dart';
 
@@ -47,7 +45,6 @@ class TokenManager extends _$TokenManager {
   AuthSession? _cachedSession;
   int _refreshAttempts = 0;
   StreamSubscription? _connectivitySubscription;
-  SecureTokenStorage? _secureStorage;
   bool _isDisposed = false;
   bool _isInitialized = false;
   Completer<void>? _initializationCompleter;
@@ -75,9 +72,8 @@ class TokenManager extends _$TokenManager {
       // _secureStorage = ref.watch(secureTokenStorageProvider);
 
       // For now, we'll use a placeholder
-      debugPrint('TokenManager: Secure storage initialized');
     } catch (e) {
-      debugPrint('TokenManager: Failed to initialize secure storage: $e');
+    // intentional silent catch
     }
 
     ref.onDispose(() {
@@ -90,39 +86,6 @@ class TokenManager extends _$TokenManager {
     return FeatureAvailability.unauthorized;
   }
 
-  FeatureAvailability _calculateCurrentState() {
-    debugPrint('TokenManager: Calculating current state');
-    final connectivityService = ref.read(connectivityServiceImplProvider);
-    final hasValidTokens = _cachedSession?.expiresAt
-            .isAfter(DateTime.now().add(_minValidityThreshold)) ??
-        false;
-
-    debugPrint('TokenManager: Has valid tokens: $hasValidTokens');
-    debugPrint(
-        'TokenManager: Cached session expiry: ${_cachedSession?.expiresAt}');
-    debugPrint('TokenManager: Current time: ${DateTime.now()}');
-    debugPrint('TokenManager: Min validity threshold: $_minValidityThreshold');
-
-    final newState = _calculateState(
-        connectivityService.hasConnectivitySync, hasValidTokens);
-    debugPrint('TokenManager: Calculated state: $newState');
-    return newState;
-  }
-
-  Future<void> _initializeAndNotify() async {
-    try {
-      await initialize();
-      if (!_isDisposed && _initializationCompleter != null) {
-        _initializationCompleter!.complete();
-      }
-    } catch (e) {
-      if (!_isDisposed && _initializationCompleter != null) {
-        _initializationCompleter!.completeError(e);
-      }
-      rethrow;
-    }
-  }
-
   Future<void> waitForInitialization() async {
     if (_isInitialized) return;
     _initializationCompleter ??= Completer<void>();
@@ -131,16 +94,13 @@ class TokenManager extends _$TokenManager {
 
   Future<void> initialize() async {
     if (_isInitialized) {
-      debugPrint('TokenManager: Already initialized, skipping initialization');
       return;
     }
 
     try {
-      debugPrint('TokenManager: Starting initialization');
       final storage = ref.read(authLocalDataSourceProvider);
-      final connectivityService = ref.read(connectivityServiceImplProvider);
+      final connectivityService = ref.read(connectivityServiceProvider);
 
-      debugPrint('TokenManager: Loading cached session data');
       // Load cached session atomically as per AWS best practices
       final sessionData = await Future.wait([
         storage.getAuthToken(),
@@ -154,17 +114,10 @@ class TokenManager extends _$TokenManager {
       final refreshToken = sessionData[2] as String?;
       final expiresAt = sessionData[3] as DateTime?;
 
-      debugPrint('TokenManager: Loaded session data:');
-      debugPrint('  - Has access token: ${accessToken != null}');
-      debugPrint('  - Has ID token: ${idToken != null}');
-      debugPrint('  - Has refresh token: ${refreshToken != null}');
-      debugPrint('  - Expires at: $expiresAt');
-
       if (accessToken != null &&
           idToken != null &&
           refreshToken != null &&
           expiresAt != null) {
-        debugPrint('TokenManager: Creating cached session from loaded data');
         _cachedSession = AuthSession(
           accessToken: accessToken,
           idToken: idToken,
@@ -174,46 +127,31 @@ class TokenManager extends _$TokenManager {
 
         // Setup refresh timer if we have a valid session
         if (!_isDisposed) {
-          debugPrint('TokenManager: Setting up token refresh schedule');
           _scheduleTokenRefresh();
         }
       } else {
-        debugPrint(
-            'TokenManager: Incomplete session data, no cached session created');
       }
 
       // Get current connectivity status
-      debugPrint('TokenManager: Checking current connectivity status');
-      final networkStatus = await connectivityService.checkConnectivity();
+      final networkStatus = await connectivityService.checkNetworkStatus();
       final isConnected = networkStatus == NetworkStatus.connected;
-      debugPrint(
-          'TokenManager: Initial connectivity status: $networkStatus (connected: $isConnected)');
 
       final hasValidTokens = _cachedSession?.expiresAt
               .isAfter(DateTime.now().add(_minValidityThreshold)) ??
           false;
-      debugPrint('TokenManager: Has valid tokens: $hasValidTokens');
 
       // Mark as initialized before updating state
-      debugPrint('TokenManager: Marking as initialized');
       _isInitialized = true;
 
       // Calculate and update state
       final newState = _calculateState(isConnected, hasValidTokens);
-      debugPrint('TokenManager: Calculated initial state: $newState');
       state = newState;
-
-      debugPrint('TokenManager: Initialization complete');
 
       // If we're online and have valid tokens, try to refresh them
       if (isConnected && hasValidTokens && !_isDisposed) {
-        debugPrint(
-            'TokenManager: Initiating token refresh after initialization');
         await _refreshTokens();
       }
     } catch (e) {
-      debugPrint('TokenManager: Failed to initialize session: $e');
-      debugPrint('TokenManager: Stack trace: ${StackTrace.current}');
       if (!_isDisposed) {
         state = FeatureAvailability.unauthorized;
       }
@@ -224,7 +162,7 @@ class TokenManager extends _$TokenManager {
   Future<void> _refreshTokens() async {
     if (_isDisposed) return;
 
-    final connectivityService = ref.read(connectivityServiceImplProvider);
+    final connectivityService = ref.read(connectivityServiceProvider);
     final isOnline = await connectivityService.hasConnectivity;
 
     if (!isOnline || _isDisposed) {
@@ -314,7 +252,7 @@ class TokenManager extends _$TokenManager {
       _refreshAttempts = 0;
       _scheduleTokenRefresh();
 
-      final networkStatus = await connectivityService.checkConnectivity();
+      final networkStatus = await connectivityService.checkNetworkStatus();
       final isConnected = networkStatus == NetworkStatus.connected;
       final hasValidTokens = newSession.expiresAt
           .isAfter(DateTime.now().add(_minValidityThreshold));
@@ -369,7 +307,6 @@ class TokenManager extends _$TokenManager {
     // Calculate token lifetime and schedule refresh according to AWS best practices
     final tokenLifetime = _cachedSession!.expiresAt.difference(DateTime.now());
     if (tokenLifetime <= Duration.zero) {
-      debugPrint('TokenManager: Token expired, initiating immediate refresh');
       state = FeatureAvailability.tokenExpired;
       if (!_isDisposed) unawaited(_refreshTokens());
       return;
@@ -380,15 +317,12 @@ class TokenManager extends _$TokenManager {
     if (tokenLifetime < const Duration(minutes: 30)) {
       refreshPercentage =
           _shortTokenRefreshPercentage; // 80% for short-lived tokens
-      debugPrint('TokenManager: Using short token refresh strategy (80%)');
     } else if (tokenLifetime < const Duration(minutes: 60)) {
       refreshPercentage =
           _mediumTokenRefreshPercentage; // 75% for medium-lived tokens
-      debugPrint('TokenManager: Using medium token refresh strategy (75%)');
     } else {
       refreshPercentage =
           _longTokenRefreshPercentage; // 70% for long-lived tokens
-      debugPrint('TokenManager: Using long token refresh strategy (70%)');
     }
 
     // AWS best practice: refresh at adaptive percentage of token lifetime for smooth token rotation
@@ -397,15 +331,10 @@ class TokenManager extends _$TokenManager {
     // AWS docs: ensure minimum 2-minute validity threshold
     if (refreshAt.isAfter(DateTime.now().add(_minValidityThreshold))) {
       final delay = refreshAt.difference(DateTime.now());
-      debugPrint(
-          'TokenManager: Scheduling token refresh in ${delay.inSeconds} seconds (75% of token lifetime)');
       _refreshTimer = Timer(delay, () {
         if (!_isDisposed) unawaited(_refreshTokens());
       });
-      debugPrint('Token refresh scheduled for ${refreshAt.toIso8601String()}');
     } else {
-      debugPrint(
-          'TokenManager: Token too close to expiry, refreshing immediately');
       state = FeatureAvailability.tokenExpired;
       if (!_isDisposed) unawaited(_refreshTokens());
     }
@@ -418,56 +347,9 @@ class TokenManager extends _$TokenManager {
 
     // AWS best practice: implement exponential backoff with jitter for retries
     final delay = _getBackoffDelay();
-    debugPrint(
-        'TokenManager: Scheduling recovery with exponential backoff in ${delay.inSeconds} seconds (attempt ${_refreshAttempts + 1}/$_maxRefreshAttempts)');
     _recoveryTimer = Timer(delay, () {
       if (!_isDisposed) unawaited(_refreshTokens());
     });
-    debugPrint('Recovery attempt scheduled with exponential backoff');
-  }
-
-  void _handleConnectivityChange(NetworkStatus status) {
-    if (!_isInitialized) {
-      debugPrint(
-          'TokenManager: Ignoring connectivity change - not initialized');
-      return;
-    }
-
-    debugPrint('TokenManager: Connectivity changed to $status');
-
-    // Update state immediately based on new connectivity
-    final isOnline = status == NetworkStatus.connected;
-    final hasValidTokens = _cachedSession?.expiresAt
-            .isAfter(DateTime.now().add(_minValidityThreshold)) ??
-        false;
-
-    debugPrint('TokenManager: Handling connectivity change');
-    debugPrint('  - Online: $isOnline');
-    debugPrint('  - Valid tokens: $hasValidTokens');
-    debugPrint('  - Session expiry: ${_cachedSession?.expiresAt}');
-    debugPrint('  - Current time: ${DateTime.now()}');
-    debugPrint('  - Min validity threshold: $_minValidityThreshold');
-
-    // Calculate new state based on current conditions
-    final newState = _calculateState(isOnline, hasValidTokens);
-    debugPrint('TokenManager: State transition');
-    debugPrint('  - Current state: $state');
-    debugPrint('  - New state: $newState');
-
-    // Always update state to ensure transitions are captured
-    state = newState;
-    debugPrint('TokenManager: State updated to $newState');
-
-    // Schedule token refresh if we're transitioning to online state
-    if (isOnline && hasValidTokens) {
-      debugPrint('TokenManager: Online with valid tokens, scheduling refresh');
-      _scheduleTokenRefresh();
-
-      // Try to refresh tokens when we regain connectivity
-      debugPrint(
-          'TokenManager: Regained connectivity, initiating token refresh');
-      unawaited(_refreshTokens());
-    }
   }
 
   Future<void> clearSession() async {
@@ -507,37 +389,22 @@ class TokenManager extends _$TokenManager {
   }
 
   FeatureAvailability _calculateState(bool isOnline, bool hasValidTokens) {
-    debugPrint('TokenManager: Calculating state');
-    debugPrint('  - Online: $isOnline');
-    debugPrint('  - Has valid tokens: $hasValidTokens');
-    debugPrint('  - Has cached session: ${_cachedSession != null}');
-    debugPrint('  - Current state: $state');
 
     if (_cachedSession == null) {
-      debugPrint('TokenManager: No cached session, returning unauthorized');
       return FeatureAvailability.unauthorized;
     }
 
     if (!hasValidTokens) {
-      debugPrint('TokenManager: Tokens not valid');
       if (isOnline) {
-        debugPrint(
-            'TokenManager: Online with invalid tokens, returning tokenExpired');
         return FeatureAvailability.tokenExpired;
       } else {
-        debugPrint(
-            'TokenManager: Offline with invalid tokens, returning offlineNoCache');
         return FeatureAvailability.offlineNoCache;
       }
     }
 
     if (isOnline) {
-      debugPrint(
-          'TokenManager: Online with valid tokens, returning fullyAvailable');
       return FeatureAvailability.fullyAvailable;
     } else {
-      debugPrint(
-          'TokenManager: Offline with valid tokens, returning offlineWithCache');
       return FeatureAvailability.offlineWithCache;
     }
   }
@@ -545,11 +412,10 @@ class TokenManager extends _$TokenManager {
   Future<void> refreshToken() async {
     if (_isDisposed) return;
 
-    final connectivityService = ref.read(connectivityServiceImplProvider);
+    final connectivityService = ref.read(connectivityServiceProvider);
     final isOnline = await connectivityService.hasConnectivity;
 
     if (!isOnline || _isDisposed) {
-      debugPrint('TokenManager: Skipping refresh - offline or disposed');
       return;
     }
 
@@ -557,7 +423,6 @@ class TokenManager extends _$TokenManager {
       final storage = ref.read(authLocalDataSourceProvider);
       final remote = ref.read(authRemoteDataSourceProvider);
 
-      debugPrint('TokenManager: Attempting to refresh token');
       final newSession = await remote.refreshToken();
 
       // Store new session data
@@ -571,9 +436,7 @@ class TokenManager extends _$TokenManager {
       _cachedSession = newSession;
       _scheduleTokenRefresh();
       state = FeatureAvailability.fullyAvailable;
-      debugPrint('TokenManager: Token refresh successful');
     } catch (e) {
-      debugPrint('TokenManager: Token refresh failed: $e');
       state = FeatureAvailability.unauthorized;
     }
   }
@@ -581,12 +444,10 @@ class TokenManager extends _$TokenManager {
   Future<void> reauthenticate(String username, String password) async {
     if (_isDisposed) return;
 
-    final connectivityService = ref.read(connectivityServiceImplProvider);
+    final connectivityService = ref.read(connectivityServiceProvider);
     final isOnline = await connectivityService.hasConnectivity;
 
     if (!isOnline || _isDisposed) {
-      debugPrint(
-          'TokenManager: Skipping reauthentication - offline or disposed');
       return;
     }
 
@@ -624,9 +485,7 @@ class TokenManager extends _$TokenManager {
       _cachedSession = newSession;
       _scheduleTokenRefresh();
       state = FeatureAvailability.fullyAvailable;
-      debugPrint('TokenManager: Reauthentication successful');
     } catch (e) {
-      debugPrint('TokenManager: Reauthentication failed: $e');
       state = FeatureAvailability.unauthorized;
     }
   }
@@ -634,15 +493,12 @@ class TokenManager extends _$TokenManager {
   Future<void> handleOffline() async {
     if (_isDisposed) return;
 
-    debugPrint('TokenManager: Handling offline state');
     final storage = ref.read(authLocalDataSourceProvider);
     final hasLocalData = await storage.hasValidSession();
 
     if (hasLocalData) {
-      debugPrint('TokenManager: Found valid local session data');
       state = FeatureAvailability.offlineWithCache;
     } else {
-      debugPrint('TokenManager: No valid local session data');
       state = FeatureAvailability.offlineNoCache;
     }
   }
@@ -650,15 +506,12 @@ class TokenManager extends _$TokenManager {
   Future<void> handleOnline() async {
     if (_isDisposed) return;
 
-    debugPrint('TokenManager: Handling online state');
     final storage = ref.read(authLocalDataSourceProvider);
     final hasLocalData = await storage.hasValidSession();
 
     if (hasLocalData) {
-      debugPrint('TokenManager: Found valid local session, refreshing token');
       await refreshToken();
     } else {
-      debugPrint('TokenManager: No valid local session');
       state = FeatureAvailability.unauthorized;
     }
   }
@@ -670,10 +523,8 @@ class TokenManager extends _$TokenManager {
   Future<void> refreshState() async {
     if (_isDisposed) return;
 
-    debugPrint('TokenManager: Refreshing state');
-
     try {
-      final connectivityService = ref.read(connectivityServiceImplProvider);
+      final connectivityService = ref.read(connectivityServiceProvider);
 
       // Load tokens from storage
       final storage = ref.read(authLocalDataSourceProvider);
@@ -689,17 +540,10 @@ class TokenManager extends _$TokenManager {
       final refreshToken = sessionData[2] as String?;
       final expiresAt = sessionData[3] as DateTime?;
 
-      debugPrint('TokenManager: Loaded session data during refresh:');
-      debugPrint('  - Has access token: ${accessToken != null}');
-      debugPrint('  - Has ID token: ${idToken != null}');
-      debugPrint('  - Has refresh token: ${refreshToken != null}');
-      debugPrint('  - Expires at: $expiresAt');
-
       if (accessToken != null &&
           idToken != null &&
           refreshToken != null &&
           expiresAt != null) {
-        debugPrint('TokenManager: Creating cached session from loaded data');
         _cachedSession = AuthSession(
           accessToken: accessToken,
           idToken: idToken,
@@ -708,13 +552,11 @@ class TokenManager extends _$TokenManager {
         );
         _scheduleTokenRefresh();
       } else {
-        debugPrint(
-            'TokenManager: Incomplete session data during refresh, clearing cache');
         _cachedSession = null;
       }
 
       // Get current connectivity status
-      final networkStatus = await connectivityService.checkConnectivity();
+      final networkStatus = await connectivityService.checkNetworkStatus();
       final isConnected = networkStatus == NetworkStatus.connected;
       final hasValidTokens = _cachedSession?.expiresAt
               .isAfter(DateTime.now().add(_minValidityThreshold)) ??
@@ -722,11 +564,8 @@ class TokenManager extends _$TokenManager {
 
       // Calculate and update state
       final newState = _calculateState(isConnected, hasValidTokens);
-      debugPrint('TokenManager: Refreshed state: $newState');
       state = newState;
-    } catch (e, stackTrace) {
-      debugPrint('TokenManager: Failed to refresh state: $e');
-      debugPrint('TokenManager: Stack trace: $stackTrace');
+    } catch (e) {
       // On error, set state to unauthorized
       if (!_isDisposed) {
         state = FeatureAvailability.unauthorized;

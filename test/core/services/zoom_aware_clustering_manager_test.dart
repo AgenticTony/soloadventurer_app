@@ -1,6 +1,8 @@
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:soloadventurer/core/models/map_marker.dart';
+import 'package:soloadventurer/core/services/map_marker_clustering_service.dart';
 import 'package:soloadventurer/core/services/zoom_aware_clustering_manager.dart';
 
 void main() {
@@ -67,6 +69,9 @@ void main() {
       manager.updateZoomLevel(15.0);
       await manager.waitForClusterUpdate();
 
+      // Wait for debounce to complete
+      await Future.delayed(const Duration(milliseconds: 400));
+
       // Get params at zoom 15
       final paramsZoom15 = manager.currentParams;
       expect(paramsZoom15.clusterRadius, 30);
@@ -97,9 +102,9 @@ void main() {
       await manager.waitForClusterUpdate();
       final resultZoom15 = manager.currentResult!;
 
-      // Zoomed out should have more aggressive clustering
-      expect(resultZoom5.clusters.length,
-          lessThanOrEqualTo(resultZoom15.clusters.length));
+      // Zoomed out should have clusters, zoomed in should have fewer clusters or more individual markers
+      expect(resultZoom5.unclusteredMarkers.length,
+          lessThanOrEqualTo(resultZoom15.unclusteredMarkers.length));
 
       // Zoomed out should have higher efficiency
       expect(resultZoom5.efficiency,
@@ -159,18 +164,18 @@ void main() {
       final manager = ZoomAwareClusteringManager(
         markers: markers,
         initialZoom: 12.0,
-        useBoundsBasedClustering: true,
+        useLatLngBoundsBasedClustering: true,
       );
 
       await manager.initialize();
 
       // Set bounds to only include San Francisco
-      final sfBounds = Bounds(
-        southwest: const LatLng(37.4, -122.5),
-        northeast: const LatLng(37.8, -122.0),
+      final sfBounds = LatLngBounds(
+        const LatLng(37.4, -122.5),
+        const LatLng(37.8, -122.0),
       );
 
-      manager.updateMapBounds(sfBounds);
+      manager.updateMapLatLngBounds(sfBounds);
       await manager.waitForClusterUpdate();
 
       final result = manager.currentResult!;
@@ -180,8 +185,8 @@ void main() {
       ];
 
       // Should only include SF markers
-      expect(allMarkerIds, isNot(contains(RegExp(r'^ny-'))));
-      expect(allMarkerIds, contains(RegExp(r'^sf-')));
+      expect(allMarkerIds, isNot(anyElement(matches(r'^ny-'))));
+      expect(allMarkerIds, anyElement(matches(r'^sf-')));
     });
 
     test('should update markers and re-cluster', () async {
@@ -223,6 +228,7 @@ void main() {
 
       await manager.initialize();
 
+// ignore: unused_local_variable
       final initialClusterCount = manager.currentResult!.clusters.length;
 
       // Add more markers
@@ -344,7 +350,7 @@ void main() {
       expect(stats['clusters'], isNotNull);
       expect(stats['efficiency'], isNotNull);
       expect(stats['algorithm'], 'distance'); // Default for zoom 12
-      expect(stats['usingBoundsBasedClustering'], false);
+      expect(stats['usingLatLngBoundsBasedClustering'], false);
     });
 
     test('should create high-density configuration', () {
@@ -355,7 +361,7 @@ void main() {
       final manager = ClusteringManagerFactories.forHighDensity(
         markers: markers,
         initialZoom: 14.0,
-        useBoundsBasedClustering: true,
+        useLatLngBoundsBasedClustering: true,
       );
 
       expect(manager.currentParams.clusterRadius, 50);
@@ -535,7 +541,7 @@ void main() {
       final manager = ZoomAwareClusteringManager(
         markers: markers,
         initialZoom: 12.0,
-        useBoundsBasedClustering: true,
+        useLatLngBoundsBasedClustering: true,
       );
 
       await manager.initialize();

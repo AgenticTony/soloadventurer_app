@@ -207,47 +207,45 @@ class OfflineIndicator extends ConsumerWidget {
     // Get the cached data info from the provider
     return Consumer(
       builder: (context, ref, _) {
-        final cachedDataAsync = ref.watch(cachedDataProvider);
+        final cachedDataProviderInstance = ref.watch(cachedDataProvider);
 
-        return cachedDataAsync.when(
-          data: (cachedDataProvider) async {
-            try {
-              final isOffline = await cachedDataProvider.isOffline();
+        return FutureBuilder<Map<String, dynamic>>(
+          future: cachedDataProviderInstance.getCachedDataInfo(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const SizedBox(
+                width: 100,
+                height: 14,
+                child: LinearProgressIndicator(),
+              );
+            }
 
-              if (!isOffline) {
-                return const SizedBox.shrink();
-              }
+            if (snapshot.hasError || !snapshot.hasData) {
+              return const SizedBox.shrink();
+            }
 
-              final cachedDataInfo =
-                  await cachedDataProvider.getCachedDataInfo();
+            final cachedDataInfo = snapshot.data!;
+            final lastSyncAt = cachedDataInfo['userCachedAt'] != null
+                ? DateTime.tryParse(cachedDataInfo['userCachedAt'] as String)
+                : null;
 
-              final lastSyncAt = cachedDataInfo.lastCachedAt;
-              if (lastSyncAt == null) {
-                return Text(
-                  'No sync data',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                );
-              }
-
-              final timeAgo = _formatTimeAgo(lastSyncAt);
+            if (lastSyncAt == null) {
               return Text(
-                'Last sync: $timeAgo',
+                'No sync data',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               );
-            } catch (e) {
-              return const SizedBox.shrink();
             }
+
+            final timeAgo = _formatTimeAgo(lastSyncAt);
+            return Text(
+              'Last sync: $timeAgo',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            );
           },
-          loading: () => const SizedBox(
-            width: 100,
-            height: 14,
-            child: LinearProgressIndicator(),
-          ),
-          error: (_, __) => const SizedBox.shrink(),
         );
       },
     );

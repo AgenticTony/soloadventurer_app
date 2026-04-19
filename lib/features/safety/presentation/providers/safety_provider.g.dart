@@ -8,32 +8,29 @@ part of 'safety_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Notifier for managing overall safety state
-/// Handles safety status, emergency SOS, and safety alerts
+/// AsyncNotifier for managing overall safety state.
 ///
 /// Riverpod 3.0 Compliant:
 /// - Uses @riverpod annotation with code generation
-/// - Uses Notifier base class instead of StateNotifier
-/// - Dependencies accessed via ref.watch() in methods
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 
 @ProviderFor(Safety)
 const safetyProvider = SafetyProvider._();
 
-/// Notifier for managing overall safety state
-/// Handles safety status, emergency SOS, and safety alerts
+/// AsyncNotifier for managing overall safety state.
 ///
 /// Riverpod 3.0 Compliant:
 /// - Uses @riverpod annotation with code generation
-/// - Uses Notifier base class instead of StateNotifier
-/// - Dependencies accessed via ref.watch() in methods
-final class SafetyProvider extends $NotifierProvider<Safety, SafetyState> {
-  /// Notifier for managing overall safety state
-  /// Handles safety status, emergency SOS, and safety alerts
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
+final class SafetyProvider extends $AsyncNotifierProvider<Safety, SafetyState> {
+  /// AsyncNotifier for managing overall safety state.
   ///
   /// Riverpod 3.0 Compliant:
   /// - Uses @riverpod annotation with code generation
-  /// - Uses Notifier base class instead of StateNotifier
-  /// - Dependencies accessed via ref.watch() in methods
+  /// - AsyncNotifier with AsyncValue handles loading/error
+  /// - State no longer has isLoading/error fields
   const SafetyProvider._()
       : super(
           from: null,
@@ -51,35 +48,29 @@ final class SafetyProvider extends $NotifierProvider<Safety, SafetyState> {
   @$internal
   @override
   Safety create() => Safety();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(SafetyState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<SafetyState>(value),
-    );
-  }
 }
 
-String _$safetyHash() => r'9f1144cbd88801ffdad78f522fbc099beec139e6';
+String _$safetyHash() => r'5b322a94416f5bc44e0d85b9027d2ab5b81756f5';
 
-/// Notifier for managing overall safety state
-/// Handles safety status, emergency SOS, and safety alerts
+/// AsyncNotifier for managing overall safety state.
 ///
 /// Riverpod 3.0 Compliant:
 /// - Uses @riverpod annotation with code generation
-/// - Uses Notifier base class instead of StateNotifier
-/// - Dependencies accessed via ref.watch() in methods
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 
-abstract class _$Safety extends $Notifier<SafetyState> {
-  SafetyState build();
+abstract class _$Safety extends $AsyncNotifier<SafetyState> {
+  FutureOr<SafetyState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<SafetyState, SafetyState>;
+    final ref = this.ref as $Ref<AsyncValue<SafetyState>, SafetyState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<SafetyState, SafetyState>, SafetyState, Object?, Object?>;
+        AnyNotifier<AsyncValue<SafetyState>, SafetyState>,
+        AsyncValue<SafetyState>,
+        Object?,
+        Object?>;
     element.handleValue(ref, created);
   }
 }

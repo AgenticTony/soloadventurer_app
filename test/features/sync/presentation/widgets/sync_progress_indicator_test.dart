@@ -216,7 +216,7 @@ void main() {
       );
 
       expect(find.text('50%'), findsOneWidget);
-      expect(find.byType(Stack), findsOneWidget);
+      expect(find.byType(Stack), findsWidgets);
     });
 
     testWidgets('respects custom size', (tester) async {

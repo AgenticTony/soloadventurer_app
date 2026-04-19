@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/connectivity_provider.dart';
 import 'package:soloadventurer/features/offline/presentation/providers/sync_status_provider.dart';

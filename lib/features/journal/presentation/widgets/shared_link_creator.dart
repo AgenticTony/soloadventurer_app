@@ -45,11 +45,11 @@ class _SharedLinkCreatorState extends ConsumerState<SharedLinkCreator> {
       expiresAt: _hasExpiration ? _expirationDate : null,
     );
 
-    final notifier = ref.read(createSharedLinkNotifierProvider.notifier);
+    final notifier = ref.read(createSharedLinkProvider.notifier);
     await notifier.createLink(config);
 
     if (mounted) {
-      final state = ref.read(createSharedLinkNotifierProvider);
+      final state = ref.read(createSharedLinkProvider);
 
       if (state.createdLink != null) {
         _showSuccessDialog(state.createdLink!);
@@ -118,7 +118,7 @@ class _SharedLinkCreatorState extends ConsumerState<SharedLinkCreator> {
 
   @override
   Widget build(BuildContext context) {
-    final createState = ref.watch(createSharedLinkNotifierProvider);
+    final createState = ref.watch(createSharedLinkProvider);
 
     return Scaffold(
       appBar: AppBar(

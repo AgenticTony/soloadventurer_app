@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/core/providers/core_providers.dart' show sharedPreferencesProvider;
-import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source_impl.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
 import 'package:soloadventurer/features/safety/data/repositories/safety_repository_impl.dart';
@@ -16,7 +15,7 @@ import 'package:soloadventurer/features/safety/presentation/providers/safety_pro
 import 'package:soloadventurer/features/safety/presentation/screens/safety_hub_screen.dart';
 import 'package:soloadventurer/features/safety/presentation/screens/trusted_contacts_screen.dart';
 import 'package:soloadventurer/features/safety/presentation/screens/emergency_sos_screen.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
+import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source.dart';
 
 // Test constants
 const testUserId = 'test-user-123';
@@ -41,9 +40,6 @@ void main() {
     // Initialize SharedPreferences for testing
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
-
-    // Initialize service locator in test mode
-    await setupServiceLocator(isTest: true);
 
     // Initialize local data source
     localDataSource = SafetyLocalDataSourceImpl(prefs);
@@ -100,7 +96,6 @@ void main() {
   });
 
   tearDown(() async {
-    await resetServiceLocator();
     container.dispose();
   });
 

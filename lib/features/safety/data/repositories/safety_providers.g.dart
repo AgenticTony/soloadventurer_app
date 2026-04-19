@@ -107,7 +107,7 @@ final class SafetyRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$safetyRemoteDataSourceHash() =>
-    r'7621d34a6ff8d6d730188d1a4b8cd4420ec7ab40';
+    r'8ccec52c4e2c1901ff90da3e4976d523f7bfb3b2';
 
 /// Provider for SafetyRepository implementation
 

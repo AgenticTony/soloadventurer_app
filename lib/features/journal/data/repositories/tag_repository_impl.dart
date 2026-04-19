@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/tag_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';

@@ -18,8 +18,9 @@ ProviderContainer createContainer({
   List<Object> overrides = const [],
   List<ProviderObserver> observers = const [],
 }) {
-  final container = ProviderContainer(
-    overrides: overrides.map((e) => e as RiverpodOverride).toList(),
+  final container = ProviderContainer.test(
+    retry: (_, __) => null,
+    overrides: overrides.cast(),
     observers: observers,
   );
 
@@ -80,57 +81,4 @@ class ProviderChange {
     required this.previousValue,
     required this.newValue,
   });
-}
-
-/// A utility class to listen to a provider and collect its state changes.
-///
-/// Riverpod 3.0 Migration:
-/// - ProviderListenable is no longer available
-/// - Updated to use Riverpod 3.0 listen API
-class ProviderListener<T> {
-  final List<T> _values = [];
-  RiverpodSubscription? _subscription;
-
-  List<T> get values => List.unmodifiable(_values);
-  T? get lastValue => _values.isEmpty ? null : _values.last;
-
-  void startListening(
-    ProviderContainer container,
-    Object provider,
-  ) {
-    _subscription = container.listen(
-      provider,
-      (previous, value) {
-        if (value is T) {
-          _values.add(value);
-        }
-      },
-      fireImmediately: true,
-    );
-  }
-
-  void reset() {
-    _values.clear();
-  }
-
-  void dispose() {
-    _subscription?.close();
-    _subscription = null;
-  }
-}
-
-/// Extension method to add a listener to a provider in a container.
-///
-/// Riverpod 3.0 Migration:
-/// - ProviderListenable is no longer available
-/// - Uses provider listen API directly
-extension ProviderContainerExtension on ProviderContainer {
-  /// Adds a listener to the specified provider and returns a [ProviderListener]
-  /// that can be used to track state changes.
-  ProviderListener<T> listenToProvider<T>(Object provider) {
-    final listener = ProviderListener<T>();
-    listener.startListening(this, provider);
-    addTearDown(listener.dispose);
-    return listener;
-  }
 }

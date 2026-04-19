@@ -4,47 +4,51 @@ import '../notifiers/manual_sync_notifier.dart' show manualSyncProvider;
 import '../notifiers/sync_state_notifier.dart' show syncStateProvider;
 import '../state/manual_sync_state.dart';
 import '../state/sync_state.dart';
-import 'service_providers.dart' show syncServiceProvider, loggingServiceProvider;
+import 'service_providers.dart' show syncServiceProvider;
 
 // ============================================================================
 // MANUAL SYNC PROVIDERS
 // ============================================================================
-// The ManualSyncNotifier class has been migrated to Riverpod 3.0 using @riverpod.
+// The ManualSyncNotifier has been migrated to Riverpod 3.0 AsyncNotifier.
 // Use the auto-generated `manualSyncProvider` from manual_sync_notifier.dart.
-// The @riverpod annotation automatically generates the provider with dependencies
-// injected via ref.watch() in the build() method.
+// The provider now exposes AsyncValue<ManualSyncState>.
+// Use ref.watch(manualSyncProvider) to get AsyncValue<ManualSyncState>.
+// Use .value or .when() to access the state.
 
-/// Provider for current manual sync state
+/// Provider for current manual sync state (unwrapped from AsyncValue)
 ///
-/// Provides direct access to the current manual sync state.
-final manualSyncStateProvider = Provider<ManualSyncState>((ref) {
-  return ref.watch(manualSyncProvider);
+/// Provides direct access to the current manual sync state, or null
+/// if loading/error. Use manualSyncProvider directly for full AsyncValue
+/// handling with loading/error states.
+final manualSyncStateProvider = Provider<ManualSyncState?>((ref) {
+  return ref.watch(manualSyncProvider).value;
 });
 
 /// Provider for whether a manual sync is in progress
 ///
-/// Provides a boolean indicating if sync is currently running.
+/// True when AsyncValue is in loading state.
 /// Useful for showing loading indicators and disabling sync buttons.
 final isSyncingProvider = Provider<bool>((ref) {
-  final state = ref.watch(manualSyncProvider);
-  return state.isSyncing;
+  final asyncState = ref.watch(manualSyncProvider);
+  // Loading state means syncing
+  if (asyncState.isLoading) return true;
+  // Also check if the status says syncing
+  return asyncState.value?.isSyncing ?? false;
 });
 
 /// Provider for last manual sync success status
 ///
 /// Provides the success status of the last manual sync.
-/// Returns null if no sync has been performed yet.
+/// Returns null if no sync has been performed yet or state is loading.
 final lastSyncSuccessProvider = Provider<bool?>((ref) {
-  final state = ref.watch(manualSyncProvider);
-  return state.lastSyncSuccess;
+  return ref.watch(manualSyncProvider).value?.lastSyncSuccess;
 });
 
 /// Provider for sync status
 ///
 /// Provides the current sync status from the manual sync state.
-final syncStatusProvider = Provider<SyncOperationStatus>((ref) {
-  final state = ref.watch(manualSyncProvider);
-  return state.status;
+final syncStatusProvider = Provider<SyncOperationStatus?>((ref) {
+  return ref.watch(manualSyncProvider).value?.status;
 });
 
 /// Provider for sync result summary
@@ -52,9 +56,9 @@ final syncStatusProvider = Provider<SyncOperationStatus>((ref) {
 /// Provides a formatted string summary of the last sync result.
 /// Useful for displaying sync results to users.
 final syncResultSummaryProvider = Provider<String?>((ref) {
-  final state = ref.watch(manualSyncProvider);
+  final state = ref.watch(manualSyncProvider).value;
 
-  if (!state.hasResults) {
+  if (state == null || !state.hasResults) {
     return null;
   }
 
@@ -66,7 +70,8 @@ final syncResultSummaryProvider = Provider<String?>((ref) {
           '${state.failureCount} ${_pluralize('failure', state.failureCount)}';
     }
   } else if (state.lastSyncSuccess == false) {
-    return 'Sync failed: ${state.errorMessage ?? "Unknown error"}';
+    // Error message is now in AsyncValue.error, not in state
+    return 'Sync failed';
   }
 
   return null;
@@ -93,13 +98,14 @@ final hasPendingOperationsProvider = Provider<bool>((ref) {
 ///
 /// Provides a user-friendly text representation of the sync status.
 final syncStatusTextProvider = Provider<String>((ref) {
-  final state = ref.watch(manualSyncProvider);
+  final asyncState = ref.watch(manualSyncProvider);
+  final state = asyncState.value;
 
-  if (state.isSyncing) {
+  if (asyncState.isLoading || state?.isSyncing == true) {
     return 'Syncing...';
   }
 
-  if (!state.hasResults) {
+  if (state == null || !state.hasResults) {
     return 'Ready to sync';
   }
 
@@ -118,8 +124,7 @@ final syncStatusTextProvider = Provider<String>((ref) {
 ///
 /// Provides the timestamp of the last completed sync, if any.
 final lastSyncTimeProvider = Provider<DateTime?>((ref) {
-  final state = ref.watch(manualSyncProvider);
-  return state.completedAt;
+  return ref.watch(manualSyncProvider).value?.completedAt;
 });
 
 /// Helper function to pluralize words
@@ -130,24 +135,18 @@ String _pluralize(String word, int count) {
 // ============================================================================
 // COMPREHENSIVE SYNC STATE PROVIDERS
 // ============================================================================
-// These providers track ALL sync state changes (not just manual sync)
-// and ensure all UI components receive immediate updates when sync state changes.
-
-// ============================================================================
-// COMPREHENSIVE SYNC STATE PROVIDERS
-// ============================================================================
-// The SyncStateNotifier class has been migrated to Riverpod 3.0 using @riverpod.
+// The SyncStateNotifier has been migrated to Riverpod 3.0 AsyncNotifier.
 // Use the auto-generated `syncStateProvider` from sync_state_notifier.dart.
-// The @riverpod annotation automatically generates the provider with dependencies
-// injected via ref.watch() in the build() method.
+// The provider now exposes AsyncValue<SyncState>.
 
-/// Provider for current comprehensive sync state
+/// Provider for current comprehensive sync state (unwrapped from AsyncValue)
 ///
 /// Note: Use the auto-generated `syncStateProvider` from sync_state_notifier.dart
-/// which directly provides the SyncState. This provider is kept for backward compatibility
-/// and simply watches the generated provider.
-final syncStateProviderOldDeprecated = Provider<SyncState>((ref) {
-  return ref.watch(syncStateProvider);
+/// which directly provides AsyncValue<SyncState>. This provider is kept for
+/// backward compatibility and unwraps the AsyncValue.
+@Deprecated('Use syncStateProvider directly and handle AsyncValue')
+final syncStateProviderOldDeprecated = Provider<SyncState?>((ref) {
+  return ref.watch(syncStateProvider).value;
 });
 
 /// Provider for global sync status
@@ -155,8 +154,8 @@ final syncStateProviderOldDeprecated = Provider<SyncState>((ref) {
 /// Provides the current sync status for all sync operations (not just manual).
 /// Updates immediately when any sync operation changes status.
 final globalSyncOperationStatusProvider = Provider<SyncOperationStatus>((ref) {
-  final state = ref.watch(syncStateProvider);
-  return state.status;
+  final state = ref.watch(syncStateProvider).value;
+  return state?.status ?? SyncOperationStatus.idle;
 });
 
 /// Provider for global syncing state
@@ -164,8 +163,9 @@ final globalSyncOperationStatusProvider = Provider<SyncOperationStatus>((ref) {
 /// Provides a boolean indicating if ANY sync operation is currently running.
 /// Updates immediately when sync starts or stops.
 final isGloballySyncingProvider = Provider<bool>((ref) {
-  final state = ref.watch(syncStateProvider);
-  return state.isSyncing;
+  final asyncState = ref.watch(syncStateProvider);
+  if (asyncState.isLoading) return true;
+  return asyncState.value?.isSyncing ?? false;
 });
 
 /// Provider for global queue size
@@ -173,8 +173,7 @@ final isGloballySyncingProvider = Provider<bool>((ref) {
 /// Provides the current number of operations in the sync queue.
 /// Updates immediately when operations are added or removed from the queue.
 final globalQueueSizeProvider = Provider<int>((ref) {
-  final state = ref.watch(syncStateProvider);
-  return state.queueSize;
+  return ref.watch(syncStateProvider).value?.queueSize ?? 0;
 });
 
 /// Provider for global pending operations state
@@ -182,8 +181,7 @@ final globalQueueSizeProvider = Provider<int>((ref) {
 /// Provides a boolean indicating if there are any pending operations.
 /// Updates immediately when queue state changes.
 final hasGlobalPendingOperationsProvider = Provider<bool>((ref) {
-  final state = ref.watch(syncStateProvider);
-  return state.hasPendingOperations;
+  return ref.watch(syncStateProvider).value?.hasPendingOperations ?? false;
 });
 
 /// Provider for last successful sync time (global)
@@ -191,8 +189,7 @@ final hasGlobalPendingOperationsProvider = Provider<bool>((ref) {
 /// Provides the timestamp of the last successful sync (any type).
 /// Useful for showing "Last synced: Xm ago" indicators.
 final lastSuccessfulSyncTimeProvider = Provider<DateTime?>((ref) {
-  final state = ref.watch(syncStateProvider);
-  return state.lastSuccessfulSyncAt;
+  return ref.watch(syncStateProvider).value?.lastSuccessfulSyncAt;
 });
 
 /// Provider for last sync success status (global)
@@ -200,9 +197,9 @@ final lastSuccessfulSyncTimeProvider = Provider<DateTime?>((ref) {
 /// Provides a boolean indicating if the last sync was successful.
 /// Returns null if no sync has occurred yet.
 final wasLastSyncSuccessfulProvider = Provider<bool?>((ref) {
-  final state = ref.watch(syncStateProvider);
-  if (state.lastSuccessfulSyncAt == null) return null;
-  return state.wasLastSyncSuccessful;
+  final state = ref.watch(syncStateProvider).value;
+  if (state?.lastSuccessfulSyncAt == null) return null;
+  return state!.wasLastSyncSuccessful;
 });
 
 /// Provider for sync status text (global)
@@ -210,7 +207,9 @@ final wasLastSyncSuccessfulProvider = Provider<bool?>((ref) {
 /// Provides a user-friendly text representation of the current sync status.
 /// Updates immediately when sync status changes.
 final globalSyncOperationStatusTextProvider = Provider<String>((ref) {
-  final state = ref.watch(syncStateProvider);
+  final state = ref.watch(syncStateProvider).value;
+
+  if (state == null) return 'Loading...';
 
   switch (state.status) {
     case SyncOperationStatus.syncing:
@@ -234,7 +233,9 @@ final globalSyncOperationStatusTextProvider = Provider<String>((ref) {
 /// Provides detailed status information including counts and timing.
 /// Useful for comprehensive status displays.
 final syncStatusDetailsProvider = Provider<String>((ref) {
-  final state = ref.watch(syncStateProvider);
+  final state = ref.watch(syncStateProvider).value;
+
+  if (state == null) return 'Loading...';
 
   final buffer = StringBuffer();
 

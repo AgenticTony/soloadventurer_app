@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:soloadventurer/core/widgets/spacing.dart';
 
 /// A read-only viewer for rich text content in journal entries
 ///
@@ -116,7 +115,7 @@ class RichTextViewer extends StatelessWidget {
             quote: quill.DefaultTextBlockStyle(
               theme.textTheme.bodyMedium!.copyWith(
                 fontStyle: FontStyle.italic,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               const quill.HorizontalSpacing(8, 4),
               const quill.VerticalSpacing(0, 0),
@@ -159,7 +158,7 @@ class RichTextViewer extends StatelessWidget {
     try {
       final decoded = jsonDecode(jsonString);
       if (decoded is List) {
-        return decoded as List<dynamic>;
+        return decoded;
       }
       if (decoded is Map) {
         return [decoded];

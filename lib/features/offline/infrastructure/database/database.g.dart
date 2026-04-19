@@ -6013,6 +6013,41 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $SyncMetadataTableTable(this);
   late final $ItinerariesTable itineraries = $ItinerariesTable(this);
   late final $ItineraryItemsTable itineraryItems = $ItineraryItemsTable(this);
+  late final Index idxTripsUserId = Index(
+      'idx_trips_userId', 'CREATE INDEX idx_trips_userId ON trips (user_id)');
+  late final Index idxTripsStatus = Index(
+      'idx_trips_status', 'CREATE INDEX idx_trips_status ON trips (status)');
+  late final Index idxTripsIsSynced = Index('idx_trips_isSynced',
+      'CREATE INDEX idx_trips_isSynced ON trips (is_synced)');
+  late final Index idxJournalsTripId = Index('idx_journals_tripId',
+      'CREATE INDEX idx_journals_tripId ON journals (trip_id)');
+  late final Index idxJournalsUserId = Index('idx_journals_userId',
+      'CREATE INDEX idx_journals_userId ON journals (user_id)');
+  late final Index idxJournalsIsSynced = Index('idx_journals_isSynced',
+      'CREATE INDEX idx_journals_isSynced ON journals (is_synced)');
+  late final Index idxUsersId =
+      Index('idx_users_id', 'CREATE INDEX idx_users_id ON users (id)');
+  late final Index idxSyncqueueStatus = Index('idx_syncqueue_status',
+      'CREATE INDEX idx_syncqueue_status ON sync_queue (status)');
+  late final Index idxSyncqueuePriority = Index('idx_syncqueue_priority',
+      'CREATE INDEX idx_syncqueue_priority ON sync_queue (priority)');
+  late final Index idxSyncqueueEntityType = Index('idx_syncqueue_entityType',
+      'CREATE INDEX idx_syncqueue_entityType ON sync_queue (entity_type)');
+  late final Index idxSyncqueueStatusPriority = Index(
+      'idx_syncqueue_status_priority',
+      'CREATE INDEX idx_syncqueue_status_priority ON sync_queue (status, priority)');
+  late final Index idxSyncmetadataEntityType = Index(
+      'idx_syncmetadata_entityType',
+      'CREATE INDEX idx_syncmetadata_entityType ON sync_metadata_table (entity_type)');
+  late final Index idxItinerariesUserId = Index('idx_itineraries_userId',
+      'CREATE INDEX idx_itineraries_userId ON itineraries (user_id)');
+  late final Index idxItinerariesIsSynced = Index('idx_itineraries_isSynced',
+      'CREATE INDEX idx_itineraries_isSynced ON itineraries (is_synced)');
+  late final Index idxItineraryitemsItineraryId = Index(
+      'idx_itineraryitems_itineraryId',
+      'CREATE INDEX idx_itineraryitems_itineraryId ON itinerary_items (itinerary_id)');
+  late final Index idxItineraryitemsId = Index('idx_itineraryitems_id',
+      'CREATE INDEX idx_itineraryitems_id ON itinerary_items (id)');
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -6024,7 +6059,23 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         syncQueue,
         syncMetadataTable,
         itineraries,
-        itineraryItems
+        itineraryItems,
+        idxTripsUserId,
+        idxTripsStatus,
+        idxTripsIsSynced,
+        idxJournalsTripId,
+        idxJournalsUserId,
+        idxJournalsIsSynced,
+        idxUsersId,
+        idxSyncqueueStatus,
+        idxSyncqueuePriority,
+        idxSyncqueueEntityType,
+        idxSyncqueueStatusPriority,
+        idxSyncmetadataEntityType,
+        idxItinerariesUserId,
+        idxItinerariesIsSynced,
+        idxItineraryitemsItineraryId,
+        idxItineraryitemsId
       ];
 }
 

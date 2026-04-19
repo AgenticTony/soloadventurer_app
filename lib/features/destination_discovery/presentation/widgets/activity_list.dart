@@ -124,7 +124,6 @@ class ActivityList extends StatelessWidget {
       case ActivityListLayout.horizontal:
         return _buildHorizontalLayout(context, theme);
       case ActivityListLayout.list:
-      default:
         return _buildVerticalLayout(context, theme);
     }
   }
@@ -272,6 +271,7 @@ class _ActivityCard extends StatelessWidget {
       button: onTap != null,
       child: Card(
         elevation: 2,
+        clipBehavior: Clip.hardEdge,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

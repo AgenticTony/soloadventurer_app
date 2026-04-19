@@ -1,18 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/destination_discovery/application/providers/filter_provider.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
 
 void main() {
-  late FilterNotifier notifier;
+  late ProviderContainer container;
+  late Filter notifier;
 
   setUp(() {
-    notifier = FilterNotifier();
+    container = ProviderContainer.test();
+    addTearDown(container.dispose);
+    notifier = container.read(filterProvider.notifier);
   });
 
-  group('FilterNotifier', () {
+  group('Filter', () {
     group('initial state', () {
       test('should start with default filter', () {
-        expect(notifier.state, const DestinationFilter());
+        expect(notifier.state, equals(DestinationFilter()));
         expect(notifier.hasActiveFilters, isFalse);
         expect(notifier.activeFilterCount, 0);
       });
@@ -20,15 +24,15 @@ void main() {
 
     group('updateFilter', () {
       test('should replace entire filter', () {
-        final newFilter = const DestinationFilter(
+        final newFilter = DestinationFilter(
           searchQuery: 'Tokyo',
-          budgetLevel: BudgetLevel.moderate,
+          budgetLevel: BudgetLevel.midRange,
         );
 
         notifier.updateFilter(newFilter);
 
         expect(notifier.state.searchQuery, 'Tokyo');
-        expect(notifier.state.budgetLevel, BudgetLevel.moderate);
+        expect(notifier.state.budgetLevel, BudgetLevel.midRange);
       });
     });
 
@@ -95,9 +99,9 @@ void main() {
 
     group('updateActivityLevel', () {
       test('should update activity level', () {
-        notifier.updateActivityLevel(ActivityLevel.adventurous);
+        notifier.updateActivityLevel(ActivityLevel.extreme);
 
-        expect(notifier.activityLevel, ActivityLevel.adventurous);
+        expect(notifier.activityLevel, ActivityLevel.extreme);
       });
 
       test('should clear activity level with null', () {
@@ -312,7 +316,7 @@ void main() {
     group('reset', () {
       test('should reset all filters to default', () {
         notifier.updateSearchQuery('Tokyo');
-        notifier.updateBudgetLevel(BudgetLevel.moderate);
+        notifier.updateBudgetLevel(BudgetLevel.midRange);
         notifier.updateMinSafetyScore(8.0);
         notifier.updateTags(['urban']);
         notifier.updateHiddenGemsOnly(true);
@@ -331,7 +335,7 @@ void main() {
     group('resetSoftFilters', () {
       test('should reset only soft filters', () {
         notifier.updateSearchQuery('Tokyo');
-        notifier.updateBudgetLevel(BudgetLevel.moderate);
+        notifier.updateBudgetLevel(BudgetLevel.midRange);
         notifier.updateCountryCode('JP');
         notifier.updateTags(['urban']);
         notifier.updateHiddenGemsOnly(true);
@@ -341,7 +345,7 @@ void main() {
         expect(notifier.searchQuery, isNull);
         expect(notifier.tags, isNull);
         expect(notifier.hiddenGemsOnly, isFalse);
-        expect(notifier.budgetLevel, BudgetLevel.moderate); // Preserved
+        expect(notifier.budgetLevel, BudgetLevel.midRange); // Preserved
         expect(notifier.countryCode, 'JP'); // Preserved
       });
     });
@@ -380,14 +384,14 @@ void main() {
       });
 
       test('should return false when hard filters are active', () {
-        notifier.updateBudgetLevel(BudgetLevel.moderate);
+        notifier.updateBudgetLevel(BudgetLevel.midRange);
 
         expect(notifier.hasOnlySoftFilters, isFalse);
       });
 
       test('should return false when both types are active', () {
         notifier.updateSearchQuery('Tokyo');
-        notifier.updateBudgetLevel(BudgetLevel.moderate);
+        notifier.updateBudgetLevel(BudgetLevel.midRange);
 
         expect(notifier.hasOnlySoftFilters, isFalse);
       });
@@ -400,7 +404,7 @@ void main() {
         notifier.updateSearchQuery('Tokyo');
         expect(notifier.activeFilterCount, 1);
 
-        notifier.updateBudgetLevel(BudgetLevel.moderate);
+        notifier.updateBudgetLevel(BudgetLevel.midRange);
         expect(notifier.activeFilterCount, 2);
 
         notifier.updateMinSafetyScore(8.0);
@@ -424,7 +428,7 @@ void main() {
       test('should handle multiple filter updates', () {
         notifier
           ..updateSearchQuery('Japan')
-          ..updateBudgetLevel(BudgetLevel.moderate)
+          ..updateBudgetLevel(BudgetLevel.midRange)
           ..updateMinSafetyScore(7.5)
           ..updateActivityLevel(ActivityLevel.moderate)
           ..updateCountryCode('JP')
@@ -433,7 +437,7 @@ void main() {
 
         expect(notifier.activeFilterCount, 6);
         expect(notifier.searchQuery, 'Japan');
-        expect(notifier.budgetLevel, BudgetLevel.moderate);
+        expect(notifier.budgetLevel, BudgetLevel.midRange);
         expect(notifier.tags?.length, 2);
       });
 

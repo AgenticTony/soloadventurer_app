@@ -10,12 +10,10 @@ void main() {
 
         expect(state.status, SyncOperationStatus.idle);
         expect(state.queueSize, 0);
-        expect(state.isProcessing, false);
         expect(state.lastStatusChangeAt, isNull);
         expect(state.lastSuccessfulSyncAt, isNull);
         expect(state.lastSuccessCount, 0);
         expect(state.lastFailureCount, 0);
-        expect(state.lastError, isNull);
         expect(state.hasPendingOperations, false);
       });
 
@@ -117,12 +115,10 @@ void main() {
         final updated = initial.copyWith(
           status: SyncOperationStatus.syncing,
           queueSize: 5,
-          isProcessing: true,
         );
 
         expect(updated.status, SyncOperationStatus.syncing);
         expect(updated.queueSize, 5);
-        expect(updated.isProcessing, true);
         expect(updated.lastStatusChangeAt, isNull); // Unchanged
       });
 
@@ -130,65 +126,28 @@ void main() {
         final original = SyncState(
           status: SyncOperationStatus.syncing,
           queueSize: 5,
-          isProcessing: true,
           lastStatusChangeAt: DateTime(2026, 1, 1),
-          lastError: 'Test error',
         );
         final copied = original.copyWith(status: SyncOperationStatus.success);
 
         expect(copied.status, SyncOperationStatus.success);
         expect(copied.queueSize, 5);
-        expect(copied.isProcessing, true);
         expect(copied.lastStatusChangeAt, DateTime(2026, 1, 1));
-        expect(copied.lastError, 'Test error');
-      });
-
-      test('copyWith clearLastError removes error', () {
-        const withError = SyncState(
-          status: SyncOperationStatus.failed,
-          lastError: 'Test error',
-        );
-        final withoutError = withError.copyWith(clearLastError: true);
-
-        expect(withoutError.lastError, isNull);
-      });
-
-      test('copyWith can update lastError with new value', () {
-        const state = SyncState(
-            status: SyncOperationStatus.failed, lastError: 'Old error');
-        final updated = state.copyWith(lastError: 'New error');
-
-        expect(updated.lastError, 'New error');
-      });
-
-      test('copyWith with clearLastError=true overrides lastError parameter',
-          () {
-        const state = SyncState(
-            status: SyncOperationStatus.failed, lastError: 'Old error');
-        final updated = state.copyWith(
-          lastError: 'New error',
-          clearLastError: true,
-        );
-
-        expect(updated.lastError, isNull);
       });
     });
 
-    group('Equatable', () {
+    group('Equality', () {
       test('two states with same values are equal', () {
         const state1 = SyncState(
           status: SyncOperationStatus.syncing,
           queueSize: 5,
-          isProcessing: true,
         );
         const state2 = SyncState(
           status: SyncOperationStatus.syncing,
           queueSize: 5,
-          isProcessing: true,
         );
 
         expect(state1, equals(state2));
-        expect(state1.hashCode, equals(state2.hashCode));
       });
 
       test('two states with different values are not equal', () {
@@ -199,51 +158,6 @@ void main() {
 
         expect(state1, isNot(equals(state2)));
       });
-
-      test('props includes all fields', () {
-        final state = SyncState(
-          status: SyncOperationStatus.syncing,
-          queueSize: 5,
-          isProcessing: true,
-          lastStatusChangeAt: DateTime(2026, 1, 1),
-          lastSuccessfulSyncAt: DateTime(2026, 1, 2),
-          lastSuccessCount: 10,
-          lastFailureCount: 2,
-          lastError: 'Test',
-          hasPendingOperations: true,
-        );
-
-        expect(state.props.length, 9);
-        expect(state.props, contains(state.status));
-        expect(state.props, contains(state.queueSize));
-        expect(state.props, contains(state.isProcessing));
-        expect(state.props, contains(state.lastStatusChangeAt));
-        expect(state.props, contains(state.lastSuccessfulSyncAt));
-        expect(state.props, contains(state.lastSuccessCount));
-        expect(state.props, contains(state.lastFailureCount));
-        expect(state.props, contains(state.lastError));
-        expect(state.props, contains(state.hasPendingOperations));
-      });
-    });
-
-    group('toString', () {
-      test('toString includes important fields', () {
-        const state = SyncState(
-          status: SyncOperationStatus.syncing,
-          queueSize: 5,
-          isProcessing: true,
-          lastSuccessCount: 10,
-          lastFailureCount: 2,
-        );
-
-        final str = state.toString();
-
-        expect(str, contains('syncing'));
-        expect(str, contains('queueSize: 5'));
-        expect(str, contains('isProcessing: true'));
-        expect(str, contains('lastSuccessCount: 10'));
-        expect(str, contains('lastFailureCount: 2'));
-      });
     });
 
     group('State Transitions', () {
@@ -251,33 +165,27 @@ void main() {
         final idle = SyncState.initial();
         final syncing = idle.copyWith(
           status: SyncOperationStatus.syncing,
-          isProcessing: true,
           lastStatusChangeAt: DateTime.now(),
         );
 
         expect(syncing.status, SyncOperationStatus.syncing);
-        expect(syncing.isProcessing, true);
         expect(syncing.isSyncing, true);
       });
 
       test('syncing to success transition', () {
         const syncing = SyncState(
           status: SyncOperationStatus.syncing,
-          isProcessing: true,
           queueSize: 10,
         );
         final success = syncing.copyWith(
           status: SyncOperationStatus.success,
-          isProcessing: false,
           lastSuccessCount: 10,
           lastFailureCount: 0,
           lastSuccessfulSyncAt: DateTime.now(),
           lastStatusChangeAt: DateTime.now(),
-          clearLastError: true,
         );
 
         expect(success.status, SyncOperationStatus.success);
-        expect(success.isProcessing, false);
         expect(success.isSyncing, false);
         expect(success.wasLastSyncSuccessful, true);
         expect(success.lastSuccessCount, 10);
@@ -287,22 +195,17 @@ void main() {
       test('syncing to failure transition', () {
         const syncing = SyncState(
           status: SyncOperationStatus.syncing,
-          isProcessing: true,
           queueSize: 5,
         );
         final failed = syncing.copyWith(
           status: SyncOperationStatus.failed,
-          isProcessing: false,
           lastFailureCount: 5,
-          lastError: 'Network error',
           lastStatusChangeAt: DateTime.now(),
         );
 
         expect(failed.status, SyncOperationStatus.failed);
-        expect(failed.isProcessing, false);
         expect(failed.isSyncing, false);
         expect(failed.didLastSyncFail, true);
-        expect(failed.lastError, 'Network error');
       });
 
       test('queue change updates hasPendingOperations', () {
@@ -324,12 +227,10 @@ void main() {
         final state = SyncState(
           status: SyncOperationStatus.syncing,
           queueSize: 5,
-          isProcessing: true,
           lastStatusChangeAt: now,
           lastSuccessfulSyncAt: now,
           lastSuccessCount: 10,
           lastFailureCount: 2,
-          lastError: 'Test error',
           hasPendingOperations: true,
         );
 
@@ -337,12 +238,10 @@ void main() {
 
         expect(json['status'], 'syncing');
         expect(json['queueSize'], 5);
-        expect(json['isProcessing'], true);
         expect(json['lastStatusChangeAt'], now.toIso8601String());
         expect(json['lastSuccessfulSyncAt'], now.toIso8601String());
         expect(json['lastSuccessCount'], 10);
         expect(json['lastFailureCount'], 2);
-        expect(json['lastError'], 'Test error');
         expect(json['hasPendingOperations'], true);
       });
 
@@ -351,12 +250,10 @@ void main() {
         final json = {
           'status': 'syncing',
           'queueSize': 5,
-          'isProcessing': true,
           'lastStatusChangeAt': now.toIso8601String(),
           'lastSuccessfulSyncAt': now.toIso8601String(),
           'lastSuccessCount': 10,
           'lastFailureCount': 2,
-          'lastError': 'Test error',
           'hasPendingOperations': true,
         };
 
@@ -365,19 +262,17 @@ void main() {
         expect(state, isNotNull);
         expect(state!.status, SyncOperationStatus.syncing);
         expect(state.queueSize, 5);
-        expect(state.isProcessing, true);
         expect(state.lastStatusChangeAt, now);
         expect(state.lastSuccessfulSyncAt, now);
         expect(state.lastSuccessCount, 10);
         expect(state.lastFailureCount, 2);
-        expect(state.lastError, 'Test error');
         expect(state.hasPendingOperations, true);
       });
 
       test('fromJson returns null for invalid JSON', () {
         expect(SyncState.fromJson({}), isNull);
         expect(SyncState.fromJson({'status': 'invalid'}), isNull);
-        expect(SyncState.fromJson(null), isNull);
+        expect(SyncState.fromJson(<String, dynamic>{}), isNull);
       });
 
       test('fromJson handles missing optional fields', () {
@@ -388,12 +283,10 @@ void main() {
         expect(state, isNotNull);
         expect(state!.status, SyncOperationStatus.idle);
         expect(state.queueSize, 0);
-        expect(state.isProcessing, false);
         expect(state.lastStatusChangeAt, isNull);
         expect(state.lastSuccessfulSyncAt, isNull);
         expect(state.lastSuccessCount, 0);
         expect(state.lastFailureCount, 0);
-        expect(state.lastError, isNull);
         expect(state.hasPendingOperations, false);
       });
 
@@ -430,12 +323,10 @@ void main() {
         final original = SyncState(
           status: SyncOperationStatus.failed,
           queueSize: 3,
-          isProcessing: false,
           lastStatusChangeAt: now,
           lastSuccessfulSyncAt: now.subtract(const Duration(days: 1)),
           lastSuccessCount: 7,
           lastFailureCount: 3,
-          lastError: 'Network timeout',
           hasPendingOperations: true,
         );
 
@@ -445,12 +336,10 @@ void main() {
         expect(restored, isNotNull);
         expect(restored!.status, original.status);
         expect(restored.queueSize, original.queueSize);
-        expect(restored.isProcessing, original.isProcessing);
         expect(restored.lastStatusChangeAt, original.lastStatusChangeAt);
         expect(restored.lastSuccessfulSyncAt, original.lastSuccessfulSyncAt);
         expect(restored.lastSuccessCount, original.lastSuccessCount);
         expect(restored.lastFailureCount, original.lastFailureCount);
-        expect(restored.lastError, original.lastError);
         expect(restored.hasPendingOperations, original.hasPendingOperations);
       });
 

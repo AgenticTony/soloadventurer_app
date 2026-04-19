@@ -8,36 +8,30 @@ part of 'check_in_provider.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Notifier for managing check-in state
-/// Handles check-in creation, completion, scheduling, and cancellation
+/// AsyncNotifier for managing check-in state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 
 @ProviderFor(CheckInNotifier)
 const checkInProvider = CheckInNotifierProvider._();
 
-/// Notifier for managing check-in state
-/// Handles check-in creation, completion, scheduling, and cancellation
+/// AsyncNotifier for managing check-in state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 final class CheckInNotifierProvider
-    extends $NotifierProvider<CheckInNotifier, CheckInState> {
-  /// Notifier for managing check-in state
-  /// Handles check-in creation, completion, scheduling, and cancellation
+    extends $AsyncNotifierProvider<CheckInNotifier, CheckInState> {
+  /// AsyncNotifier for managing check-in state.
   ///
   /// Riverpod 3.0 Compliant:
-  /// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-  /// - NO getters in state - all derived values are fields
-  /// - UI reads STATE only via ref.watch()
-  /// - UI calls methods via ref.read(provider.notifier)
+  /// - Uses @riverpod annotation with code generation
+  /// - AsyncNotifier with AsyncValue handles loading/error
+  /// - State no longer has isLoading/error fields
   const CheckInNotifierProvider._()
       : super(
           from: null,
@@ -55,37 +49,27 @@ final class CheckInNotifierProvider
   @$internal
   @override
   CheckInNotifier create() => CheckInNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(CheckInState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<CheckInState>(value),
-    );
-  }
 }
 
-String _$checkInNotifierHash() => r'5f03485d2f8003002814898dac134ba82296eacf';
+String _$checkInNotifierHash() => r'49533cea7a60c7d7948028da729a1c1c8c96bd1d';
 
-/// Notifier for managing check-in state
-/// Handles check-in creation, completion, scheduling, and cancellation
+/// AsyncNotifier for managing check-in state.
 ///
 /// Riverpod 3.0 Compliant:
-/// - Uses @riverpod annotation with autoDispose (auto-disposes when unused)
-/// - NO getters in state - all derived values are fields
-/// - UI reads STATE only via ref.watch()
-/// - UI calls methods via ref.read(provider.notifier)
+/// - Uses @riverpod annotation with code generation
+/// - AsyncNotifier with AsyncValue handles loading/error
+/// - State no longer has isLoading/error fields
 
-abstract class _$CheckInNotifier extends $Notifier<CheckInState> {
-  CheckInState build();
+abstract class _$CheckInNotifier extends $AsyncNotifier<CheckInState> {
+  FutureOr<CheckInState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<CheckInState, CheckInState>;
+    final ref = this.ref as $Ref<AsyncValue<CheckInState>, CheckInState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<CheckInState, CheckInState>,
-        CheckInState,
+        AnyNotifier<AsyncValue<CheckInState>, CheckInState>,
+        AsyncValue<CheckInState>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

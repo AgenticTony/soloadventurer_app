@@ -63,7 +63,7 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$profileRepositoryHash() => r'45bd3a1bbd53c4a3198803ee58b6aa1fbe913c7b';
+String _$profileRepositoryHash() => r'e0b79caa98e6c3db5c45b5c2c21962bbdb20dfa3';
 
 @ProviderFor(getCurrentProfileUseCase)
 const getCurrentProfileUseCaseProvider = GetCurrentProfileUseCaseProvider._();
@@ -413,7 +413,7 @@ final class ProfileNavigationHistoryProvider extends $NotifierProvider<
 }
 
 String _$profileNavigationHistoryHash() =>
-    r'04858809b252c44e3a25dbb2035dc547e646dcd0';
+    r'df5c1f4bb610f5f220c69c99e786fd9f331760d2';
 
 abstract class _$ProfileNavigationHistory
     extends $Notifier<ProfileNavigationState> {

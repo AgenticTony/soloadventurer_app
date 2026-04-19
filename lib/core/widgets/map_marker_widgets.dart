@@ -471,12 +471,6 @@ class _MapClusterWidgetState extends State<MapClusterWidget>
   }
 }
 
-/// Constants for cluster sizing
-class _ClusterSizeConstants {
-  static const double minSize = 40.0;
-  static const double maxSize = 80.0;
-}
-
 /// Zoom-aware cluster widget that adjusts size and style based on map zoom level
 ///
 /// This widget automatically adjusts cluster size, color, and text style
@@ -722,7 +716,8 @@ class ClusterTypeIcons extends StatelessWidget {
     final displayTypes = uniqueTypes.take(maxIcons).toList();
     final remainingCount = uniqueTypes.length - maxIcons;
 
-    return Row(
+    return FittedBox(
+      child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         ...displayTypes.map((type) => _buildTypeIcon(type)),
@@ -748,6 +743,7 @@ class ClusterTypeIcons extends StatelessWidget {
           ),
         ],
       ],
+    ),
     );
   }
 
@@ -836,7 +832,8 @@ class MapClusterWithTypesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return FittedBox(
+      child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         MapClusterWidget(
@@ -852,6 +849,7 @@ class MapClusterWithTypesWidget extends StatelessWidget {
           ),
         ],
       ],
+    ),
     );
   }
 }

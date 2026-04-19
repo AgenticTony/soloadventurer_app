@@ -42,8 +42,9 @@ void main() {
         // Max attempts of 0 means no retries
         expect(operation.shouldRetry(0), false);
 
-        // Max attempts of 1 means 1 retry (original attempt)
-        expect(operation.shouldRetry(1), false); // 0 is not < 1, so no retry
+        // Max attempts of 1 means 1 retry allowed (retryCount 0 < maxAttempts 1)
+        expect(operation.shouldRetry(1), true);
+        // But after 1 retry, retryCount=1 is not < maxAttempts=1
         expect(operation.copyWith(retryCount: 1).shouldRetry(1), false);
       });
     });

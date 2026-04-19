@@ -3,16 +3,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
+import 'package:mocktail/mocktail.dart';
 
 void main() {
   group('TokenRefreshScheduler Lifecycle Integration', () {
     late TokenRefreshScheduler scheduler;
     late TokenExpirationTracker tracker;
+    late MockTokenRefreshService mockRefreshService;
 
     setUp(() {
       // Ensure Flutter binding is initialized
       TestWidgetsFlutterBinding.ensureInitialized();
-      tracker = TokenExpirationTracker();
+      mockRefreshService = MockTokenRefreshService();
+      tracker = TokenExpirationTracker(refreshService: mockRefreshService);
       scheduler = TokenRefreshScheduler(expirationTracker: tracker);
     });
 
@@ -243,3 +247,5 @@ void main() {
     });
   });
 }
+
+class MockTokenRefreshService extends Mock implements TokenRefreshService {}

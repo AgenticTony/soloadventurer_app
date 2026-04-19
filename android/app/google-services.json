@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "925419186363",
+    "project_id": "soloadventurer-9780a",
+    "storage_bucket": "soloadventurer-9780a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:925419186363:android:efb77383e6c3492305a19e",
+        "android_client_info": {
+          "package_name": "com.example.soloadventurer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOeMTbf5qUIDefUA5CrQOO3CpqXUkBeo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

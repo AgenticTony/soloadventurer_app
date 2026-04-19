@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 /// Result of a batched query operation
 class BatchResult<T> {
@@ -294,8 +293,6 @@ class QueryBatcher {
       if (existing != null) {
         _deduplicatedQueries++;
         if (debug) {
-          debugPrint('[QueryBatcher] Duplicate query key: "$key" '
-              '(deduplicated, total: $_deduplicatedQueries)');
         }
         return existing.completer.future as Future<BatchResult<T>>;
       }
@@ -311,15 +308,11 @@ class QueryBatcher {
     _totalQueries++;
 
     if (debug) {
-      debugPrint('[QueryBatcher] Added query: "$key" '
-          '(pending: ${_pendingQueries.length})');
     }
 
     // Auto-execute if batch is full
     if (_pendingQueries.length >= config.maxBatchSize) {
       if (debug) {
-        debugPrint('[QueryBatcher] Batch full (${config.maxBatchSize}), '
-            'executing immediately');
       }
       _scheduleExecution();
     } else {
@@ -344,7 +337,6 @@ class QueryBatcher {
 
     if (_pendingQueries.isEmpty) {
       if (debug) {
-        debugPrint('[QueryBatcher] No queries to execute');
       }
       return {};
     }
@@ -355,8 +347,6 @@ class QueryBatcher {
     if (_pendingQueries.any((q) => q.priority != 0)) {
       _pendingQueries.sort((a, b) => a.priority.compareTo(b.priority));
       if (debug) {
-        debugPrint(
-            '[QueryBatcher] Sorted ${_pendingQueries.length} queries by priority');
       }
     }
 
@@ -387,8 +377,6 @@ class QueryBatcher {
     );
 
     if (debug) {
-      debugPrint(
-          '[QueryBatcher] Batch executed in ${stopwatch.elapsedMilliseconds}ms: $stats');
     }
 
     // Notify callback
@@ -424,19 +412,15 @@ class QueryBatcher {
         _successfulQueries++;
 
         if (debug) {
-          debugPrint('[QueryBatcher] Query "$query.key" succeeded in '
-              '${stopwatch.elapsedMilliseconds}ms');
         }
 
         return result;
-      } catch (error, stackTrace) {
+      } catch (error) {
         stopwatch.stop();
         _failedQueries++;
 
         final errorMessage = error.toString();
         if (debug) {
-          debugPrint('[QueryBatcher] Query "$query.key" failed: $errorMessage');
-          debugPrint(stackTrace.toString());
         }
 
         return BatchResult.failure(
@@ -504,17 +488,13 @@ class QueryBatcher {
         _successfulQueries++;
 
         if (debug) {
-          debugPrint('[QueryBatcher] Query "$query.key" succeeded in '
-              '${stopwatch.elapsedMilliseconds}ms');
         }
-      } catch (error, stackTrace) {
+      } catch (error) {
         stopwatch.stop();
         _failedQueries++;
 
         final errorMessage = error.toString();
         if (debug) {
-          debugPrint('[QueryBatcher] Query "$query.key" failed: $errorMessage');
-          debugPrint(stackTrace.toString());
         }
 
         results[query.key] = BatchResult.failure(
@@ -540,8 +520,6 @@ class QueryBatcher {
     _batchTimer = Timer(config.maxWaitTime, () {
       if (_pendingQueries.isNotEmpty) {
         if (debug) {
-          debugPrint('[QueryBatcher] Max wait time reached, '
-              'executing ${_pendingQueries.length} pending queries');
         }
         execute();
       }
@@ -571,7 +549,6 @@ class QueryBatcher {
     _batchTimer = null;
 
     if (debug && count > 0) {
-      debugPrint('[QueryBatcher] Cancelled $count pending queries');
     }
 
     return count;
@@ -611,7 +588,6 @@ class QueryBatcher {
     _deduplicatedQueries = 0;
 
     if (debug) {
-      debugPrint('[QueryBatcher] Statistics cleared');
     }
   }
 
@@ -625,7 +601,6 @@ class QueryBatcher {
     _disposed = true;
 
     if (debug) {
-      debugPrint('[QueryBatcher] Disposed');
     }
   }
 

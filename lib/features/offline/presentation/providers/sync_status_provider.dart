@@ -1,23 +1,21 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart'
     show SyncManager, SyncStatus, SyncResult, SyncState, SyncPhase;
+import 'package:soloadventurer/features/offline/presentation/providers/sync_manager_provider.dart'
+    show syncManagerProvider;
 
 part 'sync_status_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<SyncStatus> to Notifier<SyncStatus>
+/// - Converted from `StateNotifier<SyncStatus>` to `Notifier<SyncStatus>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - AutoDispose enabled via @Riverpod annotation
 /// - build() returns SyncStatus not AsyncValue
 /// - StreamSubscription management via ref.onDispose()
 /// - Constructor auto-load and stream subscription moved to build() method
 
-@riverpod
-SyncManager syncManager(Ref ref) {
-  return getIt<SyncManager>();
-}
+// syncManager is provided by sync_manager_provider.dart
 
 @riverpod
 Stream<SyncStatus> syncStatusStream(Ref ref) {

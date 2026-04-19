@@ -9,12 +9,12 @@ part of 'saved_destinations_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for saved destinations state management
@@ -59,12 +59,12 @@ part of 'saved_destinations_provider.dart';
 const savedDestinationsProvider = SavedDestinationsFamily._();
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for saved destinations state management
@@ -107,12 +107,12 @@ const savedDestinationsProvider = SavedDestinationsFamily._();
 final class SavedDestinationsProvider
     extends $AsyncNotifierProvider<SavedDestinations, SavedDestinationsState> {
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
   /// - Dependencies injected via ref.watch() in build() method
   /// - Family provider with userId parameter in build()
   /// - AutoDispose enabled via @Riverpod annotation
-  /// - build() returns Future<T> not AsyncValue<T>
-  /// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+  /// - build() returns `Future<T>` not `AsyncValue<T>`
+  /// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
   /// - Constructor auto-load logic moved to build() method
   ///
   /// Provider for saved destinations state management
@@ -191,12 +191,12 @@ final class SavedDestinationsProvider
 String _$savedDestinationsHash() => r'e991f28dd18ca9ceddf424eab36ae2b547f1d655';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for saved destinations state management
@@ -255,12 +255,12 @@ final class SavedDestinationsFamily extends $Family
         );
 
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
   /// - Dependencies injected via ref.watch() in build() method
   /// - Family provider with userId parameter in build()
   /// - AutoDispose enabled via @Riverpod annotation
-  /// - build() returns Future<T> not AsyncValue<T>
-  /// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+  /// - build() returns `Future<T>` not `AsyncValue<T>`
+  /// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
   /// - Constructor auto-load logic moved to build() method
   ///
   /// Provider for saved destinations state management
@@ -311,12 +311,12 @@ final class SavedDestinationsFamily extends $Family
 }
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<SavedDestinationsState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<SavedDestinationsState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for saved destinations state management

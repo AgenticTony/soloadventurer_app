@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
 import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
-import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 
 /// Offline authentication state
 enum OfflineAuthState {
@@ -34,7 +33,7 @@ class OfflineAuthResult {
   /// Timestamp of the state change
   final DateTime timestamp;
 
-  const OfflineAuthResult({
+  OfflineAuthResult({
     required this.state,
     required this.success,
     this.errorMessage,
@@ -142,7 +141,7 @@ class SyncProgress {
   /// Timestamp of this progress update
   final DateTime timestamp;
 
-  const SyncProgress({
+  SyncProgress({
     required this.step,
     required this.progress,
     this.errorMessage,
@@ -152,7 +151,7 @@ class SyncProgress {
 
   /// Creates a starting progress
   factory SyncProgress.starting() {
-    return const SyncProgress(
+    return SyncProgress(
       step: SyncStep.starting,
       progress: 0,
       isSuccess: false,
@@ -188,7 +187,7 @@ class SyncProgress {
 
   /// Creates a completed progress
   factory SyncProgress.completed() {
-    return const SyncProgress(
+    return SyncProgress(
       step: SyncStep.completed,
       progress: 100,
       isSuccess: true,
@@ -311,27 +310,19 @@ class OfflineAuthManager {
   /// 4. Start listening for connectivity changes
   Future<void> initialize() async {
     if (_isInitialized) {
-      debugPrint('OfflineAuthManager: Already initialized');
       return;
     }
 
-    debugPrint('OfflineAuthManager: Initializing');
-
     try {
       // Check initial network status
-      _lastNetworkStatus = await _connectivityService.checkConnectivity();
-      debugPrint(
-          'OfflineAuthManager: Initial network status: $_lastNetworkStatus');
+      _lastNetworkStatus = await _connectivityService.checkNetworkStatus();
 
       // Determine if we have cached credentials
       final hasCachedCredentials = await _hasCachedCredentials();
-      debugPrint(
-          'OfflineAuthManager: Has cached credentials: $hasCachedCredentials');
 
       // Set initial state
       _currentState =
           _determineInitialState(_lastNetworkStatus, hasCachedCredentials);
-      debugPrint('OfflineAuthManager: Initial state: $_currentState');
 
       // Emit initial state
       _emitState(OfflineAuthResult.success(state: _currentState));
@@ -340,9 +331,7 @@ class OfflineAuthManager {
       _startConnectivityMonitoring();
 
       _isInitialized = true;
-      debugPrint('OfflineAuthManager: Initialization complete');
     } catch (e) {
-      debugPrint('OfflineAuthManager: Initialization failed: $e');
       _currentState = OfflineAuthState.offlineWithoutCache;
       _emitState(OfflineAuthResult.failure(
         errorMessage: 'Initialization failed: ${e.toString()}',
@@ -355,14 +344,12 @@ class OfflineAuthManager {
   ///
   /// Returns [CachedDataInfo] with details about available cached data.
   Future<CachedDataInfo> getCachedDataInfo() async {
-    debugPrint('OfflineAuthManager: Getting cached data info');
 
     try {
       // Get cached user data
       final userData = await _localDataSource.getUserData();
 
       if (userData == null) {
-        debugPrint('OfflineAuthManager: No cached user data found');
         return CachedDataInfo.none();
       }
 
@@ -374,8 +361,7 @@ class OfflineAuthManager {
         try {
           cachedAt = DateTime.parse(cachedAtStr);
         } catch (e) {
-          debugPrint(
-              'OfflineAuthManager: Failed to parse cached_at timestamp: $e');
+        // intentional silent catch
         }
       }
 
@@ -383,19 +369,12 @@ class OfflineAuthManager {
       final isFresh = cachedAt != null &&
           DateTime.now().difference(cachedAt) < _maxCacheAge;
 
-      debugPrint('OfflineAuthManager: Cached data info: ${CachedDataInfo(
-        userProfile: userData,
-        lastCachedAt: cachedAt,
-        isFresh: isFresh,
-      )}');
-
       return CachedDataInfo(
         userProfile: userData,
         lastCachedAt: cachedAt,
         isFresh: isFresh,
       );
     } catch (e) {
-      debugPrint('OfflineAuthManager: Failed to get cached data info: $e');
       return CachedDataInfo.none();
     }
   }
@@ -405,20 +384,16 @@ class OfflineAuthManager {
   /// Returns the cached user profile if available, null otherwise.
   /// This method can be called when offline to access cached user data.
   Future<Map<String, dynamic>?> getCachedUserProfile() async {
-    debugPrint('OfflineAuthManager: Getting cached user profile');
 
     try {
       final userData = await _localDataSource.getUserData();
 
       if (userData == null) {
-        debugPrint('OfflineAuthManager: No cached user profile found');
         return null;
       }
 
-      debugPrint('OfflineAuthManager: Retrieved cached user profile');
       return userData;
     } catch (e) {
-      debugPrint('OfflineAuthManager: Failed to get cached user profile: $e');
       return null;
     }
   }
@@ -431,7 +406,6 @@ class OfflineAuthManager {
       final hasSession = await _localDataSource.hasValidSession();
 
       if (!hasSession) {
-        debugPrint('OfflineAuthManager: No valid cached session found');
         return false;
       }
 
@@ -439,7 +413,6 @@ class OfflineAuthManager {
       final expiration = await _localDataSource.getTokenExpiration();
 
       if (expiration == null) {
-        debugPrint('OfflineAuthManager: No token expiration found in cache');
         return false;
       }
 
@@ -450,12 +423,8 @@ class OfflineAuthManager {
 
       final isValid = daysSinceExpiration <= maxOfflineDays;
 
-      debugPrint('OfflineAuthManager: Cached credentials valid: $isValid '
-          '(expired $daysSinceExpiration days ago, max is $maxOfflineDays days)');
-
       return isValid;
     } catch (e) {
-      debugPrint('OfflineAuthManager: Failed to check cached credentials: $e');
       return false;
     }
   }
@@ -476,35 +445,28 @@ class OfflineAuthManager {
 
   /// Starts monitoring network connectivity changes
   void _startConnectivityMonitoring() {
-    debugPrint('OfflineAuthManager: Starting connectivity monitoring');
 
     _connectivitySubscription =
         _connectivityService.onConnectivityChanged.listen(
       _onConnectivityChanged,
       onError: (error) {
-        debugPrint('OfflineAuthManager: Connectivity monitoring error: $error');
       },
     );
   }
 
   /// Handles network connectivity changes
-  void _onConnectivityChanged(NetworkStatus newStatus) {
-    debugPrint(
-        'OfflineAuthManager: Connectivity changed from $_lastNetworkStatus to $newStatus');
+  Future<void> _onConnectivityChanged(NetworkStatus newStatus) async {
 
     if (newStatus == _lastNetworkStatus) {
-      debugPrint('OfflineAuthManager: Network status unchanged, skipping');
       return;
     }
 
     _lastNetworkStatus = newStatus;
 
     // Update offline state based on connectivity change
-    final newState = _handleConnectivityChange(newStatus);
+    final newState = await _handleConnectivityChange(newStatus);
 
     if (newState != _currentState) {
-      debugPrint(
-          'OfflineAuthManager: State changing from $_currentState to $newState');
       _currentState = newState;
       _emitState(OfflineAuthResult.success(state: newState));
 
@@ -513,18 +475,17 @@ class OfflineAuthManager {
         _onReconnected();
       }
     } else {
-      debugPrint('OfflineAuthManager: State unchanged: $_currentState');
     }
   }
 
   /// Handles a connectivity change and returns the new state
-  OfflineAuthState _handleConnectivityChange(NetworkStatus newStatus) {
+  Future<OfflineAuthState> _handleConnectivityChange(NetworkStatus newStatus) async {
     switch (_currentState) {
       case OfflineAuthState.online:
         // Going offline
         if (newStatus == NetworkStatus.disconnected) {
           // Check if we have cached credentials
-          final hasCache = _hasCachedCredentials();
+          final hasCache = await _hasCachedCredentials();
           return hasCache
               ? OfflineAuthState.offlineWithCache
               : OfflineAuthState.offlineWithoutCache;
@@ -542,7 +503,7 @@ class OfflineAuthManager {
       case OfflineAuthState.needsSync:
         // If we lose connection during sync
         if (newStatus == NetworkStatus.disconnected) {
-          final hasCache = _hasCachedCredentials();
+          final hasCache = await _hasCachedCredentials();
           return hasCache
               ? OfflineAuthState.offlineWithCache
               : OfflineAuthState.offlineWithoutCache;
@@ -553,11 +514,9 @@ class OfflineAuthManager {
 
   /// Handles reconnection to the network
   Future<void> _onReconnected() async {
-    debugPrint('OfflineAuthManager: Reconnected to network');
 
     // Check if we need to sync
     if (_currentState == OfflineAuthState.needsSync) {
-      debugPrint('OfflineAuthManager: Scheduling sync operation');
       // Schedule sync after a short delay to ensure network is stable
       Future.delayed(const Duration(seconds: 1), () {
         if (_currentState == OfflineAuthState.needsSync) {
@@ -580,19 +539,16 @@ class OfflineAuthManager {
   /// Emits [SyncProgress] updates to the [onSyncProgress] stream during the sync process.
   Future<OfflineAuthResult> syncWithServer() async {
     if (_isSyncing) {
-      debugPrint('OfflineAuthManager: Sync already in progress');
       return OfflineAuthResult.success(state: _currentState);
     }
 
     if (_lastNetworkStatus != NetworkStatus.connected) {
-      debugPrint('OfflineAuthManager: Cannot sync while offline');
       return OfflineAuthResult.failure(
         errorMessage: 'Cannot sync while offline',
       );
     }
 
     _isSyncing = true;
-    debugPrint('OfflineAuthManager: Starting sync with server');
 
     // Emit starting progress
     _emitSyncProgress(SyncProgress.starting());
@@ -600,7 +556,6 @@ class OfflineAuthManager {
     try {
       // Step 1: Check if we need to refresh the token
       if (_tokenRefreshService != null) {
-        debugPrint('OfflineAuthManager: Checking if token refresh is needed');
 
         _emitSyncProgress(SyncProgress.refreshingToken(progress: 10));
 
@@ -608,7 +563,6 @@ class OfflineAuthManager {
         final isExpired = await _localDataSource.isTokenExpired();
 
         if (isExpired) {
-          debugPrint('OfflineAuthManager: Token is expired, refreshing...');
 
           _emitSyncProgress(SyncProgress.refreshingToken(progress: 20));
 
@@ -616,11 +570,8 @@ class OfflineAuthManager {
             // Refresh the token using TokenRefreshService
             await _tokenRefreshService.refreshToken();
 
-            debugPrint('OfflineAuthManager: Token refreshed successfully');
-
             _emitSyncProgress(SyncProgress.refreshingToken(progress: 40));
           } catch (e) {
-            debugPrint('OfflineAuthManager: Token refresh failed: $e');
 
             _emitSyncProgress(SyncProgress.failed(
               errorMessage: 'Token refresh failed: ${e.toString()}',
@@ -630,18 +581,13 @@ class OfflineAuthManager {
             // The user might still be able to access cached data
           }
         } else {
-          debugPrint(
-              'OfflineAuthManager: Token is still valid, skipping refresh');
           _emitSyncProgress(SyncProgress.refreshingToken(progress: 40));
         }
       } else {
-        debugPrint(
-            'OfflineAuthManager: TokenRefreshService not available, skipping token refresh');
       }
 
       // Step 2: Sync user data from server
       if (_authRepository != null) {
-        debugPrint('OfflineAuthManager: Fetching fresh user data from server');
 
         _emitSyncProgress(SyncProgress.syncingUserData(progress: 60));
 
@@ -650,7 +596,6 @@ class OfflineAuthManager {
           final user = await _authRepository.getCurrentUser();
 
           if (user != null) {
-            debugPrint('OfflineAuthManager: User data fetched: ${user.email}');
 
             // Cache the user data with current timestamp
             final userData = {
@@ -664,25 +609,18 @@ class OfflineAuthManager {
 
             await _localDataSource.cacheUserData(userData);
 
-            debugPrint('OfflineAuthManager: User data cached successfully');
-
             _emitSyncProgress(SyncProgress.syncingUserData(progress: 80));
           } else {
-            debugPrint('OfflineAuthManager: No user data returned from server');
           }
         } catch (e) {
-          debugPrint('OfflineAuthManager: Failed to fetch user data: $e');
 
           // Don't fail the entire sync if user data sync fails
           // Cached data might still be available
         }
       } else {
-        debugPrint(
-            'OfflineAuthManager: AuthRepository not available, skipping user data sync');
       }
 
       // Step 3: Sync pending changes (placeholder for future implementation)
-      debugPrint('OfflineAuthManager: Checking for pending changes to sync');
       _emitSyncProgress(SyncProgress.syncingPendingChanges(progress: 90));
 
       // TODO: Implement pending changes sync when needed
@@ -691,7 +629,6 @@ class OfflineAuthManager {
 
       // Step 4: Mark sync as complete and transition to online state
       _currentState = OfflineAuthState.online;
-      debugPrint('OfflineAuthManager: Sync complete, now online');
 
       _emitSyncProgress(SyncProgress.completed());
 
@@ -700,7 +637,6 @@ class OfflineAuthManager {
 
       return result;
     } catch (e) {
-      debugPrint('OfflineAuthManager: Sync failed: $e');
 
       _emitSyncProgress(SyncProgress.failed(
         errorMessage: 'Sync failed: ${e.toString()}',
@@ -723,8 +659,6 @@ class OfflineAuthManager {
   /// This method can be used to force a state change, for example
   /// after a successful login or logout.
   void updateState(OfflineAuthState newState) {
-    debugPrint(
-        'OfflineAuthManager: Manual state update from $_currentState to $newState');
 
     if (newState != _currentState) {
       _currentState = newState;
@@ -748,7 +682,6 @@ class OfflineAuthManager {
 
   /// Disposes of the service and stops monitoring connectivity
   void dispose() {
-    debugPrint('OfflineAuthManager: Disposing');
 
     _connectivitySubscription?.cancel();
     _stateController.close();
@@ -757,12 +690,10 @@ class OfflineAuthManager {
     _isInitialized = false;
     _isSyncing = false;
 
-    debugPrint('OfflineAuthManager: Disposed');
   }
 
   /// Resets the service state (useful for testing)
   void reset() {
-    debugPrint('OfflineAuthManager: Resetting state');
 
     _currentState = OfflineAuthState.offlineWithoutCache;
     _lastNetworkStatus = NetworkStatus.disconnected;
@@ -775,12 +706,12 @@ class OfflineAuthManager {
 
   /// Checks if the device is currently offline
   Future<bool> isCurrentlyOffline() async {
-    final status = await _connectivityService.checkConnectivity();
+    final status = await _connectivityService.checkNetworkStatus();
     return status == NetworkStatus.disconnected;
   }
 
   /// Gets the current network status
   Future<NetworkStatus> getCurrentNetworkStatus() async {
-    return await _connectivityService.checkConnectivity();
+    return await _connectivityService.checkNetworkStatus();
   }
 }

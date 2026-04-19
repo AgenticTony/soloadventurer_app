@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/core/services/location_service.dart';
 import 'package:soloadventurer/core/services/places_service.dart';
@@ -6,8 +5,9 @@ import 'package:soloadventurer/core/services/weather_service.dart';
 import 'package:soloadventurer/features/onboarding/domain/entities/date_range.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary_item.dart';
-import 'package:soloadventurer/features/travel/domain/models/place_activity.dart';
 import 'package:soloadventurer/features/travel/domain/models/optimization_suggestion.dart';
+import 'package:soloadventurer/features/travel/domain/models/place_activity.dart';
+import 'package:soloadventurer/features/travel/domain/models/weather_forecast.dart';
 
 /// Service for generating itinerary optimization suggestions
 ///
@@ -133,9 +133,8 @@ class ItineraryOptimizer {
           }
         }
       }
-    } catch (e, stackTrace) {
-      debugPrint('ItineraryOptimizer: Weather optimization failed: $e');
-      debugPrint('StackTrace: $stackTrace');
+    } catch (e) {
+    // intentional silent catch
     }
 
     return suggestions;
@@ -176,9 +175,8 @@ class ItineraryOptimizer {
           }
         }
       }
-    } catch (e, stackTrace) {
-      debugPrint('ItineraryOptimizer: Geographic optimization failed: $e');
-      debugPrint('StackTrace: $stackTrace');
+    } catch (e) {
+    // intentional silent catch
     }
 
     return suggestions;
@@ -222,9 +220,8 @@ class ItineraryOptimizer {
           }
         }
       }
-    } catch (e, stackTrace) {
-      debugPrint('ItineraryOptimizer: Timing optimization failed: $e');
-      debugPrint('StackTrace: $stackTrace');
+    } catch (e) {
+    // intentional silent catch
     }
 
     return suggestions;
@@ -284,9 +281,8 @@ class ItineraryOptimizer {
           ));
         }
       }
-    } catch (e, stackTrace) {
-      debugPrint('ItineraryOptimizer: Travel time optimization failed: $e');
-      debugPrint('StackTrace: $stackTrace');
+    } catch (e) {
+    // intentional silent catch
     }
 
     return suggestions;

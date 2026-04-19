@@ -73,7 +73,7 @@ final class TripDestinationRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$tripDestinationRepositoryHash() =>
-    r'1712a1bbf95a0f5516e834ad97e9b298285f4c63';
+    r'dbc662ca647c84e1315a79ea921363f6791db1bb';
 
 /// Provider for managing trip detail state
 ///
@@ -181,7 +181,7 @@ final class TripDetailProvider
   }
 }
 
-String _$tripDetailHash() => r'48311977bfc93d3a011cc58943641da7564938cd';
+String _$tripDetailHash() => r'106fc2376783d96f3dd060ec9c02cc9b3b3cb7d1';
 
 /// Provider for managing trip detail state
 ///

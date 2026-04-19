@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/core/error/safety_exceptions.dart';
+import 'package:soloadventurer/features/safety/domain/exceptions/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_local_data_source_impl.dart';
 import 'package:soloadventurer/features/safety/data/models/location_update_model.dart';
 import 'package:soloadventurer/features/safety/data/models/safety_status_model.dart';
@@ -100,8 +100,7 @@ void main() {
       final jsonList = existingContacts.map((c) => c.toJson()).toList();
 
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode([...jsonList, newContact.toJson()]));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
@@ -126,8 +125,7 @@ void main() {
       final jsonList = [existingContact.toJson()];
 
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode([updatedContact.toJson()]));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
@@ -186,8 +184,7 @@ void main() {
           jsonList.where((json) => json['id'] != 'contact-1').toList();
 
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode(remainingJson));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
@@ -217,7 +214,9 @@ void main() {
 
     test('should throw SafetyCacheRetrievalException when retrieval fails',
         () async {
-      // Arrange
+      // Arrange - set up a fresh cache so it actually tries to retrieve
+      when(() => mockSharedPreferences.getInt('safety_last_cache_update'))
+          .thenReturn(DateTime.now().millisecondsSinceEpoch);
       when(() => mockSharedPreferences.getString('cached_trusted_contacts'))
           .thenThrow(Exception('Read error'));
 
@@ -312,8 +311,7 @@ void main() {
       final jsonList = existingCheckIns.map((c) => c.toJson()).toList();
 
       when(() => mockSharedPreferences.getString('cached_check_ins'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode([...jsonList, newCheckIn.toJson()]));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
@@ -354,8 +352,7 @@ void main() {
           jsonList.where((json) => json['id'] != 'checkin-1').toList();
 
       when(() => mockSharedPreferences.getString('cached_check_ins'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode(remainingJson));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
@@ -380,7 +377,7 @@ void main() {
         latitude: testLatitude,
         longitude: testLongitude,
         sharingStatus: LocationSharingStatus.active,
-        timestamp: testDateTime,
+        createdAt: testDateTime,
         sharedWithContactIds: [testContactId],
       ),
       LocationUpdateModel(
@@ -389,7 +386,7 @@ void main() {
         latitude: testLatitude,
         longitude: testLongitude,
         sharingStatus: LocationSharingStatus.ended,
-        timestamp: testDateTime,
+        createdAt: testDateTime,
         sharedWithContactIds: [testContactId],
       ),
     ];
@@ -402,7 +399,8 @@ void main() {
           .thenAnswer((_) async => true);
 
       // Act
-      await dataSource.cacheLocationUpdates(testLocationUpdates);
+      await dataSource.cacheLocationUpdates(
+          testLocationUpdates.map((m) => m.toEntity()).toList());
 
       // Assert
       verify(() => mockSharedPreferences.setString(
@@ -452,21 +450,20 @@ void main() {
         latitude: testLatitude,
         longitude: testLongitude,
         sharingStatus: LocationSharingStatus.active,
-        timestamp: testDateTime,
+        createdAt: testDateTime,
         sharedWithContactIds: [testContactId],
       );
       final jsonList = testLocationUpdates.map((u) => u.toJson()).toList();
 
       when(() => mockSharedPreferences.getString('cached_location_updates'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode([...jsonList, newUpdate.toJson()]));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
           .thenAnswer((_) async => true);
 
       // Act
-      await dataSource.cacheLocationUpdate(newUpdate);
+      await dataSource.cacheLocationUpdate(newUpdate.toEntity());
 
       // Assert
       verify(() => mockSharedPreferences.setString(
@@ -549,8 +546,7 @@ void main() {
       final jsonList = testAlerts.map((a) => a.toJson()).toList();
 
       when(() => mockSharedPreferences.getString('cached_safety_alerts'))
-          .thenReturn(jsonEncode(jsonList))
-          .thenReturn(jsonEncode([...jsonList, newAlert.toJson()]));
+          .thenReturn(jsonEncode(jsonList));
       when(() => mockSharedPreferences.setInt(any(), any()))
           .thenAnswer((_) async => true);
       when(() => mockSharedPreferences.setString(any(), any()))
@@ -626,7 +622,7 @@ void main() {
           .thenAnswer((_) async => true);
 
       // Act
-      await dataSource.cacheSafetyStatus(testStatus);
+      await dataSource.cacheSafetyStatus(testStatus.toEntity());
 
       // Assert
       verify(() => mockSharedPreferences.setString(
@@ -638,7 +634,7 @@ void main() {
     test('should retrieve cached safety status', () async {
       // Arrange
       when(() => mockSharedPreferences.getString('cached_safety_status'))
-          .thenReturn(jsonEncode(testStatus.toJson()));
+          .thenReturn(jsonEncode(testStatus.toEntity().toJson()));
       when(() => mockSharedPreferences.getInt('safety_last_cache_update'))
           .thenReturn(DateTime.now().millisecondsSinceEpoch);
 

@@ -1,15 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
 import 'package:soloadventurer/features/journal/data/repositories/journal_repository_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
-import 'package:soloadventurer/features/journal/helpers/journal_test_helpers.dart';
-import '../../../../test_constants.dart';
+import '../../helpers/journal_test_helpers.dart';
 
 class MockJournalRemoteDataSource extends Mock
     implements JournalRemoteDataSource {}
@@ -60,7 +58,7 @@ void main() {
         expect(
           () => repository.createEntry(testEntity),
           throwsA(isA<AppException>().having((e) => e.message, 'message',
-              contains('Failed to create journal entry'))),
+              contains('Database error'))),
         );
       });
 
@@ -124,14 +122,14 @@ void main() {
         expect(
           () => repository.getEntry('non-existent-id'),
           throwsA(isA<AppException>().having((e) => e.message, 'message',
-              contains('Failed to get journal entry'))),
+              contains('Not found'))),
         );
       });
 
       test('should rethrow AppException from data source', () async {
         // Arrange
         when(() => mockRemoteDataSource.getEntry(any()))
-            .thenThrow(const AppException('Custom error'));
+            .thenThrow(const ServerException(message: 'Custom error'));
 
         // Act & Assert
         expect(
@@ -323,7 +321,7 @@ void main() {
 
         // Assert
         expect(result.length, equals(2));
-        expect(result, everyElement(predicate((e) => e.isFavorite)));
+        expect(result, everyElement(predicate((e) => (e as JournalEntry).isFavorite)));
       });
 
       test('should return empty list when no favorites exist', () async {
@@ -376,8 +374,7 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(
-            () => repository.deleteEntry(testEntryId), returnsNormally);
+        await repository.deleteEntry(testEntryId);
         verify(() => mockRemoteDataSource.deleteEntry(testEntryId)).called(1);
       });
 
@@ -397,7 +394,6 @@ void main() {
     group('toggleFavorite', () {
       test('should toggle isFavorite from false to true', () async {
         // Arrange
-        final originalModel = createTestJournalEntryModel(isFavorite: false);
         final updatedModel = createTestJournalEntryModel(isFavorite: true);
         when(() => mockRemoteDataSource.toggleFavorite(any()))
             .thenAnswer((_) async => updatedModel);
@@ -413,7 +409,6 @@ void main() {
 
       test('should toggle isFavorite from true to false', () async {
         // Arrange
-        final originalModel = createTestJournalEntryModel(isFavorite: true);
         final updatedModel = createTestJournalEntryModel(isFavorite: false);
         when(() => mockRemoteDataSource.toggleFavorite(any()))
             .thenAnswer((_) async => updatedModel);
@@ -568,7 +563,7 @@ void main() {
     group('updateMedia', () {
       test('should return updated MediaItem', () async {
         // Arrange
-        final testEntity = createTestMediaItem(caption: 'Updated caption');
+        final testEntity = createTestMediaItem();
         final testModel = createTestMediaItemModel(caption: 'Updated caption');
         when(() => mockRemoteDataSource.updateMedia(any()))
             .thenAnswer((_) async => testModel);
@@ -600,9 +595,8 @@ void main() {
         when(() => mockRemoteDataSource.deleteMedia(any()))
             .thenAnswer((_) async {});
 
-        // Act & Assert
-        await expectLater(
-            () => repository.deleteMedia(testMediaId), returnsNormally);
+        // Act
+        await repository.deleteMedia(testMediaId);
         verify(() => mockRemoteDataSource.deleteMedia(testMediaId)).called(1);
       });
 
@@ -823,10 +817,7 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(
-          () => repository.addTagToEntry(testEntryId, testTagId),
-          returnsNormally,
-        );
+        await repository.addTagToEntry(testEntryId, testTagId);
         verify(() => mockRemoteDataSource.addTagToEntry(testEntryId, testTagId))
             .called(1);
       });
@@ -851,10 +842,7 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(
-          () => repository.removeTagFromEntry(testEntryId, testTagId),
-          returnsNormally,
-        );
+        await repository.removeTagFromEntry(testEntryId, testTagId);
         verify(() =>
                 mockRemoteDataSource.removeTagFromEntry(testEntryId, testTagId))
             .called(1);
@@ -882,10 +870,7 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(
-          () => repository.updateTagsForEntry(testEntryId, tagIds),
-          returnsNormally,
-        );
+        await repository.updateTagsForEntry(testEntryId, tagIds);
         verify(() =>
                 mockRemoteDataSource.updateTagsForEntry(testEntryId, tagIds))
             .called(1);
@@ -898,10 +883,7 @@ void main() {
             .thenAnswer((_) async {});
 
         // Act & Assert
-        await expectLater(
-          () => repository.updateTagsForEntry(testEntryId, tagIds),
-          returnsNormally,
-        );
+        await repository.updateTagsForEntry(testEntryId, tagIds);
       });
 
       test('should throw AppException on failure', () async {
@@ -1004,7 +986,7 @@ void main() {
         id: 'media-nulls',
         userId: testUserId,
         journalEntryId: testEntryId,
-        mediaType: MediaType.image,
+        mediaType: MediaType.photo,
         storagePath: '/path',
         createdAt: testDateTime,
         updatedAt: testDateTime,

@@ -89,10 +89,12 @@ class SocialSharingServiceImpl implements SocialSharingService {
       }
 
       // Share content
-      await Share.shareXFiles(
-        files,
-        text: truncatedText,
-        subject: shareConfig.title,
+      await SharePlus.instance.share(
+        ShareParams(
+          files: files,
+          text: truncatedText,
+          subject: shareConfig.title,
+        ),
       );
 
       return JournalShareResult.success(
@@ -159,10 +161,12 @@ class SocialSharingServiceImpl implements SocialSharingService {
       }
 
       // Share the file
-      await Share.shareXFiles(
-        [xFile],
-        text: truncatedText,
-        subject: shareConfig.title,
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [xFile],
+          text: truncatedText,
+          subject: shareConfig.title,
+        ),
       );
 
       return JournalShareResult.success(
@@ -214,9 +218,11 @@ class SocialSharingServiceImpl implements SocialSharingService {
       }
 
       // Share text only (trips are shared as text with link in future)
-      await Share.share(
-        truncatedText,
-        subject: shareConfig.title,
+      await SharePlus.instance.share(
+        ShareParams(
+          text: truncatedText,
+          subject: shareConfig.title,
+        ),
       );
 
       return JournalShareResult.success(
@@ -282,9 +288,11 @@ class SocialSharingServiceImpl implements SocialSharingService {
         );
       }
 
-      await Share.share(
-        truncatedText,
-        subject: shareConfig.title,
+      await SharePlus.instance.share(
+        ShareParams(
+          text: truncatedText,
+          subject: shareConfig.title,
+        ),
       );
 
       return JournalShareResult.success(
@@ -419,7 +427,7 @@ class SocialSharingServiceImpl implements SocialSharingService {
 
   @override
   Future<String?> generateShareLink({
-    required ShareableType type,
+    ShareableType type = ShareableType.journalEntry,
     String? entryId,
     String? tripId,
     String? mediaId,

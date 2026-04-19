@@ -13,7 +13,7 @@ void main() {
     );
 
     final metadata = RecommendationMetadata(
-      matchedInterests: {TravelInterest.foodTours},
+      matchedInterests: {TravelInterest.food},
       suggestedDate: DateTime(2026, 1, 15),
       suggestedTime: const TimeOfDay(hour: 12),
       distance: DistanceFromHotel.walking,
@@ -80,12 +80,12 @@ void main() {
 
       test('deserializes metadata from JSON correctly', () {
         final json = {
-          'matchedInterests': [TravelInterest.foodTours.index],
+          'matchedInterests': ['food'],
           'suggestedDate': '2026-01-15T00:00:00.000',
           'suggestedTime': {'hour': 12, 'minute': 0},
-          'distance': DistanceFromHotel.walking.index,
-          'weather': WeatherContext.anyWeather.index,
-          'crowdLevel': CrowdLevel.medium.index,
+          'distance': 'walking',
+          'weather': 'anyWeather',
+          'crowdLevel': 'medium',
           'estimatedDuration': 0,
           'requiresAdvanceBooking': false,
           'isIndoor': false,
@@ -94,7 +94,7 @@ void main() {
         final deserialized = RecommendationMetadata.fromJson(json);
 
         expect(
-            deserialized.matchedInterests, contains(TravelInterest.foodTours));
+            deserialized.matchedInterests, contains(TravelInterest.food));
         expect(deserialized.suggestedDate, DateTime(2026, 1, 15));
       });
 

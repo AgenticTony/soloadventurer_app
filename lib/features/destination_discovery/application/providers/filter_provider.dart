@@ -268,6 +268,13 @@ class Filter extends _$Filter {
   /// Returns true if only search query, tags, or toggles are set,
   /// but location, budget, and score filters are not.
   bool get hasOnlySoftFilters {
+    final hasHardFilters = state.budgetLevel != null ||
+        state.activityLevel != null ||
+        state.countryCode != null ||
+        state.region != null ||
+        state.minSafetyScore != null ||
+        state.minSoloSuitabilityScore != null;
+    if (hasHardFilters) return false;
     return state.searchQuery != null ||
         (state.tags != null && state.tags!.isNotEmpty) ||
         state.hiddenGemsOnly ||

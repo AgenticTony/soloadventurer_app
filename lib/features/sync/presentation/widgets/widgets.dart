@@ -19,4 +19,3 @@ export 'sync_pull_to_refresh.dart';
 export 'sync_status_icon.dart';
 export 'sync_status_badge.dart';
 export 'sync_progress_indicator.dart';
-export 'sync_status_widgets_example.dart';

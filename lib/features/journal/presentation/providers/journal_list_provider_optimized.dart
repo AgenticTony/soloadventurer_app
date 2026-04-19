@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
-import 'package:soloadventurer/utils/performance/query_optimizer.dart';
+import 'package:soloadventurer/features/journal/data/services/query_optimizer.dart';
 
 // Generated file
 part 'journal_list_provider_optimized.g.dart';

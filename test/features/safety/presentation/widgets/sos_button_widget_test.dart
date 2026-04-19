@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:soloadventurer/features/safety/presentation/widgets/sos_button_widget.dart';
 
@@ -7,7 +8,7 @@ void main() {
     group('Rendering', () {
       testWidgets('renders SOS button with default label', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -21,7 +22,7 @@ void main() {
 
       testWidgets('renders with custom label', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -38,7 +39,7 @@ void main() {
       testWidgets('renders ACTIVE state when hasActiveEmergency is true',
           (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -54,7 +55,7 @@ void main() {
 
       testWidgets('renders with custom active label', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -71,7 +72,7 @@ void main() {
 
       testWidgets('renders subtitle on large size', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -89,7 +90,7 @@ void main() {
       testWidgets('renders loading indicator when isLoading is true',
           (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -105,7 +106,7 @@ void main() {
 
       testWidgets('renders small size without subtitle', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -124,7 +125,7 @@ void main() {
     group('Dimensions', () {
       testWidgets('renders with small size dimensions', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -149,7 +150,7 @@ void main() {
 
       testWidgets('renders with medium size dimensions', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -164,7 +165,7 @@ void main() {
 
       testWidgets('renders with large size dimensions', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -236,7 +237,7 @@ void main() {
       testWidgets('does not call onPressed when callback is null',
           (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: null,
@@ -253,7 +254,7 @@ void main() {
     group('Accessibility', () {
       testWidgets('has semantic label for screen readers', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -268,7 +269,7 @@ void main() {
 
       testWidgets('has default semantic label', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -286,7 +287,7 @@ void main() {
       testWidgets('semantic label changes for active emergency',
           (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -304,7 +305,7 @@ void main() {
 
       testWidgets('semantics indicates enabled state', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -324,7 +325,7 @@ void main() {
     group('Animation', () {
       testWidgets('pulses when showPulse is true', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -343,7 +344,7 @@ void main() {
 
       testWidgets('does not pulse when showPulse is false', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -429,7 +430,7 @@ void main() {
     group('Visual appearance', () {
       testWidgets('uses custom color when provided', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -444,7 +445,7 @@ void main() {
 
       testWidgets('shows gradient effect', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -468,7 +469,7 @@ void main() {
 
       testWidgets('shows shadow effect', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -492,7 +493,7 @@ void main() {
 
       testWidgets('color changes for active emergency', (tester) async {
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
               body: SOSButtonWidget(
                 onPressed: () {},
@@ -508,7 +509,7 @@ void main() {
 
     group('SOSButtonDimensions', () {
       test('small dimensions are correct', () {
-        const dimensions = SOSButtonSize.small.dimensions;
+        final dimensions = SOSButtonSize.small.dimensions;
 
         expect(dimensions.width, 56);
         expect(dimensions.height, 56);
@@ -517,7 +518,7 @@ void main() {
       });
 
       test('medium dimensions are correct', () {
-        const dimensions = SOSButtonSize.medium.dimensions;
+        final dimensions = SOSButtonSize.medium.dimensions;
 
         expect(dimensions.width, 100);
         expect(dimensions.height, 100);
@@ -526,7 +527,7 @@ void main() {
       });
 
       test('large dimensions are correct', () {
-        const dimensions = SOSButtonSize.large.dimensions;
+        final dimensions = SOSButtonSize.large.dimensions;
 
         expect(dimensions.width, 180);
         expect(dimensions.height, 180);

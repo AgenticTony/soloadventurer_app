@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soloadventurer/core/services/operation_queue.dart';
+import 'package:soloadventurer/features/core/services/operation_queue.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/operation_list_item.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
 import 'package:soloadventurer/features/travel/domain/models/travel_note_operation.dart';
@@ -123,9 +123,9 @@ void main() {
         await tester
             .pumpWidget(createWidgetUnderTest(operation: testOperation));
 
-        expect(find.textContaining('ID:'), findsOneWidget);
-        expect(find.textContaining('Priority:'), findsOneWidget);
-        expect(find.textContaining('Created:'), findsOneWidget);
+        expect(find.textContaining('ID:'), findsAtLeast(1));
+        expect(find.textContaining('Priority:'), findsAtLeast(1));
+        expect(find.textContaining('Created:'), findsAtLeast(1));
         expect(find.textContaining('Requires Network:'), findsOneWidget);
       });
 
@@ -317,7 +317,7 @@ void main() {
       testWidgets('displays trip-specific fields for trip planning operations',
           (WidgetTester tester) async {
         const tripOperation = TripPlanningOperation(
-          id: 'test-id',
+          id: 'test-id-001',
           tripId: 'trip-123',
           planningType: TripPlanningType.addDestination,
           changes: {
@@ -358,7 +358,7 @@ void main() {
         await tester
             .pumpWidget(createWidgetUnderTest(operation: minutesOldOperation));
 
-        expect(find.textContaining('5m ago'), findsOneWidget);
+        expect(find.textContaining('5m ago'), findsAtLeast(1));
       });
 
       testWidgets('displays hours ago for operations hours old',

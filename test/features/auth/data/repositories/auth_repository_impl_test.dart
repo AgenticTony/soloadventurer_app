@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/security/security_manager.dart';
+import 'package:soloadventurer/core/storage/secure_storage_adapter.dart';
 import 'package:soloadventurer/features/auth/data/models/auth_response_model.dart';
 import 'package:soloadventurer/features/auth/data/models/user_model.dart';
 import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
@@ -10,80 +10,16 @@ import 'package:soloadventurer/features/auth/data/datasources/auth_remote_data_s
 import 'package:soloadventurer/features/auth/domain/entities/user.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 
-class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {
-  @override
-  Future<(UserModel, String)> signIn(String email, String password) async {
-    return (
-      UserModel(
-        id: 'test-id',
-        email: email,
-        username: 'testuser',
-        createdAt: DateTime.now(),
-      ),
-      'test-token'
-    );
-  }
+class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
-  @override
-  Future<AuthSession> refreshToken() async {
-    return AuthSession(
-      accessToken: 'refreshed-access-token',
-      idToken: 'refreshed-id-token',
-      refreshToken: 'refreshed-refresh-token',
-      expiresAt: DateTime.now().add(const Duration(hours: 1)),
-    );
-  }
-}
+class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
 
-class MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {
-  @override
-  Future<void> saveAuthData(
-    String token,
-    String refreshToken, {
-    DateTime? expiresAt,
-    String? idToken,
-  }) async {}
-
-  @override
-  Future<void> cacheUser(User user) async {}
-
-  @override
-  Future<User?> getCachedUser() async {
-    return null;
-  }
-
-  @override
-  Future<void> clearCache() async {}
-
-  @override
-  Future<bool> hasValidSession() async {
-    return true;
-  }
-}
-
-class MockSecurityManager extends Mock implements SecurityManager {
-  @override
-  Future<bool> isKnownDevice() async {
-    return true;
-  }
-
-  @override
-  Future<void> checkLoginAttempts() async {}
-
-  @override
-  Future<void> resetLoginAttempts() async {}
-
-  @override
-  Future<void> recordFailedLoginAttempt() async {}
-
-  @override
-  Future<void> registerDevice() async {}
-}
+class MockSecurityManagerAdapter extends Mock implements SecurityManagerAdapter {}
 
 void main() {
   late MockAuthRemoteDataSource mockRemoteDataSource;
   late MockAuthLocalDataSource mockLocalDataSource;
-  late MockSecurityManager mockSecurityManager;
+  late MockSecurityManagerAdapter mockSecurityManager;
   late AuthRepositoryImpl authRepository;
 
   final testDate = DateTime(2024, 3, 14);
@@ -104,7 +40,7 @@ void main() {
   setUp(() {
     mockRemoteDataSource = MockAuthRemoteDataSource();
     mockLocalDataSource = MockAuthLocalDataSource();
-    mockSecurityManager = MockSecurityManager();
+    mockSecurityManager = MockSecurityManagerAdapter();
     authRepository = AuthRepositoryImpl(
       remoteDataSource: mockRemoteDataSource,
       localDataSource: mockLocalDataSource,
@@ -112,6 +48,12 @@ void main() {
     );
     registerFallbackValue(testUser);
     registerFallbackValue(testAuthResponse);
+    registerFallbackValue(AuthSession(
+      accessToken: '',
+      idToken: '',
+      refreshToken: '',
+      expiresAt: DateTime.now(),
+    ));
   });
 
   group('AuthRepositoryImpl', () {
@@ -120,9 +62,27 @@ void main() {
         // Arrange
         when(() => mockSecurityManager.checkLoginAttempts())
             .thenAnswer((_) async {});
+        when(() => mockRemoteDataSource.signIn(any(), any()))
+            .thenAnswer((_) async => (
+                  testUser,
+                  AuthSession(
+                    accessToken: 'test-access-token',
+                    idToken: 'test-id-token',
+                    refreshToken: 'test-refresh-token',
+                    expiresAt: DateTime.now().add(const Duration(hours: 1)),
+                  ),
+                ));
         when(() => mockSecurityManager.isKnownDevice())
             .thenAnswer((_) async => true);
         when(() => mockSecurityManager.resetLoginAttempts())
+            .thenAnswer((_) async {});
+        when(() => mockLocalDataSource.saveAuthData(
+              any(that: isA<String>()),
+              any(that: isA<String>()),
+              expiresAt: any(named: 'expiresAt', that: isA<DateTime>()),
+              idToken: any(named: 'idToken', that: isA<String>()),
+            )).thenAnswer((_) async {});
+        when(() => mockLocalDataSource.cacheUser(any()))
             .thenAnswer((_) async {});
 
         // Act
@@ -169,6 +129,10 @@ void main() {
         // Arrange
         when(() => mockLocalDataSource.getCachedUser())
             .thenAnswer((_) async => testUser);
+        when(() => mockLocalDataSource.hasValidSession())
+            .thenAnswer((_) async => true);
+        when(() => mockSecurityManager.isKnownDevice())
+            .thenAnswer((_) async => true);
 
         // Act
         final result = await authRepository.getCurrentUser();
@@ -201,23 +165,28 @@ void main() {
       test('should clear local data when signout is successful', () async {
         // Arrange
         when(() => mockRemoteDataSource.signOut()).thenAnswer((_) async {});
-        when(() => mockLocalDataSource.clearAuthData())
+        when(() => mockLocalDataSource.clearCache())
             .thenAnswer((_) async {});
-        when(() => mockLocalDataSource.clearCache()).thenAnswer((_) async {});
+        when(() => mockSecurityManager.resetLoginAttempts())
+            .thenAnswer((_) async {});
 
         // Act
         await authRepository.signOut();
 
         // Assert
         verify(() => mockRemoteDataSource.signOut()).called(1);
-        verify(() => mockLocalDataSource.clearAuthData()).called(1);
         verify(() => mockLocalDataSource.clearCache()).called(1);
+        verify(() => mockSecurityManager.resetLoginAttempts()).called(1);
       });
 
       test('should throw when signout fails', () async {
         // Arrange
         when(() => mockRemoteDataSource.signOut())
             .thenThrow(const ServerException(message: 'Failed to sign out'));
+        when(() => mockLocalDataSource.clearCache())
+            .thenAnswer((_) async {});
+        when(() => mockSecurityManager.resetLoginAttempts())
+            .thenAnswer((_) async {});
 
         // Act & Assert
         expect(
@@ -230,8 +199,12 @@ void main() {
     group('isAuthenticated', () {
       test('should return true when session is valid', () async {
         // Arrange
+        when(() => mockSecurityManager.isKnownDevice())
+            .thenAnswer((_) async => true);
         when(() => mockLocalDataSource.hasValidSession())
             .thenAnswer((_) async => true);
+        when(() => mockLocalDataSource.getCachedUser())
+            .thenAnswer((_) async => testUser);
 
         // Act
         final result = await authRepository.isAuthenticated();
@@ -242,6 +215,8 @@ void main() {
 
       test('should return false when session is invalid', () async {
         // Arrange
+        when(() => mockSecurityManager.isKnownDevice())
+            .thenAnswer((_) async => true);
         when(() => mockLocalDataSource.hasValidSession())
             .thenAnswer((_) async => false);
 
@@ -297,7 +272,7 @@ void main() {
         final result = await authRepository.refreshToken();
 
         // Assert
-        expect(result, isTrue);
+        expect(result, equals(authSession));
         verify(() => mockRemoteDataSource.refreshToken()).called(1);
         verify(() => mockLocalDataSource.saveAuthData(
               any(that: isA<String>()),
@@ -307,43 +282,28 @@ void main() {
             )).called(1);
       });
 
-      test('should return false when token refresh fails', () async {
+      test('should throw when token refresh fails', () async {
         // Arrange
         when(() => mockRemoteDataSource.refreshToken())
             .thenThrow(const AuthException('Failed to refresh token'));
-        when(() => mockLocalDataSource.clearAuthData())
-            .thenAnswer((_) async {});
 
-        // Act
-        final result = await authRepository.refreshToken();
-
-        // Assert
-        expect(result, isFalse);
-        verify(() => mockLocalDataSource.clearAuthData()).called(1);
+        // Act & Assert
+        expect(
+          () => authRepository.refreshToken(),
+          throwsA(isA<AuthException>()),
+        );
       });
     });
 
     group('getAccessToken', () {
       test('should return token when session is valid', () async {
         // Arrange
+        when(() => mockSecurityManager.isKnownDevice())
+            .thenAnswer((_) async => true);
         when(() => mockLocalDataSource.hasValidSession())
             .thenAnswer((_) async => true);
-        when(() => mockLocalDataSource.saveAuthData(
-              any(that: isA<String>()),
-              any(that: isA<String>()),
-              expiresAt: any(named: 'expiresAt', that: isA<DateTime>()),
-              idToken: any(named: 'idToken', that: isA<String>()),
-            )).thenAnswer((_) async {});
-
-        // Mock the refreshToken method to return a valid session
-        final authSession = AuthSession(
-          accessToken: 'test-access-token',
-          idToken: 'test-id-token',
-          refreshToken: 'test-refresh-token',
-          expiresAt: DateTime.now().add(const Duration(hours: 1)),
-        );
-        when(() => mockRemoteDataSource.refreshToken())
-            .thenAnswer((_) async => authSession);
+        when(() => mockLocalDataSource.getAuthToken())
+            .thenAnswer((_) async => 'test-access-token');
 
         // Act
         final result = await authRepository.getAccessToken();
@@ -354,10 +314,10 @@ void main() {
 
       test('should return null when session is invalid', () async {
         // Arrange
+        when(() => mockSecurityManager.isKnownDevice())
+            .thenAnswer((_) async => true);
         when(() => mockLocalDataSource.hasValidSession())
             .thenAnswer((_) async => false);
-        when(() => mockRemoteDataSource.refreshToken())
-            .thenThrow(const AuthException('Failed to refresh token'));
 
         // Act
         final result = await authRepository.getAccessToken();

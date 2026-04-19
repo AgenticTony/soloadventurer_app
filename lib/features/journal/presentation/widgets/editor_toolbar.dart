@@ -59,24 +59,22 @@ class EditorToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return quill.QuillSimpleToolbar(
       controller: controller,
-      configurations: quill.QuillSimpleToolbarConfigurations(
+      config: quill.QuillSimpleToolbarConfig(
         showDividers: showDividers,
-        showAlignment: false,
-        showBackgroundColor: false,
+        showAlignmentButtons: false,
+        showBackgroundColorButton: false,
         showClearFormat: true,
         showCodeBlock: true,
         showDirection: false,
         showFontFamily: false,
         showHeaderStyle: true,
         showIndent: false,
-        showLineHeight: false,
+        showLineHeightButton: false,
         showLink: true,
         showListBullets: true,
-        showListChecklists: false,
+        showListCheck: false,
         showListNumbers: true,
         showQuote: true,
         showSearchButton: false,
@@ -84,13 +82,10 @@ class EditorToolbar extends StatelessWidget {
         showStrikeThrough: true,
         showSubscript: false,
         showSuperscript: false,
-        showUnderline: true,
+        showUnderLineButton: true,
         multiRowsDisplay: multiRows,
-        toolbarIconAlignment: alignment,
-        toolbarSize: 40,
-        toolbarSectionSpacing: 4,
         buttonOptions: quill.QuillSimpleToolbarButtonOptions(
-          baseOptions: quill.QuillToolbarButtonOptions(
+          base: quill.QuillToolbarBaseButtonOptions(
             afterButtonPressed: () {
               // Unfocus keyboard after button press for better UX
               final currentFocus = FocusScope.of(context);
@@ -127,16 +122,16 @@ class CompactEditorToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return quill.QuillSimpleToolbar(
       controller: controller,
-      configurations: quill.QuillSimpleToolbarConfigurations(
+      config: quill.QuillSimpleToolbarConfig(
         showDividers: false,
-        showBold: true,
-        showItalic: true,
-        showUnderline: true,
+        showBoldButton: true,
+        showItalicButton: true,
+        showUnderLineButton: true,
         showStrikeThrough: false,
         showHeaderStyle: false,
         showListBullets: true,
         showListNumbers: true,
-        showListChecklists: false,
+        showListCheck: false,
         showCodeBlock: false,
         showQuote: false,
         showLink: true,
@@ -177,16 +172,16 @@ class MinimalEditorToolbar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: quill.QuillSimpleToolbar(
         controller: controller,
-        configurations: quill.QuillSimpleToolbarConfigurations(
+        config: quill.QuillSimpleToolbarConfig(
           showDividers: false,
-          showBold: true,
-          showItalic: true,
-          showUnderline: false,
+          showBoldButton: true,
+          showItalicButton: true,
+          showUnderLineButton: false,
           showStrikeThrough: false,
           showHeaderStyle: false,
           showListBullets: true,
           showListNumbers: true,
-          showListChecklists: false,
+          showListCheck: false,
           showCodeBlock: false,
           showQuote: false,
           showLink: false,

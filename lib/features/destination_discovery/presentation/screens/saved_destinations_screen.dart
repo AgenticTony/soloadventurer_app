@@ -254,7 +254,6 @@ class _SavedDestinationsScreenState
       case SavedDestinationFilter.recentlyAdded:
         return filtered..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       case SavedDestinationFilter.all:
-      default:
         return filtered;
     }
   }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 
 /// State before an optimistic update for rollback purposes
@@ -220,7 +219,6 @@ class OptimisticUpdateHandler {
     _emitPendingUpdates();
 
     if (config.enableTracking) {
-      debugPrint('✅ Registered optimistic update: $state');
     }
 
     return state;
@@ -286,8 +284,6 @@ class OptimisticUpdateHandler {
   }) async {
     final state = _pendingUpdates[syncOperationId];
     if (state == null) {
-      debugPrint(
-          '⚠️ No optimistic update found for operation #$syncOperationId');
       return const RollbackResult.failure(
         entityId: '',
         entityType: '',
@@ -297,7 +293,6 @@ class OptimisticUpdateHandler {
 
     try {
       if (config.enableTracking) {
-        debugPrint('🔄 Rolling back optimistic update: $state');
       }
 
       // Perform the rollback via callback
@@ -312,17 +307,11 @@ class OptimisticUpdateHandler {
       if (result.success) {
         _pendingUpdates.remove(syncOperationId);
         _emitPendingUpdates();
-        debugPrint(
-            '✅ Rollback successful for ${state.entityType}:${state.entityId}');
       } else {
-        debugPrint(
-            '❌ Rollback failed for ${state.entityType}:${state.entityId}: '
-            '${result.errorMessage}');
       }
 
       return result;
     } catch (e) {
-      debugPrint('❌ Error during rollback: ${e.toString()}');
       return RollbackResult.failure(
         entityId: state.entityId,
         entityType: state.entityType,
@@ -342,8 +331,6 @@ class OptimisticUpdateHandler {
     final results = <RollbackResult>[];
     final operationIds = _pendingUpdates.keys.toList();
 
-    debugPrint('🔄 Rolling back ${operationIds.length} optimistic updates');
-
     for (final syncOperationId in operationIds) {
       final result = await rollbackOperation(
         syncOperationId: syncOperationId,
@@ -352,9 +339,7 @@ class OptimisticUpdateHandler {
       results.add(result);
     }
 
-    final successCount = results.where((r) => r.success).length;
-    debugPrint(
-        '✅ Rollback complete: $successCount/${results.length} successful');
+    results.where((r) => r.success).length;
 
     return results;
   }
@@ -370,9 +355,6 @@ class OptimisticUpdateHandler {
   }) async {
     final states = getPendingUpdatesForEntity(entityType, entityId);
     final results = <RollbackResult>[];
-
-    debugPrint('🔄 Rolling back ${states.length} updates for '
-        '$entityType:$entityId');
 
     for (final state in states) {
       final result = await rollbackOperation(
@@ -395,7 +377,6 @@ class OptimisticUpdateHandler {
   void clearOptimisticUpdate({required int syncOperationId}) {
     final removed = _pendingUpdates.remove(syncOperationId);
     if (removed != null && config.enableTracking) {
-      debugPrint('🧹 Cleared optimistic update: $removed');
     }
     _emitPendingUpdates();
   }
@@ -420,8 +401,6 @@ class OptimisticUpdateHandler {
     }
 
     if (keysToRemove.isNotEmpty && config.enableTracking) {
-      debugPrint('🧹 Cleared $keysToRemove optimistic updates for '
-          '$entityType:$entityId');
     }
     _emitPendingUpdates();
   }
@@ -433,7 +412,6 @@ class OptimisticUpdateHandler {
     final count = _pendingUpdates.length;
     _pendingUpdates.clear();
     if (count > 0 && config.enableTracking) {
-      debugPrint('🧹 Cleared all $count optimistic updates');
     }
     _emitPendingUpdates();
   }
@@ -460,8 +438,6 @@ class OptimisticUpdateHandler {
     }
 
     if (keysToRemove.isNotEmpty && config.enableTracking) {
-      debugPrint('🧹 Cleaned up ${keysToRemove.length} old optimistic updates '
-          '(older than ${maxAge}ms)');
     }
     _emitPendingUpdates();
 
@@ -490,7 +466,6 @@ class OptimisticUpdateHandler {
     _pendingUpdatesController.close();
     _pendingUpdates.clear();
     if (config.enableTracking) {
-      debugPrint('🗑️ OptimisticUpdateHandler disposed');
     }
   }
 }

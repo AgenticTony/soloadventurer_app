@@ -1,11 +1,6 @@
 import 'dart:async';
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
-import 'package:uuid/uuid.dart';
 import 'package:soloadventurer/features/offline/infrastructure/database/database.dart';
-import 'package:soloadventurer/features/offline/infrastructure/database/dao/trip_dao.dart';
-import 'package:soloadventurer/features/offline/infrastructure/database/dao/journal_dao.dart';
-import 'package:soloadventurer/features/offline/infrastructure/database/dao/user_dao.dart';
 import 'package:soloadventurer/features/offline/domain/services/conflict_resolver.dart';
 
 /// In-memory conflict log for tracking conflicts
@@ -20,9 +15,6 @@ class ConflictLog {
   /// Adds a conflict to the log
   void add(Conflict conflict) {
     _conflicts.add(conflict);
-    debugPrint(
-        '⚔️ Conflict recorded: ${conflict.entityType}/${conflict.entityId} '
-        '(${conflict.type})');
   }
 
   /// Gets all unresolved conflicts
@@ -59,7 +51,6 @@ class ConflictLog {
         c.resolvedAt != null &&
         c.resolvedAt!.isBefore(beforeDate));
 
-    debugPrint('🗑️ Cleared old conflicts from before $beforeDate');
   }
 
   /// Gets total count
@@ -94,16 +85,8 @@ class ConflictResolverImpl implements ConflictResolver {
   /// Conflict log for tracking all conflicts
   final ConflictLog _conflictLog;
 
-  /// Uuid generator for conflict IDs
-  final Uuid _uuid = const Uuid();
-
   /// Default resolution strategy for each entity type
   final Map<EntityType, ConflictResolutionStrategy> _defaultStrategies;
-
-  /// Data Access Objects
-  late final TripDao _tripDao = TripDao(_database);
-  late final JournalDao _journalDao = JournalDao(_database);
-  late final UserDao _userDao = UserDao(_database);
 
   /// Creates a new [ConflictResolverImpl] instance
   ///
@@ -114,8 +97,7 @@ class ConflictResolverImpl implements ConflictResolver {
     Map<EntityType, ConflictResolutionStrategy>? defaultStrategies,
   })  : _database = database,
         _conflictLog = ConflictLog(),
-        _defaultStrategies = defaultStrategies ??
-            const {
+        _defaultStrategies = defaultStrategies ?? const {
               // For trips, prefer server version (more authoritative)
               EntityType.trip: ConflictResolutionStrategy.serverWins,
 
@@ -137,14 +119,12 @@ class ConflictResolverImpl implements ConflictResolver {
   @override
   Future<List<Conflict>> getUnresolvedConflicts() async {
     final conflicts = _conflictLog.getUnresolved();
-    debugPrint('📊 Found ${conflicts.length} unresolved conflicts');
     return conflicts;
   }
 
   @override
   Future<List<Conflict>> getConflictsByType(EntityType entityType) async {
     final conflicts = _conflictLog.getByType(entityType);
-    debugPrint('📊 Found ${conflicts.length} conflicts for $entityType');
     return conflicts;
   }
 
@@ -157,7 +137,6 @@ class ConflictResolverImpl implements ConflictResolver {
       startDate: startDate,
       endDate: endDate,
     );
-    debugPrint('📊 Found ${conflicts.length} conflicts in history');
     return conflicts;
   }
 
@@ -171,14 +150,12 @@ class ConflictResolverImpl implements ConflictResolver {
     ConflictResolutionStrategy strategy,
   ) async {
     try {
-      debugPrint('⚔️ Resolving conflict $conflictId with $strategy');
 
       // Find the conflict
       final conflicts = await getUnresolvedConflicts();
       final conflict = conflicts.where((c) => c.id == conflictId).firstOrNull;
 
       if (conflict == null) {
-        debugPrint('❌ Conflict not found: $conflictId');
         return false;
       }
 
@@ -195,7 +172,6 @@ class ConflictResolverImpl implements ConflictResolver {
           success = await _resolveWithClientWins(conflict);
           break;
         case ConflictResolutionStrategy.manual:
-          debugPrint('⚠️ Manual resolution required for $conflictId');
           // For manual resolution, we don't auto-resolve
           // The user will need to handle this through UI
           return true;
@@ -205,19 +181,16 @@ class ConflictResolverImpl implements ConflictResolver {
         // Mark conflict as resolved in the log
         final resolvedConflict = conflict.markAsResolved(strategy);
         _updateConflictInLog(resolvedConflict);
-        debugPrint('✅ Conflict $conflictId resolved successfully');
       }
 
       return success;
     } catch (e) {
-      debugPrint('❌ Error resolving conflict $conflictId: $e');
       return false;
     }
   }
 
   @override
   Future<ConflictResolutionResult> resolveAllConflicts() async {
-    debugPrint('⚔️ Starting automatic conflict resolution...');
 
     final conflicts = await getUnresolvedConflicts();
 
@@ -248,9 +221,6 @@ class ConflictResolverImpl implements ConflictResolver {
         pendingConflicts.add(conflict);
       }
     }
-
-    debugPrint('⚔️ Conflict resolution complete: '
-        '$resolvedCount resolved, $manualCount manual, $failedCount failed');
 
     return ConflictResolutionResult(
       resolvedCount: resolvedCount,
@@ -288,14 +258,11 @@ class ConflictResolverImpl implements ConflictResolver {
           conflict.clientUpdatedAt.isAfter(conflict.serverUpdatedAt);
 
       if (clientIsNewer) {
-        debugPrint('📝 Client version is newer for ${conflict.entityId}');
         return await _applyClientVersion(conflict);
       } else {
-        debugPrint('📝 Server version is newer for ${conflict.entityId}');
         return await _applyServerVersion(conflict);
       }
     } catch (e) {
-      debugPrint('❌ Error in last-write-wins resolution: $e');
       return false;
     }
   }
@@ -306,10 +273,8 @@ class ConflictResolverImpl implements ConflictResolver {
   /// the server is considered the source of truth.
   Future<bool> _resolveWithServerWins(Conflict conflict) async {
     try {
-      debugPrint('🔒 Applying server version for ${conflict.entityId}');
       return await _applyServerVersion(conflict);
     } catch (e) {
-      debugPrint('❌ Error in server-wins resolution: $e');
       return false;
     }
   }
@@ -320,10 +285,8 @@ class ConflictResolverImpl implements ConflictResolver {
   /// the client's changes should take precedence.
   Future<bool> _resolveWithClientWins(Conflict conflict) async {
     try {
-      debugPrint('👤 Applying client version for ${conflict.entityId}');
       return await _applyClientVersion(conflict);
     } catch (e) {
-      debugPrint('❌ Error in client-wins resolution: $e');
       return false;
     }
   }
@@ -343,15 +306,11 @@ class ConflictResolverImpl implements ConflictResolver {
           return await _applyClientUserVersion(conflict);
         case EntityType.travelPreference:
           // For now, skip preferences as they're not fully implemented
-          debugPrint(
-              '⚠️ Preferences not yet supported for conflict resolution');
           return true;
         case EntityType.other:
-          debugPrint('⚠️ Unknown entity type, cannot resolve');
           return false;
       }
     } catch (e) {
-      debugPrint('❌ Error applying client version: $e');
       return false;
     }
   }
@@ -370,15 +329,11 @@ class ConflictResolverImpl implements ConflictResolver {
           return await _applyServerUserVersion(conflict);
         case EntityType.travelPreference:
           // For now, skip preferences
-          debugPrint(
-              '⚠️ Preferences not yet supported for conflict resolution');
           return true;
         case EntityType.other:
-          debugPrint('⚠️ Unknown entity type, cannot resolve');
           return false;
       }
     } catch (e) {
-      debugPrint('❌ Error applying server version: $e');
       return false;
     }
   }
@@ -399,10 +354,8 @@ class ConflictResolverImpl implements ConflictResolver {
         updatedAt: Value(conflict.clientUpdatedAt),
       ));
 
-      debugPrint('✅ Applied client version for trip ${conflict.entityId}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error applying client trip version: $e');
       return false;
     }
   }
@@ -421,10 +374,8 @@ class ConflictResolverImpl implements ConflictResolver {
         lastSyncedAt: Value(DateTime.now()),
       ));
 
-      debugPrint('✅ Applied server version for trip ${conflict.entityId}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error applying server trip version: $e');
       return false;
     }
   }
@@ -441,10 +392,8 @@ class ConflictResolverImpl implements ConflictResolver {
         updatedAt: Value(conflict.clientUpdatedAt),
       ));
 
-      debugPrint('✅ Applied client version for journal ${conflict.entityId}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error applying client journal version: $e');
       return false;
     }
   }
@@ -463,10 +412,8 @@ class ConflictResolverImpl implements ConflictResolver {
         lastSyncedAt: Value(DateTime.now()),
       ));
 
-      debugPrint('✅ Applied server version for journal ${conflict.entityId}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error applying server journal version: $e');
       return false;
     }
   }
@@ -483,10 +430,8 @@ class ConflictResolverImpl implements ConflictResolver {
         updatedAt: Value(conflict.clientUpdatedAt),
       ));
 
-      debugPrint('✅ Applied client version for user ${conflict.entityId}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error applying client user version: $e');
       return false;
     }
   }
@@ -505,10 +450,8 @@ class ConflictResolverImpl implements ConflictResolver {
         lastSyncedAt: Value(DateTime.now()),
       ));
 
-      debugPrint('✅ Applied server version for user ${conflict.entityId}');
       return true;
     } catch (e) {
-      debugPrint('❌ Error applying server user version: $e');
       return false;
     }
   }
@@ -533,25 +476,4 @@ class ConflictResolverImpl implements ConflictResolver {
   // UTILITY METHODS
   // ==============================================================================
 
-  /// Creates a new conflict ID
-  String _createConflictId() {
-    return 'conflict_${_uuid.v4()}';
-  }
-
-  /// Determines the severity of a conflict
-  ConflictSeverity _determineSeverity(
-      ConflictType type, EntityType entityType) {
-    switch (type) {
-      case ConflictType.deleteModify:
-        return ConflictSeverity.high;
-      case ConflictType.concurrentUpdate:
-        return entityType == EntityType.trip
-            ? ConflictSeverity.medium
-            : ConflictSeverity.low;
-      case ConflictType.duplicateCreate:
-        return ConflictSeverity.high;
-      case ConflictType.versionMismatch:
-        return ConflictSeverity.low;
-    }
-  }
 }

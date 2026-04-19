@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_map_provider.dart';
 
 /// Screen displaying all journal locations on an interactive map
@@ -482,29 +483,31 @@ class _JournalMapScreenState extends ConsumerState<JournalMapScreen> {
     double zoom = 13.0;
     if (maxDiff > 100) {
       zoom = 3.0;
-    } else if (maxDiff > 50)
+    } else if (maxDiff > 50) {
       zoom = 4.0;
-    else if (maxDiff > 20)
+    } else if (maxDiff > 20) {
       zoom = 5.0;
-    else if (maxDiff > 10)
+    } else if (maxDiff > 10) {
       zoom = 6.0;
-    else if (maxDiff > 5)
+    } else if (maxDiff > 5) {
       zoom = 7.0;
-    else if (maxDiff > 2)
+    } else if (maxDiff > 2) {
       zoom = 8.0;
-    else if (maxDiff > 1)
+    } else if (maxDiff > 1) {
       zoom = 9.0;
-    else if (maxDiff > 0.5)
+    } else if (maxDiff > 0.5) {
       zoom = 10.0;
-    else if (maxDiff > 0.2)
+    } else if (maxDiff > 0.2) {
       zoom = 11.0;
-    else if (maxDiff > 0.1) zoom = 12.0;
+    } else if (maxDiff > 0.1) {
+      zoom = 12.0;
+    }
 
     _mapController.move(center, zoom);
   }
 
   /// Navigate to entry detail screen
-  void _navigateToEntry(entry) {
+  void _navigateToEntry(JournalEntry entry) {
     context.push('/journal/entry/${entry.id}');
   }
 }

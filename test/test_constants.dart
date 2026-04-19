@@ -49,6 +49,7 @@ const SyncStatus testSyncStatusSynced = SyncStatus.synced;
 const SyncStatus testSyncStatusPending = SyncStatus.pending;
 const SyncStatus testSyncStatusConflict = SyncStatus.conflict;
 const SyncStatus testSyncStatusOfflineOnly = SyncStatus.offlineOnly;
+const SyncStatus testSyncStatusSyncing = SyncStatus.syncing;
 
 // Common test strings
 const String testTitle = 'Test Title';
@@ -72,5 +73,6 @@ const Duration testTimeout = Duration(seconds: 30);
 // Location test constants
 const double testLatitude = 37.7749;
 const double testLongitude = -122.4194;
+const double testLocationAccuracy = 10.0;
 const String testLocationName = 'San Francisco, CA';
 const String testCountryCode = 'US';

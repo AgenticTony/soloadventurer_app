@@ -51,7 +51,12 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SafetyInsights(insights: testInsights),
+              body: SingleChildScrollView(
+                child: SafetyInsights(
+                  insights: testInsights,
+                  initiallyExpanded: 3, // Expand all to see descriptions
+                ),
+              ),
             ),
           ),
         );
@@ -83,7 +88,12 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SafetyInsights(insights: testInsights),
+              body: SingleChildScrollView(
+                child: SafetyInsights(
+                  insights: testInsights,
+                  initiallyExpanded: 3, // Expand all to see tips
+                ),
+              ),
             ),
           ),
         );
@@ -208,14 +218,8 @@ void main() {
           ),
         );
 
-        final lowSeverityContainer = find.byWidgetPredicate(
-          (widget) =>
-              widget is Container &&
-              widget.child != null &&
-              widget.decoration != null,
-        );
-
-        expect(lowSeverityContainer, findsWidgets);
+        // Low severity insight should have a check icon
+        expect(find.byIcon(Icons.check_circle), findsOneWidget);
       });
 
       testWidgets('renders check icon for low severity',
@@ -295,9 +299,11 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SafetyInsights(
-                insights: testInsights,
-                initiallyExpanded: 2,
+              body: SingleChildScrollView(
+                child: SafetyInsights(
+                  insights: testInsights,
+                  initiallyExpanded: 2,
+                ),
               ),
             ),
           ),
@@ -341,7 +347,7 @@ void main() {
           ),
         );
 
-        expect(find.text('No safety insights available'), findsOneWidget);
+        expect(find.text('No safety information available'), findsOneWidget);
         expect(find.byIcon(Icons.security), findsOneWidget);
       });
 

@@ -9,12 +9,12 @@ part of 'recommendation_provider.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<RecommendationState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<RecommendationState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for personalized recommendations state management
@@ -48,12 +48,12 @@ part of 'recommendation_provider.dart';
 const recommendationProvider = RecommendationFamily._();
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<RecommendationState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<RecommendationState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for personalized recommendations state management
@@ -85,12 +85,12 @@ const recommendationProvider = RecommendationFamily._();
 final class RecommendationProvider
     extends $AsyncNotifierProvider<Recommendation, RecommendationState> {
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
   /// - Dependencies injected via ref.watch() in build() method
   /// - Family provider with userId parameter in build()
   /// - AutoDispose enabled via @Riverpod annotation
-  /// - build() returns Future<T> not AsyncValue<T>
-  /// - State is automatically AsyncValue<RecommendationState> when consumed
+  /// - build() returns `Future<T>` not `AsyncValue<T>`
+  /// - State is automatically `AsyncValue<RecommendationState>` when consumed
   /// - Constructor auto-load logic moved to build() method
   ///
   /// Provider for personalized recommendations state management
@@ -158,12 +158,12 @@ final class RecommendationProvider
 String _$recommendationHash() => r'2cd1f5501c15671c922470636d23ca56a362c17a';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<RecommendationState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<RecommendationState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for personalized recommendations state management
@@ -207,12 +207,12 @@ final class RecommendationFamily extends $Family
         );
 
   /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+  /// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
   /// - Dependencies injected via ref.watch() in build() method
   /// - Family provider with userId parameter in build()
   /// - AutoDispose enabled via @Riverpod annotation
-  /// - build() returns Future<T> not AsyncValue<T>
-  /// - State is automatically AsyncValue<RecommendationState> when consumed
+  /// - build() returns `Future<T>` not `AsyncValue<T>`
+  /// - State is automatically `AsyncValue<RecommendationState>` when consumed
   /// - Constructor auto-load logic moved to build() method
   ///
   /// Provider for personalized recommendations state management
@@ -252,12 +252,12 @@ final class RecommendationFamily extends $Family
 }
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<RecommendationState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<RecommendationState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for personalized recommendations state management

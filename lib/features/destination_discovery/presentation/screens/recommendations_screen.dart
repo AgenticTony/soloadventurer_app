@@ -174,7 +174,6 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
       case RecommendationFilter.hiddenGems:
         return recommendations.where((r) => r.isHiddenGemMatch).toList();
       case RecommendationFilter.all:
-      default:
         return recommendations;
     }
   }
@@ -387,8 +386,6 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
 
   /// Build empty state widget
   Widget _buildEmptyState(BuildContext context) {
-    final theme = Theme.of(context);
-
     return DestinationEmptyStateWidget(
       title: 'No recommendations yet',
       message: _getEmptyStateMessage(),
@@ -558,7 +555,6 @@ class _RecommendationsScreenState extends ConsumerState<RecommendationsScreen> {
         return 'No hidden gem recommendations found. '
             'Try selecting "All Recommendations" to see all options.';
       case RecommendationFilter.all:
-      default:
         return 'We\'re still learning about your preferences. '
             'Explore more destinations to get better recommendations!';
     }
@@ -604,10 +600,9 @@ class _RecommendationCard extends StatelessWidget {
   final bool isSaved;
   final VoidCallback onTap;
   final VoidCallback onBookmarkTap;
-  final Key? key;
 
   const _RecommendationCard({
-    this.key,
+    super.key,
     required this.recommendedDestination,
     required this.isSaved,
     required this.onTap,

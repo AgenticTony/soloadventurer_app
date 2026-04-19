@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -20,6 +19,9 @@ void main() {
     );
 
     // Register fallback values
+    registerFallbackValue(
+      _createTestSession(expiresIn: const Duration(hours: 1)),
+    );
     registerFallbackValue(
       TokenExpirationResult.valid(
         expirationTime: DateTime.now().add(const Duration(hours: 1)),
@@ -107,6 +109,7 @@ void main() {
 
     test('should not resume when not paused', () {
       // Arrange
+      // ignore: unused_local_variable
       final session = _createTestSession(expiresIn: const Duration(hours: 1));
 
       // Act - try to resume without starting
@@ -126,10 +129,13 @@ void main() {
       // Clear the session manually (simulating edge case)
       scheduler.stop();
 
+      // Reset mock to clear previous call records
+      reset(mockTracker);
+
       // Act
       scheduler.resume();
 
-      // Assert
+      // Assert - should not start tracking since session was stopped
       verifyNever(() => mockTracker.startTracking(any()));
     });
   });
@@ -187,7 +193,8 @@ void main() {
       when(() => mockTracker.checkExpiration(any()))
           .thenReturn(expirationResult);
 
-      // Act
+      // Act - first pause, then resume
+      scheduler.didChangeAppLifecycleState(AppLifecycleState.paused);
       scheduler.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
       // Assert
@@ -223,6 +230,7 @@ void main() {
           .thenReturn(expirationResult);
 
       // Act
+      scheduler.didChangeAppLifecycleState(AppLifecycleState.paused);
       scheduler.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
       // Assert
@@ -255,8 +263,8 @@ void main() {
     });
 
     test('should handle app resume with no session', () {
-      // Arrange - scheduler stopped with no session
-      when(() => mockTracker.checkExpiration(any())).thenReturn(null);
+      // Arrange - scheduler stopped with no session (don't set a session)
+      // No mock needed since tracker won't be called without a session
 
       // Act
       scheduler.didChangeAppLifecycleState(AppLifecycleState.resumed);
@@ -325,8 +333,7 @@ void main() {
     });
 
     test('should return null when checking expiration with no session', () {
-      // Arrange
-      when(() => mockTracker.checkExpiration(any())).thenReturn(null);
+      // Arrange - no session set, tracker won't be called
 
       // Act
       final result = scheduler.checkExpiration();
@@ -409,7 +416,7 @@ void main() {
       scheduler.didChangeAppLifecycleState(AppLifecycleState.resumed);
 
       // Assert
-      verify(() => mockTracker.startTracking(session)).called(atLeast(1));
+      verify(() => mockTracker.startTracking(session)).called(greaterThan(0));
       expect(scheduler.status, TokenRefreshSchedulerStatus.running);
     });
 

@@ -28,8 +28,7 @@ class NotificationSchedulerService {
 
     final itinerary = itineraryResult.fold(
       (failure) {
-        // Log error
-        print('Failed to get itinerary: $failure');
+        // Log error - silently fail
         return null;
       },
       (itinerary) => itinerary,
@@ -450,7 +449,6 @@ class NotificationSchedulerService {
     final itinerary = itineraryResult.fold(
       (failure) {
         // Log error - weather alert could not be tied to itinerary
-        print('Failed to get itinerary for weather alert: $failure');
         return null;
       },
       (itinerary) => itinerary,

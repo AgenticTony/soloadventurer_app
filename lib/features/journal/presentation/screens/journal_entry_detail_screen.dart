@@ -1,12 +1,20 @@
 import 'package:soloadventurer/core/utils/string_extensions.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/journal_entry.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_detail_provider.dart';
+import 'package:soloadventurer/features/journal/presentation/providers/journal_entry_providers.dart';
 import 'package:soloadventurer/features/journal/presentation/widgets/rich_text_viewer.dart';
+import 'package:soloadventurer/features/social/domain/entities/reaction.dart';
+import 'package:soloadventurer/features/social/presentation/widgets/reaction_bar.dart';
+import 'package:soloadventurer/features/social/presentation/widgets/comment_thread.dart';
+import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/journal/presentation/widgets/social_share_sheet.dart';
+import 'package:soloadventurer/features/journal/domain/services/social_sharing_service.dart';
 
 /// Screen for viewing a single journal entry with all content
 class JournalEntryDetailScreen extends ConsumerWidget {
@@ -34,9 +42,9 @@ class JournalEntryDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detailState = ref.watch(journalEntryDetailProvider(entryId));
-    final theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: detailState.isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -163,12 +171,11 @@ class JournalEntryDetailScreen extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {
-                // TODO: Navigate to edit screen (Phase 2+)
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Edit feature coming soon!'),
-                  ),
-                );
+                final entry = detailState.entry!;
+                ref
+                    .read(journalEntryCreationProvider.notifier)
+                    .loadEntry(entry);
+                context.push('/journal/create');
               },
               tooltip: 'Edit entry',
             ),
@@ -273,6 +280,19 @@ class JournalEntryDetailScreen extends ConsumerWidget {
 
                 // Metadata footer
                 _buildMetadataFooter(context, entry),
+
+                const SizedBox(height: 24),
+
+                // Social: reactions & comments
+                ReactionBar(
+                  targetId: entry.id,
+                  targetType: ReactionTargetType.journal,
+                ),
+
+                CommentThread(
+                  journalId: entry.id,
+                  currentUserId: ref.watch(authProvider).value?.user?.id,
+                ),
 
                 const SizedBox(height: 32),
               ],
@@ -555,11 +575,10 @@ class JournalEntryDetailScreen extends ConsumerWidget {
   }
 
   void _handleShare(BuildContext context, JournalEntry entry) {
-    // TODO: Implement share functionality (Phase 8)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Share feature coming soon!'),
-      ),
+    SocialShareSheet.show(
+      context: context,
+      contentType: ShareableType.journalEntry,
+      entry: entry,
     );
   }
 

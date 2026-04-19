@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../domain/entities/token_state.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../../../../app/providers/auth_service_providers.dart';
 
 part 'token_manager_provider.g.dart';
 
@@ -20,13 +18,11 @@ part 'token_manager_provider.g.dart';
 )
 @riverpod
 class TokenManager extends _$TokenManager {
-  late final AuthRepository _authRepository;
   Timer? _refreshTimer;
-  static const _refreshBuffer = Duration(minutes: 5);
 
   @override
   AsyncValue<TokenState> build() {
-    _authRepository = ref.read(authRepositoryProvider);
+    // AuthRepository dependency removed - deprecated provider
     ref.onDispose(() {
       _refreshTimer?.cancel();
     });
@@ -66,20 +62,6 @@ class TokenManager extends _$TokenManager {
         requiresReauthentication: true,
       );
     });
-  }
-
-  void _scheduleTokenRefresh(DateTime expiresAt) {
-    _refreshTimer?.cancel();
-
-    final refreshAt = expiresAt.subtract(_refreshBuffer);
-    final now = DateTime.now();
-
-    if (refreshAt.isBefore(now)) {
-      // Token is already close to expiration, refresh immediately
-      refreshToken();
-    } else {
-      _refreshTimer = Timer(refreshAt.difference(now), refreshToken);
-    }
   }
 
   void clearToken() {

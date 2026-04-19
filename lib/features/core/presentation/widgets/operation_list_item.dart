@@ -184,7 +184,6 @@ class OperationListItem extends StatelessWidget {
   /// Build status chip
   Widget _buildStatusChip(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     String label;
     Color backgroundColor;

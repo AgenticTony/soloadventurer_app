@@ -133,7 +133,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
         }
       } else {
         // Create new manual check-in
-        final newCheckIn = CheckIn(
+        await CheckIn(
           id: const Uuid().v4(),
           userId: user.id,
           triggerType: CheckInTriggerType.manual,
@@ -203,7 +203,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final safetyState = ref.watch(safetyProvider);
-    final isSubmitting = safetyState.isProcessing;
+    final isSubmitting = safetyState.isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -335,7 +335,7 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
 
   bool get _isSubmitting {
     final safetyState = ref.watch(safetyProvider);
-    return safetyState.isProcessing;
+    return safetyState.isLoading;
   }
 
   Widget _buildLocationCard(ThemeData theme) {
@@ -525,8 +525,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
         RadioListTile<safety.SafetyStatusType>(
           title: const Text('Just Check In'),
           subtitle: const Text('Complete check-in without updating status'),
-          value: safety.SafetyStatusType.safe, // Default to safe
           groupValue: _selectedStatus,
+          value: safety.SafetyStatusType.safe, // Default to safe
           onChanged: _isSubmitting
               ? null
               : (value) {
@@ -557,8 +557,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
             ],
           ),
           subtitle: const Text('Let your contacts know you\'re okay'),
-          value: safety.SafetyStatusType.safe,
           groupValue: _selectedStatus,
+          value: safety.SafetyStatusType.safe,
           onChanged: _isSubmitting
               ? null
               : (value) {
@@ -590,8 +590,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
           ),
           subtitle:
               const Text('You need assistance but it\'s not an emergency'),
-          value: safety.SafetyStatusType.needHelp,
           groupValue: _selectedStatus,
+          value: safety.SafetyStatusType.needHelp,
           onChanged: _isSubmitting
               ? null
               : (value) {
@@ -622,8 +622,8 @@ class _ManualCheckInScreenState extends ConsumerState<ManualCheckInScreen> {
             ],
           ),
           subtitle: const Text('You\'re in an emergency situation'),
-          value: safety.SafetyStatusType.emergency,
           groupValue: _selectedStatus,
+          value: safety.SafetyStatusType.emergency,
           onChanged: _isSubmitting
               ? null
               : (value) {

@@ -47,10 +47,26 @@ import 'package:soloadventurer/features/journal/presentation/screens/trip_list_s
 import 'package:soloadventurer/features/journal/presentation/screens/trip_detail_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/trip_overview_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/create_trip_screen.dart';
+import 'package:soloadventurer/features/matching/presentation/screens/matches_screen.dart';
+import 'package:soloadventurer/features/matching/presentation/screens/chat_list_screen.dart';
+import 'package:soloadventurer/features/matching/presentation/screens/chat_screen.dart';
+import 'package:soloadventurer/features/verification/presentation/screens/verification_welcome_screen.dart';
+import 'package:soloadventurer/features/verification/presentation/screens/verification_consent_screen.dart';
+import 'package:soloadventurer/features/verification/presentation/screens/photo_capture_screen.dart';
+import 'package:soloadventurer/features/verification/presentation/screens/id_verification_start_screen.dart';
+import 'package:soloadventurer/features/verification/presentation/screens/id_upload_screen.dart';
+import 'package:soloadventurer/features/verification/presentation/screens/verification_result_screen.dart';
+import 'package:soloadventurer/features/profile/presentation/screens/user_profile_screen.dart';
+import 'package:soloadventurer/features/subscription/presentation/screens/paywall_screen.dart';
+import 'package:soloadventurer/features/subscription/presentation/screens/connection_requests_screen.dart';
+import 'package:soloadventurer/features/subscription/presentation/screens/subscription_management_screen.dart';
+import 'package:soloadventurer/features/safety/presentation/screens/meetup/share_meetup_screen.dart';
+import 'package:soloadventurer/features/safety/presentation/screens/meetup/meetup_detail_preview_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/journal_map_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/memory_timeline_screen.dart';
 import 'package:soloadventurer/features/journal/presentation/screens/tag_list_screen.dart';
 import 'package:soloadventurer/app/router/go_router_service.dart';
+import 'package:soloadventurer/app/providers/analytics_provider.dart';
 import 'package:soloadventurer/core/widgets/main_navigation_bar.dart';
 
 /// Global navigator key for go_router
@@ -71,11 +87,16 @@ final goRouterServiceProvider = Provider<GoRouterService>((ref) {
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
+  final analytics = ref.read(analyticsServiceProvider);
+
   return GoRouter(
     debugLogDiagnostics: true,
     navigatorKey: goRouterNavigatorKey,
     initialLocation: '/home',
     redirect: (context, state) {
+      // Track screen view for analytics
+      analytics.trackScreenView(state.matchedLocation);
+
       // Don't redirect while auth state is loading
       // This prevents navigation issues during initial app load
       if (authState.isLoading) {
@@ -197,6 +218,129 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       // ============================================================
+      // MATCHING FEATURE ROUTES (outside shell)
+      // ============================================================
+
+      GoRoute(
+        path: '/chats',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: ChatListScreen()),
+      ),
+
+      GoRoute(
+        path: '/chat/:connectionId',
+        pageBuilder: (context, state) {
+          final connectionId =
+              state.pathParameters['connectionId'] ?? '';
+          final extra = state.extra as Map<String, dynamic>?;
+          final chatId = extra?['chatId'] as String? ?? '';
+          return MaterialPage(
+            child: ChatScreen(
+              key: ValueKey(connectionId),
+              chatId: chatId,
+              connectionId: connectionId,
+            ),
+          );
+        },
+      ),
+
+      // ============================================================
+      // VERIFICATION ROUTES
+      // ============================================================
+
+      GoRoute(
+        path: '/verification',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: VerificationWelcomeScreen()),
+      ),
+
+      GoRoute(
+        path: '/verification/consent',
+        pageBuilder: (context, state) {
+          final type = state.extra as String? ?? 'photo';
+          return MaterialPage(
+            child: VerificationConsentScreen(verificationType: type),
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/verification/photo',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: PhotoCaptureScreen()),
+      ),
+
+      GoRoute(
+        path: '/verification/id',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: IdVerificationStartScreen()),
+      ),
+
+      GoRoute(
+        path: '/verification/id/upload',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: IdUploadScreen()),
+      ),
+
+      GoRoute(
+        path: '/verification/result',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: VerificationResultScreen()),
+      ),
+
+      // ============================================================
+      // SUBSCRIPTION ROUTES
+      // ============================================================
+
+      GoRoute(
+        path: '/paywall',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: PaywallScreen()),
+      ),
+
+      GoRoute(
+        path: '/connection-requests',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: ConnectionRequestsScreen()),
+      ),
+
+      GoRoute(
+        path: '/subscription/manage',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: SubscriptionManagementScreen()),
+      ),
+
+      // ============================================================
+      // SHARE MY MEETUP ROUTES
+      // ============================================================
+
+      GoRoute(
+        path: '/safety/meetup/share',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: ShareMeetupScreen()),
+      ),
+
+      GoRoute(
+        path: '/safety/meetup/detail',
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: MeetupDetailPreviewScreen()),
+      ),
+
+      // ============================================================
+      // USER PROFILE VIEW (other users)
+      // ============================================================
+
+      GoRoute(
+        path: '/user/:userId',
+        pageBuilder: (context, state) {
+          final userId = state.pathParameters['userId'] ?? '';
+          return MaterialPage(
+            child: UserProfileScreen(key: ValueKey(userId), userId: userId),
+          );
+        },
+      ),
+
+      // ============================================================
       // OTHER ROUTES WITHOUT BOTTOM NAV
       // ============================================================
 
@@ -260,7 +404,29 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
 
           // ============================================================
-          // BRANCH 1: JOURNAL
+          // BRANCH 1: CONNECTIONS (Matching)
+          // ============================================================
+
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/connect',
+                pageBuilder: (context, state) =>
+                    const MaterialPage(child: MatchesScreen()),
+                routes: [
+                  // Create trip for matching
+                  GoRoute(
+                    path: 'create-trip',
+                    pageBuilder: (context, state) =>
+                        const MaterialPage(child: CreateTripScreen()),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          // ============================================================
+          // BRANCH 2: JOURNAL
           // ============================================================
 
           StatefulShellBranch(
@@ -355,7 +521,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
 
           // ============================================================
-          // BRANCH 2: DESTINATIONS
+          // BRANCH 3: DESTINATIONS
           // ============================================================
 
           StatefulShellBranch(
@@ -413,7 +579,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
 
           // ============================================================
-          // BRANCH 3: SAFETY
+          // BRANCH 4: SAFETY
           // ============================================================
 
           StatefulShellBranch(
@@ -501,7 +667,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           ),
 
           // ============================================================
-          // BRANCH 4: PROFILE
+          // BRANCH 5: PROFILE
           // ============================================================
 
           StatefulShellBranch(
@@ -516,6 +682,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                     path: 'settings',
                     pageBuilder: (context, state) =>
                         const MaterialPage(child: ProfileSettingsScreen()),
+                    routes: [
+                      // Subscription management
+                      GoRoute(
+                        path: 'subscription',
+                        pageBuilder: (context, state) =>
+                            const MaterialPage(
+                                child: SubscriptionManagementScreen()),
+                      ),
+                    ],
                   ),
                   // Sync settings
                   GoRoute(

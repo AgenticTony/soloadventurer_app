@@ -8,13 +8,31 @@ import 'package:soloadventurer/features/auth/data/models/auth_tokens.dart';
 import 'package:soloadventurer/features/auth/data/models/credentials.dart';
 
 /// Mock implementation of [AuthRemoteDataSource] for testing
+///
+/// **WARNING:** This class must NEVER be used in release builds.
+/// It returns hardcoded mock tokens and credentials.
 class MockAuthRemoteDataSource implements AuthRemoteDataSource {
+  static bool _debugGuardChecked = false;
+
+  static void _checkDebugGuard() {
+    if (_debugGuardChecked) return;
+    _debugGuardChecked = true;
+    if (kReleaseMode) {
+      throw StateError(
+        'MockAuthRemoteDataSource must not be used in release builds. '
+        'Ensure the DI container only provides real implementations in production.',
+      );
+    }
+  }
+
   final ApiClient _apiClient;
   UserModel? _currentUser;
   bool _isAuthenticated = false;
 
   /// Creates a new [MockAuthRemoteDataSource]
-  MockAuthRemoteDataSource(this._apiClient);
+  MockAuthRemoteDataSource(this._apiClient) {
+    _checkDebugGuard();
+  }
 
   @override
   Future<(UserModel, AuthSession)> signIn(String email, String password) async {
@@ -210,7 +228,6 @@ class MockAuthRemoteDataSource implements AuthRemoteDataSource {
       throw const AuthException('Invalid email format');
     }
     // In a real implementation, this would send an email
-    debugPrint('Password reset email sent to: $email');
   }
 
   @override

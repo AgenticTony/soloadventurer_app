@@ -44,7 +44,7 @@ final class SecurityManagerProvider
   }
 }
 
-String _$securityManagerHash() => r'd696a60ffb495a551429352522a5ce858c9af2f1';
+String _$securityManagerHash() => r'1470c60e9b0cce74b96ffd47b3954b113cd1d79c';
 
 /// Manages security-related features like rate limiting and device tracking
 

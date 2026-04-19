@@ -1,8 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/features/core/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_local_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/datasources/trip_local_data_source.dart';
@@ -11,6 +10,7 @@ import 'package:soloadventurer/features/journal/data/datasources/tag_local_data_
 import 'package:soloadventurer/features/journal/data/datasources/tag_remote_data_source.dart';
 import 'package:soloadventurer/features/journal/data/models/journal_entry_model.dart';
 import 'package:soloadventurer/features/journal/data/models/media_item_model.dart';
+import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/features/journal/data/models/trip_model.dart';
 import 'package:soloadventurer/features/journal/data/models/tag_model.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
@@ -91,7 +91,7 @@ TripModel createTestTripModel({
   String? destination = 'Paris, France',
   DateTime? startDate,
   DateTime? endDate,
-  String? coverImage,
+  String? coverImageUrl,
   SyncStatus syncStatus = SyncStatus.synced,
   DateTime? updatedAt,
 }) {
@@ -104,7 +104,7 @@ TripModel createTestTripModel({
     destination: destination,
     startDate: startDate ?? testDateTimeEarlier,
     endDate: endDate ?? testDateTimeLater,
-    coverImage: coverImage,
+    coverImageUrl: coverImageUrl,
     syncStatus: syncStatus,
     lastSyncedAt: syncStatus == SyncStatus.synced ? now : null,
     createdAt: testDateTimeEarlier,
@@ -132,9 +132,7 @@ TagModel createTestTagModel({
     icon: icon,
     usageCount: usageCount,
     syncStatus: syncStatus,
-    lastSyncedAt: syncStatus == SyncStatus.synced ? now : null,
     createdAt: now,
-    updatedAt: now,
   );
 }
 
@@ -143,7 +141,7 @@ MediaItemModel createTestMediaItemModel({
   String id = testMediaId,
   String userId = testUserId,
   String journalEntryId = testEntryId,
-  MediaType mediaType = MediaType.image,
+  MediaType mediaType = MediaType.photo,
   String storagePath = '/media/photo.jpg',
   String? originalFilename = 'photo.jpg',
   int? fileSize = 1024000,

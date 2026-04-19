@@ -7,11 +7,11 @@ void main() {
     testWidgets('renders placeholder when widget is first built',
         (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: LazyLoadImage(
               imageUrl: 'https://example.com/test.jpg',
-              placeholder: _TestPlaceholder(),
+              placeholder: (context, url) => _TestPlaceholder(),
             ),
           ),
         ),
@@ -22,13 +22,13 @@ void main() {
 
     testWidgets('renders with custom width and height', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: LazyLoadImage(
               imageUrl: 'https://example.com/test.jpg',
               width: 200,
               height: 300,
-              placeholder: _TestPlaceholder(),
+              placeholder: (context, url) => _TestPlaceholder(),
             ),
           ),
         ),
@@ -49,12 +49,12 @@ void main() {
 
     testWidgets('renders with border radius', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: LazyLoadImage(
               imageUrl: 'https://example.com/test.jpg',
               borderRadius: BorderRadius.all(Radius.circular(16)),
-              placeholder: _TestPlaceholder(),
+              placeholder: (context, url) => _TestPlaceholder(),
             ),
           ),
         ),
@@ -66,13 +66,11 @@ void main() {
     testWidgets('photo convenience constructor creates square image',
         (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
-            body: LazyLoadImage.photo(
+            body: LazyLoadImageExtensions.optimized(
               imageUrl: 'https://example.com/test.jpg',
-              size: 100,
-              placeholder: _TestPlaceholder(),
-            ),
+              size: 100,),
           ),
         ),
       );
@@ -93,13 +91,11 @@ void main() {
     testWidgets('card convenience constructor creates rectangular image',
         (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
-            body: LazyLoadImage.card(
+            body: LazyLoadImageExtensions.optimizedCard(
               imageUrl: 'https://example.com/test.jpg',
-              height: 200,
-              placeholder: _TestPlaceholder(),
-            ),
+              height: 200,),
           ),
         ),
       );
@@ -119,13 +115,11 @@ void main() {
     testWidgets('thumbnail convenience constructor creates small image',
         (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
-            body: LazyLoadImage.thumbnail(
+            body: LazyLoadImageExtensions.optimizedThumbnail(
               imageUrl: 'https://example.com/test.jpg',
-              size: 48,
-              placeholder: _TestPlaceholder(),
-            ),
+              size: 48,),
           ),
         ),
       );
@@ -159,7 +153,7 @@ void main() {
                   key: ValueKey('image_$index'),
                   imageUrl: imageUrls[index],
                   height: 100,
-                  placeholder: const _TestPlaceholder(),
+                  placeholder: (context, url) => const _TestPlaceholder(),
                 );
               },
             ),
@@ -186,10 +180,9 @@ void main() {
               ),
               itemCount: imageUrls.length,
               itemBuilder: (context, index) {
-                return LazyLoadImage.photo(
+                return LazyLoadImageExtensions.optimized(
                   key: ValueKey('photo_$index'),
                   imageUrl: imageUrls[index],
-                  placeholder: const _TestPlaceholder(),
                 );
               },
             ),
@@ -203,7 +196,7 @@ void main() {
 
     testWidgets('uses default placeholder when none provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: LazyLoadImage(
               imageUrl: 'https://example.com/test.jpg',
@@ -235,7 +228,7 @@ void main() {
       const visibilityThreshold = 0.5;
 
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: SingleChildScrollView(
               child: Column(
@@ -244,7 +237,7 @@ void main() {
                   LazyLoadImage(
                     imageUrl: 'https://example.com/test.jpg',
                     visibilityThreshold: visibilityThreshold,
-                    placeholder: _TestPlaceholder(),
+                    placeholder: (context, url) => _TestPlaceholder(),
                   ),
                 ],
               ),
@@ -270,10 +263,9 @@ void main() {
             body: ListView.builder(
               itemCount: photos.length,
               itemBuilder: (context, index) {
-                return LazyLoadImage.photo(
+                return LazyLoadImageExtensions.optimized(
                   key: ValueKey(photos[index]['id']),
                   imageUrl: photos[index]['url'] as String,
-                  placeholder: const _TestPlaceholder(),
                 );
               },
             ),
@@ -306,7 +298,7 @@ void main() {
                     child: LazyLoadImage(
                       key: ValueKey('image_$index'),
                       imageUrl: imageUrls[index],
-                      placeholder: const _TestPlaceholder(),
+                      placeholder: (context, url) => const _TestPlaceholder(),
                     ),
                   );
                 },
@@ -345,7 +337,7 @@ void main() {
                     child: LazyLoadImage(
                       key: ValueKey('image_$index'),
                       imageUrl: imageUrls[index],
-                      placeholder: const _TestPlaceholder(),
+                      placeholder: (context, url) => const _TestPlaceholder(),
                     ),
                   );
                 },
@@ -367,7 +359,7 @@ void main() {
               body: LazyLoadImage(
                 imageUrl: 'https://example.com/test.jpg',
                 errorWidget: (context, url, error) => const _TestErrorWidget(),
-                placeholder: const _TestPlaceholder(),
+                placeholder: (context, url) => const _TestPlaceholder(),
               ),
             ),
           ),

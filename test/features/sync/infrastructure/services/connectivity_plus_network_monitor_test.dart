@@ -112,9 +112,7 @@ void main() {
       // Arrange
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.wifi]);
-      final connectivityStream = Stream<List<ConnectivityResult>>.value([
-        [ConnectivityResult.wifi]
-      ]);
+      final connectivityStream = Stream<List<ConnectivityResult>>.value([ConnectivityResult.wifi]);
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityStream);
 
@@ -130,9 +128,7 @@ void main() {
       // Arrange
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.wifi]);
-      final connectivityStream = Stream<List<ConnectivityResult>>.value([
-        [ConnectivityResult.wifi]
-      ]);
+      final connectivityStream = Stream<List<ConnectivityResult>>.value([ConnectivityResult.wifi]);
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityStream);
 
@@ -149,9 +145,7 @@ void main() {
       // Arrange
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.wifi]);
-      final connectivityStream = Stream<List<ConnectivityResult>>.value([
-        [ConnectivityResult.wifi]
-      ]);
+      final connectivityStream = Stream<List<ConnectivityResult>>.value([ConnectivityResult.wifi]);
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityStream);
 
@@ -406,9 +400,7 @@ void main() {
       // Arrange
       when(mockConnectivity.checkConnectivity())
           .thenAnswer((_) async => [ConnectivityResult.wifi]);
-      final connectivityStream = Stream<List<ConnectivityResult>>.value([
-        [ConnectivityResult.wifi]
-      ]);
+      final connectivityStream = Stream<List<ConnectivityResult>>.value([ConnectivityResult.wifi]);
       when(mockConnectivity.onConnectivityChanged)
           .thenAnswer((_) => connectivityStream);
 

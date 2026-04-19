@@ -64,4 +64,4 @@ final class SyncManagerProvider
   }
 }
 
-String _$syncManagerHash() => r'db65d51e6de7bafb3edd1012760ecef9e77dee88';
+String _$syncManagerHash() => r'5293a70cdfd2eacfc403bc6aa08d0b8500301d44';

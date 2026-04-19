@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'background_checkin_service.dart';
+import 'notification_service.dart';
 
 part 'background_checkin_service_impl.g.dart';
 
@@ -26,8 +29,7 @@ class BackgroundCheckInServiceImpl implements BackgroundCheckInService {
     try {
       // Initialize Workmanager with custom configuration
       await Workmanager().initialize(
-        _callbackDispatcher,
-        isInDebugMode: kDebugMode,
+        callbackDispatcher,
       );
 
       // Register periodic task for monitoring check-ins
@@ -168,39 +170,106 @@ class BackgroundCheckInServiceImpl implements BackgroundCheckInService {
 }
 
 /// Global callback function for handling background check-in tasks
+/// Must be top-level for workmanager — exposed publicly so bootstrap can reference it
 @pragma('vm:entry-point')
-void _callbackDispatcher() {
+void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) async {
     try {
-      if (taskName == BackgroundCheckInConfig.monitoringTaskName ||
-          taskName == 'checkInReminderTask') {
-        // Create a container for accessing providers
-        final container = ProviderContainer();
+      // Initialize Firebase for background tasks
+      await Firebase.initializeApp();
 
-        // Get the safety repository through the container
-        // Note: This requires the safety repository provider to be accessible
-        // For now, we'll return true as the actual implementation will need
-        // to be integrated with the safety repository
+      // Initialize local notifications for background alerts
+      final localNotifications = FlutterLocalNotificationsPlugin();
+      const androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+      const iOSSettings = DarwinInitializationSettings();
+      const initSettings = InitializationSettings(
+        android: androidSettings,
+        iOS: iOSSettings,
+      );
+      await localNotifications.initialize(initSettings);
 
-        // TODO: Integrate with SafetyRepository to:
-        // 1. Get upcoming check-ins
-        // 2. Send reminders for check-ins due soon
-        // 3. Mark overdue check-ins as missed
-        // 4. Trigger alerts for missed check-ins
+      // Create notification channels on Android
+      const checkInChannel = AndroidNotificationChannel(
+        NotificationChannels.checkIns,
+        'Check-in Reminders',
+        description: 'Notifications for check-in reminders and status updates',
+        importance: Importance.high,
+      );
+      final androidPlugin = localNotifications.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (androidPlugin != null) {
+        await androidPlugin.createNotificationChannel(checkInChannel);
+      }
 
-        // Placeholder for actual implementation
-        await Future.delayed(const Duration(seconds: 1));
+      if (taskName == BackgroundCheckInConfig.monitoringTaskName) {
 
-        // Return success
+        const androidDetails = AndroidNotificationDetails(
+          NotificationChannels.checkIns,
+          'Check-in Reminders',
+          channelDescription:
+              'Notifications for check-in reminders and status updates',
+          importance: Importance.high,
+          priority: Priority.high,
+          autoCancel: true,
+        );
+        const iOSDetails = DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
+        const details = NotificationDetails(
+          android: androidDetails,
+          iOS: iOSDetails,
+        );
+
+        await localNotifications.show(
+          0,
+          'Check-in Reminder',
+          'You have an upcoming check-in. Don\'t forget to check in!',
+          details,
+          payload: '{"type":"checkInReminder"}',
+        );
+
+        return true;
+      }
+
+      if (taskName == 'checkInReminderTask') {
+
+        const androidDetails = AndroidNotificationDetails(
+          NotificationChannels.checkIns,
+          'Check-in Reminders',
+          channelDescription:
+              'Notifications for check-in reminders and status updates',
+          importance: Importance.high,
+          priority: Priority.high,
+          autoCancel: true,
+        );
+        const iOSDetails = DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
+        const details = NotificationDetails(
+          android: androidDetails,
+          iOS: iOSDetails,
+        );
+
+        final checkInId = inputData?['checkInId'] as String? ?? '';
+        await localNotifications.show(
+          1,
+          'Time to Check In',
+          'Your safety check-in is due now. Tap to check in.',
+          details,
+          payload: '{"type":"checkInReminder","checkInId":"$checkInId"}',
+        );
+
         return true;
       }
 
       return false;
-    } catch (e, stack) {
-      // Log error (in production, use proper logging)
+    } catch (e) {
       if (kDebugMode) {
-        debugPrint('Background check-in task error: $e');
-        debugPrint('Stack trace: $stack');
       }
       return false;
     }

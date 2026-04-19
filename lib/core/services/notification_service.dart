@@ -49,6 +49,9 @@ class NotificationChannels {
 
   /// Background sync and system operations
   static const String backgroundSync = 'background_sync';
+
+  /// Chat / new message notifications
+  static const String chat = 'chat_messages';
 }
 
 /// Configuration for safety notifications

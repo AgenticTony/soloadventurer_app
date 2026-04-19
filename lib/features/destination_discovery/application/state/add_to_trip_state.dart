@@ -1,5 +1,7 @@
 import '../../domain/models/destination.dart';
 
+const _absent = Object();
+
 /// State class for adding a destination to a trip
 class AddToTripState {
   /// The destination being added
@@ -46,7 +48,7 @@ class AddToTripState {
     String? tripName,
     bool? isLoading,
     bool? isSuccess,
-    String? errorMessage,
+    Object? errorMessage = _absent,
   }) {
     return AddToTripState(
       destination: destination ?? this.destination,
@@ -54,7 +56,7 @@ class AddToTripState {
       tripName: tripName ?? this.tripName,
       isLoading: isLoading ?? this.isLoading,
       isSuccess: isSuccess ?? this.isSuccess,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage: identical(errorMessage, _absent) ? this.errorMessage : errorMessage as String?,
     );
   }
 

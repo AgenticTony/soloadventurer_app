@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' as material show TimeOfDay, showTimePicker;
 import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:soloadventurer/features/recommendations/domain/entities/recommendation.dart';
 
@@ -102,12 +103,12 @@ class _ScheduleRecommendationSheetState
 
   Future<void> _selectTime(BuildContext context) async {
     final suggestedTime = widget.recommendation.metadata.suggestedTime;
-    final initialTime = TimeOfDay(
+    final initialTime = material.TimeOfDay(
       hour: suggestedTime.hour,
       minute: suggestedTime.minute,
     );
 
-    final selected = await showTimePicker(
+    final selected = await material.showTimePicker(
       context: context,
       initialTime: initialTime,
     );

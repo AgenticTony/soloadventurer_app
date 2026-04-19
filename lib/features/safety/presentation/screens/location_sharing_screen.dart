@@ -27,15 +27,10 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final locationSharingState = ref.watch(locationSharingProvider);
-    final activeShares = locationSharingState.activeShares;
-    final latestLocation = locationSharingState.latestLocation;
-    final isLoading = locationSharingState.isLoading;
-    final isStopping = locationSharingState.isStopping;
-    final error = locationSharingState.error;
+    final locationSharingAsync = ref.watch(locationSharingProvider);
+    final trustedContactsAsync = ref.watch(trustedContactsProvider);
 
-    final trustedContactsState = ref.watch(trustedContactsProvider);
-    final trustedContacts = trustedContactsState.contacts;
+    final isStopping = locationSharingAsync.value?.isStopping ?? false;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,14 +43,19 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
           ),
         ],
       ),
-      body: _buildBody(
-        context,
-        activeShares,
-        latestLocation,
-        trustedContacts,
-        isLoading,
-        isStopping,
-        error,
+      body: locationSharingAsync.when(
+        data: (locationSharingState) {
+          final trustedContacts = trustedContactsAsync.value?.contacts ?? [];
+          return _buildBody(
+            context,
+            locationSharingState.activeShares,
+            locationSharingState.latestLocation,
+            trustedContacts,
+            locationSharingState.isStopping,
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _buildErrorWidget(context, error.toString()),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: isStopping ? null : () => _showShareOptions(context),
@@ -70,20 +70,8 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
     List<LocationUpdate> activeShares,
     LocationUpdate? latestLocation,
     List<TrustedContact> trustedContacts,
-    bool isLoading,
     bool isStopping,
-    String? error,
   ) {
-    if (isLoading && activeShares.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (error != null) {
-      return _buildErrorWidget(context, error);
-    }
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -492,8 +480,8 @@ class _LocationSharingScreenState extends ConsumerState<LocationSharingScreen> {
   }
 
   void _showShareOptions(BuildContext context) {
-    final trustedContactsState = ref.read(trustedContactsProvider);
-    final trustedContacts = trustedContactsState.contacts;
+    final trustedContactsState = ref.read(trustedContactsProvider).value;
+    final trustedContacts = trustedContactsState?.contacts ?? [];
     final contactsWithSharing = trustedContacts
         .where((contact) => contact.locationSharingEnabled)
         .toList();

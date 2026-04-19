@@ -1,0 +1,202 @@
+name: Supabase CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'supabase/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'supabase/**'
+
+env:
+  SUPABASE_VERSION: 'latest'
+  DENO_VERSION: 'v1.x'
+
+jobs:
+  # =============================================================================
+  # MIGRATION LINT & VALIDATION
+  # =============================================================================
+  migration-check:
+    name: Migration Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_VERSION }}
+
+      - name: Verify Supabase config
+        run: supabase config
+
+      - name: Lint migrations
+        run: supabase db lint
+        continue-on-error: false
+
+      - name: Check for dangerous operations
+        run: |
+          echo "Checking for potentially dangerous migrations..."
+          DANGEROUS_PATTERNS=(
+            "DROP TABLE"
+            "DROP COLUMN"
+            "TRUNCATE"
+            "DELETE FROM"
+          )
+          
+          for pattern in "${DANGEROUS_PATTERNS[@]}"; do
+            if grep -rn "$pattern" supabase/migrations/*.sql 2>/dev/null; then
+              echo "::warning::Found '$pattern' in migrations. Review carefully."
+            fi
+          done
+          echo "✅ Migration safety check complete"
+
+      - name: Validate migration order
+        run: |
+          echo "Validating migration file naming..."
+          ls -1 supabase/migrations/*.sql | sort -c && echo "✅ Migrations are in order" || {
+            echo "::error::Migration files are not properly ordered"
+            exit 1
+          }
+
+  # =============================================================================
+  # BREAKING CHANGE DETECTION
+  # =============================================================================
+  breaking-changes:
+    name: Breaking Change Detection
+    runs-on: ubuntu-latest
+    needs: migration-check
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for diff
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_VERSION }}
+
+      - name: Check for breaking changes
+        run: |
+          echo "Detecting breaking changes between branches..."
+          
+          # Get the list of changed migration files
+          CHANGED_MIGRATIONS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- 'supabase/migrations/*.sql' || true)
+          
+          if [ -z "$CHANGED_MIGRATIONS" ]; then
+            echo "No migration changes detected"
+            exit 0
+          fi
+          
+          echo "Changed migrations:"
+          echo "$CHANGED_MIGRATIONS"
+          
+          # Check for RLS policy removals (security risk)
+          if echo "$CHANGED_MIGRATIONS" | xargs grep -l "DROP POLICY" 2>/dev/null; then
+            echo "::warning::Some migrations remove RLS policies. Ensure this is intentional."
+          fi
+          
+          # Check for table drops
+          if echo "$CHANGED_MIGRATIONS" | xargs grep -l "DROP TABLE" 2>/dev/null; then
+            echo "::error::Migrations contain DROP TABLE statements. This is a breaking change!"
+            exit 1
+          fi
+          
+          echo "✅ Breaking change check complete"
+
+  # =============================================================================
+  # EDGE FUNCTIONS VALIDATION
+  # =============================================================================
+  edge-functions:
+    name: Edge Functions Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ env.DENO_VERSION }}
+
+      - name: Check Edge Functions structure
+        run: |
+          echo "Checking Edge Functions..."
+          FUNCTIONS_DIR="supabase/functions"
+          
+          if [ ! -d "$FUNCTIONS_DIR" ]; then
+            echo "No Edge Functions directory found"
+            exit 0
+          fi
+          
+          for func_dir in "$FUNCTIONS_DIR"/*/; do
+            if [ -d "$func_dir" ]; then
+              FUNC_NAME=$(basename "$func_dir")
+              echo "Validating function: $FUNC_NAME"
+              
+              # Check for index.ts
+              if [ ! -f "${func_dir}index.ts" ]; then
+                echo "::error::Missing index.ts in function $FUNC_NAME"
+                exit 1
+              fi
+              
+              echo "✅ Function $FUNC_NAME structure is valid"
+            fi
+          done
+
+      - name: Lint Edge Functions with Deno
+        run: |
+          echo "Linting Edge Functions with Deno..."
+          
+          for func_dir in supabase/functions/*/; do
+            if [ -d "$func_dir" ]; then
+              FUNC_NAME=$(basename "$func_dir")
+              echo "Linting $FUNC_NAME..."
+              deno lint "${func_dir}index.ts" || {
+                echo "::warning::Deno lint issues in $FUNC_NAME"
+              }
+            fi
+          done
+          echo "✅ Edge Functions lint complete"
+
+      - name: Type check Edge Functions
+        run: |
+          echo "Type checking Edge Functions..."
+          
+          for func_dir in supabase/functions/*/; do
+            if [ -d "$func_dir" ]; then
+              FUNC_NAME=$(basename "$func_dir")
+              echo "Type checking $FUNC_NAME..."
+              deno check "${func_dir}index.ts" || {
+                echo "::error::Type check failed for $FUNC_NAME"
+                exit 1
+              }
+            fi
+          done
+          echo "✅ All Edge Functions type check passed"
+
+  # =============================================================================
+  # SUPABASE CI SUMMARY
+  # =============================================================================
+  supabase-summary:
+    name: Supabase CI Summary
+    runs-on: ubuntu-latest
+    needs: [migration-check, edge-functions]
+    if: always()
+    steps:
+      - name: Check overall status
+        run: |
+          if [[ "${{ needs.migration-check.result }}" != "success" ]]; then
+            echo "❌ Migration validation failed"
+            exit 1
+          fi
+          if [[ "${{ needs.edge-functions.result }}" != "success" ]]; then
+            echo "❌ Edge Functions validation failed"
+            exit 1
+          fi
+          echo "✅ All Supabase CI checks passed!"

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/models/destination.dart'
-    hide ActivityLevel, BudgetLevel; // Hide to avoid conflicts with filter types
-import '../../domain/models/destination_filter.dart' show FilterBudgetLevel, FilterActivityLevel, DestinationFilter;
+// Hide to avoid conflicts with filter types
+import '../../domain/models/destination_filter.dart' show FilterBudgetLevel, FilterActivityLevel;
 import '../../application/providers/filter_provider.dart';
 
 /// A horizontally scrollable list of filter chips for quick filtering.
@@ -64,7 +63,6 @@ class FilterChips extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final filterState = ref.watch(filterProvider);
     final filterNotifier = ref.read(filterProvider.notifier);
 

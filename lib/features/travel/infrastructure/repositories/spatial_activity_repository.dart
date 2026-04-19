@@ -4,6 +4,38 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/models/map_marker.dart';
 import '../../domain/models/activity.dart';
 
+/// Geographic bounding box defined by cardinal directions
+class Bounds {
+  /// Southern latitude boundary
+  final double south;
+
+  /// Western longitude boundary
+  final double west;
+
+  /// Northern latitude boundary
+  final double north;
+
+  /// Eastern longitude boundary
+  final double east;
+
+  const Bounds({
+    required this.south,
+    required this.west,
+    required this.north,
+    required this.east,
+  });
+
+  /// Create from two corner points (southWest, northEast)
+  factory Bounds.fromCorners(LatLng southWest, LatLng northEast) {
+    return Bounds(
+      south: southWest.latitude,
+      west: southWest.longitude,
+      north: northEast.latitude,
+      east: northEast.longitude,
+    );
+  }
+}
+
 /// Result of a spatial query for activities within bounds
 class SpatialQueryResult {
   /// Activities found within the specified bounds
@@ -39,7 +71,6 @@ class SpatialQueryResult {
               latitude: a.latitude,
               longitude: a.longitude,
               description: a.locationName,
-              type: _activityToMarkerType(a.category),
             ))
         .toList();
   }
@@ -87,21 +118,6 @@ class SpatialQueryResult {
     );
   }
 
-  MarkerType _activityToMarkerType(ActivityCategory category) {
-    switch (category) {
-      case ActivityCategory.accommodation:
-        return MarkerType.accommodation;
-      case ActivityCategory.food:
-        return MarkerType.restaurant;
-      case ActivityCategory.transport:
-        return MarkerType.transport;
-      case ActivityCategory.activity:
-      case ActivityCategory.sightseeing:
-      case ActivityCategory.shopping:
-      case ActivityCategory.other:
-        return MarkerType.poi;
-    }
-  }
 }
 
 /// Cache entry for viewport query results
@@ -397,8 +413,8 @@ class SpatialActivityRepository {
       query = query.eq('tripId', tripId);
     }
 
-    final count = await query.count();
-    return count;
+    final response = await query;
+    return (response as List).length;
   }
 
   /// Get statistics about query performance
@@ -440,23 +456,23 @@ class SpatialActivityRepository {
     String? tripId,
   }) async {
     // Build spatial query using bounding box
-    var query = _client
+    final filterQuery = _client
         .from('activities')
         .select()
         .eq('userId', userId)
         .gte('latitude', bounds.south)
         .lte('latitude', bounds.north)
         .gte('longitude', bounds.west)
-        .lte('longitude', bounds.east)
-        .order('createdAt', ascending: false)
-        .limit(maxMarkers);
+        .lte('longitude', bounds.east);
 
-    // Add trip filter if provided
+    // Add trip filter if provided (before transform operations)
+    var filteredQuery = filterQuery;
     if (tripId != null) {
-      query = query.eq('tripId', tripId);
+      filteredQuery = filteredQuery.eq('tripId', tripId);
     }
 
-    final response = await query;
+    final response =
+        await filteredQuery.order('createdAt', ascending: false).limit(maxMarkers);
 
     // Parse activities from response
     final activities = (response as List)

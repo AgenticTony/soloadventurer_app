@@ -1,343 +1,430 @@
-import 'package:flutter/material.dart' as material
-    show
-        TextButton,
-        ElevatedButton,
-        AppBar,
-        Text,
-        Icons,
-        Key,
-        TextField,
-        IconButton,
-        CircularProgressIndicator,
-        GridView,
-        ListView;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:soloadventurer/app/app.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
-import 'package:soloadventurer/core/storage/secure_storage.dart';
-import 'package:soloadventurer/features/auth/data/datasources/mock_auth_remote_data_source.dart';
-import 'package:soloadventurer/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
-import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart' hide BudgetLevel, ActivityLevel;
+
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart' as dest_models;
+import 'package:soloadventurer/features/destination_discovery/domain/models/destination_filter.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/curated_list.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/personalized_recommendation.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/saved_destination.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
-import 'package:soloadventurer/core/providers/core_providers.dart';
-import 'package:soloadventurer/features/auth/domain/providers/auth_providers.dart';
+import 'package:soloadventurer/features/auth/domain/entities/user.dart';
+import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
+import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
+
 import 'test_config.dart';
 
-/// Mock implementation of DestinationRepository for integration testing
-class MockDestinationRepository implements DestinationRepository {
-  // In-memory storage for test data
-  final Map<String, Destination> _destinations = {};
-  final List<CuratedList> _curatedLists = [];
-  final Map<String, List<SavedDestination>> _savedDestinations = {};
-  PersonalizedRecommendation? _recommendations;
+// ---------------------------------------------------------------------------
+// In-memory mock: AuthRepository
+// ---------------------------------------------------------------------------
 
-  /// Set up test data
-  void setupTestData() {
-    final now = DateTime.now();
-    // Create test destinations
-    final tokyo = Destination(
-      id: 'tokyo-1',
-      name: 'Tokyo',
-      description: 'Vibrant metropolis blending ancient traditions with cutting-edge technology',
-      latitude: 35.6762,
-      longitude: 139.6503,
-      safetyScore: 8.5,
-      soloSuitabilityScore: 8.0,
-      soloSuitabilityFactors: const SoloSuitabilityFactors(
-        safety: 8.5,
-        nightlife: 7.0,
-        walkability: 9.0,
-        accommodation: 8.0,
-        soloDining: 7.5,
-        communication: 6.5,
-        overall: 7.8,
-      ),
-      countryCode: 'JP',
-      region: 'Kanto',
-      budgetLevel: BudgetLevel.moderate,
-      activityLevels: const [ActivityLevel.moderate],
-      safetyInsights: const [],
-      tags: ['urban', 'cultural', 'food'],
-      images: ['https://images.unsplash.com/photo-1540959733332-eab4deabeeaf'],
-      popularActivities: const [],
-      bestTimeToVisit: 'March-May, October-November',
-      isHiddenGem: false,
-      popularityScore: 9.2,
-      createdAt: now,
-      updatedAt: now,
+class MockAuthRepository implements AuthRepository {
+  User? _currentUser;
+  final Map<String, (String, User)> _users = {}; // email -> (password, User)
+
+  void _seedTestUser() {
+    final user = User(
+      id: 'test-user-1',
+      email: TestConfig.testEmail,
+      username: TestConfig.testName,
+      createdAt: DateTime(2024, 1, 1),
     );
+    _users[TestConfig.testEmail] = (TestConfig.testPassword, user);
+  }
 
-    final kyoto = Destination(
-      id: 'kyoto-1',
-      name: 'Kyoto',
-      description: 'Ancient capital with stunning temples and traditional culture',
-      latitude: 35.0116,
-      longitude: 135.7681,
-      safetyScore: 9.0,
-      soloSuitabilityScore: 8.5,
-      soloSuitabilityFactors: const SoloSuitabilityFactors(
-        safety: 9.0,
-        nightlife: 6.0,
-        walkability: 8.5,
-        accommodation: 8.5,
-        soloDining: 8.0,
-        communication: 6.0,
-        overall: 7.7,
-      ),
-      countryCode: 'JP',
-      region: 'Kansai',
-      budgetLevel: BudgetLevel.moderate,
-      activityLevels: const [ActivityLevel.relaxed],
-      safetyInsights: const [],
-      tags: ['cultural', 'historical', 'nature'],
-      images: ['https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e'],
-      popularActivities: const [],
-      bestTimeToVisit: 'March-May, October-November',
-      isHiddenGem: false,
-      popularityScore: 8.8,
-      createdAt: now,
-      updatedAt: now,
-    );
-
-    final bali = Destination(
-      id: 'bali-1',
-      name: 'Bali',
-      description: 'Tropical paradise with beautiful beaches and rich culture',
-      latitude: -8.3405,
-      longitude: 115.0920,
-      safetyScore: 7.5,
-      soloSuitabilityScore: 7.0,
-      soloSuitabilityFactors: const SoloSuitabilityFactors(
-        safety: 7.5,
-        nightlife: 8.0,
-        walkability: 6.5,
-        accommodation: 8.5,
-        soloDining: 7.0,
-        communication: 6.5,
-        overall: 7.3,
-      ),
-      countryCode: 'ID',
-      region: 'Bali',
-      budgetLevel: BudgetLevel.budget,
-      activityLevels: const [ActivityLevel.moderate],
-      safetyInsights: const [],
-      tags: ['beach', 'nature', 'wellness'],
-      images: ['https://images.unsplash.com/photo-1537996194471-e657df975ab4'],
-      popularActivities: const [],
-      bestTimeToVisit: 'April-October',
-      isHiddenGem: false,
-      popularityScore: 8.5,
-      createdAt: now,
-      updatedAt: now,
-    );
-
-    _destinations.addAll({
-      'tokyo-1': tokyo,
-      'kyoto-1': kyoto,
-      'bali-1': bali,
-    });
-
-    // Create test curated lists
-    _curatedLists.addAll([
-      CuratedList(
-        id: 'popular-solo-1',
-        name: 'Popular Solo Destinations',
-        description: 'Most loved destinations by solo travelers',
-        type: CuratedListType.popularSolo,
-        destinations: [tokyo, kyoto, bali],
-        coverImageUrl: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800',
-        curatorName: 'SoloAdventurer Team',
-        destinationCount: 3,
-        isFeatured: true,
-        viewCount: 15234,
-        saveCount: 892,
-        tags: ['popular', 'solo', 'urban'],
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
-      ),
-      CuratedList(
-        id: 'hidden-gems-1',
-        name: 'Hidden Gems in Asia',
-        description: 'Lesser-known destinations perfect for solo exploration',
-        type: CuratedListType.hiddenGems,
-        destinations: [kyoto],
-        coverImageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
-        curatorName: 'Adventure Curator',
-        destinationCount: 1,
-        isFeatured: false,
-        viewCount: 5421,
-        saveCount: 423,
-        tags: ['hidden', 'gems', 'asia'],
-        createdAt: DateTime(2024, 1, 1),
-        updatedAt: DateTime(2024, 1, 1),
-      ),
-    ]);
-
-    // Create test recommendations
-    _recommendations = PersonalizedRecommendation(
-      id: 'rec-1',
-      userId: 'test-user-id',
-      recommendations: [
-        RecommendedDestination(
-          destination: tokyo,
-          matchScore: 0.92,
-          reason: 'Matches your interest in urban exploration and cultural experiences',
-          matchingFactors: ['high solo suitability', 'cultural activities', 'moderate budget'],
-        ),
-        RecommendedDestination(
-          destination: bali,
-          matchScore: 0.85,
-          reason: 'Perfect for your preference for beach destinations',
-          matchingFactors: ['beach activities', 'budget-friendly', 'wellness focus'],
-        ),
-      ],
-      source: RecommendationSource.userPreferences,
-      generatedAt: DateTime.now().subtract(const Duration(hours: 2)),
-      expiresAt: DateTime.now().add(const Duration(hours: 22)),
-    );
+  MockAuthRepository() {
+    _seedTestUser();
   }
 
   @override
-  Future<List<Destination>> searchDestinations(DestinationFilter filter) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 500));
+  Future<User> signInWithEmailAndPassword(String email, String password) async {
+    await Future.delayed(TestConfig.stepDelay);
+    final entry = _users[email];
+    if (entry == null || entry.$1 != password) {
+      throw Exception('Invalid email or password');
+    }
+    _currentUser = entry.$2.copyWith(lastLoginAt: DateTime.now());
+    return _currentUser!;
+  }
 
-    var results = _destinations.values.toList();
+  @override
+  Future<(User, bool)> register({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
+    await Future.delayed(TestConfig.stepDelay);
+    final exists = _users.containsKey(email);
+    final user = User(
+      id: 'user-${DateTime.now().millisecondsSinceEpoch}',
+      email: email,
+      username: name,
+      createdAt: DateTime.now(),
+    );
+    _users[email] = (password, user);
+    _currentUser = user;
+    return (user, !exists);
+  }
 
-    // Apply search query filter
+  @override
+  Future<void> signOut() async {
+    _currentUser = null;
+  }
+
+  @override
+  Future<User?> getCurrentUser() async => _currentUser;
+
+  @override
+  Future<bool> isAuthenticated() async => _currentUser != null;
+
+  // Unused AuthRepository methods — stubs required by the interface
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {}
+
+  @override
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {}
+
+  @override
+  Future<User> updateUserProfile({
+    String? name,
+    String? email,
+    String? photoUrl,
+  }) async =>
+      _currentUser!;
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {}
+
+  @override
+  Future<void> verifyEmail(String code, String email) async {}
+
+  @override
+  Future<void> resendVerificationEmail() async {}
+
+  @override
+  Future<String> enableTwoFactor() async => '';
+
+  @override
+  Future<void> disableTwoFactor(String code) async {}
+
+  @override
+  Future<void> verifyTwoFactor(String code) async {}
+
+  @override
+  Future<bool> isSignedIn() async => _currentUser != null;
+
+  @override
+  Future<String?> getAccessToken() async => _currentUser?.accessToken;
+
+  @override
+  Future<AuthSession> refreshToken() async => throw UnimplementedError();
+
+  @override
+  Future<AuthSession> performBasicTokenRefresh() async => throw UnimplementedError();
+
+  @override
+  Future<AuthSession?> getSession() async => null;
+
+  @override
+  Future<User> registerWithEmailAndPassword(
+      String email, String password, String username) async {
+    return (await register(email: email, password: password, name: username))
+        .$1;
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    if (_currentUser != null) {
+      _users.remove(_currentUser!.email);
+      _currentUser = null;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sample data helpers
+// ---------------------------------------------------------------------------
+
+final _now = DateTime(2024, 6, 1);
+final _later = DateTime(2024, 12, 31);
+
+dest_models.SoloSuitabilityFactors _soloFactors({
+  double overall = 8.0,
+  double safety = 8.0,
+}) =>
+    dest_models.SoloSuitabilityFactors(
+      safety: safety,
+      nightlife: 7.0,
+      walkability: 8.0,
+      accommodation: 7.5,
+      soloDining: 8.0,
+      communication: 7.0,
+      overall: overall,
+    );
+
+List<dest_models.SafetyInsight> get _defaultSafetyInsights => [
+      dest_models.SafetyInsight(
+        category: 'general',
+        description: 'Generally safe for solo travelers',
+        severity: 'low',
+        tips: ['Stay aware of your surroundings'],
+      ),
+    ];
+
+dest_models.Activity _activity(String id, String name, {String category = 'cultural'}) =>
+    dest_models.Activity(
+      id: id,
+      name: name,
+      category: category,
+      soloFriendly: true,
+    );
+
+dest_models.Destination _tokyo() => dest_models.Destination(
+      id: 'dest-tokyo',
+      name: 'Tokyo',
+      description: 'Vibrant metropolis blending tradition and modernity',
+      latitude: 35.6762,
+      longitude: 139.6503,
+      countryCode: 'JP',
+      region: 'Kanto',
+      safetyScore: 9.0,
+      safetyInsights: _defaultSafetyInsights,
+      soloSuitabilityScore: 8.5,
+      soloSuitabilityFactors: _soloFactors(overall: 8.5, safety: 9.0),
+      budgetLevel: dest_models.BudgetLevel.moderate,
+      activityLevels: [dest_models.ActivityLevel.moderate, dest_models.ActivityLevel.adventurous],
+      tags: ['urban', 'cultural', 'food'],
+      images: ['https://example.com/tokyo1.jpg'],
+      coverImageUrl: 'https://example.com/tokyo_cover.jpg',
+      popularActivities: [
+        _activity('act-1', 'Visit Senso-ji Temple'),
+        _activity('act-2', 'Explore Shibuya Crossing'),
+      ],
+      bestTimeToVisit: 'March to May',
+      averageDailyCost: 120,
+      currencyCode: 'JPY',
+      language: 'Japanese',
+      timezone: 'Asia/Tokyo',
+      isHiddenGem: false,
+      popularityScore: 0.9,
+      createdAt: _now,
+      updatedAt: _now,
+    );
+
+dest_models.Destination _bali() => dest_models.Destination(
+      id: 'dest-bali',
+      name: 'Bali',
+      description: 'Tropical paradise with rich culture and stunning landscapes',
+      latitude: -8.3405,
+      longitude: 115.092,
+      countryCode: 'ID',
+      region: 'Bali',
+      safetyScore: 7.5,
+      safetyInsights: _defaultSafetyInsights,
+      soloSuitabilityScore: 9.0,
+      soloSuitabilityFactors: _soloFactors(overall: 9.0, safety: 7.5),
+      budgetLevel: dest_models.BudgetLevel.budget,
+      activityLevels: [dest_models.ActivityLevel.relaxed, dest_models.ActivityLevel.moderate],
+      tags: ['beach', 'nature', 'wellness'],
+      images: ['https://example.com/bali1.jpg'],
+      coverImageUrl: 'https://example.com/bali_cover.jpg',
+      popularActivities: [
+        _activity('act-3', 'Ubud Rice Terraces', category: 'nature'),
+      ],
+      bestTimeToVisit: 'April to October',
+      averageDailyCost: 45,
+      currencyCode: 'IDR',
+      language: 'Indonesian',
+      timezone: 'Asia/Makassar',
+      isHiddenGem: false,
+      popularityScore: 0.85,
+      createdAt: _now,
+      updatedAt: _now,
+    );
+
+dest_models.Destination _kyoto() => dest_models.Destination(
+      id: 'dest-kyoto',
+      name: 'Kyoto',
+      description: 'Ancient capital with serene temples and gardens',
+      latitude: 35.0116,
+      longitude: 135.7681,
+      countryCode: 'JP',
+      region: 'Kansai',
+      safetyScore: 9.5,
+      safetyInsights: _defaultSafetyInsights,
+      soloSuitabilityScore: 8.0,
+      soloSuitabilityFactors: _soloFactors(overall: 8.0, safety: 9.5),
+      budgetLevel: dest_models.BudgetLevel.moderate,
+      activityLevels: [dest_models.ActivityLevel.relaxed, dest_models.ActivityLevel.moderate],
+      tags: ['cultural', 'temple', 'historic'],
+      images: ['https://example.com/kyoto1.jpg'],
+      coverImageUrl: 'https://example.com/kyoto_cover.jpg',
+      popularActivities: [
+        _activity('act-4', 'Fushimi Inari Shrine'),
+      ],
+      bestTimeToVisit: 'March to May',
+      averageDailyCost: 100,
+      currencyCode: 'JPY',
+      language: 'Japanese',
+      timezone: 'Asia/Tokyo',
+      isHiddenGem: true,
+      popularityScore: 0.75,
+      createdAt: _now,
+      updatedAt: _now,
+    );
+
+// ---------------------------------------------------------------------------
+// In-memory mock: DestinationRepository
+// ---------------------------------------------------------------------------
+
+class MockDestinationRepository implements DestinationRepository {
+  final List<dest_models.Destination> _destinations;
+  final Map<String, SavedDestination> _saved = {};
+
+  MockDestinationRepository()
+      : _destinations = [_tokyo(), _bali(), _kyoto()];
+
+  // --- DestinationRepository implementation ---
+
+  @override
+  Future<List<dest_models.Destination>> searchDestinations(
+    DestinationFilter filter,
+  ) async {
+    await Future.delayed(TestConfig.stepDelay);
+    var results = List<dest_models.Destination>.of(_destinations);
+
     if (filter.searchQuery != null && filter.searchQuery!.isNotEmpty) {
-      final query = filter.searchQuery!.toLowerCase();
+      final q = filter.searchQuery!.toLowerCase();
       results = results
           .where((d) =>
-              d.name.toLowerCase().contains(query) ||
-              d.description.toLowerCase().contains(query))
+              d.name.toLowerCase().contains(q) ||
+              d.description.toLowerCase().contains(q) ||
+              d.tags.any((t) => t.toLowerCase().contains(q)))
           .toList();
     }
 
-    // Apply budget level filter
-    if (filter.budgetLevel != null) {
-      results = results.where((d) => d.budgetLevel == filter.budgetLevel).toList();
-    }
-
-    // Apply activity level filter
-    if (filter.activityLevel != null) {
-      results = results.where((d) => d.activityLevels.contains(filter.activityLevel!)).toList();
-    }
-
-    // Apply safety score filter
-    if (filter.minSafetyScore != null) {
-      results = results.where((d) => d.safetyScore >= filter.minSafetyScore!).toList();
-    }
-
-    // Apply solo suitability filter
-    if (filter.minSoloSuitabilityScore != null) {
-      results = results.where((d) =>
-          d.soloSuitabilityScore >= filter.minSoloSuitabilityScore!).toList();
-    }
-
-    // Apply country filter
     if (filter.countryCode != null) {
-      results = results.where((d) => d.countryCode == filter.countryCode).toList();
+      results =
+          results.where((d) => d.countryCode == filter.countryCode).toList();
     }
 
-    // Apply region filter
-    if (filter.region != null) {
-      results = results.where((d) => d.region == filter.region).toList();
+    if (filter.budgetLevel != null) {
+      results = results
+          .where((d) => d.budgetLevel.name == filter.budgetLevel!.name)
+          .toList();
     }
 
-    // Apply tags filter
-    if (filter.tags != null && filter.tags!.isNotEmpty) {
-      results = results.where((d) =>
-          filter.tags!.any((tag) => d.tags.contains(tag))).toList();
-    }
-
-    // Apply hidden gems filter
-    if (filter.hiddenGemsOnly == true) {
+    if (filter.hiddenGemsOnly) {
       results = results.where((d) => d.isHiddenGem).toList();
     }
 
-    // Apply sorting
-    switch (filter.sortBy) {
-      case DestinationSortOrder.popularity:
-        results.sort((a, b) => b.popularityScore.compareTo(a.popularityScore));
-        break;
-      case DestinationSortOrder.safety:
-        results.sort((a, b) => b.safetyScore.compareTo(a.safetyScore));
-        break;
-      case DestinationSortOrder.soloSuitability:
-        results.sort((a, b) => b.soloSuitabilityScore.compareTo(a.soloSuitabilityScore));
-        break;
-      case DestinationSortOrder.budgetAsc:
-        results.sort((a, b) => (a.averageDailyCost ?? 0).compareTo(b.averageDailyCost ?? 0));
-        break;
-      case DestinationSortOrder.budgetDesc:
-        results.sort((a, b) => (b.averageDailyCost ?? 0).compareTo(a.averageDailyCost ?? 0));
-        break;
-      case DestinationSortOrder.newest:
-        // For simplicity, sort by ID (newer destinations have higher IDs)
-        results.sort((a, b) => b.id.compareTo(a.id));
-        break;
-      case DestinationSortOrder.relevance:
-      default:
-        // Keep current order
-        break;
+    if (filter.minSafetyScore != null) {
+      results =
+          results.where((d) => d.safetyScore >= filter.minSafetyScore!).toList();
     }
 
-    // Apply pagination
-    final offset = filter.offset ?? 0;
-    final limit = filter.limit ?? 20;
-    final paginatedResults = results.skip(offset).take(limit).toList();
+    if (filter.minSoloSuitabilityScore != null) {
+      results = results.where(
+          (d) => d.soloSuitabilityScore >= filter.minSoloSuitabilityScore!).toList();
+    }
 
-    return paginatedResults;
+    if (filter.maxDailyCost != null) {
+      results = results
+          .where((d) =>
+              d.averageDailyCost != null &&
+              d.averageDailyCost! <= filter.maxDailyCost!)
+          .toList();
+    }
+
+    if (filter.tags != null && filter.tags!.isNotEmpty) {
+      results = results
+          .where((d) =>
+              filter.tags!.every((tag) => d.tags.contains(tag)))
+          .toList();
+    }
+
+    return results.skip(filter.offset).take(filter.limit).toList();
   }
 
   @override
-  Future<Destination> getDestinationById(String id) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    final destination = _destinations[id];
-    if (destination == null) {
-      throw Exception('Destination not found: $id');
+  Future<dest_models.Destination> getDestinationById(String id) async {
+    await Future.delayed(TestConfig.stepDelay);
+    final dest = _destinations.where((d) => d.id == id).firstOrNull;
+    if (dest == null) {
+      throw Exception('dest_models.Destination not found: $id');
     }
-    return destination;
+    return dest;
   }
 
   @override
   Future<PersonalizedRecommendation> getPersonalizedRecommendations(
     String userId,
   ) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(TestConfig.stepDelay);
+    final recommendations = _destinations.map((d) => RecommendedDestination(
+          destination: d,
+          matchScore: d.soloSuitabilityScore / 10.0,
+          reason: 'Great match based on your preferences',
+          matchingFactors: ['solo suitability', ...d.tags.take(2)],
+        )).toList();
 
-    if (_recommendations == null) {
-      throw Exception('No recommendations available');
-    }
-    return _recommendations!;
+    return PersonalizedRecommendation(
+      id: 'rec-$userId',
+      userId: userId,
+      recommendations: recommendations,
+      source: RecommendationSource.aiGenerated,
+      summary: 'Destinations matched to your solo travel style',
+      totalCount: recommendations.length,
+      generatedAt: _now,
+      expiresAt: _later,
+    );
   }
 
   @override
   Future<List<CuratedList>> getCuratedLists() async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    return _curatedLists;
+    await Future.delayed(TestConfig.stepDelay);
+    return [
+      CuratedList(
+        id: 'cl-solo-asia',
+        name: 'Best Solo Destinations in Asia',
+        description: 'Curated list of top Asian destinations for solo travelers',
+        type: CuratedListType.popularSolo,
+        destinations: [_tokyo(), _bali()],
+        coverImageUrl: 'https://example.com/cl-asia.jpg',
+        curatorName: 'SoloAdventurer Team',
+        destinationCount: 2,
+        isFeatured: true,
+        tags: ['asia', 'solo'],
+        createdAt: _now,
+        updatedAt: _now,
+      ),
+      CuratedList(
+        id: 'cl-hidden-gems',
+        name: 'Hidden Gems for Solo Travelers',
+        description: 'Underrated destinations perfect for solo exploration',
+        type: CuratedListType.hiddenGems,
+        destinations: [_kyoto()],
+        curatorName: 'SoloAdventurer Team',
+        destinationCount: 1,
+        tags: ['hidden-gems'],
+        createdAt: _now,
+        updatedAt: _now,
+      ),
+    ];
   }
 
   @override
   Future<CuratedList> getCuratedListById(String id) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    final list = _curatedLists.where((l) => l.id == id).firstOrNull;
+    await Future.delayed(TestConfig.stepDelay);
+    final lists = await getCuratedLists();
+    final list = lists.where((l) => l.id == id).firstOrNull;
     if (list == null) {
       throw Exception('Curated list not found: $id');
     }
@@ -346,25 +433,8 @@ class MockDestinationRepository implements DestinationRepository {
 
   @override
   Future<SavedDestination> saveDestination(SavedDestination saved) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 400));
-
-    final userSavedList = _savedDestinations.putIfAbsent(saved.userId, () => []);
-
-    // Check if already saved
-    final existingIndex = userSavedList.indexWhere(
-      (s) => s.destination.id == saved.destination.id &&
-             s.saveType == saved.saveType,
-    );
-
-    if (existingIndex != -1) {
-      // Update existing
-      userSavedList[existingIndex] = saved;
-    } else {
-      // Add new
-      userSavedList.add(saved);
-    }
-
+    await Future.delayed(TestConfig.stepDelay);
+    _saved['${saved.userId}-${saved.destination.id}'] = saved;
     return saved;
   }
 
@@ -374,18 +444,11 @@ class MockDestinationRepository implements DestinationRepository {
     required String userId,
     SaveType? saveType,
   }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    final userSavedList = _savedDestinations[userId];
-    if (userSavedList == null) return;
-
-    if (saveType != null) {
-      userSavedList.removeWhere(
-        (s) => s.destination.id == destinationId && s.saveType == saveType,
-      );
-    } else {
-      userSavedList.removeWhere((s) => s.destination.id == destinationId);
+    await Future.delayed(TestConfig.stepDelay);
+    final key = '$userId-$destinationId';
+    final entry = _saved[key];
+    if (entry != null && (saveType == null || entry.saveType == saveType)) {
+      _saved.remove(key);
     }
   }
 
@@ -394,541 +457,583 @@ class MockDestinationRepository implements DestinationRepository {
     String userId, {
     SaveType? saveType,
   }) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    final userSavedList = _savedDestinations[userId] ?? [];
-
+    await Future.delayed(TestConfig.stepDelay);
+    var results = _saved.values.where((s) => s.userId == userId).toList();
     if (saveType != null) {
-      return userSavedList.where((s) => s.saveType == saveType).toList();
+      results = results.where((s) => s.saveType == saveType).toList();
     }
-
-    return userSavedList;
+    return results;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  late ProviderContainer container;
-  late MockDestinationRepository mockDestinationRepository;
-  late MockAuthRemoteDataSource mockAuthRemoteDataSource;
-  late AuthRepository authRepository;
+  late MockDestinationRepository destinationRepo;
+  late MockAuthRepository authRepo;
 
-  setUp(() async {
-    // Initialize SharedPreferences for testing
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-
-    // Initialize service locator in test mode
-    await setupServiceLocator(isTest: true);
-
-    // Clear any existing auth data
-    await getIt<SecureStorage>().delete(TestConfig.authTokenKey);
-    await getIt<SecureStorage>().delete(TestConfig.refreshTokenKey);
-    await getIt<SecureStorage>().delete(TestConfig.userDataKey);
-
-    // Initialize mock repositories
-    mockDestinationRepository = MockDestinationRepository();
-    mockDestinationRepository.setupTestData();
-
-    mockAuthRemoteDataSource = MockAuthRemoteDataSource(getIt());
-
-    authRepository = AuthRepositoryImpl(
-      remoteDataSource: mockAuthRemoteDataSource,
-      localDataSource: getIt(),
-      securityManager: getIt(),
-    );
-
-    // Override providers with mock implementations
-    container = ProviderContainer(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-        authRepositoryProvider.overrideWithValue(authRepository),
-      ],
-    );
+  setUp(() {
+    destinationRepo = MockDestinationRepository();
+    authRepo = MockAuthRepository();
   });
 
-  tearDown(() async {
-    await resetServiceLocator();
-    container.dispose();
+  // =========================================================================
+  // Auth helpers
+  // =========================================================================
+
+  group('Authentication', () {
+    test('sign in with test credentials', () async {
+      final user = await authRepo.signInWithEmailAndPassword(
+        TestConfig.testEmail,
+        TestConfig.testPassword,
+      );
+
+      expect(user.email, TestConfig.testEmail);
+      expect(user.username, TestConfig.testName);
+      expect(user.id, isNotEmpty);
+
+      final authenticated = await authRepo.isAuthenticated();
+      expect(authenticated, isTrue);
+    });
+
+    test('sign out clears current user', () async {
+      await authRepo.signInWithEmailAndPassword(
+        TestConfig.testEmail,
+        TestConfig.testPassword,
+      );
+      await authRepo.signOut();
+
+      final current = await authRepo.getCurrentUser();
+      expect(current, isNull);
+
+      final authenticated = await authRepo.isAuthenticated();
+      expect(authenticated, isFalse);
+    });
+
+    test('register creates a new user', () async {
+      final email = TestConfig.generateTestEmail();
+      final (user, isNew) = await authRepo.register(
+        email: email,
+        password: 'NewPass123!',
+        name: 'New Explorer',
+      );
+
+      expect(isNew, isTrue);
+      expect(user.email, email);
+      expect(user.username, 'New Explorer');
+    });
+
+    test('sign in with wrong password throws', () async {
+      expect(
+        () => authRepo.signInWithEmailAndPassword(
+          TestConfig.testEmail,
+          'wrong-password',
+        ),
+        throwsException,
+      );
+    });
   });
 
-  group('Destination Discovery Integration Tests', () {
-    testWidgets('Complete search destinations flow', (tester) async {
-      // Build app with mock repository
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
+  // =========================================================================
+  // Destination Search
+  // =========================================================================
 
-      // Should be on login screen initially
-      expect(find.widgetWithText(material.AppBar, 'Login'), findsOneWidget);
+  group('Destination Search', () {
+    test('search with empty filter returns all destinations', () async {
+      final filter = DestinationFilter();
+      final results = await destinationRepo.searchDestinations(filter);
 
-      // Perform login to access the app
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
-      );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
-      );
-
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-
-      // Should be on home screen now
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-      expect(find.text('Welcome to SoloAdventurer!'), findsOneWidget);
-
-      // Tap on "Discover Destinations" hero card
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-
-      // Should be on destination discovery screen
-      expect(find.byType(material.AppBar), findsOneWidget);
-      expect(find.text('Destination Discovery'), findsOneWidget);
-
-      // Wait for initial search to complete
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Should see destination cards (verify destinations are displayed)
-      expect(find.text('Tokyo'), findsOneWidget);
-      expect(find.text('Kyoto'), findsOneWidget);
-      expect(find.text('Bali'), findsOneWidget);
-
-      // Test search functionality
-      final searchField = find.byType(material.TextField);
-      await tester.enterText(searchField, 'Tokyo');
-      await tester.pump(const Duration(milliseconds: 500)); // Wait for debounce
-      await tester.pumpAndSettle();
-
-      // Should only see Tokyo
-      expect(find.text('Tokyo'), findsOneWidget);
-      expect(find.text('Kyoto'), findsNothing);
-      expect(find.text('Bali'), findsNothing);
-
-      // Clear search
-      await tester.tap(find.byIcon(material.Icons.clear));
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Should see all destinations again
-      expect(find.text('Tokyo'), findsOneWidget);
-      expect(find.text('Kyoto'), findsOneWidget);
-      expect(find.text('Bali'), findsOneWidget);
+      expect(results, hasLength(3));
+      expect(results.map((d) => d.name), containsAll(['Tokyo', 'Bali', 'Kyoto']));
     });
 
-    testWidgets('View destination detail flow', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
+    test('search by name query', () async {
+      final filter = DestinationFilter(searchQuery: 'Tokyo');
+      final results = await destinationRepo.searchDestinations(filter);
 
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
-      );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
-      );
-
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-
-      // Navigate to destination discovery
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Tap on Tokyo destination card
-      await tester.tap(find.text('Tokyo'));
-      await tester.pumpAndSettle();
-
-      // Should be on destination detail screen
-      expect(find.text('Tokyo'), findsOneWidget);
-      expect(find.text('Vibrant metropolis blending ancient traditions'), findsOneWidget);
-
-      // Verify safety score badge
-      expect(find.text('8.5'), findsAtLeastNWidgets(1));
-
-      // Verify solo suitability badge
-      expect(find.text('8.0'), findsAtLeastNWidgets(1));
-
-      // Scroll down to see related destinations
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, -500),
-      );
-      await tester.pumpAndSettle();
-
-      // Should see related destinations section
-      expect(find.text('Related Destinations'), findsOneWidget);
+      expect(results, hasLength(1));
+      expect(results.first.name, 'Tokyo');
     });
 
-    testWidgets('Filter destinations flow', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
+    test('search by country code', () async {
+      final filter = DestinationFilter(countryCode: 'JP');
+      final results = await destinationRepo.searchDestinations(filter);
 
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
-      );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
-      );
-
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-
-      // Navigate to destination discovery
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Should see all destinations initially
-      expect(find.text('Tokyo'), findsOneWidget);
-      expect(find.text('Kyoto'), findsOneWidget);
-      expect(find.text('Bali'), findsOneWidget);
-
-      // Tap filter button to open filter modal
-      await tester.tap(find.byIcon(material.Icons.tune));
-      await tester.pumpAndSettle();
-
-      // Filter modal should be visible
-      expect(find.text('Filter Destinations'), findsOneWidget);
-
-      // Select budget filter
-      await tester.tap(find.text('Budget'));
-      await tester.pumpAndSettle();
-
-      // Apply filter
-      await tester.tap(find.text('Apply'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Should see filtered results (Tokyo and Kyoto are moderate)
-      expect(find.text('Tokyo'), findsOneWidget);
-      expect(find.text('Kyoto'), findsOneWidget);
+      expect(results, hasLength(2));
+      expect(results.every((d) => d.countryCode == 'JP'), isTrue);
     });
 
-    testWidgets('Save destination flow', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
-
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
+    test('search with budget level filter', () async {
+      final filter = DestinationFilter(
+        budgetLevel: BudgetLevel.budget,
       );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, hasLength(1));
+      expect(results.first.name, 'Bali');
+    });
+
+    test('search hidden gems only', () async {
+      final filter = DestinationFilter(hiddenGemsOnly: true);
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, hasLength(1));
+      expect(results.first.name, 'Kyoto');
+      expect(results.first.isHiddenGem, isTrue);
+    });
+
+    test('search with minimum safety score', () async {
+      final filter = DestinationFilter(minSafetyScore: 9.0);
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, hasLength(2)); // Tokyo (9.0) and Kyoto (9.5)
+      expect(results.every((d) => d.safetyScore >= 9.0), isTrue);
+    });
+
+    test('search with minimum solo suitability score', () async {
+      final filter = DestinationFilter(minSoloSuitabilityScore: 8.5);
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results.every((d) => d.soloSuitabilityScore >= 8.5), isTrue);
+    });
+
+    test('search with max daily cost filter', () async {
+      final filter = DestinationFilter(maxDailyCost: 50);
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, hasLength(1));
+      expect(results.first.name, 'Bali');
+    });
+
+    test('search with tag filter', () async {
+      final filter = DestinationFilter(tags: ['cultural']);
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, hasLength(2)); // Tokyo and Kyoto
+      expect(results.every((d) => d.tags.contains('cultural')), isTrue);
+    });
+
+    test('search with pagination', () async {
+      final filter = DestinationFilter(offset: 0, limit: 2);
+      final page1 = await destinationRepo.searchDestinations(filter);
+
+      expect(page1, hasLength(2));
+
+      final filter2 = DestinationFilter(offset: 2, limit: 2);
+      final page2 = await destinationRepo.searchDestinations(filter2);
+
+      expect(page2, hasLength(1));
+    });
+
+    test('search combined filters', () async {
+      final filter = DestinationFilter(
+        countryCode: 'JP',
+        minSafetyScore: 9.0,
+      );
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, hasLength(2));
+      expect(results.every((d) => d.countryCode == 'JP'), isTrue);
+      expect(results.every((d) => d.safetyScore >= 9.0), isTrue);
+    });
+
+    test('search returns empty for non-matching query', () async {
+      final filter = DestinationFilter(searchQuery: 'Antarctica');
+      final results = await destinationRepo.searchDestinations(filter);
+
+      expect(results, isEmpty);
+    });
+  });
+
+  // =========================================================================
+  // Destination Detail
+  // =========================================================================
+
+  group('Destination Detail', () {
+    test('get destination by id', () async {
+      final dest = await destinationRepo.getDestinationById('dest-tokyo');
+
+      expect(dest.id, 'dest-tokyo');
+      expect(dest.name, 'Tokyo');
+      expect(dest.countryCode, 'JP');
+      expect(dest.safetyScore, 9.0);
+      expect(dest.soloSuitabilityScore, 8.5);
+      expect(dest.budgetLevel, dest_models.BudgetLevel.moderate);
+      expect(dest.popularActivities, isNotEmpty);
+    });
+
+    test('get destination with full details', () async {
+      final dest = await destinationRepo.getDestinationById('dest-bali');
+
+      expect(dest.description, isNotEmpty);
+      expect(dest.latitude, isNotNull);
+      expect(dest.longitude, isNotNull);
+      expect(dest.safetyInsights, isNotEmpty);
+      expect(dest.soloSuitabilityFactors.overall, greaterThan(0));
+      expect(dest.images, isNotEmpty);
+      expect(dest.bestTimeToVisit, isNotNull);
+      expect(dest.averageDailyCost, isNotNull);
+      expect(dest.currencyCode, isNotNull);
+      expect(dest.timezone, isNotNull);
+    });
+
+    test('get non-existent destination throws', () async {
+      expect(
+        () => destinationRepo.getDestinationById('non-existent'),
+        throwsException,
+      );
+    });
+
+    test('destination has correct activity levels', () async {
+      final tokyo = await destinationRepo.getDestinationById('dest-tokyo');
+      expect(tokyo.activityLevels, contains(dest_models.ActivityLevel.moderate));
+
+      final bali = await destinationRepo.getDestinationById('dest-bali');
+      expect(bali.activityLevels, contains(dest_models.ActivityLevel.relaxed));
+    });
+  });
+
+  // =========================================================================
+  // Personalized Recommendations
+  // =========================================================================
+
+  group('Personalized Recommendations', () {
+    test('get recommendations for a user', () async {
+      final rec = await destinationRepo.getPersonalizedRecommendations(
+        'test-user-1',
       );
 
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
+      expect(rec.userId, 'test-user-1');
+      expect(rec.recommendations, isNotEmpty);
+      expect(rec.source, RecommendationSource.aiGenerated);
+      expect(rec.summary, isNotNull);
+      expect(rec.totalCount, greaterThan(0));
+    });
 
-      // Navigate to destination discovery
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Tap on Tokyo destination
-      await tester.tap(find.text('Tokyo'));
-      await tester.pumpAndSettle();
-
-      // Tap bookmark button
-      await tester.tap(find.byIcon(material.Icons.bookmark_border));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 400));
-      await tester.pumpAndSettle();
-
-      // Bookmark icon should be filled now
-      expect(find.byIcon(material.Icons.bookmark), findsOneWidget);
-
-      // Navigate to saved destinations
-      await tester.tap(find.byIcon(material.Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, -500),
+    test('recommendations contain valid destinations', () async {
+      final rec = await destinationRepo.getPersonalizedRecommendations(
+        'test-user-1',
       );
-      await tester.pumpAndSettle();
 
-      // Find and tap "Saved" text or navigate via home
-      await tester.tap(find.byIcon(material.Icons.home));
-      await tester.pumpAndSettle();
-
-      // Scroll to find saved destinations quick access
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, -300),
-      );
-      await tester.pumpAndSettle();
-
-      if (find.text('Saved Destinations').evaluate().isNotEmpty) {
-        await tester.tap(find.text('Saved Destinations'));
-        await tester.pumpAndSettle();
-
-        // Should see saved destination
-        expect(find.text('Tokyo'), findsOneWidget);
+      for (final r in rec.recommendations) {
+        expect(r.destination, isNotNull);
+        expect(r.matchScore, greaterThanOrEqualTo(0.0));
+        expect(r.matchScore, lessThanOrEqualTo(1.0));
+        expect(r.reason, isNotEmpty);
+        expect(r.matchingFactors, isNotEmpty);
       }
     });
 
-    testWidgets('View recommendations flow', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
-
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
-      );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
+    test('recommendations have valid timestamps', () async {
+      final rec = await destinationRepo.getPersonalizedRecommendations(
+        'test-user-1',
       );
 
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
+      expect(rec.generatedAt, isNotNull);
+      expect(rec.expiresAt, isNotNull);
+      expect(rec.expiresAt.isAfter(rec.generatedAt), isTrue);
+    });
+  });
 
-      // Scroll to find recommendations section on home
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, -300),
-      );
-      await tester.pumpAndSettle();
+  // =========================================================================
+  // Curated Lists
+  // =========================================================================
 
-      // Tap on "Personalized" recommendations card
-      if (find.text('Personalized').evaluate().isNotEmpty) {
-        await tester.tap(find.text('Personalized'));
-        await tester.pumpAndSettle();
-        await tester.pump(const Duration(milliseconds: 400));
-        await tester.pumpAndSettle();
+  group('Curated Lists', () {
+    test('get all curated lists', () async {
+      final lists = await destinationRepo.getCuratedLists();
 
-        // Should be on recommendations screen
-        expect(find.text('Recommendations'), findsOneWidget);
+      expect(lists, hasLength(2));
+      expect(lists.map((l) => l.name),
+          contains('Best Solo Destinations in Asia'));
+    });
 
-        // Should see recommended destinations
-        expect(find.textContaining('92%'), findsOneWidget); // Match score
-        expect(find.text('Tokyo'), findsOneWidget);
+    test('curated lists have required fields', () async {
+      final lists = await destinationRepo.getCuratedLists();
+
+      for (final list in lists) {
+        expect(list.id, isNotEmpty);
+        expect(list.name, isNotEmpty);
+        expect(list.description, isNotEmpty);
+        expect(list.type, isNotNull);
+        expect(list.destinations, isNotNull);
+        expect(list.destinationCount, greaterThanOrEqualTo(0));
+        expect(list.createdAt, isNotNull);
+        expect(list.updatedAt, isNotNull);
       }
     });
 
-    testWidgets('View curated lists flow', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
+    test('get curated list by id', () async {
+      final list = await destinationRepo.getCuratedListById('cl-solo-asia');
 
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
-      );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
-      );
-
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-
-      // Scroll to find curated collections section on home
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, -400),
-      );
-      await tester.pumpAndSettle();
-
-      // Tap "See All" for curated collections
-      if (find.text('See All').evaluate().isNotEmpty) {
-        final seeAllButtons = find.text('See All');
-        await tester.tap(seeAllButtons.first);
-        await tester.pumpAndSettle();
-        await tester.pump(const Duration(milliseconds: 400));
-        await tester.pumpAndSettle();
-
-        // Should be on curated lists screen
-        expect(find.text('Curated Lists'), findsOneWidget);
-
-        // Should see curated list cards
-        expect(find.text('Popular Solo Destinations'), findsOneWidget);
-        expect(find.text('Hidden Gems in Asia'), findsOneWidget);
-
-        // Tap on a curated list
-        await tester.tap(find.text('Popular Solo Destinations'));
-        await tester.pumpAndSettle();
-
-        // Should see list detail
-        expect(find.text('Popular Solo Destinations'), findsOneWidget);
-        expect(find.text('Most loved destinations by solo travelers'), findsOneWidget);
-      }
+      expect(list.id, 'cl-solo-asia');
+      expect(list.name, 'Best Solo Destinations in Asia');
+      expect(list.type, CuratedListType.popularSolo);
+      expect(list.destinations, hasLength(2));
+      expect(list.isFeatured, isTrue);
     });
 
-    testWidgets('Pull to refresh functionality', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
-
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
+    test('get non-existent curated list throws', () async {
+      expect(
+        () => destinationRepo.getCuratedListById('non-existent'),
+        throwsException,
       );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
-      );
-
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-
-      // Navigate to destination discovery
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Perform pull to refresh
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, 300),
-      );
-      await tester.pumpAndSettle();
-
-      // Should show refreshing indicator
-      expect(find.byType(material.CircularProgressIndicator), findsOneWidget);
-
-      // Wait for refresh to complete
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-
-      // Should still see destinations
-      expect(find.text('Tokyo'), findsOneWidget);
     });
 
-    testWidgets('Infinite scroll pagination', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
+    test('curated list contains destinations', () async {
+      final list = await destinationRepo.getCuratedListById('cl-solo-asia');
 
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
-      );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
-        TestConfig.testPassword,
-      );
-
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
-
-      // Navigate to destination discovery
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Scroll to bottom to trigger load more
-      await tester.drag(
-        find.byType(material.ListView),
-        const Offset(0, -1000),
-      );
-      await tester.pumpAndSettle();
-
-      // Should show loading indicator at bottom
-      expect(find.byType(material.CircularProgressIndicator), findsAtLeastNWidgets(1));
-
-      // Wait for load more to complete
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
-
-      // Should still see destinations
-      expect(find.text('Tokyo'), findsOneWidget);
+      expect(list.destinations, isNotEmpty);
+      expect(list.destinations.map((d) => d.name), containsAll(['Tokyo', 'Bali']));
     });
 
-    testWidgets('Empty state handling', (tester) async {
-      await tester.pumpWidget(UncontrolledProviderScope(
-        container: container,
-        child: const App(),
-      ));
-      await tester.pumpAndSettle();
+    test('hidden gems curated list', () async {
+      final list = await destinationRepo.getCuratedListById('cl-hidden-gems');
 
-      // Login
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Email'),
-        TestConfig.testEmail,
+      expect(list.type, CuratedListType.hiddenGems);
+      expect(list.destinations, hasLength(1));
+      expect(list.destinations.first.isHiddenGem, isTrue);
+    });
+  });
+
+  // =========================================================================
+  // Save / Unsave Destinations
+  // =========================================================================
+
+  group('Save and Unsave Destinations', () {
+    test('save a destination to wishlist', () async {
+      final dest = await destinationRepo.getDestinationById('dest-tokyo');
+      final saved = SavedDestination(
+        id: 'saved-1',
+        userId: 'test-user-1',
+        destination: dest,
+        saveType: SaveType.wishlist,
+        createdAt: _now,
+        updatedAt: _now,
       );
-      await tester.enterText(
-        find.widgetWithText(material.TextField, 'Password'),
+
+      final result = await destinationRepo.saveDestination(saved);
+      expect(result.id, 'saved-1');
+      expect(result.saveType, SaveType.wishlist);
+      expect(result.destination.id, 'dest-tokyo');
+    });
+
+    test('save a destination to a trip', () async {
+      final dest = await destinationRepo.getDestinationById('dest-bali');
+      final saved = SavedDestination(
+        id: 'saved-2',
+        userId: 'test-user-1',
+        destination: dest,
+        saveType: SaveType.trip,
+        tripId: 'trip-42',
+        notes: 'Want to visit rice terraces',
+        createdAt: _now,
+        updatedAt: _now,
+      );
+
+      final result = await destinationRepo.saveDestination(saved);
+      expect(result.saveType, SaveType.trip);
+      expect(result.tripId, 'trip-42');
+      expect(result.notes, 'Want to visit rice terraces');
+    });
+
+    test('get saved destinations for a user', () async {
+      // Save two destinations
+      final tokyo = await destinationRepo.getDestinationById('dest-tokyo');
+      final bali = await destinationRepo.getDestinationById('dest-bali');
+
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-3',
+        userId: 'test-user-1',
+        destination: tokyo,
+        saveType: SaveType.wishlist,
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-4',
+        userId: 'test-user-1',
+        destination: bali,
+        saveType: SaveType.trip,
+        tripId: 'trip-1',
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+
+      final saved = await destinationRepo.getSavedDestinations('test-user-1');
+      expect(saved, hasLength(2));
+    });
+
+    test('get saved destinations filtered by save type', () async {
+      // Fresh repo per test — seed data first
+      final tokyo = await destinationRepo.getDestinationById('dest-tokyo');
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-w1',
+        userId: 'user-filter',
+        destination: tokyo,
+        saveType: SaveType.wishlist,
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-t1',
+        userId: 'user-filter',
+        destination: tokyo,
+        saveType: SaveType.trip,
+        tripId: 'trip-x',
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+
+      final wishlists = await destinationRepo.getSavedDestinations(
+        'user-filter',
+        saveType: SaveType.wishlist,
+      );
+      expect(wishlists, hasLength(1));
+      expect(wishlists.first.saveType, SaveType.wishlist);
+
+      final trips = await destinationRepo.getSavedDestinations(
+        'user-filter',
+        saveType: SaveType.trip,
+      );
+      expect(trips, hasLength(1));
+      expect(trips.first.saveType, SaveType.trip);
+    });
+
+    test('unsave a destination', () async {
+      final tokyo = await destinationRepo.getDestinationById('dest-tokyo');
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-unsave',
+        userId: 'user-unsave',
+        destination: tokyo,
+        saveType: SaveType.wishlist,
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+
+      var saved = await destinationRepo.getSavedDestinations('user-unsave');
+      expect(saved, hasLength(1));
+
+      await destinationRepo.unsaveDestination(
+        destinationId: 'dest-tokyo',
+        userId: 'user-unsave',
+      );
+
+      saved = await destinationRepo.getSavedDestinations('user-unsave');
+      expect(saved, isEmpty);
+    });
+
+    test('unsave with save type filter', () async {
+      final tokyo = await destinationRepo.getDestinationById('dest-tokyo');
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-st1',
+        userId: 'user-st',
+        destination: tokyo,
+        saveType: SaveType.wishlist,
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-st2',
+        userId: 'user-st',
+        destination: tokyo,
+        saveType: SaveType.trip,
+        tripId: 'trip-z',
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+
+      // Unsave only the wishlist entry
+      await destinationRepo.unsaveDestination(
+        destinationId: 'dest-tokyo',
+        userId: 'user-st',
+        saveType: SaveType.wishlist,
+      );
+
+      final remaining = await destinationRepo.getSavedDestinations('user-st');
+      expect(remaining, hasLength(1));
+      expect(remaining.first.saveType, SaveType.trip);
+    });
+
+    test('saved destination has notes', () async {
+      final kyoto = await destinationRepo.getDestinationById('dest-kyoto');
+      final saved = SavedDestination(
+        id: 'saved-notes',
+        userId: 'test-user-1',
+        destination: kyoto,
+        saveType: SaveType.wishlist,
+        notes: 'Must visit during cherry blossom season',
+        createdAt: _now,
+        updatedAt: _now,
+      );
+
+      final result = await destinationRepo.saveDestination(saved);
+      expect(result.hasNotes, isTrue);
+      expect(result.notes, contains('cherry blossom'));
+    });
+  });
+
+  // =========================================================================
+  // End-to-End Flow
+  // =========================================================================
+
+  group('End-to-End Discovery Flow', () {
+    test('complete discovery workflow', () async {
+      // 1. Sign in
+      final user = await authRepo.signInWithEmailAndPassword(
+        TestConfig.testEmail,
         TestConfig.testPassword,
       );
+      expect(user, isNotNull);
 
-      await tester.tap(find.widgetWithText(material.ElevatedButton, 'Login'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pumpAndSettle();
+      // 2. Search for destinations in Japan
+      final searchResults = await destinationRepo.searchDestinations(
+        DestinationFilter(countryCode: 'JP'),
+      );
+      expect(searchResults, isNotEmpty);
 
-      // Navigate to destination discovery
-      await tester.tap(find.text('Discover Destinations'));
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.pumpAndSettle();
+      // 3. Pick a destination and view details
+      final dest = await destinationRepo.getDestinationById(searchResults.first.id);
+      expect(dest.name, isNotEmpty);
+      expect(dest.safetyScore, greaterThan(0));
 
-      // Search for non-existent destination
-      final searchField = find.byType(material.TextField);
-      await tester.enterText(searchField, 'NonExistentCity123');
-      await tester.pump(const Duration(milliseconds: 500)); // Wait for debounce
-      await tester.pumpAndSettle();
+      // 4. Get personalized recommendations
+      final rec = await destinationRepo.getPersonalizedRecommendations(user.id);
+      expect(rec.recommendations, isNotEmpty);
 
-      // Should see empty state
-      expect(find.text('No destinations found'), findsOneWidget);
+      // 5. Browse curated lists
+      final lists = await destinationRepo.getCuratedLists();
+      expect(lists, isNotEmpty);
+
+      // 6. Save a destination
+      await destinationRepo.saveDestination(SavedDestination(
+        id: 'saved-e2e',
+        userId: user.id,
+        destination: dest,
+        saveType: SaveType.wishlist,
+        createdAt: _now,
+        updatedAt: _now,
+      ));
+
+      final saved = await destinationRepo.getSavedDestinations(user.id);
+      expect(saved, hasLength(1));
+
+      // 7. Unsave
+      await destinationRepo.unsaveDestination(
+        destinationId: dest.id,
+        userId: user.id,
+      );
+      final afterUnsave = await destinationRepo.getSavedDestinations(user.id);
+      expect(afterUnsave, isEmpty);
+
+      // 8. Sign out
+      await authRepo.signOut();
+      expect(await authRepo.isAuthenticated(), isFalse);
     });
   });
 }

@@ -147,6 +147,7 @@ class _SOSButtonWidgetState extends State<SOSButtonWidget>
       button: true,
       enabled: isEnabled,
       excludeSemantics: true,
+      onTap: isEnabled ? widget.onPressed : null,
       child: AnimatedBuilder(
         animation: _pulseAnimation,
         builder: (context, child) {

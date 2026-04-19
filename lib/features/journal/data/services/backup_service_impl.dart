@@ -1,6 +1,8 @@
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart'; // For SyncStatus enum
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -16,7 +18,6 @@ import '../../domain/repositories/journal_repository.dart';
 import '../../domain/repositories/trip_repository.dart';
 import '../../domain/repositories/tag_repository.dart';
 import '../../domain/services/backup_service.dart';
-import 'package:soloadventurer/core/errors/exceptions.dart';
 
 /// Implementation of [BackupService] using local file system
 class BackupServiceImpl implements BackupService {
@@ -98,9 +99,9 @@ class BackupServiceImpl implements BackupService {
       ));
 
       // Gather all data
-      final entries = await _journalRepository.getAllEntries();
-      final trips = await _tripRepository.getAllTrips();
-      final tags = await _tagRepository.getAllTags();
+      final entries = await _journalRepository.getEntries();
+      final trips = await _tripRepository.getTrips();
+      final tags = (await _tagRepository.getTags()).fold((l) => <Tag>[], (r) => r);
 
       final totalItems = entries.length + trips.length + tags.length;
       int processedItems = 0;
@@ -149,9 +150,8 @@ class BackupServiceImpl implements BackupService {
         final allMedia = <MediaItem>[];
 
         for (final entry in entries) {
-          if (entry.hasMedia && entry.mediaItems != null) {
-            allMedia.addAll(entry.mediaItems!);
-          }
+          final entryMedia = await _journalRepository.getMediaForEntry(entry.id);
+          allMedia.addAll(entryMedia);
         }
 
         backupData['mediaCount'] = allMedia.length;
@@ -167,18 +167,18 @@ class BackupServiceImpl implements BackupService {
           }
 
           try {
-            final mediaFile = File(media.localPath);
+            final mediaFile = File(media.storagePath);
             if (await mediaFile.exists()) {
               final bytes = await mediaFile.readAsBytes();
               final archiveFile =
-                  ArchiveFile(media.localPath, bytes.length, bytes);
+                  ArchiveFile(media.storagePath, bytes.length, bytes);
               mediaArchive.addFile(archiveFile);
               mediaCount++;
 
               onProgress?.call(BackupProgress(
                 stage: BackupStage.gatheringData,
                 progress: 0.5 + (0.2 * mediaCount / allMedia.length),
-                currentItem: 'Adding media: ${media.fileName}',
+                currentItem: 'Adding media: ${media.originalFilename ?? media.id}',
                 processedItems: processedItems + mediaCount,
                 totalItems: totalItems + allMedia.length,
               ));
@@ -206,7 +206,7 @@ class BackupServiceImpl implements BackupService {
 
       // Add metadata file
       final metadataJson = _encodeJson(backupData);
-      final metadataBytes = const Utf8Encoder().convert(metadataJson);
+      final metadataBytes = utf8.encode(metadataJson);
       archive.addFile(
           ArchiveFile('metadata.json', metadataBytes.length, metadataBytes));
 
@@ -261,13 +261,13 @@ class BackupServiceImpl implements BackupService {
 
       final duration = DateTime.now().difference(startedAt);
 
-      onProgress?.call(const BackupProgress(
+      onProgress?.call(BackupProgress(
         stage: BackupStage.completed,
         progress: 1.0,
         processedItems: processedItems + mediaCount,
         totalItems: totalItems + mediaCount,
       ));
-      _backupProgressController.add(const BackupProgress(
+      _backupProgressController.add(BackupProgress(
         stage: BackupStage.completed,
         progress: 1.0,
         processedItems: processedItems + mediaCount,
@@ -279,11 +279,12 @@ class BackupServiceImpl implements BackupService {
         final isValid = await validateBackup(backupPath);
         if (!isValid) {
           await backupFile.delete();
-          throw const BackupException.checksumMismatch();
+          throw BackupException.checksumMismatch();
         }
       }
 
-      return BackupResult.success(
+      return BackupResult(
+        success: true,
         backupPath: backupPath,
         entryCount: entries.length,
         tripCount: trips.length,
@@ -384,7 +385,7 @@ class BackupServiceImpl implements BackupService {
           password: config.encryptionPassword,
         );
         if (!isValid) {
-          throw const BackupException.checksumMismatch();
+          throw BackupException.checksumMismatch();
         }
       }
 
@@ -436,8 +437,6 @@ class BackupServiceImpl implements BackupService {
           config.entitiesToRestore!.contains(RestoreEntityType.trips);
       final shouldRestoreTags = config.entitiesToRestore == null ||
           config.entitiesToRestore!.contains(RestoreEntityType.tags);
-      final shouldRestoreMedia = config.entitiesToRestore == null ||
-          config.entitiesToRestore!.contains(RestoreEntityType.media);
 
       onProgress?.call(const RestoreProgress(
         stage: RestoreStage.restoringData,
@@ -478,8 +477,12 @@ class BackupServiceImpl implements BackupService {
             final entry = _jsonToEntry(entryJson);
 
             // Handle conflict resolution
-            final existingEntry =
-                await _journalRepository.getEntryById(entry.id);
+            JournalEntry? existingEntry;
+                try {
+                  existingEntry = await _journalRepository.getEntry(entry.id);
+                } catch (_) {
+                  existingEntry = null;
+                }
 
             if (existingEntry != null) {
               conflictCount++;
@@ -555,7 +558,12 @@ class BackupServiceImpl implements BackupService {
             final tripJson = tripsData[i] as Map<String, dynamic>;
             final trip = _jsonToTrip(tripJson);
 
-            final existingTrip = await _tripRepository.getTripById(trip.id);
+            Trip? existingTrip;
+            try {
+              existingTrip = await _tripRepository.getTrip(trip.id);
+            } catch (_) {
+              existingTrip = null;
+            }
 
             if (existingTrip == null) {
               await _tripRepository.createTrip(trip);
@@ -595,7 +603,15 @@ class BackupServiceImpl implements BackupService {
             final tagJson = tagsData[i] as Map<String, dynamic>;
             final tag = _jsonToTag(tagJson);
 
-            final existingTag = await _tripRepository.getTripById(tag.id);
+            Tag? existingTag;
+            try {
+              existingTag = (await _tagRepository.getTag(tag.id)).fold(
+                (l) => null,
+                (r) => r,
+              );
+            } catch (_) {
+              existingTag = null;
+            }
 
             if (existingTag == null) {
               await _tagRepository.createTag(tag);
@@ -638,7 +654,8 @@ class BackupServiceImpl implements BackupService {
         progress: 1.0,
       ));
 
-      return RestoreResult.success(
+      return RestoreResult(
+        success: true,
         entriesRestored: entriesRestored,
         tripsRestored: tripsRestored,
         tagsRestored: tagsRestored,
@@ -690,7 +707,6 @@ class BackupServiceImpl implements BackupService {
       // Try to decrypt if encrypted
       // We'll need to attempt decryption or read metadata
       // For now, assume unencrypted for info
-      bool isEncrypted = false;
 
       try {
         final archive = ZipDecoder().decodeBytes(backupData);
@@ -835,9 +851,9 @@ class BackupServiceImpl implements BackupService {
       int totalSize = 0;
 
       // Estimate data size (rough estimate)
-      final entries = await _journalRepository.getAllEntries();
-      final trips = await _tripRepository.getAllTrips();
-      final tags = await _tagRepository.getAllTags();
+      final entries = await _journalRepository.getEntries();
+      final trips = await _tripRepository.getTrips();
+      final tags = (await _tagRepository.getTags()).fold((l) => <Tag>[], (r) => r);
 
       // Rough estimate: 1KB per entry, 500 bytes per trip/tag
       totalSize += entries.length * 1024;
@@ -847,10 +863,11 @@ class BackupServiceImpl implements BackupService {
       // Add media size if requested
       if (includeMedia) {
         for (final entry in entries) {
-          if (entry.hasMedia && entry.mediaItems != null) {
-            for (final media in entry.mediaItems!) {
+          try {
+            final entryMedia = await _journalRepository.getMediaForEntry(entry.id);
+            for (final media in entryMedia) {
               try {
-                final file = File(media.localPath);
+                final file = File(media.storagePath);
                 if (await file.exists()) {
                   totalSize += await file.length();
                 }
@@ -858,6 +875,8 @@ class BackupServiceImpl implements BackupService {
                 // Skip missing files
               }
             }
+          } catch (e) {
+            // Skip if media retrieval fails
           }
         }
       }
@@ -887,51 +906,11 @@ class BackupServiceImpl implements BackupService {
   }
 
   String _encodeJson(Map<String, dynamic> data) {
-    // Simple JSON encoding
-    final buffer = StringBuffer();
-    buffer.write('{');
-    bool first = true;
-    data.forEach((key, value) {
-      if (!first) buffer.write(',');
-      first = false;
-      buffer.write('"$key":');
-      _encodeValue(value, buffer);
-    });
-    buffer.write('}');
-    return buffer.toString();
-  }
-
-  void _encodeValue(dynamic value, StringBuffer buffer) {
-    if (value == null) {
-      buffer.write('null');
-    } else if (value is String) {
-      buffer.write('"${value.replaceAll('"', '\\"')}"');
-    } else if (value is num || value is bool) {
-      buffer.write(value.toString());
-    } else if (value is List) {
-      buffer.write('[');
-      for (int i = 0; i < value.length; i++) {
-        if (i > 0) buffer.write(',');
-        _encodeValue(value[i], buffer);
-      }
-      buffer.write(']');
-    } else if (value is Map) {
-      buffer.write('{');
-      bool first = true;
-      value.forEach((key, val) {
-        if (!first) buffer.write(',');
-        first = false;
-        buffer.write('"$key":');
-        _encodeValue(val, buffer);
-      });
-      buffer.write('}');
-    }
+    return json.encode(data);
   }
 
   dynamic _decodeJson(String jsonString) {
-    // Simple JSON decoding
-    // In production, use dart:convert or json_serializable
-    return const _JsonDecoder().convert(jsonString);
+    return json.decode(jsonString);
   }
 
   Map<String, dynamic> _entryToJson(JournalEntry entry) {
@@ -1028,7 +1007,6 @@ class BackupServiceImpl implements BackupService {
       'usageCount': tag.usageCount,
       'syncStatus': tag.syncStatus.toString(),
       'createdAt': tag.createdAt.toIso8601String(),
-      'updatedAt': tag.updatedAt.toIso8601String(),
     };
   }
 
@@ -1045,26 +1023,26 @@ class BackupServiceImpl implements BackupService {
         orElse: () => SyncStatus.synced,
       ),
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
     );
   }
 
   Map<String, dynamic> _mediaToJson(MediaItem media) {
     return {
       'id': media.id,
-      'entryId': media.entryId,
-      'type': media.type.toString(),
-      'url': media.url,
-      'localPath': media.localPath,
-      'fileName': media.fileName,
+      'journalEntryId': media.journalEntryId,
+      'mediaType': media.mediaType.toString(),
+      'storagePath': media.storagePath,
+      'originalFilename': media.originalFilename,
       'mimeType': media.mimeType,
       'fileSize': media.fileSize,
       'width': media.width,
       'height': media.height,
       'duration': media.duration,
-      'thumbnailUrl': media.thumbnailUrl,
+      'thumbnailPath': media.thumbnailPath,
       'uploadStatus': media.uploadStatus.toString(),
-      'uploadedAt': media.uploadedAt?.toIso8601String(),
+      'uploadProgress': media.uploadProgress,
+      'isCover': media.isCover,
+      'orderIndex': media.orderIndex,
       'createdAt': media.createdAt.toIso8601String(),
       'updatedAt': media.updatedAt.toIso8601String(),
     };
@@ -1078,7 +1056,7 @@ class BackupServiceImpl implements BackupService {
         encrypt.AES(key, mode: encrypt.AESMode.cbc),
       );
 
-      final encrypted = encrypter.encryptBytes(data, iv: iv);
+      final encrypted = encrypter.encryptBytes(Uint8List.fromList(data), iv: iv);
       return [...iv.bytes, ...encrypted.bytes];
     } catch (e) {
       throw BackupException.encryptionFailed('Failed to encrypt backup', e);
@@ -1088,11 +1066,11 @@ class BackupServiceImpl implements BackupService {
   Future<List<int>> _decryptData(List<int> data, String password) async {
     try {
       if (data.length < 16) {
-        throw const BackupException.decryptionFailed('Invalid encrypted data');
+        throw BackupException.decryptionFailed('Invalid encrypted data');
       }
 
       final key = encrypt.Key.fromUtf8(password.padRight(32).substring(0, 32));
-      final iv = encrypt.IV(data.sublist(0, 16));
+      final iv = encrypt.IV(Uint8List.fromList(data.sublist(0, 16)));
       final encryptedData = data.sublist(16);
 
       final encrypter = encrypt.Encrypter(
@@ -1100,7 +1078,7 @@ class BackupServiceImpl implements BackupService {
       );
 
       final decrypted = encrypter.decryptBytes(
-        encrypt.Encrypted(encryptedData),
+        encrypt.Encrypted(Uint8List.fromList(encryptedData)),
         iv: iv,
       );
       return decrypted;
@@ -1115,50 +1093,5 @@ class BackupServiceImpl implements BackupService {
   void dispose() {
     _backupProgressController.close();
     _restoreProgressController.close();
-  }
-}
-
-/// Simple JSON decoder
-class _JsonDecoder {
-  dynamic convert(String jsonString) {
-    return _parse(jsonString.trim());
-  }
-
-  dynamic _parse(String str) {
-    str = str.trim();
-    if (str.startsWith('{')) {
-      return _parseObject(str);
-    } else if (str.startsWith('[')) {
-      return _parseArray(str);
-    } else if (str.startsWith('"')) {
-      return str.substring(1, str.length - 1);
-    } else if (str == 'true') {
-      return true;
-    } else if (str == 'false') {
-      return false;
-    } else if (str == 'null') {
-      return null;
-    } else {
-      return num.parse(str);
-    }
-  }
-
-  Map<String, dynamic> _parseObject(String str) {
-    final result = <String, dynamic>{};
-    final content = str.substring(1, str.length - 1).trim();
-    if (content.isEmpty) return result;
-
-    // Simple parsing - assumes well-formed JSON
-    // In production, use dart:convert
-    return result;
-  }
-
-  List<dynamic> _parseArray(String str) {
-    final result = <dynamic>[];
-    final content = str.substring(1, str.length - 1).trim();
-    if (content.isEmpty) return result;
-
-    // Simple parsing - assumes well-formed JSON
-    return result;
   }
 }

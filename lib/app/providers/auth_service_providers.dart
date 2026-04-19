@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/security/security_manager.dart';
 import 'package:soloadventurer/core/storage/secure_storage_adapter.dart';
 import 'package:soloadventurer/features/auth/data/datasources/auth_local_data_source.dart';
@@ -18,8 +17,15 @@ import 'package:soloadventurer/features/auth/domain/usecases/resend_verification
 import 'package:soloadventurer/features/auth/domain/usecases/sign_out.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/sign_up.dart';
 import 'package:soloadventurer/features/auth/domain/usecases/verify_email.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_service.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/refresh_queue_manager.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_expiration_tracker.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/token_refresh_scheduler.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/persistent_session_manager.dart';
+import 'package:soloadventurer/features/auth/infrastructure/services/offline_auth_manager.dart';
 import 'package:soloadventurer/app/providers/core_service_providers.dart';
 import 'package:soloadventurer/core/providers/api_providers.dart';
+import 'package:soloadventurer/app/providers/offline_service_providers.dart';
 
 part 'auth_service_providers.g.dart';
 
@@ -33,8 +39,7 @@ part 'auth_service_providers.g.dart';
 @Riverpod(keepAlive: true)
 AuthLocalDataSource authLocalDataSource(Ref ref) {
   final secureStorage = ref.watch(secureStorageProvider);
-  final sharedPreferences = ref.watch(sharedPreferencesProvider);
-  return AuthLocalDataSourceImpl(secureStorage, sharedPreferences);
+  return AuthLocalDataSourceImpl(secureStorage);
 }
 
 /// Provider for AuthRemoteDataSource
@@ -43,7 +48,6 @@ AuthLocalDataSource authLocalDataSource(Ref ref) {
 /// In tests, this can be overridden with the mock implementation.
 @Riverpod(keepAlive: true)
 AuthRemoteDataSource authRemoteDataSource(Ref ref) {
-  debugPrint('auth_service_providers: Initializing SupabaseAuthRemoteDataSource');
   return SupabaseAuthRemoteDataSourceImpl();
 }
 
@@ -146,4 +150,58 @@ ForgotPassword forgotPasswordUseCase(Ref ref) {
 ConfirmPasswordReset confirmPasswordResetUseCase(Ref ref) {
   final repository = ref.watch(authRepositoryProvider);
   return ConfirmPasswordReset(repository);
+}
+
+// ============================================================================
+// Token Refresh Infrastructure
+// ============================================================================
+
+/// Provider for TokenRefreshService
+@Riverpod(keepAlive: true)
+TokenRefreshService tokenRefreshService(Ref ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+  return TokenRefreshService(authRepository: authRepository);
+}
+
+/// Provider for RefreshQueueManager
+@Riverpod(keepAlive: true)
+RefreshQueueManager refreshQueueManager(Ref ref) {
+  final refreshService = ref.watch(tokenRefreshServiceProvider);
+  return RefreshQueueManager(refreshService: refreshService);
+}
+
+/// Provider for TokenExpirationTracker
+@Riverpod(keepAlive: true)
+TokenExpirationTracker tokenExpirationTracker(Ref ref) {
+  final refreshService = ref.watch(tokenRefreshServiceProvider);
+  return TokenExpirationTracker(refreshService: refreshService);
+}
+
+/// Provider for TokenRefreshScheduler
+@Riverpod(keepAlive: true)
+TokenRefreshScheduler tokenRefreshScheduler(Ref ref) {
+  final expirationTracker = ref.watch(tokenExpirationTrackerProvider);
+  return TokenRefreshScheduler(expirationTracker: expirationTracker);
+}
+
+/// Provider for PersistentSessionManager
+@Riverpod(keepAlive: true)
+PersistentSessionManager persistentSessionManager(Ref ref) {
+  final localDataSource = ref.watch(authLocalDataSourceProvider);
+  return PersistentSessionManager(localDataSource: localDataSource);
+}
+
+/// Provider for OfflineAuthManager
+@Riverpod(keepAlive: true)
+OfflineAuthManager offlineAuthManager(Ref ref) {
+  final connectivityService = ref.watch(connectivityServiceProvider);
+  final localDataSource = ref.watch(authLocalDataSourceProvider);
+  final tokenRefreshService = ref.watch(tokenRefreshServiceProvider);
+  final authRepository = ref.watch(authRepositoryProvider);
+  return OfflineAuthManager(
+    connectivityService: connectivityService,
+    localDataSource: localDataSource,
+    tokenRefreshService: tokenRefreshService,
+    authRepository: authRepository,
+  );
 }

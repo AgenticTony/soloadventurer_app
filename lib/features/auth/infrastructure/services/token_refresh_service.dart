@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
 import 'package:soloadventurer/features/auth/domain/models/auth_session.dart';
 import 'package:soloadventurer/features/auth/domain/repositories/auth_repository.dart';
@@ -148,8 +147,6 @@ class TokenRefreshService {
   Future<AuthSession> refreshToken() async {
     // If a refresh is already in progress, wait for it to complete (mutex pattern)
     if (_isRefreshing && _refreshCompleter != null) {
-      debugPrint(
-          'TokenRefreshService: Refresh already in progress, waiting for completion');
       final result = await _refreshCompleter!.future;
       return _handleResult(result);
     }
@@ -158,11 +155,18 @@ class TokenRefreshService {
     _isRefreshing = true;
     _refreshCompleter = Completer<TokenRefreshResult>();
 
-    debugPrint('TokenRefreshService: Starting token refresh operation');
-
     try {
       final result = await _performRefreshWithRetry();
-      _refreshCompleter!.complete(result);
+      if (_refreshCompleter != null && !_refreshCompleter!.isCompleted) {
+        _refreshCompleter!.complete(result);
+      }
+      // If cancelled, throw cancelled exception
+      if (!_isRefreshing && _refreshCompleter == null) {
+        throw const AuthException(
+          'Token refresh was cancelled',
+          code: 'REFRESH_CANCELLED',
+        );
+      }
       return _handleResult(result);
     } finally {
       // Release the mutex lock
@@ -178,8 +182,6 @@ class TokenRefreshService {
 
     while (attemptNumber < maxRetryAttempts) {
       attemptNumber++;
-      debugPrint(
-          'TokenRefreshService: Refresh attempt $attemptNumber of $maxRetryAttempts');
 
       // Emit in-progress status
       _emitStatus(TokenRefreshResult.inProgress(attemptNumber: attemptNumber));
@@ -188,17 +190,12 @@ class TokenRefreshService {
       if (attemptNumber > 1) {
         final delayMs = _calculateBackoffDelay(attemptNumber);
         totalDelayMs += delayMs;
-        debugPrint(
-            'TokenRefreshService: Backing off for ${delayMs}ms before retry');
         await Future.delayed(Duration(milliseconds: delayMs));
       }
 
       try {
         // Attempt to refresh the token using basic refresh (no retry logic)
         final session = await _authRepository.performBasicTokenRefresh();
-
-        debugPrint(
-            'TokenRefreshService: Token refresh successful on attempt $attemptNumber');
 
         final result = TokenRefreshResult.success(
           session: session,
@@ -209,12 +206,9 @@ class TokenRefreshService {
         _emitStatus(result);
         return result;
       } on AuthException catch (e) {
-        debugPrint(
-            'TokenRefreshService: Token refresh failed on attempt $attemptNumber: ${e.message}');
 
         // Check if this is a network error that should be retried
         if (_shouldRetry(e) && attemptNumber < maxRetryAttempts) {
-          debugPrint('TokenRefreshService: Retrying due to recoverable error');
           continue;
         }
 
@@ -228,8 +222,6 @@ class TokenRefreshService {
         _emitStatus(result);
         return result;
       } catch (e) {
-        debugPrint(
-            'TokenRefreshService: Unexpected error on attempt $attemptNumber: $e');
 
         // Wrap unexpected errors in AuthException
         final authException = AuthException(
@@ -340,7 +332,6 @@ class TokenRefreshService {
     if (_isRefreshing &&
         _refreshCompleter != null &&
         !_refreshCompleter!.isCompleted) {
-      debugPrint('TokenRefreshService: Cancelling in-progress refresh');
       _emitStatus(TokenRefreshResult.cancelled());
       _refreshCompleter!.complete(TokenRefreshResult.cancelled());
       _isRefreshing = false;
@@ -350,14 +341,12 @@ class TokenRefreshService {
 
   /// Disposes of the service and closes the status stream
   void dispose() {
-    debugPrint('TokenRefreshService: Disposing service');
     cancelRefresh();
     _statusController.close();
   }
 
   /// Resets the service state (useful for testing)
   void reset() {
-    debugPrint('TokenRefreshService: Resetting service state');
     cancelRefresh();
     _isRefreshing = false;
     _refreshCompleter = null;

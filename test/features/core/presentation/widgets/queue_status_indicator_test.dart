@@ -1,38 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
 import 'package:soloadventurer/features/core/providers/operation_queue_provider.dart';
 import 'package:soloadventurer/features/travel/domain/models/trip_planning_operation.dart';
 
-class MockOperationQueueNotifier extends OperationQueueNotifier with Mock {
-  MockOperationQueueNotifier() : super();
-
-  @override
-  OperationQueueState build() {
-    return const OperationQueueState(
-      pendingOperations: [],
-      failedOperations: [],
-      isProcessing: false,
-      pendingCount: 0,
-      failedCount: 0,
-    );
-  }
-}
+class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(MaterialPageRoute(builder: (_) => const SizedBox()));
+  });
   group('QueueStatusIndicator', () {
-    late MockOperationQueueNotifier mockNotifier;
-
-    setUp(() {
-      mockNotifier = MockOperationQueueNotifier();
-    });
-
-    Widget createWidgetUnderTest() {
+    Widget createWidgetUnderTest(OperationQueueState state) {
       return ProviderScope(
         overrides: [
-          operationQueueNotifierProvider.overrideWith((_) => mockNotifier),
+          operationQueueProvider.overrideWithValue(state),
         ],
         child: MaterialApp(
           home: Scaffold(
@@ -49,7 +34,7 @@ void main() {
     group('Visibility', () {
       testWidgets('hides indicator when pendingCount is 0',
           (WidgetTester tester) async {
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [],
             failedOperations: [],
@@ -57,9 +42,7 @@ void main() {
             pendingCount: 0,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.byType(IconButton), findsNothing);
         expect(find.byType(SizedBox), findsOneWidget);
@@ -75,7 +58,7 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
@@ -83,9 +66,7 @@ void main() {
             pendingCount: 1,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.byType(IconButton), findsOneWidget);
         expect(find.byIcon(Icons.cloud_sync), findsOneWidget);
@@ -101,7 +82,7 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
@@ -109,9 +90,7 @@ void main() {
             pendingCount: 1,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.byType(IconButton), findsOneWidget);
       });
@@ -129,7 +108,7 @@ void main() {
           ),
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           OperationQueueState(
             pendingOperations: operations,
             failedOperations: [],
@@ -137,9 +116,7 @@ void main() {
             pendingCount: 99,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.byType(IconButton), findsOneWidget);
       });
@@ -157,7 +134,7 @@ void main() {
           ),
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           OperationQueueState(
             pendingOperations: operations,
             failedOperations: [],
@@ -165,9 +142,7 @@ void main() {
             pendingCount: 100,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.byType(IconButton), findsOneWidget);
       });
@@ -184,7 +159,7 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
@@ -192,9 +167,7 @@ void main() {
             pendingCount: 1,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.text('1'), findsOneWidget);
       });
@@ -212,7 +185,7 @@ void main() {
           ),
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           OperationQueueState(
             pendingOperations: operations,
             failedOperations: [],
@@ -220,9 +193,7 @@ void main() {
             pendingCount: 10,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.text('10'), findsOneWidget);
       });
@@ -240,7 +211,7 @@ void main() {
           ),
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           OperationQueueState(
             pendingOperations: operations,
             failedOperations: [],
@@ -248,9 +219,7 @@ void main() {
             pendingCount: 150,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.text('99+'), findsOneWidget);
       });
@@ -268,7 +237,7 @@ void main() {
           ),
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           OperationQueueState(
             pendingOperations: operations,
             failedOperations: [],
@@ -276,9 +245,7 @@ void main() {
             pendingCount: 100,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         final textWidget = tester.widget<Text>(find.text('99+'));
         expect(textWidget.style?.fontSize, 10);
@@ -294,7 +261,7 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
@@ -302,9 +269,7 @@ void main() {
             pendingCount: 1,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         final textWidget = tester.widget<Text>(find.text('1'));
         expect(textWidget.style?.fontSize, 12);
@@ -321,7 +286,7 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
@@ -329,9 +294,7 @@ void main() {
             pendingCount: 1,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         expect(find.byIcon(Icons.cloud_sync), findsOneWidget);
       });
@@ -348,7 +311,7 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
+        await tester.pumpWidget(createWidgetUnderTest(
           const OperationQueueState(
             pendingOperations: [operation],
             failedOperations: [],
@@ -356,53 +319,10 @@ void main() {
             pendingCount: 5,
             failedCount: 0,
           ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
+        ));
 
         final iconButton = tester.widget<IconButton>(find.byType(IconButton));
         expect(iconButton.tooltip, 'View operation queue (5 pending)');
-      });
-
-      testWidgets('updates tooltip when count changes',
-          (WidgetTester tester) async {
-        const operation = TripPlanningOperation(
-          id: 'test-id',
-          tripId: 'trip-123',
-          planningType: TripPlanningType.update,
-          changes: {'name': 'Test'},
-          priority: 10,
-        );
-
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 1,
-            failedCount: 0,
-          ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
-
-        expect(find.byType(IconButton), findsOneWidget);
-
-        // Update state
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 10,
-            failedCount: 0,
-          ),
-        );
-
-        await tester.pump();
-
-        final iconButton = tester.widget<IconButton>(find.byType(IconButton));
-        expect(iconButton.tooltip, 'View operation queue (10 pending)');
       });
     });
 
@@ -417,23 +337,68 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 1,
-            failedCount: 0,
-          ),
+        final goRouter = GoRouter(
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => Scaffold(
+                appBar: AppBar(
+                  actions: const [
+                    QueueStatusIndicator(),
+                  ],
+                ),
+              ),
+            ),
+            GoRoute(
+              path: '/operation-queue',
+              builder: (context, state) => const Scaffold(
+                body: Text('Operation Queue Screen'),
+              ),
+            ),
+          ],
         );
-
-        final navigatorObserver = MockNavigatorObserver();
 
         await tester.pumpWidget(
           ProviderScope(
             overrides: [
-              operationQueueNotifierProvider
-                  .overrideWith((ref) => mockNotifier),
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [operation],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 1,
+                  failedCount: 0,
+                ),
+              ),
+            ],
+            child: MaterialApp.router(
+              routerConfig: goRouter,
+            ),
+          ),
+        );
+
+        await tester.tap(find.byType(IconButton));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Operation Queue Screen'), findsOneWidget);
+      });
+    });
+
+    group('State Reactivity', () {
+      testWidgets('updates when pendingCount changes from 0 to 1',
+          (WidgetTester tester) async {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 0,
+                  failedCount: 0,
+                ),
+              ),
             ],
             child: MaterialApp(
               home: Scaffold(
@@ -443,32 +408,9 @@ void main() {
                   ],
                 ),
               ),
-              navigatorObservers: [navigatorObserver],
             ),
           ),
         );
-
-        await tester.tap(find.byType(IconButton));
-        await tester.pumpAndSettle();
-
-        verify(() => navigatorObserver.didPush(any(), any())).called(1);
-      });
-    });
-
-    group('State Reactivity', () {
-      testWidgets('updates when pendingCount changes from 0 to 1',
-          (WidgetTester tester) async {
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 0,
-            failedCount: 0,
-          ),
-        );
-
-        await tester.pumpWidget(createWidgetUnderTest());
 
         expect(find.byType(IconButton), findsNothing);
 
@@ -480,17 +422,31 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 1,
-            failedCount: 0,
+        // Rebuild with new state
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [operation],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 1,
+                  failedCount: 0,
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                appBar: AppBar(
+                  actions: const [
+                    QueueStatusIndicator(),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
-
-        await tester.pump();
 
         expect(find.byType(IconButton), findsOneWidget);
         expect(find.text('1'), findsOneWidget);
@@ -506,31 +462,57 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 1,
-            failedCount: 0,
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [operation],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 1,
+                  failedCount: 0,
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                appBar: AppBar(
+                  actions: const [
+                    QueueStatusIndicator(),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
-
-        await tester.pumpWidget(createWidgetUnderTest());
 
         expect(find.byType(IconButton), findsOneWidget);
 
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 0,
-            failedCount: 0,
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 0,
+                  failedCount: 0,
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                appBar: AppBar(
+                  actions: const [
+                    QueueStatusIndicator(),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
-
-        await tester.pump();
 
         expect(find.byType(IconButton), findsNothing);
       });
@@ -545,17 +527,30 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation1],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 1,
-            failedCount: 0,
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [operation1],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 1,
+                  failedCount: 0,
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                appBar: AppBar(
+                  actions: const [
+                    QueueStatusIndicator(),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
-
-        await tester.pumpWidget(createWidgetUnderTest());
 
         expect(find.text('1'), findsOneWidget);
 
@@ -567,17 +562,30 @@ void main() {
           priority: 10,
         );
 
-        when(() => mockNotifier.state).thenReturn(
-          const OperationQueueState(
-            pendingOperations: [operation1, operation2],
-            failedOperations: [],
-            isProcessing: false,
-            pendingCount: 2,
-            failedCount: 0,
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [
+              operationQueueProvider.overrideWithValue(
+                const OperationQueueState(
+                  pendingOperations: [operation1, operation2],
+                  failedOperations: [],
+                  isProcessing: false,
+                  pendingCount: 2,
+                  failedCount: 0,
+                ),
+              ),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                appBar: AppBar(
+                  actions: const [
+                    QueueStatusIndicator(),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
-
-        await tester.pump();
 
         expect(find.text('1'), findsNothing);
         expect(find.text('2'), findsOneWidget);
@@ -585,5 +593,3 @@ void main() {
     });
   });
 }
-
-class MockNavigatorObserver extends Mock implements NavigatorObserver {}

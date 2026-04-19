@@ -36,7 +36,7 @@ final class AlertManagerProvider
   AlertManager create() => AlertManager();
 }
 
-String _$alertManagerHash() => r'e0354d7cd10f193d752dc2722cbfc6371617b2be';
+String _$alertManagerHash() => r'df94958f742664321e84656e14028903c9a38776';
 
 /// Manager responsible for handling security alerts and notifications
 

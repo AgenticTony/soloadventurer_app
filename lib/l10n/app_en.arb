@@ -1,0 +1,482 @@
+{
+  "@@locale": "en",
+  "appBarTitleNearbyTravelers": "Nearby Travelers",
+  "@appBarTitleNearbyTravelers": {
+    "description": "Title shown in the app bar on the matches screen"
+  },
+  "fabAddTrip": "Add Trip",
+  "@fabAddTrip": {
+    "description": "Floating action button label for adding a trip"
+  },
+  "noTripsTitle": "Start Your Adventure",
+  "@noTripsTitle": {
+    "description": "Title shown when user has no trips"
+  },
+  "noTripsDescription": "Add your first trip to discover fellow solo travelers nearby.",
+  "@noTripsDescription": {
+    "description": "Description shown when user has no trips"
+  },
+  "noTripsButton": "Add Your First Trip",
+  "@noTripsButton": {
+    "description": "Button label to add first trip"
+  },
+  "noMatchesTitle": "No Travelers Found",
+  "@noMatchesTitle": {
+    "description": "Title shown when no travelers are found"
+  },
+  "noMatchesDescription": "We couldn't find any travelers nearby with overlapping dates.\nTry adjusting your trip dates or expanding your search.",
+  "@noMatchesDescription": {
+    "description": "Description shown when no travelers are found"
+  },
+  "noMatchesButton": "Adjust Preferences",
+  "@noMatchesButton": {
+    "description": "Button label to adjust search preferences"
+  },
+  "unknownTraveler": "Unknown Traveler",
+  "@unknownTraveler": {
+    "description": "Fallback text for traveler name when not available"
+  },
+  "notAvailable": "N/A",
+  "@notAvailable": {
+    "description": "Text shown when a value is not available"
+  },
+  "unknownLocation": "Unknown",
+  "@unknownLocation": {
+    "description": "Fallback text for location when not available"
+  },
+  "statusNew": "New",
+  "@statusNew": {
+    "description": "Status badge for new matches"
+  },
+  "unknownDestination": "Unknown destination",
+  "@unknownDestination": {
+    "description": "Fallback text for destination when not available"
+  },
+  "daysOverlap": "{count, plural, one{1 day overlap} other{{count} days overlap}}",
+  "@daysOverlap": {
+    "description": "Text showing number of days overlap with another traveler",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "kmAway": "{distance} km away",
+  "@kmAway": {
+    "description": "Text showing distance in kilometers",
+    "placeholders": {
+      "distance": {
+        "type": "String",
+        "example": "2.5"
+      }
+    }
+  },
+  "matchTypeSameDestination": "Same destination",
+  "@matchTypeSameDestination": {
+    "description": "Match type label for geographic overlap"
+  },
+  "matchTypeSharedInterests": "Shared interests",
+  "@matchTypeSharedInterests": {
+    "description": "Match type label for activity match"
+  },
+  "matchTypePerfectMatch": "Perfect match",
+  "@matchTypePerfectMatch": {
+    "description": "Match type label for combined match"
+  },
+  "matchTypeDefault": "Match",
+  "@matchTypeDefault": {
+    "description": "Default match type label"
+  },
+  "errorTitle": "Something Went Wrong",
+  "@errorTitle": {
+    "description": "Title shown when an error occurs"
+  },
+  "errorButtonRetry": "Try Again",
+  "@errorButtonRetry": {
+    "description": "Button label to retry after an error"
+  },
+
+  "subClose": "Close",
+  "@subClose": {
+    "description": "Tooltip for close button on paywall"
+  },
+  "subWelcomeTrial": "Welcome to Explorer! Your 7-day trial has started.",
+  "@subWelcomeTrial": {
+    "description": "Snack bar message after starting free trial"
+  },
+  "subHeroHeadline": "Travel with peace of mind",
+  "@subHeroHeadline": {
+    "description": "Paywall hero section headline"
+  },
+  "subHeroSubheadline": "Connect with travelers who've verified their government ID. Your badge shows you're the real deal.",
+  "@subHeroSubheadline": {
+    "description": "Paywall hero section subheadline"
+  },
+  "subTestimonial": "\"I only meet verified travelers — it's how I stay safe while exploring solo.\"",
+  "@subTestimonial": {
+    "description": "Testimonial quote on paywall"
+  },
+  "subTestimonialAttribution": "— Solo Traveler, Barcelona",
+  "@subTestimonialAttribution": {
+    "description": "Attribution for testimonial quote"
+  },
+  "subGuardianPreview": "Plus — Guardian check-ins that watch your back during meetups",
+  "@subGuardianPreview": {
+    "description": "Guardian preview chip text on paywall"
+  },
+  "subWhatYouGet": "What you get",
+  "@subWhatYouGet": {
+    "description": "Feature comparison section heading"
+  },
+  "subFeatureIdVerification": "ID Verification",
+  "@subFeatureIdVerification": {
+    "description": "Feature row title for ID Verification"
+  },
+  "subFeatureIdVerificationDesc": "Verify your government ID — show travelers you're the real deal",
+  "@subFeatureIdVerificationDesc": {
+    "description": "Feature row description for ID Verification"
+  },
+  "subFeatureGuardian": "Guardian Check-Ins",
+  "@subFeatureGuardian": {
+    "description": "Feature row title for Guardian Check-Ins"
+  },
+  "subFeatureGuardianDesc": "Advanced safety check-ins during meetups — multiple contacts, location sharing",
+  "@subFeatureGuardianDesc": {
+    "description": "Feature row description for Guardian Check-Ins"
+  },
+  "subFeatureUnlimitedMessages": "Unlimited connection messages",
+  "@subFeatureUnlimitedMessages": {
+    "description": "Feature row title for unlimited messages"
+  },
+  "subFeatureMessagesFree": "Free: 5/day",
+  "@subFeatureMessagesFree": {
+    "description": "Subtitle showing free tier message limit"
+  },
+  "subFeatureSeeInterested": "See travelers interested in you",
+  "@subFeatureSeeInterested": {
+    "description": "Feature row title for seeing interested travelers"
+  },
+  "subFeatureVerifiedFilter": "ID Verified-only filter",
+  "@subFeatureVerifiedFilter": {
+    "description": "Feature row title for verified-only filter"
+  },
+  "subFeatureAdvancedFilters": "Advanced filters",
+  "@subFeatureAdvancedFilters": {
+    "description": "Feature row title for advanced filters"
+  },
+  "subFeatureAdvancedFiltersSub": "Age, gender, language, travel dates",
+  "@subFeatureAdvancedFiltersSub": {
+    "description": "Subtitle listing advanced filter types"
+  },
+  "subFeaturePriority": "Priority discovery",
+  "@subFeaturePriority": {
+    "description": "Feature row title for priority discovery"
+  },
+  "subFeatureReadReceipts": "Read receipts",
+  "@subFeatureReadReceipts": {
+    "description": "Feature row title for read receipts"
+  },
+  "subComingSoon": "COMING SOON",
+  "@subComingSoon": {
+    "description": "Label for coming soon tiers section"
+  },
+  "subNotifyMe": "Notify me",
+  "@subNotifyMe": {
+    "description": "Button to request notification when tier is available"
+  },
+  "subNotifyMeConfirm": "We'll notify you when {tier} is available!",
+  "@subNotifyMeConfirm": {
+    "description": "Snack bar confirming notify me request",
+    "placeholders": {
+      "tier": { "type": "String", "example": "Adventurer" }
+    }
+  },
+  "subMonthly": "Monthly",
+  "@subMonthly": {
+    "description": "Billing cycle option label"
+  },
+  "subAnnual": "Annual",
+  "@subAnnual": {
+    "description": "Billing cycle option label"
+  },
+  "subCtaStartTrial": "Get ID Verified · Start Free Trial",
+  "@subCtaStartTrial": {
+    "description": "CTA button text when eligible for trial"
+  },
+  "subCtaPurchase": "Get ID Verified · {price}",
+  "@subCtaPurchase": {
+    "description": "CTA button text for direct purchase",
+    "placeholders": {
+      "price": { "type": "String", "example": "$9.99/mo" }
+    }
+  },
+  "subTrialNote": "No credit card required. Then {price}. Cancel anytime.",
+  "@subTrialNote": {
+    "description": "Note below CTA about trial terms",
+    "placeholders": {
+      "price": { "type": "String", "example": "$9.99/mo" }
+    }
+  },
+  "subContinueFree": "Continue with Free",
+  "@subContinueFree": {
+    "description": "Link to dismiss paywall and stay on free tier"
+  },
+  "subUpgradeToSee": "Upgrade to see",
+  "@subUpgradeToSee": {
+    "description": "Overlay text on blurred connection request cards"
+  },
+  "subTravelersWantToConnectHeader": "Travelers Interested in Connecting",
+  "@subTravelersWantToConnectHeader": {
+    "description": "App bar title for connection requests screen"
+  },
+  "subTravelersWantToConnect": "{count} travelers want to connect",
+  "@subTravelersWantToConnect": {
+    "description": "Header showing count of connection requests",
+    "placeholders": {
+      "count": { "type": "int", "example": "12" }
+    }
+  },
+  "subBlurredForFree": "Blurred for free tier",
+  "@subBlurredForFree": {
+    "description": "Label explaining blurred cards for free users"
+  },
+  "subUnlock": "Unlock",
+  "@subUnlock": {
+    "description": "Button in app bar to unlock connection requests"
+  },
+  "subUpgradeBanner": "See who wants to travel with you — start your free trial",
+  "@subUpgradeBanner": {
+    "description": "Banner text encouraging upgrade to see connection requests"
+  },
+  "subStartFreeTrial": "Start Free Trial",
+  "@subStartFreeTrial": {
+    "description": "Button text to start free trial"
+  },
+  "subWantToSeeWho": "Want to see who?",
+  "@subWantToSeeWho": {
+    "description": "Dialog title when tapping blurred card"
+  },
+  "subUpgradeModalBody": "See who wants to travel with you — start your free trial to connect with {name} and other interested travelers.",
+  "@subUpgradeModalBody": {
+    "description": "Dialog body text for blurred card tap",
+    "placeholders": {
+      "name": { "type": "String", "example": "Sofia" }
+    }
+  },
+  "subMaybeLater": "Maybe Later",
+  "@subMaybeLater": {
+    "description": "Dismiss button in upgrade dialogs"
+  },
+  "subManageTitle": "Subscription",
+  "@subManageTitle": {
+    "description": "App bar title for subscription management screen"
+  },
+  "subFreeTrialActive": "Free Trial Active",
+  "@subFreeTrialActive": {
+    "description": "Badge text when trial is active"
+  },
+  "subPreviouslyVerified": "Previously verified",
+  "@subPreviouslyVerified": {
+    "description": "Badge text for cancelled subscriber"
+  },
+  "subBilling": "Billing",
+  "@subBilling": {
+    "description": "Section title for billing info"
+  },
+  "subStatus": "Status",
+  "@subStatus": {
+    "description": "Label for subscription status"
+  },
+  "subStatusActive": "Active",
+  "@subStatusActive": {
+    "description": "Status value when subscription is active"
+  },
+  "subStatusFree": "Free tier",
+  "@subStatusFree": {
+    "description": "Status value when on free tier"
+  },
+  "subNextRenewal": "Next Renewal",
+  "@subNextRenewal": {
+    "description": "Label for next renewal date"
+  },
+  "subTrialEnds": "Trial Ends",
+  "@subTrialEnds": {
+    "description": "Label for trial end date"
+  },
+  "subTrialStarted": "Trial Started",
+  "@subTrialStarted": {
+    "description": "Label for trial start date"
+  },
+  "subBillingCycle": "Billing Cycle",
+  "@subBillingCycle": {
+    "description": "Label for billing cycle selection"
+  },
+  "subAutoRenew": "Auto-Renew",
+  "@subAutoRenew": {
+    "description": "Label for auto-renew status"
+  },
+  "subOn": "On",
+  "@subOn": {
+    "description": "Value for enabled auto-renew"
+  },
+  "subOff": "Off",
+  "@subOff": {
+    "description": "Value for disabled auto-renew"
+  },
+  "subPlatform": "Platform",
+  "@subPlatform": {
+    "description": "Label for purchase platform"
+  },
+  "subPrice": "Price",
+  "@subPrice": {
+    "description": "Label for current price"
+  },
+  "subIncludedFeatures": "Included Features",
+  "@subIncludedFeatures": {
+    "description": "Section title for feature list"
+  },
+  "subChangePlan": "Change Plan",
+  "@subChangePlan": {
+    "description": "Button to change subscription plan"
+  },
+  "subCancelSubscription": "Cancel Subscription",
+  "@subCancelSubscription": {
+    "description": "Button to cancel subscription"
+  },
+  "subRestorePurchases": "Restore Purchases",
+  "@subRestorePurchases": {
+    "description": "Button to restore previous purchases"
+  },
+  "subPurchasesRestored": "Purchases restored.",
+  "@subPurchasesRestored": {
+    "description": "Snack bar confirming purchase restore"
+  },
+  "subGetVerifiedCta": "Get ID Verified · Start Trial",
+  "@subGetVerifiedCta": {
+    "description": "CTA button for free users on management screen"
+  },
+  "subCancelTitle": "Cancel Subscription?",
+  "@subCancelTitle": {
+    "description": "Dialog title for cancellation confirmation"
+  },
+  "subCancelBody": "You'll keep your Explorer features until the end of your current billing period. After that, you'll be on the Free plan with \"Previously verified\" status.",
+  "@subCancelBody": {
+    "description": "Dialog body explaining cancellation consequences"
+  },
+  "subKeepSubscription": "Keep Subscription",
+  "@subKeepSubscription": {
+    "description": "Button to keep subscription instead of cancelling"
+  },
+  "subContinueToCancel": "Continue to Cancel",
+  "@subContinueToCancel": {
+    "description": "Button to proceed with cancellation"
+  },
+  "subExitSurveyTitle": "Why are you cancelling?",
+  "@subExitSurveyTitle": {
+    "description": "Title of optional exit survey"
+  },
+  "subExitSurveyOptional": "Optional — helps us improve.",
+  "@subExitSurveyOptional": {
+    "description": "Subtitle explaining survey is optional"
+  },
+  "subCancelReasonExpensive": "Too expensive",
+  "@subCancelReasonExpensive": {
+    "description": "Exit survey reason"
+  },
+  "subCancelReasonNotUsing": "Not using it enough",
+  "@subCancelReasonNotUsing": {
+    "description": "Exit survey reason"
+  },
+  "subCancelReasonAlternative": "Found a better alternative",
+  "@subCancelReasonAlternative": {
+    "description": "Exit survey reason"
+  },
+  "subCancelReasonPrivacy": "Concerned about privacy",
+  "@subCancelReasonPrivacy": {
+    "description": "Exit survey reason"
+  },
+  "subCancelReasonTechnical": "Technical issues",
+  "@subCancelReasonTechnical": {
+    "description": "Exit survey reason"
+  },
+  "subSkip": "Skip",
+  "@subSkip": {
+    "description": "Button to skip exit survey"
+  },
+  "subConfirmCancel": "Confirm Cancel",
+  "@subConfirmCancel": {
+    "description": "Button to confirm cancellation"
+  },
+  "subCancelledConfirmation": "Subscription cancelled. You'll keep access until end of billing period.",
+  "@subCancelledConfirmation": {
+    "description": "Snack bar after confirming cancellation"
+  },
+  "subTrustTitle": "Trust & Verification",
+  "@subTrustTitle": {
+    "description": "Section title for trust display"
+  },
+  "subSignalEmail": "Email confirmed",
+  "@subSignalEmail": {
+    "description": "Trust signal for email confirmation"
+  },
+  "subSignalPhoto": "Photo checked",
+  "@subSignalPhoto": {
+    "description": "Trust signal for photo/liveness check"
+  },
+  "subSignalIdVerified": "ID Verified",
+  "@subSignalIdVerified": {
+    "description": "Trust signal for government ID verification"
+  },
+  "subPreviouslyVerifiedSignal": "Previously verified",
+  "@subPreviouslyVerifiedSignal": {
+    "description": "Text shown when user was previously verified"
+  },
+  "subProfileCompleteness": "Profile completeness",
+  "@subProfileCompleteness": {
+    "description": "Label for profile completeness bar"
+  },
+  "subGetVerifiedCtaTitle": "Get ID Verified",
+  "@subGetVerifiedCtaTitle": {
+    "description": "CTA card title on trust display"
+  },
+  "subExplorer": "Explorer",
+  "@subExplorer": {
+    "description": "Tier label shown in CTA card"
+  },
+  "subGetVerifiedCtaDesc": "Verify your government ID — show travelers you're the real deal.",
+  "@subGetVerifiedCtaDesc": {
+    "description": "CTA card description"
+  },
+  "subNewTraveler": "New traveler",
+  "@subNewTraveler": {
+    "description": "Label for accounts less than 7 days old"
+  },
+  "subChatVerifiedBanner": "This traveler is ID Verified",
+  "@subChatVerifiedBanner": {
+    "description": "Banner shown in chat with verified user"
+  },
+  "subChatSafetyReminder": "Remember: meet in public places and trust your instincts",
+  "@subChatSafetyReminder": {
+    "description": "Neutral safety reminder shown in all chats"
+  },
+  "subGateMaybeLater": "Maybe Later",
+  "@subGateMaybeLater": {
+    "description": "Dismiss button in feature gate modal"
+  },
+  "subGateCta": "Get ID Verified · Start Trial",
+  "@subGateCta": {
+    "description": "CTA button in feature gate modal"
+  },
+  "subGateIncluded": "Included with Explorer ($9.99/mo or $59.99/yr)",
+  "@subGateIncluded": {
+    "description": "Info text in feature gate modal"
+  },
+  "subConnectedWith": "Connected with {name}!",
+  "@subConnectedWith": {
+    "description": "Snack bar after connecting with a traveler",
+    "placeholders": {
+      "name": { "type": "String", "example": "Sofia" }
+    }
+  }
+}

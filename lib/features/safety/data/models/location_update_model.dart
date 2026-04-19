@@ -7,6 +7,8 @@ part 'location_update_model.g.dart';
 /// Model for [LocationUpdate] with JSON serialization
 @freezed
 sealed class LocationUpdateModel with _$LocationUpdateModel {
+  const LocationUpdateModel._(); // Private constructor for custom methods
+
   const factory LocationUpdateModel({
     required String id,
     required String userId,

@@ -6,12 +6,12 @@ import 'destination_repository_provider.dart';
 part 'recommendation_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<AsyncValue<T>> to AsyncNotifier<T>
+/// - Converted from `StateNotifier<AsyncValue<T>>` to `AsyncNotifier<T>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - Family provider with userId parameter in build()
 /// - AutoDispose enabled via @Riverpod annotation
-/// - build() returns Future<T> not AsyncValue<T>
-/// - State is automatically AsyncValue<RecommendationState> when consumed
+/// - build() returns `Future<T>` not `AsyncValue<T>`
+/// - State is automatically `AsyncValue<RecommendationState>` when consumed
 /// - Constructor auto-load logic moved to build() method
 ///
 /// Provider for personalized recommendations state management
@@ -44,7 +44,7 @@ part 'recommendation_provider.g.dart';
 class Recommendation extends _$Recommendation {
   /// Initialize the notifier and auto-load recommendations
   ///
-  /// Riverpod 3.0: build() returns Future<RecommendationState>
+  /// Riverpod 3.0: build() returns `Future<RecommendationState>`
   /// Family provider parameter (userId) is passed here
   /// AutoDispose behavior: provider will be disposed when no longer watched
   @override

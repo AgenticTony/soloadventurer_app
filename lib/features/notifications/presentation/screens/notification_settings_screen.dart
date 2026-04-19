@@ -231,6 +231,30 @@ class _NotificationSettingsScreenState
 
         const SizedBox(height: 24),
 
+        // Chat notifications
+        _buildSectionHeader(
+          context,
+          '💬 Chat Notifications',
+          'Manage message notification preferences',
+        ),
+        _buildSwitchTile(
+          context,
+          'New message notifications',
+          'Receive push notifications for new messages',
+          preferences.chatMessageNotifications,
+          (value) => _updatePreference(
+            preferences.copyWith(chatMessageNotifications: value),
+          ),
+        ),
+        if (preferences.mutedChatIds.isNotEmpty)
+          ListTile(
+            title: Text('Muted chats (${preferences.mutedChatIds.length})'),
+            subtitle: const Text('Tap chats to unmute them'),
+            trailing: const Icon(Icons.volume_off),
+          ),
+
+        const SizedBox(height: 24),
+
         // Notification style
         _buildSectionHeader(
           context,
@@ -446,14 +470,20 @@ class _RetentionDaysDialog extends StatelessWidget {
       title: const Text('History Retention'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: options.map((days) {
-          return RadioListTile<int>(
-            title: Text('$days days'),
-            value: days,
+        children: [
+          RadioGroup<int>(
             groupValue: currentDays,
             onChanged: (value) => Navigator.pop(context, value),
-          );
-        }).toList(),
+            child: Column(
+              children: options.map((days) {
+                return RadioListTile<int>(
+                  title: Text('$days days'),
+                  value: days,
+                );
+              }).toList(),
+            ),
+          ),
+        ],
       ),
     );
   }

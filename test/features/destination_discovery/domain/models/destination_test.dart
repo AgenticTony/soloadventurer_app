@@ -439,16 +439,10 @@ void main() {
       expect(BudgetLevel.expensive, isA<BudgetLevel>());
     });
 
-    test('should serialize correctly', () {
-      expect(BudgetLevel.budget.toJson(), 'budget');
-      expect(BudgetLevel.moderate.toJson(), 'moderate');
-      expect(BudgetLevel.expensive.toJson(), 'expensive');
-    });
-
-    test('should deserialize correctly', () {
-      expect(BudgetLevel.fromJson('budget'), BudgetLevel.budget);
-      expect(BudgetLevel.fromJson('moderate'), BudgetLevel.moderate);
-      expect(BudgetLevel.fromJson('expensive'), BudgetLevel.expensive);
+    test('should have correct name values', () {
+      expect(BudgetLevel.budget.name, 'budget');
+      expect(BudgetLevel.moderate.name, 'moderate');
+      expect(BudgetLevel.expensive.name, 'expensive');
     });
   });
 
@@ -460,16 +454,10 @@ void main() {
       expect(ActivityLevel.adventurous, isA<ActivityLevel>());
     });
 
-    test('should serialize correctly', () {
-      expect(ActivityLevel.relaxed.toJson(), 'relaxed');
-      expect(ActivityLevel.moderate.toJson(), 'moderate');
-      expect(ActivityLevel.adventurous.toJson(), 'adventurous');
-    });
-
-    test('should deserialize correctly', () {
-      expect(ActivityLevel.fromJson('relaxed'), ActivityLevel.relaxed);
-      expect(ActivityLevel.fromJson('moderate'), ActivityLevel.moderate);
-      expect(ActivityLevel.fromJson('adventurous'), ActivityLevel.adventurous);
+    test('should have correct name values', () {
+      expect(ActivityLevel.relaxed.name, 'relaxed');
+      expect(ActivityLevel.moderate.name, 'moderate');
+      expect(ActivityLevel.adventurous.name, 'adventurous');
     });
   });
 }

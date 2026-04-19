@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:soloadventurer/core/errors/exceptions.dart';
-import 'package:soloadventurer/core/error/failures.dart';
+import 'package:soloadventurer/core/failures/failures.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/itinerary_local_data_source.dart';
 import 'package:soloadventurer/features/recommendations/domain/repositories/itinerary_repository.dart';
 import 'package:soloadventurer/features/travel/domain/models/itinerary_item.dart';

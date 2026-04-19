@@ -100,6 +100,9 @@ sealed class PeakHours with _$PeakHours {
   /// Empty peak hours (no data available)
   static const empty = PeakHours(hours: [], dayOfWeek: 'daily');
 
+  // Private constructor for freezed getters
+  const PeakHours._();
+
   /// Returns true if the given hour is a peak hour
   bool isPeakHour(int hour) => hours.contains(hour);
 }

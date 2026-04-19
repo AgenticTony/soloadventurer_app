@@ -10,40 +10,37 @@ part of 'manual_sync_notifier.dart';
 // ignore_for_file: type=lint, type=warning
 /// Notifier for managing manual sync operations
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Uses ref.onDispose() for cleanup instead of dispose() method
-/// - Initialization logic moved from constructor to build() method
-///
-/// Handles manual sync triggers, tracks sync progress,
-/// and provides state updates for UI components.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isSyncing/errorMessage removed from state (AsyncValue handles them)
+/// - Methods use AsyncValue.guard() for async operations
+/// - UI reads state via ref.watch(manualSyncProvider)
+/// - UI calls methods via ref.read(manualSyncProvider.notifier)
 
 @ProviderFor(ManualSyncNotifier)
 const manualSyncProvider = ManualSyncNotifierProvider._();
 
 /// Notifier for managing manual sync operations
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Uses ref.onDispose() for cleanup instead of dispose() method
-/// - Initialization logic moved from constructor to build() method
-///
-/// Handles manual sync triggers, tracks sync progress,
-/// and provides state updates for UI components.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isSyncing/errorMessage removed from state (AsyncValue handles them)
+/// - Methods use AsyncValue.guard() for async operations
+/// - UI reads state via ref.watch(manualSyncProvider)
+/// - UI calls methods via ref.read(manualSyncProvider.notifier)
 final class ManualSyncNotifierProvider
-    extends $NotifierProvider<ManualSyncNotifier, ManualSyncState> {
+    extends $AsyncNotifierProvider<ManualSyncNotifier, ManualSyncState> {
   /// Notifier for managing manual sync operations
   ///
-  /// Riverpod 3.0 Migration Notes:
-  /// - Converted from StateNotifier to @riverpod Notifier
-  /// - Dependencies injected via ref.watch() in build() method
-  /// - Uses ref.onDispose() for cleanup instead of dispose() method
-  /// - Initialization logic moved from constructor to build() method
-  ///
-  /// Handles manual sync triggers, tracks sync progress,
-  /// and provides state updates for UI components.
+  /// Riverpod 3.0 AsyncNotifier Migration:
+  /// - Uses AsyncNotifier pattern with AsyncValue wrapper
+  /// - Loading/error states handled by AsyncValue, NOT manual state fields
+  /// - isSyncing/errorMessage removed from state (AsyncValue handles them)
+  /// - Methods use AsyncValue.guard() for async operations
+  /// - UI reads state via ref.watch(manualSyncProvider)
+  /// - UI calls methods via ref.read(manualSyncProvider.notifier)
   const ManualSyncNotifierProvider._()
       : super(
           from: null,
@@ -61,40 +58,31 @@ final class ManualSyncNotifierProvider
   @$internal
   @override
   ManualSyncNotifier create() => ManualSyncNotifier();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ManualSyncState value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<ManualSyncState>(value),
-    );
-  }
 }
 
 String _$manualSyncNotifierHash() =>
-    r'c926b6b0daae70a046778f0ca1fe8f5e1f2f66a4';
+    r'e6a0f73dd2da4bf1fc7f9e2035824987fd78a5e7';
 
 /// Notifier for managing manual sync operations
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Uses ref.onDispose() for cleanup instead of dispose() method
-/// - Initialization logic moved from constructor to build() method
-///
-/// Handles manual sync triggers, tracks sync progress,
-/// and provides state updates for UI components.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Uses AsyncNotifier pattern with AsyncValue wrapper
+/// - Loading/error states handled by AsyncValue, NOT manual state fields
+/// - isSyncing/errorMessage removed from state (AsyncValue handles them)
+/// - Methods use AsyncValue.guard() for async operations
+/// - UI reads state via ref.watch(manualSyncProvider)
+/// - UI calls methods via ref.read(manualSyncProvider.notifier)
 
-abstract class _$ManualSyncNotifier extends $Notifier<ManualSyncState> {
-  ManualSyncState build();
+abstract class _$ManualSyncNotifier extends $AsyncNotifier<ManualSyncState> {
+  FutureOr<ManualSyncState> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<ManualSyncState, ManualSyncState>;
+    final ref = this.ref as $Ref<AsyncValue<ManualSyncState>, ManualSyncState>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<ManualSyncState, ManualSyncState>,
-        ManualSyncState,
+        AnyNotifier<AsyncValue<ManualSyncState>, ManualSyncState>,
+        AsyncValue<ManualSyncState>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

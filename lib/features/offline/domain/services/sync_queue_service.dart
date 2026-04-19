@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/entities/sync_operation.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
-import 'connectivity_service.dart';
 
 /// Result of a sync queue operation
 class SyncQueueResult {
@@ -83,9 +81,6 @@ class SyncQueueService {
   /// Repository for sync queue database operations
   final SyncQueueRepository _repository;
 
-  /// Connectivity service for checking network status
-  final ConnectivityService _connectivityService;
-
   /// Stream subscription for connectivity changes
   StreamSubscription? _connectivitySubscription;
 
@@ -111,18 +106,15 @@ class SyncQueueService {
   /// Creates a new [SyncQueueService] instance
   ///
   /// [repository] - Repository for sync queue database operations
-  /// [connectivityService] - Connectivity service for checking network status
   /// [cleanupInterval] - Interval for periodic cleanup (default: 1 hour)
   /// [completedOperationMaxAge] - Max age for completed operations (default: 7 days)
   /// [failedOperationMaxAge] - Max age for failed operations (default: 30 days)
   SyncQueueService({
     required SyncQueueRepository repository,
-    required ConnectivityService connectivityService,
     this.cleanupInterval = const Duration(hours: 1),
     this.completedOperationMaxAge = const Duration(days: 7),
     this.failedOperationMaxAge = const Duration(days: 30),
-  })  : _repository = repository,
-        _connectivityService = connectivityService;
+  })  : _repository = repository;
 
   // ==============================================================================
   // PUBLIC API - QUEUE MANAGEMENT
@@ -143,7 +135,6 @@ class SyncQueueService {
       _currentQueueSize = await _repository.getQueueSize();
       return _currentQueueSize;
     } catch (e) {
-      debugPrint('❌ Error getting queue size: $e');
       return 0;
     }
   }
@@ -155,7 +146,6 @@ class SyncQueueService {
     try {
       return await _repository.countPendingOperations();
     } catch (e) {
-      debugPrint('❌ Error getting pending count: $e');
       return 0;
     }
   }
@@ -167,7 +157,6 @@ class SyncQueueService {
     try {
       return await _repository.countFailedOperations();
     } catch (e) {
-      debugPrint('❌ Error getting failed count: $e');
       return 0;
     }
   }
@@ -180,7 +169,6 @@ class SyncQueueService {
     try {
       return await _repository.getQueueStatistics();
     } catch (e) {
-      debugPrint('❌ Error getting queue statistics: $e');
       return {
         'pending': 0,
         'processing': 0,
@@ -230,14 +218,10 @@ class SyncQueueService {
 
       final result = await _repository.enqueueOperation(entity);
 
-      debugPrint('✅ Enqueued sync operation: ${result.description} '
-          '(id: ${result.id})');
-
       await _emitQueueSizeUpdate();
 
       return SyncQueueResult.success(operationId: result.id);
     } catch (e) {
-      debugPrint('❌ Error enqueueing operation: $e');
       return SyncQueueResult.failure('Failed to enqueue operation: $e');
     }
   }
@@ -270,13 +254,10 @@ class SyncQueueService {
 
       final count = await _repository.enqueueOperations(entities);
 
-      debugPrint('✅ Enqueued $count sync operations in batch');
-
       await _emitQueueSizeUpdate();
 
       return SyncQueueResult.success(operationsCount: count);
     } catch (e) {
-      debugPrint('❌ Error enqueuing operations: $e');
       return SyncQueueResult.failure(
         'Failed to enqueue operations: $e',
         operationsCount: 0,
@@ -305,14 +286,10 @@ class SyncQueueService {
       final operations = await _repository.getPendingOperations(limit: limit);
 
       if (operations.isEmpty) {
-        debugPrint('📭 No pending operations to process');
         return const SyncQueueResult.success(operationsCount: 0);
       }
 
-      debugPrint('🔄 Processing ${operations.length} pending operations...');
-
       int successCount = 0;
-      int failureCount = 0;
 
       for (final operation in operations) {
         try {
@@ -326,32 +303,23 @@ class SyncQueueService {
             // Mark as completed
             await _repository.markAsCompleted(operation.id);
             successCount++;
-            debugPrint('✅ Operation completed: ${operation.description}');
           } else {
             // Mark as failed
             await _repository.markAsFailed(
               operation.id,
               'Operation processing returned false',
             );
-            failureCount++;
-            debugPrint('❌ Operation failed: ${operation.description}');
           }
         } catch (e) {
           // Mark as failed with error
           await _repository.markAsFailed(operation.id, e.toString());
-          failureCount++;
-          debugPrint('❌ Operation error: ${operation.description} - $e');
         }
       }
 
       await _emitQueueSizeUpdate();
 
-      debugPrint('📊 Processing complete: $successCount succeeded, '
-          '$failureCount failed');
-
       return SyncQueueResult.success(operationsCount: successCount);
     } catch (e) {
-      debugPrint('❌ Error processing operations: $e');
       return SyncQueueResult.failure('Failed to process operations: $e');
     }
   }
@@ -368,26 +336,20 @@ class SyncQueueService {
       final readyForRetry = await _repository.getOperationsReadyForRetry();
 
       if (readyForRetry.isEmpty) {
-        debugPrint('📭 No failed operations ready for retry');
         return const SyncQueueResult.success(operationsCount: 0);
       }
 
       // Take only up to the limit
       final toRetry = readyForRetry.take(limit).toList();
 
-      debugPrint('🔄 Retrying ${toRetry.length} failed operations...');
-
       // Reset operations to pending status
       final ids = toRetry.map((op) => op.id).toList();
       final count = await _repository.resetOperationsForRetry(ids);
-
-      debugPrint('✅ Reset $count operations for retry');
 
       await _emitQueueSizeUpdate();
 
       return SyncQueueResult.success(operationsCount: count);
     } catch (e) {
-      debugPrint('❌ Error retrying operations: $e');
       return SyncQueueResult.failure('Failed to retry operations: $e');
     }
   }
@@ -408,13 +370,11 @@ class SyncQueueService {
       final count = await _repository.clearOldCompletedOperations(cutoffDate);
 
       if (count > 0) {
-        debugPrint('🧹 Cleared $count old completed operations');
         await _emitQueueSizeUpdate();
       }
 
       return SyncQueueResult.success(operationsCount: count);
     } catch (e) {
-      debugPrint('❌ Error clearing old completed operations: $e');
       return SyncQueueResult.failure(
         'Failed to clear old operations: $e',
         operationsCount: 0,
@@ -434,13 +394,11 @@ class SyncQueueService {
       final count = await _repository.clearOldFailedOperations(cutoffDate);
 
       if (count > 0) {
-        debugPrint('🧹 Cleared $count old failed operations');
         await _emitQueueSizeUpdate();
       }
 
       return SyncQueueResult.success(operationsCount: count);
     } catch (e) {
-      debugPrint('❌ Error clearing old failed operations: $e');
       return SyncQueueResult.failure(
         'Failed to clear failed operations: $e',
         operationsCount: 0,
@@ -456,13 +414,11 @@ class SyncQueueService {
       final count = await _repository.clearCompletedOperations();
 
       if (count > 0) {
-        debugPrint('🧹 Cleared $count completed operations');
         await _emitQueueSizeUpdate();
       }
 
       return SyncQueueResult.success(operationsCount: count);
     } catch (e) {
-      debugPrint('❌ Error clearing completed operations: $e');
       return SyncQueueResult.failure(
         'Failed to clear completed operations: $e',
         operationsCount: 0,
@@ -480,13 +436,10 @@ class SyncQueueService {
     try {
       final count = await _repository.clearAllOperations();
 
-      debugPrint('🧹 Cleared all $count operations from queue');
-
       await _emitQueueSizeUpdate();
 
       return SyncQueueResult.success(operationsCount: count);
     } catch (e) {
-      debugPrint('❌ Error clearing all operations: $e');
       return SyncQueueResult.failure(
         'Failed to clear all operations: $e',
         operationsCount: 0,
@@ -508,7 +461,6 @@ class SyncQueueService {
   /// Returns [true] if initialization was successful.
   Future<bool> initialize() async {
     try {
-      debugPrint('🔄 Initializing SyncQueueService...');
 
       // Recover any operations that were marked as processing
       // but the app crashed before completion
@@ -520,11 +472,8 @@ class SyncQueueService {
       // Start periodic cleanup timer
       _startCleanupTimer();
 
-      debugPrint('✅ SyncQueueService initialized successfully');
-
       return true;
     } catch (e) {
-      debugPrint('❌ Error initializing SyncQueueService: $e');
       return false;
     }
   }
@@ -533,7 +482,6 @@ class SyncQueueService {
   ///
   /// Call this when the service is no longer needed to prevent memory leaks.
   void dispose() {
-    debugPrint('🔄 Disposing SyncQueueService...');
 
     _cleanupTimer?.cancel();
     _cleanupTimer = null;
@@ -558,15 +506,13 @@ class SyncQueueService {
           .getOperationsByStatus(SyncOperationStatus.processing);
 
       if (processingOps.isNotEmpty) {
-        debugPrint('🔄 Recovering ${processingOps.length} stuck operations...');
 
         final ids = processingOps.map((op) => op.id).toList();
         await _repository.resetOperationsForRetry(ids);
 
-        debugPrint('✅ Recovered ${processingOps.length} stuck operations');
       }
     } catch (e) {
-      debugPrint('❌ Error recovering stuck operations: $e');
+    // intentional silent catch
     }
   }
 
@@ -579,7 +525,7 @@ class SyncQueueService {
         _queueSizeController.add(newSize);
       }
     } catch (e) {
-      debugPrint('❌ Error emitting queue size update: $e');
+    // intentional silent catch
     }
   }
 
@@ -588,12 +534,9 @@ class SyncQueueService {
     _cleanupTimer?.cancel();
 
     _cleanupTimer = Timer.periodic(cleanupInterval, (_) {
-      debugPrint('🧹 Running periodic cleanup...');
       clearOldCompletedOperations();
       clearOldFailedOperations();
     });
 
-    debugPrint(
-        '⏰ Cleanup timer started (interval: ${cleanupInterval.inMinutes}min)');
   }
 }

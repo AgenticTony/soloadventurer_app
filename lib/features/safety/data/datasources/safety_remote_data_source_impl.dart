@@ -1,6 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
-import 'package:soloadventurer/core/error/safety_exceptions.dart';
+import 'package:soloadventurer/features/safety/domain/exceptions/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
 import 'package:soloadventurer/features/safety/domain/entities/check_in.dart';
 import 'package:soloadventurer/features/safety/domain/entities/location_update.dart';
@@ -15,15 +14,10 @@ import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.d
 class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   final ApiClient _apiClient;
 
-  /// GraphQL endpoint for safety operations
-  final String _baseUrl;
-
   /// Creates a new [SafetyRemoteDataSourceImpl]
   SafetyRemoteDataSourceImpl({
     required ApiClient apiClient,
-    required String baseUrl,
-  })  : _apiClient = apiClient,
-        _baseUrl = baseUrl;
+  })  : _apiClient = apiClient;
 
   // ==================== Helper Methods ====================
 
@@ -57,7 +51,6 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
     } on SafetyException {
       rethrow;
     } catch (e) {
-      debugPrint('GraphQL query error: $e');
       throw const SafetySyncFailedException(
         'Failed to communicate with server',
       );
@@ -94,7 +87,6 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
     } on SafetyException {
       rethrow;
     } catch (e) {
-      debugPrint('GraphQL mutation error: $e');
       throw const SafetySyncFailedException(
         'Failed to communicate with server',
       );

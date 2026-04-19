@@ -22,10 +22,8 @@ SafetyLocalDataSource safetyLocalDataSource(Ref ref) {
 @riverpod
 SafetyRemoteDataSource safetyRemoteDataSource(Ref ref) {
   final apiClient = ref.watch(apiClientProviderFull);
-  final baseUrl = ref.watch(apiBaseUrlProvider);
   return SafetyRemoteDataSourceImpl(
     apiClient: apiClient,
-    baseUrl: baseUrl,
   );
 }
 

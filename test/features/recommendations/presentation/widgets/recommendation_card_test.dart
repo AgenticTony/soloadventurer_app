@@ -24,7 +24,7 @@ void main() {
           priceLevel: '\$\$',
         ),
         metadata: RecommendationMetadata(
-          matchedInterests: {TravelInterest.foodTours},
+          matchedInterests: {TravelInterest.food},
           suggestedDate: DateTime(2026, 6, 15),
           suggestedTime: const TimeOfDay(hour: 12, minute: 30),
           distance: DistanceFromHotel.walking,
@@ -134,8 +134,8 @@ void main() {
         onTap: () => tapped = true,
       ));
 
-      // Act
-      await tester.tap(find.byType(InkWell));
+      // Act - tap the first InkWell (the card itself)
+      await tester.tap(find.byType(InkWell).first);
 
       // Assert
       expect(tapped, true);
@@ -206,7 +206,7 @@ void main() {
       ));
 
       // Assert
-      expect(find.text('1.5k reviews'), findsOneWidget);
+      expect(find.text('(1.5k reviews)'), findsOneWidget);
     });
 
     testWidgets('renders without image when images list is empty',

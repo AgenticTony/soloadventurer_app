@@ -57,9 +57,9 @@ void main() {
       final user1Saved = await dataSource.getSavedRecommendations(user1Id);
       final user2Saved = await dataSource.getSavedRecommendations(user2Id);
 
-      expect(user1Saved.first.name, 'Place for User 1',
+      expect(user1Saved.first.activity.name, 'Place for User 1',
           reason: 'User 1 should have their version');
-      expect(user2Saved.first.name, 'Place for User 2',
+      expect(user2Saved.first.activity.name, 'Place for User 2',
           reason: 'User 2 should have their version');
     });
 
@@ -268,7 +268,7 @@ void main() {
       // Assert - Should update, not duplicate
       final saved = await dataSource.getSavedRecommendations(userId);
       expect(saved.length, 1, reason: 'Should only have one recommendation');
-      expect(saved.first.name, 'Updated Name',
+      expect(saved.first.activity.name, 'Updated Name',
           reason: 'Should have the updated name');
     });
   });

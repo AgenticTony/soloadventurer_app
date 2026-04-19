@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_navigation_provider.dart';
-import 'package:soloadventurer/features/auth/presentation/routes/auth_routes.dart';
 import 'package:soloadventurer/features/auth/presentation/state/auth_state.dart';
 import 'package:soloadventurer/features/core/presentation/widgets/queue_status_indicator.dart';
 import 'package:soloadventurer/features/offline/presentation/widgets/connectivity_indicator.dart';
@@ -211,7 +210,7 @@ class HomeScreen extends ConsumerWidget {
                 'Ready for your next adventure?',
                 style: TextStyle(
                   fontSize: 16,
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ),
               const SizedBox(height: 24),

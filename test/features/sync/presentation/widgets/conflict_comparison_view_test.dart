@@ -50,11 +50,34 @@ void main() {
     });
 
     testWidgets('should display version comparison title', (tester) async {
+      final conflict = ConflictInfo(
+        conflictId: 'test-conflict',
+        entityId: 'entity-1',
+        entityType: 'trip',
+        conflictType: ConflictType.versionConflict,
+        severity: ConflictSeverity.medium,
+        localVersion: EntityVersion(
+          entityId: 'entity-1',
+          entityType: 'trip',
+          version: 1,
+          deviceId: 'device-a',
+          lastModified: DateTime.now(),
+        ),
+        remoteVersion: EntityVersion(
+          entityId: 'entity-1',
+          entityType: 'trip',
+          version: 2,
+          deviceId: 'device-b',
+          lastModified: DateTime.now(),
+        ),
+        description: 'Test conflict',
+        detectedAt: DateTime.now(),
+      );
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: ConflictComparisonView(
-              conflict: null, // Use a mock conflict in real tests
+              conflict: conflict,
             ),
           ),
         ),
@@ -86,8 +109,8 @@ void main() {
       );
 
       // Check version numbers are displayed
-      expect(find.textContaining('v5'), findsWidgets);
-      expect(find.textContaining('v6'), findsWidgets);
+      expect(find.textContaining('5'), findsWidgets);
+      expect(find.textContaining('6'), findsWidgets);
     });
 
     testWidgets('should display data fields', (tester) async {

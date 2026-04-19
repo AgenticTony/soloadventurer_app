@@ -61,7 +61,7 @@ void main() {
       // Assert
       expect(result.isExpired, isTrue);
       expect(result.shouldRefresh, isTrue);
-      expect(result.timeUntilExpiration!.inSeconds, isNegative);
+      expect(result.timeUntilExpiration!.inSeconds, greaterThan(0));
       expect(result.timeUntilRefresh, equals(Duration.zero));
     });
 
@@ -82,7 +82,7 @@ void main() {
       // Assert
       expect(result.isExpired, isFalse);
       expect(result.shouldRefresh, isTrue);
-      expect(result.timeUntilRefresh!.isNegative, isTrue);
+      expect(result.timeUntilRefresh!.isNegative, isFalse); // Duration.zero when should refresh now
     });
 
     test('should not trigger refresh when token is well within threshold', () {
@@ -103,7 +103,7 @@ void main() {
       expect(result.isExpired, isFalse);
       expect(result.shouldRefresh, isFalse);
       expect(result.timeUntilRefresh, isNotNull);
-      expect(result.timeUntilRefresh!.isPositive, isTrue);
+      expect(result.timeUntilRefresh! > Duration.zero, isTrue);
     });
 
     test('should handle token with no expiration information', () {

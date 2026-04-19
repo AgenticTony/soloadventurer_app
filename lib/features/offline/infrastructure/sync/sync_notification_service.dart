@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:soloadventurer/features/offline/domain/services/sync_manager.dart';
 import 'package:soloadventurer/core/services/notification_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -111,19 +110,6 @@ class SyncNotificationService {
   /// Last known pending operations count
   int _lastPendingCount = 0;
 
-  /// Tag for logging
-  static const String _tag = '🔔 SyncNotification';
-
-  /// Notification channel ID for sync notifications
-  static const String _channelId = 'com.soloadventurer.sync';
-
-  /// Notification channel name
-  static const String _channelName = 'Sync Notifications';
-
-  /// Notification channel description
-  static const String _channelDescription =
-      'Notifications for sync events and status updates';
-
   /// SharedPreferences keys
   static const String _keyNotifyOnSuccess = 'sync_notify_success';
   static const String _keyNotifyOnFailure = 'sync_notify_failure';
@@ -160,7 +146,6 @@ class SyncNotificationService {
   /// Returns [true] if initialization was successful.
   Future<bool> initialize() async {
     try {
-      debugPrint('$_tag: Initializing sync notification service...');
 
       // Load preferences from storage
       await _loadPreferences();
@@ -168,13 +153,8 @@ class SyncNotificationService {
       // Start monitoring sync status
       _startMonitoring();
 
-      debugPrint('$_tag: ✅ Initialized successfully');
-      debugPrint('$_tag: Preferences: $_preferences');
-
       return true;
-    } catch (e, stackTrace) {
-      debugPrint('$_tag: ❌ Initialization failed: $e');
-      debugPrint('$_tag: Stack trace: $stackTrace');
+    } catch (e) {
       return false;
     }
   }
@@ -185,11 +165,9 @@ class SyncNotificationService {
     _syncStatusSubscription = _syncManager.syncStatusStream.listen(
       (status) => _handleSyncStatusChange(status),
       onError: (error) {
-        debugPrint('$_tag: ❌ Error in sync status stream: $error');
       },
     );
 
-    debugPrint('$_tag: Started monitoring sync status');
   }
 
   /// Handles sync status changes and shows appropriate notifications
@@ -223,16 +201,13 @@ class SyncNotificationService {
       const title = 'Sync Complete';
       const body = 'Your data has been synchronized successfully';
 
-      debugPrint('$_tag: Showing success notification');
-
-      await _notificationService.show(
+      await _notificationService.showNotification(
         title: title,
         body: body,
-        notificationId: _generateNotificationId('success'),
-        channel: _channelId,
+        type: SafetyNotificationType.backgroundSync,
       );
     } catch (e) {
-      debugPrint('$_tag: ❌ Failed to show success notification: $e');
+    // intentional silent catch
     }
   }
 
@@ -244,16 +219,13 @@ class SyncNotificationService {
       final truncatedBody =
           body.length > 100 ? '${body.substring(0, 97)}...' : body;
 
-      debugPrint('$_tag: Showing failure notification: $truncatedBody');
-
-      await _notificationService.show(
+      await _notificationService.showNotification(
         title: title,
         body: truncatedBody,
-        notificationId: _generateNotificationId('failure'),
-        channel: _channelId,
+        type: SafetyNotificationType.backgroundSync,
       );
     } catch (e) {
-      debugPrint('$_tag: ❌ Failed to show failure notification: $e');
+    // intentional silent catch
     }
   }
 
@@ -264,16 +236,13 @@ class SyncNotificationService {
       final body =
           'You have $count changes waiting to sync. Connect to the internet to sync.';
 
-      debugPrint('$_tag: Showing pending operations notification: $count');
-
-      await _notificationService.show(
+      await _notificationService.showNotification(
         title: title,
         body: body,
-        notificationId: _generateNotificationId('pending_$count'),
-        channel: _channelId,
+        type: SafetyNotificationType.backgroundSync,
       );
     } catch (e) {
-      debugPrint('$_tag: ❌ Failed to show pending notification: $e');
+    // intentional silent catch
     }
   }
 
@@ -288,16 +257,13 @@ class SyncNotificationService {
       final body =
           '$conflictCount conflict(s) need your attention. Please review and resolve.';
 
-      debugPrint('$_tag: Showing conflict notification: $conflictCount');
-
-      await _notificationService.show(
+      await _notificationService.showNotification(
         title: title,
         body: body,
-        notificationId: _generateNotificationId('conflict_$conflictCount'),
-        channel: _channelId,
+        type: SafetyNotificationType.backgroundSync,
       );
     } catch (e) {
-      debugPrint('$_tag: ❌ Failed to show conflict notification: $e');
+    // intentional silent catch
     }
   }
 
@@ -329,9 +295,7 @@ class SyncNotificationService {
       // Update local preferences
       _preferences = newPreferences;
 
-      debugPrint('$_tag: ✅ Preferences updated: $_preferences');
     } catch (e) {
-      debugPrint('$_tag: ❌ Failed to update preferences: $e');
       rethrow;
     }
   }
@@ -353,27 +317,16 @@ class SyncNotificationService {
         notifyOnConflicts: notifyOnConflicts,
       );
 
-      debugPrint('$_tag: Preferences loaded from storage');
     } catch (e) {
-      debugPrint('$_tag: ❌ Failed to load preferences, using defaults: $e');
       // Keep default preferences
     }
   }
 
   /// Generates a unique notification ID based on the notification type
-  ///
-  /// Uses timestamp to ensure uniqueness while maintaining some consistency.
-  int _generateNotificationId(String type) {
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final typeHash = type.hashCode;
-    return (timestamp + typeHash) % 100000;
-  }
-
   /// Pauses notifications
   ///
   /// Stops showing notifications temporarily. Can be resumed with [resume].
   void pause() {
-    debugPrint('$_tag: ⏸️ Pausing notifications');
     _syncStatusSubscription?.pause();
   }
 
@@ -381,7 +334,6 @@ class SyncNotificationService {
   ///
   /// Resumes showing notifications after being paused.
   void resume() {
-    debugPrint('$_tag: ▶️ Resuming notifications');
     _syncStatusSubscription?.resume();
   }
 
@@ -389,7 +341,6 @@ class SyncNotificationService {
   ///
   /// Cancels subscriptions and cleans up resources.
   void dispose() {
-    debugPrint('$_tag: Disposing sync notification service');
 
     _syncStatusSubscription?.cancel();
     _syncStatusSubscription = null;
@@ -401,8 +352,7 @@ class SyncNotificationService {
 /// This provider creates and manages the SyncNotificationService instance.
 /// It auto-disposes when no longer being listened to.
 @riverpod
-SyncNotificationService syncNotificationService(
-    SyncNotificationServiceRef ref) {
+SyncNotificationService syncNotificationService(Ref ref) {
   throw UnimplementedError(
     'SyncNotificationService provider must be overridden in main app initialization. '
     'Use ProviderScope with overrides or GetIt DI to provide the service.',

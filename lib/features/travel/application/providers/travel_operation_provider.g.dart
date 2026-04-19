@@ -11,7 +11,7 @@ part of 'travel_operation_provider.dart';
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier to @riverpod Notifier
 /// - Dependencies injected via ref.watch() in build() method
-/// - Keeps AsyncValue<void> state pattern (synchronous Notifier with AsyncValue state)
+/// - Keeps `AsyncValue<void>` state pattern (synchronous Notifier with AsyncValue state)
 /// - Initialization logic moved from constructor to build() method
 ///
 /// Provider for the travel operation repository
@@ -22,7 +22,7 @@ const travelOperationRepositoryProvider = TravelOperationRepositoryProvider._();
 /// Riverpod 3.0 Migration Notes:
 /// - Converted from StateNotifier to @riverpod Notifier
 /// - Dependencies injected via ref.watch() in build() method
-/// - Keeps AsyncValue<void> state pattern (synchronous Notifier with AsyncValue state)
+/// - Keeps `AsyncValue<void>` state pattern (synchronous Notifier with AsyncValue state)
 /// - Initialization logic moved from constructor to build() method
 ///
 /// Provider for the travel operation repository
@@ -34,7 +34,7 @@ final class TravelOperationRepositoryProvider extends $FunctionalProvider<
   /// Riverpod 3.0 Migration Notes:
   /// - Converted from StateNotifier to @riverpod Notifier
   /// - Dependencies injected via ref.watch() in build() method
-  /// - Keeps AsyncValue<void> state pattern (synchronous Notifier with AsyncValue state)
+  /// - Keeps `AsyncValue<void>` state pattern (synchronous Notifier with AsyncValue state)
   /// - Initialization logic moved from constructor to build() method
   ///
   /// Provider for the travel operation repository
@@ -73,7 +73,7 @@ final class TravelOperationRepositoryProvider extends $FunctionalProvider<
 }
 
 String _$travelOperationRepositoryHash() =>
-    r'd42dbd847cd01c38d233d30f04f940efab187d03';
+    r'6318ee50665a4c2aae8b61e401560e0e7197a90f';
 
 /// Provider for pending operations
 ///
@@ -122,12 +122,12 @@ final class PendingOperationsProvider extends $FunctionalProvider<
   }
 }
 
-String _$pendingOperationsHash() => r'c234fed25378e7172626194f479fc72f9fadbb34';
+String _$pendingOperationsHash() => r'285db1be87dc0a53f0642f5a4215faad86710987';
 
 /// Provider for managing travel operation state
 ///
 /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
-/// Keeps AsyncValue<void> state for tracking operation status.
+/// Keeps `AsyncValue<void>` state for tracking operation status.
 ///
 /// Usage:
 /// ```dart
@@ -147,7 +147,7 @@ const travelOperationProvider = TravelOperationProvider._();
 /// Provider for managing travel operation state
 ///
 /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
-/// Keeps AsyncValue<void> state for tracking operation status.
+/// Keeps `AsyncValue<void>` state for tracking operation status.
 ///
 /// Usage:
 /// ```dart
@@ -165,7 +165,7 @@ final class TravelOperationProvider
   /// Provider for managing travel operation state
   ///
   /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
-  /// Keeps AsyncValue<void> state for tracking operation status.
+  /// Keeps `AsyncValue<void>` state for tracking operation status.
   ///
   /// Usage:
   /// ```dart
@@ -205,12 +205,12 @@ final class TravelOperationProvider
   }
 }
 
-String _$travelOperationHash() => r'4da0b7313b07ecd32387ea11a520f70cc36b7981';
+String _$travelOperationHash() => r'4268f9401556dab2efec2727acb8dff54a3fd731';
 
 /// Provider for managing travel operation state
 ///
 /// Riverpod 3.0: Uses @riverpod annotation with Notifier pattern.
-/// Keeps AsyncValue<void> state for tracking operation status.
+/// Keeps `AsyncValue<void>` state for tracking operation status.
 ///
 /// Usage:
 /// ```dart

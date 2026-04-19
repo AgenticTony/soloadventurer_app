@@ -323,7 +323,7 @@ final class ConnectivityServiceProvider extends $FunctionalProvider<
 }
 
 String _$connectivityServiceHash() =>
-    r'2b88e30a3a8dfbdde312d73997566f26b0e2083c';
+    r'f0664fd42c529ba14ea62ee8637172081410d4a1';
 
 /// Provider for NetworkReachabilityService
 ///
@@ -487,7 +487,7 @@ final class SyncQueueServiceProvider extends $FunctionalProvider<
   }
 }
 
-String _$syncQueueServiceHash() => r'f1d0963f4413e614f1c8aecac43c26a1549a8ac6';
+String _$syncQueueServiceHash() => r'ad6057a2f19a286322cf2bdb5bb54ef791df8ce8';
 
 /// Provider for OfflineInterceptor
 ///
@@ -921,4 +921,4 @@ final class BackgroundSyncServiceProvider extends $FunctionalProvider<
 }
 
 String _$backgroundSyncServiceHash() =>
-    r'3f0a1be55600fa6f6080b0528822200830065866';
+    r'2f43a8fac8312d901f275005462fcb0533553e8a';

@@ -39,7 +39,6 @@ abstract class ProfileLocalDataSource {
 class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
   final SecureStorage _storage;
   final SharedPreferences _sharedPreferences;
-  static const String _profileKey = 'cached_profile';
   static const String _preferencesKeyPrefix = 'profile_preferences_';
   static const String _interestsKeyPrefix = 'profile_interests_';
   static const String _lastUpdateKey = 'profile_last_update';

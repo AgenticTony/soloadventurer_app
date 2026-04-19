@@ -362,7 +362,7 @@ class SupabasePhotoRepository
         .select()
         .count(CountOption.exact);
 
-    return (count.count ?? 0) > 0;
+    return count.count > 0;
   }
 
   @override

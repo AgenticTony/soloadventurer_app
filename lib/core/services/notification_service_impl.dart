@@ -150,7 +150,7 @@ class NotificationServiceImpl implements NotificationService {
     // For now, we'll just log it
     if (response.payload != null) {
       try {
-        final payload = jsonDecode(response.payload!);
+        jsonDecode(response.payload!);
         // TODO: Navigate to appropriate screen based on payload
       } catch (e) {
         // Ignore JSON decode errors

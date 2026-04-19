@@ -148,7 +148,7 @@ final class OperationStorageServiceProvider
 }
 
 String _$operationStorageServiceHash() =>
-    r'a06ca5e2590975586217238c9affb143241cdd4b';
+    r'357364656c65a11829bf53e2ab9eb2088122460d';
 
 /// Service for persisting and retrieving queued operations.
 ///

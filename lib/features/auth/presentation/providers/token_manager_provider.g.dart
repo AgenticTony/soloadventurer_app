@@ -69,7 +69,7 @@ final class TokenManagerProvider
   }
 }
 
-String _$tokenManagerHash() => r'18a970f6eb6a824d9cc95b747bcb3c54713deb1e';
+String _$tokenManagerHash() => r'79684f1ac2fb76a5d38156a2728d0267a13f4792';
 
 /// DEPRECATED: This presentation layer TokenManager is deprecated.
 ///

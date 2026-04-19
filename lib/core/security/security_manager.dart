@@ -22,7 +22,6 @@ class SecurityManager extends _$SecurityManager {
   static const _knownDevicesKey = 'known_devices';
   static const _securityEventsKey = 'security_events';
   static const _rateLimitKey = 'rate_limit';
-  static const _sensitiveEndpointsKey = 'sensitive_endpoints';
   static const _revokedTokensKey = 'revoked_tokens';
 
   // List of sensitive endpoints that require extra monitoring

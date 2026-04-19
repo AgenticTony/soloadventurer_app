@@ -513,7 +513,7 @@ extension LocationUpdateModelPatterns on LocationUpdateModel {
 
 /// @nodoc
 @JsonSerializable()
-class _LocationUpdateModel implements LocationUpdateModel {
+class _LocationUpdateModel extends LocationUpdateModel {
   const _LocationUpdateModel(
       {required this.id,
       required this.userId,
@@ -533,7 +533,8 @@ class _LocationUpdateModel implements LocationUpdateModel {
       this.expiresAt,
       required this.createdAt,
       this.updatedAt})
-      : _sharedWithContactIds = sharedWithContactIds;
+      : _sharedWithContactIds = sharedWithContactIds,
+        super._();
   factory _LocationUpdateModel.fromJson(Map<String, dynamic> json) =>
       _$LocationUpdateModelFromJson(json);
 

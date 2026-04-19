@@ -418,7 +418,7 @@ extension SafetyStatusModelPatterns on SafetyStatusModel {
 
 /// @nodoc
 @JsonSerializable()
-class _SafetyStatusModel implements SafetyStatusModel {
+class _SafetyStatusModel extends SafetyStatusModel {
   const _SafetyStatusModel(
       {required this.id,
       required this.userId,
@@ -431,7 +431,8 @@ class _SafetyStatusModel implements SafetyStatusModel {
       this.safetyAlertId,
       this.checkInId,
       final Map<String, dynamic>? metadata})
-      : _metadata = metadata;
+      : _metadata = metadata,
+        super._();
   factory _SafetyStatusModel.fromJson(Map<String, dynamic> json) =>
       _$SafetyStatusModelFromJson(json);
 

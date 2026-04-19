@@ -28,13 +28,7 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final checkInState = ref.watch(checkInProvider);
-    final allCheckIns = checkInState.checkIns;
-    final isLoading = checkInState.isLoading;
-    final error = checkInState.error;
-
-    // Apply filters and sorting
-    final filteredCheckIns = _applyFiltersAndSort(allCheckIns);
+    final checkInAsync = ref.watch(checkInProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -127,26 +121,22 @@ class _CheckInHistoryScreenState extends ConsumerState<CheckInHistoryScreen> {
           ),
         ],
       ),
-      body: _buildBody(context, filteredCheckIns, isLoading, error),
+      body: checkInAsync.when(
+        data: (checkInState) {
+          final allCheckIns = checkInState.checkIns;
+          final filteredCheckIns = _applyFiltersAndSort(allCheckIns);
+          return _buildBody(context, filteredCheckIns);
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => _buildErrorWidget(context, error.toString()),
+      ),
     );
   }
 
   Widget _buildBody(
     BuildContext context,
     List<CheckIn> checkIns,
-    bool isLoading,
-    String? error,
   ) {
-    if (isLoading && checkIns.isEmpty) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (error != null) {
-      return _buildErrorWidget(context, error);
-    }
-
     if (checkIns.isEmpty) {
       return _buildEmptyState(context);
     }

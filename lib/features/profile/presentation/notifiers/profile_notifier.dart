@@ -1,121 +1,77 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../state/profile_state.dart';
-import '../../domain/entities/profile_state.dart';
 import '../providers/profile_providers.dart';
 import '../../../auth/presentation/providers/auth_notifier_provider.dart';
 
 part 'profile_notifier.g.dart';
 
-/// Notifier for managing profile state and user interactions
+/// Notifier for managing profile state and user interactions.
 ///
-/// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier to @riverpod Notifier
-/// - Dependencies injected via ref.watch() in build() method
-/// - Removed _ref field (use ref directly in methods)
-/// - Initialization logic moved from constructor to build() method
-///
-/// Maps domain state to presentation state and handles user profile operations.
+/// Riverpod 3.0 AsyncNotifier Migration:
+/// - Converted from synchronous Notifier to AsyncNotifier
+/// - build() is async and loads initial profile data
+/// - Loading/error state handled by AsyncValue wrapper
+/// - AsyncValue.guard() replaces manual try/catch + isLoading/error
+/// - Methods set state = AsyncLoading() then AsyncValue.guard()
 @riverpod
 class Profile extends _$Profile {
-  /// Initialize the notifier with dependencies
-  ///
-  /// Riverpod 3.0: build() replaces constructor for initialization
   @override
-  ProfileState build() {
-    // Get dependencies via ref.watch()
-    final getCurrentProfile = ref.watch(getCurrentProfileUseCaseProvider);
-    final updateProfile = ref.watch(updateProfileUseCaseProvider);
-    final manageAvatar = ref.watch(manageAvatarUseCaseProvider);
-    final deleteProfile = ref.watch(deleteProfileUseCaseProvider);
+  Future<ProfileState> build() async {
+    final authStateAsync = ref.read(authStateProvider);
+    final authState = authStateAsync.value;
 
-    // Note: ProfileDomainState is obtained from auth state
-    // We'll initialize with empty state and load profile later
+    if (authState == null ||
+        !authState.isAuthenticated ||
+        authState.user == null) {
+      // Not authenticated - return empty state (no profile)
+      return const ProfileState();
+    }
 
-    return const ProfileState();
-  }
-
-  /// Maps domain state to presentation state, initializing UI-specific fields
-  ProfileState _mapDomainState(ProfileDomainState domainState) {
-    return ProfileState(
-      profile: domainState.profile,
-      isLoading: false,
-      error: null,
-      isUpdating: false,
-      isUploading: false,
-      hasChanges: false,
-      pendingChanges: null,
-    );
+    final getCurrentProfile = ref.read(getCurrentProfileUseCaseProvider);
+    final profile = await getCurrentProfile();
+    return ProfileState(profile: profile);
   }
 
   Future<void> loadProfile() async {
-    if (state.isLoading) return;
-
-    // Get auth state
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
     if (authState == null ||
         !authState.isAuthenticated ||
         authState.user == null) {
-      state = state.copyWith(
-        isLoading: false,
-        error: 'Not authenticated',
-      );
+      state = AsyncData(ProfileState(profile: null));
       return;
     }
 
-    final user = authState.user!;
     final getCurrentProfile = ref.read(getCurrentProfileUseCaseProvider);
 
-    state = state.copyWith(isLoading: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final profile = await getCurrentProfile();
-      state = state.copyWith(
-        isLoading: false,
-        profile: profile,
-        error: null,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.toString(),
-      );
-    }
+      return ProfileState(profile: profile);
+    });
   }
 
   Future<void> updateProfile(Map<String, dynamic> changes) async {
-    if (state.isUpdating || !state.isInitialized) {
-      return;
-    }
+    final current = state.value;
+    if (current == null || !current.isInitialized) return;
 
-    final currentProfile = state.profile;
-    if (currentProfile == null) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: 'Profile not loaded',
-      );
-      return;
-    }
+    final currentProfile = current.profile;
+    if (currentProfile == null) return;
 
-    // Get auth state
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
     if (authState == null ||
         !authState.isAuthenticated ||
         authState.user == null) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: 'Not authenticated',
-      );
       return;
     }
 
-    final user = authState.user!;
     final updateProfile = ref.read(updateProfileUseCaseProvider);
 
-    state = state.copyWith(isUpdating: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       final updatedProfile = await updateProfile(
         currentProfile.copyWith(
           displayName:
@@ -124,162 +80,113 @@ class Profile extends _$Profile {
           isPublic: changes['isPublic'] as bool? ?? currentProfile.isPublic,
         ),
       );
-      state = state.copyWith(
-        isUpdating: false,
+      return ProfileState(
         profile: updatedProfile,
         hasChanges: false,
         pendingChanges: null,
-        error: null,
       );
-    } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   Future<void> uploadAvatar(String filePath) async {
-    if (state.isUploading || !state.isInitialized) return;
+    final current = state.value;
+    if (current == null || !current.isInitialized) return;
 
-    final currentProfile = state.profile;
-    if (currentProfile == null) {
-      state = state.copyWith(
-        isUploading: false,
-        error: 'Profile not loaded',
-      );
-      return;
-    }
+    final currentProfile = current.profile;
+    if (currentProfile == null) return;
 
-    // Get auth state
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
     if (authState == null ||
         !authState.isAuthenticated ||
         authState.user == null) {
-      state = state.copyWith(
-        isUploading: false,
-        error: 'Not authenticated',
-      );
       return;
     }
 
     final user = authState.user!;
     final manageAvatar = ref.read(manageAvatarUseCaseProvider);
 
-    state = state.copyWith(isUploading: true, error: null);
-    try {
-      final avatarUrl = await manageAvatar.uploadAvatar(
-        user.id,
-        filePath,
-      );
-      state = state.copyWith(
-        isUploading: false,
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final avatarUrl = await manageAvatar.uploadAvatar(user.id, filePath);
+      return current.copyWith(
         profile: currentProfile.copyWith(avatarUrl: avatarUrl),
       );
-    } catch (e) {
-      state = state.copyWith(
-        isUploading: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   Future<void> removeAvatar() async {
-    if (state.isUpdating || !state.isInitialized) return;
+    final current = state.value;
+    if (current == null || !current.isInitialized) return;
 
-    final currentProfile = state.profile;
-    if (currentProfile == null) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: 'Profile not loaded',
-      );
-      return;
-    }
+    final currentProfile = current.profile;
+    if (currentProfile == null) return;
 
-    // Get auth state
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
     if (authState == null ||
         !authState.isAuthenticated ||
         authState.user == null) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: 'Not authenticated',
-      );
       return;
     }
 
     final user = authState.user!;
     final manageAvatar = ref.read(manageAvatarUseCaseProvider);
 
-    state = state.copyWith(isUpdating: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       await manageAvatar.removeAvatar(user.id);
-      state = state.copyWith(
-        isUpdating: false,
+      return current.copyWith(
         profile: currentProfile.copyWith(avatarUrl: null),
       );
-    } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: e.toString(),
-      );
-    }
+    });
   }
 
   Future<void> deleteProfile() async {
-    if (state.isUpdating || !state.isInitialized) return;
+    final current = state.value;
+    if (current == null || !current.isInitialized) return;
 
-    // Get auth state
     final authStateAsync = ref.read(authStateProvider);
     final authState = authStateAsync.value;
 
     if (authState == null ||
         !authState.isAuthenticated ||
         authState.user == null) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: 'Not authenticated',
-      );
       return;
     }
 
     final user = authState.user!;
     final deleteProfile = ref.read(deleteProfileUseCaseProvider);
 
-    state = state.copyWith(isUpdating: true, error: null);
-    try {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
       await deleteProfile(user.id);
-      state = const ProfileState();
-    } catch (e) {
-      state = state.copyWith(
-        isUpdating: false,
-        error: e.toString(),
-      );
-    }
+      return const ProfileState();
+    });
   }
 
   void setField(String field, dynamic value) {
-    if (!state.isInitialized) return;
+    final current = state.value;
+    if (current == null || !current.isInitialized) return;
 
-    final currentChanges =
-        Map<String, dynamic>.from(state.pendingChanges ?? {});
+    final currentChanges = Map<String, dynamic>.from(current.pendingChanges ?? {});
     currentChanges[field] = value;
 
-    state = state.copyWith(
+    state = AsyncData(current.copyWith(
       hasChanges: true,
       pendingChanges: currentChanges,
-    );
+    ));
   }
 
   void discardChanges() {
-    state = state.copyWith(
+    final current = state.value;
+    if (current == null) return;
+
+    state = AsyncData(current.copyWith(
       hasChanges: false,
       pendingChanges: null,
-      error: null,
-    );
+    ));
   }
 }

@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:soloadventurer/utils/media_compression.dart';
-import 'package:soloadventurer/utils/video_compression.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:soloadventurer/features/journal/data/services/media_compression.dart';
+import 'package:soloadventurer/features/journal/data/services/video_compression.dart';
 import 'package:soloadventurer/features/journal/data/models/upload_task.dart';
 import 'package:soloadventurer/features/journal/domain/entities/media_item.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
@@ -154,14 +154,15 @@ UploadTask createTestUploadTask({
 /// Creates test media item entity
 MediaItem createTestMediaItem({
   String id = 'media-123',
+  String userId = 'user-123',
   String journalEntryId = 'entry-123',
   MediaType mediaType = MediaType.photo,
   String storagePath = 'user123/2024-01-15T10:30:00.000Z.jpg',
   String? thumbnailPath,
   int? width = testImageWidth,
   int? height = testImageHeight,
-  double? duration,
-  int fileSize = testFileSize,
+  int? duration,
+  int? fileSize = testFileSize,
   UploadStatus uploadStatus = UploadStatus.completed,
   int uploadProgress = 100,
   String? caption,
@@ -172,6 +173,7 @@ MediaItem createTestMediaItem({
 }) {
   return MediaItem(
     id: id,
+    userId: userId,
     journalEntryId: journalEntryId,
     mediaType: mediaType,
     storagePath: storagePath,
@@ -183,7 +185,7 @@ MediaItem createTestMediaItem({
     uploadStatus: uploadStatus,
     uploadProgress: uploadProgress,
     caption: caption,
-    orderIndex: orderIndex,
+    orderIndex: orderIndex ?? 0,
     syncStatus: syncStatus,
     createdAt: createdAt ?? DateTime(2024, 1, 15, 10, 30),
     updatedAt: updatedAt ?? DateTime(2024, 1, 15, 10, 30),

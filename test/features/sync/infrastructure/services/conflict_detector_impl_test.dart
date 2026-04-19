@@ -25,12 +25,12 @@ void main() {
     });
 
     group('Conflict Detection - Version Based', () {
-      test('should detect no conflict when local is newer', () async {
+      test('should detect diverged conflict when local version is higher with concurrent timestamps', () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(const Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(milliseconds: 200)),
           deviceId: 'device-A',
           dataHash: 'hash-new',
         );
@@ -50,12 +50,12 @@ void main() {
         );
 
         expect(conflict, isNotNull);
-        expect(conflict!.conflictType, ConflictType.localNewer);
-        expect(conflict.severity, ConflictSeverity.low);
-        expect(conflict.canAutoResolve, true);
+        expect(conflict!.conflictType, ConflictType.diverged);
+        expect(conflict.severity, ConflictSeverity.high);
+        expect(conflict.canAutoResolve, false);
       });
 
-      test('should detect no conflict when remote is newer', () async {
+      test('should detect diverged conflict when remote version is higher with concurrent timestamps', () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
@@ -69,7 +69,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(const Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(milliseconds: 200)),
           deviceId: 'device-B',
           dataHash: 'hash-new',
         );
@@ -80,9 +80,9 @@ void main() {
         );
 
         expect(conflict, isNotNull);
-        expect(conflict!.conflictType, ConflictType.remoteNewer);
-        expect(conflict.severity, ConflictSeverity.low);
-        expect(conflict.canAutoResolve, true);
+        expect(conflict!.conflictType, ConflictType.diverged);
+        expect(conflict.severity, ConflictSeverity.high);
+        expect(conflict.canAutoResolve, false);
       });
 
       test('should detect conflict when same version has different content',
@@ -121,7 +121,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 2,
-          lastModified: baseTime.add(const Duration(seconds: 10)),
+          lastModified: baseTime.add(const Duration(milliseconds: 100)),
           deviceId: 'device-A',
           dataHash: 'hash-A',
         );
@@ -130,7 +130,7 @@ void main() {
           entityId: 'entity-1',
           entityType: 'trip',
           version: 3,
-          lastModified: baseTime.add(const Duration(seconds: 5)),
+          lastModified: baseTime.add(const Duration(milliseconds: 500)),
           deviceId: 'device-B',
           dataHash: 'hash-B',
         );
@@ -296,12 +296,12 @@ void main() {
     });
 
     group('Conflict Severity', () {
-      test('should assign low severity to clear winner', () async {
+      test('should assign high severity to diverged versions with concurrent timestamps', () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
           version: 5,
-          lastModified: baseTime.add(const Duration(minutes: 5)),
+          lastModified: baseTime.add(const Duration(milliseconds: 200)),
           deviceId: 'device-A',
         );
 
@@ -318,7 +318,7 @@ void main() {
           remoteVersion: remote,
         );
 
-        expect(conflict!.severity, ConflictSeverity.low);
+        expect(conflict!.severity, ConflictSeverity.high);
       });
 
       test('should assign high severity to concurrent edits', () async {
@@ -350,12 +350,12 @@ void main() {
     });
 
     group('Conflict Descriptions', () {
-      test('should generate appropriate description for local newer', () async {
+      test('should generate appropriate description for diverged conflict', () async {
         final local = EntityVersion(
           entityId: 'entity-1',
           entityType: 'trip',
           version: 5,
-          lastModified: baseTime.add(const Duration(minutes: 5)),
+          lastModified: baseTime.add(const Duration(milliseconds: 200)),
           deviceId: 'device-A',
         );
 
@@ -372,8 +372,8 @@ void main() {
           remoteVersion: remote,
         );
 
-        expect(conflict!.description, contains('Local changes'));
-        expect(conflict.description, contains('are newer'));
+        expect(conflict!.description, contains('diverged'));
+        expect(conflict.description, contains('Manual resolution'));
       });
 
       test('should generate appropriate description for concurrent edits',
@@ -401,7 +401,7 @@ void main() {
           remoteVersion: remote,
         );
 
-        expect(conflict!.description, contains('concurrent edits'));
+        expect(conflict!.description, contains('Concurrent edits'));
         expect(conflict.description, contains('Manual resolution'));
       });
     });

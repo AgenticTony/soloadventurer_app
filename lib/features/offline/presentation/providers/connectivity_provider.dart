@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:soloadventurer/app/di/service_locator.dart';
-import 'package:soloadventurer/features/offline/domain/services/connectivity_service.dart';
+import 'package:soloadventurer/app/providers/core_service_providers.dart' as core_providers;
+import 'package:soloadventurer/core/services/connectivity_service.dart';
+import 'package:soloadventurer/core/services/connectivity_service_impl.dart';
 
 part 'connectivity_provider.g.dart';
 
 /// Riverpod 3.0 Migration Notes:
-/// - Converted from StateNotifier<ConnectivityState> to Notifier<ConnectivityState>
+/// - Converted from `StateNotifier<ConnectivityState>` to `Notifier<ConnectivityState>`
 /// - Dependencies injected via ref.watch() in build() method
 /// - AutoDispose enabled via @Riverpod annotation
 /// - build() returns ConnectivityState not AsyncValue
@@ -80,9 +81,11 @@ class ConnectivityState {
   int get hashCode => connectionType.hashCode ^ isConnected.hashCode;
 }
 
+/// Provider for the offline ConnectivityService
 @riverpod
 ConnectivityService connectivityService(Ref ref) {
-  return getIt<ConnectivityService>();
+  final connectivity = ref.watch(core_providers.connectivityProvider);
+  return ConnectivityServiceImpl(connectivity: connectivity, debounceMs: 300);
 }
 
 @riverpod

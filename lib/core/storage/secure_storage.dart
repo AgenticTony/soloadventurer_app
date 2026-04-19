@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -26,6 +27,7 @@ class SecureStorageService {
           iOptions: IOSOptions(
             accessibility: KeychainAccessibility.first_unlock,
           ),
+          mOptions: MacOsOptions(usesDataProtectionKeychain: false),
         );
 
   /// Stores the authentication token securely.
@@ -98,35 +100,121 @@ class SecureStorageService {
 }
 
 /// A simple wrapper around FlutterSecureStorage for secure data storage
+///
+/// On macOS debug builds without proper code signing, falls back to an
+/// in-memory store since the Keychain requires a signing entitlement
+/// (-34018 errSecMissingEntitlement).
 class SecureStorage {
-  final FlutterSecureStorage _storage;
+  FlutterSecureStorage? _storage;
+  bool _useFallback = false;
+
+  // In-memory fallback for macOS debug without signing
+  static final Map<String, String> _memoryStore = {};
 
   /// Creates a new [SecureStorage] instance
-  SecureStorage() : _storage = const FlutterSecureStorage();
+  SecureStorage()
+      : _storage = const FlutterSecureStorage(
+          mOptions: MacOsOptions(usesDataProtectionKeychain: false),
+        );
 
   /// Deletes a value from storage
   Future<void> delete(String key) async {
-    await _storage.delete(key: key);
+    if (_useFallback) {
+      _memoryStore.remove(key);
+      return;
+    }
+    try {
+      await _storage!.delete(key: key);
+    } on PlatformException catch (e) {
+      if (_isKeychainError(e)) {
+        _switchToFallback();
+        _memoryStore.remove(key);
+      } else {
+        rethrow;
+      }
+    }
   }
 
   /// Reads a value from storage
   Future<String?> read(String key) async {
-    return await _storage.read(key: key);
+    if (_useFallback) {
+      return _memoryStore[key];
+    }
+    try {
+      return await _storage!.read(key: key);
+    } on PlatformException catch (e) {
+      if (_isKeychainError(e)) {
+        _switchToFallback();
+        return _memoryStore[key];
+      } else {
+        rethrow;
+      }
+    }
   }
 
   /// Writes a value to storage
   Future<void> write(String key, String value) async {
-    await _storage.write(key: key, value: value);
+    if (_useFallback) {
+      _memoryStore[key] = value;
+      return;
+    }
+    try {
+      await _storage!.write(key: key, value: value);
+    } on PlatformException catch (e) {
+      if (_isKeychainError(e)) {
+        _switchToFallback();
+        _memoryStore[key] = value;
+      } else {
+        rethrow;
+      }
+    }
   }
 
   /// Deletes all values from storage
   Future<void> deleteAll() async {
-    await _storage.deleteAll();
+    if (_useFallback) {
+      _memoryStore.clear();
+      return;
+    }
+    try {
+      await _storage!.deleteAll();
+    } on PlatformException catch (e) {
+      if (_isKeychainError(e)) {
+        _switchToFallback();
+        _memoryStore.clear();
+      } else {
+        rethrow;
+      }
+    }
   }
 
   /// Checks if a key exists in storage
   Future<bool> containsKey(String key) async {
-    return await _storage.containsKey(key: key);
+    if (_useFallback) {
+      return _memoryStore.containsKey(key);
+    }
+    try {
+      return await _storage!.containsKey(key: key);
+    } on PlatformException catch (e) {
+      if (_isKeychainError(e)) {
+        _switchToFallback();
+        return _memoryStore.containsKey(key);
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  bool _isKeychainError(PlatformException e) {
+    // -34018 = errSecMissingEntitlement (macOS Keychain signing issue)
+    return e.code == '-34018' ||
+        e.message?.contains('entitlement') == true ||
+        e.message?.contains('34018') == true;
+  }
+
+  void _switchToFallback() {
+    _useFallback = true;
+    _storage = null;
   }
 }
 

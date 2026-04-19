@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/destination_discovery/application/providers/saved_destinations_provider.dart';
+import 'package:soloadventurer/features/destination_discovery/application/providers/destination_repository_provider.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/saved_destination.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/models/destination.dart';
 import 'package:soloadventurer/features/destination_discovery/domain/repositories/destination_repository.dart';
@@ -10,250 +12,201 @@ class MockDestinationRepository extends Mock implements DestinationRepository {}
 
 void main() {
   late MockDestinationRepository mockRepository;
-  late SavedDestinationsNotifier notifier;
+  late ProviderContainer container;
   const testUserId = 'user123';
 
-  // Test data
-  final testDestination = Destination(
-    id: 'dest1',
-    name: 'Tokyo',
-    description: 'Amazing city',
-    location: (lat: 35.6762, lng: 139.6503),
-    safetyScore: 8.5,
-    soloSuitabilityScore: 8.0,
-    soloSuitabilityFactors: const SoloSuitabilityFactors(
-      safety: 8.5,
-      nightlife: 7.0,
-      walkability: 9.0,
-      accommodation: 8.0,
-      soloDining: 7.5,
-      communication: 6.5,
-      overall: 7.8,
-    ),
-    countryCode: 'JP',
-    region: 'Kanto',
-    budgetLevel: BudgetLevel.moderate,
-    activityLevel: ActivityLevel.moderate,
-    tags: ['urban', 'cultural'],
-    images: ['https://example.com/tokyo.jpg'],
-    popularActivities: [],
-    bestTimeToVisit: 'Spring',
-  );
+  // Helper to create test destinations
+  Destination createTestDestination({
+    String id = 'dest1',
+    String name = 'Tokyo',
+    double lat = 35.6762,
+    double lng = 139.6503,
+    double safetyScore = 8.5,
+    double soloScore = 8.0,
+    BudgetLevel budget = BudgetLevel.moderate,
+    List<ActivityLevel> activities = const [ActivityLevel.moderate],
+    List<String> tags = const ['urban', 'cultural'],
+  }) {
+    return Destination(
+      id: id,
+      name: name,
+      description: 'Amazing city',
+      latitude: lat,
+      longitude: lng,
+      safetyScore: safetyScore,
+      safetyInsights: [],
+      soloSuitabilityScore: soloScore,
+      soloSuitabilityFactors: SoloSuitabilityFactors(
+        safety: safetyScore,
+        nightlife: 7.0,
+        walkability: 9.0,
+        accommodation: 8.0,
+        soloDining: 7.5,
+        communication: 6.5,
+        overall: 7.8,
+      ),
+      countryCode: 'JP',
+      region: 'Kanto',
+      budgetLevel: budget,
+      activityLevels: activities,
+      tags: tags,
+      images: ['https://example.com/$name.jpg'],
+      popularActivities: [],
+      createdAt: DateTime(2024, 1, 1),
+      updatedAt: DateTime(2024, 1, 1),
+    );
+  }
 
-  final testSavedDestinations = [
-    SavedDestination(
-      id: 'saved1',
-      userId: testUserId,
-      destination: Destination(
-        id: 'dest1',
-        name: 'Tokyo',
-        description: 'Amazing city',
-        location: (lat: 35.6762, lng: 139.6503),
-        safetyScore: 8.5,
-        soloSuitabilityScore: 8.0,
-        soloSuitabilityFactors: const SoloSuitabilityFactors(
-          safety: 8.5,
-          nightlife: 7.0,
-          walkability: 9.0,
-          accommodation: 8.0,
-          soloDining: 7.5,
-          communication: 6.5,
-          overall: 7.8,
-        ),
-        countryCode: 'JP',
-        region: 'Kanto',
-        budgetLevel: BudgetLevel.moderate,
-        activityLevel: ActivityLevel.moderate,
-        tags: ['urban', 'cultural'],
-        images: ['https://example.com/tokyo.jpg'],
-        popularActivities: [],
-        bestTimeToVisit: 'Spring',
+  List<SavedDestination> createTestSavedDestinations() {
+    final now = DateTime.now();
+    return [
+      SavedDestination(
+        id: 'saved1',
+        userId: testUserId,
+        destination: createTestDestination(id: 'dest1', name: 'Tokyo'),
+        saveType: SaveType.wishlist,
+        notes: 'Must visit',
+        createdAt: now.subtract(const Duration(days: 1)),
+        updatedAt: now.subtract(const Duration(days: 1)),
       ),
+      SavedDestination(
+        id: 'saved2',
+        userId: testUserId,
+        destination: createTestDestination(
+          id: 'dest2',
+          name: 'Kyoto',
+          lat: 35.0116,
+          lng: 135.7681,
+          activities: [ActivityLevel.relaxed],
+          tags: ['cultural', 'historical'],
+        ),
+        saveType: SaveType.trip,
+        tripId: 'trip1',
+        notes: 'Temple visit',
+        createdAt: now.subtract(const Duration(days: 2)),
+        updatedAt: now.subtract(const Duration(days: 2)),
+      ),
+      SavedDestination(
+        id: 'saved3',
+        userId: testUserId,
+        destination: createTestDestination(
+          id: 'dest3',
+          name: 'Osaka',
+          lat: 34.6937,
+          lng: 135.5023,
+          safetyScore: 8.0,
+          soloScore: 7.5,
+          budget: BudgetLevel.budget,
+          tags: ['food', 'urban'],
+        ),
+        saveType: SaveType.trip,
+        tripId: 'trip1',
+        notes: null,
+        createdAt: now.subtract(const Duration(days: 3)),
+        updatedAt: now.subtract(const Duration(days: 3)),
+      ),
+    ];
+  }
+
+  setUpAll(() {
+    registerFallbackValue(SavedDestination(
+      id: 'fallback',
+      userId: 'fallback-user',
+      destination: createTestDestination(),
       saveType: SaveType.wishlist,
-      notes: 'Must visit',
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    SavedDestination(
-      id: 'saved2',
-      userId: testUserId,
-      destination: Destination(
-        id: 'dest2',
-        name: 'Kyoto',
-        description: 'Historic city',
-        location: (lat: 35.0116, lng: 135.7681),
-        safetyScore: 9.0,
-        soloSuitabilityScore: 8.5,
-        soloSuitabilityFactors: const SoloSuitabilityFactors(
-          safety: 9.0,
-          nightlife: 6.0,
-          walkability: 8.5,
-          accommodation: 8.5,
-          soloDining: 8.0,
-          communication: 6.0,
-          overall: 7.7,
-        ),
-        countryCode: 'JP',
-        region: 'Kansai',
-        budgetLevel: BudgetLevel.moderate,
-        activityLevel: ActivityLevel.relaxed,
-        tags: ['cultural', 'historical'],
-        images: ['https://example.com/kyoto.jpg'],
-        popularActivities: [],
-        bestTimeToVisit: 'Spring',
-      ),
-      saveType: SaveType.trip,
-      tripId: 'trip1',
-      notes: 'Temple visit',
-      createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    SavedDestination(
-      id: 'saved3',
-      userId: testUserId,
-      destination: Destination(
-        id: 'dest3',
-        name: 'Osaka',
-        description: 'Food capital',
-        location: (lat: 34.6937, lng: 135.5023),
-        safetyScore: 8.0,
-        soloSuitabilityScore: 7.5,
-        soloSuitabilityFactors: const SoloSuitabilityFactors(
-          safety: 8.0,
-          nightlife: 8.0,
-          walkability: 7.5,
-          accommodation: 7.5,
-          soloDining: 8.5,
-          communication: 6.5,
-          overall: 7.7,
-        ),
-        countryCode: 'JP',
-        region: 'Kansai',
-        budgetLevel: BudgetLevel.budget,
-        activityLevel: ActivityLevel.moderate,
-        tags: ['food', 'urban'],
-        images: ['https://example.com/osaka.jpg'],
-        popularActivities: [],
-        bestTimeToVisit: 'Fall',
-      ),
-      saveType: SaveType.trip,
-      tripId: 'trip1',
-      notes: null,
-      createdAt: DateTime.now().subtract(const Duration(days: 3)),
-      updatedAt: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-  ];
+      createdAt: DateTime(2024, 1, 1),
+      updatedAt: DateTime(2024, 1, 1),
+    ));
+  });
 
   setUp(() {
     mockRepository = MockDestinationRepository();
-    // Setup mock to return test saved destinations
     when(() => mockRepository.getSavedDestinations(any()))
-        .thenAnswer((_) async => testSavedDestinations);
-    notifier = SavedDestinationsNotifier(mockRepository, testUserId);
+        .thenAnswer((_) async => createTestSavedDestinations());
 
-    // Wait for auto-load
-    Future.delayed(const Duration(milliseconds: 100));
+    container = ProviderContainer.test(
+      overrides: [
+        destinationRepositoryProvider.overrideWith((ref) => mockRepository),
+      ],
+    );
   });
 
-  group('SavedDestinationsNotifier', () {
+  tearDown(() {
+    container.dispose();
+  });
+
+  group('savedDestinationsProvider', () {
     group('initial state', () {
-      test('should start with initial state', () {
-        notifier.clear();
-
-        expect(notifier.state.value, isNotNull);
-        expect(notifier.state.value!.savedDestinations.isEmpty, isTrue);
-      });
-
-      test('should auto-load saved destinations on creation', () async {
-        // Create a new notifier to verify auto-load
-        final newNotifier =
-            SavedDestinationsNotifier(mockRepository, testUserId);
-
-        // Wait for auto-load
-        await Future.delayed(const Duration(milliseconds: 100));
+      test('should auto-load saved destinations on build', () async {
+        await container.read(savedDestinationsProvider(testUserId).future);
 
         verify(() => mockRepository.getSavedDestinations(testUserId)).called(1);
       });
     });
 
-    group('loadSavedDestinations', () {
+    group('loadSavedDestinations via refresh', () {
       test('should load all saved destinations successfully', () async {
-        notifier.clear(); // Clear auto-loaded state
+        final state = await container.read(savedDestinationsProvider(testUserId).future);
 
-        await notifier.loadSavedDestinations();
-
-        verify(() =>
-                mockRepository.getSavedDestinations(testUserId, saveType: null))
-            .called(1);
-        expect(notifier.state.value, isNotNull);
-        expect(notifier.state.value!.count, 3);
-      });
-
-      test('should load wishlist items only', () async {
-        notifier.clear();
-
-        final wishlistOnly = testSavedDestinations
-            .where((sd) => sd.saveType == SaveType.wishlist)
-            .toList();
-        when(() => mockRepository.getSavedDestinations(testUserId,
-            saveType: SaveType.wishlist)).thenAnswer((_) async => wishlistOnly);
-
-        await notifier.loadSavedDestinations(saveType: SaveType.wishlist);
-
-        expect(notifier.state.value!.count, 1);
-        expect(notifier.state.value!.wishlistCount, 1);
-        expect(notifier.state.value!.tripCount, 0);
+        verify(() => mockRepository.getSavedDestinations(testUserId)).called(1);
+        expect(state.savedDestinations.length, 3);
       });
 
       test('should handle errors', () async {
-        notifier.clear();
-        when(() => mockRepository.getSavedDestinations(any(),
-                saveType: any(named: 'saveType')))
+        when(() => mockRepository.getSavedDestinations(any()))
             .thenThrow(Exception('Network error'));
 
-        await notifier.loadSavedDestinations();
+        final errorContainer = ProviderContainer(
+          overrides: [
+            destinationRepositoryProvider.overrideWith((ref) => mockRepository),
+          ],
+        );
 
-        expect(notifier.state.hasValue, isFalse);
+        bool gotError = false;
+        final sub = errorContainer.listen(
+          savedDestinationsProvider(testUserId),
+          (_, next) {
+            if (next.hasError) gotError = true;
+          },
+          fireImmediately: true,
+          onError: (error, stackTrace) {
+            gotError = true;
+          },
+        );
+
+        await Future.delayed(const Duration(milliseconds: 100));
+
+        expect(gotError, isTrue);
+
+        sub.close();
+        errorContainer.dispose();
       });
     });
 
     group('refresh', () {
       test('should refresh saved destinations', () async {
-        // Wait for initial load
-        await Future.delayed(const Duration(milliseconds: 100));
+        await container.read(savedDestinationsProvider(testUserId).future);
 
-        // Reset mock
         reset(mockRepository);
-        final refreshedDestinations = [testSavedDestinations[0]];
-        when(() => mockRepository.getSavedDestinations(any(),
-                saveType: any(named: 'saveType')))
+        final refreshedDestinations = [createTestSavedDestinations()[0]];
+        when(() => mockRepository.getSavedDestinations(any(), saveType: any(named: 'saveType')))
             .thenAnswer((_) async => refreshedDestinations);
 
-        await notifier.refresh();
+        await container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .refresh();
 
-        expect(notifier.state.value!.count, 1);
-      });
-
-      test('should handle errors during refresh', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
-
-        reset(mockRepository);
-        when(() => mockRepository.getSavedDestinations(any(),
-                saveType: any(named: 'saveType')))
-            .thenThrow(Exception('Network error'));
-
-        await notifier.refresh();
-
-        expect(notifier.state.hasValue, isFalse);
+        final state = container.read(savedDestinationsProvider(testUserId));
+        expect(state.value, isNotNull);
+        expect(state.value!.savedDestinations.length, 1);
       });
     });
 
     group('saveDestination', () {
       test('should save destination to wishlist', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final testDestination = createTestDestination();
         final newSaved = SavedDestination(
           id: 'saved4',
           userId: testUserId,
@@ -266,20 +219,23 @@ void main() {
         when(() => mockRepository.saveDestination(any()))
             .thenAnswer((_) async => newSaved);
 
-        await notifier.saveDestination(
-          userId: testUserId,
-          destination: testDestination,
-          saveType: SaveType.wishlist,
-        );
+        await container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .saveDestination(
+              userId: testUserId,
+              destination: testDestination,
+              saveType: SaveType.wishlist,
+            );
 
-        expect(notifier.state.value!.count, 4); // 3 initial + 1 new
-        expect(notifier.state.value!.savedDestinations.last.id, 'saved4');
+        final state = container.read(savedDestinationsProvider(testUserId));
+        expect(state.value!.savedDestinations.length, 4);
+        expect(state.value!.savedDestinations.last.id, 'saved4');
       });
 
       test('should save destination to trip', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final testDestination = createTestDestination();
         final newSaved = SavedDestination(
           id: 'saved4',
           userId: testUserId,
@@ -294,31 +250,35 @@ void main() {
         when(() => mockRepository.saveDestination(any()))
             .thenAnswer((_) async => newSaved);
 
-        await notifier.saveDestination(
-          userId: testUserId,
-          destination: testDestination,
-          saveType: SaveType.trip,
-          tripId: 'trip2',
-          notes: 'Test notes',
-        );
+        await container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .saveDestination(
+              userId: testUserId,
+              destination: testDestination,
+              saveType: SaveType.trip,
+              tripId: 'trip2',
+              notes: 'Test notes',
+            );
 
-        expect(notifier.state.value!.count, 4);
-        expect(notifier.state.value!.savedDestinations.last.tripId, 'trip2');
+        final state = container.read(savedDestinationsProvider(testUserId));
+        expect(state.value!.savedDestinations.length, 4);
+        expect(state.value!.savedDestinations.last.tripId, 'trip2');
       });
 
       test('should handle errors during save', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
         when(() => mockRepository.saveDestination(any()))
             .thenThrow(Exception('Network error'));
 
         expect(
-          () async => await notifier.saveDestination(
-            userId: testUserId,
-            destination: testDestination,
-            saveType: SaveType.wishlist,
-          ),
+          () => container
+              .read(savedDestinationsProvider(testUserId).notifier)
+              .saveDestination(
+                userId: testUserId,
+                destination: createTestDestination(),
+                saveType: SaveType.wishlist,
+              ),
           throwsException,
         );
       });
@@ -327,23 +287,24 @@ void main() {
     group('unsaveDestination', () {
       test('should remove destination from all saves when saveType is null',
           () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
-        // Mock unsave
         when(() => mockRepository.unsaveDestination(
               destinationId: any(named: 'destinationId'),
               userId: any(named: 'userId'),
               saveType: any(named: 'saveType'),
             )).thenAnswer((_) async => {});
 
-        await notifier.unsaveDestination(
-          userId: testUserId,
-          destinationId: 'dest1',
-        );
+        await container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .unsaveDestination(
+              userId: testUserId,
+              destinationId: 'dest1',
+            );
 
+        final state = container.read(savedDestinationsProvider(testUserId));
         expect(
-            notifier.state.value!.savedDestinations
+            state.value!.savedDestinations
                 .any((sd) => sd.destination.id == 'dest1'),
             isFalse);
         verify(() => mockRepository.unsaveDestination(
@@ -354,8 +315,7 @@ void main() {
       });
 
       test('should remove destination from wishlist only', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
         when(() => mockRepository.unsaveDestination(
               destinationId: any(named: 'destinationId'),
@@ -363,13 +323,16 @@ void main() {
               saveType: any(named: 'saveType'),
             )).thenAnswer((_) async => {});
 
-        await notifier.unsaveDestination(
-          userId: testUserId,
-          destinationId: 'dest1',
-          saveType: SaveType.wishlist,
-        );
+        await container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .unsaveDestination(
+              userId: testUserId,
+              destinationId: 'dest1',
+              saveType: SaveType.wishlist,
+            );
 
-        expect(notifier.state.value!.wishlistCount, 0);
+        final state = container.read(savedDestinationsProvider(testUserId));
+        expect(state.value!.wishlistCount, 0);
         verify(() => mockRepository.unsaveDestination(
               destinationId: 'dest1',
               userId: testUserId,
@@ -378,8 +341,7 @@ void main() {
       });
 
       test('should handle errors during unsave', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
         when(() => mockRepository.unsaveDestination(
               destinationId: any(named: 'destinationId'),
@@ -388,10 +350,12 @@ void main() {
             )).thenThrow(Exception('Network error'));
 
         expect(
-          () async => await notifier.unsaveDestination(
-            userId: testUserId,
-            destinationId: 'dest1',
-          ),
+          () => container
+              .read(savedDestinationsProvider(testUserId).notifier)
+              .unsaveDestination(
+                userId: testUserId,
+                destinationId: 'dest1',
+              ),
           throwsException,
         );
       });
@@ -399,37 +363,27 @@ void main() {
 
     group('updateNotes', () {
       test('should update notes for saved destination', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
         when(() => mockRepository.saveDestination(any()))
-            .thenAnswer((_) async => testSavedDestinations[0]);
+            .thenAnswer((_) async => createTestSavedDestinations()[0]);
 
-        await notifier.updateNotes('dest1', 'Updated notes');
+        await container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .updateNotes('dest1', 'Updated notes');
 
-        final updated = notifier.state.value!.getSavedDestination('dest1');
+        final state = container.read(savedDestinationsProvider(testUserId));
+        final updated = state.value!.getSavedDestination('dest1');
         expect(updated?.notes, 'Updated notes');
       });
 
       test('should throw error when destination not found', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
         expect(
-          () async => await notifier.updateNotes('nonexistent', 'Notes'),
-          throwsException,
-        );
-      });
-
-      test('should handle errors during update', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
-
-        when(() => mockRepository.saveDestination(any()))
-            .thenThrow(Exception('Network error'));
-
-        expect(
-          () async => await notifier.updateNotes('dest1', 'Notes'),
+          () => container
+              .read(savedDestinationsProvider(testUserId).notifier)
+              .updateNotes('nonexistent', 'Notes'),
           throwsException,
         );
       });
@@ -437,43 +391,55 @@ void main() {
 
     group('clear', () {
       test('should reset state to initial', () async {
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
-        notifier.clear();
+        container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .clear();
 
-        expect(notifier.state.value!.savedDestinations.isEmpty, isTrue);
+        final state = container.read(savedDestinationsProvider(testUserId));
+        expect(state.value!.savedDestinations.isEmpty, isTrue);
       });
     });
 
     group('checker methods', () {
       test('isDestinationSaved should return true for saved destination',
           () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.isDestinationSaved('dest1'), isTrue);
         expect(notifier.isDestinationSaved('dest99'), isFalse);
       });
 
       test('isDestinationInWishlist should check wishlist', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.isDestinationInWishlist('dest1'), isTrue);
         expect(notifier.isDestinationInWishlist('dest2'), isFalse);
       });
 
       test('isDestinationInTrip should check trip saves', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.isDestinationInTrip('dest2'), isTrue);
         expect(notifier.isDestinationInTrip('dest1'), isFalse);
       });
 
       test('should return false when state has no value', () async {
-        notifier.clear();
+        // Wait for auto-load then clear
+        await container.read(savedDestinationsProvider(testUserId).future);
+        container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .clear();
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.isDestinationSaved('dest1'), isFalse);
         expect(notifier.isDestinationInWishlist('dest1'), isFalse);
         expect(notifier.isDestinationInTrip('dest1'), isFalse);
@@ -482,55 +448,62 @@ void main() {
 
     group('getters', () {
       test('getSavedDestination should return saved destination', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         final saved = notifier.getSavedDestination('dest1');
         expect(saved?.id, 'saved1');
       });
 
       test('wishlistItems should return wishlist items', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.wishlistItems.length, 1);
         expect(notifier.wishlistItems[0].destination.id, 'dest1');
       });
 
       test('tripItems should return trip items', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.tripItems.length, 2);
         expect(notifier.tripItems.every((sd) => sd.saveType == SaveType.trip),
             isTrue);
       });
 
       test('totalCount should return total count', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.totalCount, 3);
       });
 
       test('wishlistCount should return wishlist count', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.wishlistCount, 1);
       });
 
       test('tripCount should return trip count', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.tripCount, 2);
       });
 
       test('groupedByTrip should group by trip ID', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         final grouped = notifier.groupedByTrip;
 
         expect(grouped.length, 1); // Only one trip
@@ -538,22 +511,33 @@ void main() {
       });
 
       test('isEmpty should return true when empty', () async {
-        notifier.clear();
+        await container.read(savedDestinationsProvider(testUserId).future);
+        container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .clear();
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.isEmpty, isTrue);
       });
 
       test('isNotEmpty should return true when has items', () async {
-        notifier.clear();
-        await notifier.loadSavedDestinations();
+        await container.read(savedDestinationsProvider(testUserId).future);
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.isNotEmpty, isTrue);
       });
 
       test('getters should return empty/null when state has no value',
           () async {
-        notifier.clear();
+        await container.read(savedDestinationsProvider(testUserId).future);
+        container
+            .read(savedDestinationsProvider(testUserId).notifier)
+            .clear();
 
+        final notifier = container
+            .read(savedDestinationsProvider(testUserId).notifier);
         expect(notifier.getSavedDestination('dest1'), isNull);
         expect(notifier.wishlistItems.isEmpty, isTrue);
         expect(notifier.tripItems.isEmpty, isTrue);

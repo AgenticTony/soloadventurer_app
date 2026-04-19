@@ -53,7 +53,7 @@ final class AuthNavigationProvider
   }
 }
 
-String _$authNavigationHash() => r'7153f8550d7b9e77a5041b71ef552e877549f203';
+String _$authNavigationHash() => r'cebb9b5bb80c7ace8d4e232b496e9e03f24b76a0';
 
 /// Provider for handling auth-related navigation state
 ///

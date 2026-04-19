@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/services/connectivity_service.dart'
     as core_connectivity;
+import 'package:soloadventurer/core/services/connectivity_service_impl.dart';
 import 'package:soloadventurer/core/network/network_reachability.dart';
 import 'package:soloadventurer/features/offline/data/repositories/offline_repositories.dart';
 import 'package:soloadventurer/features/offline/domain/repositories/sync_queue_repository.dart';
@@ -84,7 +85,7 @@ ItineraryDao itineraryDao(Ref ref) {
 @Riverpod(keepAlive: true)
 core_connectivity.ConnectivityService connectivityService(Ref ref) {
   final connectivity = ref.watch(connectivityProvider);
-  return core_connectivity.ConnectivityServiceImpl(
+  return ConnectivityServiceImpl(
     connectivity: connectivity,
     debounceMs: 300,
   );
@@ -123,11 +124,8 @@ SyncQueueRepository syncQueueRepository(Ref ref) {
 @Riverpod(keepAlive: true)
 SyncQueueService syncQueueService(Ref ref) {
   final repository = ref.watch(syncQueueRepositoryProvider);
-  final connectivityService =
-      ref.watch(offline_connectivity.connectivityServiceProvider);
   return SyncQueueService(
     repository: repository,
-    connectivityService: connectivityService,
     cleanupInterval: const Duration(hours: 1),
     completedOperationMaxAge: const Duration(days: 7),
     failedOperationMaxAge: const Duration(days: 30),
@@ -258,12 +256,7 @@ OptimisticUpdateHandler optimisticUpdateHandler(Ref ref) {
 /// Configures Workmanager for periodic background sync tasks.
 @Riverpod(keepAlive: true)
 BackgroundSyncService backgroundSyncService(Ref ref) {
-  final syncManager = ref.watch(syncManagerProvider);
-  final connectivityService =
-      ref.watch(offline_connectivity.connectivityServiceProvider);
   return BackgroundSyncService(
-    syncManager: syncManager,
-    connectivityService: connectivityService,
     periodicSyncInterval: const Duration(minutes: 15),
     initialDelay: const Duration(minutes: 5),
   );

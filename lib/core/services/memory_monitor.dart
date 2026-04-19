@@ -400,13 +400,6 @@ class MemoryMonitor {
     await _instance!._startMonitoring();
 
     if (kDebugMode) {
-      debugPrint('MemoryMonitor initialized with config:');
-      debugPrint(
-          '  Warning threshold: ${effectiveConfig.warningThresholdMB.toStringAsFixed(0)} MB');
-      debugPrint(
-          '  Critical threshold: ${effectiveConfig.criticalThresholdMB.toStringAsFixed(0)} MB');
-      debugPrint(
-          '  Monitoring interval: ${effectiveConfig.monitoringInterval.inSeconds}s');
     }
   }
 
@@ -451,7 +444,6 @@ class MemoryMonitor {
       _checkThresholds(snapshot);
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Error capturing memory snapshot: $e');
       }
     }
   }
@@ -475,7 +467,6 @@ class MemoryMonitor {
       return memoryUsage.heapUsage ?? 0;
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('Error getting memory usage: $e');
       }
       return 0;
     }
@@ -500,7 +491,6 @@ class MemoryMonitor {
         _currentAlertLevel = MemoryAlertLevel.critical;
         _onAlert(alert);
         if (kDebugMode) {
-          debugPrint('🚨 MEMORY ALERT: ${alert.message}');
         }
       }
       return;
@@ -522,7 +512,6 @@ class MemoryMonitor {
         _currentAlertLevel = MemoryAlertLevel.warning;
         _onAlert(alert);
         if (kDebugMode) {
-          debugPrint('⚠️ MEMORY ALERT: ${alert.message}');
         }
       }
       return;
@@ -532,8 +521,6 @@ class MemoryMonitor {
     if (_currentAlertLevel != MemoryAlertLevel.normal) {
       _currentAlertLevel = MemoryAlertLevel.normal;
       if (kDebugMode) {
-        debugPrint(
-            '✅ Memory usage back to normal: ${snapshot.memoryUsageMB.toStringAsFixed(2)} MB');
       }
     }
   }
@@ -641,7 +628,6 @@ class MemoryMonitor {
     }
     _instance!._history.clear();
     if (kDebugMode) {
-      debugPrint('Memory history cleared');
     }
   }
 
@@ -658,7 +644,6 @@ class MemoryMonitor {
     await _instance!._startMonitoring();
 
     if (kDebugMode) {
-      debugPrint('MemoryMonitor config updated');
     }
   }
 
@@ -692,7 +677,6 @@ class MemoryMonitor {
     _instance = null;
 
     if (kDebugMode) {
-      debugPrint('MemoryMonitor disposed');
     }
   }
 }

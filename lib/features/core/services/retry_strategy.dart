@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 
 /// Base class for retry strategies that calculate delay between retry attempts
 abstract class RetryStrategy {
@@ -52,13 +51,14 @@ class ExponentialBackoffStrategy extends RetryStrategy {
   @override
   Duration calculateDelay(int attemptCount) {
     if (attemptCount < 0) {
-      debugPrint(
-          'ExponentialBackoffStrategy: attemptCount cannot be negative, defaulting to 0');
       attemptCount = 0;
     }
 
+    // Cap attemptCount to avoid overflow in pow(2, n)
+    final effectiveAttempt = attemptCount.clamp(0, 62);
+
     // Calculate exponential backoff: baseDelay * 2^attemptCount
-    final exponentialDelay = baseDelay.inMilliseconds * pow(2, attemptCount);
+    final exponentialDelay = baseDelay.inMilliseconds * pow(2, effectiveAttempt);
 
     // Calculate jitter: random value between -jitterFactor and +jitterFactor
     final jitterRange = exponentialDelay * jitterFactor;
@@ -71,11 +71,6 @@ class ExponentialBackoffStrategy extends RetryStrategy {
     final cappedDelay = min(delayWithJitter, maxDelay.inMilliseconds);
 
     final result = Duration(milliseconds: cappedDelay);
-
-    debugPrint(
-        'ExponentialBackoffStrategy: attempt #$attemptCount -> ${result.inSeconds}s '
-        '(base: ${baseDelay.inSeconds}s, exponential: ${(exponentialDelay / 1000).toStringAsFixed(2)}s, '
-        'jitter: ${(jitter / 1000).toStringAsFixed(2)}s)');
 
     return result;
   }
@@ -105,11 +100,7 @@ class FixedDelayStrategy extends RetryStrategy {
   @override
   Duration calculateDelay(int attemptCount) {
     if (attemptCount < 0) {
-      debugPrint('FixedDelayStrategy: attemptCount cannot be negative');
     }
-
-    debugPrint(
-        'FixedDelayStrategy: attempt #$attemptCount -> ${delay.inSeconds}s');
 
     return delay;
   }
@@ -161,8 +152,6 @@ class LinearBackoffStrategy extends RetryStrategy {
   @override
   Duration calculateDelay(int attemptCount) {
     if (attemptCount < 0) {
-      debugPrint(
-          'LinearBackoffStrategy: attemptCount cannot be negative, defaulting to 0');
       attemptCount = 0;
     }
 
@@ -180,11 +169,6 @@ class LinearBackoffStrategy extends RetryStrategy {
     final cappedDelay = min(delayWithJitter, maxDelay.inMilliseconds);
 
     final result = Duration(milliseconds: cappedDelay);
-
-    debugPrint(
-        'LinearBackoffStrategy: attempt #$attemptCount -> ${result.inSeconds}s '
-        '(base: ${baseDelay.inSeconds}s, increment: ${increment.inSeconds}s, '
-        'jitter: ${(jitter / 1000).toStringAsFixed(2)}s)');
 
     return result;
   }

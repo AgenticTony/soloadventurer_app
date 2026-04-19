@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:soloadventurer/features/sync/domain/services/conflict_resolver.dart';
 import 'package:soloadventurer/features/sync/domain/services/sync_service.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_info.dart';
+import 'package:soloadventurer/features/sync/domain/models/conflict_resolution.dart';
 import 'package:soloadventurer/features/sync/presentation/notifiers/conflict_resolution_notifier.dart';
 import 'package:soloadventurer/features/sync/presentation/state/conflict_resolution_state.dart';
 import 'package:soloadventurer/features/core/domain/services/logging_service.dart';
@@ -32,93 +34,36 @@ final loggingServiceProvider = Provider<LoggingService>((ref) {
   );
 });
 
-/// Provider for the conflict resolution notifier
+/// Provider for the current conflict resolution state (unwrapped from AsyncValue)
 ///
-/// Manages conflict resolution state and user interactions.
-/// Uses AsyncValue pattern for loading, error, and data states.
-final conflictResolutionNotifierProvider = StateNotifierProvider<
-    ConflictResolutionNotifier, AsyncValue<ConflictResolutionState>>((ref) {
-  final resolver = ref.watch(conflictResolverProvider);
-  final syncService = ref.watch(syncServiceProvider);
-  final logger = ref.watch(loggingServiceProvider);
-
-  final notifier = ConflictResolutionNotifier(
-    conflictResolver: resolver,
-    syncService: syncService,
-    logger: logger,
-  );
-
-  // Dispose notifier when provider is disposed
-  ref.onDispose(() {
-    notifier.dispose();
-  });
-
-  return notifier;
-});
-
-/// Stream provider for conflict resolution state changes
-///
-/// Provides a stream of state updates for reactive UI.
-/// This is useful for widgets that need to react to state changes.
-final conflictResolutionStateProvider =
-    StreamProvider<AsyncValue<ConflictResolutionState>>((ref) {
-  final notifier = ref.watch(conflictResolutionNotifierProvider);
-  return notifier.stream;
-});
-
-/// Provider for the current conflict resolution state
-///
-/// Provides direct access to the current state value.
-/// Returns null if state is loading or error.
+/// Provides direct access to the current state, or null if loading/error.
+/// Use conflictResolutionProvider directly for full AsyncValue handling.
 final currentConflictResolutionStateProvider =
     Provider<ConflictResolutionState?>((ref) {
-  final asyncState = ref.watch(conflictResolutionNotifierProvider);
-  return asyncState.value;
-});
+      return ref.watch(conflictResolutionProvider).value;
+    });
 
 /// Provider for pending conflicts count
-///
-/// Provides the number of conflicts waiting to be resolved.
-/// Useful for showing badge counts in UI.
 final pendingConflictsCountProvider = Provider<int>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).value;
-  return state?.pendingCount ?? 0;
+  return ref.watch(conflictResolutionProvider).value?.pendingConflicts.length ?? 0;
 });
 
 /// Provider for whether there are any conflicts
-///
-/// Provides a boolean indicating if there are pending or active conflicts.
-/// Useful for showing/hiding conflict indicators.
 final hasConflictsProvider = Provider<bool>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).value;
-  return state?.hasConflicts ?? false;
+  return ref.watch(conflictResolutionProvider).value?.hasConflicts ?? false;
 });
 
 /// Provider for active conflict
-///
-/// Provides the conflict currently being resolved, if any.
 final activeConflictProvider = Provider<ConflictInfo?>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).value;
-  return state?.activeConflict;
+  return ref.watch(conflictResolutionProvider).value?.activeConflict;
 });
 
 /// Provider for resolution result
-///
-/// Provides the result of the last successful resolution, if any.
 final resolutionResultProvider = Provider<ConflictResolution?>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider).value;
-  return state?.resolution;
+  return ref.watch(conflictResolutionProvider).value?.resolution;
 });
 
 /// Provider for conflict resolution status
-///
-/// Provides a high-level status of conflict resolution:
-/// - idle: No conflicts
-/// - hasConflicts: Conflicts waiting to be resolved
-/// - resolving: Currently resolving a conflict
-/// - resolved: Conflict was successfully resolved
-/// - failed: Resolution failed
-/// - cancelled: User cancelled resolution
 enum ConflictResolutionStatus {
   idle,
   hasConflicts,
@@ -129,40 +74,34 @@ enum ConflictResolutionStatus {
 }
 
 /// Provider for conflict resolution status
-///
-/// Provides a high-level status enum for easier UI state management.
 final conflictResolutionStatusProvider =
     Provider<ConflictResolutionStatus>((ref) {
-  final state = ref.watch(conflictResolutionNotifierProvider);
-  final value = state.value;
+      final asyncState = ref.watch(conflictResolutionProvider);
 
-  if (value == null) {
-    return ConflictResolutionStatus.idle;
-  }
+      // Loading means resolving
+      if (asyncState.isLoading) {
+        return ConflictResolutionStatus.resolving;
+      }
 
-  if (state.isLoading) {
-    return ConflictResolutionStatus.resolving;
-  }
+      // Error means failed
+      if (asyncState.hasError) {
+        return ConflictResolutionStatus.failed;
+      }
 
-  if (state.hasError) {
-    return ConflictResolutionStatus.failed;
-  }
+      final state = asyncState.value;
+      if (state == null) return ConflictResolutionStatus.idle;
 
-  if (value.wasCancelled) {
-    return ConflictResolutionStatus.cancelled;
-  }
+      if (state.wasCancelled) {
+        return ConflictResolutionStatus.cancelled;
+      }
 
-  if (value.isResolved) {
-    return ConflictResolutionStatus.resolved;
-  }
+      if (state.isResolved) {
+        return ConflictResolutionStatus.resolved;
+      }
 
-  if (value.isResolving) {
-    return ConflictResolutionStatus.resolving;
-  }
+      if (state.hasConflicts) {
+        return ConflictResolutionStatus.hasConflicts;
+      }
 
-  if (value.hasConflicts) {
-    return ConflictResolutionStatus.hasConflicts;
-  }
-
-  return ConflictResolutionStatus.idle;
-});
+      return ConflictResolutionStatus.idle;
+    });

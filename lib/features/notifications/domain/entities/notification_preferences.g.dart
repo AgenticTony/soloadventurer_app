@@ -39,6 +39,12 @@ _NotificationPreferences _$NotificationPreferencesFromJson(
           json['locationBasedNotificationsEnabled'] as bool? ?? false,
       proximityNotificationRadiusMeters:
           (json['proximityNotificationRadiusMeters'] as num?)?.toInt() ?? 500,
+      mutedChatIds: (json['mutedChatIds'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      chatMessageNotifications:
+          json['chatMessageNotifications'] as bool? ?? true,
       lastUpdated: json['lastUpdated'] == null
           ? null
           : DateTime.parse(json['lastUpdated'] as String),
@@ -74,6 +80,8 @@ Map<String, dynamic> _$NotificationPreferencesToJson(
           instance.locationBasedNotificationsEnabled,
       'proximityNotificationRadiusMeters':
           instance.proximityNotificationRadiusMeters,
+      'mutedChatIds': instance.mutedChatIds,
+      'chatMessageNotifications': instance.chatMessageNotifications,
       'lastUpdated': instance.lastUpdated?.toIso8601String(),
       'userId': instance.userId,
     };

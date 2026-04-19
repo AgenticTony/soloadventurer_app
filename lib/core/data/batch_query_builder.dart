@@ -373,7 +373,6 @@ class BatchQueryBuilder<T> {
   }) async {
     if (items.isEmpty) {
       if (debug) {
-        debugPrint('[BatchQueryBuilder] No items to process');
       }
       return const BatchOperationResult(successCount: 0, failureCount: 0);
     }
@@ -381,12 +380,9 @@ class BatchQueryBuilder<T> {
     final stopwatch = Stopwatch()..start();
 
     if (debug) {
-      debugPrint('[BatchQueryBuilder] Starting ${operationType.name} '
-          'on ${tableName ?? 'unknown'}: ${items.length} items');
     }
 
     int successCount = 0;
-    int failureCount = 0;
     var errors = <BatchError>[];
     int processedCount = 0;
 
@@ -400,7 +396,6 @@ class BatchQueryBuilder<T> {
       );
 
       successCount += batchResults['success'] as int;
-      failureCount += batchResults['failed'] as int;
       errors.addAll(batchResults['errors'] as List<BatchError>);
 
       processedCount += batch.length;
@@ -409,7 +404,6 @@ class BatchQueryBuilder<T> {
       // Stop if configured and there are failures
       if (config.stopOnError && errors.isNotEmpty) {
         if (debug) {
-          debugPrint('[BatchQueryBuilder] Stopping due to errors');
         }
         break;
       }
@@ -428,9 +422,6 @@ class BatchQueryBuilder<T> {
     _totalTime += stopwatch.elapsed;
 
     if (debug) {
-      debugPrint('[BatchQueryBuilder] Completed ${operationType.name}: '
-          'success: $successCount, failed: $failureCount, '
-          'time: ${stopwatch.elapsedMilliseconds}ms');
     }
 
     if (errors.isEmpty) {
@@ -564,23 +555,18 @@ class BatchQueryBuilder<T> {
       try {
         await operation(item.data);
         return (success: true, error: null);
-      } catch (error, stackTrace) {
+      } catch (error) {
         if (attempt < config.retryCount) {
           // Retry after delay
           if (config.retryDelay > Duration.zero) {
             await Future.delayed(config.retryDelay);
           }
           if (debug) {
-            debugPrint('[BatchQueryBuilder] Retry ${attempt + 1} '
-                'for item ${item.index}: $error');
           }
         } else {
           // All retries exhausted
           if (debug) {
-            debugPrint(
-                '[BatchQueryBuilder] Failed at item ${item.index}: $error');
             if (kDebugMode) {
-              debugPrint(stackTrace.toString());
             }
           }
 
@@ -616,7 +602,6 @@ class BatchQueryBuilder<T> {
     _totalTime = Duration.zero;
 
     if (debug) {
-      debugPrint('[BatchQueryBuilder] Statistics reset');
     }
   }
 }

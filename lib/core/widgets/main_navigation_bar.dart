@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 ///
 /// Provides navigation between the main sections:
 /// - Home
+/// - Connections (matching)
 /// - Journal
 /// - Destinations
 /// - Safety
@@ -25,6 +26,11 @@ class MainNavigationBar extends StatelessWidget {
       label: 'Home',
     ),
     NavigationDestination(
+      icon: Icon(Icons.people_outline),
+      selectedIcon: Icon(Icons.people),
+      label: 'Connect',
+    ),
+    NavigationDestination(
       icon: Icon(Icons.book_outlined),
       selectedIcon: Icon(Icons.book),
       label: 'Journal',
@@ -32,7 +38,7 @@ class MainNavigationBar extends StatelessWidget {
     NavigationDestination(
       icon: Icon(Icons.explore_outlined),
       selectedIcon: Icon(Icons.explore),
-      label: 'Destinations',
+      label: 'Discover',
     ),
     NavigationDestination(
       icon: Icon(Icons.shield_outlined),
@@ -68,14 +74,16 @@ class MainNavigationBar extends StatelessWidget {
     // Map routes to indices
     if (location.startsWith('/home') || location == '/') {
       return 0;
-    } else if (location.startsWith('/journal')) {
+    } else if (location.startsWith('/connect')) {
       return 1;
-    } else if (location.startsWith('/destinations')) {
+    } else if (location.startsWith('/journal')) {
       return 2;
-    } else if (location.startsWith('/safety')) {
+    } else if (location.startsWith('/destinations')) {
       return 3;
-    } else if (location.startsWith('/profile')) {
+    } else if (location.startsWith('/safety')) {
       return 4;
+    } else if (location.startsWith('/profile')) {
+      return 5;
     }
 
     // Default to home
@@ -89,15 +97,18 @@ class MainNavigationBar extends StatelessWidget {
         context.go('/home');
         break;
       case 1:
-        context.go('/journal');
+        context.go('/connect');
         break;
       case 2:
-        context.go('/destinations');
+        context.go('/journal');
         break;
       case 3:
-        context.go('/safety');
+        context.go('/destinations');
         break;
       case 4:
+        context.go('/safety');
+        break;
+      case 5:
         context.go('/profile');
         break;
     }

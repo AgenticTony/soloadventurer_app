@@ -359,12 +359,22 @@ void main() {
     });
 
     group('TravelInterestGrid', () {
+      Future<void> setLargeSurface(WidgetTester tester) async {
+        tester.view.physicalSize = const Size(1200, 1600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+      }
+
       testWidgets('renders all available interests', (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -379,13 +389,14 @@ void main() {
       });
 
       testWidgets('marks selected interests', (tester) async {
+        await setLargeSurface(tester);
         final selectedInterests = {TravelInterest.food, TravelInterest.culture};
 
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: selectedInterests,
@@ -409,6 +420,7 @@ void main() {
       });
 
       testWidgets('calls onToggle when chip is tapped', (tester) async {
+        await setLargeSurface(tester);
         var callbackCalled = false;
         TravelInterest? tappedInterest;
         bool? selectedState;
@@ -417,7 +429,7 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -442,11 +454,12 @@ void main() {
       });
 
       testWidgets('uses 2 columns by default', (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -465,15 +478,19 @@ void main() {
       });
 
       testWidgets('respects custom crossAxisCount', (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 400,
-                child: TravelInterestGrid(
-                  availableInterests: TravelInterest.values.toSet(),
-                  selectedInterests: const {},
-                  crossAxisCount: 3,
+              body: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: 2000,
+                  child: TravelInterestGrid(
+                    availableInterests: TravelInterest.values.toSet(),
+                    selectedInterests: const {},
+                    crossAxisCount: 3,
+                  ),
                 ),
               ),
             ),
@@ -490,11 +507,12 @@ void main() {
 
       testWidgets('uses compact chips when useCompactChips is true',
           (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -512,11 +530,12 @@ void main() {
 
       testWidgets('uses regular chips when useCompactChips is false',
           (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -533,11 +552,12 @@ void main() {
       });
 
       testWidgets('disables all chips when enabled is false', (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -559,11 +579,12 @@ void main() {
       });
 
       testWidgets('respects custom spacing', (tester) async {
+        await setLargeSurface(tester);
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: TravelInterest.values.toSet(),
                   selectedInterests: const {},
@@ -595,7 +616,7 @@ void main() {
           MaterialApp(
             home: Scaffold(
               body: SizedBox(
-                width: 400,
+                width: 2000,
                 child: TravelInterestGrid(
                   availableInterests: subset,
                   selectedInterests: const {},

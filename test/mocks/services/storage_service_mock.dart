@@ -1,7 +1,7 @@
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:soloadventurer/core/storage/secure_storage_service.dart';
+import 'package:soloadventurer/features/core/infrastructure/storage/secure_storage_service.dart';
 
 /// A mock implementation of [SharedPreferences] for testing.
 class MockSharedPreferences extends Mock implements SharedPreferences {
@@ -134,10 +134,14 @@ class MockFlutterSecureStorage extends Mock implements FlutterSecureStorage {
 
 /// A mock implementation of [SecureStorageService] for testing.
 class MockSecureStorageService extends Mock implements SecureStorageService {
+  // ignore: unused_field
   String? _username;
-  String? _authToken;
+  // ignore: unused_field
+  String? _accessToken;
+  // ignore: unused_field
   String? _refreshToken;
-  String? _userId;
+  // ignore: unused_field
+  String? _idToken;
 
   /// Sets up the mock for a successful getUsername operation.
   void setupGetUsername(String? username) {
@@ -149,21 +153,19 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
   void setupStoreUsername() {
     when(() => storeUsername(any())).thenAnswer((invocation) async {
       _username = invocation.positionalArguments[0] as String;
-      return;
     });
   }
 
-  /// Sets up the mock for a successful getAuthToken operation.
-  void setupGetAuthToken(String? authToken) {
-    _authToken = authToken;
-    when(() => getAuthToken()).thenAnswer((_) async => authToken);
+  /// Sets up the mock for a successful getAccessToken operation.
+  void setupGetAccessToken(String? accessToken) {
+    _accessToken = accessToken;
+    when(() => getAccessToken()).thenAnswer((_) async => accessToken);
   }
 
-  /// Sets up the mock for a successful storeAuthToken operation.
-  void setupStoreAuthToken() {
-    when(() => storeAuthToken(any())).thenAnswer((invocation) async {
-      _authToken = invocation.positionalArguments[0] as String;
-      return;
+  /// Sets up the mock for a successful storeAccessToken operation.
+  void setupStoreAccessToken() {
+    when(() => storeAccessToken(any())).thenAnswer((invocation) async {
+      _accessToken = invocation.positionalArguments[0] as String;
     });
   }
 
@@ -177,32 +179,34 @@ class MockSecureStorageService extends Mock implements SecureStorageService {
   void setupStoreRefreshToken() {
     when(() => storeRefreshToken(any())).thenAnswer((invocation) async {
       _refreshToken = invocation.positionalArguments[0] as String;
-      return;
     });
   }
 
-  /// Sets up the mock for a successful getUserId operation.
-  void setupGetUserId(String? userId) {
-    _userId = userId;
-    when(() => getUserId()).thenAnswer((_) async => userId);
+  /// Sets up the mock for a successful getIdToken operation.
+  void setupGetIdToken(String? idToken) {
+    _idToken = idToken;
+    when(() => getIdToken()).thenAnswer((_) async => idToken);
   }
 
-  /// Sets up the mock for a successful storeUserId operation.
-  void setupStoreUserId() {
-    when(() => storeUserId(any())).thenAnswer((invocation) async {
-      _userId = invocation.positionalArguments[0] as String;
-      return;
+  /// Sets up the mock for a successful storeIdToken operation.
+  void setupStoreIdToken() {
+    when(() => storeIdToken(any())).thenAnswer((invocation) async {
+      _idToken = invocation.positionalArguments[0] as String;
     });
   }
 
-  /// Sets up the mock for a successful clearAuthData operation.
-  void setupClearAuthData() {
-    when(() => clearAuthData()).thenAnswer((_) async {
+  /// Sets up the mock for a successful clearAll operation.
+  void setupClearAll() {
+    when(() => clearAll()).thenAnswer((_) async {
       _username = null;
-      _authToken = null;
+      _accessToken = null;
       _refreshToken = null;
-      _userId = null;
-      return;
+      _idToken = null;
     });
+  }
+
+  /// Sets up the mock for a successful clear operation.
+  void setupClear(String key) {
+    when(() => clear(key)).thenAnswer((_) async {});
   }
 }

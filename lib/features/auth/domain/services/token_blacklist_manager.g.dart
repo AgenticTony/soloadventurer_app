@@ -45,7 +45,7 @@ final class TokenBlacklistManagerProvider
 }
 
 String _$tokenBlacklistManagerHash() =>
-    r'7c139ca9d5fbf309d300b68e2156cad10b81c6b0';
+    r'26833df257f41f847decad31db8ab338eeae3999';
 
 /// Manages token blacklisting and rotation according to AWS Cognito best practices
 

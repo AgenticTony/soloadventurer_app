@@ -149,7 +149,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget _buildLoginForm(BuildContext context, authState) {
     // Note: With AsyncValue pattern, loading state is handled by .when() in build()
     // When _buildLoginForm is called, we're already in data state
-    const isLoading = false;
+    const isLoading = false; // TODO: Wire up to actual loading state
 
     return Scaffold(
       appBar: AppBar(
@@ -237,11 +237,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const SizedBox(height: 8),
 
                       // Forgot password link
-                      Align(
+                        Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed:
-                              isLoading ? null : _navigateToForgotPassword,
+                          onPressed: _navigateToForgotPassword,
                           child: const Text('Forgot Password?'),
                         ),
                       ),
@@ -250,18 +249,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                       // Login button
                       ElevatedButton(
-                        onPressed: isLoading ? null : _login,
+                        onPressed: _login,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                         ),
-                        child: isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : const Text(
+                        child: const Text(
                                 'Login',
                                 style: TextStyle(fontSize: 16),
                               ),
@@ -275,7 +267,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         children: [
                           const Text("Don't have an account?"),
                           TextButton(
-                            onPressed: isLoading ? null : _navigateToSignUp,
+                            onPressed: _navigateToSignUp,
                             child: const Text('Sign Up'),
                           ),
                         ],

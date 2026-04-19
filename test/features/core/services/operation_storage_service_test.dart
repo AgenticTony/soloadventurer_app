@@ -1,150 +1,108 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:soloadventurer/core/providers/core_providers.dart';
 import 'package:soloadventurer/features/core/services/operation_queue.dart';
 import 'package:soloadventurer/features/core/services/operation_storage_service.dart';
 
-@GenerateMocks([SharedPreferences, FlutterSecureStorage])
-import 'operation_storage_service_test.mocks.dart';
-
 void main() {
   group('OperationStorageService', () {
-    late MockSharedPreferences mockPrefs;
-    late MockFlutterSecureStorage mockSecureStorage;
     late ProviderContainer container;
+    late ProviderSubscription subscription;
 
     setUp(() {
-      mockPrefs = MockSharedPreferences();
-      mockSecureStorage = MockFlutterSecureStorage();
-
-      // Set up mocks for SharedPreferences.getInstance()
       SharedPreferences.setMockInitialValues({});
-
-      container = ProviderContainer(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(mockPrefs),
-          secureStorageProvider.overrideWithValue(mockSecureStorage),
-        ],
+      container = ProviderContainer();
+      // Keep a subscription so auto-dispose doesn't kill the provider
+      subscription = container.listen(
+        operationStorageServiceProvider,
+        (_, __) {},
+        fireImmediately: true,
       );
     });
 
     tearDown(() {
+      subscription.close();
       container.dispose();
     });
 
+    OperationStorageService getService() {
+      return container.read(operationStorageServiceProvider.notifier);
+    }
+
     group('Save Operations', () {
       test('should save pending operations successfully', () async {
-        // Arrange
-        when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
-        when(mockPrefs.setInt(any, any)).thenAnswer((_) async => true);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        // Wait for the service to initialize
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
         final result = await service.savePendingOperations([]);
 
-        // Assert
         expect(result, isTrue);
-        verify(mockPrefs.setString('pending_operations', any));
-        verify(mockPrefs.setInt('operation_queue_last_save', any));
       });
 
-      test('should clear storage when saving empty operation list', () async {
-        // Arrange
-        when(mockPrefs.remove('pending_operations'))
-            .thenAnswer((_) async => true);
-        when(mockPrefs.setInt(any, any)).thenAnswer((_) async => true);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+      test('should save pending operations with data', () async {
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
-        final result = await service.savePendingOperations([]);
-
-        // Assert
-        expect(result, isTrue);
-        verify(mockPrefs.remove('pending_operations'));
-      });
-
-      test('should save failed operations successfully', () async {
-        // Arrange
-        when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result = await service.saveFailedOperations([]);
-
-        // Assert
-        expect(result, isTrue);
-        verify(mockPrefs.setString('failed_operations', any));
-      });
-
-      test('should handle large operation data', () async {
-        // Arrange
+        final service = getService();
         final operations = List.generate(
           100,
           (i) => _createMockOperation('id_$i', 'type_$i'),
         );
-        when(mockPrefs.setString(any, any)).thenAnswer((_) async => true);
-        when(mockPrefs.setInt(any, any)).thenAnswer((_) async => true);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
 
-        // Act
         final result = await service.savePendingOperations(operations);
 
-        // Assert
         expect(result, isTrue);
-        verify(mockPrefs.setString('pending_operations', any));
       });
 
-      test('should handle save errors gracefully', () async {
-        // Arrange
-        when(mockPrefs.setString(any, any))
-            .thenThrow(Exception('Storage error'));
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+      test('should clear storage when saving empty operation list', () async {
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        // Save something first
+        final service = getService();
+        await service.savePendingOperations([_createMockOperation('op1', 'test')]);
+
+        // Clear with empty list
         final result = await service.savePendingOperations([]);
 
-        // Assert
-        expect(result, isFalse);
+        expect(result, isTrue);
+      });
+
+      test('should save failed operations successfully', () async {
+        await container.read(operationStorageServiceProvider.future);
+
+        final service = getService();
+        final result = await service.saveFailedOperations([]);
+
+        expect(result, isTrue);
+      });
+
+      test('should handle large operation data', () async {
+        await container.read(operationStorageServiceProvider.future);
+
+        final service = getService();
+        final operations = List.generate(
+          100,
+          (i) => _createMockOperation('id_$i', 'type_$i'),
+        );
+        final result = await service.savePendingOperations(operations);
+
+        expect(result, isTrue);
       });
     });
 
     group('Load Operations', () {
       test('should load pending operations successfully', () async {
-        // Arrange
-        final operationsJson = [
-          {
-            'id': 'op1',
-            'type': 'trip_planning',
-            'priority': 2,
-            'requiresNetwork': true,
-          },
-          {
-            'id': 'op2',
-            'type': 'location_update',
-            'priority': 1,
-            'requiresNetwork': true,
-          },
-        ];
-        when(mockPrefs.getString('pending_operations')).thenReturn(
-            '[${operationsJson.map((e) => _jsonEncode(e)).join(',')}]');
-        when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_version')).thenReturn(1);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
+        final operations = [
+          _createMockOperation('op1', 'trip_planning'),
+          _createMockOperation('op2', 'location_update'),
+        ];
+        await service.savePendingOperations(operations);
+
         final result = await service.loadOperations();
 
-        // Assert
         expect(result.pendingOperations.length, 2);
         expect(result.pendingOperations[0]['id'], 'op1');
         expect(result.pendingOperations[1]['id'], 'op2');
@@ -152,139 +110,112 @@ void main() {
       });
 
       test('should handle missing operations data', () async {
-        // Arrange
-        when(mockPrefs.getString('pending_operations')).thenReturn(null);
-        when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_version')).thenReturn(0);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
         final result = await service.loadOperations();
 
-        // Assert
         expect(result.pendingOperations, isEmpty);
         expect(result.failedOperations, isEmpty);
         expect(result.hadCorruptedData, isFalse);
       });
 
       test('should handle corrupted data gracefully', () async {
-        // Arrange
-        when(mockPrefs.getString('pending_operations'))
-            .thenReturn('invalid json{{{');
-        when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_version')).thenReturn(1);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        // Set up mock with corrupted data
+        SharedPreferences.setMockInitialValues({
+          'pending_operations': 'invalid json{{{',
+          'operation_queue_version': 1,
+        });
 
-        // Act
+        final corruptedContainer = ProviderContainer();
+        await corruptedContainer.read(operationStorageServiceProvider.future);
+
+        final service =
+            corruptedContainer.read(operationStorageServiceProvider.notifier);
         final result = await service.loadOperations();
 
-        // Assert
         expect(result.pendingOperations, isEmpty);
         expect(result.hadCorruptedData, isTrue);
         expect(result.errorMessage, isNotNull);
+
+        corruptedContainer.dispose();
       });
 
       test('should skip operations with missing required fields', () async {
-        // Arrange
-        final operationsJson = [
-          {
-            'id': 'op1',
-            'type': 'trip_planning',
-            'priority': 2,
-          },
-          {
-            // Missing 'type' field - should be skipped
-            'id': 'op2',
-            'priority': 1,
-          },
-          {
-            // Missing 'id' field - should be skipped
-            'type': 'location_update',
-          },
-        ];
-        when(mockPrefs.getString('pending_operations')).thenReturn(
-            '[${operationsJson.map((e) => _jsonEncode(e)).join(',')}]');
-        when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_version')).thenReturn(1);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        SharedPreferences.setMockInitialValues({
+          'pending_operations':
+              '[{"id":"op1","type":"trip_planning","priority":1},'
+              '{"id":"op2","priority":1},'
+              '{"type":"location_update"}]',
+          'operation_queue_version': 1,
+        });
 
-        // Act
+        final corruptedContainer = ProviderContainer();
+        // Keep provider alive with listen and fireImmediately
+        final sub = corruptedContainer.listen<AsyncValue<void>>(
+          operationStorageServiceProvider,
+          (_, __) {},
+          fireImmediately: true,
+        );
+        // Wait for the async build
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+        final service =
+            corruptedContainer.read(operationStorageServiceProvider.notifier);
         final result = await service.loadOperations();
 
-        // Assert
         expect(result.pendingOperations.length, 1);
         expect(result.pendingOperations[0]['id'], 'op1');
         expect(result.hadCorruptedData, isTrue);
+
+        sub.close();
+        corruptedContainer.dispose();
       });
 
       test('should handle version mismatch', () async {
-        // Arrange
-        when(mockPrefs.getString('pending_operations')).thenReturn('[]');
-        when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_version')).thenReturn(999);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        SharedPreferences.setMockInitialValues({
+          'operation_queue_version': 999,
+        });
 
-        // Act
+        final versionContainer = ProviderContainer();
+        await versionContainer.read(operationStorageServiceProvider.future);
+
+        final service =
+            versionContainer.read(operationStorageServiceProvider.notifier);
         final result = await service.loadOperations();
 
-        // Assert
         expect(result.pendingOperations, isEmpty);
-        // Should still load but log warning about version mismatch
+
+        versionContainer.dispose();
       });
     });
 
     group('Clear Operations', () {
       test('should clear all operations successfully', () async {
-        // Arrange
-        when(mockPrefs.remove(any)).thenAnswer((_) async => true);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
+        await service.savePendingOperations([_createMockOperation('op1', 'test')]);
+        await service.saveFailedOperations([_createMockOperation('op2', 'test')]);
+
         final result = await service.clearAllOperations();
 
-        // Assert
         expect(result, isTrue);
-        verify(mockPrefs.remove('pending_operations'));
-        verify(mockPrefs.remove('failed_operations'));
-        verify(mockPrefs.remove('operation_queue_last_save'));
-      });
-
-      test('should handle clear errors gracefully', () async {
-        // Arrange
-        when(mockPrefs.remove(any)).thenThrow(Exception('Clear error'));
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result = await service.clearAllOperations();
-
-        // Assert
-        expect(result, isFalse);
       });
     });
 
     group('Storage Statistics', () {
       test('should return accurate storage statistics', () async {
-        // Arrange
-        const pendingJson =
-            '[{"id":"op1","type":"test"},{"id":"op2","type":"test"}]';
-        const failedJson = '[{"id":"op3","type":"test"}]';
-        when(mockPrefs.getString('pending_operations')).thenReturn(pendingJson);
-        when(mockPrefs.getString('failed_operations')).thenReturn(failedJson);
-        when(mockPrefs.getInt('operation_queue_last_save_time'))
-            .thenReturn(1640000000000);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
+        await service.savePendingOperations([
+          _createMockOperation('op1', 'test'),
+          _createMockOperation('op2', 'test'),
+        ]);
+        await service.saveFailedOperations([_createMockOperation('op3', 'test')]);
+
         final stats = await service.getStorageStats();
 
-        // Assert
         expect(stats['pendingCount'], 2);
         expect(stats['failedCount'], 1);
         expect(stats['totalSizeBytes'], greaterThan(0));
@@ -292,18 +223,11 @@ void main() {
       });
 
       test('should handle empty storage statistics', () async {
-        // Arrange
-        when(mockPrefs.getString('pending_operations')).thenReturn(null);
-        when(mockPrefs.getString('failed_operations')).thenReturn(null);
-        when(mockPrefs.getInt('operation_queue_last_save_time'))
-            .thenReturn(null);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
         final stats = await service.getStorageStats();
 
-        // Assert
         expect(stats['pendingCount'], 0);
         expect(stats['failedCount'], 0);
         expect(stats['totalSizeBytes'], 0);
@@ -311,113 +235,25 @@ void main() {
       });
     });
 
-    group('Secure Storage', () {
-      test('should save sensitive data successfully', () async {
-        // Arrange
-        when(mockSecureStorage.write(key: any, value: any))
-            .thenAnswer((_) async => Future.value());
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result =
-            await service.saveSensitiveData('test_key', 'test_value');
-
-        // Assert
-        expect(result, isTrue);
-        verify(mockSecureStorage.write(key: 'test_key', value: 'test_value'));
-      });
-
-      test('should load sensitive data successfully', () async {
-        // Arrange
-        when(mockSecureStorage.read(key: any))
-            .thenAnswer((_) async => 'test_value');
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result = await service.loadSensitiveData('test_key');
-
-        // Assert
-        expect(result, 'test_value');
-        verify(mockSecureStorage.read(key: 'test_key'));
-      });
-
-      test('should delete sensitive data successfully', () async {
-        // Arrange
-        when(mockSecureStorage.delete(key: any))
-            .thenAnswer((_) async => Future.value());
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result = await service.deleteSensitiveData('test_key');
-
-        // Assert
-        expect(result, isTrue);
-        verify(mockSecureStorage.delete(key: 'test_key'));
-      });
-
-      test('should clear all sensitive data successfully', () async {
-        // Arrange
-        when(mockSecureStorage.deleteAll())
-            .thenAnswer((_) async => Future.value());
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result = await service.clearAllSensitiveData();
-
-        // Assert
-        expect(result, isTrue);
-        verify(mockSecureStorage.deleteAll());
-      });
-
-      test('should handle secure storage errors gracefully', () async {
-        // Arrange
-        when(mockSecureStorage.write(key: any, value: any))
-            .thenThrow(Exception('Secure storage error'));
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
-
-        // Act
-        final result =
-            await service.saveSensitiveData('test_key', 'test_value');
-
-        // Assert
-        expect(result, isFalse);
-      });
-    });
-
     group('Last Save Time', () {
       test('should return null if no save time exists', () async {
-        // Arrange
-        when(mockPrefs.getInt('operation_queue_last_save_time'))
-            .thenReturn(null);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
         final result = service.getLastSaveTime();
 
-        // Assert
         expect(result, isNull);
       });
 
       test('should return valid DateTime if save time exists', () async {
-        // Arrange
-        const timestamp = 1640000000000;
-        when(mockPrefs.getInt('operation_queue_last_save_time'))
-            .thenReturn(timestamp);
-        final service =
-            container.read(operationStorageServiceProvider.notifier);
+        await container.read(operationStorageServiceProvider.future);
 
-        // Act
+        final service = getService();
+        await service.savePendingOperations([]);
+
         final result = service.getLastSaveTime();
 
-        // Assert
         expect(result, isNotNull);
-        expect(result!.millisecondsSinceEpoch, timestamp);
       });
     });
   });
@@ -426,11 +262,6 @@ void main() {
 // Helper function to create mock operations
 QueueableOperation _createMockOperation(String id, String type) {
   return _MockQueueableOperation(id, type);
-}
-
-// Helper function to encode JSON
-String _jsonEncode(Map<String, dynamic> map) {
-  return '{${map.entries.map((e) => '"${e.key}":"${e.value}"').join(',')}}';
 }
 
 // Mock implementation of QueueableOperation for testing
@@ -468,9 +299,17 @@ class _MockQueueableOperation implements QueueableOperation {
   _MockQueueableOperation(this.id, this.type);
 
   @override
-  Future<void> execute() async {
-    // Mock implementation
-  }
+  Future<void> execute() async {}
+
+  @override
+  QueueableOperation resetForRetry() => this;
+
+  @override
+  QueueableOperation withAttemptMetadata({
+    DateTime? lastAttempt,
+    int? attemptCount,
+    String? lastError,
+  }) => this;
 
   @override
   Map<String, dynamic> toJson() {

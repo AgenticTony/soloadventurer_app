@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 import '../cache/cache_manager.dart';
 import '../cache/cache_stats.dart';
@@ -299,7 +298,6 @@ class QueryOptimizer {
     this.debug = false,
   }) : _cacheManager = cacheManager {
     if (debug) {
-      debugPrint('[QueryOptimizer] Initialized with config: $config');
     }
   }
 
@@ -332,8 +330,6 @@ class QueryOptimizer {
     }
 
     if (debug) {
-      debugPrint('[QueryOptimizer] Executing query: "$key" '
-          '(fields: $usedFieldSelection)');
     }
 
     // Check cache first
@@ -349,8 +345,6 @@ class QueryOptimizer {
         _cacheHits++;
 
         if (debug) {
-          debugPrint('[QueryOptimizer] Cache hit for "$key" '
-              '(${stopwatch.elapsedMilliseconds}ms)');
         }
 
         return OptimizedQueryResult.cacheHit(
@@ -367,7 +361,6 @@ class QueryOptimizer {
       _deduplicatedQueries++;
 
       if (debug) {
-        debugPrint('[QueryOptimizer] Deduplicating query: "$key"');
       }
 
       try {
@@ -385,7 +378,6 @@ class QueryOptimizer {
       } catch (error) {
         // If deduplicated query failed, execute fresh
         if (debug) {
-          debugPrint('[QueryOptimizer] Deduplicated query failed: $error');
         }
       }
     }
@@ -413,8 +405,6 @@ class QueryOptimizer {
       }
 
       if (debug) {
-        debugPrint('[QueryOptimizer] Query executed: "$key" '
-            '(${stopwatch.elapsedMilliseconds}ms)');
       }
 
       return OptimizedQueryResult.fresh(
@@ -440,8 +430,6 @@ class QueryOptimizer {
     Duration? ttl,
   }) async {
     if (debug) {
-      debugPrint(
-          '[QueryOptimizer] Executing batch of ${queries.length} queries');
     }
 
     final futures = queries.entries.map((entry) async {
@@ -481,12 +469,10 @@ class QueryOptimizer {
     if (key != null) {
       await _cacheManager.invalidate(key);
       if (debug) {
-        debugPrint('[QueryOptimizer] Invalidated cache for "$key"');
       }
     } else {
       await _cacheManager.clearAll();
       if (debug) {
-        debugPrint('[QueryOptimizer] Invalidated all cache');
       }
     }
   }
@@ -498,7 +484,6 @@ class QueryOptimizer {
     // Note: This requires cache manager to support predicate-based deletion
     // For now, we'll just log it
     if (debug) {
-      debugPrint('[QueryOptimizer] Predicate-based invalidation requested');
     }
   }
 
@@ -511,21 +496,18 @@ class QueryOptimizer {
     Duration? ttl,
   }) async {
     if (debug) {
-      debugPrint('[QueryOptimizer] Preloading data for "$key"');
     }
 
     try {
-      final result = await execute<T>(
+      await execute<T>(
         key: key,
         query: query,
         ttl: ttl,
       );
       if (debug) {
-        debugPrint('[QueryOptimizer] Preloaded "$key": $result');
       }
     } catch (error) {
       if (debug) {
-        debugPrint('[QueryOptimizer] Preload failed for "$key": $error');
       }
     }
   }
@@ -555,7 +537,6 @@ class QueryOptimizer {
     _selectiveFieldQueries = 0;
 
     if (debug) {
-      debugPrint('[QueryOptimizer] Statistics reset');
     }
   }
 
@@ -563,7 +544,6 @@ class QueryOptimizer {
   Future<void> clearCache() async {
     await invalidate();
     if (debug) {
-      debugPrint('[QueryOptimizer] Cache cleared');
     }
   }
 
@@ -571,7 +551,6 @@ class QueryOptimizer {
   void dispose() {
     _pendingQueries.clear();
     if (debug) {
-      debugPrint('[QueryOptimizer] Disposed (stats: $stats)');
     }
   }
 

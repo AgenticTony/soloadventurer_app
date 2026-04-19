@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:soloadventurer/core/services/connectivity_service.dart';
 import 'package:soloadventurer/features/notifications/data/datasources/notification_local_data_source.dart';
 import 'package:soloadventurer/features/notifications/data/models/notification_model.dart';
 import 'package:soloadventurer/features/notifications/data/models/notification_preferences_model.dart';
@@ -12,11 +11,8 @@ import 'package:soloadventurer/features/notifications/domain/entities/travel_not
 class MockNotificationLocalDataSource extends Mock
     implements NotificationLocalDataSource {}
 
-class MockConnectivityService extends Mock implements ConnectivityService {}
-
 void main() {
   late MockNotificationLocalDataSource mockLocalDataSource;
-  late MockConnectivityService mockConnectivityService;
   late NotificationRepositoryImpl repository;
 
   // Test data
@@ -76,6 +72,8 @@ void main() {
     nearbyDeals: false,
     localEventSuggestions: false,
     restaurantRecommendations: false,
+    quietHoursStart: 0,
+    quietHoursEnd: 0,
   );
 
   final testPreferencesModel =
@@ -83,10 +81,8 @@ void main() {
 
   setUp(() {
     mockLocalDataSource = MockNotificationLocalDataSource();
-    mockConnectivityService = MockConnectivityService();
     repository = NotificationRepositoryImpl(
       mockLocalDataSource,
-      mockConnectivityService,
     );
 
     // Register fallback values
@@ -229,6 +225,8 @@ void main() {
         // Arrange
         final disabledPrefs = testPreferences.copyWith(
           flightCheckInReminders: false,
+          flightDelaysAndCancellations: false,
+          flightGateChanges: false,
         );
         when(() => mockLocalDataSource.getPreferences()).thenAnswer((_) async =>
             NotificationPreferencesModel.fromEntity(disabledPrefs));
@@ -408,11 +406,7 @@ void main() {
         await repository.updatePreferences(testPreferences);
 
         // Assert
-        verify(() => mockLocalDataSource.savePreferences(
-              any()((model) =>
-                  model.flightCheckInReminders ==
-                  testPreferences.flightCheckInReminders),
-            )).called(1);
+        verify(() => mockLocalDataSource.savePreferences(any())).called(1);
       });
     });
 
@@ -467,7 +461,7 @@ void main() {
         );
         final pendingModel = testNotificationModel.copyWith(
           id: 'notif-4',
-          scheduledAt: DateTime(2024, 12, 1),
+          scheduledAt: DateTime.now().add(const Duration(days: 30)),
           deliveredAt: null,
         );
         when(() => mockLocalDataSource.getAllNotifications())

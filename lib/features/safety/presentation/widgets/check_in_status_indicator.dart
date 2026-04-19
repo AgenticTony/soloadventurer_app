@@ -39,7 +39,6 @@ class CheckInStatusIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final color = _getStatusColor();
     final label = customLabel ?? _getStatusLabel();
 

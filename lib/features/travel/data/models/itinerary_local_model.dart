@@ -53,8 +53,8 @@ extension ItineraryEntityExtension on Itinerary {
       itemsCount: items.length,
       completedItemsCount: items.where((i) => i.isCompleted).length,
       completionPercentage: completionPercentage.round(),
-      createdAt: createdAt ?? DateTime.now(), // Provide default if null
-      updatedAt: updatedAt ?? DateTime.now(), // Provide default if null
+      createdAt: createdAt,
+      updatedAt: updatedAt ?? DateTime.now(),
       isSynced: false, // Will be set by repository
       hasPendingChanges: false, // Will be set by repository
       version: 1,

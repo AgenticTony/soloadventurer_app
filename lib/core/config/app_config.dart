@@ -81,15 +81,30 @@ class AppConfig {
   /// Supabase project URL from environment variables
   ///
   /// Set in `.env` file: `SUPABASE_URL=https://your-project.supabase.co`
-  static String get supabaseUrl => dotenv.env['SUPABASE_URL'] ?? '';
+  static String get supabaseUrl => _envFallback('SUPABASE_URL');
 
   /// Supabase anonymous key from environment variables
   ///
   /// Set in `.env` file: `SUPABASE_ANON_KEY=your-anon-key`
-  static String get supabaseAnonKey =>
-      dotenv.env['SUPABASE_ANON_KEY'] ??
-      dotenv.env['SUPABASE_SERVICE_KEY'] ??
-      '';
+  static String get supabaseAnonKey {
+    final key = _envFallback('SUPABASE_ANON_KEY');
+    if (key.isEmpty) {
+      throw StateError(
+        'SUPABASE_ANON_KEY is not configured. '
+        'Provide it via --dart-define or .env file.',
+      );
+    }
+    return key;
+  }
+
+  /// Safely reads from dotenv, returning empty string if not initialized
+  static String _envFallback(String key) {
+    try {
+      return dotenv.env[key] ?? '';
+    } catch (_) {
+      return '';
+    }
+  }
 
   /// Whether Supabase debug mode is enabled
   ///
@@ -106,14 +121,14 @@ class AppConfig {
   /// Set in `.env` file: `API_BASE_URL=https://api.example.com`
   static String get apiBaseUrl {
     if (kReleaseMode) {
-      return dotenv.env['API_BASE_URL_PROD'] ??
-          'https://api.soloadventurer.com/prod';
+      final url = _envFallback('API_BASE_URL_PROD');
+      return url.isNotEmpty ? url : 'https://api.soloadventurer.com/prod';
     } else if (kProfileMode) {
-      return dotenv.env['API_BASE_URL_STAGING'] ??
-          'https://api.soloadventurer.com/staging';
+      final url = _envFallback('API_BASE_URL_STAGING');
+      return url.isNotEmpty ? url : 'https://api.soloadventurer.com/staging';
     } else {
-      return dotenv.env['API_BASE_URL_DEV'] ??
-          'https://api.soloadventurer.com/dev';
+      final url = _envFallback('API_BASE_URL_DEV');
+      return url.isNotEmpty ? url : 'https://api.soloadventurer.com/dev';
     }
   }
 
