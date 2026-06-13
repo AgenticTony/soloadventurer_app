@@ -89,6 +89,37 @@ class _BatchQuery<T> {
     required this.query,
     this.priority = 0,
   }) : completer = Completer<BatchResult<T>>();
+
+  /// Run this query and complete its completer with a correctly-typed result.
+  ///
+  /// This must live on `_BatchQuery<T>` rather than on the batcher: the batcher
+  /// holds pending queries in a `List<_BatchQuery>` (dynamic), so executing
+  /// `query.query()` from there erases T to dynamic and yields a
+  /// `BatchResult<dynamic>` that cannot complete a `Completer<BatchResult<T>>`
+  /// (a reified-generics type error). Here T is in scope, so the result keeps
+  /// its real type.
+  Future<BatchResult<T>> execute() async {
+    final stopwatch = Stopwatch()..start();
+    try {
+      final data = await query();
+      stopwatch.stop();
+      final result = BatchResult<T>.success(
+        key: key,
+        data: data,
+        duration: stopwatch.elapsed,
+      );
+      if (!completer.isCompleted) completer.complete(result);
+      return result;
+    } catch (error) {
+      stopwatch.stop();
+      final result = BatchResult<T>.failure(
+        key: key,
+        error: error.toString(),
+      );
+      if (!completer.isCompleted) completer.complete(result);
+      return result;
+    }
+  }
 }
 
 /// Configuration for query batching behavior
@@ -397,36 +428,14 @@ class QueryBatcher {
     }
 
     final futures = queriesToExecute.map((query) async {
-      final stopwatch = Stopwatch()..start();
-
       try {
-        final data = await query.query();
-        stopwatch.stop();
-
-        final result = BatchResult.success(
-          key: query.key,
-          data: data,
-          duration: stopwatch.elapsed,
-        );
-
-        _successfulQueries++;
-
-        if (debug) {
+        final result = await query.execute();
+        if (result.success) {
+          _successfulQueries++;
+        } else {
+          _failedQueries++;
         }
-
         return result;
-      } catch (error) {
-        stopwatch.stop();
-        _failedQueries++;
-
-        final errorMessage = error.toString();
-        if (debug) {
-        }
-
-        return BatchResult.failure(
-          key: query.key,
-          error: errorMessage,
-        );
       } finally {
         _executingKeys.remove(query.key);
       }
@@ -453,12 +462,7 @@ class QueryBatcher {
       }
     }
 
-    // Complete all completors
-    for (final query in queriesToExecute) {
-      if (!query.completer.isCompleted) {
-        query.completer.complete(results[query.key]);
-      }
-    }
+    // Completers are completed type-safely inside `_BatchQuery.execute()`.
 
     return results;
   }
@@ -471,43 +475,16 @@ class QueryBatcher {
 
     for (final query in queriesToExecute) {
       _executingKeys.add(query.key);
-
-      final stopwatch = Stopwatch()..start();
-
       try {
-        final data = await query.query();
-        stopwatch.stop();
-
-        final result = BatchResult.success(
-          key: query.key,
-          data: data,
-          duration: stopwatch.elapsed,
-        );
-
+        final result = await query.execute();
+        if (result.success) {
+          _successfulQueries++;
+        } else {
+          _failedQueries++;
+        }
         results[query.key] = result;
-        _successfulQueries++;
-
-        if (debug) {
-        }
-      } catch (error) {
-        stopwatch.stop();
-        _failedQueries++;
-
-        final errorMessage = error.toString();
-        if (debug) {
-        }
-
-        results[query.key] = BatchResult.failure(
-          key: query.key,
-          error: errorMessage,
-        );
       } finally {
         _executingKeys.remove(query.key);
-      }
-
-      // Complete the completer
-      if (!query.completer.isCompleted) {
-        query.completer.complete(results[query.key]);
       }
     }
 
