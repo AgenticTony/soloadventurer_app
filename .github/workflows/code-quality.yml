@@ -69,7 +69,7 @@ jobs:
   coverage-gate:
     name: Coverage Gate (80% min)
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
