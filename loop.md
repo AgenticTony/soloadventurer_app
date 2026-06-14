@@ -1,137 +1,112 @@
 # SoloAdventurer standing sprint loop
 
-Scope: works ONLY the active sprint named in
-`.claude/state/sprint-progress.json` → `active_sprint`. Never touches
-`docs/sprints/SPRINT_*.md` files — those are read-only intent. Never advances to
-the next sprint on its own.
+`/loop` is the **autonomous recurring backlog-walker** — a **PR-production
+engine, not a PR-merging engine.** It reads state, picks the next eligible
+story, runs the full chain on it, opens a PR, **stops** (the PR waits for human
+merge), then loops to the next story. It never merges; never pushes to main.
+You merge in batches when you sit down. The autonomy is in the grind (it never
+idles waiting for you to start the next task), not in the merge.
 
-**Provenance guard:** the first time this loop runs, `active_sprint` is
-`SPRINT_7_POLISH` (a low-stakes sprint) — NOT `SPRINT_6.7`. `SPRINT_6.7`
-(Safety / Guardian) is `DEFERRED` and must stay deferred until the
-implementer → simplifier → verifier chain has proven trustworthy on boring work.
-Never auto-promote a `DEFERRED` sprint to active. That is a human decision.
+## Scope
+- Works ONLY the `active_sprint` in `.claude/state/sprint-progress.json`. Never
+  edits `docs/sprints/SPRINT_*.md` (read-only intent). Never advances to the
+  next sprint on its own — on sprint completion it outputs "SPRINT COMPLETE —
+  human decision needed to advance" and stops.
+- **Before starting:** read `.claude/state/session-handoff.md` for context.
 
-**Before starting:** read `.claude/state/session-handoff.md` for context from
-the last session.
+## Two modes
+- **grind** (default): walk the active sprint's backlog → one reviewed-ready PR per story.
+- **babysit**: scan open PRs for failing CI → diagnose → fix → push → re-watch.
 
-**Checkpoint rule:** after EVERY numbered step below (not just story
-completion), update `.claude/state/session-handoff.md` with:
-- Which story/task you're on and which step you just completed
-- Any branches, worktrees, or PRs in flight
-- CI status if applicable
-- What the next step is
-
-This ensures that if the context window fills and the user has to `/clear`, the
-handoff file has enough state to resume without losing progress.
-
-Each iteration:
-
-1. Read `.claude/state/sprint-progress.json`.
-   - If `active_sprint` is `DEFERRED`, stop — do not run it. Report and wait for
-     a human to re-point.
-   - If `active_sprint` has no stories with `done: false` → output
-     "SPRINT COMPLETE — human decision needed to advance" and stop. Do not pick
-     the next sprint yourself.
-   **Checkpoint:** write "Selected task <id>, starting pre-flight" to handoff.
-
-2. Select the FIRST task in the active sprint with `done: false` that is not
-   `needs_human`. One task per iteration, no batching.
-
-3. Pre-flight docs grounding:
-   - Read the task's section in its `docs/sprints/SPRINT_*.md` file.
-   - If it touches a third-party API or framework feature, WebFetch the CURRENT
-     official documentation (Supabase, Riverpod, go_router, Freezed, Drift,
-     Google Maps — per CLAUDE.md) BEFORE writing any code. Note the URLs — they
-     go in the PR description under "Sources".
-   **Checkpoint:** write "Docs grounded, spawning implementer for <id>".
-
-4. Run the `implementer` subagent on the task (worktree isolation). It must:
-   implement to the sprint file's acceptance criteria, add a test proving it,
-   run the suite green (count ≥ `test_baseline`), and include doc citations.
-   **Checkpoint:** write "Implementer done for <id>, <N> files changed, tests
-   pass".
-
-5. Run the `code-simplifier` subagent on the implementer's branch.
-   - Reviews only the files changed by this task (`git diff origin/main`).
-   - Removes dead code, flattens abstractions, improves naming.
-   - Does NOT add features or refactor unrelated code.
-   - Runs `flutter test` after any change to confirm nothing broke.
-   **Checkpoint:** write "Code-simplifier done for <id>".
-
-6. Run the `verifier` subagent on the branch (AFTER simplifier — it is always
-   LAST before shipping). The verifier checks the code in its final state.
-   - The verifier MUST diff against `origin/main` to catch unintended removals
-     or additions. If a file/import/package was removed, flag it unless the task
-     explicitly called for removal.
-   - FAIL → feed the numbered findings back to the implementer. Max 3 attempts
-     total. Still failing → set `needs_human: true` on the task with a one-line
-     reason, leave `done: false`, move on.
+## grind — each tick
+1. **Unreviewed-PR-depth check.** Count this loop's open (unmerged) PRs
+   (`gh pr list --state open`). If **≥ 3**, PAUSE — report "N unreviewed PRs
+   queued; pausing for human merge before producing more" and stop. Do not open
+   a 4th. (Caps comprehension debt: no stack of unreviewed PRs.)
+2. Read `sprint-progress.json`. If `active_sprint` is `DEFERRED` → stop, report.
+   If no task has `done: false` → "SPRINT COMPLETE", stop.
+3. Select the FIRST task with `done: false` and not `needs_human`.
+   - **If the task is `safety: true`** (auth/payments/paywall/ID-verification/
+     Guardian) → STOP and flag: "REQUIRES HUMAN SIGN-OFF — safety story; the
+     loop does not autonomously implement or merge safety work." Do not pick it.
+4. **Pre-flight docs grounding.** Read the task's section in its
+   `docs/sprints/SPRINT_*.md`. If it touches a third-party API/framework feature,
+     WebFetch the CURRENT official docs (Supabase, Riverpod, go_router, Freezed,
+     Drift, Google Maps — per CLAUDE.md) BEFORE writing code. Note URLs for the
+     PR's "Sources".
+5. **`implementer` subagent** (worktree isolation): implement to the sprint
+   file's acceptance criteria, add a test proving it, run the suite green
+   (count ≥ `test_baseline`), include doc citations.
+6. **`code-simplifier` subagent** on the implementer's branch — runs BEFORE the
+   verifier. Reviews only files changed by this task (`git diff origin/main`);
+   removes dead code, flattens abstraction, improves naming; re-runs
+   `flutter test`. Does not add features or touch unrelated code.
+7. **`verifier` subagent** (always LAST before the PR). PASS gate.
+   - FAIL → feed numbered findings to the implementer; re-run simplify → verify
+     on the fixed branch. **Max 3 attempts.** Still failing → set
+     `needs_human: true` (one-line reason), leave `done: false`, move on.
    - PASS → continue.
-   **Checkpoint:** write "Verifier verdict: PASS/FAIL for <id>".
+8. **Local build gate** (before pushing): `flutter test` (count ≥ `test_baseline`),
+   `flutter analyze` (0 errors), and for UI tasks `flutter build apk --debug`.
+9. **Open a PR** (`gh pr create`). Title: "[<task-id>] <summary>". Body MUST
+   include: what changed and why; test evidence (count vs baseline, analyzer);
+   "Sources" doc URLs from pre-flight; the verifier's verdict block **verbatim**
+   (including any REQUIRES HUMAN SIGN-OFF / REQUIRES CI VALIDATION line); any
+   new dependencies flagged prominently.
+10. **Watch CI pass.** Push, monitor `gh pr checks` until all jobs pass/fail.
+    If CI fails: pull logs (`gh run view <run-id> --log-failed`), diagnose (code
+    vs environment), fix on the same branch, re-run the local build gate (step 8),
+    push, re-watch. After 3 CI-fail cycles on the same task → `needs_human`,
+    move on. A task is NOT done until CI is green on the PR.
+    ONLY then → state file: `done: true`, `verified: true`, `pr: <url>`.
+11. **NEVER merge. NEVER push to main.** The PR waits for human review/merge.
+12. **Loop to step 1** for the next tick (next story).
 
-7. **Local build gate.** Before pushing, run:
-   - `flutter test` — all pass, count ≥ `test_baseline`
-   - `flutter analyze` — 0 errors
-   - If the task touches UI: `flutter build apk --debug` — clean build
-   This catches lock-file issues and SDK drift before burning a CI run.
-   **Checkpoint:** write "Local build gate passed for <id>".
+## babysit — each tick
+1. `gh pr list --state open`. For each PR with failing CI:
+2. Pull failing logs, diagnose (code issue or environment).
+3. Fix on the PR's branch → re-run local build gate (grind step 8) → push →
+   re-watch CI.
+4. Repeat until green, or after 3 failed cycles → flag the PR for human.
+5. **NEVER merge.** Babysit pushes fixes only; merge stays human.
 
-8. Open a PR via `gh pr create`:
-   - Title: "[<task-id>] <summary>"
-   - Body MUST include:
-     - What changed and why
-     - Test evidence (test count vs baseline, analyzer result)
-     - "Sources" list of doc URLs used during pre-flight
-     - The verifier's verdict block verbatim — including any
-       "REQUIRES HUMAN SIGN-OFF" or "REQUIRES CI VALIDATION" line
-     - Any new dependencies flagged prominently
-   **Checkpoint:** write "PR opened: <url>, watching CI".
+## Stop conditions (either mode — first one hit)
+- **≥ 3 unreviewed (open, unmerged) PRs** from this loop (grind) → pause for queue clearance.
+- A `needs_human` or `safety: true` task is the next eligible (grind) → stop, flag.
+- `active_sprint` is DEFERRED, or the sprint is complete (no eligible tasks).
+- Test count drops below `test_baseline` → STOP (never ship a regression).
+- Repeated failure on one task: verifier FAIL 3×, or CI fail 3× → `needs_human`, move on / flag.
 
-9. **Watch CI pass.** Push the branch, then monitor `gh pr checks` until all
-   jobs report pass/fail. If CI fails:
-   - Pull the failing logs: `gh run view <run-id> --log-failed`
-   - Diagnose: code issue or environment issue?
-   - Fix on the same branch, push, watch again.
-   - After ANY fix, the local build gate (step 7) MUST pass before pushing.
-   - A task is NOT done until CI is green on the PR.
-   ONLY after CI green → update the state file: `done: true`, `verified: true`,
-   `pr: <url>`.
-   **Checkpoint:** write "CI green for <id>, task DONE".
+## Hard rules
+- **Never merge. Never push to main. PRs wait for human review.** (This is the
+  gate that has caught every real problem in this project — audit-after-merge is
+  strictly worse than PR-waits-for-merge, so it stays. The loop produces
+  reviewed-ready PRs; you merge.)
+- Safety stories (`safety: true`): never autonomously implemented or merged.
+- `SPRINT_6.7` (Safety/Guardian): DEFERRED — never auto-touched, never
+  auto-promoted to active. Advancing it is a human decision.
+- If the state file looks malformed or contradicts the sprint `.md` files → stop
+  immediately and report; do not "repair" it.
+- No new dependencies without flagging them prominently in the PR body.
+- Test count never below `test_baseline`.
 
-10. Never merge anything. Never push to main. PRs wait for human review.
-
-**Sub-agent chain (the correct order):**
+## Sub-agent chain (order matters)
 ```
-implementer → code-simplifier → verifier → commit-push-pr → CI
+implementer → code-simplifier → verifier → commit-push-pr → CI green → [HUMAN MERGE]
 ```
-The verifier is always LAST before shipping. Nobody checks after it. The
-code-simplifier runs BETWEEN implementer and verifier so the verifier catches
-any mistake the simplifier might introduce.
-
-**Critical rule — verifier re-runs are mandatory:**
-After ANY fix cycle (verifier FAIL → implementer fixes), the full chain re-runs:
-fix → code-simplifier → verifier. The verifier MUST be re-run on the updated
-branch. The verifier's PASS on the FIXED code is the gate — not the loop
+The verifier is always LAST before the PR; nobody checks after it. The
+code-simplifier runs BETWEEN implementer and verifier so the verifier inspects
+the final code (including whatever the simplifier changed). After ANY fix cycle
+(verifier FAIL → implementer fixes), re-run simplify → verify on the updated
+branch — the verifier's PASS on the FIXED code is the gate, not the loop
 runner's judgment.
 
-**Critical rule — verifier checks for unintended removals:**
+## Critical — verifier checks for unintended removals
 The verifier MUST diff against `origin/main` and flag any packages, imports, or
 files removed without the task explicitly requiring removal. "Not present
 locally" is NOT a reason to delete — only "not imported anywhere" is.
 
-**Safety rule:** any task touching auth, payments/paywall, ID verification, or
-the Guardian check-in system is implemented and PR'd as normal, but the PR
-ALWAYS carries the `REQUIRES HUMAN SIGN-OFF` warning and is never considered
-production-ready from this loop alone.
-
-Stop conditions for this run (whichever comes first):
-- 2 tasks fully processed (PASS + PR opened)
-- 1 task marked `needs_human`
-- No eligible tasks remain
-
-Hard rules:
-- If the state file looks malformed or contradicts the sprint `.md` files, stop
-  immediately and report — do not "repair" it.
-- Stay inside the repo. No new dependencies without flagging them prominently in
-  the PR body.
-- If test count drops below `test_baseline`, STOP — do not ship a regression.
+## Checkpoint rule
+After EVERY numbered step above, update `.claude/state/session-handoff.md`:
+which task/step you're on, branches/worktrees/PRs in flight, CI status, and the
+next step. (So a `/clear` resumes without losing progress.)
