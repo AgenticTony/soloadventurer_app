@@ -127,6 +127,15 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/android/**/*.gradle*', '**/android/**/gradle-wrapper.properties', '**/pubspec.lock') }}
+          restore-keys: gradle-${{ runner.os }}-
+
       - name: Build ${{ matrix.target }}
         run: ${{ matrix.build_cmd }}
 
