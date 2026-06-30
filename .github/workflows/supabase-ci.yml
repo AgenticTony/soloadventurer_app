@@ -181,12 +181,36 @@ jobs:
           echo "✅ All Edge Functions type check passed"
 
   # =============================================================================
+  # DATABASE UNIT TESTS (pgTAP) — added Phase A
+  # Boots the local stack (applies all migrations, enables pgTAP), then runs tests
+  # under supabase/tests/database/. Docs: https://supabase.com/docs/guides/database/testing
+  # =============================================================================
+  db-tests:
+    name: Database Tests (pgTAP)
+    runs-on: ubuntu-latest
+    needs: migration-check
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: ${{ env.SUPABASE_VERSION }}
+
+      - name: Start local Supabase (applies migrations)
+        run: supabase start
+
+      - name: Run pgTAP tests
+        run: supabase test db
+
+  # =============================================================================
   # SUPABASE CI SUMMARY
   # =============================================================================
   supabase-summary:
     name: Supabase CI Summary
     runs-on: ubuntu-latest
-    needs: [migration-check, edge-functions]
+    needs: [migration-check, edge-functions, db-tests]
     if: always()
     steps:
       - name: Check overall status
@@ -197,6 +221,10 @@ jobs:
           fi
           if [[ "${{ needs.edge-functions.result }}" != "success" ]]; then
             echo "❌ Edge Functions validation failed"
+            exit 1
+          fi
+          if [[ "${{ needs.db-tests.result }}" != "success" ]]; then
+            echo "❌ Database tests (pgTAP) failed"
             exit 1
           fi
           echo "✅ All Supabase CI checks passed!"
