@@ -9,13 +9,13 @@ idles waiting for you to start the next task), not in the merge.
 
 ## Scope
 - Works ONLY the `active_sprint` in `.claude/state/sprint-progress.json`. Never
-  edits `docs/sprints/SPRINT_*.md` (read-only intent). Never advances to the
-  next sprint on its own — on sprint completion it outputs "SPRINT COMPLETE —
+  edits `docs/sprints/PHASE_*.md` (read-only intent). Never advances to the
+  next phase on its own — on phase completion it outputs "PHASE COMPLETE —
   human decision needed to advance" and stops.
 - **Before starting:** read `.claude/state/session-handoff.md` for context.
 
 ## Two modes
-- **grind** (default): walk the active sprint's backlog → one reviewed-ready PR per story.
+- **grind** (default): walk the active phase's backlog → one reviewed-ready PR per story.
 - **babysit**: scan open PRs for failing CI → diagnose → fix → push → re-watch.
 
 ## grind — each tick
@@ -24,17 +24,17 @@ idles waiting for you to start the next task), not in the merge.
    queued; pausing for human merge before producing more" and stop. Do not open
    a 4th. (Caps comprehension debt: no stack of unreviewed PRs.)
 2. Read `sprint-progress.json`. If `active_sprint` is `DEFERRED` → stop, report.
-   If no task has `done: false` → "SPRINT COMPLETE", stop.
+   If no task has `done: false` → "PHASE COMPLETE", stop.
 3. Select the FIRST task with `done: false` and not `needs_human`.
    - **If the task is `safety: true`** (auth/payments/paywall/ID-verification/
      Guardian) → STOP and flag: "REQUIRES HUMAN SIGN-OFF — safety story; the
      loop does not autonomously implement or merge safety work." Do not pick it.
 4. **Pre-flight docs grounding.** Read the task's section in its
-   `docs/sprints/SPRINT_*.md`. If it touches a third-party API/framework feature,
+   `docs/sprints/PHASE_*.md`. If it touches a third-party API/framework feature,
      WebFetch the CURRENT official docs (Supabase, Riverpod, go_router, Freezed,
      Drift, Google Maps — per CLAUDE.md) BEFORE writing code. Note URLs for the
      PR's "Sources".
-5. **`implementer` subagent** (worktree isolation): implement to the sprint
+5. **`implementer` subagent** (worktree isolation): implement to the phase
    file's acceptance criteria, add a test proving it, run the suite green
    (count ≥ `test_baseline`), include doc citations.
 6. **`code-simplifier` subagent** on the implementer's branch — runs BEFORE the
@@ -73,7 +73,7 @@ idles waiting for you to start the next task), not in the merge.
 ## Stop conditions (either mode — first one hit)
 - **≥ 3 unreviewed (open, unmerged) PRs** from this loop (grind) → pause for queue clearance.
 - A `needs_human` or `safety: true` task is the next eligible (grind) → stop, flag.
-- `active_sprint` is DEFERRED, or the sprint is complete (no eligible tasks).
+- `active_sprint` is DEFERRED, or the phase is complete (no eligible tasks).
 - Test count drops below `test_baseline` → STOP (never ship a regression).
 - Repeated failure on one task: verifier FAIL 3×, or CI fail 3× → `needs_human`, move on / flag.
 
@@ -83,8 +83,10 @@ idles waiting for you to start the next task), not in the merge.
   strictly worse than PR-waits-for-merge, so it stays. The loop produces
   reviewed-ready PRs; you merge.)
 - Safety stories (`safety: true`): never autonomously implemented or merged.
-- `SPRINT_6.7` (Safety/Guardian): DEFERRED — never auto-touched, never
-  auto-promoted to active. Advancing it is a human decision.
+- `PHASE_C_AGENT_LAYER` (Guardian / moderation = safety): its safety stories are
+  annotated `safety: true` in the phase doc — never auto-touched, never
+  auto-promoted to active. Advancing safety work is a human decision.
+  (Supersedes the old `SPRINT_6.7` DEFERRED rule.)
 - If the state file looks malformed or contradicts the sprint `.md` files → stop
   immediately and report; do not "repair" it.
 - No new dependencies without flagging them prominently in the PR body.
