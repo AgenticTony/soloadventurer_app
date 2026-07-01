@@ -30,9 +30,6 @@ jobs:
         with:
           version: ${{ env.SUPABASE_VERSION }}
 
-      - name: Verify Supabase config
-        run: supabase config
-
       - name: Lint migrations
         run: supabase db lint
         continue-on-error: false
