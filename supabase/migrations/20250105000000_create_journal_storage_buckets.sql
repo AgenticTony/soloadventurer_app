@@ -279,10 +279,14 @@ ON CONFLICT (id) DO NOTHING;
 -- 
 -- RESET ROLE;
 
-COMMENT ON FUNCTION generate_storage_path IS 'Generates a unique, sanitized storage path for user media files with optional prefix for organization';
+-- generate_storage_path() is commented out above (storage.objects DDL disabled for CI/local
+-- stack — owner is supabase_storage_admin; see issue #9). Its COMMENT is dropped to match,
+-- otherwise migration apply fails with "could not find a function named generate_storage_path".
 
--- Storage bucket documentation
-COMMENT ON COLUMN storage.buckets.id IS 'Unique bucket identifier following DNS naming conventions';
-COMMENT ON COLUMN storage.buckets.public IS 'Whether bucket contents are publicly accessible';
-COMMENT ON COLUMN storage.buckets.file_size_limit IS 'Maximum file size in bytes';
-COMMENT ON COLUMN storage.buckets.allowed_mime_types IS 'Array of allowed MIME types for uploads';
+-- Storage bucket documentation — DISABLED: storage.buckets is owned by supabase_storage_admin
+-- and the migration user (postgres) cannot COMMENT on its columns (SQLSTATE 42501). Column
+-- comments are non-functional documentation; dropped for CI/local parity. See issue #9.
+-- COMMENT ON COLUMN storage.buckets.id IS 'Unique bucket identifier following DNS naming conventions';
+-- COMMENT ON COLUMN storage.buckets.public IS 'Whether bucket contents are publicly accessible';
+-- COMMENT ON COLUMN storage.buckets.file_size_limit IS 'Maximum file size in bytes';
+-- COMMENT ON COLUMN storage.buckets.allowed_mime_types IS 'Array of allowed MIME types for uploads';

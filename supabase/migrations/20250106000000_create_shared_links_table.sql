@@ -31,8 +31,10 @@ CREATE TABLE IF NOT EXISTS shared_links (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 
   -- Constraints
-  CONSTRAINT shared_links_slug_check CHECK (slug ~ '^[a-zA-Z0-9_-]+$'),
-  CONSTRAINT shared_links_user_check CHECK (user_id = (SELECT user_id FROM trips WHERE trips.id = trip_id))
+  CONSTRAINT shared_links_slug_check CHECK (slug ~ '^[a-zA-Z0-9_-]+$')
+  -- shared_links_user_check removed: Postgres forbids subqueries in CHECK constraints
+  -- (SQLSTATE 0A000). The user_id↔trip ownership guarantee is enforced by the INSERT
+  -- RLS policy below (EXISTS trip owned by auth.uid()). See issue #9.
 );
 
 -- ============================================================================
@@ -125,7 +127,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to validate shared link access
-CREATE OR REPLACE FUNCTION validate_shared_link_access(link_slug VARCHAR(50, password TEXT DEFAULT NULL))
+CREATE OR REPLACE FUNCTION validate_shared_link_access(link_slug VARCHAR(50), password TEXT DEFAULT NULL)
 RETURNS TABLE (
   trip_id UUID,
   is_valid BOOLEAN,
