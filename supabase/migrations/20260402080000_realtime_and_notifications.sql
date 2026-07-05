@@ -132,7 +132,8 @@ CREATE POLICY typing_indicators_delete ON typing_indicators
 
 SELECT cron.schedule(
   'cleanup-expired-typing-indicators',
-  '*/5 * * * * *',  -- Every 5 seconds
+  -- pg_cron takes 5-field crontab or 'N seconds'; 6-field (seconds) syntax is invalid
+  '5 seconds',
   $$ DELETE FROM typing_indicators WHERE expires_at < NOW(); $$
 );
 
