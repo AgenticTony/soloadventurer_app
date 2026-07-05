@@ -89,9 +89,11 @@ CREATE TABLE IF NOT EXISTS typing_indicators (
   CONSTRAINT unique_typing_user_chat UNIQUE (chat_id, user_id)
 );
 
--- Index for quick lookups
-CREATE INDEX IF NOT EXISTS idx_typing_chat ON typing_indicators(chat_id, expires_at) WHERE expires_at > NOW();
-CREATE INDEX IF NOT EXISTS idx_typing_expiry ON typing_indicators(expires_at) WHERE expires_at > NOW();
+-- Index for quick lookups. NOW() is STABLE, not IMMUTABLE, so it cannot appear
+-- in a partial-index predicate (SQLSTATE 42P17) — queries filter on expires_at
+-- at runtime against these plain indexes instead.
+CREATE INDEX IF NOT EXISTS idx_typing_chat ON typing_indicators(chat_id, expires_at);
+CREATE INDEX IF NOT EXISTS idx_typing_expiry ON typing_indicators(expires_at);
 
 -- Enable RLS
 ALTER TABLE typing_indicators ENABLE ROW LEVEL SECURITY;
@@ -130,7 +132,8 @@ CREATE POLICY typing_indicators_delete ON typing_indicators
 
 SELECT cron.schedule(
   'cleanup-expired-typing-indicators',
-  '*/5 * * * * *',  -- Every 5 seconds
+  -- pg_cron takes 5-field crontab or 'N seconds'; 6-field (seconds) syntax is invalid
+  '5 seconds',
   $$ DELETE FROM typing_indicators WHERE expires_at < NOW(); $$
 );
 

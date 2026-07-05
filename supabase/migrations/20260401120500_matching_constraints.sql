@@ -36,7 +36,7 @@ BEGIN
   ) THEN
     ALTER TABLE trips 
     ADD CONSTRAINT valid_trip_duration 
-    CHECK (end_date IS NULL OR (end_date - start_date <= 90));
+    CHECK (end_date IS NULL OR (end_date - start_date <= INTERVAL '90 days'));
   END IF;
 END $$;
 

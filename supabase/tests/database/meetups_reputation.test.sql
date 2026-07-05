@@ -5,13 +5,25 @@
 -- Auth simulation: auth.uid() reads the JWT `sub`, so we impersonate a user with
 --   set local role authenticated;
 --   select set_config('request.jwt.claims', '{"sub":"<uuid>","role":"authenticated"}', true);
--- No auth.users seeding is needed because the new tables (and connections) hold the
--- user ids as plain uuids.
+-- The Phase A tables hold user ids as plain uuids, but inserting into connections
+-- fires trg_notify_new_match (20260402080000), which writes notifications rows whose
+-- user_id/actor_id FK-reference profiles — so the test users are seeded in
+-- auth.users + profiles below (rolled back with the rest of the transaction).
 --
 -- NOTE: PL/pgSQL `RAISE EXCEPTION` → SQLSTATE P0001; a unique-constraint violation → 23505.
 
 begin;
 select plan(22);
+
+-- Seed the test users (see header note: the notify trigger FK-references profiles).
+insert into auth.users (id, email) values
+  ('11111111-1111-1111-1111-111111111111', 'a@test.local'),
+  ('22222222-2222-2222-2222-222222222222', 'b@test.local'),
+  ('44444444-4444-4444-4444-444444444444', 'd@test.local');
+insert into public.profiles (id, username) values
+  ('11111111-1111-1111-1111-111111111111', 'user_a'),
+  ('22222222-2222-2222-2222-222222222222', 'user_b'),
+  ('44444444-4444-4444-4444-444444444444', 'user_d');
 
 -- :a  = 11111111-1111-1111-1111-111111111111  (requester / user_a)
 -- :b  = 22222222-2222-2222-2222-222222222222  (recipient / user_b)
@@ -106,6 +118,7 @@ select set_config('request.jwt.claims', '{"sub":"44444444-4444-4444-4444-4444444
 select throws_ok(
   $$ select public.propose_meetup('33333333-3333-3333-3333-333333333333', '2030-02-02', 'x') $$,
   'P0001',
+  NULL,
   'non-party cannot propose a meetup'
 );
 
@@ -114,6 +127,7 @@ select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-1111111
 select throws_ok(
   $$ select public.propose_meetup('55555555-5555-5555-5555-555555555555', '2030-02-02', 'x') $$,
   'P0001',
+  NULL,
   'cannot propose a meetup from a non-accepted connection'
 );
 
@@ -142,8 +156,9 @@ select is(
 
 -- (f) submit_review BEFORE completion → error (gate)
 select throws_ok(
-  $$ select public.submit_review((select meetup_id from _m), 5, true, 'pre') $$,
+  $$ select public.submit_review((select meetup_id from _m), 5::smallint, true, 'pre') $$,
   'P0001',
+  NULL,
   'cannot review until meetup is completed (gate)'
 );
 
@@ -167,14 +182,15 @@ select is(
 -- (h) review now succeeds (completed) for A
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
 select lives_ok(
-  $$ select public.submit_review((select meetup_id from _m), 5, true, 'good') $$,
+  $$ select public.submit_review((select meetup_id from _m), 5::smallint, true, 'good') $$,
   'party can review a completed meetup'
 );
 
 -- (i) double-review by same party → unique violation
 select throws_ok(
-  $$ select public.submit_review((select meetup_id from _m), 4, false, 'dup') $$,
+  $$ select public.submit_review((select meetup_id from _m), 4::smallint, false, 'dup') $$,
   '23505',
+  NULL,
   'a party cannot review the same meetup twice'
 );
 
