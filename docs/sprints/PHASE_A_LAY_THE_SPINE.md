@@ -1,41 +1,48 @@
 # Phase A — Lay the Spine
 
 > FOUNDATIONS §4, §9 (Phase A) · Repo: mobile (owns the shared backend) · Safety-sensitive: **YES** (RLS)
-> Status: queued after Phase 0. **Mostly schema + a reward-function artifact — not ML.**
+> Status: **backend shipped via PR #8 (2026-06-30)** — meetups / outcomes / reputation live. Remaining: A.4 (no-show + cancel RPCs) + deferred `events` table + north-star city/time indexes. `active_sprint` stays PHASE_0 (blockers outstanding). **Mostly schema + a reward-function artifact — not ML.**
 
 ## Goal
 Build the foundation every later phase compounds on: the L0 event/outcome store, the reward-function v0.1, and the meetup-gated bilateral reputation entity. This is what flips AI from decorative to structural (FOUNDATIONS §4 — the spine is a closed loop, and L0 is the missing foundation).
 
 ## Scope
-**IN:** `events`/`meetup_outcomes` tables (migration + RLS); reward-function v0.1 (spec + scoring RPC); bilateral `member_reviews` entity (migration + RLS + RPCs), gated to verified meetups.
+**IN:** `meetup_outcomes` table (migration + RLS); reward-function v0.1 (spec + scoring RPC); bilateral `member_reviews` entity (migration + RLS + RPCs), gated to verified meetups. *(Unified `events` log table deferred — see A.1.)*
 **OUT:** outcome-trained ranker (Phase B); agents (Phase C); UI surfacing (Phase D).
 **Guardrails (§4, §6):** reward = outcomes, never engagement; no synthetic/fake liquidity.
 
 ## Stories
 
 ### Story A.1 — L0 event/outcome store  [safety: true]
-- [ ] Migration: `meetup_outcomes` + unified `events` log tables
-- [ ] RLS: only participants write their own outcome; reads per reputation rules
-- [ ] Indexes for north-star queries (`meetups_completed` by cohort / city / time)
-- [ ] Cross-check web client read paths (shared backend — FOUNDATIONS §10)
+- [x] Migration: `meetup_outcomes` table (shipped PR #8, 2026-06-30)
+- [ ] Unified `events` log table — **deferred** (only `meetup_outcomes` was built; revisit only if a broader event log is actually needed)
+- [x] RLS: outcome writes go through the SECURITY DEFINER RPCs (no direct write policy); reads scoped to parties
+- [ ] Indexes for north-star queries (`meetups_completed` by cohort / city / time) — **partial**: user/status indexes shipped; city/time indexes pending (`meetups` has no city column yet)
+- [x] Cross-check web client read paths (shared backend — FOUNDATIONS §10) — done in the 2026-07-05 two-repo review
 
 ### Story A.2 — Reward function v0.1  [needs_human: true]
-- [ ] Author the reward-fn spec (FOUNDATIONS §4 v0.1 weights) as a **versioned artifact** in `docs/`
-- [ ] Scoring RPC `reputation_score(user_id)` derived from outcomes
-- [ ] Tests: reward reflects outcomes; engagement inputs (sessions/scrolls) are **never** inputs
+- [x] Author the reward-fn spec (FOUNDATIONS §4 v0.1 weights) as a **versioned artifact** in `docs/` (`docs/reward-function-v0.1.md`)
+- [x] Scoring RPC `reputation_score(user_id)` derived from outcomes
+- [x] Tests: reward reflects outcomes; engagement inputs (sessions/scrolls) are **never** inputs (pgTAP)
 
 ### Story A.3 — Bilateral reputation entity (meetup-gated)  [safety: true]
-- [ ] Migration: `member_reviews` (bilateral, tied to `meetup_checkin` proof)
-- [ ] RLS: a review requires a verified co-located meetup; cannot review a stranger never met
-- [ ] RPCs: `submit_review`, `get_reputation`
-- [ ] Tests: gating logic — no verified meetup → no review possible
+- [x] Migration: `member_reviews` (bilateral) — gated on a **mutually-confirmed** completed meetup (both parties tap "we met"); co-location / `meetup_checkin` gate deferred to Phase C (see migration header)
+- [x] RLS: a review requires a **completed (mutually-confirmed)** meetup; cannot review a stranger never met
+- [x] RPCs: `submit_review`, `reputation_score`
+- [x] Tests: gating logic — no completed meetup → no review possible (pgTAP)
+
+### Story A.4 — Close reward-fn v0.1: no-show + cancel paths  [safety: true]  *(added 2026-07-05)*
+- [ ] RPC `report_no_show` — writes `meetup_outcomes.outcome = 'no_show'` (the reward fn penalizes no-shows but nothing writes them yet — see `docs/reward-function-v0.1.md`)
+- [ ] RPC to cancel a proposed/confirmed meetup from the **proposer** side (currently only the invited party can decline, via `respond_meetup`)
+- [ ] Tests: no_show write path; proposer-cancel authorization; `reputation_score` reflects the no-show penalty
+- [ ] Cross-check web client (shared backend — FOUNDATIONS §10)
 
 ## Definition of Done / Acceptance Criteria
-- [ ] Migrations applied; RLS tested (positive + negative cases)
-- [ ] Reward fn documented; scoring RPC returns correct values
-- [ ] Reputation entity is meetup-gated; bilateral review enforced
-- [ ] `flutter analyze` clean; new tests green; baseline not regressed
-- [ ] Web client cross-checked for shared-backend changes
+- [x] Migrations applied; RLS tested (positive + negative cases) — PR #8 (pgTAP)
+- [x] Reward fn documented; scoring RPC returns correct values
+- [x] Reputation entity is meetup-gated; bilateral review enforced
+- [ ] `flutter analyze` clean; new tests green; baseline not regressed — pending A.4
+- [x] Web client cross-checked for shared-backend changes (2026-07-05 review)
 
 ## Dependencies
 Phase 0 (analytics + secrets) unblocks. Phase B consumes these tables; Phase D surfaces reputation.
