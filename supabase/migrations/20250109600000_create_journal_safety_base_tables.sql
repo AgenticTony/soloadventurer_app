@@ -25,14 +25,18 @@ CREATE TABLE IF NOT EXISTS public.journals (
 CREATE INDEX IF NOT EXISTS idx_journals_user_id ON public.journals (user_id);
 
 CREATE TABLE IF NOT EXISTS public.trusted_contacts (
-  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id       uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  contact_name  text,
-  contact_phone text,
-  contact_email text,
-  is_active     boolean NOT NULL DEFAULT true,
-  created_at    timestamptz NOT NULL DEFAULT now(),
-  updated_at    timestamptz NOT NULL DEFAULT now()
+  id                        uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                   uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  -- set when the trusted contact is also a registered user (SOS RLS in
+  -- 20260402080100 joins on this to let them see active alerts)
+  contact_user_id           uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  contact_name              text,
+  contact_phone             text,
+  contact_email             text,
+  is_active                 boolean NOT NULL DEFAULT true,
+  receives_emergency_alerts boolean NOT NULL DEFAULT true,
+  created_at                timestamptz NOT NULL DEFAULT now(),
+  updated_at                timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_trusted_contacts_user_id ON public.trusted_contacts (user_id);
