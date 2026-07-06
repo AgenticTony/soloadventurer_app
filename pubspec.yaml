@@ -87,6 +87,9 @@ dependencies:
   sentry_flutter: ^9.9.2
   logger: ^2.4.0
 
+  # Product Analytics (PostHog — EU Cloud; see docs/analytics-v0.1.md)
+  posthog_flutter: ^5.30.0
+
   # Encryption
   encrypt: ^5.0.3
   crypto: ^3.0.3

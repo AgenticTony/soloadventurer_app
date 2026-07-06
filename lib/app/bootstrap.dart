@@ -25,6 +25,11 @@ import 'package:soloadventurer/features/journal/presentation/providers/journal_e
 import 'package:soloadventurer/features/journal/data/datasources/journal_remote_data_source_impl.dart';
 import 'package:soloadventurer/features/journal/data/repositories/journal_repository_impl.dart';
 import 'package:soloadventurer/core/services/push_notification_service.dart';
+import 'package:soloadventurer/core/services/analytics_service.dart';
+import 'package:soloadventurer/core/services/posthog_analytics_service.dart';
+import 'package:soloadventurer/core/services/consent_gated_analytics_service.dart';
+import 'package:soloadventurer/app/providers/analytics_provider.dart';
+import 'package:soloadventurer/app/providers/analytics_consent_provider.dart';
 import 'package:soloadventurer/app/router/go_router_config.dart';
 
 /// Bootstrap is responsible for app initialization and configuration
@@ -155,6 +160,35 @@ Future<void> bootstrap() async {
     final databaseService = results[0] as DatabaseService?;
     final sharedPreferences = results[1] as SharedPreferences;
 
+    // Analytics (PostHog) — opt-in and consent-gated (GDPR). Nothing is
+    // collected until the user consents. See docs/analytics-v0.1.md.
+    final analyticsConsent = readPersistedAnalyticsConsent(sharedPreferences);
+    AnalyticsService analyticsService;
+    if (AppConfig.analyticsEnabled) {
+      try {
+        await PostHogAnalyticsService.setup(
+          apiKey: AppConfig.posthogApiKey,
+          host: AppConfig.posthogHost,
+        );
+        analyticsService = ConsentGatedAnalyticsService(
+          const PostHogAnalyticsService(),
+          consentGranted: analyticsConsent,
+          onConsentChanged: PostHogAnalyticsService.setOptedIn,
+        );
+        // Match the SDK opt-in state to persisted consent on cold start.
+        if (analyticsConsent) {
+          await PostHogAnalyticsService.setOptedIn(true);
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          debugPrint('⚠️ PostHog init failed, falling back to no-op: $e');
+        }
+        analyticsService = DebugAnalyticsService();
+      }
+    } else {
+      analyticsService = DebugAnalyticsService();
+    }
+
     AppStartTracker.endPhase('parallel_init');
 
     // Start provider initialization phase
@@ -164,6 +198,9 @@ Future<void> bootstrap() async {
     final container = ProviderContainer(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+        // Analytics: consent-gated PostHog (or no-op) + prefs for the consent controller.
+        analyticsServiceProvider.overrideWithValue(analyticsService),
+        analyticsConsentPrefsProvider.overrideWithValue(sharedPreferences),
         if (databaseService != null)
           databaseServiceProvider.overrideWithValue(databaseService),
         // Wire MatchingRepository with real Supabase implementation

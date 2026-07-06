@@ -28,10 +28,12 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 - [ ] Edge/load testing of all safety paths
 
 ### Story 0.3 — Analytics + north-star instrumentation  [needs_human: true]
-- [ ] Pick analytics provider (docs-grounded — PostHog/Sentry Product)
-- [ ] Instrument `meetups_completed` as the north-star (sourced from `meetup_checkins`)
-- [ ] Instrument D1/D7/D30 cohort retention
-- [ ] Privacy/consent gate on analytics (GDPR — opt-in)
+- [x] Pick analytics provider (docs-grounded) — **PostHog** (product analytics, EU Cloud) + **Sentry** for errors (decided 2026-07-06; see `docs/analytics-v0.1.md`)
+- [x] **Lock** `meetups_completed` as the north-star — **RECONCILED**: sourced from **`meetup_outcomes.outcome = 'completed'`** (the Phase A mutual-confirmation atomic unit), **not** `meetup_checkins` (that predated Phase A). Event `meetup_completed` + typed `trackMeetupCompleted` helper shipped; authoritative server-side emitter deferred (see below).
+- [x] Privacy/consent gate on analytics (GDPR — opt-in) — SDK starts `optOut`; `ConsentGatedAnalyticsService` blocks all events until consent; persisted flag + Riverpod controller; no PII in events (`beforeSend` scrub). Tests green.
+- [ ] Instrument D1/D7/D30 cohort retention — **PostHog dashboard config, not app code** (retention insight from `identify` + events); documented in `docs/analytics-v0.1.md`.
+
+**Deferred follow-ups (tracked in `docs/analytics-v0.1.md`):** (a) server-side authoritative north-star — DB trigger on `meetup_outcomes` insert → PostHog (the client helper is interim; no Dart caller of `complete_meetup` exists yet — Phase A shipped backend-only); (b) Sentry runtime `init` (dep present, not yet initialized); (c) wire funnel event call-sites into UI as each flow is touched.
 
 ## Definition of Done / Acceptance Criteria
 - [ ] No secrets in history (scan clean); all keys rotated and old ones revoked
