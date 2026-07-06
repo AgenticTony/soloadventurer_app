@@ -17,6 +17,12 @@ abstract class AnalyticsEvents {
   static const String acceptConnection = 'accept_connection';
   static const String declineConnection = 'decline_connection';
 
+  // ── North-star (docs/analytics-v0.1.md) ──────────────────────────────
+  // A mutually-confirmed, completed meetup — FOUNDATIONS §4's atomic unit.
+  // Source of truth: meetup_outcomes.outcome = 'completed'. The authoritative
+  // emission is server-side (deferred trigger); this client event is interim.
+  static const String meetupCompleted = 'meetup_completed';
+
   // Chat events
   static const String openChat = 'open_chat';
   static const String sendMessage = 'send_message';
@@ -79,6 +85,26 @@ abstract class AnalyticsService {
 
   /// Flush any queued events
   Future<void> flush();
+}
+
+/// Typed helpers for the events that matter most.
+///
+/// Keeps the north-star firing site consistent and greppable. See
+/// `docs/analytics-v0.1.md` — the authoritative source is server-side
+/// (`meetup_outcomes`); this client call is the interim emitter.
+extension AnalyticsNorthStar on AnalyticsService {
+  /// Fire the north-star: a mutually-confirmed, completed meetup.
+  ///
+  /// [meetupId] identifies the meetup; no PII is attached.
+  void trackMeetupCompleted({
+    required String meetupId,
+    Map<String, dynamic>? properties,
+  }) {
+    track(AnalyticsEvents.meetupCompleted, properties: {
+      'meetup_id': meetupId,
+      ...?properties,
+    });
+  }
 }
 
 /// Debug-only analytics service that logs events to console

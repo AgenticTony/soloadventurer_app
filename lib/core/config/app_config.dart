@@ -133,6 +133,29 @@ class AppConfig {
   }
 
   // ============================================================
+  // ANALYTICS CONFIGURATION (PostHog — see docs/analytics-v0.1.md)
+  // ============================================================
+
+  /// PostHog project API key. Empty string when unset (analytics stays off).
+  ///
+  /// Set in `.env`: `POSTHOG_API_KEY=phc_...`
+  static String get posthogApiKey => _envFallback('POSTHOG_API_KEY');
+
+  /// PostHog ingestion host. Defaults to **EU Cloud** for GDPR data residency.
+  ///
+  /// Set in `.env`: `POSTHOG_HOST=https://eu.i.posthog.com`
+  static String get posthogHost {
+    final host = _envFallback('POSTHOG_HOST');
+    return host.isNotEmpty ? host : 'https://eu.i.posthog.com';
+  }
+
+  /// Whether product analytics should be wired at all.
+  ///
+  /// Only when a key is configured. Consent is enforced separately at runtime
+  /// via the opt-in gate (SDK starts opted-out; nothing is sent until consent).
+  static bool get analyticsEnabled => posthogApiKey.isNotEmpty;
+
+  // ============================================================
   // DEBUG CONFIGURATION
   // ============================================================
 
