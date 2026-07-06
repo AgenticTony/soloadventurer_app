@@ -9,13 +9,13 @@ The single rule that decides which behavior the platform rewards. Optimizing an
 engagement proxy produces addiction + enshittification (FOUNDATIONS §6, §7.5); this
 function optimizes **real-world outcomes** only.
 
-## Inputs (v0.1 — wired now)
+## Inputs (v0.1)
 | Signal | Source | Weight |
 |---|---|---|
 | Meetup completed | `meetup_outcomes.outcome = 'completed'` | **+2** each |
 | Vouch rate | `member_reviews.would_meet_again` (share of reviews) | **+(vouch_pct / 10)** |
 | Review rating | `member_reviews.rating` (1–5) | reported (avg), not yet weighted into score |
-| No-show | `meetup_outcomes.outcome = 'no_show'` | **−1** each |
+| No-show | `meetup_outcomes.outcome = 'no_show'` | **−1** each — **wired (Story A.4, 2026-07-06)** via the `report_no_show` RPC. Attribution: the penalty lands on `meetup_outcomes.no_show_user_id` (the absent party) **only** — the traveler who showed up and reported takes no penalty. Cancellations (`cancel_meetup`) are no-fault in v0.1: no outcome row, no penalty. |
 
 **v0.1 score** = `2 × meetups_completed + floor(vouch_pct / 10) − no_shows`.
 
