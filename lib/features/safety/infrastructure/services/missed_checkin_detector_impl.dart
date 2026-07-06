@@ -341,8 +341,11 @@ class MissedCheckInDetectorImpl implements MissedCheckInDetector {
 
   @override
   void dispose() {
-    _statusController.close();
+    // Emit the final `stopped` transition BEFORE closing — the previous order
+    // added an event to an already-closed controller (throws "Cannot add event
+    // after closing") whenever the detector had been active. See test.
     _updateStatus(MissedCheckInDetectorStatus.stopped);
+    _statusController.close();
   }
 }
 

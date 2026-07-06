@@ -21,11 +21,12 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 - [ ] Revoke old keys only after rotation confirmed live
 
 ### Story 0.2 — Production-grade safety surface  [safety: true]
-- [ ] SOS: end-to-end (trigger → trusted contacts + live location → confirmation)
-- [ ] Check-ins: scheduled + missed-checkin detector validated
-- [ ] Meetup safety: pre-meetup risk nudge, live-location share, check-in window — hardened + tested
-- [ ] Trusted contacts: add/edit/remove flow verified
-- [ ] Edge/load testing of all safety paths
+> Audit 2026-07-06 (step 7): the safety module is already mature (SOS, check-ins, missed-check-in detector, trusted contacts, meetup check-ins — 17 test files). See `docs/reports/safety-hardening-audit-2026-07-06.md`. Remaining items are human/device-led.
+- [x] SOS: end-to-end (trigger → trusted contacts + live location → confirmation) — **implemented + unit-tested**; real on-device delivery validation is human-led (see report).
+- [x] Check-ins: scheduled + missed-checkin detector validated — detector **now unit-tested** (was untested); **fixed a `dispose()` bug** (added to a closed StreamController → threw when active).
+- [ ] Meetup safety: pre-meetup risk nudge, live-location share, check-in window — implemented; **deeper hardening + tests remain** (human-led).
+- [x] Trusted contacts: add/edit/remove flow verified — implemented + tested.
+- [ ] Edge/load testing of all safety paths — **NOT done; inherently human/device/infra-led** (device matrix, background execution, notification delivery under load, permission-denied paths). Launch-gating for the safety pillar; needs sign-off + real devices.
 
 ### Story 0.3 — Analytics + north-star instrumentation  [needs_human: true]
 - [x] Pick analytics provider (docs-grounded) — **PostHog** (product analytics, EU Cloud) + **Sentry** for errors (decided 2026-07-06; see `docs/analytics-v0.1.md`)
