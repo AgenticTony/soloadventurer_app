@@ -15,16 +15,19 @@
 - ⚠ = safety-sensitive or human-gated (needs sign-off; the loop must not auto-ship it).
 - After each step is done, commit, push to GitHub, and merge the PR. Make sure all checks pass first b4 you merge.
 - Make sure all docs are up-to-date (see `docs/` folder). after each step is done. /Users/anthonyforan/Desktop/SoloAdventurerWeb/docs/sprints
+- Reference all docs before completing tasks. /Users/anthonyforan/Desktop/SoloAdventurerWeb/docs/
+- Use all the tools, skills, mcp servers and pluggins available to you.
+- ALWAYS REFERENCE OFFICIAL DOCUMENTATION BEFORE COMPLETING ANY TASKS USING WEB SEARCH TOOLS AVAILABLE TO YOU.
 
 ## Current status (start line)
 
 - ✅ **Mobile PR #8** — Phase A backend (meetups/outcomes/reputation) merged.
-- 🔶 **Mobile PR #10** — Supabase CI repair — **open, needs merge** (blocks all further backend PRs).
+- ✅ **Mobile PR #10** — Supabase CI repair — **merged 2026-07-05**, all 17 checks green, pgTAP passing for the first time (12 pre-existing defects fixed; see the PR's closing comment). ⚠ Prod note: run `supabase migration repair --status applied` for the already-live 2026 migrations before the first real `supabase db push`.
+- ✅ **Landing-page fix** (web Story 0.4) — merged (web PR #17).
+- ✅ **Doc-cleanup PRs** (web #15/#16) — merged.
 - 🔶 **Credential purge** (mobile 0.1) — in progress, Anthony-owned.
-- 🔶 **Doc-cleanup PRs** (web #15, mobile #11) — open, awaiting review.
-- ⬜ **Landing-page fix** (web Story 0.4) — documented, not yet coded.
 
-**Start here:** step 1 (merge PR #10) → step 2 (web landing fix) → step 4 (mobile A.4) → step 5/6 (analytics).
+**Start here:** step 4 (mobile A.4 — `report_no_show` + proposer-cancel) → step 5/6 (analytics). Step 3 (credential purge) continues in parallel and still gates launch.
 
 ---
 

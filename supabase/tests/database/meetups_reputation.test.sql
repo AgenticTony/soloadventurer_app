@@ -13,7 +13,7 @@
 -- NOTE: PL/pgSQL `RAISE EXCEPTION` → SQLSTATE P0001; a unique-constraint violation → 23505.
 
 begin;
-select plan(22);
+select plan(36);
 
 -- Seed the test users (see header note: the notify trigger FK-references profiles).
 insert into auth.users (id, email) values
@@ -192,6 +192,120 @@ select throws_ok(
   '23505',
   NULL,
   'a party cannot review the same meetup twice'
+);
+
+-- ============================================================================
+-- 5. STORY A.4 — report_no_show + cancel_meetup (14)
+-- ============================================================================
+-- Fixture: A (1111) and D (4444) already have the pending connection :nc (5555)
+-- from section 4, and connections are unique per pair — promote it to accepted.
+reset role;
+update public.connections
+   set status = 'accepted'
+ where id = '55555555-5555-5555-5555-555555555555';
+set local role authenticated;
+
+-- (a) a FUTURE confirmed meetup → cannot report a no-show yet
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
+create temp table _m2 as
+  select public.propose_meetup('55555555-5555-5555-5555-555555555555', '2030-03-03', 'Museum') as meetup_id;
+select set_config('request.jwt.claims', '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}', true);
+select public.respond_meetup((select meetup_id from _m2), true);
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
+select throws_ok(
+  $$ select public.report_no_show((select meetup_id from _m2)) $$,
+  'P0001',
+  NULL,
+  'cannot report a no-show before the meetup time'
+);
+
+-- (b) a PAST confirmed meetup: non-party rejected, then A reports D
+create temp table _m3 as
+  select public.propose_meetup('55555555-5555-5555-5555-555555555555', '2020-01-01', 'Ghost cafe') as meetup_id;
+select set_config('request.jwt.claims', '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}', true);
+select public.respond_meetup((select meetup_id from _m3), true);
+select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}', true);
+select throws_ok(
+  $$ select public.report_no_show((select meetup_id from _m3)) $$,
+  'P0001',
+  NULL,
+  'non-party cannot report a no-show'
+);
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
+select lives_ok(
+  $$ select public.report_no_show((select meetup_id from _m3)) $$,
+  'party can report a no-show after the meetup time'
+);
+select is(
+  (select status::text from public.meetups where id = (select meetup_id from _m3)),
+  'cancelled',
+  'a no-show terminalizes the meetup (cancelled)'
+);
+select is(
+  (select outcome || ':' || no_show_user_id::text
+   from public.meetup_outcomes where meetup_id = (select meetup_id from _m3)),
+  'no_show:44444444-4444-4444-4444-444444444444',
+  'outcome row attributes the no-show to the ABSENT party'
+);
+
+-- (c) double-report → meetup is no longer confirmed
+select throws_ok(
+  $$ select public.report_no_show((select meetup_id from _m3)) $$,
+  'P0001',
+  NULL,
+  'cannot report the same no-show twice (meetup no longer confirmed)'
+);
+
+-- (d) reward fn v0.1: penalty lands on the no-shower only
+select is(
+  (public.reputation_score('44444444-4444-4444-4444-444444444444') ->> 'no_shows')::int,
+  1,
+  'no-show counted against the absent party'
+);
+select is(
+  (public.reputation_score('44444444-4444-4444-4444-444444444444') ->> 'score')::int,
+  -1,
+  'no-shower score = -1 (0 completed, 0 vouch, 1 no-show)'
+);
+select is(
+  (public.reputation_score('11111111-1111-1111-1111-111111111111') ->> 'no_shows')::int,
+  0,
+  'the reporter (who showed up) takes NO no-show penalty'
+);
+
+-- (e) no-show cannot be reported on an unconfirmed (proposed) meetup
+create temp table _m4 as
+  select public.propose_meetup('33333333-3333-3333-3333-333333333333', '2030-04-04', 'Pier') as meetup_id;
+select throws_ok(
+  $$ select public.report_no_show((select meetup_id from _m4)) $$,
+  'P0001',
+  NULL,
+  'cannot report a no-show on an unconfirmed meetup'
+);
+
+-- (f) cancel_meetup: non-party rejected; proposer cancels; completed is immutable
+select set_config('request.jwt.claims', '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}', true);
+select throws_ok(
+  $$ select public.cancel_meetup((select meetup_id from _m4)) $$,
+  'P0001',
+  NULL,
+  'non-party cannot cancel a meetup'
+);
+select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
+select lives_ok(
+  $$ select public.cancel_meetup((select meetup_id from _m4)) $$,
+  'proposer can cancel a proposed meetup'
+);
+select is(
+  (select status::text from public.meetups where id = (select meetup_id from _m4)),
+  'cancelled',
+  'cancel sets status = cancelled'
+);
+select throws_ok(
+  $$ select public.cancel_meetup((select meetup_id from _m)) $$,
+  'P0001',
+  NULL,
+  'cannot cancel a completed meetup'
 );
 
 select * from finish();

@@ -15,7 +15,7 @@ function optimizes **real-world outcomes** only.
 | Meetup completed | `meetup_outcomes.outcome = 'completed'` | **+2** each |
 | Vouch rate | `member_reviews.would_meet_again` (share of reviews) | **+(vouch_pct / 10)** |
 | Review rating | `member_reviews.rating` (1–5) | reported (avg), not yet weighted into score |
-| No-show | `meetup_outcomes.outcome = 'no_show'` | **−1** each — ⚠ **penalty defined but not yet wired**: nothing writes a `no_show` outcome until the `report_no_show` RPC lands (mobile Phase A Story A.4). Until then this term is structurally always 0. |
+| No-show | `meetup_outcomes.outcome = 'no_show'` | **−1** each — **wired (Story A.4, 2026-07-06)** via the `report_no_show` RPC. Attribution: the penalty lands on `meetup_outcomes.no_show_user_id` (the absent party) **only** — the traveler who showed up and reported takes no penalty. Cancellations (`cancel_meetup`) are no-fault in v0.1: no outcome row, no penalty. |
 
 **v0.1 score** = `2 × meetups_completed + floor(vouch_pct / 10) − no_shows`.
 

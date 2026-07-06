@@ -32,10 +32,10 @@ Build the foundation every later phase compounds on: the L0 event/outcome store,
 - [x] Tests: gating logic — no completed meetup → no review possible (pgTAP)
 
 ### Story A.4 — Close reward-fn v0.1: no-show + cancel paths  [safety: true]  *(added 2026-07-05)*
-- [ ] RPC `report_no_show` — writes `meetup_outcomes.outcome = 'no_show'` (the reward fn penalizes no-shows but nothing writes them yet — see `docs/reward-function-v0.1.md`)
-- [ ] RPC to cancel a proposed/confirmed meetup from the **proposer** side (currently only the invited party can decline, via `respond_meetup`)
-- [ ] Tests: no_show write path; proposer-cancel authorization; `reputation_score` reflects the no-show penalty
-- [ ] Cross-check web client (shared backend — FOUNDATIONS §10)
+- [x] RPC `report_no_show` — writes `meetup_outcomes.outcome = 'no_show'` with **attribution** (`no_show_user_id`, new column + CHECK) so the −1 lands on the absent party only, not both; guards: party-only, confirmed status, meetup_time passed, blocked once either party tapped "we met"; terminalizes the meetup (migration `20260706100000`)
+- [x] RPC `cancel_meetup` — **either party** may cancel while proposed/confirmed (superset of proposer-only; flagged for sign-off in the PR); no-fault in v0.1 (no outcome row, no penalty)
+- [x] Tests: no_show write path + attribution; before-time / unconfirmed / non-party / double-report rejections; cancel authorization + completed-is-immutable; `reputation_score` penalty on the no-shower only (pgTAP 22 → 36)
+- [x] Cross-check web client (shared backend — FOUNDATIONS §10) — web has **zero** Phase A consumers yet (step 10 not started; verified by grep 2026-07-06), so the `reputation_score` JSON change is safe
 
 ## Definition of Done / Acceptance Criteria
 - [x] Migrations applied; RLS tested (positive + negative cases) — PR #8 (pgTAP)
