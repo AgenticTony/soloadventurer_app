@@ -2,7 +2,7 @@
 
 **One linear sequence across both repos.** The two projects share the FOUNDATIONS §9 phase spine (0 → A → B → C → D → E) but each has its own sprint plan, because they have different jobs (web = acquisition, mobile = product + shared backend). This document flattens both into a single "do this next" order so there's never ambiguity about which repo to work in.
 
-> **Mirror — canonical copy: `SoloAdventurerWeb/docs/EXECUTION_ORDER.md` (web repo wins if the two differ).** **Created:** 2026-07-05 · **Source of truth for _what_:** `docs/FOUNDATIONS.md` §9. This doc governs _order_ only.
+> **Created:** 2026-07-05 · **Source of truth for _what_:** `docs/FOUNDATIONS.md` §9. This doc governs _order_ only. Mirror it into the mobile repo (like FOUNDATIONS) so both sides read the same sequence.
 
 ---
 
@@ -25,9 +25,10 @@
 - ✅ **Mobile PR #10** — Supabase CI repair — **merged 2026-07-05**, all 17 checks green, pgTAP passing for the first time (12 pre-existing defects fixed; see the PR's closing comment). ⚠ Prod note: run `supabase migration repair --status applied` for the already-live 2026 migrations before the first real `supabase db push`.
 - ✅ **Landing-page fix** (web Story 0.4) — merged (web PR #17).
 - ✅ **Doc-cleanup PRs** (web #15/#16) — merged.
-- 🔶 **Credential purge** (mobile 0.1) — in progress, Anthony-owned.
+- ✅ **Mobile PR #13 (step 4 — A.4)** — `report_no_show` + `cancel_meetup` RPCs — **merged 2026-07-06**, closes reward-fn v0.1 (no-show penalty now wired + attributed to the absent party). pgTAP 22→36. Phase A backend fully shipped.
+- 🔶 **Credential purge** (mobile 0.1, step 3) — in progress, Anthony-owned. Still gates launch.
 
-**Start here:** step 4 (mobile A.4 — `report_no_show` + proposer-cancel) → step 5/6 (analytics). Step 3 (credential purge) continues in parallel and still gates launch.
+**Start here:** step 9 (mobile Phase A finish — north-star city/time indexes; decide the deferred `events` table) unblocks now. Steps 5 (mobile analytics ⚠), 7 (mobile safety ⚠), 8 (web privacy/RLS audit ⚠) remain human-gated per the ⚠ rule. Step 9's city index needs a data-model decision first (`meetups` has no city column — where does city come from: meetup location geocode vs. a new column?).
 
 ---
 
