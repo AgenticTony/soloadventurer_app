@@ -197,19 +197,18 @@ select throws_ok(
 -- ============================================================================
 -- 5. STORY A.4 — report_no_show + cancel_meetup (14)
 -- ============================================================================
--- Fixture: an accepted connection between A (1111) and D (4444).
+-- Fixture: A (1111) and D (4444) already have the pending connection :nc (5555)
+-- from section 4, and connections are unique per pair — promote it to accepted.
 reset role;
-insert into public.connections (id, requester_id, recipient_id, status)
-values ('66666666-6666-6666-6666-666666666666',
-        '11111111-1111-1111-1111-111111111111',
-        '44444444-4444-4444-4444-444444444444',
-        'accepted');
+update public.connections
+   set status = 'accepted'
+ where id = '55555555-5555-5555-5555-555555555555';
 set local role authenticated;
 
 -- (a) a FUTURE confirmed meetup → cannot report a no-show yet
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
 create temp table _m2 as
-  select public.propose_meetup('66666666-6666-6666-6666-666666666666', '2030-03-03', 'Museum') as meetup_id;
+  select public.propose_meetup('55555555-5555-5555-5555-555555555555', '2030-03-03', 'Museum') as meetup_id;
 select set_config('request.jwt.claims', '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}', true);
 select public.respond_meetup((select meetup_id from _m2), true);
 select set_config('request.jwt.claims', '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}', true);
@@ -222,7 +221,7 @@ select throws_ok(
 
 -- (b) a PAST confirmed meetup: non-party rejected, then A reports D
 create temp table _m3 as
-  select public.propose_meetup('66666666-6666-6666-6666-666666666666', '2020-01-01', 'Ghost cafe') as meetup_id;
+  select public.propose_meetup('55555555-5555-5555-5555-555555555555', '2020-01-01', 'Ghost cafe') as meetup_id;
 select set_config('request.jwt.claims', '{"sub":"44444444-4444-4444-4444-444444444444","role":"authenticated"}', true);
 select public.respond_meetup((select meetup_id from _m3), true);
 select set_config('request.jwt.claims', '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}', true);
