@@ -15,9 +15,9 @@ Build the foundation every later phase compounds on: the L0 event/outcome store,
 
 ### Story A.1 — L0 event/outcome store  [safety: true]
 - [x] Migration: `meetup_outcomes` table (shipped PR #8, 2026-06-30)
-- [ ] Unified `events` log table — **deferred** (only `meetup_outcomes` was built; revisit only if a broader event log is actually needed)
+- [ ] Unified `events` log table — **deferred to Phase B** (only `meetup_outcomes` was built; a general event log is an L1/ranker concern — build with the feature store, step 11, not before; see `docs/design/step-9-phase-a-finish-scope.md`)
 - [x] RLS: outcome writes go through the SECURITY DEFINER RPCs (no direct write policy); reads scoped to parties
-- [ ] Indexes for north-star queries (`meetups_completed` by cohort / city / time) — **partial**: user/status indexes shipped; city/time indexes pending (`meetups` has no city column yet)
+- [x] Indexes for north-star queries — **TIME cohort shipped** (step 9, `20260706160000`: completed-over-time + outcome/status time indexes + pgTAP). **CITY cohort DEFERRED**: `trips.destination_city` is a dead column (never written) and no normalized city source exists, so a city index would index NULL with no reader — lands when a real city source arrives (client-supplied city on `propose_meetup`, or geocoding `location_point`). See the scope doc.
 - [x] Cross-check web client read paths (shared backend — FOUNDATIONS §10) — done in the 2026-07-05 two-repo review
 
 ### Story A.2 — Reward function v0.1  [needs_human: true]
