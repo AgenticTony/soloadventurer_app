@@ -1,3 +1,4 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/core/api/client/api_client.dart';
 import 'package:soloadventurer/features/safety/domain/exceptions/safety_exceptions.dart';
 import 'package:soloadventurer/features/safety/data/datasources/safety_remote_data_source.dart';
@@ -14,10 +15,17 @@ import 'package:soloadventurer/features/safety/domain/entities/trusted_contact.d
 class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
   final ApiClient _apiClient;
 
+  /// Supabase client — used for the Emergency SOS trigger, which calls the
+  /// deployed `trigger-sos` Edge Function (the rest of this data source still
+  /// uses [_apiClient]; migrating those is tracked under PHASE_H).
+  final SupabaseClient _supabase;
+
   /// Creates a new [SafetyRemoteDataSourceImpl]
   SafetyRemoteDataSourceImpl({
     required ApiClient apiClient,
-  })  : _apiClient = apiClient;
+    SupabaseClient? supabaseClient,
+  })  : _apiClient = apiClient,
+        _supabase = supabaseClient ?? Supabase.instance.client;
 
   // ==================== Helper Methods ====================
 
@@ -1118,62 +1126,52 @@ class SafetyRemoteDataSourceImpl implements SafetyRemoteDataSource {
     String? tripId,
   }) async {
     try {
-      const mutation = '''
-        mutation TriggerEmergencySOS(
-          \$userId: ID!
-          \$message: String
-          \$location: SafetyAlertLocationInput!
-          \$notifyContactIds: [String!]!
-          \$batteryLevel: Int
-          \$tripId: String
-        ) {
-          triggerEmergencySOS(
-            userId: \$userId
-            message: \$message
-            location: \$location
-            notifyContactIds: \$notifyContactIds
-            batteryLevel: \$batteryLevel
-            tripId: \$tripId
-          ) {
-            id
-            userId
-            alertType
-            status
-            location {
-              latitude
-              longitude
-              accuracy
-              altitude
-              timestamp
-              address
-              placeName
-            }
-            message
-            notifiedContactIds
-            acknowledgedByContactIds
-            batteryLevel
-            triggeredAt
-            resolvedAt
-            canceledAt
-            tripId
-            checkInId
-            createdAt
-            updatedAt
-          }
-        }
-      ''';
+      // Calls the deployed `trigger-sos` Supabase Edge Function, which verifies
+      // the JWT, creates the SOS alert, records it for contact delivery, and
+      // returns a tracking id. Replaces the dead GraphQL host
+      // (api.soloadventurer.com) that made this button always fail.
+      final response = await _supabase.functions.invoke(
+        'trigger-sos',
+        body: <String, dynamic>{
+          'latitude': location.latitude,
+          'longitude': location.longitude,
+          if (location.accuracy != null) 'accuracy': location.accuracy,
+          if (location.altitude != null) 'altitude': location.altitude,
+          if (location.address != null) 'address': location.address,
+          if (message != null) 'message': message,
+          if (batteryLevel != null) 'battery_level': batteryLevel,
+          if (tripId != null) 'trip_id': tripId,
+        },
+      );
 
-      final response = await _mutation(mutation, variables: {
-        'userId': userId,
-        'message': message,
-        'location': location.toJson(),
-        'notifyContactIds': notifyContactIds,
-        'batteryLevel': batteryLevel,
-        'tripId': tripId,
-      });
+      final data = response.data;
+      if (response.status != 200 || data is! Map<String, dynamic>) {
+        throw const EmergencySOSTriggerFailedException();
+      }
 
-      final data = response['triggerEmergencySOS'] as Map<String, dynamic>;
-      return SafetyAlert.fromJson(data);
+      final triggeredAt =
+          DateTime.tryParse(data['triggered_at'] as String? ?? '') ??
+              DateTime.now().toUtc();
+
+      // The edge function returns { success, alert_id, status, triggered_at,
+      // notified_contacts_count }; the full alert lives server-side. Build the
+      // domain entity from the request + the returned tracking fields.
+      return SafetyAlert(
+        id: data['alert_id'] as String,
+        userId: userId,
+        type: SafetyAlertType.emergencySOS,
+        // Edge fn returns 'active' for a freshly-triggered alert; the client
+        // models that as `sent` (dispatched, not yet acknowledged).
+        status: SafetyAlertStatus.sent,
+        message: message,
+        location: location,
+        notifiedContactIds: notifyContactIds,
+        acknowledgedByContactIds: const [],
+        triggeredAt: triggeredAt,
+        batteryLevel: batteryLevel,
+        tripId: tripId,
+        createdAt: triggeredAt,
+      );
     } on SafetyException {
       rethrow;
     } catch (e) {
