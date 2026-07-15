@@ -33,7 +33,14 @@
 - 🔶 **Mobile (step 9 — Phase A finish)** — north-star **TIME indexes** shipping; **city cohort deferred** (`trips.destination_city` is a dead column — no city source exists yet); `events` table deferred to Phase B. **PR open.** Scope: `docs/design/step-9-phase-a-finish-scope.md`.
 - 🔶 **Credential purge** (mobile 0.1, step 3) — Anthony-owned. Still gates launch.
 
-**Stage 0 closed** (steps 1–8 merged). **Launch-gating remainder = human-led:** the credential purge (step 3) + on-device safety validation (step 7 report). **Open backend follow-ups (⚠, mobile, need sign-off):** (a) a public-safe `profiles` projection (view / column REVOKE) from the step-8 audit; (b) the north-star **city** cohort + the server-side PostHog trigger, once a real city source lands (step-9 scope). Next feature work: **step 10 (web) — consume `reputation_score` on public `/profile/[username]`** (Stage A, now unblocked — Phase A backend fully shipped).
+**Stage 0 closed** (steps 1–8 merged). **Launch-gating remainder = human-led:** the credential purge (step 3) + on-device safety validation (step 7 report). **Open backend follow-ups (⚠, mobile, need sign-off):** (a) a public-safe `profiles` projection (view / column REVOKE) from the step-8 audit — **now step 9b**; (b) the north-star **city** cohort + the server-side PostHog trigger, once a real city source lands (step-9 scope).
+
+> **⚠ RE-SEQUENCED 2026-07-07 — full project audit** (`docs/reports/full-project-audit-2026-07-07.md`, both repos).
+> Two NEW launch blockers were found and **jump the queue ahead of step 10**:
+> **9a** (mobile ⚠) the Emergency SOS screen is wired to a non-existent GraphQL backend — the SOS button always fails; and
+> **9b** (mobile ⚠) a `USING (true)` SELECT policy on `profiles` nullifies PII/block/women-only RLS gating (this absorbs follow-up (a) above).
+> The audit also found **step 10 has an unstated prerequisite**: `/profile/[username]` is a client component behind the auth wall — it must become **public + server-rendered** before consuming `reputation_score` has any acquisition value. New sprint docs: mobile `PHASE_H_HARDENING.md` (+ Phase 0 Stories 0.4/0.5), web `PHASE_W_FOUNDATION_UPGRADE.md` + `PHASE_A_PUBLIC_SURFACE.md`.
+> **Target: lift the audit scores** (Clean Arch 6, SOLID 5, code quality 6.5, schema 8, security-as-deployed 4) **to ≥8 across the board before Stage B.**
 
 ---
 
@@ -52,12 +59,22 @@
 | 7   | MOBILE ⚠ | **0.2** — production-grade safety (SOS / check-ins / meetup safety)                  | —                           | Before strangers meet offline.                                        |
 | 8   | WEB ⚠    | **0.2 + 0.3** — public-page privacy/RLS audit; confirm web holds no service-role key | 2                           | Before web goes public.                                               |
 
+### Stage 0.5 — Audit launch blockers _(inserted 2026-07-07 — do before Stage A feature work)_
+
+| #   | Repo      | Do                                                                                                                                                                      | Depends on | Est.     | Notes                                                                                                       |
+| --- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| 9a  | MOBILE ⚠ | **Story 0.4** — replace the phantom GraphQL safety backend with Supabase; fix `trigger-sos` contact-token join + notification targeting; delete the dead stack          | —          | 3–5 d    | Audit P0 #1. Safety — human sign-off + on-device validation. `PHASE_0_BLOCKERS.md` Story 0.4.               |
+| 9b  | MOBILE ⚠ | **Story 0.5** — drop `USING (true)` on `profiles`; scoped embedding access; public-safe projection (REVOKE email/phone/DOB); pgTAP proof; cross-check web              | —          | 2–3 d    | Audit P0 #2. RLS — human sign-off. Absorbs the step-8 follow-up. **Gates step 10** (public pages ride this). |
+
 ### Stage A — Reputation exists → make it visible _(mobile done → web consumes)_
 
-| #   | Repo   | Do                                                                                                    | Depends on       | Notes                                       |
-| --- | ------ | ----------------------------------------------------------------------------------------------------- | ---------------- | ------------------------------------------- |
-| 9   | MOBILE | **Phase A finish** — north-star city/time indexes; decide the deferred `events` table                 | 4                | Backend mostly shipped (PR #8).             |
-| 10  | WEB ⚠ | **Phase A** — consume `reputation_score` on public `/profile/[username]`; scaffold public share pages | 9 (tables exist) | **Now unblocked.** Read-only, RLS-verified. |
+| #   | Repo      | Do                                                                                                                                                                     | Depends on           | Est.     | Notes                                                                                                          |
+| --- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
+| 9   | MOBILE    | **Phase A finish** — north-star city/time indexes; decide the deferred `events` table                                                                                  | 4                    | PR open  | PR #17 awaiting merge.                                                                                          |
+| 9c  | WEB       | **PHASE_W** — stack upgrade (Next 15→16, React 18.2→19.2, Tailwind 3→4); server-first Supabase refactor + generated types; retire `/feed`; reframe landing; test audit | —                    | 1–2 wk   | Parallel with 9a/9b (different repos). Build the public surface ONCE, on current majors.                        |
+| 10  | WEB ⚠    | **PHASE_A_PUBLIC_SURFACE** — make `/profile/[username]` **public + SSR**, consume `reputation_score`, public trip pages, `generateMetadata`/OG, sitemap/robots         | 9b + 9c              | ~2 wk    | The original step 10 **plus its discovered prerequisite**. Privacy sign-off; no-show data stays private (see H.5). |
+| 10b | WEB ⚠    | **Funnel + viral groundwork** — install CTA everywhere public (`install_click` live), `referral_landing` wired, smart-banner config, Loop-1 (trusted-contact page) design | 10                   | 3–5 d    | In `PHASE_A_PUBLIC_SURFACE.md` (Stories A-web.3/4). Store links = 👤 Anthony's release train (waitlist interim).  |
+| 10c | MOBILE ⚠ | **PHASE_H** — audit hardening: test the product core, error spine, women-only extraction, no-Supabase-in-UI, SECURITY DEFINER backfill, no-show dispute design, deps + Flutter 3.44 | 9a + 9b              | 2–3 wk   | Runs **parallel** with 9c/10/10b (different repo). H.5's dispute design gates public negative reputation (10).  |
 
 ### Stage B — Close the AI loop _(§9: moat before growth)_
 
@@ -89,8 +106,21 @@
 
 ---
 
+## Timeline (added 2026-07-07 — solo dev + loop, human-merged PRs; estimates, not promises)
+
+| When        | Mobile lane                                                                | Web lane                                                       | 👤 Anthony (not automatable)                                        |
+| ----------- | -------------------------------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Week 1**  | Merge PR #17 (step 9) · **9a** SOS backend ⚠ · **9b** RLS repair ⚠         | **9c** PHASE_W starts (W.1 upgrades)                            | Sign off 9a/9b · credential purge (step 3) continues                 |
+| **Week 2**  | **10c** PHASE_H starts (H.1 core tests, H.2 error spine)                   | 9c finishes (W.2 server-first, W.3 feed/landing, W.4 test audit) | On-device SOS validation (with 9a)                                   |
+| **Week 3–4**| PHASE_H continues (H.3 women-only ⚠, H.4 no-UI-Supabase, H.5 backend ⚠)   | **10** public SSR profile + reputation + trip pages + SEO ⚠     | Privacy sign-offs (10) · store-listing prep (gates 10b full CTA)     |
+| **Week 5**  | PHASE_H closes (H.6 deps/Flutter 3.44, H.7 TODOs) · **re-score the audit** | **10b** install CTA + referral + Loop-1 design ⚠                | Dispute-path sign-off (H.5) · merge backlog                          |
+| **Week 6+** | Stage B (step 11) **only when real meetup volume exists**                   | Stage B web (step 12) after 11                                  | Launch call: blockers 3/9a/9b closed + safety validated              |
+
+**Definition of "scores fixed":** re-run the audit rubric after Week 5 — target Clean Architecture ≥ 8, SOLID ≥ 8, code quality ≥ 8.5, backend security ≥ 8 (schema already 8). Anything still below 8 gets a named follow-up story, not a shrug.
+
 ## What can run in parallel
 
+- **The 2026-07-07 wave:** 9a/9b (mobile) ⟂ 9c (web) — different repos, no shared tables. 10c (mobile PHASE_H) ⟂ 10/10b (web) — the only cross-repo seams are 9b's migration (cross-check web types) and H.5's dispute design (gates 10's public negative reputation).
 - **Stage 0** is the most parallel: steps 1 (PR #10), 2 (web landing), 3 (secrets, Anthony), and 5/7 (mobile analytics/safety) have no dependencies on each other.
 - **Within each of Stages A–E:** once the mobile step of a phase ships, its web step and the _next_ phase's mobile prep can overlap.
 - **Serial choke points:** PR #10 (step 1) gates all later backend work; mobile Phase B (step 11) gates Stages C–E; the credential purge (step 3) gates real-user launch regardless of dev progress.
