@@ -413,7 +413,10 @@ class UploadSync {
           .from('profiles')
           .update(operation.data)
           .eq('id', operation.entityId)
-          .select()
+          // Return only the id — a bare `.select()` is RETURNING * and would fail
+          // once email/phone/date_of_birth are column-REVOKE'd from authenticated
+          // (profiles PII column-privileges migration). The row isn't consumed here.
+          .select('id')
           .single();
 
       // Fire-and-forget: trigger embedding regeneration after profile update
