@@ -1,5 +1,17 @@
 # Phantom schema references — both repos
 
+> **UPDATE 2026-07-17.** (a) **#2 message reporting: FIXED** — repointed at the existing `reports`
+> table (`target_type='message'` was in the enum all along; no migration), errors propagate, wired
+> into the chat UI, proven by pgTAP. The scan half was **deleted**; moderation-at-creation is Phase C
+> (§9) and will be rebuilt from that design. (b) **#8 `photos`: deleted** (decision: Anthony). The
+> `Photo` model and `thumbnail_service.dart` were deliberately kept — see the commit. (c) The ratchet
+> now also checks **`.functions.invoke()`**, which immediately found a **12th phantom**:
+> `delete-user-account` (auth) — **account deletion is broken** (GDPR + store requirement). (d) A
+> related but distinct gap: **8 of the repo's 12 edge functions are not deployed to prod** (incl.
+> `verify-with-onfido`, `request-connection`/`respond-connection`, `find-potential-matches-semantic`)
+> — "merged ≠ live" applies to edge functions too; the ratchet proves repo-consistency only.
+> Current state lives in `PHASE_0_BLOCKERS.md` Story 0.7; the body below is the 2026-07-16 snapshot.
+
 > **Date:** 2026-07-16 · **Scope:** mobile `lib/`, `supabase/functions/`, web `src/` · **Verified against:** live prod (Supabase MCP, `information_schema`) **and** `supabase/migrations/`
 > **Status:** findings only — **no fixes applied.** The remediations are safety-sensitive and gated on human sign-off (Story 0.7).
 > **Reproduce:** `python3 scripts/check-schema-refs.py` (mobile + edge). Web is scanned by the same logic; its durable fix is Story **W.2** generated types.

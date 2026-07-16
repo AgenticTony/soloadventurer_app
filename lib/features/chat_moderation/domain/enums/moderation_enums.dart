@@ -1,46 +1,10 @@
-/// Result of a message moderation scan.
-enum ModerationResult {
-  /// Message is clean, no action needed
-  clean,
-
-  /// Message may be inappropriate — show overlay to recipient
-  flagged,
-
-  /// Moderation scan timed out or failed — treat as clean
-  unknown,
-  ;
-
-  static ModerationResult fromString(String? value) {
-    if (value == null) return unknown;
-    return ModerationResult.values.firstWhere(
-      (r) => r.name == value.toLowerCase(),
-      orElse: () => unknown,
-    );
-  }
-}
-
-/// Severity level for flagged messages.
-enum ModerationSeverity {
-  /// Potentially inappropriate but low confidence
-  low,
-
-  /// Likely inappropriate
-  medium,
-
-  /// High confidence inappropriate or explicit content
-  high,
-  ;
-
-  static ModerationSeverity fromString(String? value) {
-    if (value == null) return low;
-    return ModerationSeverity.values.firstWhere(
-      (s) => s.name == value.toLowerCase(),
-      orElse: () => low,
-    );
-  }
-}
-
-/// Category of moderation flag.
+/// Category a user assigns when reporting a chat message.
+///
+/// Stored (via its `name`) in `reports.details` and folded into the report
+/// reason. `ModerationResult` / `ModerationSeverity` were deleted with the
+/// background-scan half of this module (Story 0.7) — they described the output
+/// of a `moderate-message` edge function that was never created. The Phase C
+/// moderation-at-creation agent (FOUNDATIONS §9) defines its own types.
 enum ModerationCategory {
   /// Harassment or bullying
   harassment,
@@ -60,14 +24,6 @@ enum ModerationCategory {
   /// Other / general
   other,
   ;
-
-  static ModerationCategory fromString(String? value) {
-    if (value == null) return other;
-    return ModerationCategory.values.firstWhere(
-      (c) => c.name == value.toLowerCase(),
-      orElse: () => other,
-    );
-  }
 
   /// Human-readable label
   String get label => switch (this) {

@@ -73,6 +73,11 @@ STORAGE_FROM = re.compile(r"""storage\s*\.\s*from\(\s*['"]""")
 
 FROM_RE = re.compile(r"""\.from\(\s*['"]([A-Za-z_][A-Za-z0-9_]*)['"]\s*\)""")
 RPC_RE = re.compile(r"""\.rpc\(\s*['"]([A-Za-z_][A-Za-z0-9_]*)['"]""")
+# Edge-function calls are the same failure class: the chat_moderation scan half
+# invoked 'moderate-message', which was never created, and auth invokes
+# 'delete-user-account', which does not exist either. Checked against the
+# directories under supabase/functions/.
+INVOKE_RE = re.compile(r"""\.invoke\(\s*['"]([A-Za-z0-9][A-Za-z0-9_-]*)['"]""")
 
 CREATE_TABLE_RE = re.compile(
     r"""CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?["']?([a-z_][a-z0-9_]*)""",
@@ -112,14 +117,16 @@ KNOWN_NON_TABLES: dict[str, str] = {
 # ---------------------------------------------------------------------------
 BASELINE: dict[str, str] = {
     "shared_meetups": "Story 0.7 — FOUNDATIONS §5 names this a KEEP (safety pillar, 'the differentiator'). Table never created.",
-    "message_reports": "Story 0.7 — FOUNDATIONS §5 REFACTOR ('the incumbent-can't-do wedge'). Reporting a message writes nowhere.",
-    "message_moderation": "Story 0.7 — as above; the moderation lookup reads a table that does not exist.",
     "chats": "Story 0.7 — notify-new-message is trigger-invoked on EVERY message insert and selects a phantom table (messages has connection_id, not chat_id).",
     "get_entries_near_location": "Story 0.7 — journal 'entries near location' RPC was never created.",
     "travel_preferences": "Story 0.7 — offline upload_sync writes to a table that does not exist.",
     # 'photos' removed 2026-07-17: the unwired scaffold was deleted (Story 0.7 box 8).
-    # The ratchet flagged this entry as stale the moment the code went, which is the
-    # mechanism working — an entry cannot outlive its phantom.
+    # 'message_reports' / 'message_moderation' removed 2026-07-17: reporting was
+    # repointed at the real `reports` table; the scan half (and its phantom
+    # 'moderate-message' edge fn) was deleted, to be rebuilt in Phase C.
+    # The ratchet flagged each entry as stale the moment its code went, which is
+    # the mechanism working — an entry cannot outlive its phantom.
+    "delete-user-account": "Story 0.7 — auth_remote_data_source_impl invokes an edge function that does not exist in supabase/functions/. Account deletion (GDPR + store requirement) is broken; found 2026-07-17 while extending this check to .invoke().",
 }
 
 
@@ -147,8 +154,8 @@ def strip_comments(text: str, is_dart_or_ts: bool) -> str:
     return "\n".join(out)
 
 
-def parse_schema() -> tuple[set[str], set[str]]:
-    """Return (relations, functions) declared by the migrations."""
+def parse_schema() -> tuple[set[str], set[str], set[str]]:
+    """Return (relations, functions, edge_functions) declared by the repo."""
     rels: set[str] = set()
     funcs: set[str] = set()
     if not os.path.isdir(MIGRATIONS):
@@ -161,7 +168,16 @@ def parse_schema() -> tuple[set[str], set[str]]:
         rels.update(m.group(1).lower() for m in CREATE_TABLE_RE.finditer(sql))
         rels.update(m.group(1).lower() for m in CREATE_VIEW_RE.finditer(sql))
         funcs.update(m.group(1).lower() for m in CREATE_FUNC_RE.finditer(sql))
-    return rels, funcs
+    # An edge function exists iff it has a directory under supabase/functions/.
+    # NOTE: this proves the function is in the REPO, not that it is DEPLOYED —
+    # "merged ≠ live" still applies (8 of 12 repo functions were undeployed when
+    # this check was written; that gap is tracked in Story 0.7, not here).
+    edge_dir = os.path.join(REPO, "supabase", "functions")
+    edge = {
+        d for d in (os.listdir(edge_dir) if os.path.isdir(edge_dir) else [])
+        if os.path.isdir(os.path.join(edge_dir, d)) and not d.startswith(("_", "."))
+    }
+    return rels, funcs, edge
 
 
 def scan() -> dict[tuple[str, str], list[str]]:
@@ -202,25 +218,30 @@ def scan() -> dict[tuple[str, str], list[str]]:
                     hits.setdefault(("rpc", m.group(1).lower()), []).append(
                         f"{rel}:{line_of(m.start())}"
                     )
+                for m in INVOKE_RE.finditer(text):
+                    hits.setdefault(("edge-fn", m.group(1)), []).append(
+                        f"{rel}:{line_of(m.start())}"
+                    )
     return hits
 
 
 def main() -> int:
-    rels, funcs = parse_schema()
+    rels, funcs, edge = parse_schema()
 
     if "--list" in sys.argv:
         print(f"relations ({len(rels)}):\n  " + "\n  ".join(sorted(rels)))
         print(f"\nfunctions ({len(funcs)}):\n  " + "\n  ".join(sorted(funcs)))
+        print(f"\nedge functions ({len(edge)}):\n  " + "\n  ".join(sorted(edge)))
         return 0
 
     hits = scan()
+    known_by_kind = {"table": rels, "rpc": funcs, "edge-fn": edge}
     new: list[tuple[str, str, list[str]]] = []
     baselined: list[tuple[str, str, list[str]]] = []
     for (kind, name), locs in sorted(hits.items()):
         if name in KNOWN_NON_TABLES:
             continue
-        known = rels if kind == "table" else funcs
-        if name in known:
+        if name in known_by_kind[kind]:
             continue
         (baselined if name in BASELINE else new).append((kind, name, locs))
 
@@ -238,7 +259,7 @@ def main() -> int:
         print("   that no migration creates. Tests cannot catch this: they mock the")
         print("   Supabase client, and a mock answers to any name you invent.\n")
         for kind, name, locs in new:
-            label = "table/view" if kind == "table" else "rpc"
+            label = {"table": "table/view", "rpc": "rpc", "edge-fn": "edge function"}[kind]
             print(f"  {label} {name!r} — {len(locs)} call site(s)")
             for l in locs:
                 print(f"      {l}")

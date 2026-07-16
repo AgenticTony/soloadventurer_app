@@ -210,16 +210,19 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 > four photo surfaces; **a trip gallery is not one of them**. So `photos` is an unwired duplicate of
 > the sanctioned path → **likely deletion, but a 👤 product call**. **Not a launch blocker.**
 
-- [x] Add a schema-reference check that fails CI on a phantom `.from()`/`.rpc()` — `scripts/check-schema-refs.py`, wired into `code-quality.yml`. **Ratchet:** 7 known mobile/edge phantoms baselined with their owning story; **new** phantoms fail; a **fixed** baseline entry also fails until deleted, so the list can only shrink.
+- [x] Add a schema-reference check that fails CI on a phantom `.from()`/`.rpc()` — `scripts/check-schema-refs.py`, wired into `code-quality.yml`. **Ratchet:** known phantoms baselined with their owning story; **new** phantoms fail; a **fixed** baseline entry also fails until deleted, so the list can only shrink. **Extended 2026-07-17 to `.functions.invoke()`** — which immediately found the `delete-user-account` phantom below.
 - [ ] ⚠ Fix `shared_meetups` — create the table (+ RLS) or repoint the screen; FOUNDATIONS §5 names it a KEEP. **Safety — sign-off.**
-- [ ] ⚠ Fix `message_reports` / `message_moderation` — create the tables (+ RLS) or repoint. **Safety — sign-off.** Cross-check §5's server-side/at-creation direction before building the wrong shape.
+- [x] ⚠ Fix `message_reports` / `message_moderation` — **DONE 2026-07-17 (Anthony's sign-off: "rebuild server-side per §5"), executed as a split per §9:**
+  **L0 now:** `reportMessage` repointed at the **existing `reports` table** (`target_type = 'message'` was in the enum from day one — the exact `blocked_users`→`blocks` lesson; **no migration needed**). Errors now **propagate** instead of being swallowed. **Wired into the chat UI** (long-press another user's bubble → category sheet → honest success/failure snackbar; reported messages hidden). pgTAP proof: `message_reports_via_reports.test.sql` (8 assertions — real table, real RLS, not mocked).
+  **L3 deferred to Phase C:** the background-scan half (`scanMessage`/`getFlagStatus`, `ModerationFlag`, `flagged_message_overlay`) was **deleted** — it called a `moderate-message` edge function that was never created, and §9 places moderation-at-creation in Phase C, **after** the L2 ranker it feeds. Rebuild from the Phase C design, not this scaffold.
 - [ ] Fix `notify-new-message` — `.from("chats")` → the real `messages`/`connections` shape; `message.chat_id` → `connection_id`. **A column bug the scanner cannot see.**
 - [ ] Fix web's trip RPCs (`create_trip` / `get_trip_by_id` / `list_my_trips`) — create them or repoint to table queries. **Cross-repo.**
 - [ ] Fix `get_entries_near_location` — create the RPC or repoint the journal datasources
 - [ ] Fix `travel_preferences` — create the table or drop the sync path
-- [ ] 👤 Decide `photos`: delete the ~5-file scaffold (incl. orphaned `thumbnail_service.dart`), or keep it as groundwork for a §7-permitted use
-- [ ] **Web: land Story W.2 generated types** — a typed client makes all 4 web phantoms `tsc` errors **and** catches column defects the scanner cannot. The durable web fix; second independent argument for W.2's priority.
-- [ ] Each fix lands with a test that would **fail against a wrong name** — i.e. not mocked at the client boundary. **The mocked test is the root cause, not the phantom table.**
+- [x] 👤 Decide `photos` — **decided (delete) + executed 2026-07-17.** Repository/interface/screen/14-test suite removed. **Kept deliberately:** the `Photo` model (fixture data for `integration_test/performance/` — deleting it broke the build, caught and reverted) and `thumbnail_service.dart` (generic image utility; §7 lists the media pipeline as re-shape-not-delete). Tests 4517→4503, failure set identical.
+- [ ] ⚠ **NEW (2026-07-17): fix `delete-user-account`** — `auth_remote_data_source_impl.dart:614` invokes an edge function that exists **nowhere in `supabase/functions/`**. **Account deletion is broken** — a GDPR right and an app-store requirement (the ship checklist's delete-account item is wired to a phantom). Found by extending the ratchet to `.invoke()`. **Auth — sign-off.**
+- [ ] 👤 **NEW (2026-07-17): deploy the 8 undeployed edge functions** — prod runs only 4 of the repo's 12 (`trigger-sos`, `send-push-notification`, `notify-new-message`, `process-safety-alert`). **Not deployed:** `verify-with-onfido` (**ID verification — core to "vetted"**), `request-connection`/`respond-connection` (the connection flow), `find-potential-matches-semantic` (semantic matching), `generate-profile-embedding`, `notify-new-match`, `process-checkin`, `find-overlapping-trips`. "Merged ≠ live" applies to edge functions too; the ratchet proves repo-consistency only. One `supabase functions deploy <name>` each — 👤 prod action.
+- [ ] Each fix lands with a test that would **fail against a wrong name** — i.e. not mocked at the client boundary. **The mocked test is the root cause, not the phantom table.** (Done for reports: pgTAP hits the real table under RLS, and the Dart test asserts the table name + `verifyNever('message_reports')`.)
 
 ## Definition of Done / Acceptance Criteria
 - [ ] No secrets in history (scan clean); all keys rotated and old ones revoked — **keys rotated + revoked ✅ (2026-07-16); history NOT purged** → blocked on Story 0.1 box 3.
@@ -240,7 +243,7 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 | 0.4 Phantom safety backend   | 3/7   | **Blocker cleared** (SOS works). Dead-stack removal → PHASE_H.             |
 | 0.5 Profiles RLS             | 5/6   | **Live in prod.** Box 4 blocked on **0.6** — cannot prove block gating while nothing can create a block. |
 | **0.6 Blocking (NEW)**       | 0/8   | 🚨 **LAUNCH BLOCKER.** Block feature does not exist on either surface. |
-| **0.7 Phantom refs (NEW)**   | 1/10  | 🚨 **LAUNCH BLOCKER.** 11 phantom targets / 27 sites. CI ratchet landed; fixes need sign-off. |
+| **0.7 Phantom refs (NEW)**   | 3/12  | 🚨 **LAUNCH BLOCKER.** Ratchet + `.invoke()` extension live; **reporting fixed + UI-wired** (2026-07-17); photos deleted. Grew: `delete-user-account` phantom + **8 of 12 edge functions undeployed** (incl. Onfido verification). |
 
 **Phase 0 is NOT done, and it grew twice today.** The two original audit P0 *blockers* are cleared —
 the SOS button works and the `USING (true)` leak is dead in production — but **0.6 and 0.7 replaced
@@ -253,10 +256,14 @@ today and has never touched a real table name. All eleven were invisible until t
 against the live schema — which is why 0.7's first box is a **CI check**, not a fix: the fixes close
 today's list, the check closes the class.
 
-**Three safety controls do not function: block (0.6), report (0.7), share-meetup (0.7).** The last
-two are things FOUNDATIONS §5 names as strategic assets — `shared_meetups` is "the differentiator",
+**Safety controls that did not function: block (0.6 — still open), report (0.7 — ✅ FIXED
+2026-07-17, live path + pgTAP), share-meetup (0.7 — still open).** Report and share-meetup are
+things FOUNDATIONS §5 names as strategic assets — `shared_meetups` is "the differentiator",
 message moderation is "the incumbent-can't-do wedge". **The KEEP list is partly describing
-infrastructure that isn't there** — worth a charter review, not just a code fix.
+infrastructure that isn't there** — worth a charter review, not just a code fix. The 2026-07-17
+`.invoke()` extension added two more instances of "described but not there": account deletion
+(`delete-user-account` phantom) and **8 of 12 edge functions never deployed to prod** — including
+`verify-with-onfido`, which §5 calls "core to vetted".
 
 Gating other work: **0.6 + 0.7** (launch) → **0.5 box 4** (→ step 10's public profiles) → **0.4
 boxes 1/2/6** (dead-stack removal → PHASE_H). The rest are 👤 Anthony's: history purge, on-device
