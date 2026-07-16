@@ -97,3 +97,6 @@ coverage/
 
 # Archive (reference only, not active code)
 docs/archive/
+
+# Local DB backups (do not commit)
+backup_*.sql

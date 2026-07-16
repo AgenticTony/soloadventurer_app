@@ -6,7 +6,7 @@
 
 -- ── user_verification ────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS user_verification (
-  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id       uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   tier          verification_tier NOT NULL DEFAULT 'unverified',
   provider      text,                -- 'onfido' | 'stripe_identity'
@@ -56,7 +56,7 @@ ON CONFLICT DO NOTHING;
 
 -- ── profile_privacy_settings ─────────────────────────────────
 CREATE TABLE IF NOT EXISTS profile_privacy_settings (
-  id                          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id                     uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   visibility                  profile_visibility NOT NULL DEFAULT 'hidden',
   min_viewer_age              int CHECK (min_viewer_age IS NULL OR min_viewer_age BETWEEN 18 AND 99),
@@ -101,7 +101,7 @@ ON CONFLICT DO NOTHING;
 
 -- ── content_privacy_settings ─────────────────────────────────
 CREATE TABLE IF NOT EXISTS content_privacy_settings (
-  id                          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id                     uuid NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   default_post_audience       content_audience NOT NULL DEFAULT 'followers',
   allow_comments_from         comment_permission NOT NULL DEFAULT 'followers',
@@ -143,7 +143,7 @@ ON CONFLICT DO NOTHING;
 
 -- ── follows ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS follows (
-  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   follower_id   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   following_id  uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   status        follow_status NOT NULL DEFAULT 'pending',
@@ -163,7 +163,7 @@ CREATE TRIGGER trg_follows_updated_at
 
 -- ── blocks ───────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS blocks (
-  id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   blocker_id  uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   blocked_id  uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   created_at  timestamptz NOT NULL DEFAULT now(),
@@ -192,7 +192,7 @@ CREATE TRIGGER trg_block_remove_follows
 
 -- ── reports ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS reports (
-  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_id   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   target_id     uuid NOT NULL,
   target_type   report_target_type NOT NULL,
@@ -211,7 +211,7 @@ CREATE INDEX IF NOT EXISTS idx_reports_unresolved  ON reports (resolved) WHERE r
 -- ── comments ─────────────────────────────────────────────────
 -- References journals(id) — your existing content table
 CREATE TABLE IF NOT EXISTS comments (
-  id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   journal_id  uuid NOT NULL REFERENCES journals(id) ON DELETE CASCADE,
   author_id   uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   parent_id   uuid REFERENCES comments(id) ON DELETE CASCADE,
@@ -248,7 +248,7 @@ CREATE TRIGGER trg_sync_comment_count
 
 -- ── reactions ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS reactions (
-  id           uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id      uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   target_id    uuid NOT NULL,
   target_type  text NOT NULL CHECK (target_type IN ('journal', 'comment')),
@@ -281,7 +281,7 @@ CREATE TRIGGER trg_sync_reaction_count
 -- Fan-out on write: one row per follower per action.
 -- Feeds are pre-computed; reads are O(1).
 CREATE TABLE IF NOT EXISTS feed_items (
-  id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   actor_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   verb        feed_verb NOT NULL,
@@ -312,7 +312,7 @@ $$;
 
 -- ── notifications ────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS notifications (
-  id          uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   type        text NOT NULL,
   actor_id    uuid REFERENCES profiles(id) ON DELETE SET NULL,
@@ -331,7 +331,7 @@ CREATE INDEX IF NOT EXISTS idx_notifications_all    ON notifications (user_id, c
 -- Separate from existing check_ins — this is the social meetup
 -- safety feature. Link back via check_ins.meetup_checkin_id.
 CREATE TABLE IF NOT EXISTS meetup_checkins (
-  id                    uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id               uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   trusted_contact_id    uuid NOT NULL REFERENCES trusted_contacts(id) ON DELETE CASCADE,
   meetup_time           timestamptz NOT NULL,
@@ -388,7 +388,7 @@ ALTER TABLE check_ins
 
 -- ── safety_alerts (immutable audit log) ──────────────────────
 CREATE TABLE IF NOT EXISTS safety_alerts (
-  id                uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   checkin_id        uuid NOT NULL REFERENCES meetup_checkins(id),
   user_id           uuid NOT NULL REFERENCES profiles(id),
   alert_type        alert_type NOT NULL,

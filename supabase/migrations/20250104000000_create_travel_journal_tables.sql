@@ -12,7 +12,7 @@ CREATE EXTENSION IF NOT EXISTS "postgis";  -- For location/geospatial queries
 
 -- trips table: Organizes journal entries into trips
 CREATE TABLE IF NOT EXISTS trips (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   name VARCHAR(255) NOT NULL,
   description TEXT,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS trips (
 
 -- journal_entries table: Main journal entries with rich text content
 CREATE TABLE IF NOT EXISTS journal_entries (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   trip_id UUID REFERENCES trips(id) ON DELETE SET NULL,
   title VARCHAR(500) NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
 
 -- media_items table: Photos and videos attached to journal entries
 CREATE TABLE IF NOT EXISTS media_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   journal_entry_id UUID NOT NULL REFERENCES journal_entries(id) ON DELETE CASCADE,
   media_type VARCHAR(20) NOT NULL CHECK (media_type IN ('photo', 'video')),
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS media_items (
 
 -- tags table: Custom tags for categorizing entries
 CREATE TABLE IF NOT EXISTS tags (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   name VARCHAR(100) NOT NULL,
   color VARCHAR(7),  -- Hex color code for display
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS journal_tags (
 
 -- offline_changes table: Track changes made while offline for sync
 CREATE TABLE IF NOT EXISTS offline_changes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL,
   table_name VARCHAR(100) NOT NULL,
   record_id UUID NOT NULL,

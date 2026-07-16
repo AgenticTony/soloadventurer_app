@@ -8,7 +8,7 @@
 
 -- shared_links table: Store shareable links for trips with optional passwords
 CREATE TABLE IF NOT EXISTS shared_links (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   user_id UUID NOT NULL,
 
