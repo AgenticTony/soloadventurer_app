@@ -2,7 +2,7 @@
 
 **One linear sequence across both repos.** The two projects share the FOUNDATIONS §9 phase spine (0 → A → B → C → D → E) but each has its own sprint plan, because they have different jobs (web = acquisition, mobile = product + shared backend). This document flattens both into a single "do this next" order so there's never ambiguity about which repo to work in.
 
-> **Created:** 2026-07-05 · **Source of truth for _what_:** `docs/FOUNDATIONS.md` §9. This doc governs _order_ only. Mirror it into the mobile repo (like FOUNDATIONS) so both sides read the same sequence.
+> **Created:** 2026-07-05 · **Last updated:** 2026-07-16 · **Source of truth for _what_:** `docs/FOUNDATIONS.md` §9. This doc governs _order_ only. Mirror it into the mobile repo (like FOUNDATIONS) so both sides read the same sequence — **update both copies in the same change, or neither.**
 
 ---
 
@@ -22,7 +22,7 @@
 ## Current status (start line)
 
 - ✅ **Mobile PR #8** — Phase A backend (meetups/outcomes/reputation) merged.
-- ✅ **Mobile PR #10** — Supabase CI repair — **merged 2026-07-05**, all 17 checks green, pgTAP passing for the first time (12 pre-existing defects fixed; see the PR's closing comment). ⚠ Prod note: run `supabase migration repair --status applied` for the already-live 2026 migrations before the first real `supabase db push`.
+- ✅ **Mobile PR #10** — Supabase CI repair — **merged 2026-07-05**, all 17 checks green, pgTAP passing for the first time (12 pre-existing defects fixed; see the PR's closing comment). ~~⚠ Prod note: run `supabase migration repair --status applied` for the already-live 2026 migrations before the first real `supabase db push`.~~ **OBSOLETE — do NOT do this.** Superseded by the 2026-07-15 repave (below): the live migration history is now clean and complete, so a `repair` would mark migrations applied that the repave already applied for real. The earlier repair plan was caught marking `sos_alerts` / `notification_tokens` as applied when those tables did **not** exist live — which would have skipped their creation on the next `db push` and silently broken the 9a SOS backend.
 - ✅ **Landing-page fix** (web Story 0.4) — merged (web PR #17).
 - ✅ **Doc-cleanup PRs** (web #15/#16) — merged.
 - ✅ **Mobile PR #13 (step 4 — A.4)** — `report_no_show` + `cancel_meetup` RPCs — **merged 2026-07-06**, closes reward-fn v0.1 (no-show penalty now wired + attributed to the absent party). pgTAP 22→36. Phase A backend fully shipped.
@@ -30,13 +30,35 @@
 - ✅ **Web (step 6 — 0.1)** — PostHog-js acquisition funnel + GDPR consent, **same PostHog project** as mobile — **merged 2026-07-06** (web PR #20).
 - ✅ **Web (step 8 — 0.2/0.3 privacy/RLS audit)** — **merged 2026-07-06** (web PR #21). No service-role key; anon-key only; **fixed a PII leak** (`select('*')` on profiles → other users' email/phone/DOB) via a non-PII projection. Report: `docs/reports/web-privacy-rls-audit-2026-07-06.md`.
 - ✅ **Mobile (step 7 — 0.2 safety audit)** — **merged 2026-07-06** (mobile PR #16). Safety surface is mature; tested the missed-check-in detector + **fixed a `dispose()` bug**. On-device/edge-load safety validation remains **human-led** (launch-gating). Report: `docs/reports/safety-hardening-audit-2026-07-06.md`.
-- 🔶 **Mobile (step 9 — Phase A finish)** — north-star **TIME indexes** shipping; **city cohort deferred** (`trips.destination_city` is a dead column — no city source exists yet); `events` table deferred to Phase B. **PR open.** Scope: `docs/design/step-9-phase-a-finish-scope.md`.
-- 🔶 **Credential purge** (mobile 0.1, step 3) — Anthony-owned. Still gates launch.
+- ✅ **Mobile PR #17 (step 9 — Phase A finish)** — north-star **TIME indexes** — **merged 2026-07-07**. **City cohort deferred** (`trips.destination_city` is a dead column — no city source exists yet); `events` table deferred to Phase B. Scope: `docs/design/step-9-phase-a-finish-scope.md`.
+- ✅ **Mobile 9b (Story 0.5 — RLS/PII repair)** — **merged + LIVE in prod 2026-07-15** (PR #20 `USING (true)` drop + guarded SECURITY DEFINER matchers, pgTAP green; PR #21 H.5 partial hardening; PR #22 / web PR #25 Batch-2 PII column privileges). Absorbs the step-8 follow-up (a). **Step 10's RLS dependency is satisfied.**
+- ✅ **Mobile 9a (Story 0.4 — SOS backend)** — **merged 2026-07-16** (PR #23 client wiring → `trigger-sos`; PR #25 edge-function repair: contact columns + notification targeting). Deployed; prod == `main`. **Remaining: on-device validation — 👤 human, launch-gating.**
+- ✅ **Web 9c/W.1a (step 9c — PHASE_W first slice)** — Next 15→16, React 18.2→19.2, ESLint 9 flat config — **merged 2026-07-15** (web PR #24). **PHASE_W overall is 3/24** — see below.
+- 🔶 **Credential purge** (mobile 0.1, step 3) — **rotation CONFIRMED DONE 2026-07-15** (the leaked service-role key is dead). **Git-history purge (~561 commits) still open** — Anthony-owned, now a lower-priority cleanup rather than a `db push` blocker.
 
-**Stage 0 closed** (steps 1–8 merged). **Launch-gating remainder = human-led:** the credential purge (step 3) + on-device safety validation (step 7 report). **Open backend follow-ups (⚠, mobile, need sign-off):** (a) a public-safe `profiles` projection (view / column REVOKE) from the step-8 audit — **now step 9b**; (b) the north-star **city** cohort + the server-side PostHog trigger, once a real city source lands (step-9 scope).
+> **🔁 PROD REPAVED 2026-07-15 — the "CI green ≠ deployed" gap is closed.**
+> Prod had drifted badly: Phase A was never deployed, another project's migrations sat in the
+> live history (stray `jobs` table), and the live `profiles` RLS was dashboard-era. Fixed by a
+> clean repave (`supabase db reset --linked`) — **prod now matches the repo** (27 migrations
+> applied; Phase A / `sos_alerts` / `notification_tokens` present; foreign `jobs` gone; the
+> `USING (true)` leak and the PII REVOKEs are **live, not just in CI**). Blocked once on
+> unqualified `uuid_generate_v4()`; fixed via mobile PR #24 (`gen_random_uuid()`), merged so
+> `main`/CI carry it. **Cost:** prod data was truncated (`auth.users`, `profiles`, `trips` all 0 —
+> was 2 profiles / 5 trips of test data; dumped to `backup_*.sql`). **Test accounts must be
+> recreated.** Plan/verification: `docs/reports/prod-db-reconciliation-plan-2026-07-15.md`.
+> **Standing rule this cost us:** "merged" ≠ "live" — verify every backend claim against prod.
+
+**Stage 0 closed** (steps 1–8 merged). **Stage 0.5 closed** (9a + 9b merged and live).
+**Launch-gating remainder = 👤 human-led:** on-device SOS/safety validation (step 7 + 9a) and the
+git-history purge (step 3). **Open backend follow-ups (⚠, mobile, need sign-off):** the north-star
+**city** cohort + the server-side PostHog trigger, once a real city source lands (step-9 scope).
+**Post-repave advisor backlog → PHASE_H (not blockers):** `check_ins` has **RLS disabled** (unused
+legacy table — drop or enable), 5 SECURITY DEFINER views should be INVOKER, 45
+`function_search_path_mutable`, avatars bucket listable.
 
 > **⚠ RE-SEQUENCED 2026-07-07 — full project audit** (`docs/reports/full-project-audit-2026-07-07.md`, both repos).
-> Two NEW launch blockers were found and **jump the queue ahead of step 10**:
+> _Both blockers below are **RESOLVED** as of 2026-07-16 — kept for the rationale._
+> Two NEW launch blockers were found and **jumped the queue ahead of step 10**:
 > **9a** (mobile ⚠) the Emergency SOS screen is wired to a non-existent GraphQL backend — the SOS button always fails; and
 > **9b** (mobile ⚠) a `USING (true)` SELECT policy on `profiles` nullifies PII/block/women-only RLS gating (this absorbs follow-up (a) above).
 > The audit also found **step 10 has an unstated prerequisite**: `/profile/[username]` is a client component behind the auth wall — it must become **public + server-rendered** before consuming `reputation_score` has any acquisition value. New sprint docs: mobile `PHASE_H_HARDENING.md` (+ Phase 0 Stories 0.4/0.5), web `PHASE_W_FOUNDATION_UPGRADE.md` + `PHASE_A_PUBLIC_SURFACE.md`.
@@ -59,22 +81,30 @@
 | 7   | MOBILE ⚠ | **0.2** — production-grade safety (SOS / check-ins / meetup safety)                  | —                           | Before strangers meet offline.                                        |
 | 8   | WEB ⚠    | **0.2 + 0.3** — public-page privacy/RLS audit; confirm web holds no service-role key | 2                           | Before web goes public.                                               |
 
-### Stage 0.5 — Audit launch blockers _(inserted 2026-07-07 — do before Stage A feature work)_
+### Stage 0.5 — Audit launch blockers _(inserted 2026-07-07 — **CLOSED 2026-07-16**)_
 
-| #   | Repo      | Do                                                                                                                                                                      | Depends on | Est.     | Notes                                                                                                       |
-| --- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| 9a  | MOBILE ⚠ | **Story 0.4** — replace the phantom GraphQL safety backend with Supabase; fix `trigger-sos` contact-token join + notification targeting; delete the dead stack          | —          | 3–5 d    | Audit P0 #1. Safety — human sign-off + on-device validation. `PHASE_0_BLOCKERS.md` Story 0.4.               |
-| 9b  | MOBILE ⚠ | **Story 0.5** — drop `USING (true)` on `profiles`; scoped embedding access; public-safe projection (REVOKE email/phone/DOB); pgTAP proof; cross-check web              | —          | 2–3 d    | Audit P0 #2. RLS — human sign-off. Absorbs the step-8 follow-up. **Gates step 10** (public pages ride this). |
+| #   | Repo      | Do                                                                                                                                                             | Depends on | Est.  | Notes                                                                                                                     |
+| --- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------- |
+| 9a  | MOBILE ⚠ | **Story 0.4** — replace the phantom GraphQL safety backend with Supabase; fix `trigger-sos` contact-token join + notification targeting; delete the dead stack | —          | 3–5 d | ✅ **DONE** — PRs #23 + #25, merged + deployed 2026-07-16. **👤 on-device validation still outstanding (launch-gating).** |
+| 9b  | MOBILE ⚠ | **Story 0.5** — drop `USING (true)` on `profiles`; scoped embedding access; public-safe projection (REVOKE email/phone/DOB); pgTAP proof; cross-check web      | —          | 2–3 d | ✅ **DONE + LIVE** — PRs #20/#21/#22 + web #25, live in prod 2026-07-15 via the repave. **Step 10 is unblocked on RLS.**  |
 
 ### Stage A — Reputation exists → make it visible _(mobile done → web consumes)_
 
-| #   | Repo      | Do                                                                                                                                                                     | Depends on           | Est.     | Notes                                                                                                          |
-| --- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| 9   | MOBILE    | **Phase A finish** — north-star city/time indexes; decide the deferred `events` table                                                                                  | 4                    | PR open  | PR #17 awaiting merge.                                                                                          |
-| 9c  | WEB       | **PHASE_W** — stack upgrade (Next 15→16, React 18.2→19.2, Tailwind 3→4); server-first Supabase refactor + generated types; retire `/feed`; reframe landing; test audit | —                    | 1–2 wk   | Parallel with 9a/9b (different repos). Build the public surface ONCE, on current majors.                        |
-| 10  | WEB ⚠    | **PHASE_A_PUBLIC_SURFACE** — make `/profile/[username]` **public + SSR**, consume `reputation_score`, public trip pages, `generateMetadata`/OG, sitemap/robots         | 9b + 9c              | ~2 wk    | The original step 10 **plus its discovered prerequisite**. Privacy sign-off; no-show data stays private (see H.5). |
-| 10b | WEB ⚠    | **Funnel + viral groundwork** — install CTA everywhere public (`install_click` live), `referral_landing` wired, smart-banner config, Loop-1 (trusted-contact page) design | 10                   | 3–5 d    | In `PHASE_A_PUBLIC_SURFACE.md` (Stories A-web.3/4). Store links = 👤 Anthony's release train (waitlist interim).  |
-| 10c | MOBILE ⚠ | **PHASE_H** — audit hardening: test the product core, error spine, women-only extraction, no-Supabase-in-UI, SECURITY DEFINER backfill, no-show dispute design, deps + Flutter 3.44 | 9a + 9b              | 2–3 wk   | Runs **parallel** with 9c/10/10b (different repo). H.5's dispute design gates public negative reputation (10).  |
+| #   | Repo      | Do                                                                                                                                                                                  | Depends on | Est.    | Notes                                                                                                                                                                                                                                  |
+| --- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 9   | MOBILE    | **Phase A finish** — north-star city/time indexes; decide the deferred `events` table                                                                                               | 4          | ✅ done | PR #17 **merged 2026-07-07**. City cohort + `events` still deferred.                                                                                                                                                                   |
+| 9c  | WEB       | **PHASE_W** — stack upgrade (Next 15→16, React 18.2→19.2, Tailwind 3→4); server-first Supabase refactor + generated types; retire `/feed`; reframe landing; test audit              | —          | 1–2 wk  | 🔶 **IN PROGRESS — 3/24.** W.1a (Next 16 + React 19) merged; Tailwind 4 + `date-fns` v4 open. **W.2 is now the priority** (see note under the table).                                                                                  |
+| 10  | WEB ⚠    | **PHASE_A_PUBLIC_SURFACE** — make `/profile/[username]` **public + SSR**, consume `reputation_score`, public trip pages, `generateMetadata`/OG, sitemap/robots                      | 9b + 9c    | ~2 wk   | 0/23. **9b is satisfied; 9c is the only remaining gate.** Prerequisite still unmet: `/profile/[username]` renders a `'use client'` child and `middleware.ts` walls `/profile`. Privacy sign-off; no-show data stays private (see H.5). |
+| 10b | WEB ⚠    | **Funnel + viral groundwork** — install CTA everywhere public (`install_click` live), `referral_landing` wired, smart-banner config, Loop-1 (trusted-contact page) design           | 10         | 3–5 d   | In `PHASE_A_PUBLIC_SURFACE.md` (Stories A-web.3/4). Store links = 👤 Anthony's release train (waitlist interim).                                                                                                                       |
+| 10c | MOBILE ⚠ | **PHASE_H** — audit hardening: test the product core, error spine, women-only extraction, no-Supabase-in-UI, SECURITY DEFINER backfill, no-show dispute design, deps + Flutter 3.44 | 9a + 9b    | 2–3 wk  | **Unblocked** (9a + 9b both done). Runs **parallel** with 9c/10/10b (different repo). H.5's dispute design gates public negative reputation (10). Absorbs the post-repave advisor backlog.                                             |
+
+> **⚠ Cross-repo seam, live now — do W.2 first (added 2026-07-16).** The repave put mobile's Story 0.5
+> schema — including **column-level REVOKEs on `profiles` (email/phone/DOB)** — into production. Web
+> still has **no generated types** (`src/types/database.types.ts` does not exist) and reads rows through
+> `Record<string, unknown>` casts in `src/lib/api.ts`, so **nothing type-checks web against the schema it
+> actually queries**. This is exactly the `get_reputation` / `reputation_score` class of drift that §10's
+> seam rule exists to prevent. W.2's type generation is the highest-value web story and should precede
+> the remaining W.1 majors.
 
 ### Stage B — Close the AI loop _(§9: moat before growth)_
 
@@ -108,13 +138,18 @@
 
 ## Timeline (added 2026-07-07 — solo dev + loop, human-merged PRs; estimates, not promises)
 
-| When        | Mobile lane                                                                | Web lane                                                       | 👤 Anthony (not automatable)                                        |
-| ----------- | -------------------------------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------- |
-| **Week 1**  | Merge PR #17 (step 9) · **9a** SOS backend ⚠ · **9b** RLS repair ⚠         | **9c** PHASE_W starts (W.1 upgrades)                            | Sign off 9a/9b · credential purge (step 3) continues                 |
-| **Week 2**  | **10c** PHASE_H starts (H.1 core tests, H.2 error spine)                   | 9c finishes (W.2 server-first, W.3 feed/landing, W.4 test audit) | On-device SOS validation (with 9a)                                   |
-| **Week 3–4**| PHASE_H continues (H.3 women-only ⚠, H.4 no-UI-Supabase, H.5 backend ⚠)   | **10** public SSR profile + reputation + trip pages + SEO ⚠     | Privacy sign-offs (10) · store-listing prep (gates 10b full CTA)     |
-| **Week 5**  | PHASE_H closes (H.6 deps/Flutter 3.44, H.7 TODOs) · **re-score the audit** | **10b** install CTA + referral + Loop-1 design ⚠                | Dispute-path sign-off (H.5) · merge backlog                          |
-| **Week 6+** | Stage B (step 11) **only when real meetup volume exists**                   | Stage B web (step 12) after 11                                  | Launch call: blockers 3/9a/9b closed + safety validated              |
+> **Week 1 is done (2026-07-16), and it ran ahead on mobile / behind on web.** Mobile did Week 1's
+> scope **plus** an unplanned prod repave: step 9 merged, 9a + 9b merged and live, rotation confirmed.
+> Web got W.1a only, so **9c is the critical path now** — it is the sole remaining gate on step 10.
+> Weeks below are unrenumbered; read them as sequence, not dates.
+
+| When          | Mobile lane                                                                                                     | Web lane                                                                  | 👤 Anthony (not automatable)                                                                 |
+| ------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| **Week 1** ✅ | ~~Merge PR #17 (step 9)~~ · ~~**9a** SOS backend ⚠~~ · ~~**9b** RLS repair ⚠~~ — all merged; **prod repaved** | **9c** PHASE_W started (W.1a only — Next 16 + React 19)                   | ~~Rotation~~ ✅ done · history purge open · 9a/9b sign-off open                              |
+| **Week 2**    | **10c** PHASE_H starts (H.1 core tests, H.2 error spine) — **unblocked**                                        | 9c finishes (**W.2 first**, W.1 majors, W.3 feed/landing, W.4 test audit) | On-device SOS validation (with 9a) · **recreate prod test accounts** (repave truncated them) |
+| **Week 3–4**  | PHASE_H continues (H.3 women-only ⚠, H.4 no-UI-Supabase, H.5 backend ⚠)                                       | **10** public SSR profile + reputation + trip pages + SEO ⚠              | Privacy sign-offs (10) · store-listing prep (gates 10b full CTA)                             |
+| **Week 5**    | PHASE_H closes (H.6 deps/Flutter 3.44, H.7 TODOs) · **re-score the audit**                                      | **10b** install CTA + referral + Loop-1 design ⚠                         | Dispute-path sign-off (H.5) · merge backlog                                                  |
+| **Week 6+**   | Stage B (step 11) **only when real meetup volume exists**                                                       | Stage B web (step 12) after 11                                            | Launch call: blockers 3/9a/9b closed + safety validated                                      |
 
 **Definition of "scores fixed":** re-run the audit rubric after Week 5 — target Clean Architecture ≥ 8, SOLID ≥ 8, code quality ≥ 8.5, backend security ≥ 8 (schema already 8). Anything still below 8 gets a named follow-up story, not a shrug.
 
