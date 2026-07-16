@@ -10,8 +10,15 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 > found two NEW launch blockers — the phantom SOS backend (Story 0.4) and the `USING (true)`
 > profiles RLS policy (Story 0.5). Both added below; both ⚠ human sign-off.
 
+> **🚨 Updated 2026-07-16 — a THIRD launch blocker: Story 0.6.** The 0.4 and 0.5 blockers are now
+> cleared (SOS reaches Supabase; the RLS leak is dead in prod), but attempting 0.5's block pgTAP
+> revealed that **blocking does not exist**: web's block code targets `blocked_users`, a table that
+> is not in the schema, and mobile has no block path at all. Same failure mode as 0.4 — safety
+> scaffolding wired to a phantom backend, with green tests because they mock the client. **Story 0.6
+> below is now the open Phase 0 blocker.** See the per-story table at the end for current state.
+
 ## Scope
-**IN:** credential rotation + history purge; safety hardening (SOS, check-ins, meetup safety) to production; product analytics; lock `meetups_completed` as the north-star event; **audit P0s: real Supabase safety backend (0.4) + profiles RLS repair (0.5)**.
+**IN:** credential rotation + history purge; safety hardening (SOS, check-ins, meetup safety) to production; product analytics; lock `meetups_completed` as the north-star event; **audit P0s: real Supabase safety backend (0.4) + profiles RLS repair (0.5)**; **make blocking actually work (0.6)**.
 **OUT:** new product features (Phase A+); acquisition/growth (web lane).
 **Guardrails (FOUNDATIONS §6):** safety is the substrate, not a feature page; no engagement proxy as a north star.
 
@@ -112,9 +119,63 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 > per `CLAUDE.md`, and **execution-order step 10 makes profiles public + SSR on top of this exact
 > schema**. Shipping public profile pages while block/women-only gating is unproven is the risk the
 > DoD box exists to prevent. **Recommend: this box gates step 10, not just Phase 0.**
+>
+> **UPDATE 2026-07-16 — writing this test is what found Story 0.6.** The block clause of box 4
+> **cannot be made honestly green yet**: the DB-level gating in `profiles_read_potential_matches` is
+> real and would largely pass if pgTAP inserted `blocks` rows directly — but **no application code
+> path can create a block row** (see 0.6), and `profiles_read_connected` bypasses the check entirely.
+> A green "block gating holds" here would be true of the database and false of the product — exactly
+> the false-green this doc has been correcting all day. **Box 4 is therefore blocked on 0.6.**
+> The **women-only clause is independently testable** and can go green on its own merit.
+
+### Story 0.6 — Blocking does not exist (phantom `blocked_users` table)  [safety: true] [needs_human: true]
+> **NEW LAUNCH BLOCKER — found 2026-07-16 while trying to write Story 0.5's block pgTAP.**
+> **The block feature is non-functional on both surfaces.** It is not "buggy" — no code path can
+> create a block row. This is the **same class as Story 0.4** (safety scaffolding wired to a backend
+> that isn't there); the 2026-07-07 audit caught that pattern for SOS and missed it for blocking.
+>
+> **Evidence (all verified 2026-07-16, live prod + both repos):**
+> | Layer | State |
+> | --- | --- |
+> | `public.blocks` table + RLS | ✅ exists in prod — columns `id, blocker_id, blocked_id, created_at` |
+> | `are_users_blocked(a,b)` | ✅ exists; used by `profiles_read_potential_matches` |
+> | Web writes to… | ❌ **`blocked_users` — NO SUCH TABLE.** Confirmed absent from live prod (`information_schema`: only `blocks` exists). 4 call sites: `PrivacyContext.tsx:165,214,294`, `BlockDialog.tsx:96` |
+> | Web references `blocks` | ❌ **zero times** |
+> | `BlockDialog` component | ❌ imported by nothing — unreachable |
+> | `PrivacyContext.blockUser` | ❌ called only from `src/contexts/__tests__/PrivacyContext.test.tsx` |
+> | Mobile | ❌ **no block implementation at all** |
+> | `PrivacyContext.test.tsx` | ⚠️ **passes** — it mocks the Supabase client, so it proves nothing about the table |
+>
+> **Consequence:** `are_users_blocked()` can never return true in production, so the block clause in
+> `profiles_read_potential_matches` is **unreachable in practice** — a correct policy guarding an
+> empty table. A user cannot protect themselves from a harasser. On a vetted trust platform for solo
+> travellers with **women-only mode as core strategy** (`CLAUDE.md`), this is launch-gating.
+>
+> **Not a data leak.** Nothing is exposed that shouldn't be; prod has 0 users post-repave. This is a
+> **missing safety capability**, and the web path fails loudly (error toast) rather than silently.
+>
+> **Second, independent defect (same area):** `profiles_read_connected`
+> (`20260401150000_rls_policies.sql:35`) grants SELECT on `has_active_connection()` with **no block
+> check**. Permissive policies OR together, and the `AFTER INSERT ON blocks` trigger
+> (`20250111000000_new_social_tables.sql:190`) deletes rows from **`follows`, not `connections`**. So
+> even once blocking works, **blocking a connected user will not hide your profile from them** —
+> `profiles_read_potential_matches` denies, `profiles_read_connected` grants, grant wins.
+>
+> **Third mismatch:** web inserts a `reason` field, but `blocks` has **no `reason` column** — so this
+> is not a rename. `reason` needs a column, a drop, or routing to `reports` (a product decision).
+
+- [ ] Decide the target shape 👤: add `reason` to `blocks`, drop the field, or route it to `reports`
+- [ ] Point all 4 web call sites at `blocks` (`PrivacyContext.tsx:165,214,294`, `BlockDialog.tsx:96`); delete every `blocked_users` reference
+- [ ] Wire `BlockDialog` into a reachable surface (it is currently imported by nothing)
+- [ ] Add the block clause to `profiles_read_connected` — `AND NOT are_users_blocked(auth.uid(), id)` — so a block severs profile visibility regardless of connection state ⚠ RLS change, human sign-off
+- [ ] Decide 👤 whether a block should also tear down the `connections` row (status → `blocked`) or only gate reads; the trigger currently touches `follows` only
+- [ ] Mobile: implement the block path (none exists) or explicitly defer it with a dated note
+- [ ] Replace the mocked-Supabase block test with one that would fail against a wrong table name (the current test passes on a phantom table — that is the defect that hid this)
+- [ ] pgTAP: a block row makes the blocker's profile unreadable **via every SELECT policy**, including the connected path — this is Story 0.5 box 4's block clause, and it cannot pass honestly until the above lands
 
 ## Definition of Done / Acceptance Criteria
 - [ ] No secrets in history (scan clean); all keys rotated and old ones revoked — **keys rotated + revoked ✅ (2026-07-16); history NOT purged** → blocked on Story 0.1 box 3.
+- [ ] **Blocking actually works end-to-end: a real block row is written to `blocks`, and it hides the profile via every SELECT policy** (Story 0.6)
 - [ ] Safety flows pass end-to-end + integration tests green — **integration tests green in CI ✅; "end-to-end" (real device → real contact delivery) NOT done** → 👤 Story 0.2 box 5 + Story 0.4 box 7.
 - [ ] `meetups_completed` event firing in analytics; cohort dashboard live — **cohort dashboard not configured** (Story 0.3 box 4, confirmed 2026-07-16).
 - [x] `flutter analyze` errors-only clean; test baseline not regressed — green on `main` (Analyze & Format, Unit & Widget Tests, Coverage Gate 80%, Integration Tests all pass).
@@ -123,19 +184,28 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 
 ## Phase 0 status at a glance (2026-07-16)
 
-| Story                        | State | Note                                                                    |
-| ---------------------------- | ----- | ----------------------------------------------------------------------- |
-| 0.1 Credentials              | 3/5   | Rotated + revoked ✅. History purge open (👤). Box 4 blocked on box 3.  |
-| 0.2 Safety surface           | 3/5   | Device/load-led items open (👤) — launch-gating.                        |
-| 0.3 Analytics + north-star   | 3/4   | Cohort retention dashboard not configured (PostHog UI, 👤).             |
-| 0.4 Phantom safety backend   | 3/7   | **Blocker cleared** (SOS works). Dead-stack removal → PHASE_H.          |
-| 0.5 Profiles RLS             | 5/6   | **Live in prod.** Missing: block + women-only pgTAP proof.              |
+| Story                        | State | Note                                                                       |
+| ---------------------------- | ----- | -------------------------------------------------------------------------- |
+| 0.1 Credentials              | 3/5   | Rotated + revoked ✅. History purge open (👤). Box 4 blocked on box 3.     |
+| 0.2 Safety surface           | 3/5   | Device/load-led items open (👤) — launch-gating. **See 0.6** — the audit's "mature safety surface" did not notice blocking is absent. |
+| 0.3 Analytics + north-star   | 3/4   | Cohort retention dashboard not configured (PostHog UI, 👤).                |
+| 0.4 Phantom safety backend   | 3/7   | **Blocker cleared** (SOS works). Dead-stack removal → PHASE_H.             |
+| 0.5 Profiles RLS             | 5/6   | **Live in prod.** Box 4 blocked on **0.6** — cannot prove block gating while nothing can create a block. |
+| **0.6 Blocking (NEW)**       | 0/8   | 🚨 **NEW LAUNCH BLOCKER.** Block feature does not exist on either surface. |
 
-**Phase 0 is NOT done.** The two audit P0 *blockers* are cleared — the SOS button works and the
-`USING (true)` leak is dead in production — but four stories carry real remainders. The two that
-gate other work: **0.5 box 4** (block/women-only proof → gates step 10's public profiles) and
-**0.4 boxes 1/2/6** (dead-stack removal → PHASE_H). The rest are 👤 Anthony's: history purge,
-on-device safety validation, PostHog dashboard.
+**Phase 0 is NOT done, and it grew.** The two original audit P0 *blockers* are cleared — the SOS
+button works and the `USING (true)` leak is dead in production — but **Story 0.6 replaces them as
+the open blocker**: blocking is a safety control that does not function, found only because 0.5's
+pgTAP forced someone to check whether the gating was reachable.
+
+**The lesson worth keeping:** 0.4 and 0.6 are the same failure — a safety feature with a table,
+a policy, a component, an API and green tests, wired to a backend that does not exist. The tests
+passed because they mocked the client. **When a safety test mocks its backend, it proves the mock.**
+Both were invisible until someone diffed the code against the live schema.
+
+Gating other work: **0.6** (launch) → **0.5 box 4** (→ step 10's public profiles) → **0.4 boxes
+1/2/6** (dead-stack removal → PHASE_H). The rest are 👤 Anthony's: history purge, on-device safety
+validation, PostHog dashboard.
 
 ## Dependencies
 None — this is first. Unblocks Phase A. (The loop will stop on these `safety`/`needs_human` stories; a human flips `active_sprint` to `PHASE_A_LAY_THE_SPINE` once unblocked.)

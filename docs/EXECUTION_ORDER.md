@@ -31,10 +31,25 @@
 - ✅ **Web (step 8 — 0.2/0.3 privacy/RLS audit)** — **merged 2026-07-06** (web PR #21). No service-role key; anon-key only; **fixed a PII leak** (`select('*')` on profiles → other users' email/phone/DOB) via a non-PII projection. Report: `docs/reports/web-privacy-rls-audit-2026-07-06.md`.
 - ✅ **Mobile (step 7 — 0.2 safety audit)** — **merged 2026-07-06** (mobile PR #16). Safety surface is mature; tested the missed-check-in detector + **fixed a `dispose()` bug**. On-device/edge-load safety validation remains **human-led** (launch-gating). Report: `docs/reports/safety-hardening-audit-2026-07-06.md`.
 - ✅ **Mobile PR #17 (step 9 — Phase A finish)** — north-star **TIME indexes** — **merged 2026-07-07**. **City cohort deferred** (`trips.destination_city` is a dead column — no city source exists yet); `events` table deferred to Phase B. Scope: `docs/design/step-9-phase-a-finish-scope.md`.
-- 🔶 **Mobile 9b (Story 0.5 — RLS/PII repair) — LIVE in prod, 5/6.** Merged 2026-07-15 (PR #20 `USING (true)` drop + guarded SECURITY DEFINER matchers; PR #21 H.5 partial hardening; PR #22 / web PR #25 Batch-2 PII column privileges) and live via the repave. The **leak is dead in production** — verified: `authenticated` can read `username`, not `email`. **⚠ Open: the pgTAP proof is incomplete.** PII is proven (20 assertions), but **block-list and women-only gating have ZERO pgTAP coverage** — the exact gating the audit said `USING (true)` had nullified. **This gates step 10** (see the Stage A note).
+- 🔶 **Mobile 9b (Story 0.5 — RLS/PII repair) — LIVE in prod, 5/6.** Merged 2026-07-15 (PR #20 `USING (true)` drop + guarded SECURITY DEFINER matchers; PR #21 H.5 partial hardening; PR #22 / web PR #25 Batch-2 PII column privileges) and live via the repave. The **leak is dead in production** — verified: `authenticated` can read `username`, not `email`. **⚠ Open: the pgTAP proof is incomplete.** PII is proven (20 assertions), but **block-list and women-only gating have ZERO pgTAP coverage** — the exact gating the audit said `USING (true)` had nullified. The **women-only clause is testable now**; the **block clause is blocked on 9d** (proving block gating is meaningless while nothing can create a block row). **This gates step 10** (see the Stage A note).
 - 🔶 **Mobile 9a (Story 0.4 — SOS backend) — blocker cleared, story 3/7.** Merged + deployed 2026-07-16 (PR #23 client wiring → `trigger-sos`; PR #25 edge-function repair: contact columns + notification targeting); prod == `main`. **The audit's P0 is resolved — the SOS button reaches Supabase and reports honestly.** But the phantom stack was **not** deleted: PR #23 patched the SOS method inside the existing data source, so `lib/` still holds **8 `api.soloadventurer.com` references** (DoD demands zero), 4 `_apiClient` calls for check-ins/contacts/location, `MockSafetyRemoteDataSource` in `lib/`, and `profile_repository_impl.dart:167` still POSTing `/graphql`. **Removal → PHASE_H (10c).** **👤 On-device validation still launch-gating.**
 - ✅ **Web 9c/W.1a (step 9c — PHASE_W first slice)** — Next 15→16, React 18.2→19.2, ESLint 9 flat config — **merged 2026-07-15** (web PR #24). **PHASE_W overall is 3/24** — see below.
 - 🔶 **Credential purge** (mobile 0.1, step 3) — **3/5. Rotation AND revocation are DONE** (service-role key confirmed 2026-07-15; AWS / OpenAI / Resend / Twilio / GitHub+GitLab PATs rotated and old keys revoked at the providers — confirmed by Anthony 2026-07-16). **Git-history purge (~561 commits) still open** — Anthony-owned. Now a **lower-severity cleanup**: history holds only **dead** credentials, so it stopped being a `db push` or launch blocker. Note the scan box **cannot** go green until the purge does, and **CI's GitGuardian check scans the diff, not history** — a green PR check is not evidence history is clean.
+
+> **🚨 NEW LAUNCH BLOCKER 2026-07-16 — step 9d: blocking does not exist.**
+> Found while attempting 9b's block pgTAP. **The block feature is non-functional on both surfaces**
+> — not buggy, _absent_: web's block code (4 call sites in `src/contexts/PrivacyContext.tsx` +
+> `src/components/moderation/BlockDialog.tsx`) writes to **`blocked_users`, a table that does not
+> exist** (live prod has `blocks`, confirmed via `information_schema`); web never references `blocks`
+> once; `BlockDialog` is imported by nothing; `blockUser` is called only from its own test; and
+> mobile has **no block path at all**. The web test passes because it **mocks the Supabase client**.
+> **Consequence:** `are_users_blocked()` can never return true in prod, so the block clause in
+> `profiles_read_potential_matches` guards an empty table — a user cannot protect themselves from a
+> harasser. Launch-gating on a trust platform whose core strategy is women-only mode.
+> **Not a leak** (nothing over-exposed; 0 users post-repave) — a missing safety capability.
+> **Same failure mode as 9a** (phantom SOS backend): table + policy + component + API + green tests,
+> wired to a backend that isn't there. The 2026-07-07 audit caught the pattern for SOS and missed it
+> here. **Both repos.** Full detail + acceptance criteria: mobile `PHASE_0_BLOCKERS.md` **Story 0.6**.
 
 > **🔁 PROD REPAVED 2026-07-15 — the "CI green ≠ deployed" gap is closed.**
 > Prod had drifted badly: Phase A was never deployed, another project's migrations sat in the
@@ -48,10 +63,13 @@
 > recreated.** Plan/verification: `docs/reports/prod-db-reconciliation-plan-2026-07-15.md`.
 > **Standing rule this cost us:** "merged" ≠ "live" — verify every backend claim against prod.
 
-**Stage 0 closed** (steps 1–8 merged). **Stage 0.5 — both audit P0 _blockers_ are cleared, but
-neither story is finished** (9a is 3/7, 9b is 5/6 — see above). Phase 0 overall: `PHASE_0_BLOCKERS.md`
-has the per-story table. **Do not read "blocker cleared" as "story done"** — that conflation is what
-this doc got wrong on 2026-07-16 and had to correct.
+**Stage 0 closed** (steps 1–8 merged). **Stage 0.5 — the two original audit P0 _blockers_ are cleared,
+but neither story is finished (9a is 3/7, 9b is 5/6), and a THIRD blocker (9d) has replaced them as
+the open one.** Phase 0 overall: `PHASE_0_BLOCKERS.md` has the per-story table.
+**Do not read "blocker cleared" as "story done"** — that conflation is what this doc got wrong on
+2026-07-16 and had to correct. **9d is the reason the distinction matters:** it was found only
+because someone tried to write 9b's remaining proof and discovered the thing being proven was
+unreachable. The unfinished tail of a story is where the next blocker hides.
 **Launch-gating remainder = 👤 human-led:** on-device SOS/safety validation (step 7 + 9a) and the
 git-history purge (step 3 — keys are **rotated + revoked**, so history holds only dead credentials).
 **Open backend follow-ups (⚠, mobile, need sign-off):** 9b's block/women-only pgTAP proof (**gates
@@ -88,10 +106,11 @@ legacy table — drop or enable), 5 SECURITY DEFINER views should be INVOKER, 45
 
 ### Stage 0.5 — Audit launch blockers _(inserted 2026-07-07 — **blockers cleared 2026-07-16; stories NOT closed**)_
 
-| #   | Repo      | Do                                                                                                                                                             | Depends on | Est.  | Notes                                                                                                                                                                                                                                                          |
-| --- | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 9a  | MOBILE ⚠ | **Story 0.4** — replace the phantom GraphQL safety backend with Supabase; fix `trigger-sos` contact-token join + notification targeting; delete the dead stack | —          | 3–5 d | 🔶 **Blocker cleared; 3/7.** PRs #23 + #25 merged + deployed — SOS reaches Supabase and reports honestly. **Dead stack NOT deleted** — 8 `api.soloadventurer.com` refs remain in `lib/` (DoD demands zero) → **PHASE_H**. 👤 on-device validation outstanding. |
-| 9b  | MOBILE ⚠ | **Story 0.5** — drop `USING (true)` on `profiles`; scoped embedding access; public-safe projection (REVOKE email/phone/DOB); pgTAP proof; cross-check web      | —          | 2–3 d | 🔶 **Live in prod; 5/6.** The leak is dead. **⚠ block + women-only pgTAP proof MISSING** — the gating `USING (true)` had nullified is unverified. **Gates step 10.**                                                                                          |
+| #   | Repo      | Do                                                                                                                                                                                                                                                                                                        | Depends on | Est.  | Notes                                                                                                                                                                                                                                                          |
+| --- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 9a  | MOBILE ⚠ | **Story 0.4** — replace the phantom GraphQL safety backend with Supabase; fix `trigger-sos` contact-token join + notification targeting; delete the dead stack                                                                                                                                            | —          | 3–5 d | 🔶 **Blocker cleared; 3/7.** PRs #23 + #25 merged + deployed — SOS reaches Supabase and reports honestly. **Dead stack NOT deleted** — 8 `api.soloadventurer.com` refs remain in `lib/` (DoD demands zero) → **PHASE_H**. 👤 on-device validation outstanding. |
+| 9b  | MOBILE ⚠ | **Story 0.5** — drop `USING (true)` on `profiles`; scoped embedding access; public-safe projection (REVOKE email/phone/DOB); pgTAP proof; cross-check web                                                                                                                                                 | —          | 2–3 d | 🔶 **Live in prod; 5/6.** The leak is dead. **⚠ pgTAP proof open:** women-only clause is testable now; the **block clause is blocked on 9d** — a green "block gating holds" would be true of the DB and false of the product. **Gates step 10.**              |
+| 9d  | BOTH ⚠   | **Story 0.6 (NEW)** — blocking does not exist: repoint web's 4 call sites from the phantom `blocked_users` to `blocks`, wire the unreachable `BlockDialog`, add the missing block check to `profiles_read_connected`, decide `reason`/`connections` teardown, implement or defer mobile, de-mock the test | —          | ~1 wk | 🚨 **LAUNCH BLOCKER, 0/8.** A safety control that does not function. RLS change + both repos → **human sign-off**. Blocks 9b box 4. `PHASE_0_BLOCKERS.md` Story 0.6.                                                                                           |
 
 ### Stage A — Reputation exists → make it visible _(mobile done → web consumes)_
 
