@@ -10,12 +10,15 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 > found two NEW launch blockers — the phantom SOS backend (Story 0.4) and the `USING (true)`
 > profiles RLS policy (Story 0.5). Both added below; both ⚠ human sign-off.
 
-> **🚨 Updated 2026-07-16 — a THIRD launch blocker: Story 0.6.** The 0.4 and 0.5 blockers are now
-> cleared (SOS reaches Supabase; the RLS leak is dead in prod), but attempting 0.5's block pgTAP
-> revealed that **blocking does not exist**: web's block code targets `blocked_users`, a table that
-> is not in the schema, and mobile has no block path at all. Same failure mode as 0.4 — safety
-> scaffolding wired to a phantom backend, with green tests because they mock the client. **Story 0.6
-> below is now the open Phase 0 blocker.** See the per-story table at the end for current state.
+> **🚨 Updated 2026-07-16 — two NEW launch blockers: Stories 0.6 and 0.7.** The 0.4 and 0.5 blockers
+> are now cleared (SOS reaches Supabase; the RLS leak is dead in prod), but attempting 0.5's block
+> pgTAP revealed that **blocking does not exist** (0.6) — and sweeping every `.from()`/`.rpc()`
+> against the schema then found **11 phantom targets across 27 call sites** (0.7). **0.7 is the
+> general case; 0.4 and 0.6 are instances of it.** Safety scaffolding wired to backends that were
+> never built, invisible because the tests mock the Supabase client. **Three safety controls do not
+> function: block, report, share-meetup** — the latter two are named in FOUNDATIONS §5 as strategic
+> assets. Report: `docs/reports/phantom-schema-refs-2026-07-16.md`. A CI ratchet
+> (`scripts/check-schema-refs.py`) now blocks new instances. See the per-story table at the end.
 
 ## Scope
 **IN:** credential rotation + history purge; safety hardening (SOS, check-ins, meetup safety) to production; product analytics; lock `meetups_completed` as the north-star event; **audit P0s: real Supabase safety backend (0.4) + profiles RLS repair (0.5)**; **make blocking actually work (0.6)**.
@@ -173,6 +176,51 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 - [ ] Replace the mocked-Supabase block test with one that would fail against a wrong table name (the current test passes on a phantom table — that is the defect that hid this)
 - [ ] pgTAP: a block row makes the blocker's profile unreadable **via every SELECT policy**, including the connected path — this is Story 0.5 box 4's block clause, and it cannot pass honestly until the above lands
 
+### Story 0.7 — Phantom schema references (the class behind 0.4 and 0.6)  [safety: true] [needs_human: true]
+> **Found 2026-07-16 by sweeping every `.from()`/`.rpc()` against the schema — the check that
+> should have existed since 0.4.** Full report: `docs/reports/phantom-schema-refs-2026-07-16.md`.
+> **11 phantom targets / 27 call sites** across both repos: code queries relations and RPCs that no
+> migration creates and that are absent from prod. **Stories 0.4 and 0.6 are two instances of this
+> one defect** — a feature with a table, a policy, a component, an API and green tests, wired to a
+> backend that was never built. The suites mock the Supabase client, so **a mock answers to any name
+> you invent**; every instance was invisible until the code was diffed against the live schema.
+>
+> **Ordered by FOUNDATIONS impact — the top three are named strategic assets:**
+> | # | Target | Why it ranks here |
+> | - | ------ | ----------------- |
+> | 1 | `shared_meetups` | **§5 KEEP `(high)`** — _"Safety pillar (… `shared_meetups` …) — **the differentiator**"_. `ShareMeetupScreen` is a **live route** (`go_router_config.dart:320`); the write fails. |
+> | 2 | `message_reports`, `message_moderation` | **§5 REFACTOR `(high)`** — _"**The incumbent-can't-do wedge**"_. **Reporting a harmful message writes nowhere.** |
+> | 3 | `chats` (+ column `message.chat_id`) | `notify-new-message` is **trigger-invoked on every message insert** and is deployed+ACTIVE. **Push notifications are broken in prod.** `messages` has `connection_id`, not `chat_id`. |
+> | 4 | `create_trip`, `get_trip_by_id`, `list_my_trips` | Web's entire trip CRUD (`SoloAdventurerWeb/src/lib/api.ts`). Gates step 10's public trip pages. |
+> | 5 | `blocked_users` | Story 0.6 — tracked there. |
+> | 6 | `get_entries_near_location` | Journal RPC — notable because it sits in the journal's **real, wired** datasources. |
+> | 7 | `travel_preferences` | Offline `upload_sync` queues writes to a table that does not exist. |
+> | 8 | `photos` (12 sites) | **Lowest priority despite the most call sites** — see below. |
+>
+> **With 0.6, that is three non-functional safety controls: block, report, share-meetup.**
+>
+> **Not a data leak** — nothing is over-exposed and prod has 0 users post-repave. The cost is
+> **capability** (safety controls that don't work) and **the honesty of the completion estimate**.
+>
+> **`photos` is the odd one out and the charter says so.** Everything above is code that **runs and
+> breaks**; `photos` **never runs** — `photoRepositoryProvider` is never defined, `PhotoGalleryScreen`
+> is unrouted and fakes its data with `Future.delayed`. FOUNDATIONS **§7** says photos matter
+> ("photos as fuel, not feed") but that the pipeline **already exists** — _"a re-shape, not a build"_
+> — naming `media_item` (= the live `media_items`, wired into the journal). PRODUCT **§5** lists the
+> four photo surfaces; **a trip gallery is not one of them**. So `photos` is an unwired duplicate of
+> the sanctioned path → **likely deletion, but a 👤 product call**. **Not a launch blocker.**
+
+- [x] Add a schema-reference check that fails CI on a phantom `.from()`/`.rpc()` — `scripts/check-schema-refs.py`, wired into `code-quality.yml`. **Ratchet:** 7 known mobile/edge phantoms baselined with their owning story; **new** phantoms fail; a **fixed** baseline entry also fails until deleted, so the list can only shrink.
+- [ ] ⚠ Fix `shared_meetups` — create the table (+ RLS) or repoint the screen; FOUNDATIONS §5 names it a KEEP. **Safety — sign-off.**
+- [ ] ⚠ Fix `message_reports` / `message_moderation` — create the tables (+ RLS) or repoint. **Safety — sign-off.** Cross-check §5's server-side/at-creation direction before building the wrong shape.
+- [ ] Fix `notify-new-message` — `.from("chats")` → the real `messages`/`connections` shape; `message.chat_id` → `connection_id`. **A column bug the scanner cannot see.**
+- [ ] Fix web's trip RPCs (`create_trip` / `get_trip_by_id` / `list_my_trips`) — create them or repoint to table queries. **Cross-repo.**
+- [ ] Fix `get_entries_near_location` — create the RPC or repoint the journal datasources
+- [ ] Fix `travel_preferences` — create the table or drop the sync path
+- [ ] 👤 Decide `photos`: delete the ~5-file scaffold (incl. orphaned `thumbnail_service.dart`), or keep it as groundwork for a §7-permitted use
+- [ ] **Web: land Story W.2 generated types** — a typed client makes all 4 web phantoms `tsc` errors **and** catches column defects the scanner cannot. The durable web fix; second independent argument for W.2's priority.
+- [ ] Each fix lands with a test that would **fail against a wrong name** — i.e. not mocked at the client boundary. **The mocked test is the root cause, not the phantom table.**
+
 ## Definition of Done / Acceptance Criteria
 - [ ] No secrets in history (scan clean); all keys rotated and old ones revoked — **keys rotated + revoked ✅ (2026-07-16); history NOT purged** → blocked on Story 0.1 box 3.
 - [ ] **Blocking actually works end-to-end: a real block row is written to `blocks`, and it hides the profile via every SELECT policy** (Story 0.6)
@@ -191,21 +239,28 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 | 0.3 Analytics + north-star   | 3/4   | Cohort retention dashboard not configured (PostHog UI, 👤).                |
 | 0.4 Phantom safety backend   | 3/7   | **Blocker cleared** (SOS works). Dead-stack removal → PHASE_H.             |
 | 0.5 Profiles RLS             | 5/6   | **Live in prod.** Box 4 blocked on **0.6** — cannot prove block gating while nothing can create a block. |
-| **0.6 Blocking (NEW)**       | 0/8   | 🚨 **NEW LAUNCH BLOCKER.** Block feature does not exist on either surface. |
+| **0.6 Blocking (NEW)**       | 0/8   | 🚨 **LAUNCH BLOCKER.** Block feature does not exist on either surface. |
+| **0.7 Phantom refs (NEW)**   | 1/10  | 🚨 **LAUNCH BLOCKER.** 11 phantom targets / 27 sites. CI ratchet landed; fixes need sign-off. |
 
-**Phase 0 is NOT done, and it grew.** The two original audit P0 *blockers* are cleared — the SOS
-button works and the `USING (true)` leak is dead in production — but **Story 0.6 replaces them as
-the open blocker**: blocking is a safety control that does not function, found only because 0.5's
-pgTAP forced someone to check whether the gating was reachable.
+**Phase 0 is NOT done, and it grew twice today.** The two original audit P0 *blockers* are cleared —
+the SOS button works and the `USING (true)` leak is dead in production — but **0.6 and 0.7 replaced
+them**, and 0.7 is the general case of which **0.4 and 0.6 are instances**.
 
-**The lesson worth keeping:** 0.4 and 0.6 are the same failure — a safety feature with a table,
-a policy, a component, an API and green tests, wired to a backend that does not exist. The tests
-passed because they mocked the client. **When a safety test mocks its backend, it proves the mock.**
-Both were invisible until someone diffed the code against the live schema.
+**The one lesson worth keeping:** every instance is the same failure — a feature with a table, a
+policy, a component, an API and **green tests**, wired to a backend that does not exist.
+**When a safety test mocks its backend, it proves the mock.** `PrivacyContext.test.tsx` is green
+today and has never touched a real table name. All eleven were invisible until the code was diffed
+against the live schema — which is why 0.7's first box is a **CI check**, not a fix: the fixes close
+today's list, the check closes the class.
 
-Gating other work: **0.6** (launch) → **0.5 box 4** (→ step 10's public profiles) → **0.4 boxes
-1/2/6** (dead-stack removal → PHASE_H). The rest are 👤 Anthony's: history purge, on-device safety
-validation, PostHog dashboard.
+**Three safety controls do not function: block (0.6), report (0.7), share-meetup (0.7).** The last
+two are things FOUNDATIONS §5 names as strategic assets — `shared_meetups` is "the differentiator",
+message moderation is "the incumbent-can't-do wedge". **The KEEP list is partly describing
+infrastructure that isn't there** — worth a charter review, not just a code fix.
+
+Gating other work: **0.6 + 0.7** (launch) → **0.5 box 4** (→ step 10's public profiles) → **0.4
+boxes 1/2/6** (dead-stack removal → PHASE_H). The rest are 👤 Anthony's: history purge, on-device
+safety validation, PostHog dashboard, and the `photos` product call.
 
 ## Dependencies
 None — this is first. Unblocks Phase A. (The loop will stop on these `safety`/`needs_human` stories; a human flips `active_sprint` to `PHASE_A_LAY_THE_SPINE` once unblocked.)
