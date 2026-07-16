@@ -96,10 +96,13 @@ Deno.serve(async (req: Request) => {
       })
     }
 
-    // Get trusted contacts with emergency alerts enabled
+    // Get trusted contacts with emergency alerts enabled.
+    // Columns are contact_name/contact_phone/contact_email in this schema;
+    // contact_user_id is set only when the contact is also a registered user
+    // (that's the key we push / in-app-notify on).
     const { data: contacts, error: contactsError } = await supabase
       .from('trusted_contacts')
-      .select('id, name, phone, email')
+      .select('id, contact_user_id')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .eq('receives_emergency_alerts', true)
@@ -138,10 +141,18 @@ Deno.serve(async (req: Request) => {
       throw new Error('Failed to create SOS alert')
     }
 
-    // Create notifications for each emergency contact
-    if (notifiedContactIds.length > 0) {
-      const notifications = notifiedContactIds.map(contactId => ({
-        user_id: user.id,
+    // Registered-user contacts (those with a linked account) get the in-app
+    // notification + push. Phone/email-only contacts are reached via SMS/email
+    // through the safety_alerts -> process-safety-alert webhook below.
+    const contactUserIds = (contacts || [])
+      .map(c => c.contact_user_id)
+      .filter((id): id is string => Boolean(id))
+
+    // Create in-app notifications for each registered emergency contact
+    if (contactUserIds.length > 0) {
+      const notifications = contactUserIds.map(contactUserId => ({
+        user_id: contactUserId, // deliver TO the contact's account...
+        actor_id: user.id,      // ...from the person who triggered the SOS
         type: 'emergency_sos',
         object_id: alert.id,
         object_type: 'sos_alert',
@@ -159,11 +170,11 @@ Deno.serve(async (req: Request) => {
         console.error('Failed to create notifications:', notifError)
       }
 
-      // Send push notifications to trusted contacts
+      // Send push notifications to the registered contacts' devices
       const { data: contactTokens, error: tokensError } = await supabase
         .from('notification_tokens')
         .select('token, platform, user_id')
-        .in('user_id', contacts.map(c => c.user_id || c.id))
+        .in('user_id', contactUserIds)
         .eq('is_active', true)
 
       if (tokensError) {
