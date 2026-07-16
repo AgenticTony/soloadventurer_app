@@ -159,6 +159,9 @@ await ThumbnailService.clearCache();
 
 ## Integration with PhotoGalleryScreen
 
+> **Note (2026-07-17):** `PhotoGalleryScreen` was **deleted** in Story 0.7 — it was unwired scaffold over a phantom `photos` table (see `docs/reports/phantom-schema-refs-2026-07-16.md`). The example below is retained as an **illustration of the API only**; the class no longer exists. The real media path is `media_items` + the journal (FOUNDATIONS §7).
+
+
 Update your photo gallery to use thumbnails:
 
 ```dart

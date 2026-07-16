@@ -206,5 +206,5 @@ The thumbnail service is now ready for integration with photo repositories and s
 
 - **ImageCacheConfig**: Manages cached_network_image settings
 - **LazyLoadImage**: Visibility-based lazy loading widget
-- **PhotoGalleryScreen**: Uses thumbnails with VirtualGridView
+- **Media grids**: Use thumbnails with `VirtualGridView`. (The former `PhotoGalleryScreen` example was deleted in Story 0.7 — unwired scaffold over a phantom `photos` table.)
 - **VirtualGridView**: Memory-efficient grid rendering

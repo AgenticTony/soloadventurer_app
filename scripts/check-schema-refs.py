@@ -117,7 +117,9 @@ BASELINE: dict[str, str] = {
     "chats": "Story 0.7 — notify-new-message is trigger-invoked on EVERY message insert and selects a phantom table (messages has connection_id, not chat_id).",
     "get_entries_near_location": "Story 0.7 — journal 'entries near location' RPC was never created.",
     "travel_preferences": "Story 0.7 — offline upload_sync writes to a table that does not exist.",
-    "photos": "Story 0.7 — unwired duplicate of the sanctioned media_items path (FOUNDATIONS §7); scaffold fakes its own data. Likely deletion, pending a product call.",
+    # 'photos' removed 2026-07-17: the unwired scaffold was deleted (Story 0.7 box 8).
+    # The ratchet flagged this entry as stale the moment the code went, which is the
+    # mechanism working — an entry cannot outlive its phantom.
 }
 
 

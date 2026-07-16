@@ -400,7 +400,7 @@ class _InfinitePhotoGridState extends ConsumerState<InfinitePhotoGrid> {
     if (_isLoadingMore) return;
     setState(() => _isLoadingMore = true);
     // Load next page
-    await ref.read(photoRepositoryProvider).fetchNextPage();
+    await ref.read(mediaRepositoryProvider).fetchNextPage(); // illustrative; photoRepositoryProvider never existed
     setState(() => _isLoadingMore = false);
   }
 
