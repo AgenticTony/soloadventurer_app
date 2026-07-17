@@ -124,9 +124,10 @@ BASELINE: dict[str, str] = {
     # 'message_reports' / 'message_moderation' removed 2026-07-17: reporting was
     # repointed at the real `reports` table; the scan half (and its phantom
     # 'moderate-message' edge fn) was deleted, to be rebuilt in Phase C.
+    # 'delete-user-account' removed 2026-07-17 (same day it was added): the edge
+    # function now exists in supabase/functions/. Deployment is a separate step.
     # The ratchet flagged each entry as stale the moment its code went, which is
     # the mechanism working — an entry cannot outlive its phantom.
-    "delete-user-account": "Story 0.7 — auth_remote_data_source_impl invokes an edge function that does not exist in supabase/functions/. Account deletion (GDPR + store requirement) is broken; found 2026-07-17 while extending this check to .invoke().",
 }
 
 

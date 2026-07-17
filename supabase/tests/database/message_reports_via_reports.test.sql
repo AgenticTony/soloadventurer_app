@@ -65,6 +65,7 @@ select lives_ok(
   'authenticated user can file a message report as themself'
 );
 
+-- errcode-only: 42501 is the contract; the message text varies by PG version.
 select throws_ok(
   $$insert into public.reports (reporter_id, target_id, target_type, reason)
     values ('bbbbbbbb-0007-0007-0007-bbbbbbbbbbbb',
@@ -72,7 +73,7 @@ select throws_ok(
             'message',
             'Forged report as another user')$$,
   '42501',
-  'new row violates row-level security policy for table "reports"',
+  null,
   'cannot file a report as someone else (RLS)'
 );
 
@@ -105,5 +106,6 @@ select is(
   'another user cannot read the report'
 );
 
+reset role;
 select * from finish();
 rollback;
