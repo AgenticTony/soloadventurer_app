@@ -123,6 +123,9 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 > schema**. Shipping public profile pages while block/women-only gating is unproven is the risk the
 > DoD box exists to prevent. **Recommend: this box gates step 10, not just Phase 0.**
 >
+> **UPDATE 2026-07-17: the block clause is now PROVEN** — `blocks_sever_and_gate.test.sql` (see Story 0.6;
+> covers both directions including the connected path). **Box 4 now waits only on the women-only clause.**
+>
 > **UPDATE 2026-07-16 — writing this test is what found Story 0.6.** The block clause of box 4
 > **cannot be made honestly green yet**: the DB-level gating in `profiles_read_potential_matches` is
 > real and would largely pass if pgTAP inserted `blocks` rows directly — but **no application code
@@ -167,14 +170,18 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 > **Third mismatch:** web inserts a `reason` field, but `blocks` has **no `reason` column** — so this
 > is not a rename. `reason` needs a column, a drop, or routing to `reports` (a product decision).
 
-- [ ] Decide the target shape 👤: add `reason` to `blocks`, drop the field, or route it to `reports`
-- [ ] Point all 4 web call sites at `blocks` (`PrivacyContext.tsx:165,214,294`, `BlockDialog.tsx:96`); delete every `blocked_users` reference
-- [ ] Wire `BlockDialog` into a reachable surface (it is currently imported by nothing)
-- [ ] Add the block clause to `profiles_read_connected` — `AND NOT are_users_blocked(auth.uid(), id)` — so a block severs profile visibility regardless of connection state ⚠ RLS change, human sign-off
-- [ ] Decide 👤 whether a block should also tear down the `connections` row (status → `blocked`) or only gate reads; the trigger currently touches `follows` only
-- [ ] Mobile: implement the block path (none exists) or explicitly defer it with a dated note
-- [ ] Replace the mocked-Supabase block test with one that would fail against a wrong table name (the current test passes on a phantom table — that is the defect that hid this)
-- [ ] pgTAP: a block row makes the blocker's profile unreadable **via every SELECT policy**, including the connected path — this is Story 0.5 box 4's block clause, and it cannot pass honestly until the above lands
+- [x] Decide the target shape — **routed to `reports`** (decision 2026-07-17, per Anthony's "most logical" delegation; ⚠ flagged for sign-off). A reasoned block is a block **plus** a report about a person; both feed the §4 reward function. `blocks` stays minimal — **no schema change needed**, `target_type='profile'` was in the enum all along.
+- [x] Point all 4 web call sites at `blocks` — done via a **single write path**, `src/lib/moderation.ts` (`blockUserInDb`/`unblockUserInDb`/`listBlockedUserIds`); two components each carrying their own insert is how the phantom survived. Zero `blocked_users` references remain.
+- [x] Wire `BlockDialog` into a reachable surface — "Block @username" on `OtherUserProfile` (was imported by nothing).
+- [x] Add the block clause to `profiles_read_connected` — migration `20260717120000` ⚠ **RLS change, sign-off**. Policy recreated verbatim + `AND NOT are_users_blocked(auth.uid(), id)`.
+- [x] Connections teardown — **both** (decision 2026-07-17, ⚠ sign-off): `trg_block_sever_connections` flips pending/accepted → `'blocked'` (the CHECK constraint allowed it since day one — the state machine anticipated this), AND the policy re-checks blocks. Unblocking does **not** resurrect the connection (one-way door; a new request is required — pgTAP-pinned).
+- [x] Mobile: **deferred with dated note (2026-07-17)** — the DB-level trigger + RLS now protect both surfaces; a mobile block UI (profile action sheet) is new feature surface → its own story. Until then mobile users cannot *create* blocks (unchanged from before) but are fully protected by blocks created on web.
+- [x] Replace the mocked-Supabase block test — `src/lib/__tests__/moderation.test.ts` asserts the **table names** (`blocks`, never `blocked_users`; reason → `reports`). Worse than assumed: the old test **never executed the DB branch at all** — no supabase mock existed, `getSession()` returned null against the placeholder URL, and `if (session?.user)` skipped the insert. The suite couldn't have caught any table name.
+- [x] pgTAP: `blocks_sever_and_gate.test.sql` (11 assertions) — pre-block read works, block severs the connection, reads blocked **in both directions** including the connected path, unblock ≠ resurrect. **This closes Story 0.5 box 4's BLOCK clause.** Includes explicit `blocks`/`connections` grants in the migration (the `reports` CI-hermeticity lesson, applied proactively).
+
+> **Status 2026-07-17: 8/8 — implemented, pending CI + ⚠ human sign-off + 👤 an on-device/web block test.**
+> The two decisions Anthony delegated are embedded above (reason→reports; sever+gate) and flagged on
+> the PR. **Story 0.5 box 4 is now half-closed** (block clause proven; women-only clause still open).
 
 ### Story 0.7 — Phantom schema references (the class behind 0.4 and 0.6)  [safety: true] [needs_human: true]
 > **Found 2026-07-16 by sweeping every `.from()`/`.rpc()` against the schema — the check that
@@ -245,7 +252,7 @@ Remove the hard launch blockers before any growth work: purge the leaked credent
 | 0.3 Analytics + north-star   | 3/4   | Cohort retention dashboard not configured (PostHog UI, 👤).                |
 | 0.4 Phantom safety backend   | 3/7   | **Blocker cleared** (SOS works). Dead-stack removal → PHASE_H.             |
 | 0.5 Profiles RLS             | 5/6   | **Live in prod.** Box 4 blocked on **0.6** — cannot prove block gating while nothing can create a block. |
-| **0.6 Blocking (NEW)**       | 0/8   | 🚨 **LAUNCH BLOCKER.** Block feature does not exist on either surface. |
+| **0.6 Blocking (NEW)**       | 8/8   | ✅ **Implemented 2026-07-17** — single write path to `blocks`, reason→`reports`, dialog wired, trigger severs connections, RLS re-checks blocks, pgTAP-proven. ⚠ sign-off + 👤 live block test pending; mobile UI deferred (dated). |
 | **0.7 Phantom refs (NEW)**   | 5/12  | 🚨 **LAUNCH BLOCKER.** Ratchet + `.invoke()` live; **reporting fixed + UI-wired** (+ explicit `reports` grants — CI-hermeticity fix, prod no-op); photos deleted; `delete-user-account` implemented (deploys after CI); **8 fns deployed — prod 12/12 ACTIVE** (👤 Onfido + SYSTEM_SECRET keys pending). Open: `shared_meetups`, `chats`, trip RPCs, journal RPC, `travel_preferences`, W.2. |
 
 **Phase 0 is NOT done, and it grew twice today.** The two original audit P0 *blockers* are cleared —
