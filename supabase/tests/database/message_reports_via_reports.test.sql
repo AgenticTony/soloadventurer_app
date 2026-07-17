@@ -13,11 +13,19 @@
 -- `sub`; impersonate via `set local role authenticated` + request.jwt.claims.
 
 begin;
-select plan(8);
+select plan(9);
 
 -- ============================================================================
--- 1. Schema facts the repoint relies on (3)
+-- 1. Schema facts the repoint relies on (4)
 -- ============================================================================
+-- Pinned as an invariant after the 2026-07-16 CI failure: this grant existed
+-- in prod only via platform default privileges, so migrations alone did not
+-- define access and CI (which lacks the platform bootstrap) failed with
+-- "permission denied". 20260717090000 makes it explicit.
+select ok(
+  has_table_privilege('authenticated', 'public.reports', 'INSERT'),
+  'authenticated holds INSERT on reports (explicit grant, not platform default)'
+);
 select ok(
   EXISTS (
     SELECT 1 FROM pg_enum e

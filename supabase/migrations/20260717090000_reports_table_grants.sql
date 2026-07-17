@@ -1,0 +1,25 @@
+-- ============================================================================
+-- Explicit table grants for public.reports (Story 0.7 follow-through)
+--
+-- WHY THIS EXISTS: reports (like most pre-Phase-A tables) carried no explicit
+-- GRANT in any migration — it relied on hosted Supabase's platform bootstrap
+-- (default privileges grant to anon/authenticated/service_role on tables the
+-- migration role creates). Live prod therefore works. But the ephemeral CI
+-- stack used by `supabase test db` does not replay that platform bootstrap,
+-- so the first pgTAP test to do direct DML as `authenticated`
+-- (message_reports_via_reports.test.sql, 2026-07-16) failed with
+-- "permission denied for table reports" — in CI only.
+--
+-- Making the grant explicit means MIGRATIONS ALONE define access, identically
+-- in prod, CI, and any future environment — instead of depending on whatever
+-- the platform's defaults happen to be. Phase A already works this way
+-- (20260630145537 grants its tables explicitly).
+--
+-- Scope: additive only — a strict no-op on prod (both privileges already
+-- held there via defaults). RLS remains the row gate: insert-own
+-- (reporter_id = auth.uid()) and read-own. anon gets nothing here; whether to
+-- REVOKE anon's bootstrap-default table privileges wholesale is an H.5
+-- follow-up decision, not smuggled into this fix.
+-- ============================================================================
+
+grant insert, select on public.reports to authenticated;
