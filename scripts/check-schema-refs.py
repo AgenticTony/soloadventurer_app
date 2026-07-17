@@ -116,18 +116,14 @@ KNOWN_NON_TABLES: dict[str, str] = {
 # CI green; that is precisely how Story 0.4 survived for months.
 # ---------------------------------------------------------------------------
 BASELINE: dict[str, str] = {
-    "shared_meetups": "Story 0.7 — FOUNDATIONS §5 names this a KEEP (safety pillar, 'the differentiator'). Table never created.",
-    "chats": "Story 0.7 — notify-new-message is trigger-invoked on EVERY message insert and selects a phantom table (messages has connection_id, not chat_id).",
-    "get_entries_near_location": "Story 0.7 — journal 'entries near location' RPC was never created.",
-    "travel_preferences": "Story 0.7 — offline upload_sync writes to a table that does not exist.",
-    # 'photos' removed 2026-07-17: the unwired scaffold was deleted (Story 0.7 box 8).
-    # 'message_reports' / 'message_moderation' removed 2026-07-17: reporting was
-    # repointed at the real `reports` table; the scan half (and its phantom
-    # 'moderate-message' edge fn) was deleted, to be rebuilt in Phase C.
-    # 'delete-user-account' removed 2026-07-17 (same day it was added): the edge
-    # function now exists in supabase/functions/. Deployment is a separate step.
-    # The ratchet flagged each entry as stale the moment its code went, which is
-    # the mechanism working — an entry cannot outlive its phantom.
+    # EMPTY since 2026-07-17 — every baselined phantom has been fixed:
+    #   photos (scaffold deleted) · message_reports/message_moderation
+    #   (repointed to `reports`) · delete-user-account (edge fn created) ·
+    #   chats (notify-new-message now uses messages.receiver_id) ·
+    #   shared_meetups, travel_preferences (tables created, 20260717160000/
+    #   180000) · get_entries_near_location (RPC created, 20260717170000).
+    # The ratchet flagged each entry as stale the moment its fix landed.
+    # From here, ANY phantom reference fails the build with no grace period.
 }
 
 
