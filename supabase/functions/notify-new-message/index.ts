@@ -35,22 +35,23 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
 );
 
+// Mirrors the actual `messages` row shape the DB trigger sends
+// (20260407000000: body = { record: row_to_json(NEW) }). Story 0.7: this used
+// to declare a `chat_id` that messages does not have — the guard below
+// rejected EVERY trigger payload with 400, so push notifications never fired.
 interface MessageRecord {
   id: string;
-  chat_id: string;
+  connection_id: string;
   sender_id: string;
+  receiver_id: string;
   content: string;
-  message_type?: string;
-  created_at: string;
+  created_at?: string;
 }
 
 interface Profile {
   id: string;
-  first_name: string | null;
-}
-
-interface ChatMember {
-  user_id: string;
+  username: string | null;
+  full_name: string | null;
 }
 
 Deno.serve(async (req: Request) => {
@@ -82,59 +83,28 @@ Deno.serve(async (req: Request) => {
 
     console.log("[notify-new-message] Processing message:", message.id);
 
-    if (!message.chat_id || !message.sender_id) {
+    if (!message.id || !message.sender_id || !message.receiver_id) {
       return new Response(JSON.stringify({ error: "Missing message data" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Get sender profile for notification content
+    // Get sender profile for notification content.
+    // Story 0.7: this selected `first_name`, a column profiles does not have.
     const { data: senderProfile } = await supabase
       .from("profiles")
-      .select("id, first_name")
+      .select("id, username, full_name")
       .eq("id", message.sender_id)
       .single();
 
-    const senderName = senderProfile?.first_name || "Someone";
+    const senderName =
+      senderProfile?.full_name || senderProfile?.username || "Someone";
 
-    // Get chat members to find the recipient
-    // Chat members are stored in the chat record or a junction table
-    const { data: chat } = await supabase
-      .from("chats")
-      .select(
-        "id, connection_id, connections!inner(requester_id, recipient_id)",
-      )
-      .eq("id", message.chat_id)
-      .single();
-
-    if (!chat) {
-      console.warn("[notify-new-message] Chat not found:", message.chat_id);
-      return new Response(JSON.stringify({ error: "Chat not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    // Determine the recipient (the other person in the chat)
-    const connection = chat.connections as unknown as {
-      requester_id: string;
-      recipient_id: string;
-    };
-    const recipientId =
-      message.sender_id === connection.requester_id
-        ? connection.recipient_id
-        : connection.requester_id;
-
-    if (!recipientId) {
-      return new Response(
-        JSON.stringify({ error: "Could not determine recipient" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
+    // The recipient is on the message row itself (messages.receiver_id).
+    // Story 0.7: this used to join a `chats` table that does not exist —
+    // the query failed on every invocation.
+    const recipientId = message.receiver_id;
 
     // Truncate message content for notification preview
     const preview =
@@ -147,7 +117,7 @@ Deno.serve(async (req: Request) => {
       user_id: recipientId,
       type: "new_message",
       actor_id: message.sender_id,
-      object_id: message.chat_id,
+      object_id: message.connection_id,
       object_type: "message",
       body: `${senderName}: ${preview}`,
       read: false,
@@ -192,7 +162,7 @@ Deno.serve(async (req: Request) => {
               body: preview,
               data: {
                 type: "new_message",
-                chatId: message.chat_id,
+                connectionId: message.connection_id,
                 senderId: message.sender_id,
                 messageId: message.id,
               },
