@@ -45,7 +45,30 @@ BEGIN
 END $$;
 
 -- Restore the Batch-2 PII posture the blanket grant just re-widened.
-REVOKE SELECT ON public.profiles FROM authenticated, anon;
+-- NOTE: a table-level REVOKE also revokes COLUMN-level grants of the same
+-- privilege (documented Postgres behavior — a bare REVOKE here wiped the
+-- Batch-2 column ACLs and profiles_pii_column_privileges.test.sql caught it),
+-- so the non-PII column grants must be re-issued, same as 20260708093000.
+DO $$
+DECLARE
+  v_nonpii text;
+BEGIN
+  SELECT string_agg(quote_ident(column_name), ', ')
+    INTO v_nonpii
+    FROM information_schema.columns
+   WHERE table_schema = 'public'
+     AND table_name   = 'profiles'
+     AND column_name NOT IN ('email', 'phone', 'date_of_birth');
+
+  IF v_nonpii IS NULL THEN
+    RAISE EXCEPTION 'profiles has no non-PII columns — aborting privilege change';
+  END IF;
+
+  EXECUTE 'REVOKE SELECT ON public.profiles FROM authenticated';
+  EXECUTE format('GRANT SELECT (%s) ON public.profiles TO authenticated', v_nonpii);
+  EXECUTE 'REVOKE SELECT ON public.profiles FROM anon';
+  EXECUTE format('GRANT SELECT (%s) ON public.profiles TO anon', v_nonpii);
+END $$;
 
 -- Sequences + future objects, matching the platform bootstrap.
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
