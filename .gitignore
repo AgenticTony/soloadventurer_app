@@ -60,8 +60,12 @@ Ai-VoiceHive/
 .auto-claude/
 .claude/
 
-# Python (not part of Flutter project)
+# Python (not part of Flutter project) — stray scripts, venvs, tooling spew.
+# Repo tooling under scripts/ is exempt: it is version-controlled and CI runs it.
+# Without this exception `git add -A` drops it SILENTLY — that is how
+# scripts/check-schema-refs.py was committed as a CI job with no script behind it.
 *.py
+!scripts/*.py
 
 # Build/test artifacts
 build_output.log

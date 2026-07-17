@@ -5,6 +5,8 @@ import 'package:soloadventurer/l10n/app_localizations.dart';
 import 'package:soloadventurer/app/providers/analytics_provider.dart';
 import 'package:soloadventurer/core/services/analytics_service.dart';
 import 'package:soloadventurer/features/auth/presentation/providers/auth_notifier_provider.dart';
+import 'package:soloadventurer/features/chat_moderation/domain/enums/moderation_enums.dart';
+import 'package:soloadventurer/features/chat_moderation/presentation/providers/report_providers.dart';
 import 'package:soloadventurer/features/matching/domain/entities/message.dart';
 import 'package:soloadventurer/features/matching/presentation/providers/chat_provider.dart';
 import 'package:soloadventurer/features/verification/presentation/widgets/verification_badge.dart';
@@ -41,7 +43,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   void initState() {
     super.initState();
     _chatId = widget.chatId;
-    
+
     // Mark messages as read when opening chat
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(chatProvider.notifier).markAsRead(_chatId);
@@ -78,7 +80,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         title: GestureDetector(
           onTap: () {
             if (widget.connectionId != null) {
-              final chatAsync = ref.read(chatForConnectionProvider(widget.connectionId!));
+              final chatAsync =
+                  ref.read(chatForConnectionProvider(widget.connectionId!));
               final otherUserId = chatAsync.value?.otherUserId;
               if (otherUserId != null && otherUserId.isNotEmpty) {
                 context.push('/user/$otherUserId');
@@ -122,41 +125,55 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           // Messages list
           Expanded(
             child: messagesAsync.when(
-              data: (messages) {
+              data: (allMessages) {
+                // Hide messages the user has reported this session.
+                final reported = ref.watch(reportedMessagesProvider);
+                final messages = allMessages
+                    .where((m) => !reported.contains(m.serverId ?? m.id))
+                    .toList();
                 if (messages.isEmpty) {
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.chat_bubble_outline,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'No messages yet',
-                              style: Theme.of(context).textTheme.titleMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Start the conversation!',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.chat_bubble_outline,
+                            size: 64,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No messages yet',
+                            style: Theme.of(context).textTheme.titleMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Start the conversation!',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }
 
                 // Auto-scroll when new messages arrive
-                WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _scrollToBottom());
 
                 return ListView.builder(
                   controller: _scrollController,
@@ -165,10 +182,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   itemBuilder: (context, index) {
                     final message = messages[index];
                     final isCurrentUser = message.senderId == currentUserId;
-                    
+
                     return _MessageBubble(
                       message: message,
                       isCurrentUser: isCurrentUser,
+                      // Only the other user's messages are reportable.
+                      onLongPress: isCurrentUser || currentUserId.isEmpty
+                          ? null
+                          : () => _showReportSheet(message, currentUserId),
                     );
                   },
                 );
@@ -179,12 +200,70 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               ),
             ),
           ),
-          
+
           // Message input
           _buildMessageInput(context, l10n),
         ],
       ),
     );
+  }
+
+  /// Bottom sheet offering report categories for [message].
+  ///
+  /// Reports land in the `reports` table (`target_type = 'message'`) and the
+  /// outcome is surfaced honestly — the previous implementation swallowed
+  /// errors while writing to a table that did not exist (Story 0.7).
+  void _showReportSheet(Message message, String reporterId) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                'Report this message',
+                style: Theme.of(sheetContext).textTheme.titleMedium,
+              ),
+            ),
+            for (final category in ModerationCategory.values)
+              ListTile(
+                leading: const Icon(Icons.flag_outlined),
+                title: Text(category.label),
+                onTap: () {
+                  Navigator.of(sheetContext).pop();
+                  _submitReport(message, reporterId, category);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _submitReport(
+    Message message,
+    String reporterId,
+    ModerationCategory category,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(reportedMessagesProvider.notifier).report(
+            messageId: message.serverId ?? message.id,
+            reporterId: reporterId,
+            category: category,
+          );
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Message reported. Thank you.')),
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Report failed — please try again.'),
+        ),
+      );
+    }
   }
 
   Widget _buildTitle() {
@@ -196,8 +275,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         data: (chat) => Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Flexible(child: Text(chat.otherUserName, overflow: TextOverflow.ellipsis)),
-            if (chat.otherUserVerificationTier != VerificationTier.unverified) ...[
+            Flexible(
+                child:
+                    Text(chat.otherUserName, overflow: TextOverflow.ellipsis)),
+            if (chat.otherUserVerificationTier !=
+                VerificationTier.unverified) ...[
               const SizedBox(width: 6),
               VerificationBadge(
                 tier: chat.otherUserVerificationTier,
@@ -225,11 +307,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       properties: {'chatId': _chatId, 'contentLength': content.length},
     );
 
-    ref.read(chatProvider.notifier).sendMessage(
-      chatId: _chatId,
-      recipientId: widget.connectionId ?? '',
-      content: content,
-    ).then((_) {
+    ref
+        .read(chatProvider.notifier)
+        .sendMessage(
+          chatId: _chatId,
+          recipientId: widget.connectionId ?? '',
+          content: content,
+        )
+        .then((_) {
       _scrollToBottom();
     }).catchError((error) {
       if (mounted) {
@@ -288,9 +373,13 @@ class _MessageBubble extends StatelessWidget {
   final Message message;
   final bool isCurrentUser;
 
+  /// Long-press action (report). Null for the user's own messages.
+  final VoidCallback? onLongPress;
+
   const _MessageBubble({
     required this.message,
     required this.isCurrentUser,
+    this.onLongPress,
   });
 
   @override
@@ -299,50 +388,53 @@ class _MessageBubble extends StatelessWidget {
 
     return Align(
       alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isCurrentUser
-              ? theme.colorScheme.primary
-              : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              message.content,
-              style: TextStyle(
-                color: isCurrentUser
-                    ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _formatTime(message.createdAt),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: isCurrentUser
-                        ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isCurrentUser
+                ? theme.colorScheme.primary
+                : theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.75,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                message.content,
+                style: TextStyle(
+                  color: isCurrentUser
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.onSurface,
                 ),
-                if (isCurrentUser) ...[
-                  const SizedBox(width: 4),
-                  _buildStatusIcon(message.status),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _formatTime(message.createdAt),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isCurrentUser
+                          ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
+                          : theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  if (isCurrentUser) ...[
+                    const SizedBox(width: 4),
+                    _buildStatusIcon(message.status),
+                  ],
                 ],
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

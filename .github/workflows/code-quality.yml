@@ -137,6 +137,23 @@ jobs:
   # =============================================================================
   # AUTH MIGRATION COMPLIANCE - Riverpod 3.0 AsyncNotifier pattern
   # =============================================================================
+  schema-refs:
+    name: Schema Reference Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      # Catches code that queries a table/RPC no migration creates — the class of
+      # bug behind Story 0.4 (phantom SOS backend), 0.6 (blocking writes to
+      # `blocked_users`; the table is `blocks`) and 0.7. The test suites cannot
+      # catch it: they mock the Supabase client, and a mock answers to any table
+      # name you invent. Lives here rather than in supabase-ci.yml because that
+      # workflow is path-filtered to supabase/** and would not fire on a new
+      # phantom `.from()` in lib/.
+      - name: Check schema references resolve
+        run: python3 scripts/check-schema-refs.py
+
   auth-compliance:
     name: Auth Pattern Compliance
     runs-on: ubuntu-latest

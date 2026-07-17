@@ -24,18 +24,24 @@ This directory contains the presentation layer for the travel feature, demonstra
   - Time and location information
   - Floating action button for adding activities
 
-### PhotoGalleryScreen
-- **Route:** `/trips/photos`
-- **Purpose:** Displays a photo gallery with virtual scrolling grid
-- **Features:**
-  - Virtual scrolling grid for handling 500+ photos efficiently
-  - Responsive layout (2-4 columns based on screen size)
-  - Loading, error, and empty states
-  - Photo captions overlay
-  - Location indicators for geotagged photos
-  - Sort menu (newest, oldest, by location)
-  - Floating action button for adding photos
-- **Documentation:** See `PHOTO_GALLERY_README.md` for detailed information
+### ~~PhotoGalleryScreen~~ — REMOVED 2026-07-17 (Story 0.7)
+Deleted along with `PhotoRepository` and `SupabasePhotoRepository`.
+It was **never wired**: the `/trips/photos` route documented here was never registered,
+`photoRepositoryProvider` was never defined, the screen faked its data with
+`Future.delayed`, and the repository queried a **`photos` table that does not exist**
+(12 call sites). See `docs/reports/phantom-schema-refs-2026-07-16.md`.
+
+**The `Photo` model survives on purpose** — `integration_test/performance/` uses it as
+fixture data for the `VirtualGridView` performance suites. It now has no feature behind
+it; it should move into those tests' fixtures rather than sit in `travel/domain/models/`.
+Tracked as a follow-up, not done here.
+
+**Photos are not gone from the product — this was the wrong vehicle.** FOUNDATIONS §7
+("photos as fuel, not feed") says the media pipeline **already exists** and is a
+_"re-shape, not a build"_: the real path is **`media_items`** + the journal, which is
+live and wired. PRODUCT §5 lists the four surfaces photos belong on — match card,
+verified profile, city board, post-meetup memory — and a trip gallery is not one of
+them. Any future media grid should ride `media_items`, not a second photos table.
 
 ## Architecture
 
