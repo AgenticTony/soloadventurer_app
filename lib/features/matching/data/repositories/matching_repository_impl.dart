@@ -837,7 +837,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         if (userId != null) {
           await _supabaseClient
               .from('profiles')
-              .update({'women_only_mode': true})
+              .update({'women_only_mode_enabled': true})
               .eq('id', userId);
         }
       } catch (e) {
@@ -856,7 +856,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         if (userId != null) {
           await _supabaseClient
               .from('profiles')
-              .update({'women_only_mode': false})
+              .update({'women_only_mode_enabled': false})
               .eq('id', userId);
         }
       } catch (e) {
@@ -874,10 +874,10 @@ class MatchingRepositoryImpl implements MatchingRepository {
         if (userId != null) {
           final response = await _supabaseClient
               .from('profiles')
-              .select('women_only_mode')
+              .select('women_only_mode_enabled')
               .eq('id', userId)
               .single();
-          _womenOnlyModeEnabled = response['women_only_mode'] as bool? ?? false;
+          _womenOnlyModeEnabled = response['women_only_mode_enabled'] as bool? ?? false;
         }
       } catch (e) {
         // Return cached value
