@@ -87,7 +87,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
 
     if (record == null) {
       return VerificationRequest(
-        id: result['verification_id'] as String? ?? '',
+        id: result['verification_id'] as String? ?? shuftiReference,
         userId: Supabase.instance.client.auth.currentUser?.id ?? '',
         type: type,
         status: VerificationRemoteDataSource.mapStatus(status),
@@ -125,7 +125,7 @@ class VerificationRepositoryImpl implements VerificationRepository {
 
     if (record == null) {
       return VerificationRequest(
-        id: '',
+        id: result['verification_id'] as String? ?? shuftiReference,
         userId: Supabase.instance.client.auth.currentUser?.id ?? '',
         type: type,
         status: VerificationRemoteDataSource.mapStatus(

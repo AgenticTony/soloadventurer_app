@@ -417,6 +417,7 @@ async function handleClientCall(req: Request): Promise<Response> {
     return new Response(
       JSON.stringify({
         success: true,
+        verification_id: newRecord?.id ?? null,
         shufti_reference: shuftiData.reference,
         status,
         verified_gender: verifiedGender,
@@ -482,9 +483,18 @@ async function handleClientCall(req: Request): Promise<Response> {
     rawBody,
   );
 
+  // Get the verification record ID for the response
+  const { data: recordRow } = await supabase
+    .from("verification_records")
+    .select("id")
+    .eq("provider_reference", shufti_reference)
+    .limit(1)
+    .single();
+
   return new Response(
     JSON.stringify({
       success: true,
+      verification_id: recordRow?.id ?? null,
       shufti_reference,
       status,
       verified_gender: verifiedGender,
