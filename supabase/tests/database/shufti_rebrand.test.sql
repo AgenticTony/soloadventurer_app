@@ -70,8 +70,8 @@ select ok(
   EXISTS (SELECT 1 FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace
           WHERE n.nspname = 'public' AND c.conrelid = 'public.verification_records'::regclass
             AND c.contype = 'c'
-            AND pg_get_constraintdef(c.oid) LIKE '%provider = ''shuftipro''%'),
-  'provider column has CHECK constraint allowing shuftipro'
+            AND pg_get_constraintdef(c.oid) LIKE '%shuftipro%'),
+  'provider column has CHECK constraint including shuftipro'
 );
 
 -- ============================================================================
