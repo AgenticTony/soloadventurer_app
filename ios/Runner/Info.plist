@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>SoloAdventurer needs camera access to verify your identity.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SoloAdventurer needs photo access to upload your ID document.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

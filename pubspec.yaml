@@ -82,6 +82,10 @@ dependencies:
   package_info_plus: ^9.0.0
   device_info_plus: ^12.3.0
 
+  # Identity Verification — uses the Shufti Pro REST API via the
+  # verify-with-shuftipro edge function (not the Flutter SDK, which has a
+  # dio ^4.0.4 conflict). Document capture uses the existing image_picker dep.
+
 
   # Performance Monitoring
   sentry_flutter: ^9.9.2

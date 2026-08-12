@@ -63,7 +63,19 @@ const corsHeaders = {
 // ---------------------------------------------------------------------------
 interface ClientRequest {
   verification_type: "gender" | "age" | "identity";
-  shufti_reference: string;
+  shufti_reference?: string;
+  // Mode C (submit): base64-encoded images from the Flutter app
+  document_front?: string; // data:image/...;base64,...  or raw base64
+  document_back?: string;
+  selfie?: string;
+  country?: string;
+}
+
+// Result of submitting a verification to Shufti
+interface ShuftiSubmitResult {
+  reference: string;
+  event: string;
+  verification_url?: string;
 }
 
 interface ShuftiProof {
@@ -145,6 +157,72 @@ async function fetchShuftiStatus(
   }
 
   return { data: JSON.parse(rawBody) as ShuftiResponse, rawBody, signature };
+}
+
+// ---------------------------------------------------------------------------
+// Submit a verification to Shufti with base64 images (Mode C)
+// Docs: https://developers.shuftipro.com/docs/verification_endpoints/requests
+// ---------------------------------------------------------------------------
+async function submitShuftiVerification(
+  body: ClientRequest,
+  userId: string,
+): Promise<ShuftiResponse | null> {
+  const { clientId, secretKey } = getShuftiCreds();
+  const basicAuth = btoa(`${clientId}:${secretKey}`);
+
+  const reference = `sa_${userId.substring(0, 8)}_${Date.now()}`;
+  const country = body.country || "GB";
+
+  // Build the Shufti request payload
+  // The Flutter app captures images via image_picker and sends them as base64.
+  const payload: Record<string, unknown> = {
+    reference,
+    callback_url: `${Deno.env.get("SUPABASE_URL")}/functions/v1/verify-with-shuftipro`,
+    country,
+    language: "EN",
+    fetch_enhanced_data: "1",
+    verification_mode: "any",
+  };
+
+  // Document service (with enhanced data extraction for gender/DOB)
+  payload["document"] = {
+    proof: body.document_front,
+    ...(body.document_back ? { additional_proof: body.document_back } : {}),
+    supported_types: ["id_card", "driving_license", "passport"],
+    allow_offline: "1",
+    allow_online: "1",
+  };
+
+  // Face service (selfie + liveness)
+  if (body.selfie) {
+    payload["face"] = { proof: body.selfie };
+  }
+
+  const response = await fetch(SHUFTI_API_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": `Basic ${basicAuth}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const rawBody = await response.text();
+  const signature = response.headers.get("signature") ||
+    response.headers.get("sp_signature");
+
+  if (!response.ok) {
+    console.error("Shufti submit error:", response.status, rawBody);
+    return null;
+  }
+
+  // Verify the signature
+  if (!verifyShuftiSignature(rawBody, signature)) {
+    console.error("Shufti submit signature verification FAILED");
+    return null;
+  }
+
+  return JSON.parse(rawBody) as ShuftiResponse;
 }
 
 // ---------------------------------------------------------------------------
@@ -300,10 +378,61 @@ async function handleClientCall(req: Request): Promise<Response> {
   }
 
   const body: ClientRequest = await req.json();
-  const { verification_type, shufti_reference } = body;
+  const { verification_type, shufti_reference, document_front, selfie } = body;
 
-  if (!verification_type || !shufti_reference) {
-    return jsonError(400, "verification_type and shufti_reference are required");
+  if (!verification_type) {
+    return jsonError(400, "verification_type is required");
+  }
+
+  // ─── Mode C: Submit verification with base64 images ─────────────────────
+  // The Flutter app captures photos via image_picker and sends them here.
+  // The edge function submits them to Shufti and returns the result.
+  if (document_front || selfie) {
+    const shuftiData = await submitShuftiVerification(body, user.id);
+
+    if (!shuftiData) {
+      return jsonError(502, "Failed to submit verification to Shufti");
+    }
+
+    // Create a verification_records row
+    const { data: newRecord } = await supabase
+      .from("verification_records")
+      .insert({
+        user_id: user.id,
+        verification_type,
+        provider_reference: shuftiData.reference,
+        provider: "shuftipro",
+        status: mapStatus(shuftiData.event),
+      })
+      .select("id")
+      .single();
+
+    // Process the result (writes gender_verified etc.)
+    const { status, verifiedGender } = await processVerificationResult(
+      shuftiData,
+      verification_type,
+      JSON.stringify(shuftiData),
+    );
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        shufti_reference: shuftiData.reference,
+        status,
+        verified_gender: verifiedGender,
+        message: status === "approved"
+          ? "Verification complete."
+          : status === "declined"
+            ? "Verification declined."
+            : "Verification is still processing.",
+      }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } },
+    );
+  }
+
+  // ─── Mode A: Poll status with an existing reference ─────────────────────
+  if (!shufti_reference) {
+    return jsonError(400, "Either shufti_reference or document_front+selfie is required");
   }
 
   if (shufti_reference.length < 6 || shufti_reference.length > 250) {

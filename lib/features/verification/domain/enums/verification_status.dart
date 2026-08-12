@@ -21,12 +21,14 @@ enum VerificationStatus {
       case 'pending':
         return VerificationStatus.pending;
       case 'processing':
+      case 'in_review':
         return VerificationStatus.processing;
       case 'verified':
       case 'approved':
         return VerificationStatus.verified;
       case 'failed':
       case 'rejected':
+      case 'declined':
         return VerificationStatus.failed;
       case 'expired':
         return VerificationStatus.expired;
