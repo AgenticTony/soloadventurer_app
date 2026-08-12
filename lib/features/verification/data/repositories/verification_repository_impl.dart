@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/entities/verification_request.dart';
@@ -6,19 +9,31 @@ import '../../domain/repositories/verification_repository.dart';
 import '../datasources/verification_remote_data_source.dart';
 import 'package:soloadventurer/features/social/domain/enums/verification_tier.dart';
 
+/// Thrown when a captured verification image cannot be read from disk.
+class VerificationImageException implements Exception {
+  /// Human-readable description of what went wrong.
+  final String message;
+
+  /// Creates a new [VerificationImageException].
+  VerificationImageException(this.message);
+
+  @override
+  String toString() => 'VerificationImageException: $message';
+}
+
 /// Implementation of [VerificationRepository] using Supabase + Shufti Pro.
 ///
 /// The verification flow:
-///   1. The Flutter app runs the Shufti SDK (onsite document capture + selfie).
-///   2. The SDK returns a Shufti `reference`.
-///   3. This repository calls the `verify-with-shuftipro` edge function with
-///      that reference.
-///   4. The edge function fetches the result from Shufti, verifies the
+///   1. The app captures the ID document and a selfie via `image_picker`.
+///   2. This repository base64-encodes both and calls the
+///      `verify-with-shuftipro` edge function (Mode C).
+///   3. The edge function submits them to Shufti, verifies the response
 ///      signature, writes to `verification_records`, and sets
-///      `profiles.gender_verified = true` for approved female verifications.
+///      `profiles.gender_verified = true` for approved verifications.
 ///
-/// The Shufti SDK call itself happens in the presentation layer (the SDK
-/// provides its own UI). This repository handles the backend confirmation.
+/// The app never holds Shufti credentials — the edge function talks to Shufti
+/// server-to-server (FOUNDATIONS §2.4). The Flutter SDK was rejected because
+/// its `dio ^4.0.4` pin conflicts with this project's `dio ^5.4.1`.
 class VerificationRepositoryImpl implements VerificationRepository {
   final VerificationRemoteDataSource _remoteDataSource;
 
@@ -47,28 +62,23 @@ class VerificationRepositoryImpl implements VerificationRepository {
     return VerificationTier.unverified;
   }
 
-  /// Submit a Shufti verification with document images.
-  ///
-  /// The Flutter app captures photos via `image_picker`, converts them to
-  /// base64, and passes them here. The edge function forwards them to Shufti
-  /// which runs OCR + face match and returns the result.
-  ///
-  /// For approved female gender verifications, the edge function sets
-  /// `profiles.gender_verified = true` (unlocking women-only mode).
-  Future<VerificationRequest> submitShuftiVerification({
+  @override
+  Future<VerificationRequest> submitIdentityVerification({
     required VerificationType type,
-    required String documentFrontBase64,
-    required String selfieBase64,
-    String? documentBackBase64,
+    required String documentFrontPath,
+    String? documentBackPath,
+    required String selfiePath,
     String country = 'GB',
   }) async {
     final dbType = _remoteDataSource.dbVerificationType(type);
 
     final result = await _remoteDataSource.submitShuftiVerification(
       verificationType: dbType,
-      documentFrontBase64: documentFrontBase64,
-      selfieBase64: selfieBase64,
-      documentBackBase64: documentBackBase64,
+      documentFrontBase64: await _encodeImage(documentFrontPath),
+      selfieBase64: await _encodeImage(selfiePath),
+      documentBackBase64: documentBackPath == null
+          ? null
+          : await _encodeImage(documentBackPath),
       country: country,
     );
 
@@ -99,19 +109,16 @@ class VerificationRepositoryImpl implements VerificationRepository {
     return _mapToVerificationRequest(record, type);
   }
 
-  /// Poll the status of an existing Shufti verification.
-  ///
-  /// Used when the initial submit returned "pending" (Shufti is still
-  /// processing). Call this every ~3 seconds until status is terminal.
-  Future<VerificationRequest> pollShuftiVerification({
+  @override
+  Future<VerificationRequest> pollVerification({
     required VerificationType type,
-    required String shuftiReference,
+    required String providerReference,
   }) async {
     final dbType = _remoteDataSource.dbVerificationType(type);
 
     final result = await _remoteDataSource.pollShuftiVerification(
       verificationType: dbType,
-      shuftiReference: shuftiReference,
+      shuftiReference: providerReference,
     );
 
     final success = result['success'] as bool? ?? false;
@@ -131,39 +138,12 @@ class VerificationRepositoryImpl implements VerificationRepository {
         status: VerificationRemoteDataSource.mapStatus(
           result['status'] as String?,
         ),
-        providerRef: shuftiReference,
+        providerRef: providerReference,
         createdAt: DateTime.now(),
       );
     }
 
     return _mapToVerificationRequest(record, type);
-  }
-
-  @override
-  Future<VerificationRequest> submitPhotoVerification(String imagePath) async {
-    // Photo verification now goes through Shufti's face verification service.
-    // The SDK call happens in the presentation layer; this method is kept
-    // for backward compatibility but delegates to confirmShuftiVerification.
-    //
-    // In practice, the presentation layer should call the Shufti SDK directly
-    // and then call confirmShuftiVerification. This method is a fallback.
-    throw UnimplementedError(
-      'Photo verification now uses the Shufti SDK. Call confirmShuftiVerification '
-      'with the SDK reference instead.',
-    );
-  }
-
-  @override
-  Future<VerificationRequest> submitIdVerification({
-    required String frontImagePath,
-    String? backImagePath,
-  }) async {
-    // ID verification now goes through Shufti's document verification service.
-    // Same as submitPhotoVerification — the SDK handles capture.
-    throw UnimplementedError(
-      'ID verification now uses the Shufti SDK. Call confirmShuftiVerification '
-      'with the SDK reference instead.',
-    );
   }
 
   @override
@@ -198,6 +178,26 @@ class VerificationRepositoryImpl implements VerificationRepository {
       status: 'declined',
       failureReason: 'Cancelled by user',
     );
+  }
+
+  /// Read an on-device image and base64-encode it for the edge function.
+  ///
+  /// Throws [VerificationImageException] if the file is missing or empty, so a
+  /// bad capture surfaces as a clear message rather than a provider-side
+  /// rejection several seconds later.
+  Future<String> _encodeImage(String path) async {
+    final file = File(path);
+
+    if (!await file.exists()) {
+      throw VerificationImageException('Image file not found: $path');
+    }
+
+    final bytes = await file.readAsBytes();
+    if (bytes.isEmpty) {
+      throw VerificationImageException('Image file is empty: $path');
+    }
+
+    return base64Encode(bytes);
   }
 
   /// Map a Supabase verification_records row to a VerificationRequest entity.

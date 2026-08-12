@@ -21,7 +21,6 @@ class _IdUploadScreenState extends ConsumerState<IdUploadScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   String? _frontImagePath;
   String? _backImagePath;
-  bool _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +41,8 @@ class _IdUploadScreenState extends ConsumerState<IdUploadScreen> {
       }
     });
 
-    // Navigate to result on success
-    if (!state.isInProgress && _frontImagePath != null && _isUploading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          context.go('/verification/result', extra: {
-            'type': 'id',
-            'success': true,
-          });
-        }
-      });
-    }
+    // The document is only staged here — the selfie step submits both together,
+    // so this screen advances to photo capture rather than to the result.
 
     final requiresBack = documentType != 'passport';
 
@@ -291,12 +281,13 @@ class _IdUploadScreenState extends ConsumerState<IdUploadScreen> {
 
   void _submitVerification() {
     if (_frontImagePath == null) return;
-    setState(() => _isUploading = true);
 
-    ref.read(verificationFlowProvider.notifier).submitIdVerification(
+    ref.read(verificationFlowProvider.notifier).stageDocument(
           frontImagePath: _frontImagePath!,
           backImagePath: _backImagePath,
         );
+
+    context.go('/verification/photo');
   }
 
   String _documentLabel(String type) {

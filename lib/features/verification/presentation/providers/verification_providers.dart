@@ -39,6 +39,13 @@ class VerificationFlowState {
   /// Verification history
   final List<VerificationRequest> history;
 
+  /// Path to the captured front of the ID document, held between the document
+  /// step and the selfie step. The provider needs both in one submission.
+  final String? documentFrontPath;
+
+  /// Path to the captured back of the ID document, when the document type has one.
+  final String? documentBackPath;
+
   /// Creates a new [VerificationFlowState]
   const VerificationFlowState({
     this.currentTier = VerificationTier.unverified,
@@ -47,7 +54,12 @@ class VerificationFlowState {
     this.activeRequest,
     this.error,
     this.history = const [],
+    this.documentFrontPath,
+    this.documentBackPath,
   });
+
+  /// Whether a document has been captured and is waiting for a selfie.
+  bool get hasStagedDocument => documentFrontPath != null;
 
   /// Whether the user can start a new verification
   bool get canStartVerification => !isInProgress && currentTier != VerificationTier.idVerified;
@@ -60,7 +72,11 @@ class VerificationFlowState {
       currentTier == VerificationTier.emailVerified ||
       currentTier == VerificationTier.unverified;
 
-  /// Creates a copy with updated fields
+  /// Creates a copy with updated fields.
+  ///
+  /// [error] is intentionally not defaulted to the current value — omitting it
+  /// clears the error. Pass [clearDocument] to drop staged document paths once
+  /// a submission completes, so a later run cannot reuse a stale capture.
   VerificationFlowState copyWith({
     VerificationTier? currentTier,
     bool? isInProgress,
@@ -68,6 +84,9 @@ class VerificationFlowState {
     VerificationRequest? activeRequest,
     String? error,
     List<VerificationRequest>? history,
+    String? documentFrontPath,
+    String? documentBackPath,
+    bool clearDocument = false,
   }) {
     return VerificationFlowState(
       currentTier: currentTier ?? this.currentTier,
@@ -76,6 +95,10 @@ class VerificationFlowState {
       activeRequest: activeRequest ?? this.activeRequest,
       error: error,
       history: history ?? this.history,
+      documentFrontPath:
+          clearDocument ? null : (documentFrontPath ?? this.documentFrontPath),
+      documentBackPath:
+          clearDocument ? null : (documentBackPath ?? this.documentBackPath),
     );
   }
 }
@@ -105,48 +128,48 @@ class VerificationFlowNotifier extends Notifier<VerificationFlowState> {
     }
   }
 
-  /// Start photo verification with a selfie image
-  Future<void> submitPhotoVerification(String imagePath) async {
-    state = state.copyWith(
-      isInProgress: true,
-      activeType: VerificationType.photo,
-      error: null,
-    );
-
-    try {
-      final request = await _repository.submitPhotoVerification(imagePath);
-      final updatedHistory = await _repository.getVerificationHistory();
-      final newTier = await _repository.getVerificationTier();
-
-      state = state.copyWith(
-        isInProgress: false,
-        activeRequest: request,
-        currentTier: newTier,
-        history: updatedHistory,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isInProgress: false,
-        error: e.toString(),
-      );
-    }
-  }
-
-  /// Start ID verification with document images
-  Future<void> submitIdVerification({
+  /// Hold the captured ID document until the selfie step supplies the face.
+  ///
+  /// Nothing is sent to the provider here — Shufti needs the document and the
+  /// selfie in one submission, so the document step only stages its capture.
+  void stageDocument({
     required String frontImagePath,
     String? backImagePath,
-  }) async {
+  }) {
+    state = state.copyWith(
+      activeType: VerificationType.governmentId,
+      documentFrontPath: frontImagePath,
+      documentBackPath: backImagePath,
+      error: null,
+    );
+  }
+
+  /// Submit the staged document together with [selfiePath].
+  ///
+  /// Sets an error if no document has been staged — the provider cannot match a
+  /// face against nothing, and a selfie alone would prove nothing about identity.
+  Future<void> submitWithSelfie(String selfiePath) async {
+    final frontPath = state.documentFrontPath;
+    if (frontPath == null) {
+      state = state.copyWith(
+        isInProgress: false,
+        error: 'Capture your ID document before taking a selfie.',
+      );
+      return;
+    }
+
     state = state.copyWith(
       isInProgress: true,
-      activeType: VerificationType.governmentId,
+      activeType: state.activeType ?? VerificationType.governmentId,
       error: null,
     );
 
     try {
-      final request = await _repository.submitIdVerification(
-        frontImagePath: frontImagePath,
-        backImagePath: backImagePath,
+      final request = await _repository.submitIdentityVerification(
+        type: state.activeType ?? VerificationType.governmentId,
+        documentFrontPath: frontPath,
+        documentBackPath: state.documentBackPath,
+        selfiePath: selfiePath,
       );
       final updatedHistory = await _repository.getVerificationHistory();
       final newTier = await _repository.getVerificationTier();
@@ -156,6 +179,7 @@ class VerificationFlowNotifier extends Notifier<VerificationFlowState> {
         activeRequest: request,
         currentTier: newTier,
         history: updatedHistory,
+        clearDocument: true,
       );
     } catch (e) {
       state = state.copyWith(
