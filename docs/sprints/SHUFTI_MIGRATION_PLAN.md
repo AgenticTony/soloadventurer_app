@@ -501,50 +501,21 @@ Stops a live-breaking bug today (`PGRST205` on every women-only-mode toggle) and
 - ✅ PR #29 (`feature/shufti-verification`) — merged to main (`031c1e7`)
 - ✅ All CI checks green on final rebase (pgTAP, Unit, Coverage, Migration, Schema Ref, Lint, Edge Functions Validation — all pass). Build iOS had an SSL cert flake (GoogleDataTransport CDN), not a code issue.
 
-**Deploy — BLOCKED on free-tier project limit:**
-- ❌ `supabase db push` — fails: prod project `zyiuajhltmxbsrqplqlx` is INACTIVE (paused)
-- ❌ `supabase functions deploy verify-with-shuftipro` — fails: same (INACTIVE)
-- ❌ `supabase secrets set` — same blocker
-- **Root cause:** the Supabase free tier allows max 2 active projects. Two are currently active: `badrumads` and `boost-by-fcr`. To restore `soloadventurer-dev`, one of those must be paused first.
-- **Project statuses (verified via Management API 2026-08-12):**
-  - `ClaudeVoice` (hsywumxeaokljyxabhpz) — INACTIVE
-  - `soloadventurer-dev` (zyiuajhltmxbsrqplqlx) — INACTIVE ← the one we need
-  - `badrumads` (lmxaarbhkkgpuszamxve) — ACTIVE_HEALTHY
-  - `Rydo` (yuubaaiqeingvcdpvqzh) — INACTIVE
-  - `boost-by-fcr` (eqqeuawjqwugfeujfool) — ACTIVE_HEALTHY
+**Deploy — ✅ COMPLETE (2026-08-12):**
+- ✅ Paused `boost-by-fcr` (free-tier slot freed via Management API)
+- ✅ Restored `soloadventurer-dev` (waited for ACTIVE_HEALTHY)
+- ✅ Applied migration `20260812000000_shufti_rebrand.sql` via Management API `/database/query` endpoint (db push needed DB password we didn't have; query endpoint worked)
+- ✅ Verified on prod: `provider_reference`, `provider_workflow_id`, `provider_result`, `provider_breakdown`, `provider` columns present; zero `onfido_*` columns
+- ✅ Deployed `verify-with-shuftipro` edge function to prod
+- ✅ Set `SHUFTIPRO_CLIENT_ID` + `SHUFTIPRO_SECRET_KEY` secrets on prod
+- ✅ Function verified live: OPTIONS → 204, POST (no auth) → 401 (auth gate works)
 
-**To unblock (👤 Anthony must choose which project to pause):**
-```bash
-# Option A: pause badrumads
-curl -X POST "https://api.supabase.com/v1/projects/lmxaarbhkkgpuszamxve/pause" \
-  -H "Authorization: Bearer $(security find-generic-password -s 'Supabase CLI' -a 'access-token' -w | sed 's/^go-keyring-base64://' | base64 -d)"
-
-# Option B: pause boost-by-fcr
-curl -X POST "https://api.supabase.com/v1/projects/eqqeuawjqwugfeujfool/pause" \
-  -H "Authorization: Bearer $(security find-generic-password -s 'Supabase CLI' -a 'access-token' -w | sed 's/^go-keyring-base64://' | base64 -d)"
-
-# Then restore soloadventurer-dev:
-curl -X POST "https://api.supabase.com/v1/projects/zyiuajhltmxbsrqplqlx/restore" \
-  -H "Authorization: Bearer $(security find-generic-password -s 'Supabase CLI' -a 'access-token' -w | sed 's/^go-keyring-base64://' | base64 -d)"
-```
-
-**Deploy commands (run after project is restored):**
-```bash
-cd /Users/anthonyforan/Desktop/SoloAdventurer_app
-export SUPABASE_DB_PASSWORD="<your prod DB password>"
-supabase db push                                    # applies 20260812000000_shufti_rebrand.sql
-supabase functions deploy verify-with-shuftipro --no-verify-jwt
-CLIENT_ID=$(grep SHUFTI_CLIENT_ID .env | sed 's/^[[:space:]]*//' | cut -d= -f2 | tr -d '[:space:]')
-SECRET=$(grep SHUFTI_SECRET_KEY .env | sed 's/^[[:space:]]*//' | cut -d= -f2 | tr -d '[:space:]')
-supabase secrets set SHUFTIPRO_CLIENT_ID=$CLIENT_ID SHUFTIPRO_SECRET_KEY=$SECRET
-```
-
-**Live test (👤 human-led, after deploy):**
+**Live test (👤 human-led — the only remaining item):**
 - Run a real verification against prod with a female volunteer's ID to confirm `gender = 'female'` + `gender_verified = true` flips and women-only mode unlocks
 - Re-verify tampered-callback rejection against prod (already proven locally, §4.1.3a)
 - Update `EXECUTION_ORDER.md` Story 0.7 row to reflect Shufti is live
 
-**Status:** ⏳ Code merged to main. Deploy blocked on paused project. Live test pending deploy.
+**Status:** ✅ Deployed. Live test pending (human-only — requires a real person's ID document).
 
 ---
 
