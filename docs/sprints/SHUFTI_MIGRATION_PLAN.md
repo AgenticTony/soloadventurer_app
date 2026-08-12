@@ -494,14 +494,36 @@ Stops a live-breaking bug today (`PGRST205` on every women-only-mode toggle) and
 - All 37 verification tests pass ✅
 - **Status:** ✅ Committed `f5a083f`, pushed.
 
-### Step 5 — Sign-off (safety-sensitive) — 👤 PENDING (human-led)
-- 👤 **Merge PR #28** (`fix/matching-women-only-column-name`) — Step 0
-- 👤 **Merge the Shufti feature PR** (`feature/shufti-verification`) — Steps 1–4
-- 👤 **Deploy:** `supabase db push` + `supabase functions deploy verify-with-shuftipro` + set prod secrets
-- 👤 **Live test:** run a real verification against prod with a female volunteer's ID to confirm `gender = 'female'` + `gender_verified = true` flips and women-only mode unlocks
-- 👤 **Tampered-callback test:** already proven locally (§4.1.3a); re-verify against prod
+### Step 5 — Sign-off (safety-sensitive) — PARTIALLY COMPLETE
+
+**Code merged:**
+- ✅ PR #28 (`fix/matching-women-only-column-name`) — merged to main (`72656e0`)
+- ✅ PR #29 (`feature/shufti-verification`) — merged to main (`031c1e7`)
+- ✅ All CI checks green on final rebase (pgTAP, Unit, Coverage, Migration, Schema Ref, Lint, Edge Functions Validation — all pass). Build iOS had an SSL cert flake (GoogleDataTransport CDN), not a code issue.
+
+**Deploy — BLOCKED on prod project being paused:**
+- ❌ `supabase db push` — fails: prod project `zyiuajhltmxbsrqplqlx` is INACTIVE (paused on free tier)
+- ❌ `supabase functions deploy verify-with-shuftipro` — fails: same (INACTIVE)
+- ❌ `supabase secrets set` — same blocker
+- **To unblock:** restore the project at https://supabase.com/dashboard/project/zyiuajhltmxbsrqplqlx (click "Restore project"), then run the deploy commands below.
+
+**Deploy commands (run after project is restored):**
+```bash
+cd /Users/anthonyforan/Desktop/SoloAdventurer_app
+export SUPABASE_DB_PASSWORD="<your prod DB password>"
+supabase db push                                    # applies 20260812000000_shufti_rebrand.sql
+supabase functions deploy verify-with-shuftipro --no-verify-jwt
+CLIENT_ID=$(grep SHUFTI_CLIENT_ID .env | sed 's/^[[:space:]]*//' | cut -d= -f2 | tr -d '[:space:]')
+SECRET=$(grep SHUFTI_SECRET_KEY .env | sed 's/^[[:space:]]*//' | cut -d= -f2 | tr -d '[:space:]')
+supabase secrets set SHUFTIPRO_CLIENT_ID=$CLIENT_ID SHUFTIPRO_SECRET_KEY=$SECRET
+```
+
+**Live test (👤 human-led, after deploy):**
+- Run a real verification against prod with a female volunteer's ID to confirm `gender = 'female'` + `gender_verified = true` flips and women-only mode unlocks
+- Re-verify tampered-callback rejection against prod (already proven locally, §4.1.3a)
 - Update `EXECUTION_ORDER.md` Story 0.7 row to reflect Shufti is live
-- **Status:** ⏳ All code complete and locally tested. Awaiting human sign-off.
+
+**Status:** ⏳ Code merged to main. Deploy blocked on paused project. Live test pending deploy.
 
 ---
 
