@@ -501,11 +501,32 @@ Stops a live-breaking bug today (`PGRST205` on every women-only-mode toggle) and
 - ✅ PR #29 (`feature/shufti-verification`) — merged to main (`031c1e7`)
 - ✅ All CI checks green on final rebase (pgTAP, Unit, Coverage, Migration, Schema Ref, Lint, Edge Functions Validation — all pass). Build iOS had an SSL cert flake (GoogleDataTransport CDN), not a code issue.
 
-**Deploy — BLOCKED on prod project being paused:**
-- ❌ `supabase db push` — fails: prod project `zyiuajhltmxbsrqplqlx` is INACTIVE (paused on free tier)
+**Deploy — BLOCKED on free-tier project limit:**
+- ❌ `supabase db push` — fails: prod project `zyiuajhltmxbsrqplqlx` is INACTIVE (paused)
 - ❌ `supabase functions deploy verify-with-shuftipro` — fails: same (INACTIVE)
 - ❌ `supabase secrets set` — same blocker
-- **To unblock:** restore the project at https://supabase.com/dashboard/project/zyiuajhltmxbsrqplqlx (click "Restore project"), then run the deploy commands below.
+- **Root cause:** the Supabase free tier allows max 2 active projects. Two are currently active: `badrumads` and `boost-by-fcr`. To restore `soloadventurer-dev`, one of those must be paused first.
+- **Project statuses (verified via Management API 2026-08-12):**
+  - `ClaudeVoice` (hsywumxeaokljyxabhpz) — INACTIVE
+  - `soloadventurer-dev` (zyiuajhltmxbsrqplqlx) — INACTIVE ← the one we need
+  - `badrumads` (lmxaarbhkkgpuszamxve) — ACTIVE_HEALTHY
+  - `Rydo` (yuubaaiqeingvcdpvqzh) — INACTIVE
+  - `boost-by-fcr` (eqqeuawjqwugfeujfool) — ACTIVE_HEALTHY
+
+**To unblock (👤 Anthony must choose which project to pause):**
+```bash
+# Option A: pause badrumads
+curl -X POST "https://api.supabase.com/v1/projects/lmxaarbhkkgpuszamxve/pause" \
+  -H "Authorization: Bearer $(security find-generic-password -s 'Supabase CLI' -a 'access-token' -w | sed 's/^go-keyring-base64://' | base64 -d)"
+
+# Option B: pause boost-by-fcr
+curl -X POST "https://api.supabase.com/v1/projects/eqqeuawjqwugfeujfool/pause" \
+  -H "Authorization: Bearer $(security find-generic-password -s 'Supabase CLI' -a 'access-token' -w | sed 's/^go-keyring-base64://' | base64 -d)"
+
+# Then restore soloadventurer-dev:
+curl -X POST "https://api.supabase.com/v1/projects/zyiuajhltmxbsrqplqlx/restore" \
+  -H "Authorization: Bearer $(security find-generic-password -s 'Supabase CLI' -a 'access-token' -w | sed 's/^go-keyring-base64://' | base64 -d)"
+```
 
 **Deploy commands (run after project is restored):**
 ```bash
