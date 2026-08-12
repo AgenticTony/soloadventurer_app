@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../domain/enums/verification_status.dart';
 import '../providers/verification_providers.dart';
 
 /// Screen for capturing a selfie for photo verification
@@ -21,15 +22,20 @@ class _PhotoCaptureScreenState extends ConsumerState<PhotoCaptureScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   String? _capturedImagePath;
   bool _isCapturing = false;
+  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final state = ref.watch(verificationFlowProvider);
 
-    // Listen for errors
+    // Navigate only when a submission actually resolves — the transition from
+    // in-progress to settled. Reporting the real outcome matters here: this
+    // screen previously navigated on capture and always claimed success.
     ref.listen<VerificationFlowState>(verificationFlowProvider, (prev, next) {
-      if (next.error != null && mounted) {
+      if (!mounted) return;
+
+      if (next.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.error!),
@@ -37,20 +43,20 @@ class _PhotoCaptureScreenState extends ConsumerState<PhotoCaptureScreen> {
           ),
         );
         ref.read(verificationFlowProvider.notifier).clearError();
+        setState(() => _isSubmitting = false);
+        return;
+      }
+
+      final settled = (prev?.isInProgress ?? false) && !next.isInProgress;
+      if (settled && next.activeRequest != null) {
+        context.go('/verification/result', extra: {
+          'type': 'id',
+          'success':
+              next.activeRequest!.status != VerificationStatus.failed,
+          'status': next.activeRequest!.status.name,
+        });
       }
     });
-
-    // If verification completed successfully, navigate to result
-    if (!state.isInProgress && _capturedImagePath != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          context.go('/verification/result', extra: {
-            'type': 'photo',
-            'success': true,
-          });
-        }
-      });
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -312,9 +318,11 @@ class _PhotoCaptureScreenState extends ConsumerState<PhotoCaptureScreen> {
   }
 
   void _submitVerification() {
-    if (_capturedImagePath == null) return;
-    ref.read(verificationFlowProvider.notifier).submitPhotoVerification(
-          _capturedImagePath!,
-        );
+    if (_capturedImagePath == null || _isSubmitting) return;
+
+    setState(() => _isSubmitting = true);
+    ref
+        .read(verificationFlowProvider.notifier)
+        .submitWithSelfie(_capturedImagePath!);
   }
 }
