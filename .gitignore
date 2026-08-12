@@ -104,3 +104,5 @@ docs/archive/
 
 # Local DB backups (do not commit)
 backup_*.sql
+supabase/.env
+supabase/functions/.env
