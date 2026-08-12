@@ -417,6 +417,7 @@ async function handleClientCall(req: Request): Promise<Response> {
     return new Response(
       JSON.stringify({
         success: true,
+        verification_id: newRecord?.id ?? null,
         shufti_reference: shuftiData.reference,
         status,
         verified_gender: verifiedGender,
