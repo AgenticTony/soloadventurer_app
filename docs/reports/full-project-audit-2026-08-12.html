@@ -1,0 +1,612 @@
+<title>SoloAdventurer — Dual-Repo Audit, 2026-08-12</title>
+<style>
+  :root{
+    --bg:#EEF1F4; --surface:#FFFFFF; --surface-2:#E5EAEF; --surface-3:#DCE3EA;
+    --ink:#0F1922; --ink-2:#4A5B6D; --ink-3:#6E8093;
+    --line:#C9D4DE; --line-2:#B3C1CE;
+    --accent:#1F6485; --accent-soft:#DCEAF2;
+    --crit:#A32B21; --crit-bg:#F7E2E0;
+    --warn:#8A5605; --warn-bg:#F8ECD8;
+    --ok:#1B6446; --ok-bg:#DCEEE5;
+    --shadow:0 1px 2px rgba(15,25,34,.06),0 8px 24px -12px rgba(15,25,34,.18);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B131A; --surface:#121D26; --surface-2:#182634; --surface-3:#1F3040;
+      --ink:#E3EAF1; --ink-2:#93A6B8; --ink-3:#6F8497;
+      --line:#243645; --line-2:#31485C;
+      --accent:#63B4DA; --accent-soft:#14313F;
+      --crit:#EC8175; --crit-bg:#3A1D1A;
+      --warn:#DDA745; --warn-bg:#332612;
+      --ok:#5BC494; --ok-bg:#122E23;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B131A; --surface:#121D26; --surface-2:#182634; --surface-3:#1F3040;
+    --ink:#E3EAF1; --ink-2:#93A6B8; --ink-3:#6F8497;
+    --line:#243645; --line-2:#31485C;
+    --accent:#63B4DA; --accent-soft:#14313F;
+    --crit:#EC8175; --crit-bg:#3A1D1A;
+    --warn:#DDA745; --warn-bg:#332612;
+    --ok:#5BC494; --ok-bg:#122E23;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px 96px}
+  .prose{max-width:68ch}
+
+  /* ---------- masthead ---------- */
+  header.mast{
+    border-bottom:1px solid var(--line); background:var(--surface);
+    padding:44px 0 0;
+  }
+  .eyebrow{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink-3); display:flex; gap:14px; flex-wrap:wrap; align-items:center;
+  }
+  .eyebrow span{white-space:nowrap}
+  h1{
+    font-size:clamp(30px,4.6vw,46px); line-height:1.1; letter-spacing:-.022em;
+    font-weight:680; margin:14px 0 10px; text-wrap:balance;
+  }
+  .dek{font-size:18px; color:var(--ink-2); max-width:64ch; margin:0 0 28px}
+  .dek strong{color:var(--ink); font-weight:620}
+
+  /* ---------- readout ---------- */
+  .readout{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+    border-top:1px solid var(--line); border-left:1px solid var(--line);
+  }
+  .stat{
+    border-right:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:16px 18px; background:var(--surface);
+  }
+  .stat .k{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3);
+  }
+  .stat .v{
+    font-size:26px; font-weight:660; letter-spacing:-.02em; margin-top:5px;
+    font-variant-numeric:tabular-nums; line-height:1.15;
+  }
+  .stat .v.crit{color:var(--crit)} .stat .v.warn{color:var(--warn)} .stat .v.ok{color:var(--ok)}
+  .stat .n{font-size:12.5px; color:var(--ink-3); margin-top:2px}
+
+  /* ---------- sections ---------- */
+  section{margin-top:56px}
+  h2{
+    font-size:12px; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--accent);
+    margin:0 0 6px; font-weight:600;
+  }
+  h2 + .sub{
+    font-size:25px; font-weight:640; letter-spacing:-.02em; margin:0 0 16px;
+    line-height:1.25; text-wrap:balance;
+  }
+  h3{font-size:17.5px; font-weight:640; letter-spacing:-.01em; margin:32px 0 8px}
+  p{margin:0 0 14px}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.875em; background:var(--surface-2); border:1px solid var(--line);
+    padding:1px 5px; border-radius:3px; white-space:nowrap;
+  }
+
+  /* ---------- verdict ledger ---------- */
+  .ledger{display:flex; flex-direction:column; gap:10px}
+  .row{
+    background:var(--surface); border:1px solid var(--line);
+    border-left:3px solid var(--line-2); border-radius:4px;
+    padding:14px 16px; box-shadow:var(--shadow);
+  }
+  .row.refuted{border-left-color:var(--ok)}
+  .row.stale{border-left-color:var(--warn)}
+  .row.missed{border-left-color:var(--crit)}
+  .row.confirmed{border-left-color:var(--accent)}
+  .rhead{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px}
+  .stamp{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:10px; letter-spacing:.11em; text-transform:uppercase; font-weight:600;
+    padding:3px 7px; border-radius:3px; white-space:nowrap; border:1px solid transparent;
+  }
+  .s-refuted{background:var(--ok-bg); color:var(--ok); border-color:var(--ok)}
+  .s-stale{background:var(--warn-bg); color:var(--warn); border-color:var(--warn)}
+  .s-missed{background:var(--crit-bg); color:var(--crit); border-color:var(--crit)}
+  .s-confirmed{background:var(--accent-soft); color:var(--accent); border-color:var(--accent)}
+  .claim{font-weight:600; font-size:15.5px; letter-spacing:-.005em}
+  .src{font-size:12px; color:var(--ink-3); font-family:ui-monospace,Menlo,monospace}
+  .evidence{font-size:14.5px; color:var(--ink-2); margin:0}
+  .evidence b{color:var(--ink); font-weight:600}
+
+  /* ---------- tables ---------- */
+  .tscroll{overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:560px}
+  th{
+    text-align:left; font-family:ui-monospace,Menlo,monospace; font-size:10.5px;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+    padding:11px 14px; border-bottom:1px solid var(--line); background:var(--surface-2);
+    font-weight:600; white-space:nowrap;
+  }
+  td{padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.num{font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap}
+  .pill{
+    display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:10px;
+    letter-spacing:.09em; text-transform:uppercase; padding:2px 6px; border-radius:3px; font-weight:600;
+  }
+  .p-crit{background:var(--crit-bg); color:var(--crit)}
+  .p-warn{background:var(--warn-bg); color:var(--warn)}
+  .p-ok{background:var(--ok-bg); color:var(--ok)}
+  .p-info{background:var(--accent-soft); color:var(--accent)}
+
+  /* ---------- callout ---------- */
+  .callout{
+    background:var(--surface); border:1px solid var(--crit); border-radius:4px;
+    padding:18px 20px; box-shadow:var(--shadow);
+  }
+  .callout.warnbox{border-color:var(--warn)}
+  .callout h3{margin:0 0 8px; font-size:17px; color:var(--crit)}
+  .callout.warnbox h3{color:var(--warn)}
+  .callout p:last-child{margin-bottom:0}
+  pre{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:4px;
+    padding:12px 14px; overflow-x:auto; font-size:13px; line-height:1.55;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; margin:12px 0;
+  }
+  pre code{background:none; border:none; padding:0; white-space:pre}
+
+  /* ---------- ordered remediation ---------- */
+  ol.steps{list-style:none; counter-reset:s; padding:0; margin:0; display:flex; flex-direction:column; gap:2px}
+  ol.steps li{
+    counter-increment:s; display:grid; grid-template-columns:34px 1fr; gap:14px;
+    padding:13px 0; border-bottom:1px solid var(--line);
+  }
+  ol.steps li:last-child{border-bottom:none}
+  ol.steps li::before{
+    content:counter(s,decimal-leading-zero);
+    font-family:ui-monospace,Menlo,monospace; font-size:12px; font-weight:600;
+    color:var(--accent); padding-top:2px; font-variant-numeric:tabular-nums;
+  }
+  ol.steps .t{font-weight:620; letter-spacing:-.005em}
+  ol.steps .d{font-size:14.5px; color:var(--ink-2)}
+  ul.tight{margin:0 0 14px; padding-left:20px}
+  ul.tight li{margin-bottom:5px}
+
+  footer{
+    margin-top:64px; padding-top:20px; border-top:1px solid var(--line);
+    font-size:13px; color:var(--ink-3);
+  }
+  a{color:var(--accent)}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span>Full audit</span><span>·</span>
+      <span>2026-08-12</span><span>·</span>
+      <span>SoloAdventurer_app + SoloAdventurerWeb</span><span>·</span>
+      <span>6 agents, findings re-verified against prod</span>
+    </div>
+    <h1>Both repos are in better shape than the agents reported — and production is in worse shape than anyone reported.</h1>
+    <p class="dek">Six specialist agents produced ~500 findings. Verifying them against the live database and working tree
+      <strong>refuted three of the four "CRITICAL" web findings</strong>, showed three agents were quoting superseded
+      2026-07-15 documents, and surfaced <strong>two production defects no agent found</strong> — including a deleted
+      verification function that is still deployed and still able to grant women-only access.</p>
+  </div>
+  <div class="wrap" style="padding-bottom:0">
+    <div class="readout">
+      <div class="stat"><div class="k">Live P0</div><div class="v crit">3</div><div class="n">none visible to CI</div></div>
+      <div class="stat"><div class="k">Agent claims refuted</div><div class="v ok">6</div><div class="n">of 14 headline claims</div></div>
+      <div class="stat"><div class="k">Prod migrations</div><div class="v">34</div><div class="n">ledger stops at 07-17</div></div>
+      <div class="stat"><div class="k">Mobile tests</div><div class="v ok">4487</div><div class="n">+63 known-fail, honest</div></div>
+      <div class="stat"><div class="k">Web E2E tests</div><div class="v crit">0</div><div class="n">Cypress config only</div></div>
+      <div class="stat"><div class="k">Anon-callable SECDEF</div><div class="v warn">17</div><div class="n">live advisories</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ THE TWO LIVE P0s ============ -->
+  <section>
+    <h2>Section 01 — Not previously reported</h2>
+    <div class="sub">Three defects the audit chain could not see</div>
+    <p class="prose">Every agent audited the <em>repository</em>. The first two appear only when you query the live
+      project — both caused by <strong>work applied to production out-of-band</strong>, outside the migration and
+      deploy tooling. The third is the mirror image: code that is correct in isolation but never connected, invisible
+      to any check that reads one layer at a time.</p>
+
+    <div class="callout" style="margin-bottom:16px">
+      <h3>P0-A · The deleted Onfido function is still deployed and still writes <code>gender_verified</code></h3>
+      <p>PR #29 deleted <code>supabase/functions/verify-with-onfido/</code> from the repo, and the migration plan,
+        the grep gate, and the database agent all recorded Onfido as fully removed. Deleting the directory does not
+        undeploy the function. It is live right now:</p>
+      <pre><code>slug: verify-with-onfido   status: ACTIVE   version: 3   verify_jwt: true
+id:   7a08d2b5-1696-4894-958c-887ec223d38c</code></pre>
+      <p>Its own source — recovered from <code>031c1e7^</code> — carries the hole the Shufti migration was written to
+        eliminate. Line 315 concedes it, line 366 acts on it:</p>
+      <pre><code>315:  // Verify webhook signature (simplified - in production, use proper signature verification)
+319:  if (!signature || !webhookSecret) {          // presence check only — never validated
+366:            gender_verified: true,             // the women-only admission flag</code></pre>
+      <p>The webhook branch is entered on the mere presence of an <code>x-onfido-signature</code> header, and the
+        signature is never verified against the payload. <code>gender_verified</code> is the flag
+        <code>is_verified_female()</code> reads and the <code>women_only_requires_verified_female</code> constraint
+        enforces. Exploitability depends on whether <code>ONFIDO_WEBHOOK_SECRET</code> is still set in prod secrets —
+        if it is unset the branch errors out early. <strong>That distinction is not worth relying on.</strong> The
+        function has no callers, no purpose, and a known auth bypass on the platform's most safety-sensitive flag.</p>
+      <p style="margin-bottom:0"><b>Fix:</b> <code>supabase functions delete verify-with-onfido</code>, then confirm no
+        <code>ONFIDO_*</code> secrets remain.</p>
+    </div>
+
+    <div class="callout warnbox">
+      <h3>P0-B · The Shufti schema is live but absent from the migration ledger — the next <code>db push</code> will fail</h3>
+      <p>Step 5 of the migration plan applied the Shufti DDL through the Management API <code>/database/query</code>
+        endpoint, because <code>db push</code> needed a DB password that wasn't available. The DDL landed. The ledger
+        entry did not:</p>
+      <pre><code>shufti_migrations_in_ledger : 0          ← expected 2
+latest_ledger_version       : 20260717180000
+onfido_cols_remaining       : 0          ← DDL *is* live
+provider_col_live           : 1
+provider_check_def          : CHECK (provider = ANY (ARRAY['shuftipro','onfido',
+                                      'stripe_identity','persona','veriff']))</code></pre>
+      <p>So the database is correct and the ledger is a liar. The next <code>supabase db push</code> will replay
+        <code>20260812000000_shufti_rebrand.sql</code>, hit
+        <code>RENAME COLUMN onfido_check_id TO provider_reference</code> against a column that no longer exists, and
+        abort — taking every later migration with it. This is a live tripwire under the very next backend deploy
+        either repo attempts.</p>
+      <p style="margin-bottom:0"><b>Fix:</b>
+        <code>supabase migration repair --status applied 20260812000000 20260812010000</code>, then
+        <code>supabase db diff --linked</code> to confirm the ledger and schema agree before pushing anything.</p>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <h3>P0-C · The verification UI cannot reach the Shufti code — no user can verify</h3>
+      <p>Found while inventorying user-facing screens after the audit. The Shufti pipeline is real, deployed, and proven
+        end-to-end against prod — and completely unreachable from the app. Both verification entry points call
+        repository methods that PR&nbsp;#29 left as <code>UnimplementedError</code>:</p>
+      <pre><code>photo_capture_screen.dart:316 → submitPhotoVerification() → throw UnimplementedError
+id_upload_screen.dart:296     → submitIdVerification()    → throw UnimplementedError</code></pre>
+      <p>The working methods — <code>submitShuftiVerification</code> / <code>pollShuftiVerification</code> — were added
+        to the <em>implementation only</em>, never to the <code>VerificationRepository</code> interface, and have zero
+        callers in the presentation layer. Before PR&nbsp;#29 the button hit a simulation stub that always approved
+        after two seconds; now it throws. That is a user-facing regression, and it makes the remaining DoD item — a
+        live test with a real female volunteer's ID — impossible to perform through the app.</p>
+      <p>Two further defects surfaced in the same screens. <code>photo_capture_screen.dart</code> navigated to the
+        result page on <em>photo capture</em> rather than on submission, always reporting
+        <code>success: true</code>; <code>id_upload_screen.dart</code> did the same on any settled state, including
+        failure. Both would have shown users a success screen for a verification that never happened.</p>
+      <p>Underneath the wiring sits a design gap: Shufti Mode C requires the document <em>and</em> the selfie in one
+        submission, but the two screens were built as terminal alternatives, each submitting alone. A document without
+        a face match proves the document is genuine, not that it belongs to the person holding it — which is precisely
+        the binding the women-only gate depends on.</p>
+      <p style="margin-bottom:0"><b>Fix:</b> branch <code>fix/verification-ui-wiring</code> — the document step now
+        stages its capture, the selfie step submits both together, and navigation reports the real outcome. Adds a
+        selfie to the ID flow, so it is a deliberate product change requiring sign-off. 9 new tests, 46/46 green,
+        <code>flutter analyze</code> clean.</p>
+    </div>
+  </section>
+
+  <!-- ============ VERIFICATION LEDGER ============ -->
+  <section>
+    <h2>Section 02 — Agent findings, re-verified</h2>
+    <div class="sub">What the sub-agents reported vs. what the code and database actually say</div>
+    <p class="prose">I checked every headline claim rather than relaying it. The dominant failure mode was
+      <strong>agents reading a comment or a report that <em>describes</em> a past bug and reporting it as present</strong> —
+      the web repo documents its own fixes thoroughly, and that documentation was mistaken for the defect.</p>
+
+    <div class="ledger">
+
+      <div class="row refuted">
+        <div class="rhead"><span class="stamp s-refuted">Refuted</span>
+          <span class="claim">"CRITICAL: live API keys committed in <code>.env.local</code>"</span>
+          <span class="src">web agent</span></div>
+        <p class="evidence"><b>Not tracked, never committed.</b> <code>git ls-files</code> returns only
+          <code>.env.example</code>; <code>git log --all -- .env.local</code> is empty; <code>.gitignore:18</code> is
+          <code>.env.*</code>. The file exists on disk locally, which is exactly correct. The agent read a local
+          untracked file and reported it as repository contents. The genuine credential incident is the 2026-06-13
+          history exposure — separate, and already rotated.</p>
+      </div>
+
+      <div class="row stale">
+        <div class="rhead"><span class="stamp s-stale">Already fixed</span>
+          <span class="claim">"CRITICAL: phantom trip RPCs (<code>create_trip</code>, <code>list_my_trips</code>)"</span>
+          <span class="src">web agent</span></div>
+        <p class="evidence"><b>Fixed, with a regression test guarding it.</b> The only surviving mentions are
+          explanatory comments — <code>src/lib/api.ts:211</code> reads <em>"Story 0.7: this called a
+          <code>create_trip</code> RPC that never existed"</em> — and
+          <code>src/lib/__tests__/api.test.ts:81</code> asserts <em>"inserts into the trips table — not the phantom
+          create_trip RPC"</em>. Real remainder: <code>tripService.ts:37,44</code> still has unimplemented
+          <code>updateTrip</code>/<code>deleteTrip</code> stubs. That is a gap, not a critical.</p>
+      </div>
+
+      <div class="row stale">
+        <div class="rhead"><span class="stamp s-stale">Already fixed</span>
+          <span class="claim">"CRITICAL: blocking writes to phantom <code>blocked_users</code> table"</span>
+          <span class="src">web agent</span></div>
+        <p class="evidence"><b>Writes to <code>blocks</code>, and a test enforces it.</b>
+          <code>src/lib/moderation.ts:31,65,77</code> all target <code>from('blocks')</code>;
+          <code>moderation.test.ts:55</code> asserts <code>expect(calls).not.toContain('blocked_users')</code>.
+          Same failure mode as above — the fix's own comments were read as the bug.</p>
+      </div>
+
+      <div class="row stale">
+        <div class="rhead"><span class="stamp s-stale">Superseded</span>
+          <span class="claim">"Prod critically drifted: Phase A tables missing, foreign <code>jobs</code>/<code>demos</code> migrations present"</span>
+          <span class="src">security · mobile · testing agents</span></div>
+        <p class="evidence"><b>Describes the pre-repave state of 2026-07-15.</b> Live now: 34 migrations through
+          <code>20260717180000</code>; <code>meetups</code>, <code>meetup_outcomes</code>, <code>member_reviews</code>,
+          <code>sos_alerts</code>, <code>notification_tokens</code>, <code>shared_meetups</code>,
+          <code>travel_preferences</code> all present; no <code>jobs</code> table; no foreign migration versions in the
+          ledger. The clean repave worked. Three agents inherited the stale narrative from
+          <code>session-handoff.md</code> and the 07-15 reports.</p>
+      </div>
+
+      <div class="row refuted">
+        <div class="rhead"><span class="stamp s-refuted">Refuted</span>
+          <span class="claim">"<code>USING(true)</code> leak will go live on first <code>db push</code>"</span>
+          <span class="src">mobile agent</span></div>
+        <p class="evidence"><b>Already closed in prod.</b> <code>20260404100000</code> creates the policy;
+          <code>20260708090000_profiles_rls_repair.sql:162</code> drops it — and both are applied in the live ledger.
+          Ordering guarantees the end state is safe; the hole exists only transiently mid-sequence within a fresh apply.</p>
+      </div>
+
+      <div class="row missed">
+        <div class="rhead"><span class="stamp s-missed">Inverted</span>
+          <span class="claim">"<code>verify-with-onfido</code> ✅ removed / not present" and "Applied to production: ✅ yes"</span>
+          <span class="src">database agent</span></div>
+        <p class="evidence"><b>Both wrong in the dangerous direction.</b> The function is <code>ACTIVE</code> in prod
+          (P0-A), and zero <code>202608*</code> migrations exist in the ledger despite the DDL being live (P0-B). This
+          agent scored the backend 94/100 while both live defects sat inside its own scope — a reminder that
+          repo-only inspection cannot certify production.</p>
+      </div>
+
+      <div class="row confirmed">
+        <div class="rhead"><span class="stamp s-confirmed">Confirmed</span>
+          <span class="claim"><code>MatchingRepositoryImpl</code> — 933 lines, zero tests</span>
+          <span class="src">mobile agent</span></div>
+        <p class="evidence"><code>grep -rl "MatchingRepositoryImpl" test/</code> returns <b>nothing</b>. This file owns
+          the offline sync queue, trip CRUD retry logic, and women-only mode state. It is the single largest untested
+          critical component in either repo.</p>
+      </div>
+
+      <div class="row confirmed">
+        <div class="rhead"><span class="stamp s-confirmed">Confirmed, understated</span>
+          <span class="claim">"12 presentation files import Supabase directly"</span>
+          <span class="src">mobile agent</span></div>
+        <p class="evidence">Actual count is <b>13 Dart files</b> under <code>lib/features/*/presentation/</code>,
+          including <code>safety/…/share_meetup_screen.dart</code> writing to <code>shared_meetups</code> straight from
+          the widget layer, and <code>safety/…/meetup_checkin_providers.dart</code> which the agent missed entirely.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ LIVE SECURITY POSTURE ============ -->
+  <section>
+    <h2>Section 03 — Live security posture</h2>
+    <div class="sub">Queried directly from the production project</div>
+    <p class="prose">Beyond the two P0s, the live advisor set surfaces one genuinely safety-relevant item and a large
+      hardening backlog. <em>Note: I read a summarized extraction of the advisor payload, not all 94,843 characters —
+      counts below are from that extraction.</em></p>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Finding</th><th>Sev</th><th>Detail</th><th class="num">Count</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>check_ins</code> has RLS disabled</td>
+            <td><span class="pill p-crit">P1</span></td>
+            <td>Fully exposed to <code>anon</code> — readable <em>and writable</em> by anyone with the public anon key.
+              Columns: <code>user_id, status, scheduled_at, completed_at, meetup_checkin_id</code>. An attacker can mark a
+              safety check-in complete, defeating the missed-check-in escalation. Safety-sensitive per CLAUDE.md.</td>
+            <td class="num">1</td>
+          </tr>
+          <tr>
+            <td>SECURITY DEFINER fns callable by <code>anon</code></td>
+            <td><span class="pill p-warn">P2</span></td>
+            <td>Includes <code>get_active_sos_alert</code>, <code>resolve_sos_alert</code>,
+              <code>acknowledge_sos_alert</code>, <code>cancel_sos_alert</code>. SOS lifecycle verbs should not be
+              anon-reachable.</td>
+            <td class="num">17</td>
+          </tr>
+          <tr>
+            <td><code>function_search_path_mutable</code></td>
+            <td><span class="pill p-warn">P2</span></td>
+            <td>Search-path not pinned. <code>20260708091000</code> hardened the in-repo set; these are the
+              dashboard-era remainder.</td>
+            <td class="num">44</td>
+          </tr>
+          <tr>
+            <td>SECDEF fns callable by <code>authenticated</code></td>
+            <td><span class="pill p-info">P3</span></td>
+            <td>Largely by design, but unaudited as a set.</td>
+            <td class="num">40</td>
+          </tr>
+          <tr>
+            <td><code>security_definer_view</code></td>
+            <td><span class="pill p-info">P3</span></td>
+            <td>Views bypassing invoker RLS; carried from the 07-15 advisor backlog into PHASE_H.</td>
+            <td class="num">5</td>
+          </tr>
+          <tr>
+            <td><code>spatial_ref_sys</code> RLS disabled</td>
+            <td><span class="pill p-ok">Noise</span></td>
+            <td>PostGIS system table. Benign; standard lint false-positive.</td>
+            <td class="num">1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Credential incident — status</h3>
+    <p class="prose">Rotation is <strong>complete</strong> (2026-07-15): the leaked Supabase service-role key, AWS, OpenAI,
+      Resend, Twilio and PAT credentials are dead. History purge via <code>git filter-repo</code> remains
+      <strong>outstanding</strong>. Both repos are private, so with rotation done this is now hygiene rather than
+      exposure — do it at the next maintenance window, before any public mirror.</p>
+  </section>
+
+  <!-- ============ PER-REPO ============ -->
+  <section>
+    <h2>Section 04 — Mobile · SoloAdventurer_app</h2>
+    <div class="sub">Flutter · 932 Dart files · 253 test files · architecture sound, observability weak</div>
+
+    <div class="tscroll" style="margin-bottom:20px">
+      <table>
+        <thead><tr><th>Dimension</th><th class="num">Score</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Clean Architecture</td><td class="num">6 / 10</td><td>Feature-first slicing holds; domain layer near-pure. Undermined by ~120 cross-feature import edges, <code>auth ↔ profile</code> cycles, and a domain repo extending a data-layer class.</td></tr>
+          <tr><td>Test coverage</td><td class="num">5 / 10</td><td>4487 green / 63 known-fail on a signature-keyed gate — an honest baseline with no hidden production bugs. But the three riskiest components (<code>MatchingRepositoryImpl</code>, <code>MeetupCheckinRepositoryImpl</code>, SOS trigger behaviour) have none.</td></tr>
+          <tr><td>Error observability</td><td class="num">3 / 10</td><td><b>1,219 <code>catch</code> vs 244 <code>rethrow</code>.</b> Failures are swallowed without logging across datasources and repositories. Any production incident here is currently undiagnosable.</td></tr>
+          <tr><td>Riverpod patterns</td><td class="num">7 / 10</td><td>Codegen + <code>AsyncValue</code> used consistently; GetIt fully removed. Some presentation providers hand-rolled without <code>@riverpod</code>.</td></tr>
+          <tr><td>Layer isolation</td><td class="num">5 / 10</td><td>13 presentation files reach <code>Supabase.instance</code> directly, bypassing the data layer entirely.</td></tr>
+          <tr><td>Docs &amp; comments</td><td class="num">8 / 10</td><td>~97% doc-comment coverage, Google style, genuinely useful on complex RLS and reputation logic.</td></tr>
+          <tr><td>Dependencies</td><td class="num">6 / 10</td><td><code>flutter_secure_storage ^10.0.0-beta.4</code> is a beta in a security-critical path. Duplicated stacks: <code>http</code>+<code>dio</code>, <code>mockito</code>+<code>mocktail</code>, <code>sqflite</code>+<code>drift</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="prose"><strong>Verification feature specifically:</strong> the Shufti integration is sound — three-mode edge
+      function, double-SHA256 signature proven against a live response, tampered payloads rejected 401,
+      <code>verify_jwt=false</code> correctly justified by in-function signature checking. The
+      <code>verification_id</code> and provider-CHECK findings from the earlier review are both fixed and live.
+      Its one real weakness is the ambiguity flagged below.</p>
+
+    <div class="callout warnbox">
+      <h3>Undocumented invariant: what does <code>gender_verified</code> actually mean?</h3>
+      <p style="margin-bottom:0">Women-only mode is gated by two separate checks in
+        <code>matching_repository_impl.dart:815–932</code> — <code>isVerifiedForWomenOnly()</code> reading
+        <code>gender_verified</code>, and <code>getUserGender() == 'female'</code>. The edge function sets
+        <code>gender_verified = true</code> for <em>any</em> approved gender, male included. So the flag means
+        "gender was verified", not "verified female" — and only the conjunction is safe. This is load-bearing safety
+        logic held together by an undocumented convention, with in-memory state
+        (<code>_womenOnlyModeEnabled</code>) that can silently diverge from the database because the write failures are
+        caught and ignored. Document the invariant, then extract to the safety layer per Story H.3.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Section 05 — Web · SoloAdventurerWeb</h2>
+    <div class="sub">Next 16.2 · React 19.2 · TypeScript 5.9 · 227 source files · 48 tests · healthier than reported</div>
+    <p class="prose">With the three false criticals removed, the web repo's real problems are narrower and mostly about
+      <em>safety nets it doesn't have</em> rather than defects it does.</p>
+
+    <div class="tscroll">
+      <table>
+        <thead><tr><th>Issue</th><th>Sev</th><th>Impact</th></tr></thead>
+        <tbody>
+          <tr><td>No generated Supabase types (<code>database.types.ts</code> absent)</td><td><span class="pill p-crit">High</span></td>
+            <td>40+ <code>Record&lt;string,unknown&gt;</code> casts. Schema drift in the <em>shared</em> backend is invisible at compile time — the single highest-leverage fix in this repo. This is Story W.2, still unstarted.</td></tr>
+          <tr><td>Zero E2E tests</td><td><span class="pill p-crit">High</span></td>
+            <td>Cypress is configured; the specs that exist reference dead routes (<code>/dashboard</code> → <code>/discover</code>). No end-to-end proof of auth, matching, or verification flows.</td></tr>
+          <tr><td>Edge-function proxy unauthenticated at the edge</td><td><span class="pill p-warn">Med</span></td>
+            <td><code>/api/edge/[...functionName]</code> is absent from <code>protectedRoutes</code> in <code>middleware.ts</code>; missing/expired tokens are only rejected later at the database.</td></tr>
+          <tr><td>Auth context re-derived in 3 places</td><td><span class="pill p-warn">Med</span></td>
+            <td><code>getAuthContext()</code> duplicated across <code>api.ts</code>, <code>matching.ts</code>, <code>userService.ts</code> while <code>AuthContext</code> already provides it.</td></tr>
+          <tr><td>Mocked Supabase client answers any query</td><td><span class="pill p-warn">Med</span></td>
+            <td>Test mocks resolve unknown tables and RPCs happily — precisely what let the phantom-schema class of bug survive as long as it did.</td></tr>
+          <tr><td>Oversized components</td><td><span class="pill p-info">Low</span></td>
+            <td><code>ConnectionList.tsx</code> 795 lines; <code>TripCard</code> 461; <code>NearYouTab</code> 451.</td></tr>
+          <tr><td>Hook lint rules set to <code>warn</code></td><td><span class="pill p-info">Low</span></td>
+            <td>Tracked as W.4 debt, but warnings are invisible in CI so the debt compounds unobserved.</td></tr>
+          <tr><td>Unimplemented trip mutations</td><td><span class="pill p-info">Low</span></td>
+            <td><code>tripService.ts:37,44</code> — <code>updateTrip</code>/<code>deleteTrip</code> are TODO stubs.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ CI + SPRINT ============ -->
+  <section>
+    <h2>Section 06 — Pipelines &amp; sprint position</h2>
+    <div class="sub">CI is green on both repos; the gap is between "merged" and "live"</div>
+    <div class="tscroll" style="margin-bottom:20px">
+      <table>
+        <thead><tr><th>Pipeline</th><th>Status</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Mobile <code>test.yml</code></td><td><span class="pill p-ok">12 / 12</span></td><td>Android build down to ~5 min from the 15-min timeout via Gradle caching.</td></tr>
+          <tr><td>Mobile <code>supabase-ci.yml</code></td><td><span class="pill p-ok">17 / 17</span></td><td>pgTAP fully green; 11 suites cover RLS recursion, women-only gating, PII columns, block symmetry.</td></tr>
+          <tr><td>Mobile <code>code-quality.yml</code></td><td><span class="pill p-ok">Pass</span></td><td>Errors-only gate. 420 analyzer issues (137 warn / 283 info) tracked as non-blocking debt.</td></tr>
+          <tr><td>Web <code>ci.yml</code></td><td><span class="pill p-ok">Pass</span></td><td>Types, ESLint, Jest, sprint-state sync, Turbopack build.</td></tr>
+          <tr><td>Web <code>api-tests.yml</code></td><td><span class="pill p-warn">Degraded</span></td><td>Canary test commented out — no live API validation running at all.</td></tr>
+          <tr><td>Release checklist</td><td><span class="pill p-crit">Absent</span></td><td>Neither repo has one. No documented rollback, no environment promotion path.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="prose"><strong>Sprint position:</strong> FOUNDATIONS, PRODUCT, EXECUTION_ORDER and CLAUDE.md are mutually
+      consistent across both repos — no strategic drift. Phase 0 is the live front: stories 0.4/0.5/0.6 have shipped,
+      0.7 (phantom schema refs) is the pivot blocker at ~3/12, and 0.1's history purge is the last credential item.
+      Phase A is code-complete and its tables <em>are</em> live. PHASE_H is unblocked and can start in parallel.
+      The web repo's <code>fix/story-0.7-trip-rpcs</code> branch is 11 commits behind <code>main</code> with no open PR —
+      rebase or close it.</p>
+  </section>
+
+  <!-- ============ REMEDIATION ============ -->
+  <section>
+    <h2>Section 07 — What to do, in dependency order</h2>
+    <div class="sub">The first two are today; nothing else should precede them</div>
+    <ol class="steps">
+      <li><div><div class="t">Delete the deployed <code>verify-with-onfido</code> function</div>
+        <div class="d"><code>supabase functions delete verify-with-onfido</code>, then audit prod secrets for any
+        <code>ONFIDO_*</code> remnant. Closes a live auth bypass on the women-only admission flag. Minutes of work.</div></div></li>
+      <li><div><div class="t">Repair the migration ledger before any <code>db push</code></div>
+        <div class="d"><code>supabase migration repair --status applied 20260812000000 20260812010000</code>, then
+        <code>db diff --linked</code> to confirm ledger and schema agree. Until this runs, the next backend deploy from
+        <em>either</em> repo fails on the Onfido column rename.</div></div></li>
+      <li><div><div class="t">Enable RLS on <code>check_ins</code> with policies</div>
+        <div class="d">Currently anon-writable, which defeats missed-check-in escalation. Needs owner-scoped policies
+        written alongside — enabling RLS bare will block all access. Safety-sensitive: human sign-off required.</div></div></li>
+      <li><div><div class="t">Revoke <code>anon</code> EXECUTE on the 17 SECURITY DEFINER functions</div>
+        <div class="d">Prioritise the four SOS lifecycle verbs. Fold the 44 <code>search_path</code> pins into the same pass.</div></div></li>
+      <li><div><div class="t">Generate web Supabase types — Story W.2</div>
+        <div class="d"><code>supabase gen types typescript --linked &gt; src/types/database.types.ts</code>. Retires 40+ unsafe
+        casts and gives the web repo its first compile-time defence against shared-schema drift.</div></div></li>
+      <li><div><div class="t">Stop swallowing errors in mobile</div>
+        <div class="d">One <code>core/utils/error_mapping.dart</code>, logging at every catch with stack traces preserved.
+        Do this before more feature work — every incident until then is undiagnosable.</div></div></li>
+      <li><div><div class="t">Test <code>MatchingRepositoryImpl</code></div>
+        <div class="d">Offline sync queue, retry semantics, women-only filtering. Largest untested critical surface in
+        either codebase.</div></div></li>
+      <li><div><div class="t">Document the <code>gender_verified</code> invariant, then extract women-only to safety</div>
+        <div class="d">Story H.3. Single source of truth in the database, no in-memory mirror, no silently-ignored write failures.</div></div></li>
+      <li><div><div class="t">Write a release checklist; restore the web canary; add web E2E smoke tests</div>
+        <div class="d">The pre-production hygiene neither repo currently has.</div></div></li>
+      <li><div><div class="t">Purge git history</div>
+        <div class="d">Rotation already neutralised the exposure, so this is hygiene — but do it before any public mirror.</div></div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Section 08 — Verdict</h2>
+    <div class="sub">Engineering quality is good. Deployment discipline is the actual risk.</div>
+    <p class="prose">Both codebases show real care: RLS-first schema design, no service-role key anywhere in a client, an
+      honest signature-keyed test gate, pgTAP proofs on the safety-critical policies, and a documentation set that stays
+      consistent across two repos. The Shufti migration in particular was executed well — proven signature algorithm,
+      tampered-payload rejection, vendor-neutral schema.</p>
+    <p class="prose">The risk is not in the code. It is that <strong>production has been modified through side channels</strong>
+      — a function deleted from the repo but not from the platform, a schema applied through a query endpoint but not
+      recorded in the ledger. Both P0s are invisible to every repo-based check the project runs, including its own
+      CI, its grep gates, and five of six audit agents. That is the class of defect worth building a guard against:
+      a deploy-time reconciliation check that diffs live functions and live ledger against the repo.</p>
+    <p class="prose"><strong>Launch readiness:</strong> not today, but closer than the agent reports suggested. Steps 1–2
+      are hours of work and clear the live defects. Phase 0 completion plus a release checklist is the remaining
+      gate — realistically one sprint, not the two-plus that the stale drift narrative implied.</p>
+  </section>
+
+  <footer>
+    <p>Audit conducted 2026-08-12 across <code>SoloAdventurer_app</code> and <code>SoloAdventurerWeb</code>.
+      Six parallel specialist agents; all headline findings independently re-verified by the author against the working
+      tree and the live Supabase project before inclusion. Claims that could not be reproduced were refuted and are
+      recorded as such in Section 02 rather than dropped.</p>
+    <p>Not verified: the full 94,843-character advisor payload (a summarised extraction was used); Shufti's behaviour
+      against a real female document, which remains an inherently human test.</p>
+  </footer>
+</div>
