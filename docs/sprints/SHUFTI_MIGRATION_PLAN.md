@@ -485,17 +485,23 @@ Stops a live-breaking bug today (`PGRST205` on every women-only-mode toggle) and
 - All 37 verification tests pass ✅
 - **Status:** ✅ Committed `eda9d07`, pushed.
 
-### Step 4 — Onfido deletion (cleanup)
-- `rm -rf supabase/functions/verify-with-onfido/`
-- Edit the 3 source/test files (§5.3)
-- Archive/update the 25 docs (§5.4)
-- Run the `grep -ri onfido` verification gate
-- **Commit + merge.**
+### Step 4 — Onfido deletion (cleanup) ✅ DONE
+- `rm -rf supabase/functions/verify-with-onfido/` ✅
+- Updated test fixture: `'onfido-123'` → `'shufti-123'` ✅
+- Archived `docs/matching/ONFIDO_INTEGRATION_SCOPE.md` → `docs/archive/matching/` ✅
+- Grep gate passed (zero Onfido in `lib/`, `supabase/functions/`, `test/`, config) ✅
+- Migration history retains Onfido refs (immutable append-only — correct) ✅
+- All 37 verification tests pass ✅
+- **Status:** ✅ Committed `f5a083f`, pushed.
 
-### Step 5 — Sign-off (safety-sensitive)
-- 👤 **Human-led live test:** run a real verification against prod with a female volunteer's ID to confirm `gender = 'female'` + `gender_verified = true` flips and women-only mode unlocks.
-- 👤 Confirm the Shufti callback signature verification blocks a tampered payload.
-- Update `EXECUTION_ORDER.md` Story 0.7 row to reflect Shufti is live.
+### Step 5 — Sign-off (safety-sensitive) — 👤 PENDING (human-led)
+- 👤 **Merge PR #28** (`fix/matching-women-only-column-name`) — Step 0
+- 👤 **Merge the Shufti feature PR** (`feature/shufti-verification`) — Steps 1–4
+- 👤 **Deploy:** `supabase db push` + `supabase functions deploy verify-with-shuftipro` + set prod secrets
+- 👤 **Live test:** run a real verification against prod with a female volunteer's ID to confirm `gender = 'female'` + `gender_verified = true` flips and women-only mode unlocks
+- 👤 **Tampered-callback test:** already proven locally (§4.1.3a); re-verify against prod
+- Update `EXECUTION_ORDER.md` Story 0.7 row to reflect Shufti is live
+- **Status:** ⏳ All code complete and locally tested. Awaiting human sign-off.
 
 ---
 
