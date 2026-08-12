@@ -41,7 +41,7 @@ class VerificationRequest extends Equatable {
   /// URL of the back of the ID document
   final String? documentBackUrl;
 
-  /// Reference ID from the verification provider (Onfido, etc.)
+  /// Reference ID from the verification provider (Shufti Pro, etc.)
   final String? providerRef;
 
   /// Reason for failure if status is failed

@@ -52,7 +52,7 @@ void main() {
         imageUrl: 'https://example.com/selfie.jpg',
         documentFrontUrl: 'https://example.com/id-front.jpg',
         documentBackUrl: 'https://example.com/id-back.jpg',
-        providerRef: 'onfido-123',
+        providerRef: 'shufti-123',
         failureReason: null,
         updatedAt: now.add(const Duration(hours: 1)),
         expiresAt: now.add(const Duration(days: 90)),
@@ -60,7 +60,7 @@ void main() {
       expect(request.imageUrl, 'https://example.com/selfie.jpg');
       expect(request.documentFrontUrl, 'https://example.com/id-front.jpg');
       expect(request.documentBackUrl, 'https://example.com/id-back.jpg');
-      expect(request.providerRef, 'onfido-123');
+      expect(request.providerRef, 'shufti-123');
     });
 
     test('copyWith updates fields', () {
