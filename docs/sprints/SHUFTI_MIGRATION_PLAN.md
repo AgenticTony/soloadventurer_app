@@ -1,9 +1,10 @@
 # Shufti Pro Integration + Onfido Removal Plan
 
-**Status:** Reviewed — ready to build
+**Status:** ✅ Code complete, merged, deployed to prod. One human-only test remaining (see Step 5).
 **Author:** Engineering
 **Date:** 2026-08-12
 **Review:** 2026-08-12 — signature algorithm proven against live response (§4.1.3); tampered-payload rejection proven (§8); `women_only_mode_enabled` bug confirmed live-breaking (§4.2.5 → split to separate PR); camera permissions documented (§4.2.6)
+**Final:** 2026-08-12 — Steps 0–5 deployed to prod; prod pipeline proven end-to-end; real-female-ID test blocked on live Shufti creds + human document (inherently human-only)
 **Supersedes:** `docs/matching/ONFIDO_INTEGRATION_SCOPE.md`
 **Cross-repo:** Web repo has zero Onfido source code — no changes required there.
 
