@@ -45,7 +45,7 @@ final class LoggingServiceImplProvider
 }
 
 String _$loggingServiceImplHash() =>
-    r'57985073370ef4a49d854b2b7e3386089e5a725c';
+    r'9444352f09bbf70c76a2b06d30efbcde4db2276d';
 
 /// Implementation of [LoggingService] that follows AWS best practices for logging
 

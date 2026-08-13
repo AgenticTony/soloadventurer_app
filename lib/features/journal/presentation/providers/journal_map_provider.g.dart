@@ -52,7 +52,7 @@ final class SupabaseClientProvider
   }
 }
 
-String _$supabaseClientHash() => r'834a58d6ae4b94e36f4e04a10d8a7684b929310e';
+String _$supabaseClientHash() => r'8486d939815e256abe601a33d086b3ba0dbcc990';
 
 /// Provides the JournalRemoteDataSource implementation
 

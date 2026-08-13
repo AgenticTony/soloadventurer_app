@@ -85,7 +85,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
 
         return remoteTrip;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.createTrip', e, stackTrace: st);
         // Mark as pending sync if remote fails
         // Local version is still available
         _addToSyncQueue(SyncOperation(
@@ -123,7 +123,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         }
         return remoteTrips;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getUserTrips', e, stackTrace: st);
         // Return local data if remote fails
         return localTrips;
       }
@@ -145,7 +145,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
           return remoteTrip;
         }
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getTrip', e, stackTrace: st);
         // Return local if remote fails
         return localTrip;
       }
@@ -168,7 +168,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         await _localDataSource.updateTrip(remoteTrip);
         return remoteTrip;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.updateTrip', e, stackTrace: st);
         // Add to sync queue for retry
         _addToSyncQueue(SyncOperation(
           id: 'update-trip-${trip.id}',
@@ -192,7 +192,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       try {
         await _remoteDataSource.deleteTrip(tripId);
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.deleteTrip', e, stackTrace: st);
         // Add to sync queue for retry
         _addToSyncQueue(SyncOperation(
           id: 'delete-trip-$tripId',
@@ -214,7 +214,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       try {
         await _remoteDataSource.archiveExpiredTrips();
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.archiveExpiredTrips', e, stackTrace: st);
         // Archive operation failed - will retry on next sync
         _addToSyncQueue(SyncOperation(
           id: 'archive-trips-${DateTime.now().millisecondsSinceEpoch}',
@@ -236,7 +236,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         await _localDataSource.cacheMatches(remoteMatches);
         return remoteMatches;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.findMatches', e, stackTrace: st);
         // Return cached data if remote fails
         return _localDataSource.getMatches();
       }
@@ -264,7 +264,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       try {
         await _remoteDataSource.hideConnection(connectionId);
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.hideConnection', e, stackTrace: st);
         // Add to sync queue for retry
         _addToSyncQueue(SyncOperation(
           id: 'hide-connection-$connectionId',
@@ -284,7 +284,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         await _localDataSource.cacheNearbyTravelersCount(count);
         return count;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getNearbyTravelersCount', e, stackTrace: st);
         // Return cached count if remote fails
         final cachedCount = await _localDataSource.getNearbyTravelersCount();
         return cachedCount ?? 0;
@@ -303,7 +303,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         await _localDataSource.cacheActivities(remoteActivities);
         return remoteActivities;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getActivities', e, stackTrace: st);
         // Return cached if remote fails
         return _localDataSource.getActivities();
       }
@@ -320,7 +320,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         await _localDataSource.cacheUserActivities(remoteActivities);
         return remoteActivities;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getUserActivities', e, stackTrace: st);
         // Return cached if remote fails
         return _localDataSource.getUserActivities();
       }
@@ -338,7 +338,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         final activities = await _remoteDataSource.getUserActivities();
         await _localDataSource.cacheUserActivities(activities);
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.setUserActivities', e, stackTrace: st);
         // Add to sync queue for retry
         _addToSyncQueue(SyncOperation(
           id: 'set-activities-${DateTime.now().millisecondsSinceEpoch}',
@@ -358,7 +358,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       try {
         await _remoteDataSource.addUserActivity(activityId);
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.addUserActivity', e, stackTrace: st);
         // Add to sync queue for retry
         _addToSyncQueue(SyncOperation(
           id: 'add-activity-$activityId',
@@ -378,7 +378,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       try {
         await _remoteDataSource.removeUserActivity(activityId);
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.removeUserActivity', e, stackTrace: st);
         // Add to sync queue for retry
         _addToSyncQueue(SyncOperation(
           id: 'remove-activity-$activityId',
@@ -424,7 +424,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       // Clear pending changes
       await _localDataSource.clearPendingChanges();
     } catch (e, st) {
-      ErrorMapping.log('MatchingRepository.unknown', e, stackTrace: st);
+      ErrorMapping.log('MatchingRepository.syncData', e, stackTrace: st);
       // Log sync error but don't throw - will retry on next sync
       rethrow;
     }
@@ -458,7 +458,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       final queueJson = _syncQueue.map((op) => op.toJson()).toList();
       await _localDataSource.saveSyncQueue(queueJson);
     } catch (e, st) {
-      ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+      ErrorMapping.log('MatchingRepository._persistSyncQueue', e, stackTrace: st);
       // Silently fail - sync queue persistence is not critical
     }
   }
@@ -472,7 +472,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         queueJson.map((json) => SyncOperation.fromJson(json)),
       );
     } catch (e, st) {
-      ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+      ErrorMapping.log('MatchingRepository._loadSyncQueue', e, stackTrace: st);
       // Silently fail - sync queue loading is not critical
     }
   }
@@ -559,7 +559,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       
       return SyncOperationResult.success;
     } catch (e, st) {
-      ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+      ErrorMapping.log('MatchingRepository._processSyncOperation', e, stackTrace: st);
       return SyncOperationResult.failure;
     }
   }
@@ -589,7 +589,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
           // Add other entity types as needed
         }
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository._applyServerChanges', e, stackTrace: st);
       // intentional silent catch
       }
     }
@@ -646,7 +646,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
           );
         }
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.sendMessage', e, stackTrace: st);
         // Mark as failed
         final index = _messageCache[chatId]!.indexWhere((m) => m.id == messageId);
         if (index != -1) {
@@ -698,7 +698,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         }
         return chats;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getChats', e, stackTrace: st);
         // Return cached if remote fails
       }
     }
@@ -753,7 +753,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
           return serverChat;
         }
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getOrCreateChat', e, stackTrace: st);
         // Silently fail - chat creation retry is not critical
       }
     }
@@ -771,7 +771,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
         _messageCache[chatId] = remoteMessages;
         return remoteMessages;
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.getMessages', e, stackTrace: st);
         // Fall through to local cache
       }
     }
@@ -789,7 +789,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
           return messages;
         });
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.watchMessages', e, stackTrace: st);
         // Fall through to polling fallback
       }
     }
@@ -817,7 +817,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       try {
         await _remoteDataSource.markMessagesRead(chatId);
       } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
+        ErrorMapping.log('MatchingRepository.markMessagesAsRead', e, stackTrace: st);
         // Silently fail - marking messages as read retry is not critical
       }
     }
@@ -884,11 +884,15 @@ class MatchingRepositoryImpl implements MatchingRepository {
   }
 
   @override
-  Future<bool> isWomenOnlyModeEnabled() async {
-    if (!_isOnline) return false; // fail-closed when offline
+  Future<bool?> isWomenOnlyModeEnabled() async {
+    // null means "cannot determine", not "off". Returning false here would tell
+    // a user whose protection is active that it is disabled — see the interface
+    // doc. The mode itself stays enforced server-side by RLS regardless of what
+    // this client can see.
+    if (!_isOnline) return null;
 
     final userId = _supabaseClient.auth.currentUser?.id;
-    if (userId == null) return false;
+    if (userId == null) return null;
 
     try {
       final response = await _supabaseClient
@@ -899,7 +903,7 @@ class MatchingRepositoryImpl implements MatchingRepository {
       return response['women_only_mode_enabled'] as bool? ?? false;
     } catch (e, st) {
       ErrorMapping.log('MatchingRepository.isWomenOnlyModeEnabled', e, stackTrace: st);
-      return false; // fail-closed on error
+      return null;
     }
   }
 

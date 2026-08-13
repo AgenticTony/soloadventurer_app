@@ -472,9 +472,14 @@ Future<int> pendingMessagesCount(Ref ref) async {
 // WOMEN-ONLY MODE
 // ============================================================
 
-/// Provider for women-only mode status
+/// Current women-only mode status, or `null` when it cannot be determined
+/// (offline, signed out, or the read failed).
+///
+/// The null case is deliberately propagated to the UI rather than flattened to
+/// `false`, so the settings screen can say "unavailable" instead of asserting
+/// that a user's safety setting is off when it may well be on.
 @riverpod
-Future<bool> womenOnlyModeEnabled(Ref ref) async {
+Future<bool?> womenOnlyModeEnabled(Ref ref) async {
   final repository = ref.watch(matchingRepositoryProvider);
   return repository.isWomenOnlyModeEnabled();
 }
@@ -496,25 +501,39 @@ Future<bool> canEnableWomenOnlyMode(Ref ref) async {
 @riverpod
 class WomenOnlyModeNotifier extends _$WomenOnlyModeNotifier {
   @override
-  FutureOr<bool> build() async {
+  FutureOr<bool?> build() async {
     final repository = ref.read(matchingRepositoryProvider);
     return repository.isWomenOnlyModeEnabled();
   }
 
-  /// Enable women-only mode
+  /// Enable women-only mode.
+  ///
+  /// Throws if the write does not land, so the caller can surface the failure
+  /// rather than showing a success it cannot back up.
   Future<void> enable() async {
     final repository = ref.read(matchingRepositoryProvider);
     await repository.enableWomenOnlyMode();
-    ref.invalidate(matchesProvider);
+    _refreshDependents();
     state = const AsyncValue.data(true);
   }
 
-  /// Disable women-only mode
+  /// Disable women-only mode. See [enable] for failure behaviour.
   Future<void> disable() async {
     final repository = ref.read(matchingRepositoryProvider);
     await repository.disableWomenOnlyMode();
-    ref.invalidate(matchesProvider);
+    _refreshDependents();
     state = const AsyncValue.data(false);
+  }
+
+  /// Invalidate everything that reflects women-only state.
+  ///
+  /// [womenOnlyModeEnabledProvider] is a separate provider from this notifier,
+  /// and it is the one the settings switch binds to. Without invalidating it,
+  /// a successful toggle left the switch showing its previous value — the write
+  /// landed, the confirmation appeared, and the control snapped back to off.
+  void _refreshDependents() {
+    ref.invalidate(womenOnlyModeEnabledProvider);
+    ref.invalidate(matchesProvider);
   }
 }
 

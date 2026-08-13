@@ -128,10 +128,23 @@ abstract class MatchingRepository {
   /// Disable women-only mode
   Future<void> disableWomenOnlyMode();
 
-  /// Check if women-only mode is enabled
-  Future<bool> isWomenOnlyModeEnabled();
+  /// Whether women-only mode is currently enabled for the signed-in user.
+  ///
+  /// Returns `null` when the answer cannot be determined — offline, not
+  /// authenticated, or the read failed. Callers must render that as an explicit
+  /// unknown state, never as "off": this drives a safety control, and telling a
+  /// user her protection is disabled when it is in fact enabled invites her to
+  /// act on false information.
+  ///
+  /// Never returns a cached value. The database is the single source of truth
+  /// (see `docs/standards/GENDER_VERIFIED_INVARIANT.md`).
+  Future<bool?> isWomenOnlyModeEnabled();
 
-  /// Check if user is verified for women-only mode
+  /// Whether the signed-in user has passed gender verification.
+  ///
+  /// Returns `false` — not `null` — when indeterminate. This one genuinely is
+  /// fail-closed: it gates *enabling* the mode, so denying on uncertainty is
+  /// the safe direction.
   Future<bool> isVerifiedForWomenOnly();
 
   /// Get user's gender (from verification)

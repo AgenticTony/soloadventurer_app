@@ -54,7 +54,7 @@ final class SharedLinkServiceProvider extends $FunctionalProvider<
   }
 }
 
-String _$sharedLinkServiceHash() => r'241bc04c9bb4b792e69767c5cb55a3832f076740';
+String _$sharedLinkServiceHash() => r'5597a98e3f8327350cba06f5826606f1ba4a9178';
 
 /// Notifier for managing shared links
 ///

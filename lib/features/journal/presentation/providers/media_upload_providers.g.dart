@@ -55,7 +55,7 @@ final class MediaUploadServiceProvider extends $FunctionalProvider<
 }
 
 String _$mediaUploadServiceHash() =>
-    r'cd6f202ba99ae72a75409133b4c155a3e2796dc6';
+    r'01698dcfd1311615c63d21b291326ca160202b84';
 
 /// Provider for upload statistics
 

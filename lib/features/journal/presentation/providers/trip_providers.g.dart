@@ -52,7 +52,7 @@ final class SupabaseClientProvider
   }
 }
 
-String _$supabaseClientHash() => r'834a58d6ae4b94e36f4e04a10d8a7684b929310e';
+String _$supabaseClientHash() => r'8486d939815e256abe601a33d086b3ba0dbcc990';
 
 /// Provides the TripRemoteDataSource implementation
 
@@ -262,7 +262,7 @@ final class TripFormProvider
   }
 }
 
-String _$tripFormHash() => r'391fc76a05fb94d49c1fa38e4d6aefd1378431c9';
+String _$tripFormHash() => r'99d21d719719ba7ece40d56a9cf44f0300a2c186';
 
 /// Notifier for managing trip form state
 ///

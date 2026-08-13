@@ -52,7 +52,7 @@ final class SupabaseClientProvider
   }
 }
 
-String _$supabaseClientHash() => r'834a58d6ae4b94e36f4e04a10d8a7684b929310e';
+String _$supabaseClientHash() => r'8486d939815e256abe601a33d086b3ba0dbcc990';
 
 /// Real-time channel for a specific chat
 /// Subscribes to INSERT events on messages table for the given connection
@@ -801,17 +801,32 @@ final class PendingMessagesCountProvider
 String _$pendingMessagesCountHash() =>
     r'd4aeda3b8f39a8bc32428b684c342e5a90e4a40f';
 
-/// Provider for women-only mode status
+/// Current women-only mode status, or `null` when it cannot be determined
+/// (offline, signed out, or the read failed).
+///
+/// The null case is deliberately propagated to the UI rather than flattened to
+/// `false`, so the settings screen can say "unavailable" instead of asserting
+/// that a user's safety setting is off when it may well be on.
 
 @ProviderFor(womenOnlyModeEnabled)
 const womenOnlyModeEnabledProvider = WomenOnlyModeEnabledProvider._();
 
-/// Provider for women-only mode status
+/// Current women-only mode status, or `null` when it cannot be determined
+/// (offline, signed out, or the read failed).
+///
+/// The null case is deliberately propagated to the UI rather than flattened to
+/// `false`, so the settings screen can say "unavailable" instead of asserting
+/// that a user's safety setting is off when it may well be on.
 
 final class WomenOnlyModeEnabledProvider
-    extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
-    with $FutureModifier<bool>, $FutureProvider<bool> {
-  /// Provider for women-only mode status
+    extends $FunctionalProvider<AsyncValue<bool?>, bool?, FutureOr<bool?>>
+    with $FutureModifier<bool?>, $FutureProvider<bool?> {
+  /// Current women-only mode status, or `null` when it cannot be determined
+  /// (offline, signed out, or the read failed).
+  ///
+  /// The null case is deliberately propagated to the UI rather than flattened to
+  /// `false`, so the settings screen can say "unavailable" instead of asserting
+  /// that a user's safety setting is off when it may well be on.
   const WomenOnlyModeEnabledProvider._()
       : super(
           from: null,
@@ -828,29 +843,47 @@ final class WomenOnlyModeEnabledProvider
 
   @$internal
   @override
-  $FutureProviderElement<bool> $createElement($ProviderPointer pointer) =>
+  $FutureProviderElement<bool?> $createElement($ProviderPointer pointer) =>
       $FutureProviderElement(pointer);
 
   @override
-  FutureOr<bool> create(Ref ref) {
+  FutureOr<bool?> create(Ref ref) {
     return womenOnlyModeEnabled(ref);
   }
 }
 
 String _$womenOnlyModeEnabledHash() =>
-    r'4fbced387a42d86a8179f1ce3908f53f6db56ba5';
+    r'032e2b0535dff22d8fe290b0794df3bc7e130c6c';
 
 /// Provider for checking if user can enable women-only mode
+///
+/// Free for all verified women (decision 2026-08-13): women-only mode is core
+/// strategy per FOUNDATIONS, not a premium toggle — paywalling the safety
+/// property that differentiates the product would make the safest experience
+/// the one fewest people have. Verification (Shufti ID check) is the natural
+/// gate. Monetize Guardian/concierge instead.
 
 @ProviderFor(canEnableWomenOnlyMode)
 const canEnableWomenOnlyModeProvider = CanEnableWomenOnlyModeProvider._();
 
 /// Provider for checking if user can enable women-only mode
+///
+/// Free for all verified women (decision 2026-08-13): women-only mode is core
+/// strategy per FOUNDATIONS, not a premium toggle — paywalling the safety
+/// property that differentiates the product would make the safest experience
+/// the one fewest people have. Verification (Shufti ID check) is the natural
+/// gate. Monetize Guardian/concierge instead.
 
 final class CanEnableWomenOnlyModeProvider
     extends $FunctionalProvider<AsyncValue<bool>, bool, FutureOr<bool>>
     with $FutureModifier<bool>, $FutureProvider<bool> {
   /// Provider for checking if user can enable women-only mode
+  ///
+  /// Free for all verified women (decision 2026-08-13): women-only mode is core
+  /// strategy per FOUNDATIONS, not a premium toggle — paywalling the safety
+  /// property that differentiates the product would make the safest experience
+  /// the one fewest people have. Verification (Shufti ID check) is the natural
+  /// gate. Monetize Guardian/concierge instead.
   const CanEnableWomenOnlyModeProvider._()
       : super(
           from: null,
@@ -877,7 +910,7 @@ final class CanEnableWomenOnlyModeProvider
 }
 
 String _$canEnableWomenOnlyModeHash() =>
-    r'1ee7a717212c9276cf28867a30f8a41f61fa1ba3';
+    r'2a7df2b478ade643d566089f4b4e8c27a8feb855';
 
 /// Notifier for managing women-only mode
 
@@ -886,7 +919,7 @@ const womenOnlyModeProvider = WomenOnlyModeNotifierProvider._();
 
 /// Notifier for managing women-only mode
 final class WomenOnlyModeNotifierProvider
-    extends $AsyncNotifierProvider<WomenOnlyModeNotifier, bool> {
+    extends $AsyncNotifierProvider<WomenOnlyModeNotifier, bool?> {
   /// Notifier for managing women-only mode
   const WomenOnlyModeNotifierProvider._()
       : super(
@@ -908,20 +941,20 @@ final class WomenOnlyModeNotifierProvider
 }
 
 String _$womenOnlyModeNotifierHash() =>
-    r'bf4f4d269bb4ca523781ba9d3087eba5f2c0775c';
+    r'8ab97984f1f58c706aa73d6a5ed3452a7512db38';
 
 /// Notifier for managing women-only mode
 
-abstract class _$WomenOnlyModeNotifier extends $AsyncNotifier<bool> {
-  FutureOr<bool> build();
+abstract class _$WomenOnlyModeNotifier extends $AsyncNotifier<bool?> {
+  FutureOr<bool?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
+    final ref = this.ref as $Ref<AsyncValue<bool?>, bool?>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<bool>, bool>,
-        AsyncValue<bool>,
+        AnyNotifier<AsyncValue<bool?>, bool?>,
+        AsyncValue<bool?>,
         Object?,
         Object?>;
     element.handleValue(ref, created);
