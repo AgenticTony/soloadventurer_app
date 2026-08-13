@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/journal/data/datasources/tag_remote_data
 import 'package:soloadventurer/features/journal/data/repositories/tag_repository_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/tag.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/tag_repository.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 // Generated file
 part 'tag_providers.g.dart';
@@ -15,7 +16,7 @@ part 'tag_providers.g.dart';
 /// Provider for Supabase client
 @riverpod
 SupabaseClient tagSupabaseClient(Ref ref) {
-  return Supabase.instance.client;
+  return ref.watch(supabaseClientProvider);
 }
 
 /// Provides the TagRemoteDataSource implementation

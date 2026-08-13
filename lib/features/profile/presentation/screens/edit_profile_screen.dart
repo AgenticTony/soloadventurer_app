@@ -7,6 +7,7 @@ import '../../../../core/services/analytics_service.dart';
 import '../../../auth/presentation/providers/auth_navigation_provider.dart';
 import '../providers/test_profile_provider.dart';
 import '../notifiers/profile_notifier.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 /// Screen for editing user profile information
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -49,7 +50,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _avatarUrl = profile.avatarUrl;
     } else {
       // Fallback: populate from Supabase auth user
-      final user = Supabase.instance.client.auth.currentUser;
+      final user = ref.read(supabaseClientProvider).auth.currentUser;
       if (user != null) {
         _emailController.text = user.email ?? '';
         _displayNameController.text =
@@ -115,14 +116,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isSaving = true);
 
-      final user = Supabase.instance.client.auth.currentUser;
+      final user = ref.read(supabaseClientProvider).auth.currentUser;
       final displayName = _displayNameController.text.trim();
       final bio = _bioController.text.trim();
 
       try {
         // Update display name and bio in Supabase auth user metadata
         if (user != null) {
-          await Supabase.instance.client.auth.updateUser(
+          await ref.read(supabaseClientProvider).auth.updateUser(
             UserAttributes(
               data: {
                 'full_name': displayName,

@@ -34,6 +34,7 @@ import 'package:soloadventurer/features/matching/data/datasources/matching_remot
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthException, AuthState, User;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'auth_notifier_provider.g.dart';
 
@@ -303,7 +304,7 @@ class AuthNotifier extends _$AuthNotifier {
       }
 
       final remoteDataSource = MatchingRemoteDataSourceImpl(
-        client: Supabase.instance.client,
+        client: ref.watch(supabaseClientProvider),
       );
 
       await remoteDataSource.registerNotificationToken(
@@ -327,7 +328,7 @@ class AuthNotifier extends _$AuthNotifier {
       if (token == null) return;
 
       final remoteDataSource = MatchingRemoteDataSourceImpl(
-        client: Supabase.instance.client,
+        client: ref.watch(supabaseClientProvider),
       );
 
       await remoteDataSource.unregisterNotificationToken(token);

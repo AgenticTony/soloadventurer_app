@@ -3,10 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/enums/moderation_enums.dart';
 import '../../domain/services/message_report_service.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 /// Provider for the [MessageReportService].
 final messageReportServiceProvider = Provider<MessageReportService>((ref) {
-  return MessageReportService(Supabase.instance.client);
+  return MessageReportService(ref.watch(supabaseClientProvider));
 });
 
 /// Message ids (server ids) the current user has reported this session.

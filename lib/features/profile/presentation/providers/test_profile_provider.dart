@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/profile.dart';
 import '../state/profile_state.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'test_profile_provider.g.dart';
 
@@ -11,7 +12,7 @@ part 'test_profile_provider.g.dart';
 /// Falls back to placeholder values if no session exists.
 @riverpod
 ProfileState testProfile(Ref ref) {
-  final user = Supabase.instance.client.auth.currentUser;
+  final user = ref.watch(supabaseClientProvider).auth.currentUser;
 
   if (user == null) {
     return const ProfileState();

@@ -9,6 +9,7 @@ import 'package:soloadventurer/features/safety/domain/usecases/check_in_safe_use
 import 'package:soloadventurer/features/safety/domain/usecases/create_meetup_checkin_usecase.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/get_active_checkins_usecase.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/trigger_sos_usecase.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'meetup_checkin_providers.g.dart';
 
@@ -19,7 +20,7 @@ part 'meetup_checkin_providers.g.dart';
 /// Provides the meetup check-in remote data source backed by Supabase
 @Riverpod(keepAlive: true)
 MeetupCheckinRemoteDataSource meetupCheckinRemoteDataSource(Ref ref) {
-  return MeetupCheckinRemoteDataSourceImpl(client: Supabase.instance.client);
+  return MeetupCheckinRemoteDataSourceImpl(client: ref.watch(supabaseClientProvider));
 }
 
 // ============================================================
@@ -81,9 +82,9 @@ class ActiveCheckinsNotifier extends _$ActiveCheckinsNotifier {
     final checkins = await useCase();
 
     // Subscribe to Supabase Realtime for meetup_checkins changes
-    final userId = Supabase.instance.client.auth.currentUser?.id;
+    final userId = ref.watch(currentUserIdProvider);
     if (userId != null) {
-      Supabase.instance.client
+      ref.watch(supabaseClientProvider)
           .from('meetup_checkins')
           .stream(primaryKey: ['id'])
           .eq('user_id', userId)

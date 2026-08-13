@@ -198,6 +198,31 @@ jobs:
           fi
 
   # =============================================================================
+  # LAYER ISOLATION — no Supabase.instance in presentation/domain (Story H.4)
+  # =============================================================================
+  layer-isolation:
+    name: Layer Isolation Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check no Supabase.instance in presentation/
+        run: |
+          # Story H.4: presentation layer must not call Supabase.instance directly.
+          # Use supabaseClientProvider from core/providers/core_providers.dart instead.
+          VIOLATIONS=$(grep -rn "Supabase\.instance" lib/features/*/presentation/ --include="*.dart" 2>/dev/null || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "::error::Found direct Supabase.instance usage in presentation layer (Story H.4 violation):"
+            echo "$VIOLATIONS"
+            echo ""
+            echo "Use ref.watch(supabaseClientProvider) from core/providers/core_providers.dart instead."
+            exit 1
+          else
+            echo "✅ No Supabase.instance in presentation layer"
+          fi
+
+  # =============================================================================
   # DEPENDENCY CHECKS
   # =============================================================================
   dependencies:
