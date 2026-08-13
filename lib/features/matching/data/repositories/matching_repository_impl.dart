@@ -834,131 +834,112 @@ class MatchingRepositoryImpl implements MatchingRepository {
   }
 
   // ============================================================
-  // WOMEN-ONLY MODE (F-005)
+  // WOMEN-ONLY MODE (F-005) — server-authoritative, no in-memory cache
+  //
+  // The DB is the single source of truth. See:
+  //   docs/standards/GENDER_VERIFIED_INVARIANT.md
+  //
+  // Key design decisions (Story H.3):
+  //   - No in-memory mirror: every read goes to the DB when online.
+  //   - Offline = fail-closed: return false (not a potentially stale cache).
+  //   - Write failures throw (not silently swallowed) — the caller needs to
+  //     know the toggle didn't land.
   // ============================================================
-
-  // In-memory storage for demo purposes
-  bool _womenOnlyModeEnabled = false;
-  bool _isVerifiedForWomenOnly = false;
-  String? _userGender;
 
   @override
   Future<void> enableWomenOnlyMode() async {
-    // Check if verified
+    // Guard 1: user must have gender_verified = true
     if (!await isVerifiedForWomenOnly()) {
       throw Exception('User must be verified to enable women-only mode');
     }
 
-    // Verify user gender is female
+    // Guard 2: verified gender must be female (gender_verified alone is not enough —
+    // see the invariant doc: the flag means "gender was verified", not "verified female")
     final gender = await getUserGender();
     if (gender?.toLowerCase() != 'female') {
       throw Exception('Only verified women can enable women-only mode');
     }
 
-    _womenOnlyModeEnabled = true;
+    // Write to DB (the authoritative source). The CHECK constraint
+    // women_only_requires_verified_female enforces this at the DB level too.
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) throw Exception('Not authenticated');
 
-    if (_isOnline) {
-      try {
-        final userId = _supabaseClient.auth.currentUser?.id;
-        if (userId != null) {
-          await _supabaseClient
-              .from('profiles')
-              .update({'women_only_mode_enabled': true})
-              .eq('id', userId);
-        }
-      } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
-        // Silently fail - women-only mode enable retry is not critical
-      }
-    }
+    await _supabaseClient
+        .from('profiles')
+        .update({'women_only_mode_enabled': true})
+        .eq('id', userId);
+    // If the update fails, the exception propagates — the caller knows it didn't land.
   }
 
   @override
   Future<void> disableWomenOnlyMode() async {
-    _womenOnlyModeEnabled = false;
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) throw Exception('Not authenticated');
 
-    if (_isOnline) {
-      try {
-        final userId = _supabaseClient.auth.currentUser?.id;
-        if (userId != null) {
-          await _supabaseClient
-              .from('profiles')
-              .update({'women_only_mode_enabled': false})
-              .eq('id', userId);
-        }
-      } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
-        // Silently fail - women-only mode disable retry is not critical
-      }
-    }
+    await _supabaseClient
+        .from('profiles')
+        .update({'women_only_mode_enabled': false})
+        .eq('id', userId);
   }
 
   @override
   Future<bool> isWomenOnlyModeEnabled() async {
-    // If online, fetch latest status from server
-    if (_isOnline) {
-      try {
-        final userId = _supabaseClient.auth.currentUser?.id;
-        if (userId != null) {
-          final response = await _supabaseClient
-              .from('profiles')
-              .select('women_only_mode_enabled')
-              .eq('id', userId)
-              .single();
-          _womenOnlyModeEnabled = response['women_only_mode_enabled'] as bool? ?? false;
-        }
-      } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
-        // Return cached value
-      }
-    }
+    if (!_isOnline) return false; // fail-closed when offline
 
-    return _womenOnlyModeEnabled;
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      final response = await _supabaseClient
+          .from('profiles')
+          .select('women_only_mode_enabled')
+          .eq('id', userId)
+          .single();
+      return response['women_only_mode_enabled'] as bool? ?? false;
+    } catch (e, st) {
+      ErrorMapping.log('MatchingRepository.isWomenOnlyModeEnabled', e, stackTrace: st);
+      return false; // fail-closed on error
+    }
   }
 
   @override
   Future<bool> isVerifiedForWomenOnly() async {
-    // If online, check verification status from server
-    if (_isOnline) {
-      try {
-        final userId = _supabaseClient.auth.currentUser?.id;
-        if (userId != null) {
-          final response = await _supabaseClient
-              .from('profiles')
-              .select('gender_verified')
-              .eq('id', userId)
-              .single();
-          _isVerifiedForWomenOnly = response['gender_verified'] as bool? ?? false;
-        }
-      } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
-        // Return cached value
-      }
-    }
+    if (!_isOnline) return false; // fail-closed when offline
 
-    return _isVerifiedForWomenOnly;
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return false;
+
+    try {
+      final response = await _supabaseClient
+          .from('profiles')
+          .select('gender_verified')
+          .eq('id', userId)
+          .single();
+      return response['gender_verified'] as bool? ?? false;
+    } catch (e, st) {
+      ErrorMapping.log('MatchingRepository.isVerifiedForWomenOnly', e, stackTrace: st);
+      return false; // fail-closed on error
+    }
   }
 
   @override
   Future<String?> getUserGender() async {
-    // If online, fetch gender from server profile
-    if (_isOnline) {
-      try {
-        final userId = _supabaseClient.auth.currentUser?.id;
-        if (userId != null) {
-          final response = await _supabaseClient
-              .from('profiles')
-              .select('gender')
-              .eq('id', userId)
-              .single();
-          _userGender = response['gender'] as String?;
-        }
-      } catch (e, st) {
-        ErrorMapping.log('MatchingRepository._addToSyncQueue', e, stackTrace: st);
-        // Return cached value
-      }
-    }
+    if (!_isOnline) return null; // can't determine offline
 
-    return _userGender;
+    final userId = _supabaseClient.auth.currentUser?.id;
+    if (userId == null) return null;
+
+    try {
+      final response = await _supabaseClient
+          .from('profiles')
+          .select('gender')
+          .eq('id', userId)
+          .single();
+      return response['gender'] as String?;
+    } catch (e, st) {
+      ErrorMapping.log('MatchingRepository.getUserGender', e, stackTrace: st);
+      return null;
+    }
   }
 }
