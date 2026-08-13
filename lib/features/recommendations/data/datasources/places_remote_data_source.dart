@@ -45,6 +45,53 @@ abstract class PlacesRemoteDataSource {
   });
 }
 
+/// Disabled implementation — used when the recommendations surface is
+/// feature-flagged OFF (decision 2026-08-13: Places ships mock data behind
+/// 6 PRODUCTION TODOs, so the surface is flagged off for launch).
+///
+/// Returns empty results and never serves mock data. Flip
+/// `FeatureFlags.recommendationsSurfaceActive` to true once the real
+/// Google Places integration lands.
+class DisabledPlacesRemoteDataSource implements PlacesRemoteDataSource {
+  @override
+  Future<List<PlaceActivity>> findPlacesByInterest({
+    required Destination destination,
+    required TravelInterest interest,
+    Set<RecommendationCategory>? categories,
+    int limit = 20,
+  }) async => const [];
+
+  @override
+  Future<List<PlaceActivity>> searchPlaces({
+    required Destination destination,
+    required String query,
+    int limit = 20,
+  }) async => const [];
+
+  @override
+  Future<PlaceActivity> getPlaceDetails(String placeId) async {
+    throw ServerException(
+      message: 'Recommendations are currently unavailable',
+      statusCode: 503,
+    );
+  }
+
+  @override
+  Future<List<PlaceActivity>> getNearbyPlaces({
+    required double latitude,
+    required double longitude,
+    required double radiusKm,
+    Set<RecommendationCategory>? categories,
+    int limit = 20,
+  }) async => const [];
+
+  @override
+  Future<List<PlaceActivity>> getPopularPlaces({
+    required Destination destination,
+    int limit = 20,
+  }) async => const [];
+}
+
 /// Mock implementation for development/testing
 ///
 /// Returns predefined place data without making API calls.

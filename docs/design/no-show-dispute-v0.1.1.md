@@ -35,7 +35,15 @@ report_no_show() → inserts meetup_outcome with status='pending_dispute'
 
 During the 48-hour window:
 - The accused can **accept** (the no-show is confirmed) or **dispute** (elevates to review)
-- If the accused does nothing in 48 hours, the no-show is **auto-confirmed**
+- If the accused does nothing in 48 hours, the report **EXPIRES** — no penalty applies
+  (decision 2026-08-13: silence must not confirm. A no-show report creates public
+  negative reputation, and for travellers silence usually means "didn't see the
+  notification" — different timezone, no roaming, phone dead. Auto-confirm would
+  bake a false-positive generator into the reputation system, and `report_no_show`
+  remains unilateral, so the griefing surface must stay small.)
+- **Repeated reported-and-unanswered events feed a private moderation signal**, not
+  a public mark — a user who accumulates expired unanswered reports gets flagged for
+  moderation review, but nothing appears on their public profile
 - The reporter cannot retract (prevents retaliation gaming)
 
 ### Phase 2 — Human review (v0.2, post-launch)
@@ -63,7 +71,8 @@ ALTER TYPE meetup_outcome_status ADD VALUE IF NOT EXISTS 'under_review';
 -- The report_no_show RPC changes:
 --   BEFORE: directly sets status='completed', outcome='no_show'
 --   AFTER:  sets status='pending_dispute', starts 48h timer
--- A pg_cron job auto-confirms after 48h if no dispute is filed.
+-- A pg_cron job EXPIRES unanswered reports after 48h (status='expired', no penalty)
+-- and increments a private moderation counter on the accused.
 ```
 
 ---
@@ -81,12 +90,12 @@ This means the web profile's `reputation_score` only reflects resolved outcomes,
 
 ## Sign-off
 
-This is a design gate, not an implementation. The implementation can land in a later sprint (Phase B reward-fn v0.1.1), but the **design must be agreed before web step 10 ships** (public reputation surfacing).
+✅ **Decided 2026-08-13 (Anthony):**
+1. **48 hours** is the evidence window.
+2. **Auto-confirm-on-inaction: REJECTED.** Silence expires the report — no public penalty. Repeated reported-and-unanswered events feed a private moderation signal instead.
+3. Phase 2 scope deferred to implementation time (manual review first).
 
-👤 **Anthony's decision needed:**
-1. Is 48 hours the right evidence window?
-2. Is auto-confirm-on-inaction acceptable?
-3. Phase 2 scope — manual review only, or rules-engine?
+This design gate is **CLOSED** — the design is agreed and web step 10 (public reputation surfacing) is unblocked from this side. Implementation lands in Phase B reward-fn v0.1.1.
 
 ---
 

@@ -27,6 +27,12 @@ enum FeatureFlagKey {
   /// Whether verification is required to use matching
   verificationRequiredForMatching,
 
+  /// Whether the recommendations (Places) surface is active.
+  /// OFF for launch — the Places data source serves mock data behind
+  /// PRODUCTION TODOs (decision 2026-08-13). Flip on when the real
+  /// Google Places integration lands.
+  recommendationsSurfaceActive,
+
   /// Maximum likes per day for free users (when freeTierCapsActive is true)
   freeTierDailyLikeLimit,
 
@@ -61,6 +67,9 @@ class FeatureFlags {
   /// Whether verification is required for matching
   final bool verificationRequiredForMatching;
 
+  /// Whether the recommendations (Places) surface is active
+  final bool recommendationsSurfaceActive;
+
   /// Maximum likes per day for free tier
   final int freeTierDailyLikeLimit;
 
@@ -82,6 +91,7 @@ class FeatureFlags {
     this.aiModerationActive = false,
     this.shareMyMeetupActive = true,
     this.verificationRequiredForMatching = false,
+    this.recommendationsSurfaceActive = false,
     this.freeTierDailyLikeLimit = 100,
     this.freeTierMatchLimit = 50,
     this.freeTierDailyMessageLimit = 5,
@@ -105,6 +115,8 @@ class FeatureFlags {
         return shareMyMeetupActive;
       case FeatureFlagKey.verificationRequiredForMatching:
         return verificationRequiredForMatching;
+      case FeatureFlagKey.recommendationsSurfaceActive:
+        return recommendationsSurfaceActive;
       case FeatureFlagKey.freeTierDailyLikeLimit:
         return freeTierDailyLikeLimit;
       case FeatureFlagKey.freeTierMatchLimit:
@@ -162,5 +174,8 @@ final isFeatureGatedProvider = Provider.family<bool, FeatureFlagKey>((ref, key) 
       return flags.freeTierCapsActive;
     case FeatureFlagKey.freeTierMatchLimit:
       return flags.freeTierCapsActive;
+    case FeatureFlagKey.recommendationsSurfaceActive:
+      // Not a premium gate — an availability flag. Never subscription-gated.
+      return false;
   }
 });
