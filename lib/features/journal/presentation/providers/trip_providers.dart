@@ -4,6 +4,7 @@ import 'package:soloadventurer/features/journal/data/datasources/trip_remote_dat
 import 'package:soloadventurer/features/journal/data/repositories/trip_repository_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/trip.dart';
 import 'package:soloadventurer/features/journal/domain/repositories/trip_repository.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 // Generated file
 part 'trip_providers.g.dart';
@@ -15,7 +16,7 @@ part 'trip_providers.g.dart';
 /// Provides the Supabase client instance
 @riverpod
 SupabaseClient supabaseClient(Ref ref) {
-  return Supabase.instance.client;
+  return ref.watch(supabaseClientProvider);
 }
 
 /// Provides the TripRemoteDataSource implementation
@@ -277,7 +278,7 @@ class TripForm extends _$TripForm {
 
     try {
       final now = DateTime.now();
-      final userId = Supabase.instance.client.auth.currentUser?.id;
+      final userId = ref.watch(currentUserIdProvider);
 
       if (userId == null) {
         throw Exception('User not authenticated');

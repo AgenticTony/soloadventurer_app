@@ -5,6 +5,7 @@ import 'package:soloadventurer/features/journal/domain/entities/journal_entry.da
 import 'package:soloadventurer/features/journal/domain/repositories/journal_repository.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'journal_map_provider.g.dart';
 
@@ -15,7 +16,7 @@ part 'journal_map_provider.g.dart';
 /// Provides the Supabase client instance
 @riverpod
 SupabaseClient supabaseClient(Ref ref) {
-  return Supabase.instance.client;
+  return ref.watch(supabaseClientProvider);
 }
 
 /// Provides the JournalRemoteDataSource implementation

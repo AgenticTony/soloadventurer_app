@@ -6,6 +6,7 @@ import '../../data/models/upload_task.dart';
 import '../../data/services/media_upload_service_impl.dart';
 import '../../domain/entities/media_item.dart';
 import '../../domain/services/media_upload_service.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'media_upload_providers.g.dart';
 part 'media_upload_state.dart';
@@ -14,7 +15,7 @@ part 'media_upload_state.dart';
 @riverpod
 MediaUploadService mediaUploadService(Ref ref) {
   final prefs = ref.watch(sharedPreferencesProvider);
-  final client = Supabase.instance.client;
+  final client = ref.watch(supabaseClientProvider);
   return MediaUploadServiceImpl(
     client: client,
     prefs: prefs,

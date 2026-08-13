@@ -16,6 +16,7 @@ import '../../domain/usecases/delete_profile_use_case.dart';
 import '../../domain/usecases/create_profile_use_case.dart';
 import '../state/profile_navigation_state.dart';
 import '../../domain/entities/profile.dart' as domain_profile;
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'profile_providers.g.dart';
 
@@ -29,7 +30,7 @@ ProfileRepository profileRepository(Ref ref) {
   return ProfileRepositoryImpl(
     userDao: ref.read(offline_providers.userDaoProvider),
     apiService: ref.read(travel_providers.dioApiServiceProvider),
-    supabaseClient: Supabase.instance.client,
+    supabaseClient: ref.watch(supabaseClientProvider),
     connectivityService: ref.read(connectivityServiceProvider),
     syncQueueService: ref.read(offline_providers.syncQueueServiceProvider),
   );

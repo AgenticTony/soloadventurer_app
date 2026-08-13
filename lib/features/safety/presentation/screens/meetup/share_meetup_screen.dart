@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:soloadventurer/features/safety/presentation/providers/safety_providers.dart';
 import 'package:soloadventurer/features/safety/presentation/widgets/liability_disclaimer_modal.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 /// Screen for creating a Share My Meetup entry.
 ///
@@ -283,11 +284,11 @@ class _ShareMeetupScreenState extends ConsumerState<ShareMeetupScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
+      final user = ref.read(supabaseClientProvider).auth.currentUser;
       if (user == null) throw Exception('Not authenticated');
 
       // Save to Supabase
-      await Supabase.instance.client.from('shared_meetups').insert({
+      await ref.read(supabaseClientProvider).from('shared_meetups').insert({
         'user_id': user.id,
         'meeting_with': _meetingWithController.text.trim(),
         'location_name': _locationController.text.trim(),

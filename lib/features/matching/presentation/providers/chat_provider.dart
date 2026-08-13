@@ -5,6 +5,7 @@ import 'package:soloadventurer/features/matching/domain/entities/message.dart';
 import 'package:soloadventurer/features/matching/domain/entities/chat.dart';
 import 'matching_provider.dart';
 import 'connection_provider.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 part 'chat_provider.g.dart';
 
@@ -15,7 +16,7 @@ part 'chat_provider.g.dart';
 /// Provider for Supabase client
 @riverpod
 SupabaseClient supabaseClient(Ref ref) {
-  return Supabase.instance.client;
+  return ref.watch(supabaseClientProvider);
 }
 
 /// Real-time channel for a specific chat

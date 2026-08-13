@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soloadventurer/features/journal/data/services/shared_link_service_impl.dart';
 import 'package:soloadventurer/features/journal/domain/entities/shared_link.dart';
 import 'package:soloadventurer/features/journal/domain/services/shared_link_service.dart';
+import 'package:soloadventurer/core/providers/core_providers.dart';
 
 // Generated file
 part 'shared_link_providers.g.dart';
@@ -14,7 +15,7 @@ part 'shared_link_providers.g.dart';
 /// Provider for SharedLinkService
 @riverpod
 SharedLinkService sharedLinkService(Ref ref) {
-  final client = Supabase.instance.client;
+  final client = ref.watch(supabaseClientProvider);
   return SharedLinkServiceImpl(client: client);
 }
 
