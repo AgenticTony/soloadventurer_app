@@ -139,9 +139,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   }
 
   Widget _buildSignUpForm(BuildContext context, authState) {
-    // Note: With AsyncValue pattern, loading state is handled by .when() in build()
-    // When _buildSignUpForm is called, we're already in data state
-    const isLoading = false; // TODO: Wire up to actual loading state
+    // With AsyncValue, loading state is handled by the .when() pattern in build().
+    // When _buildSignUpForm is called, we're already in the data state — not loading.
+    const isLoading = false;
 
     return Scaffold(
       appBar: AppBar(
