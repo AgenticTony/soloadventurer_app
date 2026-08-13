@@ -193,13 +193,15 @@ class _FilterModalState extends ConsumerState<FilterModal> {
     final theme = Theme.of(context);
     final currentFilter = _tempFilter!;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
+    return Material(
+      // Flutter 3.47 asserts that ListTile's nearest Material ancestor paints
+      // its background/ink — a bare decorated Container hides ink splashes.
+      type: MaterialType.canvas,
+      color: theme.colorScheme.surface,
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.85,
+        child: Column(
         children: [
           // Handle bar
           _buildHandleBar(theme),
@@ -286,6 +288,7 @@ class _FilterModalState extends ConsumerState<FilterModal> {
           // Bottom action buttons
           _buildActionButtons(theme, currentFilter),
         ],
+        ),
       ),
     );
   }
