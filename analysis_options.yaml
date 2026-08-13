@@ -15,6 +15,14 @@ analyzer:
     # that are implemented in generated subclasses. The analyzer doesn't
     # recognize this pattern correctly, so we suppress this error.
     non_abstract_class_inherits_abstract_member: ignore
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 
 linter:
   # The lint rules applied to this project can be customized in the
