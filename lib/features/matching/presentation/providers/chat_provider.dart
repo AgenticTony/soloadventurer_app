@@ -480,12 +480,16 @@ Future<bool> womenOnlyModeEnabled(Ref ref) async {
 }
 
 /// Provider for checking if user can enable women-only mode
+///
+/// Free for all verified women (decision 2026-08-13): women-only mode is core
+/// strategy per FOUNDATIONS, not a premium toggle — paywalling the safety
+/// property that differentiates the product would make the safest experience
+/// the one fewest people have. Verification (Shufti ID check) is the natural
+/// gate. Monetize Guardian/concierge instead.
 @riverpod
 Future<bool> canEnableWomenOnlyMode(Ref ref) async {
   final repository = ref.watch(matchingRepositoryProvider);
-  final isVerified = await repository.isVerifiedForWomenOnly();
-  // TODO: Also check premium tier
-  return isVerified;
+  return repository.isVerifiedForWomenOnly();
 }
 
 /// Notifier for managing women-only mode

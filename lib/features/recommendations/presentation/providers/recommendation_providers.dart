@@ -12,6 +12,7 @@ import 'package:soloadventurer/features/recommendations/data/datasources/itinera
 import 'package:soloadventurer/features/recommendations/data/datasources/itinerary_local_data_source_impl.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/places_remote_data_source.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/places_remote_data_source_impl.dart';
+import 'package:soloadventurer/features/feature_flags/feature_flag_provider.dart';
 import 'package:soloadventurer/features/recommendations/data/datasources/recommendation_local_data_source.dart';
 import 'package:soloadventurer/features/recommendations/data/repositories/itinerary_repository_impl.dart';
 import 'package:soloadventurer/features/recommendations/data/repositories/places_repository_impl.dart';
@@ -36,7 +37,16 @@ part 'recommendation_providers.g.dart';
 /// In production, Google Places API integration should be completed.
 @riverpod
 PlacesRemoteDataSource placesRemoteDataSource(Ref ref) {
-  return PlacesRemoteDataSourceImpl();
+  // Decision 2026-08-13: the recommendations (Places) surface is flagged OFF
+  // for launch — PlacesRemoteDataSourceImpl serves mock data behind 6
+  // PRODUCTION TODOs. When the flag is off, wire the disabled source so no
+  // mock data is reachable in prod. Flip recommendationsSurfaceActive once
+  // the real Google Places integration lands.
+  final surfaceActive =
+      ref.watch(featureFlagsProvider).recommendationsSurfaceActive;
+  return surfaceActive
+      ? PlacesRemoteDataSourceImpl()
+      : DisabledPlacesRemoteDataSource();
 }
 
 /// Provider for places repository
