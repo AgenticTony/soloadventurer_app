@@ -4,6 +4,36 @@ This directory contains utility scripts for the SoloAdventurer app development p
 
 ## Available Scripts
 
+### 0. Release Preflight (`preflight.py`)
+
+Compares the **deployed** Supabase project against this repo. Every other gate
+here reads the repository, so this is the only one that can see drift between
+what is in the tree and what is actually running.
+
+**Checks:**
+
+- Edge functions deployed but absent from the repo (deleting a directory does not
+  undeploy a function — `verify-with-onfido` ran in production for a day after
+  its removal was "verified" by a grep gate)
+- Migration ledger vs migration files, in both directions (a version applied
+  out-of-band leaves the database right and its history wrong, and the next
+  `db push` fails on it)
+- Required edge-function secrets present; retired-vendor secrets absent
+- RLS enabled on every public table
+- `SECURITY DEFINER` functions executable by `anon`
+
+**Usage:**
+
+```bash
+python3 scripts/preflight.py            # report; exit 1 on any FAIL
+python3 scripts/preflight.py --strict   # also exit 1 on any SKIP
+python3 scripts/preflight.py --json     # machine-readable
+```
+
+Needs the Supabase CLI, authenticated and linked. The RLS and grant checks
+additionally need `SUPABASE_DB_URL`; without it they SKIP, and a SKIP is not a
+PASS. Run as step 1 of `docs/RELEASE.md`.
+
 ### 1. Performance Measurement (`measure_performance.dart`)
 
 A Dart utility for measuring and tracking performance metrics within the app.
