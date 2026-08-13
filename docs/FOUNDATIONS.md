@@ -39,7 +39,7 @@ From the playbook (Part 11.21), made specific to SoloAdventurer:
 
 | Property | What it means here |
 |---|---|
-| **Vetted + vertical** | Onfido ID verification + behavioral reputation. Solo travelers, one tribe, served deeply — not everyone. |
+| **Vetted + vertical** | Shufti Pro ID verification (document + face match) + behavioral reputation. Solo travelers, one tribe, served deeply — not everyone. |
 | **AI-moderated at creation** | Messages and meetup proposals screened *before* delivery, not after. Safety is a product feature, not a report queue. |
 | **Real-world action as the north star** | `meetups_completed` (and repeat meetups). Never time-in-app, sessions, or scrolls. |
 | **Subscription, not ads** | Sprint 6.6 paywall retained. AI value (guardian, concierge, flywheel matches) is the Pro tier. |
@@ -122,12 +122,12 @@ A durable decision log. Verdicts are grounded in the thesis; confidence in paren
 - **Riverpod 3 + Clean Architecture + Drift** (mobile) — solid foundation. *(high)*
 - **`generate-profile-embedding` (MiniLM 384-dim, on-edge)** — the spine limb. Extend, don't replace. *(high)*
 - **Safety pillar** (SOS, check-ins, `meetup_checkins`, `shared_meetups`, trusted contacts) — the differentiator and the trust scaffold for offline meeting. Elevate into the AI guardian. *(high)*
-- **Onfido verification** — core to "vetted." *(high)*
+- **ID verification** — core to "vetted." Provider is **Shufti Pro** (migrated from Onfido 2026-08-12, `docs/sprints/SHUFTI_MIGRATION_PLAN.md`); the schema is vendor-neutral (`verification_records.provider`), so the *capability* is what this KEEP entry protects, not the vendor. *(high)*
 - **Subscription paywall** (Sprint 6.6) — matches the thesis. *(high)*
 - **`graphql_flutter`** — used by the Viator destination client; scoped external-API use only. *(high, verified)*
 - **Viator affiliate** — transaction-monetization seed. *(med)*
 - **Drift offline/sync** — neutral-to-positive. *(med)*
-- **~4,950 tests (mobile 4487 / web 464)** — an asset. Refactor *around* them; do not throw them away.
+- **~5,060 tests (mobile 4542 green / web 516)** — an asset. Refactor *around* them; do not throw them away. Counts as of 2026-08-13; mobile also carries 63 known failures tracked by signature in `.claude/state/sprint-progress.json`.
 
 ### ⚠️ REFACTOR — exists but wrong shape for the thesis
 - **Matching ranker** — keep the *features* (date/activity/destination overlap) as model inputs; **replace the hand-tuned weights (`destination: 0.10`, country `0.5`, exact `1.0`) with outcome-trained scoring (L2)**. This is the #1 "AI becomes the spine" move. *(high)*

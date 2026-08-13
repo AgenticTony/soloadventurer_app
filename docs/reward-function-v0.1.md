@@ -23,12 +23,29 @@ function optimizes **real-world outcomes** only.
 Session length · scrolls · taps · feed impressions · DAU · time-in-app · any
 engagement proxy. These are **banned** from the reward function (FOUNDATIONS §6).
 
-## Deferred to v0.1.1 (pending table confirmation)
-- **− blocks** (`blocked_users`) and **− reports** (`reports` / `message_reports`):
-  penalty weighted by severity. Wiring deferred until those tables are confirmed
-  in the mobile schema and added to `reputation_score()`.
+## v0.1.1 — unblocked, not yet wired
+
+> **Corrected 2026-08-13.** This section deferred the block/report penalty
+> "pending table confirmation" and named `blocked_users` and `message_reports`.
+> Those are the **phantom** tables from Stories 0.6 / 0.7 — they never existed.
+> The confirmation had already happened; the answer was "these do not exist", and
+> the deferral was never revisited against the tables that *do*.
+>
+> Verified against prod 2026-08-13: `blocks` ✅ · `reports` ✅ ·
+> `blocked_users` ❌ · `message_reports` ❌.
+>
+> **The dependency is therefore satisfied.** Both signals are available now.
+
+- **− blocks** (`public.blocks`) and **− reports** (`public.reports`, polymorphic
+  via `target_id` + `target_type`): penalty weighted by severity. Ready to wire
+  into `reputation_score()`.
 - **+ repeat meetups** (same pair meeting again): a stronger positive signal than a
   first meetup. Needs a "repeat pair" count over `meetup_outcomes`.
+
+**Sequencing note.** The existing `−1` no-show penalty and any new block/report
+penalty are *negative reputation*, and `EXECUTION_ORDER` step 10 gates public
+negative reputation on **H.5's dispute design**. Wire the signals when ready, but
+surfacing them publicly waits on that sign-off.
 
 ## Why this is the moat
 Incumbents cannot retrain on meetup outcomes — they don't have this data. Every
