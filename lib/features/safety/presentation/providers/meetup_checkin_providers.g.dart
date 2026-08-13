@@ -58,7 +58,7 @@ final class MeetupCheckinRemoteDataSourceProvider extends $FunctionalProvider<
 }
 
 String _$meetupCheckinRemoteDataSourceHash() =>
-    r'dce53c71a7518e98ad9f4fad407905e714b5f9dc';
+    r'2215dfba6c907bbbfd2908c37ca652130776fa87';
 
 /// Provides the meetup check-in repository implementation
 
@@ -384,7 +384,7 @@ final class ActiveCheckinsNotifierProvider extends $AsyncNotifierProvider<
 }
 
 String _$activeCheckinsNotifierHash() =>
-    r'918ab1222210dd97674be36a2012d94750bbda3f';
+    r'04f7618f8e1406d84cfd44a6d8726150c8eb9044';
 
 /// Manages the list of active meetup check-ins with real-time updates
 

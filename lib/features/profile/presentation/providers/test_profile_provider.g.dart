@@ -61,4 +61,4 @@ final class TestProfileProvider
   }
 }
 
-String _$testProfileHash() => r'4efc52069b759e1bbbd2da7dce01dd3cdd18fac7';
+String _$testProfileHash() => r'890a0234979bc91e9aabc7bc92f9416f506b7b19';

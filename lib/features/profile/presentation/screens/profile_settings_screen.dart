@@ -367,8 +367,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'This mode requires identity verification and a premium subscription. '
-                          'You will only see and be visible to other verified women travelers.',
+                          'Free for every verified woman. Once your identity is '
+                          'verified, you will only see and be visible to other '
+                          'verified women travelers.',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
@@ -414,18 +415,27 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                             label: const Text('Start Verification'),
                           ),
                         ],
+                        // `enabled == null` means the status could not be read
+                        // (offline / signed out / read failed). Render that as
+                        // an explicit unknown rather than as "Disabled": the
+                        // mode may well be active, and it stays enforced
+                        // server-side either way.
                         SwitchListTile(
                           title: const Text('Enable Women-Only Mode'),
                           subtitle: Text(
-                            enabled
-                                ? 'Active - only verified women will see you'
-                                : 'Disabled',
+                            enabled == null
+                                ? 'Status unavailable — reconnect to view or change this'
+                                : enabled
+                                    ? 'Active - only verified women will see you'
+                                    : 'Disabled',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                              color: enabled == null
+                                  ? theme.colorScheme.error
+                                  : theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                          value: enabled,
-                          onChanged: canEnableValue
+                          value: enabled ?? false,
+                          onChanged: (canEnableValue && enabled != null)
                               ? (value) async {
                                   try {
                                     if (value) {

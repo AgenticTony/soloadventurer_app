@@ -63,7 +63,7 @@ final class ProfileRepositoryProvider extends $FunctionalProvider<
   }
 }
 
-String _$profileRepositoryHash() => r'e0b79caa98e6c3db5c45b5c2c21962bbdb20dfa3';
+String _$profileRepositoryHash() => r'3f776253463b8341e2cb05d9df7562161dd40b7c';
 
 @ProviderFor(getCurrentProfileUseCase)
 const getCurrentProfileUseCaseProvider = GetCurrentProfileUseCaseProvider._();

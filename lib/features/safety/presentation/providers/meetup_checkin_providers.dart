@@ -10,6 +10,7 @@ import 'package:soloadventurer/features/safety/domain/usecases/create_meetup_che
 import 'package:soloadventurer/features/safety/domain/usecases/get_active_checkins_usecase.dart';
 import 'package:soloadventurer/features/safety/domain/usecases/trigger_sos_usecase.dart';
 import 'package:soloadventurer/core/providers/core_providers.dart';
+import 'package:soloadventurer/core/utils/error_mapping.dart';
 
 part 'meetup_checkin_providers.g.dart';
 
@@ -81,16 +82,60 @@ class ActiveCheckinsNotifier extends _$ActiveCheckinsNotifier {
     final useCase = ref.read(getActiveCheckinsUseCaseProvider);
     final checkins = await useCase();
 
-    // Subscribe to Supabase Realtime for meetup_checkins changes
     final userId = ref.watch(currentUserIdProvider);
     if (userId != null) {
-      ref.watch(supabaseClientProvider)
+      // Realtime keeps the active check-in list fresh. Two things this
+      // subscription must get right, because it did not before:
+      //
+      //  1. It is cancelled on dispose. Previously the StreamSubscription was
+      //     dropped on the floor, so every rebuild left a live listener behind.
+      //  2. It updates state directly instead of calling ref.invalidateSelf().
+      //     Invalidating from inside the listener re-ran build(), which opened
+      //     *another* subscription while the old one kept firing — each change
+      //     event multiplied the listener count for the rest of the session.
+      // Guards a late-arriving refresh: the notifier can be disposed while the
+      // use case below is still awaiting, and assigning `state` after that
+      // throws. Flipped in onDispose, which Riverpod runs before teardown.
+      var disposed = false;
+
+      final subscription = ref
+          .watch(supabaseClientProvider)
           .from('meetup_checkins')
           .stream(primaryKey: ['id'])
           .eq('user_id', userId)
-          .listen((List<Map<String, dynamic>> records) {
-        // Invalidate self on any change to refresh the list
-        ref.invalidateSelf();
+          .listen(
+            (_) async {
+              // Re-read through the use case so the domain mapping and any
+              // filtering stay in one place; the payload is only a signal that
+              // something changed.
+              try {
+                final refreshed = await useCase();
+                if (disposed) return;
+                state = AsyncValue.data(refreshed);
+              } catch (e, st) {
+                ErrorMapping.log(
+                  'ActiveCheckinsNotifier.refreshOnRealtimeEvent',
+                  e,
+                  stackTrace: st,
+                );
+                // Deliberately keep the previous list. A failed refresh is not
+                // evidence the check-ins ended, and blanking this surface would
+                // hide an active check-in from the person relying on it.
+              }
+            },
+            onError: (Object e, StackTrace st) {
+              ErrorMapping.log(
+                'ActiveCheckinsNotifier.realtime',
+                e,
+                stackTrace: st,
+              );
+              // Same reasoning: a dropped socket is not a state change.
+            },
+          );
+
+      ref.onDispose(() {
+        disposed = true;
+        subscription.cancel();
       });
     }
 

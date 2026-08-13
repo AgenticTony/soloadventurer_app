@@ -52,7 +52,7 @@ final class TagSupabaseClientProvider
   }
 }
 
-String _$tagSupabaseClientHash() => r'a8e848c86657267e44b53742ac981fb1555669e5';
+String _$tagSupabaseClientHash() => r'1e51fe7931eac7f045039396dd831f50aa4163c8';
 
 /// Provides the TagRemoteDataSource implementation
 

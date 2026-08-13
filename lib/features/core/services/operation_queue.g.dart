@@ -141,7 +141,7 @@ final class OperationQueueProvider
   OperationQueue create() => OperationQueue();
 }
 
-String _$operationQueueHash() => r'eacef1b171caed4ea6167c0ca87a86d2fdc1aa13';
+String _$operationQueueHash() => r'7c6aeba02d5618fc7948bdae3666dccc63f6dac3';
 
 /// A persistent priority queue for managing offline-capable operations.
 ///
