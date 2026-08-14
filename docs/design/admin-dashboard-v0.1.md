@@ -1,7 +1,7 @@
 # Admin Dashboard — design v0.1
 
-**Status:** Decision document. Not implemented. Needs sign-off on §8 before build.
-**Date:** 2026-08-14
+**Status:** Decision document. Not implemented. **§8 decisions answered 2026-08-14** — build may proceed on Phase 0.
+**Date:** 2026-08-14 (v0.2 — decisions folded in, agent triage added)
 **Safety-sensitive:** Yes — this is the one surface that can see everything.
 **Related:** `docs/design/no-show-dispute-v0.1.1.md` (its Phase 2 human review lands here) ·
 `docs/reward-function-v0.1.md` (the report penalty is inert until §4.3 ships) ·
@@ -102,10 +102,9 @@ Supabase Auth, same identity provider as the app, **plus a second factor for any
 role above `support`**. An admin session should be short-lived and re-auth'd for
 destructive verbs (§7).
 
-**Open question for §8:** whether admin accounts are separate identities from
-personal user accounts. Separate is cleaner — an admin browsing as themselves
-cannot accidentally act as a user, and revoking admin does not disturb a real
-profile — but it is more accounts to manage for a solo operator.
+**Decided (§8.1):** admin accounts are **separate identities** from personal user
+accounts. An admin browsing cannot act as a user by accident, and revoking admin
+never disturbs a real profile.
 
 ### 3.3 Authorisation in the database
 
@@ -227,43 +226,154 @@ The actions most likely to be wrong, coerced, or abused:
   and attributable.
 - **Grant admin roles** — `owner` only, always audited.
 
-**Open question for §8:** whether any of these should need two-person approval.
-For a solo operator that is impractical today; the schema should not preclude it.
+**Decided (§8):** no two-person approval — impractical for a solo operator.
+`admin_audit_log.detail` is jsonb, so an `approved_by` can be added later without
+migrating the audit shape.
 
 ---
 
-## 8. Decisions needed before build
+## 8. Decisions — answered 2026-08-14
 
-1. **Separate admin identities, or admin flags on personal accounts?**
-   (§3.2 — separate is safer, more overhead for one person.)
-2. **Separate app, or `/admin` in the web app?** (§6 — recommendation is separate.)
-3. **Who moderates, and what is the response expectation?** An SOS view is only
-   as useful as the person watching it. A solo founder adjudicating harassment
-   reports on a women's-safety product is an operational and duty-of-care
-   commitment, not just a screen. What is the SLA when someone reports being
-   harassed at 02:00 in another timezone?
-4. **Do reads of PII/location get logged?** (§2 recommends yes — it costs write
-   volume and is unusual, so it should be a conscious choice.)
-5. **Two-person approval for irreversible actions?** (§7 — impractical now, but
-   decides whether the schema carries an `approved_by`.)
+| # | Question | Decision |
+|---|---|---|
+| 1 | Separate admin identities, or flags on personal accounts? | **Separate identities.** An admin browsing cannot act as a user by accident, and revoking admin never disturbs a real profile. |
+| 2 | Separate app, or `/admin` in web? | **Separate app.** Blast-radius isolation; no admin code in the public bundle. |
+| 3 | Who moderates, and what is the response expectation? | **AI agent performs initial triage; escalates to a human when it cannot resolve within its parameters.** Designed in §11. |
+| 4 | Log reads of PII / location? | **Yes.** Reads are audited as first-class events (§2 principle 2, §5). |
+| 5 | Two-person approval for irreversible actions? | **No** — impractical for a solo operator. `admin_audit_log.detail` keeps room for an `approved_by` so this can be added without a migration to the audit shape. |
+
+### 8.1 "Command centre" — one place to look, not one query
+
+The stated goal is a single surface where an admin can see everything. That is in
+real tension with §2's least-visibility principle, so the resolution is explicit:
+
+**One place to look; still purpose-shaped underneath.** A single dashboard
+aggregates panels — live safety, queues, alerts — and each panel shows the
+minimum needed to triage. Full detail (location history, message content, PII) is
+a deliberate drill-down, and drilling down is an audited read.
+
+The thing to avoid is not density. It is a surface that hands over everything about
+a person because someone glanced at a queue.
+
+## 9. Agent triage and escalation
+
+**Decision (§8.3):** an AI agent performs initial triage and escalates to a human
+when it cannot resolve within its parameters.
+
+This is the right shape for the charter — FOUNDATIONS §6.2 requires AI to live in
+the core loop (matching, safety, moderation, concierge) rather than be bolted on,
+and §4's L3 layer names a moderator agent explicitly. It is also the only honest
+answer to "who responds at 02:00" for a solo operator.
+
+Four constraints make the difference between triage that helps and automation that
+hurts.
+
+### 9.1 The agent triages; it never adjudicates
+
+Hard line:
+
+| Agent may | Agent may not |
+|---|---|
+| Classify a report (category, severity) | Set `reports.outcome` |
+| Gather context (history, prior reports, block counts) | Change anyone's reputation |
+| Rank and route the queue | Suspend, ban, or restrict an account |
+| Draft a recommendation with reasoning | Close a report as dismissed |
+| Escalate, and page a human | Decide that nothing needs a human |
+
+The reward function is described in FOUNDATIONS §4 as the ethical spine, and
+`reports.outcome` is now an input to it (reward-fn v0.1.1). An agent that could
+write `outcome` would be issuing automated punishment with no human in the loop.
+
+**Agent proposes, human disposes** — for anything that writes a penalty.
+
+Concretely: the agent writes to a `report_triage` record (classification,
+severity, recommendation, reasoning, confidence). `adjudicate_report` stays a
+human-only verb. A dismissal is still a decision, so "dismiss" is not the agent's
+to make either.
+
+### 9.2 SOS is not triaged
+
+An unacknowledged `sos_alerts` row pages a human **immediately and always**. There
+is no version of "the agent investigates first" that is appropriate when someone
+has pressed an emergency button.
+
+The agent may *enrich* an SOS — pull location, battery, trip context, which
+contacts were notified — but enrichment runs in parallel with the page, never
+ahead of it.
+
+### 9.3 Escalation thresholds are the safety design
+
+The parameters are not configuration; they are where this succeeds or fails. Two
+failure modes, asymmetric in cost:
+
+- **Under-escalation** leaves a harassed user unanswered — the exact failure this
+  whole document exists to prevent.
+- **Over-escalation** pages a human for everything, making the agent pointless.
+
+Under-escalation is far more expensive than over-escalation, so the threshold
+should be **deliberately biased toward paging a human**, especially early. Escalate
+on any of:
+
+- any report mentioning physical safety, threats, sexual content, or minors —
+  regardless of the agent's confidence
+- agent confidence below threshold
+- a repeat target (a user already carrying upheld reports or `risk_flag`)
+- **anything the agent has not seen before** — novelty is a reason to escalate, not
+  a reason to guess
+- any report where the reporter is in an active or recent meetup with the target
+
+**Time-to-human is the metric to instrument**, not agent resolution rate. A high
+resolution rate is as likely to mean the agent is swallowing things as solving
+them.
+
+### 9.4 The agent reads attacker-controlled text
+
+Report text, message content and profile bios are **untrusted input**. An agent
+that can be talked into dismissing a report by instructions embedded in the report
+itself is a real and reachable attack on this product.
+
+Requirements:
+
+- User content is passed as **data, never as instruction**, with clear delimiting.
+- The agent has **no destructive tools**. Its capability surface is: read context,
+  write a triage record, escalate. Even if fully subverted, the worst it can do is
+  misclassify and over-page.
+- Content that attempts to instruct the agent is itself an **escalation trigger** —
+  someone crafting prompt injection is displaying intent worth a human's attention.
+- Triage records are auditable and reversible; a bad prompt version can be
+  identified and its whole batch re-triaged.
+
+### 9.5 Agent actions are audited as agent actions
+
+`admin_audit_log.actor_id` assumes a human. Agent entries record the agent as
+actor plus, in `detail`: model, prompt version, confidence, and the inputs it
+saw. Without prompt version, a systematically bad batch cannot be found and
+re-run.
+
+**Paging is a build item, not a dashboard feature.** A command centre nobody is
+looking at at 02:00 does not answer the question this section exists for; the
+escalation path needs a real channel (push, SMS, PagerDuty) with an
+acknowledgement loop. That belongs in Phase 1 alongside the live-safety view.
 
 ---
 
-## 9. Proposed sequencing
+## 10. Proposed sequencing
 
 | Phase | Ships | Why here |
 |---|---|---|
 | **0 — Foundation** | `admin_users`, `admin_role`, `is_admin()`, `admin_audit_log`, RLS clauses, pgTAP | Nothing else can be built safely first. Also unblocks 4.3 from any surface, including a script. |
-| **1 — Live safety** | SOS + missed check-in views, acknowledge/resolve verbs | The only slice where blindness has a real-world cost |
+| **1 — Live safety + paging** | SOS + missed check-in views, acknowledge/resolve verbs, **and the escalation channel** (§9.5) | The only slice where blindness has a real-world cost. A dashboard without paging does not answer the 02:00 question. |
 | **2 — Reports + user context** | Adjudication with the context to adjudicate *on* | Turns the v0.1.1 penalty live; 4.4 is a prerequisite for 4.3 being correct |
 | **3 — Verification queue** | Review, override with reason | Needs the strictest controls, so it goes last |
+| **4 — Agent triage** | Classification, context-gathering, recommendation, escalation (§9) | Needs phases 1–2 to exist first: the agent escalates *into* the human queues, so the queues must be real before the agent routes to them. |
 
 Phase 0 is small and is the prerequisite for everything, including the
-report-penalty activation. Phases 1–3 are independently shippable.
+report-penalty activation. Phases 1–3 are independently shippable; Phase 4 is not,
+since the agent escalates into queues that phases 1–2 create.
 
 ---
 
-## 10. Consequences if this is not built
+## 11. Consequences if this is not built
 
 Stated plainly, so deferring is a choice rather than an oversight:
 
@@ -273,3 +383,5 @@ Stated plainly, so deferring is a choice rather than an oversight:
 - The reward-fn v0.1.1 report penalty stays permanently zero, so filing a report
   has no effect on reputation.
 - `no-show-dispute-v0.1.1.md` Phase 2 (human review) has nowhere to live.
+- The agent triage in §9 has nothing to escalate *into*, so the 02:00 answer stays
+  theoretical.
