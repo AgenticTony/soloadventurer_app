@@ -1,6 +1,6 @@
 # Admin Dashboard — design v0.1
 
-**Status:** §8 decisions answered 2026-08-14. **Phases 0 and 1 shipped**; phases 2–4 not started.
+**Status:** §8 decisions answered 2026-08-14. **Phases 0–2 shipped** (backend); phases 3–4 not started.
 **Date:** 2026-08-14 (v0.2 — decisions folded in, agent triage added)
 **Safety-sensitive:** Yes — this is the one surface that can see everything.
 **Related:** `docs/design/no-show-dispute-v0.1.1.md` (its Phase 2 human review lands here) ·
@@ -363,7 +363,7 @@ acknowledgement loop. That belongs in Phase 1 alongside the live-safety view.
 |---|---|---|
 | **0 — Foundation** ✅ | `admin_users`, `admin_role`, `is_admin()`, `admin_audit_log`, `log_admin_action()`, admin-read RLS, 18 pgTAP | **Shipped** `20260814100000_admin_foundation.sql`. |
 | **1 — Live safety + paging** ✅ *(backend)* | `admin_live_safety_queue`, acknowledge/resolve/annotate verbs, `admin_escalations` queue + cron, `dispatch-escalations` edge function, 16 pgTAP | **Backend shipped** `20260814200000_admin_live_safety.sql`. **The console UI is not built** — paging works without it, which is the point. |
-| **2 — Reports + user context** | Adjudication with the context to adjudicate *on* | Turns the v0.1.1 penalty live; 4.4 is a prerequisite for 4.3 being correct |
+| **2 — Reports + user context** ✅ *(backend)* | `admin_reports_queue`, `admin_user_context()`, `adjudicate_report()`, 17 pgTAP | **Shipped** `20260814300000_admin_reports_and_context.sql`. The v0.1.1 report penalty is now live — `adjudicate_report` is the only path that can set `reports.outcome`. |
 | **3 — Verification queue** | Review, override with reason | Needs the strictest controls, so it goes last |
 | **4 — Agent triage** | Classification, context-gathering, recommendation, escalation (§9) | Needs phases 1–2 to exist first: the agent escalates *into* the human queues, so the queues must be real before the agent routes to them. |
 
