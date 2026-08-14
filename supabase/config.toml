@@ -340,3 +340,9 @@ s3_region = "env(S3_REGION)"
 s3_access_key = "env(S3_ACCESS_KEY)"
 # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
 s3_secret_key = "env(S3_SECRET_KEY)"
+
+# dispatch-escalations: verify_jwt=false because a scheduler calls this, not a
+# user session. It authenticates with the WEBHOOK_SECRET header instead — the
+# same pattern process-safety-alert uses.
+[functions.dispatch-escalations]
+verify_jwt = false
