@@ -18,6 +18,13 @@ what is in the tree and what is actually running.
 - Migration ledger vs migration files, in both directions (a version applied
   out-of-band leaves the database right and its history wrong, and the next
   `db push` fails on it)
+- **Destructive statements in migrations that have not run yet** — `DROP TABLE`,
+  `DROP COLUMN`, `TRUNCATE`, unqualified `DELETE`, `DROP SCHEMA`. Added after a
+  near miss: an unapplied, uncommitted migration opened with
+  `drop table if exists public.waitlist_entries cascade` while that table was
+  already live in production holding real signups. The ledger check reported the
+  drift and said nothing about the danger — a migration that replays harmlessly
+  and one that drops a populated table look identical to it
 - Required edge-function secrets present; retired-vendor secrets absent
 - RLS enabled on every public table
 - `SECURITY DEFINER` functions executable by `anon`

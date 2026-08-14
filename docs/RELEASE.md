@@ -34,8 +34,12 @@ python3 scripts/preflight.py
 ```
 
 Compares the deployed project against the tree: orphaned edge functions, migration
-ledger drift, required and retired-vendor secrets, RLS coverage, anon-executable
-`SECURITY DEFINER` functions.
+ledger drift, **destructive statements in unapplied migrations**, required and
+retired-vendor secrets, RLS coverage, anon-executable `SECURITY DEFINER` functions.
+
+The destructive check exists because drift alone is not the danger — drift *plus*
+a `DROP` is. An unapplied migration whose objects are already live will replay
+against real rows.
 
 - [ ] Preflight exits `0`
 - [ ] **No check reported SKIP.** A skip is not a pass. The RLS and grant checks

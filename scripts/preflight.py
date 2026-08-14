@@ -238,6 +238,83 @@ def check_migrations() -> Check:
 
 
 # ---------------------------------------------------------------------------
+# 2b. Destructive statements in unapplied migrations
+# ---------------------------------------------------------------------------
+# Added 2026-08-14, after a near miss the ledger check could not have caught.
+#
+# `20260813100000_create_waitlist_entries.sql` sat unapplied *and* uncommitted
+# while its objects were already live in production. Its first statement was
+# `drop table if exists public.waitlist_entries cascade`, and prod held two real
+# signups. The next `supabase db push` would have replayed it and deleted them.
+#
+# check_migrations() reported the drift correctly and said nothing about the
+# danger: a migration that replays harmlessly and one that drops a populated
+# table look identical to it. Drift plus destructiveness is the combination that
+# actually costs data, so this check looks for the second half.
+
+DESTRUCTIVE = [
+    (re.compile(r"^\s*drop\s+table\b", re.I | re.M), "DROP TABLE"),
+    (re.compile(r"^\s*truncate\b", re.I | re.M), "TRUNCATE"),
+    (re.compile(r"\balter\s+table\b[^;]*?\bdrop\s+column\b", re.I | re.S), "DROP COLUMN"),
+    (re.compile(r"^\s*delete\s+from\b(?![^;]*\bwhere\b)", re.I | re.M), "unqualified DELETE"),
+    (re.compile(r"^\s*drop\s+schema\b", re.I | re.M), "DROP SCHEMA"),
+]
+
+
+def _strip_sql_comments(sql: str) -> str:
+    """Remove -- line and /* */ block comments so prose cannot trigger a match."""
+    sql = re.sub(r"/\*.*?\*/", " ", sql, flags=re.S)
+    sql = re.sub(r"--[^\n]*", " ", sql)
+    return sql
+
+
+def check_destructive_migrations() -> Check:
+    """Flag destructive statements in migrations that have NOT been applied yet.
+
+    Applied migrations are left alone: whatever they did, they already did it.
+    The risk is a pending file that will run against live data.
+    """
+    name = "No destructive statements pending in unapplied migrations"
+
+    if not MIGRATIONS_DIR.is_dir():
+        return Check(name, SKIP, "supabase/migrations/ not found")
+
+    code, out, err = run(["supabase", "migration", "list", "--linked"], timeout=120)
+    if code != 0:
+        return Check(name, SKIP, f"supabase migration list failed: {err.strip() or out.strip()}")
+
+    payload = parse_cli_json(out)
+    if payload is None:
+        return Check(name, SKIP, "could not parse JSON from `supabase migration list`")
+
+    applied = {r["remote"] for r in payload.get("migrations", []) if r.get("remote")}
+
+    findings: list[str] = []
+    for f in sorted(MIGRATIONS_DIR.glob("*.sql")):
+        m = re.match(r"(\d{14})_", f.name)
+        if not m or m.group(1) in applied:
+            continue
+        body = _strip_sql_comments(f.read_text(errors="replace"))
+        for pattern, label in DESTRUCTIVE:
+            if pattern.search(body):
+                findings.append(f"{f.name}: {label}")
+
+    if findings:
+        return Check(
+            name,
+            FAIL,
+            f"{len(findings)} destructive statement(s) in migrations that have not run yet. "
+            f"If the objects already exist in production with data, `db push` will "
+            f"replay these against live rows. Make the migration idempotent, or "
+            f"`supabase migration repair --status applied <version>` if it was "
+            f"applied out of band.",
+            findings,
+        )
+
+    return Check(name, PASS, "no destructive statements pending")
+
+
+# ---------------------------------------------------------------------------
 # 3. Required secrets
 # ---------------------------------------------------------------------------
 def check_secrets() -> Check:
@@ -360,7 +437,14 @@ def check_anon_secdef() -> Check:
 # ---------------------------------------------------------------------------
 # Report
 # ---------------------------------------------------------------------------
-CHECKS = [check_functions, check_migrations, check_secrets, check_rls, check_anon_secdef]
+CHECKS = [
+    check_functions,
+    check_migrations,
+    check_destructive_migrations,
+    check_secrets,
+    check_rls,
+    check_anon_secdef,
+]
 
 GLYPH = {PASS: "PASS", FAIL: "FAIL", SKIP: "SKIP"}
 
